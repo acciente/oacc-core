@@ -1,0 +1,179 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
+                            http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+    <modelVersion>4.0.0</modelVersion>
+
+    <!-- artifact identification -->
+    <groupId>com.acciente.rsf</groupId>
+    <artifactId>acciente-rsf-core</artifactId>
+    <version>2.0.0-SNAPSHOT</version>
+    <packaging>jar</packaging>
+
+    <properties>
+        <!-- Dependency versions -->
+        <jasypt.version>1.9.2</jasypt.version>
+        <junit.version>4.11</junit.version>
+        <hamcrest-core.version>1.3</hamcrest-core.version>
+
+        <!-- Maven plugin versions -->
+        <maven-compiler-plugin.version>3.1</maven-compiler-plugin.version>
+        <maven-source-plugin.version>2.3</maven-source-plugin.version>
+        <maven-javadoc-plugin.version>2.1</maven-javadoc-plugin.version>
+        <maven-surefire-plugin.version>2.17</maven-surefire-plugin.version>
+
+        <!-- Don't compile tests automatically since they assume a test db is already setup -->
+        <maven.test.skip>true</maven.test.skip>
+    </properties>
+
+    <!-- project information -->
+    <name>Acciente Resource Security Framework (RSF)</name>
+    <description>RSF is a high-performance access control system for Java applications. RSF provides fine grained
+        permissions based access control for application objects. It has support for hierarchical domains,
+        super users, permission inheritance and impersonation.
+    </description>
+
+    <!-- dependencies -->
+    <dependencies>
+        <!-- compile time -->
+        <dependency>
+            <groupId>org.jasypt</groupId>
+            <artifactId>jasypt</artifactId>
+            <version>${jasypt.version}</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>${junit.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.hamcrest</groupId>
+            <artifactId>hamcrest-core</artifactId>
+            <version>${hamcrest-core.version}</version>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+    <!-- shared project information -->
+    <url>http://www.resourcesecurityframework.org</url>
+    <inceptionYear>2014</inceptionYear>
+    <licenses>
+        <license>
+            <name>Apache License 2.0</name>
+            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+            <distribution>manual</distribution>
+            <comments>Commercial-friendly, open-source license</comments>
+        </license>
+    </licenses>
+    <organization>
+        <name>Acciente, LLC</name>
+        <url>http://www.acciente.com</url>
+    </organization>
+    <developers>
+        <developer>
+            <id>adinath</id>
+            <name>Adinath Raveendra Raj</name>
+            <organization>Acciente, LLC</organization>
+            <organizationUrl>http://www.acciente.com</organizationUrl>
+            <timezone>-7</timezone>
+        </developer>
+        <developer>
+            <id>fabian</id>
+            <name>Fabian Spinnenhirn</name>
+            <organization>Acciente, LLC</organization>
+            <organizationUrl>http://www.acciente.com</organizationUrl>
+            <timezone>-7</timezone>
+        </developer>
+    </developers>
+
+    <!-- profile to build for jdk1.7 -->
+    <profiles>
+        <profile>
+            <id>jdk1_7</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <!-- export a property with the JDK version for use in the build section -->
+            <properties>
+                <jdk-version>jdk1_7</jdk-version>
+            </properties>
+            <!-- compiler settings -->
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-compiler-plugin</artifactId>
+                        <version>${maven-compiler-plugin.version}</version>
+                        <configuration>
+                            <source>1.7</source>
+                            <target>1.7</target>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
+
+    <!-- shared build settings -->
+    <build>
+        <outputDirectory>target/classes-${jdk-version}</outputDirectory>
+        <testOutputDirectory>target/test-classes-${jdk-version}</testOutputDirectory>
+        <!-- we want the jar with the classes to have the JDK suffix -->
+        <finalName>${project.artifactId}-${project.version}-${jdk-version}</finalName>
+        <plugins>
+            <!-- configure the maven source plugin to make a source jar in the package phase -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-source-plugin</artifactId>
+                <version>${maven-source-plugin.version}</version>
+                <configuration>
+                    <!-- we want the jar with the sources to NOT have the JDK suffix -->
+                    <finalName>${project.artifactId}-${project.version}</finalName>
+                </configuration>
+            </plugin>
+            <!-- configure the javadoc plugin to make a javadoc jar in the package phase -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <version>${maven-javadoc-plugin.version}</version>
+                <configuration>
+                    <!-- we want the jar with the javadocs to NOT have the JDK suffix -->
+                    <finalName>${project.artifactId}-${project.version}</finalName>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>${maven-surefire-plugin.version}</version>
+                <configuration>
+                    <includes>
+                        <include>**/Test_RSF_Resource.java</include>
+                        <include>**/TestSQLAccessControlSystemInitializer.java</include>
+                        <include>**/TestResourcePermission.java</include>
+                        <include>**/TestDomainPermission.java</include>
+                        <include>**/TestAccessControl_*.java</include>
+                    </includes>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
+    <!-- shared reporting settings -->
+    <reporting>
+        <plugins>
+            <!-- javadoc plugin settings -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <version>${maven-javadoc-plugin.version}</version>
+                <configuration>
+                    <header>
+                        <![CDATA[<a href="http://www.resourcesecurityframework.org" target="_top">Return to www.resourcesecurityframework.org</a>]]></header>
+                </configuration>
+            </plugin>
+        </plugins>
+    </reporting>
+</project>
