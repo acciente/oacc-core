@@ -20,7 +20,7 @@
         <!-- Maven plugin versions -->
         <maven-compiler-plugin.version>3.1</maven-compiler-plugin.version>
         <maven-source-plugin.version>2.3</maven-source-plugin.version>
-        <maven-javadoc-plugin.version>2.1</maven-javadoc-plugin.version>
+        <maven-javadoc-plugin.version>2.10.1</maven-javadoc-plugin.version>
         <maven-surefire-plugin.version>2.17</maven-surefire-plugin.version>
 
         <!-- Don't compile tests automatically since they assume a test db is already setup -->
@@ -142,6 +142,7 @@
                 <configuration>
                     <!-- we want the jar with the javadocs to NOT have the JDK suffix -->
                     <finalName>${project.artifactId}-${project.version}</finalName>
+                    <outputDirectory>target/apidocs-${project.version}</outputDirectory>
                 </configuration>
             </plugin>
             <plugin>
@@ -171,7 +172,8 @@
                 <version>${maven-javadoc-plugin.version}</version>
                 <configuration>
                     <header>
-                        <![CDATA[<a href="http://www.resourcesecurityframework.org" target="_top">Return to www.resourcesecurityframework.org</a>]]></header>
+                        <![CDATA[<a href="http://www.resourcesecurityframework.org" target="_top">Return to www.resourcesecurityframework.org</a>]]>
+                    </header>
                 </configuration>
             </plugin>
         </plugins>
