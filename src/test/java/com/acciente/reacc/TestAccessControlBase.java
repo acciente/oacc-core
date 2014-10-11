@@ -177,10 +177,10 @@ public class TestAccessControlBase {
       systemAccessControlContext.setDomainCreatePermissions(accessorResource, domainCreatePermissions);
    }
 
-   protected void grantResourceClassCreatePermission(Resource accessorResource,
-                                                     String resourceClassName,
-                                                     String domainName,
-                                                     String... permissionNames) throws AccessControlException {
+   protected void grantResourceCreatePermission(Resource accessorResource,
+                                                String resourceClassName,
+                                                String domainName,
+                                                String... permissionNames) throws AccessControlException {
       authenticateSystemAccessControlContext();
       Set<ResourceCreatePermission> resourceCreatePermissions = new HashSet<>();
       resourceCreatePermissions.add(ResourceCreatePermission.getInstance(ResourceCreatePermission.CREATE, false));

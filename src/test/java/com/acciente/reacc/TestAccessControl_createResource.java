@@ -54,7 +54,7 @@ public class TestAccessControl_createResource extends TestAccessControlBase {
       final Resource authenticatedResource = generateResourceAndAuthenticate();
       final String permissionName = generateResourceClassPermission(resourceClassName);
       final ResourcePermission grantedResourcePermission = ResourcePermission.getInstance(permissionName);
-      grantResourceClassCreatePermission(authenticatedResource, resourceClassName, domainName, permissionName);
+      grantResourceCreatePermission(authenticatedResource, resourceClassName, domainName, permissionName);
 
       Set<Resource> resourcesByPermission = accessControlContext.getResourcesByResourcePermission(resourceClassName, grantedResourcePermission);
       assertThat(resourcesByPermission.isEmpty(), is(true));
@@ -90,7 +90,7 @@ public class TestAccessControl_createResource extends TestAccessControlBase {
 
       // set up an authenticatable resource with resource class create permission
       final Resource authenticatedResource = generateResourceAndAuthenticate();
-      grantResourceClassCreatePermission(authenticatedResource, resourceClassName, domainName);
+      grantResourceCreatePermission(authenticatedResource, resourceClassName, domainName);
 
       final ResourcePermission implicitResourcePermission = ResourcePermission.getInstance(permissionName);
       final ResourcePermission implicitResourcePermission2 = ResourcePermission.getInstance(permissionName2);
@@ -126,7 +126,7 @@ public class TestAccessControl_createResource extends TestAccessControlBase {
       final String domainName = accessControlContext.getDomainNameByResource(authenticatedResource);
       final String permissionName = generateResourceClassPermission(resourceClassName);
       final ResourcePermission grantedResourcePermission = ResourcePermission.getInstance(permissionName);
-      grantResourceClassCreatePermission(authenticatedResource, resourceClassName, domainName, permissionName);
+      grantResourceCreatePermission(authenticatedResource, resourceClassName, domainName, permissionName);
 
       Set<Resource> resourcesByPermission = accessControlContext.getResourcesByResourcePermission(resourceClassName, grantedResourcePermission);
       assertThat(resourcesByPermission.isEmpty(), is(true));
@@ -149,7 +149,7 @@ public class TestAccessControl_createResource extends TestAccessControlBase {
       final Resource authenticatedResource = generateResourceAndAuthenticate();
       final String permissionName = generateResourceClassPermission(resourceClassName);
       final ResourcePermission grantedResourcePermission = ResourcePermission.getInstance(permissionName);
-      grantResourceClassCreatePermission(authenticatedResource, resourceClassName, domainName, permissionName);
+      grantResourceCreatePermission(authenticatedResource, resourceClassName, domainName, permissionName);
 
       Set<Resource> resourcesByPermission = accessControlContext.getResourcesByResourcePermission(resourceClassName, grantedResourcePermission);
       assertThat(resourcesByPermission.isEmpty(), is(true));
@@ -195,10 +195,10 @@ public class TestAccessControl_createResource extends TestAccessControlBase {
          // and an extra permission in each domain/class combo, so that we can look up
          // the resources later via that permission
          final Resource authenticatedResource = generateResourceAndAuthenticate();
-         grantResourceClassCreatePermission(authenticatedResource, resourceClass_lower, domain_lower, permissionName);
-         grantResourceClassCreatePermission(authenticatedResource, resourceClass_lower, domain_UPPER, permissionName);
-         grantResourceClassCreatePermission(authenticatedResource, resourceClass_UPPER, domain_lower, permissionName);
-         grantResourceClassCreatePermission(authenticatedResource, resourceClass_UPPER, domain_UPPER, permissionName);
+         grantResourceCreatePermission(authenticatedResource, resourceClass_lower, domain_lower, permissionName);
+         grantResourceCreatePermission(authenticatedResource, resourceClass_lower, domain_UPPER, permissionName);
+         grantResourceCreatePermission(authenticatedResource, resourceClass_UPPER, domain_lower, permissionName);
+         grantResourceCreatePermission(authenticatedResource, resourceClass_UPPER, domain_UPPER, permissionName);
          final ResourcePermission grantedResourcePermission_lower = ResourcePermission.getInstance(permissionName);
          final ResourcePermission grantedResourcePermission_UPPER = ResourcePermission.getInstance(permissionName);
 
@@ -239,7 +239,7 @@ public class TestAccessControl_createResource extends TestAccessControlBase {
          // set up an authenticatable resource with resource class create permission
          // so that we can look up the resources later via that permission
          final Resource authenticatedResource = generateResourceAndAuthenticate();
-         grantResourceClassCreatePermission(authenticatedResource, resourceClass_lower, domain_lower, permissionName);
+         grantResourceCreatePermission(authenticatedResource, resourceClass_lower, domain_lower, permissionName);
          final ResourcePermission grantedResourcePermission = ResourcePermission.getInstance(permissionName);
 
          Set<Resource> resourcesByPermission;
