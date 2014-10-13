@@ -1,16 +1,16 @@
-Resource Security Framework (RSF) 
-=================================
+REACC Framework
+===============
 
 ## Overview
-Resource Security Framework (RSF) is a high-performance access control API that provides _permission based_ authorization services for Java application objects. 
+REACC is a Java Application Security Framework. REACC is acronym for Resource ACCess Control. REACC provides a high-performance access control API that provides _permission based_ authorization services for Java application objects.
 It has support for hierarchical domains, super users, permission inheritance and impersonation.
 
-In a nutshell, RSF allows your application to enforce security by answering the question: 
+In a nutshell, REACC allows your application to enforce security by answering the question:
 
     Is entity 'A' allowed to perform action 'p' on entity 'B'?
 
 ## Design Goals
-The key design goals of RSF are to:
+The key design goals of REACC are to:
 
 - **simplify** the maintenance of complex, real world security topologies
 
@@ -25,20 +25,20 @@ The key design goals of RSF are to:
 
 
 ## Supported Environments
-RSF persists all security relationships in database tables and currently supports the following databases:
+REACC persists all security relationships in database tables and currently supports the following databases:
 
 - IBM DB2 10.5
 - Microsoft SQL Server 12.0 (2014)
 - Oracle 11g R2
 - PostgreSQL 9.3
 
-RSF is compatible with Java&#8482; SE 7 (Java&#8482; version 1.7.0), or higher.
+REACC is compatible with Java&#8482; SE 7 (Java&#8482; version 1.7.0), or higher.
 
 ## License
-RSF is open source software released under the commercial friendly [Apache License, Version 2.0](http://www.apache.org/licenses/LICENSE-2.0).
+REACC is open source software released under the commercial friendly [Apache License, Version 2.0](http://www.apache.org/licenses/LICENSE-2.0).
 
 ## Documentation
-You can find more information about RSF, including the latest Javadocs, releases, and tutorials on the project website:
+You can find more information about REACC, including the latest Javadocs, releases, and tutorials on the project website:
 [resourcesecurityframework.org](http://resourcesecurityframework.org).
 
 ## About Acciente
