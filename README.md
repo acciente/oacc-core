@@ -1,4 +1,4 @@
-REACC (Resource ACCess Control) Framework
+REACC (REsource ACcess Control) Framework
 =========================================
 
 ## Overview
