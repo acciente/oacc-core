@@ -1,8 +1,8 @@
-REACC (REsource ACcess Control) Framework
-=========================================
+REACC Framework
+===============
 
 ## Overview
-REACC is an advanced Java Application Security Framework. REACC provides a high-performance access control API that provides _permission based_ authorization services for Java application objects.
+REACC (REsource ACcess Control) is an advanced Java Application Security Framework. REACC provides a high-performance access control API that provides _permission based_ authorization services for Java application objects.
 It has support for hierarchical domains, super users, permission inheritance and impersonation.
 
 In a nutshell, REACC allows your application to enforce security by answering the question:
