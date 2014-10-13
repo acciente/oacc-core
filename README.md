@@ -39,7 +39,7 @@ REACC is open source software released under the commercial friendly [Apache Lic
 
 ## Documentation
 You can find more information about REACC, including the latest Javadocs, releases, and tutorials on the project website:
-[resourcesecurityframework.org](http://resourcesecurityframework.org).
+[reaccframework.org](http://reaccframework.org).
 
 ## About Acciente
 [Acciente, LLC](http://www.acciente.com) is a software company located in Scottsdale, Arizona specializing in systems architecture and software design for medium to large scale software projects.

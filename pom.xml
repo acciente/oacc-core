@@ -58,7 +58,7 @@
     </dependencies>
 
     <!-- shared project information -->
-    <url>http://www.resourcesecurityframework.org</url>
+    <url>http://www.reaccframework.org</url>
     <inceptionYear>2014</inceptionYear>
     <licenses>
         <license>
@@ -172,7 +172,7 @@
                 <version>${maven-javadoc-plugin.version}</version>
                 <configuration>
                     <header>
-                        <![CDATA[<a href="http://www.resourcesecurityframework.org" target="_top">Return to www.resourcesecurityframework.org</a>]]>
+                        <![CDATA[<a href="http://www.reaccframework.org" target="_top">Return to www.reaccframework.org</a>]]>
                     </header>
                 </configuration>
             </plugin>
