@@ -257,7 +257,7 @@ public class TestAccessControl_assertPostCreateResourcePermission extends TestAc
       resourceCreatePermissions_forIntermediaryDomain.add(ResourceCreatePermission.getInstance(customPermission_forIntermediaryDomain, false));
       resourceCreatePermissions_forIntermediaryDomain.addAll(resourceCreatePermissions_forAccessorDomain);
       final Set<ResourceCreatePermission> allResourceCreatePermissionsForResourceClassAndIntermediaryDomain
-            = accessControlContext.getEffectiveResourceCreatePermissions(accessorResource, resourceClassName, accessedDomainName);
+            = accessControlContext.getEffectiveResourceCreatePermissions(accessorResource, resourceClassName, intermediaryDomainName);
       assertThat(allResourceCreatePermissionsForResourceClassAndIntermediaryDomain, is(resourceCreatePermissions_forIntermediaryDomain));
 
       // authenticate accessor/creator resource
@@ -271,6 +271,83 @@ public class TestAccessControl_assertPostCreateResourcePermission extends TestAc
          fail("asserting post-create resource permission for a domain-inherited create permission should have succeeded for authenticated resource");
       }
 
+      try {
+         accessControlContext.assertPostCreateResourcePermission(resourceClassName, customPermission_forAccessorDomain, accessedDomainName);
+      }
+      catch (AccessControlException e) {
+         fail("asserting post-create resource permission for a domain-inherited create permission (for a domain) should have succeeded for authenticated resource");
+      }
+      try {
+         accessControlContext.assertPostCreateResourcePermission(resourceClassName, customPermission_forIntermediaryDomain, accessedDomainName);
+      }
+      catch (AccessControlException e) {
+         fail("asserting post-create resource permission for a domain-inherited create permission (for a domain) should have succeeded for authenticated resource");
+      }
+   }
+
+   @Test
+   public void assertPostCreateResourcePermission_domainInheritedInherited_succeedsAsAuthenticatedResource() throws AccessControlException {
+      authenticateSystemResource();
+
+      final String resourceClassName = generateResourceClass(false, false);
+      final String customPermissionName_forAccessorDomain = generateResourceClassPermission(resourceClassName);
+      final String customPermissionName_forIntermediaryDomain = generateResourceClassPermission(resourceClassName);
+      final ResourcePermission customPermission_forAccessorDomain = ResourcePermission.getInstance(customPermissionName_forAccessorDomain);
+      final ResourcePermission customPermission_forIntermediaryDomain = ResourcePermission.getInstance(customPermissionName_forIntermediaryDomain);
+      final String password = generateUniquePassword();
+      final Resource accessorResource = generateAuthenticatableResource(password);
+      final String accessorDomainName = accessControlContext.getDomainNameByResource(accessorResource);
+      final Resource donorResource = accessControlContext.createResource(generateResourceClass(false, false),accessorDomainName);
+      final String intermediaryDomainName = generateUniqueDomainName();
+      final String accessedDomainName = generateUniqueDomainName();
+      accessControlContext.createDomain(intermediaryDomainName, accessorDomainName);
+      accessControlContext.createDomain(accessedDomainName, intermediaryDomainName);
+
+      // setup create permissions
+      grantResourceCreatePermission(donorResource, resourceClassName, accessorDomainName, customPermissionName_forAccessorDomain);
+      grantResourceCreatePermission(donorResource, resourceClassName, intermediaryDomainName, customPermissionName_forIntermediaryDomain);
+      // setup inheritance permission
+      Set<ResourcePermission> inheritanceResourcePermissions = new HashSet<>();
+      inheritanceResourcePermissions.add(ResourcePermission.getInstance(ResourcePermission.INHERIT));
+      accessControlContext.setResourcePermissions(accessorResource, donorResource, inheritanceResourcePermissions);
+
+      // verify permissions
+      Set<ResourceCreatePermission> resourceCreatePermissions_forDonorDomain = new HashSet<>();
+      resourceCreatePermissions_forDonorDomain.add(ResourceCreatePermission.getInstance(ResourceCreatePermission.CREATE, false));
+      resourceCreatePermissions_forDonorDomain.add(ResourceCreatePermission.getInstance(customPermission_forAccessorDomain, false));
+      final Set<ResourceCreatePermission> allResourceCreatePermissionsForResourceClassAndDonorDomain
+            = accessControlContext.getEffectiveResourceCreatePermissions(donorResource, resourceClassName, accessorDomainName);
+      assertThat(allResourceCreatePermissionsForResourceClassAndDonorDomain, is(resourceCreatePermissions_forDonorDomain));
+
+      Set<ResourceCreatePermission> resourceCreatePermissions_forIntermediaryDomain = new HashSet<>();
+      resourceCreatePermissions_forIntermediaryDomain.add(ResourceCreatePermission.getInstance(ResourceCreatePermission.CREATE, false));
+      resourceCreatePermissions_forIntermediaryDomain.add(ResourceCreatePermission.getInstance(customPermission_forIntermediaryDomain, false));
+      resourceCreatePermissions_forIntermediaryDomain.addAll(resourceCreatePermissions_forDonorDomain);
+      final Set<ResourceCreatePermission> allResourceCreatePermissionsForResourceClassAndIntermediaryDomain
+            = accessControlContext.getEffectiveResourceCreatePermissions(donorResource, resourceClassName, intermediaryDomainName);
+      assertThat(allResourceCreatePermissionsForResourceClassAndIntermediaryDomain, is(resourceCreatePermissions_forIntermediaryDomain));
+
+      final Set<ResourcePermission> allResourcePermissionsForAccessorResource
+            = accessControlContext.getEffectiveResourcePermissions(accessorResource, donorResource);
+      assertThat(allResourcePermissionsForAccessorResource, is(inheritanceResourcePermissions));
+
+      // authenticate accessor/creator resource
+      accessControlContext.authenticate(accessorResource, password);
+
+      // verify
+      try {
+         accessControlContext.assertPostCreateResourcePermission(resourceClassName, customPermission_forAccessorDomain);
+      }
+      catch (AccessControlException e) {
+         fail("asserting post-create resource permission for a domain-inherited create permission should have succeeded for authenticated resource");
+      }
+
+      try {
+         accessControlContext.assertPostCreateResourcePermission(resourceClassName, customPermission_forAccessorDomain, accessedDomainName);
+      }
+      catch (AccessControlException e) {
+         fail("asserting post-create resource permission for a domain-inherited create permission (for a domain) should have succeeded for authenticated resource");
+      }
       try {
          accessControlContext.assertPostCreateResourcePermission(resourceClassName, customPermission_forIntermediaryDomain, accessedDomainName);
       }
