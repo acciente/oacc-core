@@ -15,7 +15,7 @@
  * See the License for the specific language governing
  * permissions and limitations under the License.
  */
-package com.acciente.rsf;
+package com.acciente.reacc;
 
 import org.junit.Test;
 
@@ -24,8 +24,8 @@ import java.util.Set;
 
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.hasItem;
-import static org.hamcrest.CoreMatchers.hasItems;
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.core.IsCollectionContaining.hasItems;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 
@@ -225,12 +225,63 @@ public class TestAccessControl_assertPostCreateResourcePermission extends TestAc
 
    @Test
    public void assertPostCreateResourcePermission_domainInherited_succeedsAsAuthenticatedResource() throws AccessControlException {
-      fail("to be implemented");
+      authenticateSystemResource();
+
+      final String resourceClassName = generateResourceClass(false, false);
+      final String customPermissionName_forAccessorDomain = generateResourceClassPermission(resourceClassName);
+      final String customPermissionName_forIntermediaryDomain = generateResourceClassPermission(resourceClassName);
+      final ResourcePermission customPermission_forAccessorDomain = ResourcePermission.getInstance(customPermissionName_forAccessorDomain);
+      final ResourcePermission customPermission_forIntermediaryDomain = ResourcePermission.getInstance(customPermissionName_forIntermediaryDomain);
+      final String password = generateUniquePassword();
+      final Resource accessorResource = generateAuthenticatableResource(password);
+      final String accessorDomainName = accessControlContext.getDomainNameByResource(accessorResource);
+      final String intermediaryDomainName = generateUniqueDomainName();
+      final String accessedDomainName = generateUniqueDomainName();
+      accessControlContext.createDomain(intermediaryDomainName, accessorDomainName);
+      accessControlContext.createDomain(accessedDomainName, intermediaryDomainName);
+
+      // setup create permissions
+      grantResourceCreatePermission(accessorResource, resourceClassName, accessorDomainName, customPermissionName_forAccessorDomain);
+      grantResourceCreatePermission(accessorResource, resourceClassName, intermediaryDomainName, customPermissionName_forIntermediaryDomain);
+
+      // verify permissions
+      Set<ResourceCreatePermission> resourceCreatePermissions_forAccessorDomain = new HashSet<>();
+      resourceCreatePermissions_forAccessorDomain.add(ResourceCreatePermission.getInstance(ResourceCreatePermission.CREATE, false));
+      resourceCreatePermissions_forAccessorDomain.add(ResourceCreatePermission.getInstance(customPermission_forAccessorDomain, false));
+      final Set<ResourceCreatePermission> allResourceCreatePermissionsForResourceClassAndAccessorDomain
+            = accessControlContext.getEffectiveResourceCreatePermissions(accessorResource, resourceClassName, accessorDomainName);
+      assertThat(allResourceCreatePermissionsForResourceClassAndAccessorDomain, is(resourceCreatePermissions_forAccessorDomain));
+
+      Set<ResourceCreatePermission> resourceCreatePermissions_forIntermediaryDomain = new HashSet<>();
+      resourceCreatePermissions_forIntermediaryDomain.add(ResourceCreatePermission.getInstance(ResourceCreatePermission.CREATE, false));
+      resourceCreatePermissions_forIntermediaryDomain.add(ResourceCreatePermission.getInstance(customPermission_forIntermediaryDomain, false));
+      resourceCreatePermissions_forIntermediaryDomain.addAll(resourceCreatePermissions_forAccessorDomain);
+      final Set<ResourceCreatePermission> allResourceCreatePermissionsForResourceClassAndIntermediaryDomain
+            = accessControlContext.getEffectiveResourceCreatePermissions(accessorResource, resourceClassName, accessedDomainName);
+      assertThat(allResourceCreatePermissionsForResourceClassAndIntermediaryDomain, is(resourceCreatePermissions_forIntermediaryDomain));
+
+      // authenticate accessor/creator resource
+      accessControlContext.authenticate(accessorResource, password);
+
+      // verify
+      try {
+         accessControlContext.assertPostCreateResourcePermission(resourceClassName, customPermission_forAccessorDomain);
+      }
+      catch (AccessControlException e) {
+         fail("asserting post-create resource permission for a domain-inherited create permission should have succeeded for authenticated resource");
+      }
+
+      try {
+         accessControlContext.assertPostCreateResourcePermission(resourceClassName, customPermission_forIntermediaryDomain, accessedDomainName);
+      }
+      catch (AccessControlException e) {
+         fail("asserting post-create resource permission for a domain-inherited create permission (for a domain) should have succeeded for authenticated resource");
+      }
    }
 
    @Test
-   public void assertPostCreateResourcePermission_global_succeedsAsAuthenticatedResource() throws AccessControlException {
-      // special case where there we requested permission hasn't been granted as a create permission
+   public void assertPostCreateResourcePermission_globalOnly_succeedsAsAuthenticatedResource() throws AccessControlException {
+      // special case where the requested permission hasn't been granted as a create permission
       // but will be available from the granted global permissions on the resource class - domain tuple
       authenticateSystemResource();
 
@@ -287,6 +338,106 @@ public class TestAccessControl_assertPostCreateResourcePermission extends TestAc
       }
       catch (AccessControlException e) {
          fail("asserting post-create resource permission for a global permission (for a domain) should have succeeded for authenticated resource");
+      }
+   }
+
+   @Test
+   public void assertPostCreateResourcePermission_globalAndDirect_succeedsAsAuthenticatedResource() throws AccessControlException {
+      // special case where some of the requested permission haven't been granted as a create permission
+      // but will be available from the granted global permissions on the resource class - domain tuple
+      authenticateSystemResource();
+
+      final String resourceClassName = generateResourceClass(true, false);
+      final String globalPermissionName = generateResourceClassPermission(resourceClassName);
+      final String customPermissionName = generateResourceClassPermission(resourceClassName);
+      final ResourcePermission globalResourcePermission = ResourcePermission.getInstance(globalPermissionName);
+      final ResourcePermission customResourcePermission = ResourcePermission.getInstance(customPermissionName);
+      final ResourcePermission systemResourcePermission = ResourcePermission.getInstance(ResourcePermission.RESET_PASSWORD);
+      final String password = generateUniquePassword();
+      final Resource accessorResource = generateAuthenticatableResource(password);
+      final String accessorDomainName = accessControlContext.getDomainNameByResource(accessorResource);
+      // setup direct resource create permissions
+      Set<ResourceCreatePermission> resourceCreatePermissions = new HashSet<>();
+      final ResourceCreatePermission createPermission_create = ResourceCreatePermission.getInstance(ResourceCreatePermission.CREATE, false);
+      final ResourceCreatePermission createPermission_custom = ResourceCreatePermission.getInstance(customResourcePermission, false);
+      final ResourceCreatePermission createPermission_system = ResourceCreatePermission.getInstance(systemResourcePermission, false);
+      resourceCreatePermissions.add(createPermission_create);
+      resourceCreatePermissions.add(createPermission_custom);
+      resourceCreatePermissions.add(createPermission_system);
+      accessControlContext.setResourceCreatePermissions(accessorResource,
+                                                        resourceClassName,
+                                                        resourceCreatePermissions,
+                                                        accessorDomainName);
+      // setup global permission
+      Set<ResourcePermission> globalResourcePermissions = new HashSet<>();
+      globalResourcePermissions.add(globalResourcePermission);
+      accessControlContext.setGlobalResourcePermissions(accessorResource,
+                                                        resourceClassName,
+                                                        globalResourcePermissions,
+                                                        accessorDomainName);
+
+      // verify permissions
+      final Set<ResourceCreatePermission> allResourceCreatePermissionsForResourceClass
+            = accessControlContext.getEffectiveResourceCreatePermissions(accessorResource, resourceClassName, accessorDomainName);
+      assertThat(allResourceCreatePermissionsForResourceClass.isEmpty(), is(false));
+      assertThat(allResourceCreatePermissionsForResourceClass.size(), is(3));
+      assertThat(allResourceCreatePermissionsForResourceClass, hasItems(createPermission_create, createPermission_custom, createPermission_system));
+
+      final Set<ResourcePermission> allGlobalResourcePermissionsForResourceClass
+            = accessControlContext.getEffectiveGlobalResourcePermissions(accessorResource, resourceClassName, accessorDomainName);
+      assertThat(allGlobalResourcePermissionsForResourceClass.isEmpty(), is(false));
+      assertThat(allGlobalResourcePermissionsForResourceClass, hasItem(globalResourcePermission));
+
+      // authenticate accessor/creator resource
+      accessControlContext.authenticate(accessorResource, password);
+
+      // verify
+      try {
+         accessControlContext.assertPostCreateResourcePermission(resourceClassName,
+                                                                 globalResourcePermission);
+      }
+      catch (AccessControlException e) {
+         fail("asserting post-create resource permission for a global permission should have succeeded for authenticated resource");
+      }
+      try {
+         accessControlContext.assertPostCreateResourcePermission(resourceClassName,
+                                                                 customResourcePermission);
+      }
+      catch (AccessControlException e) {
+         fail("asserting post-create resource permission for a direct permission should have succeeded for authenticated resource");
+      }
+      try {
+         accessControlContext.assertPostCreateResourcePermission(resourceClassName,
+                                                                 systemResourcePermission);
+      }
+      catch (AccessControlException e) {
+         fail("asserting post-create resource permission for a system permission should have succeeded for authenticated resource");
+      }
+
+      // verify by domain
+      try {
+         accessControlContext.assertPostCreateResourcePermission(resourceClassName,
+                                                                 globalResourcePermission,
+                                                                 accessorDomainName);
+      }
+      catch (AccessControlException e) {
+         fail("asserting post-create resource permission for a global permission (for a domain) should have succeeded for authenticated resource");
+      }
+      try {
+         accessControlContext.assertPostCreateResourcePermission(resourceClassName,
+                                                                 customResourcePermission,
+                                                                 accessorDomainName);
+      }
+      catch (AccessControlException e) {
+         fail("asserting post-create resource permission for a direct permission (for a domain) should have succeeded for authenticated resource");
+      }
+      try {
+         accessControlContext.assertPostCreateResourcePermission(resourceClassName,
+                                                                 systemResourcePermission,
+                                                                 accessorDomainName);
+      }
+      catch (AccessControlException e) {
+         fail("asserting post-create resource permission for a system permission (for a domain) should have succeeded for authenticated resource");
       }
    }
 
