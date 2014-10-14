@@ -2943,47 +2943,41 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       return resourcePermissions;
    }
 
-   // shared asserts
+   // shared assets
 
    private void assertPasswordOK(String password)
          throws AccessControlException {
       if (password == null) {
-         throw new AccessControlException("Password expected, none specified",
-                                    true);
+         throw new AccessControlException("Password expected, none specified");
       }
 
       if (password.length() != password.trim().length()) {
-         throw new AccessControlException("Password may not contain leading/trailing spaces",
-                                    true);
+         throw new AccessControlException("Password may not contain leading/trailing spaces");
       }
 
       if (password.length() < 6) {
-         throw new AccessControlException("Password must have at least 6 characters",
-                                    true);
+         throw new AccessControlException("Password must have at least 6 characters");
       }
    }
 
    private void assertPasswordEmpty(String password)
          throws AccessControlException {
       if (password != null && !password.isEmpty()) {
-         throw new AccessControlException("Password not permitted for resources of specified class",
-                                    true);
+         throw new AccessControlException("Password not permitted for resources of specified class");
       }
    }
 
    private void assertDomainSpecified(String domainName)
          throws AccessControlException {
       if (domainName == null || domainName.trim().isEmpty()) {
-         throw new AccessControlException("Domain required, none specified",
-                                    true);
+         throw new AccessControlException("Domain required, none specified");
       }
    }
 
    private void assertParentDomainSpecified(String domainName)
          throws AccessControlException {
       if (domainName == null || domainName.isEmpty()) {
-         throw new AccessControlException("Parent domain required, none specified",
-                                    true);
+         throw new AccessControlException("Parent domain required, none specified");
       }
    }
 
