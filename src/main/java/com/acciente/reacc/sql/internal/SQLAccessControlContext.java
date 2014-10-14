@@ -2356,21 +2356,36 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
                                                      ResourcePermission requestedResourcePermission,
                                                      String domainName)
          throws AccessControlException {
-      final Set<ResourcePermission>
-            postCreateResourcePermissions = __getPostCreateResourcePermissions(__getEffectiveResourceCreatePermissions(connection,
-                                                                                                                       sessionResource,
-                                                                                                                       resourceClassName,
-                                                                                                                       domainName));
-      if (__containsIgnoringGrant(postCreateResourcePermissions, requestedResourcePermission)) {
-         return;
+      boolean createSysPermissionFound = false;
+      final Set<ResourceCreatePermission> effectiveResourceCreatePermissions
+            = __getEffectiveResourceCreatePermissions(connection,
+                                                      sessionResource,
+                                                      resourceClassName,
+                                                      domainName);
+
+      for (ResourceCreatePermission resourceCreatePermission : effectiveResourceCreatePermissions) {
+         if (resourceCreatePermission.isSystemPermission()
+               && ResourceCreatePermission.CREATE.equals(resourceCreatePermission.getSysPermissionName())) {
+            createSysPermissionFound = true;
+            break;
+         }
       }
 
-      if (__containsIgnoringGrant(__getEffectiveGlobalPermissions(connection,
-                                                                  sessionResource,
-                                                                  resourceClassName,
-                                                                  domainName),
-                                  requestedResourcePermission)) {
-         return;
+      if (createSysPermissionFound) {
+         final Set<ResourcePermission> postCreateResourcePermissions
+               = __getPostCreateResourcePermissions(effectiveResourceCreatePermissions);
+
+         if (__containsIgnoringGrant(postCreateResourcePermissions, requestedResourcePermission)) {
+            return;
+         }
+
+         if (__containsIgnoringGrant(__getEffectiveGlobalPermissions(connection,
+                                                                     sessionResource,
+                                                                     resourceClassName,
+                                                                     domainName),
+                                     requestedResourcePermission)) {
+            return;
+         }
       }
 
       if (__isSuperUserOfDomain(connection, domainName)) {
@@ -2378,8 +2393,13 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       }
 
       // if none of the above then complain...
-      throw new AccessControlException("No create permission: " + requestedResourcePermission,
-                                       true);
+      if (createSysPermissionFound) {
+         throw new AccessControlException("No create permission: " + requestedResourcePermission, true);
+      }
+      else {
+         throw new AccessControlException("No *CREATE permission to create any " + resourceClassName
+                                                + " resources in domain " + domainName, true);
+      }
    }
 
    @Override

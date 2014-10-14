@@ -91,7 +91,7 @@ public class TestAccessControl_assertPostCreateResourcePermission extends TestAc
       }
       catch (AccessControlException e) {
          assertThat(e.isNotAuthorizedError(), is(true));
-         assertThat(e.getMessage().toLowerCase(), containsString("no create permission"));
+         assertThat(e.getMessage().toLowerCase(), containsString("no *create permission"));
       }
 
       final String domainName = generateDomain();
@@ -106,7 +106,7 @@ public class TestAccessControl_assertPostCreateResourcePermission extends TestAc
       }
       catch (AccessControlException e) {
          assertThat(e.isNotAuthorizedError(), is(true));
-         assertThat(e.getMessage().toLowerCase(), containsString("no create permission"));
+         assertThat(e.getMessage().toLowerCase(), containsString("no *create permission"));
       }
    }
 
@@ -370,13 +370,13 @@ public class TestAccessControl_assertPostCreateResourcePermission extends TestAc
       final Resource accessorResource = generateAuthenticatableResource(password);
       final String accessorDomainName = accessControlContext.getDomainNameByResource(accessorResource);
       // setup create permission
-      Set<ResourceCreatePermission> resourceCreatePermissions = new HashSet<>();
-      final ResourceCreatePermission createPermission_create = ResourceCreatePermission.getInstance(ResourceCreatePermission.CREATE, false);
-      resourceCreatePermissions.add(createPermission_create);
-      accessControlContext.setResourceCreatePermissions(accessorResource,
-                                                        resourceClassName,
-                                                        resourceCreatePermissions,
-                                                        accessorDomainName);
+      //Set<ResourceCreatePermission> resourceCreatePermissions = new HashSet<>();
+      //final ResourceCreatePermission createPermission_create = ResourceCreatePermission.getInstance(ResourceCreatePermission.CREATE, false);
+      //resourceCreatePermissions.add(createPermission_create);
+      //accessControlContext.setResourceCreatePermissions(accessorResource,
+      //                                                  resourceClassName,
+      //                                                  resourceCreatePermissions,
+      //                                                  accessorDomainName);
       // setup global permission
       Set<ResourcePermission> globalResourcePermissions = new HashSet<>();
       globalResourcePermissions.add(globalResourcePermission);
@@ -388,9 +388,7 @@ public class TestAccessControl_assertPostCreateResourcePermission extends TestAc
       // verify permissions
       final Set<ResourceCreatePermission> allResourceCreatePermissionsForResourceClass
             = accessControlContext.getEffectiveResourceCreatePermissions(accessorResource, resourceClassName, accessorDomainName);
-      assertThat(allResourceCreatePermissionsForResourceClass.isEmpty(), is(false));
-      assertThat(allResourceCreatePermissionsForResourceClass.size(), is(1));
-      assertThat(allResourceCreatePermissionsForResourceClass, hasItem(createPermission_create));
+      assertThat(allResourceCreatePermissionsForResourceClass.isEmpty(), is(true));
 
       final Set<ResourcePermission> allGlobalResourcePermissionsForResourceClass
             = accessControlContext.getEffectiveGlobalResourcePermissions(accessorResource, resourceClassName, accessorDomainName);
