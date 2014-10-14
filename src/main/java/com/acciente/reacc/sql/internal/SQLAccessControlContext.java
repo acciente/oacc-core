@@ -2356,6 +2356,8 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
                                                      ResourcePermission requestedResourcePermission,
                                                      String domainName)
          throws AccessControlException {
+      assertPermissionValid(connection, resourceClassName, requestedResourcePermission);
+
       boolean createSysPermissionFound = false;
       final Set<ResourceCreatePermission> effectiveResourceCreatePermissions
             = __getEffectiveResourceCreatePermissions(connection,
@@ -3048,6 +3050,18 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
    private void assertResourceClassNameValid(String resourceClassName) throws AccessControlException {
       if (resourceClassName == null || resourceClassName.trim().isEmpty()) {
          throw new AccessControlException("Resource class name may not be null or blank");
+      }
+   }
+
+   private void assertPermissionValid(SQLConnection connection,
+                                      String resourceClassName,
+                                      ResourcePermission resourcePermission) throws AccessControlException {
+      if (!resourcePermission.isSystemPermission()) {
+         final List<String> permissionNames
+               = resourceClassPermissionPersister.getPermissionNames(connection, resourceClassName);
+         if (!permissionNames.contains(resourcePermission.getPermissionName())) {
+            throw new AccessControlException("Permission: " + resourcePermission + " is not defined for resource class: " + resourceClassName);
+         }
       }
    }
 

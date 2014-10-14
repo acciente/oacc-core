@@ -594,7 +594,7 @@ public class TestAccessControl_assertPostCreateResourcePermission extends TestAc
       }
       catch (AccessControlException e) {
          assertThat(e.isNotAuthorizedError(), is(false));
-         assertThat(e.getMessage().toLowerCase(), containsString("could not find resource class"));
+         assertThat(e.getMessage().toLowerCase(), containsString("not defined for resource class"));
       }
       try {
          accessControlContext.assertPostCreateResourcePermission(resourceClassName,
@@ -603,7 +603,7 @@ public class TestAccessControl_assertPostCreateResourcePermission extends TestAc
       }
       catch (AccessControlException e) {
          assertThat(e.isNotAuthorizedError(), is(false));
-         assertThat(e.getMessage().toLowerCase(), containsString("could not find permission"));
+         assertThat(e.getMessage().toLowerCase(), containsString("not defined for resource class"));
       }
 
       final String domainName = generateDomain();
@@ -615,7 +615,7 @@ public class TestAccessControl_assertPostCreateResourcePermission extends TestAc
       }
       catch (AccessControlException e) {
          assertThat(e.isNotAuthorizedError(), is(false));
-         assertThat(e.getMessage().toLowerCase(), containsString("could not find resource class"));
+         assertThat(e.getMessage().toLowerCase(), containsString("not defined for resource class"));
       }
       try {
          accessControlContext.assertPostCreateResourcePermission(resourceClassName,
@@ -625,7 +625,7 @@ public class TestAccessControl_assertPostCreateResourcePermission extends TestAc
       }
       catch (AccessControlException e) {
          assertThat(e.isNotAuthorizedError(), is(false));
-         assertThat(e.getMessage().toLowerCase(), containsString("could not find permission"));
+         assertThat(e.getMessage().toLowerCase(), containsString("not defined for resource class"));
       }
       try {
          accessControlContext.assertPostCreateResourcePermission(resourceClassName,
