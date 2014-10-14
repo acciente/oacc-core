@@ -2360,12 +2360,11 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
          return;
       }
 
-      if (postCreateResourcePermissions.size() == 1 /* we assume the single permission is the CREATE permission */
-            && __containsIgnoringGrant(__getEffectiveGlobalPermissions(connection,
-                                                                       sessionResource,
-                                                                       resourceClassName,
-                                                                       domainName),
-                                       requestedResourcePermission)) {
+      if (__containsIgnoringGrant(__getEffectiveGlobalPermissions(connection,
+                                                                  sessionResource,
+                                                                  resourceClassName,
+                                                                  domainName),
+                                  requestedResourcePermission)) {
          return;
       }
 
@@ -2375,7 +2374,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
 
       // if none of the above then complain...
       throw new AccessControlException("No create permission: " + requestedResourcePermission,
-                                 true);
+                                       true);
    }
 
    @Override
