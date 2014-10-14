@@ -2309,6 +2309,8 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       SQLConnection connection = null;
 
       assertAuth();
+      assertResourceClassNotBlank(resourceClassName);
+      assertPermissionSpecified(requestedResourcePermission);
 
       try {
          connection = getConnection();
@@ -2332,6 +2334,9 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       SQLConnection connection = null;
 
       assertAuth();
+      assertResourceClassNotBlank(resourceClassName);
+      assertPermissionSpecified(requestedResourcePermission);
+      assertDomainSpecified(domainName);
 
       try {
          connection = getConnection();
@@ -3007,6 +3012,12 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
    private void assertResourceClassNotBlank(String resourceClassName) throws AccessControlException {
       if (resourceClassName == null || resourceClassName.trim().isEmpty()) {
          throw new AccessControlException("Resource class required, none specified");
+      }
+   }
+
+   private void assertPermissionSpecified(ResourcePermission resourcePermission) throws AccessControlException {
+      if (resourcePermission == null) {
+         throw new AccessControlException("Resource permission required, none specified");
       }
    }
 
