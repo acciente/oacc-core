@@ -6,9 +6,9 @@
     <modelVersion>4.0.0</modelVersion>
 
     <!-- artifact identification -->
-    <groupId>com.acciente.reacc</groupId>
-    <artifactId>acciente-reacc</artifactId>
-    <version>2.0.0-alpha.2</version>
+    <groupId>com.acciente.oacc</groupId>
+    <artifactId>acciente-oacc</artifactId>
+    <version>2.0.0-alpha.3</version>
     <packaging>jar</packaging>
 
     <properties>
@@ -28,9 +28,9 @@
     </properties>
 
     <!-- project information -->
-    <name>Acciente REACC</name>
-    <description>REACC is a Java Application Security Framework. REACC provides a high-performance access control
-        system for Java applications. REACC provides fine grained permissions based access control for application
+    <name>Acciente OACC</name>
+    <description>OACC is a Java Application Security Framework. OACC provides a high-performance access control
+        system for Java applications. OACC provides fine grained permissions based access control for application
         objects. It has support for hierarchical domains, super users, permission inheritance and impersonation.
     </description>
 
@@ -58,7 +58,7 @@
     </dependencies>
 
     <!-- shared project information -->
-    <url>http://www.reaccframework.org</url>
+    <url>http://www.oaccframework.org</url>
     <inceptionYear>2014</inceptionYear>
     <licenses>
         <license>
@@ -151,7 +151,7 @@
                 <version>${maven-surefire-plugin.version}</version>
                 <configuration>
                     <includes>
-                        <include>**/Test_REACC_Resource.java</include>
+                        <include>**/Test_OACC_Resource.java</include>
                         <include>**/TestSQLAccessControlSystemInitializer.java</include>
                         <include>**/TestResourcePermission.java</include>
                         <include>**/TestDomainPermission.java</include>
@@ -172,7 +172,7 @@
                 <version>${maven-javadoc-plugin.version}</version>
                 <configuration>
                     <header>
-                        <![CDATA[<a href="http://www.reaccframework.org" target="_top">Return to www.reaccframework.org</a>]]>
+                        <![CDATA[<a href="http://www.oaccframework.org" target="_top">Return to www.oaccframework.org</a>]]>
                     </header>
                 </configuration>
             </plugin>
