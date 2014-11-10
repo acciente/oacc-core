@@ -121,7 +121,7 @@ public class TestAccessControl_getEffectiveGlobalPermissions extends TestAccessC
                                                         grantorDomainName);
 
       // authenticate grantor resource
-      accessControlContext.authenticate(grantorResource, password);
+      accessControlContext.authenticate(PasswordCredentialsBuilder.newPasswordCredentials(grantorResource, password));
 
       // verify
       final Set<ResourcePermission> permissions_post_specific = accessControlContext.getEffectiveGlobalResourcePermissions(accessorResource, resourceClassName, grantorDomainName);

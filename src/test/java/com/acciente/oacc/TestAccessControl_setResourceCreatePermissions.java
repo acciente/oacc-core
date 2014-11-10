@@ -88,7 +88,7 @@ public class TestAccessControl_setResourceCreatePermissions extends TestAccessCo
       assertThat(accessControlContext.getEffectiveResourceCreatePermissions(grantorResource, resourceClassName, domainName), is(grantorPermissions));
 
       // now authenticate as the granterResource
-      accessControlContext.authenticate(grantorResource, password);
+      accessControlContext.authenticate(PasswordCredentialsBuilder.newPasswordCredentials(grantorResource, password));
 
       // prep for the createPermissions to be assigned to the accessorResource
       final Resource accessorResource = generateUnauthenticatableResource();
@@ -134,7 +134,7 @@ public class TestAccessControl_setResourceCreatePermissions extends TestAccessCo
       assertThat(accessControlContext.getEffectiveResourceCreatePermissions(grantorResource, resourceClassName, domainName), is(grantorPermissions));
 
       // now authenticate as the granterResource
-      accessControlContext.authenticate(grantorResource, password);
+      accessControlContext.authenticate(PasswordCredentialsBuilder.newPasswordCredentials(grantorResource, password));
 
       // prep for the createPermissions to be assigned to the accessorResource
       final Resource accessorResource = generateUnauthenticatableResource();
@@ -202,7 +202,8 @@ public class TestAccessControl_setResourceCreatePermissions extends TestAccessCo
       // reset create permissions to empty set (i.e. remove all) and verify
       accessControlContext.setResourceCreatePermissions(accessorResource,
                                                         resourceClassName,
-                                                        Collections.EMPTY_SET, domainName
+                                                        Collections.<ResourceCreatePermission>emptySet(),
+                                                        domainName
       );
 
       final Set<ResourceCreatePermission> resourceCreatePermissions_post3 = accessControlContext.getEffectiveResourceCreatePermissions(accessorResource, resourceClassName, domainName);
@@ -508,7 +509,7 @@ public class TestAccessControl_setResourceCreatePermissions extends TestAccessCo
       assertThat(accessControlContext.getEffectiveResourceCreatePermissions(grantorResource, resourceClassName, domainName), is(grantorPermissions));
 
       // now authenticate as the granterResource
-      accessControlContext.authenticate(grantorResource, password);
+      accessControlContext.authenticate(PasswordCredentialsBuilder.newPasswordCredentials(grantorResource, password));
 
       // prep for the createPermissions to be assigned to the accessorResource
       final Resource accessorResource = generateUnauthenticatableResource();

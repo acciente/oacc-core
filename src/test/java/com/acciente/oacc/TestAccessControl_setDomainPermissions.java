@@ -89,7 +89,8 @@ public class TestAccessControl_setDomainPermissions extends TestAccessControlBas
       domainPermissions_pre.add(domPerm_child_withGrant);
       assertThat(domainPermissions_pre, is(not(domainPermissions_granter)));
 
-      accessControlContext.authenticate(authenticatableResource,password);
+      accessControlContext.authenticate(PasswordCredentialsBuilder.newPasswordCredentials(authenticatableResource,
+                                                                                          password));
       accessControlContext.setDomainPermissions(accessorResource, domainName, domainPermissions_pre);
 
       domainPermissions_post = accessControlContext.getEffectiveDomainPermissions(accessorResource, domainName);
@@ -133,7 +134,8 @@ public class TestAccessControl_setDomainPermissions extends TestAccessControlBas
       domainPermissions_pre.add(domCreatePerm_child);
       assertThat(domainPermissions_pre, is(not(domainPermissions_granter)));
 
-      accessControlContext.authenticate(authenticatableResource, password);
+      accessControlContext.authenticate(PasswordCredentialsBuilder.newPasswordCredentials(authenticatableResource,
+                                                                                          password));
       accessControlContext.setDomainPermissions(accessorResource, domainName, domainPermissions_pre);
       domainPermissions_post = accessControlContext.getEffectiveDomainPermissions(accessorResource, domainName);
       assertThat(domainPermissions_post, is(domainPermissions_pre));
@@ -292,7 +294,8 @@ public class TestAccessControl_setDomainPermissions extends TestAccessControlBas
       domainPermissions_pre.add(domCreatePerm_superuser);
       assertThat(domainPermissions_pre, is(not(domainPermissions_granter)));
 
-      accessControlContext.authenticate(authenticatableResource, password);
+      accessControlContext.authenticate(PasswordCredentialsBuilder.newPasswordCredentials(authenticatableResource,
+                                                                                          password));
 
       try {
          accessControlContext.setDomainPermissions(accessorResource, dmainName, domainPermissions_pre);
@@ -307,7 +310,8 @@ public class TestAccessControl_setDomainPermissions extends TestAccessControlBas
       domainPermissions_pre.add(domCreatePerm_superuser);
       assertThat(domainPermissions_pre, is(not(domainPermissions_granter)));
 
-      accessControlContext.authenticate(authenticatableResource, password);
+      accessControlContext.authenticate(PasswordCredentialsBuilder.newPasswordCredentials(authenticatableResource,
+                                                                                          password));
 
       try {
          accessControlContext.setDomainPermissions(accessorResource, dmainName, domainPermissions_pre);

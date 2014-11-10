@@ -41,7 +41,7 @@ public class TestAccessControl_createAuthenticatableResource extends TestAccessC
       final Resource resource = accessControlContext.createAuthenticatableResource(resourceClassName, domainName, password);
 
       assertThat(resource, is(not(nullValue())));
-      accessControlContext.authenticate(resource, password);
+      accessControlContext.authenticate(PasswordCredentialsBuilder.newPasswordCredentials(resource, password));
       assertThat(accessControlContext.getDomainNameByResource(resource), is(domainName));
       final ResourceClassInfo resourceClassInfo = accessControlContext.getResourceClassInfoByResource(resource);
       assertThat(resourceClassInfo.getResourceClassName(), is(resourceClassName));
@@ -85,8 +85,8 @@ public class TestAccessControl_createAuthenticatableResource extends TestAccessC
       assertThat(resourceClassInfo2.getResourceClassName(), is(resourceClassName));
 
       // verify we can authenticate
-      accessControlContext.authenticate(resource, password);
-      accessControlContext.authenticate(resource2, password2);
+      accessControlContext.authenticate(PasswordCredentialsBuilder.newPasswordCredentials(resource, password));
+      accessControlContext.authenticate(PasswordCredentialsBuilder.newPasswordCredentials(resource2, password2));
    }
 
    @Test
@@ -126,7 +126,7 @@ public class TestAccessControl_createAuthenticatableResource extends TestAccessC
       assertThat(resourcesByPermission2.size(), is(1));
 
       // verify we can authenticate
-      accessControlContext.authenticate(resource, password);
+      accessControlContext.authenticate(PasswordCredentialsBuilder.newPasswordCredentials(resource, password));
    }
 
    @Test
@@ -153,7 +153,7 @@ public class TestAccessControl_createAuthenticatableResource extends TestAccessC
       assertThat(resourcesByPermission.size(), is(1));
 
       // verify we can authenticate
-      accessControlContext.authenticate(resource, password);
+      accessControlContext.authenticate(PasswordCredentialsBuilder.newPasswordCredentials(resource, password));
    }
 
    @Test
@@ -190,17 +190,21 @@ public class TestAccessControl_createAuthenticatableResource extends TestAccessC
       assertThat(resource.getId(), is(not(whitespacedResource.getId())));
 
       // verify passwords are whitespace-sensitive
-      accessControlContext.authenticate(whitespacedResource, password);
-      accessControlContext.authenticate(resource, password);
+      accessControlContext.authenticate(PasswordCredentialsBuilder.newPasswordCredentials(whitespacedResource,
+                                                                                          password));
+      accessControlContext.authenticate(PasswordCredentialsBuilder.newPasswordCredentials(resource,
+                                                                                          password));
       try {
-         accessControlContext.authenticate(whitespacedResource, password_whitespaced);
+         accessControlContext.authenticate(PasswordCredentialsBuilder.newPasswordCredentials(whitespacedResource,
+                                                                                             password_whitespaced));
          fail("authentication of system resource with whitespace password should not have succeeded");
       }
       catch (AccessControlException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("invalid password"));
       }
       try {
-         accessControlContext.authenticate(resource, password_whitespaced);
+         accessControlContext.authenticate(PasswordCredentialsBuilder.newPasswordCredentials(resource,
+                                                                                             password_whitespaced));
          fail("authentication of system resource with whitespace password should not have succeeded");
       }
       catch (AccessControlException e) {
@@ -271,17 +275,21 @@ public class TestAccessControl_createAuthenticatableResource extends TestAccessC
          assertThat(resourcesByPermission.size(), is(2));
 
          // verify passwords are case-sensitive
-         accessControlContext.authenticate(resource_lowlow, password_lower);
-         accessControlContext.authenticate(resource_UPUP, password_UPPER);
+         accessControlContext.authenticate(PasswordCredentialsBuilder.newPasswordCredentials(resource_lowlow,
+                                                                                             password_lower));
+         accessControlContext.authenticate(PasswordCredentialsBuilder.newPasswordCredentials(resource_UPUP,
+                                                                                             password_UPPER));
          try {
-            accessControlContext.authenticate(resource_lowlow, password_UPPER);
+            accessControlContext.authenticate(PasswordCredentialsBuilder.newPasswordCredentials(resource_lowlow,
+                                                                                                password_UPPER));
             fail("authentication of system resource with case-insensitive password should not have succeeded");
          }
          catch (AccessControlException e) {
             assertThat(e.getMessage().toLowerCase(), containsString("invalid password"));
          }
          try {
-            accessControlContext.authenticate(resource_UPUP, password_lower);
+            accessControlContext.authenticate(PasswordCredentialsBuilder.newPasswordCredentials(resource_UPUP,
+                                                                                                password_lower));
             fail("authentication of system resource with case-insensitive password should not have succeeded");
          }
          catch (AccessControlException e) {
@@ -330,17 +338,21 @@ public class TestAccessControl_createAuthenticatableResource extends TestAccessC
          assertThat(resourcesByPermission.size(), is(4));
 
          // verify passwords are case-sensitive
-         accessControlContext.authenticate(resource_lowlow, password_lower);
-         accessControlContext.authenticate(resource_UPUP, password_UPPER);
+         accessControlContext.authenticate(PasswordCredentialsBuilder.newPasswordCredentials(resource_lowlow,
+                                                                                             password_lower));
+         accessControlContext.authenticate(PasswordCredentialsBuilder.newPasswordCredentials(resource_UPUP,
+                                                                                             password_UPPER));
          try {
-            accessControlContext.authenticate(resource_lowlow, password_UPPER);
+            accessControlContext.authenticate(PasswordCredentialsBuilder.newPasswordCredentials(resource_lowlow,
+                                                                                                password_UPPER));
             fail("authentication of system resource with case-insensitive password should not have succeeded");
          }
          catch (AccessControlException e) {
             assertThat(e.getMessage().toLowerCase(), containsString("invalid password"));
          }
          try {
-            accessControlContext.authenticate(resource_UPUP, password_lower);
+            accessControlContext.authenticate(PasswordCredentialsBuilder.newPasswordCredentials(resource_UPUP,
+                                                                                                password_lower));
             fail("authentication of system resource with case-insensitive password should not have succeeded");
          }
          catch (AccessControlException e) {

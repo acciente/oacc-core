@@ -33,8 +33,8 @@ public class AccessControlContextProxy implements AccessControlContext {
    private AccessControlContext accessControlContext;
 
    @Override
-   public void authenticate(Resource resource, String password) throws AccessControlException {
-      accessControlContext.authenticate(resource, password);
+   public void authenticate(Credentials credentials) throws AccessControlException {
+      accessControlContext.authenticate(credentials);
    }
 
    @Override
@@ -53,13 +53,8 @@ public class AccessControlContextProxy implements AccessControlContext {
    }
 
    @Override
-   public void setAuthenticatedResourcePassword(String newPassword) throws AccessControlException {
-      accessControlContext.setAuthenticatedResourcePassword(newPassword);
-   }
-
-   @Override
-   public void setResourcePassword(Resource resource, String newPassword) throws AccessControlException {
-      accessControlContext.setResourcePassword(resource, newPassword);
+   public void updateCredentials(Credentials newCredentials) throws AccessControlException {
+      accessControlContext.updateCredentials(newCredentials);
    }
 
    @Override
@@ -158,13 +153,6 @@ public class AccessControlContextProxy implements AccessControlContext {
    @Override
    public Resource getSessionResource() throws AccessControlException {
       return accessControlContext.getSessionResource();
-   }
-
-   @Override
-   public void setResourcePassword(Resource resource,
-                                   AuthenticationProvider authenticationProvider,
-                                   String newPassword) throws AccessControlException {
-      accessControlContext.setResourcePassword(resource, authenticationProvider, newPassword);
    }
 
    @Override

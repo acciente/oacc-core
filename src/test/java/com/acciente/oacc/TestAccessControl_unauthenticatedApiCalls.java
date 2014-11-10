@@ -27,22 +27,6 @@ import static org.junit.Assert.assertThat;
 
 public class TestAccessControl_unauthenticatedApiCalls extends TestAccessControlBase {
    @Test
-   public void unauthenticate_shouldSucceed() throws AccessControlException {
-      accessControlContext.unauthenticate();
-
-      // this method has to be called from an unauthenticated session
-      accessControlContext
-            .setResourcePassword(SYS_RESOURCE,
-                                 new AuthenticationProvider() {
-                                    @Override
-                                    public boolean isAuthenticated(Resource authResource) {
-                                       return true;
-                                    }
-                                 },
-                                 Constants.OACC_ROOT_PWD);
-   }
-
-   @Test
    public void unimpersonate_shouldSucceed() throws AccessControlException {
       accessControlContext.unimpersonate();
    }
@@ -203,13 +187,7 @@ public class TestAccessControl_unauthenticatedApiCalls extends TestAccessControl
 
       // verify setters
       try {
-         accessControlContext.setAuthenticatedResourcePassword(null);
-      }
-      catch (AccessControlException e) {
-         assertThat(e.getMessage().toLowerCase(), containsString("not authenticated"));
-      }
-      try {
-         accessControlContext.setResourcePassword(null, null);
+         accessControlContext.updateCredentials(null);
       }
       catch (AccessControlException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("not authenticated"));

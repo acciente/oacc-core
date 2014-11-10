@@ -26,7 +26,8 @@ import static org.junit.Assert.assertThat;
 public class TestAccessControl_unauthenticate extends TestAccessControlBase {
    @Test
    public void unauthenticate_authenticatedSystemUser() throws AccessControlException {
-      accessControlContext.authenticate(getSystemResource(), Constants.OACC_ROOT_PWD);
+      accessControlContext.authenticate(PasswordCredentialsBuilder.newPasswordCredentials(getSystemResource(),
+                                                                                          Constants.OACC_ROOT_PWD));
 
       // unauthenticate and verify
       accessControlContext.unauthenticate();

@@ -19,6 +19,7 @@ package com.acciente.oacc.sql;
 
 import com.acciente.oacc.AccessControlContext;
 import com.acciente.oacc.AccessControlException;
+import com.acciente.oacc.PasswordCredentialsBuilder;
 import com.acciente.oacc.ResourceCreatePermission;
 import com.acciente.oacc.DomainCreatePermission;
 import com.acciente.oacc.DomainPermission;
@@ -81,7 +82,8 @@ public class TestSQLAccessControlContext extends TestSQLAccessControlContextBase
 
       setupName("ACS authenticate( SYSTEM, valid-password )");
       try {
-         accessControlContext.authenticate(sysAuthResource, oaccRootPwd);
+         accessControlContext.authenticate(PasswordCredentialsBuilder.newPasswordCredentials(sysAuthResource,
+                                                                                             oaccRootPwd));
          setupOK();
       }
       catch (AccessControlException e) {
@@ -98,7 +100,8 @@ public class TestSQLAccessControlContext extends TestSQLAccessControlContextBase
 
       testName("authenticate( resource-0, <invalid-pwd> )");
       try {
-         accessControlContext.authenticate(sysAuthResource, "foobar");
+         accessControlContext.authenticate(PasswordCredentialsBuilder.newPasswordCredentials(sysAuthResource,
+                                                                                             "foobar"));
          testFail();
       }
       catch (AccessControlException e) {
@@ -112,7 +115,8 @@ public class TestSQLAccessControlContext extends TestSQLAccessControlContextBase
 
       testName("authenticate( resource-0, valid-password )");
       try {
-         accessControlContext.authenticate(sysAuthResource, oaccRootPwd);
+         accessControlContext.authenticate(PasswordCredentialsBuilder.newPasswordCredentials(sysAuthResource,
+                                                                                             oaccRootPwd));
 
          testOK();
       }
@@ -380,7 +384,7 @@ public class TestSQLAccessControlContext extends TestSQLAccessControlContextBase
       // next we auth as the new user in the ACMECorp domain
       setupName("authenticate( acmeRootUser, <valid-pwd> )");
       try {
-         accessControlContext.authenticate(acmeRootUser, "foobar");
+         accessControlContext.authenticate(PasswordCredentialsBuilder.newPasswordCredentials(acmeRootUser, "foobar"));
          setupOK();
       }
       catch (AccessControlException e) {
@@ -485,7 +489,7 @@ public class TestSQLAccessControlContext extends TestSQLAccessControlContextBase
       // next we auth as the new user in the ACMECorp domain
       setupName("authenticate( acmeRootUser, <valid-pwd> )");
       try {
-         accessControlContext.authenticate(acmeRootUser, "foobar");
+         accessControlContext.authenticate(PasswordCredentialsBuilder.newPasswordCredentials(acmeRootUser, "foobar"));
          setupOK();
       }
       catch (AccessControlException e) {
@@ -556,7 +560,7 @@ public class TestSQLAccessControlContext extends TestSQLAccessControlContextBase
       // next we auth as the new user in the ACMECorp domain
       setupName("authenticate( acmeRootUser, <valid-pwd> )");
       try {
-         accessControlContext.authenticate(acmeRootUser, "foobar");
+         accessControlContext.authenticate(PasswordCredentialsBuilder.newPasswordCredentials(acmeRootUser, "foobar"));
          setupOK();
       }
       catch (AccessControlException e) {
@@ -644,7 +648,7 @@ public class TestSQLAccessControlContext extends TestSQLAccessControlContextBase
       // next we re-auth as the new user in the ACMECorp domain
       setupName("authenticate( acmeRootUser, <valid-pwd> )");
       try {
-         accessControlContext.authenticate(acmeRootUser, "foobar");
+         accessControlContext.authenticate(PasswordCredentialsBuilder.newPasswordCredentials(acmeRootUser, "foobar"));
          setupOK();
       }
       catch (AccessControlException e) {
@@ -919,8 +923,8 @@ public class TestSQLAccessControlContext extends TestSQLAccessControlContextBase
       // next we auth as user #1
       setupName("authenticate( newUser_1, <valid-pwd> )");
       try {
-         accessControlContext.authenticate(newUser_1, "foobar");
-         accessControlContext.authenticate(newUser_1, "foobar");
+         accessControlContext.authenticate(PasswordCredentialsBuilder.newPasswordCredentials(newUser_1, "foobar"));
+         accessControlContext.authenticate(PasswordCredentialsBuilder.newPasswordCredentials(newUser_1, "foobar"));
          setupOK();
       }
       catch (AccessControlException e) {
@@ -955,8 +959,8 @@ public class TestSQLAccessControlContext extends TestSQLAccessControlContextBase
       // next we auth as user #2
       setupName("authenticate( newUser_2, <valid-pwd> )");
       try {
-         accessControlContext.authenticate(newUser_2, "goobar");
-         accessControlContext.authenticate(newUser_2, "goobar");
+         accessControlContext.authenticate(PasswordCredentialsBuilder.newPasswordCredentials(newUser_2, "goobar"));
+         accessControlContext.authenticate(PasswordCredentialsBuilder.newPasswordCredentials(newUser_2, "goobar"));
          setupOK();
       }
       catch (AccessControlException e) {
@@ -991,8 +995,8 @@ public class TestSQLAccessControlContext extends TestSQLAccessControlContextBase
       // next we auth as user #2
       setupName("authenticate( newUser_2, <valid-pwd> )");
       try {
-         accessControlContext.authenticate(newUser_2, "goobar");
-         accessControlContext.authenticate(newUser_2, "goobar");
+         accessControlContext.authenticate(PasswordCredentialsBuilder.newPasswordCredentials(newUser_2, "goobar"));
+         accessControlContext.authenticate(PasswordCredentialsBuilder.newPasswordCredentials(newUser_2, "goobar"));
          setupOK();
       }
       catch (AccessControlException e) {

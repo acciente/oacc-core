@@ -42,15 +42,17 @@ public class TestAccessControl_setAuthResourcePassword extends TestAccessControl
 
       // update password and verify
       final String newPwd = Constants.OACC_ROOT_PWD + "_modified";
-      accessControlContext.setAuthenticatedResourcePassword(newPwd);
+      accessControlContext.updateCredentials(PasswordCredentialsBuilder.newPasswordCredentials(getSystemResource(),
+                                                                                               newPwd));
       accessControlContext.unauthenticate();
       try {
-         accessControlContext.authenticate(getSystemResource(), Constants.OACC_ROOT_PWD);
+         accessControlContext.authenticate(PasswordCredentialsBuilder.newPasswordCredentials(getSystemResource(),
+                                                                                             Constants.OACC_ROOT_PWD));
       }
       catch (AccessControlException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("invalid password"));
       }
-      accessControlContext.authenticate(getSystemResource(), newPwd);
+      accessControlContext.authenticate(PasswordCredentialsBuilder.newPasswordCredentials(getSystemResource(), newPwd));
 
       // optional: explicit check of password stored in DB
 //      final DB_Resource helperResource_postChange = new DB_Resource.Builder( systemResource.getID() )
@@ -65,23 +67,28 @@ public class TestAccessControl_setAuthResourcePassword extends TestAccessControl
 
       // update password and verify
       final String emptyPwd = "";
-      accessControlContext.setAuthenticatedResourcePassword(emptyPwd);
+      accessControlContext.updateCredentials(PasswordCredentialsBuilder.newPasswordCredentials(getSystemResource(),
+                                                                                               emptyPwd));
       try {
-         accessControlContext.authenticate(getSystemResource(), newPwd);
+         accessControlContext.authenticate(PasswordCredentialsBuilder.newPasswordCredentials(getSystemResource(),
+                                                                                             newPwd));
       }
       catch (AccessControlException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("invalid password"));
       }
       try {
-         accessControlContext.authenticate(getSystemResource(), Constants.OACC_ROOT_PWD);
+         accessControlContext.authenticate(PasswordCredentialsBuilder.newPasswordCredentials(getSystemResource(),
+                                                                                             Constants.OACC_ROOT_PWD));
       }
       catch (AccessControlException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("invalid password"));
       }
-      accessControlContext.authenticate(getSystemResource(), emptyPwd);
+      accessControlContext.authenticate(PasswordCredentialsBuilder.newPasswordCredentials(getSystemResource(),
+                                                                                          emptyPwd));
 
       // optional: reset to original password
-      accessControlContext.setAuthenticatedResourcePassword(Constants.OACC_ROOT_PWD);
+      accessControlContext.updateCredentials(PasswordCredentialsBuilder.newPasswordCredentials(getSystemResource(),
+                                                                                               Constants.OACC_ROOT_PWD));
    }
 
    @Test
@@ -90,7 +97,8 @@ public class TestAccessControl_setAuthResourcePassword extends TestAccessControl
 
       // update password and verify
       try {
-         accessControlContext.setAuthenticatedResourcePassword(null);
+         accessControlContext.updateCredentials(PasswordCredentialsBuilder.newPasswordCredentials(getSystemResource(),
+                                                                                                  null));
       }
       catch (NullPointerException e) {
       }
@@ -105,15 +113,18 @@ public class TestAccessControl_setAuthResourcePassword extends TestAccessControl
 
       // set password and verify
       final String newPassword = password + "_modified";
-      accessControlContext.setResourcePassword(authenticatableResource, newPassword);
+      accessControlContext.updateCredentials(PasswordCredentialsBuilder.newPasswordCredentials(authenticatableResource,
+                                                                                               newPassword));
       accessControlContext.unauthenticate();
       try {
-         accessControlContext.authenticate(authenticatableResource, password);
+         accessControlContext.authenticate(PasswordCredentialsBuilder.newPasswordCredentials(authenticatableResource,
+                                                                                             password));
       }
       catch (AccessControlException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("invalid password"));
       }
-      accessControlContext.authenticate(authenticatableResource, newPassword);
+      accessControlContext.authenticate(PasswordCredentialsBuilder.newPasswordCredentials(authenticatableResource,
+                                                                                          newPassword));
    }
 
    // todo: try setting pwd on resource we don't have permissions on

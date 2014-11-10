@@ -161,7 +161,7 @@ public class TestAccessControl_getEffectiveResourceCreatePermissions extends Tes
       );
 
       // authenticate the 'session' resource
-      accessControlContext.authenticate(sessionResource, password);
+      accessControlContext.authenticate(PasswordCredentialsBuilder.newPasswordCredentials(sessionResource, password));
 
       // get all create permissions and verify for each domain/resource-class combination
       final Set<ResourceCreatePermission> resourceCreatePermissions_post2 = accessControlContext.getEffectiveResourceCreatePermissions(accessorResource, resourceClassName);

@@ -81,7 +81,8 @@ public class TestAccessControl_assertPostCreateResourcePermission extends TestAc
       assertThat(allResourceCreatePermissionsForResourceClass.isEmpty(), is(true));
 
       // authenticate accessor/creator resource
-      accessControlContext.authenticate(accessorResource, password);
+      accessControlContext.authenticate(PasswordCredentialsBuilder.newPasswordCredentials(accessorResource,
+                                                                                          password));
 
       // verify
       try {
@@ -144,7 +145,7 @@ public class TestAccessControl_assertPostCreateResourcePermission extends TestAc
       assertThat(allResourceCreatePermissionsForResourceClassAndAccessedDomain, is(resourceCreatePermissions_forAccessedDomain));
 
       // authenticate accessor/creator resource
-      accessControlContext.authenticate(accessorResource, password);
+      accessControlContext.authenticate(PasswordCredentialsBuilder.newPasswordCredentials(accessorResource, password));
 
       // verify
       try {
@@ -205,7 +206,7 @@ public class TestAccessControl_assertPostCreateResourcePermission extends TestAc
       assertThat(allResourcePermissionsForAccessorResource, is(resourcePermissions));
 
       // authenticate accessor/creator resource
-      accessControlContext.authenticate(accessorResource, password);
+      accessControlContext.authenticate(PasswordCredentialsBuilder.newPasswordCredentials(accessorResource, password));
 
       // verify
       try {
@@ -261,7 +262,7 @@ public class TestAccessControl_assertPostCreateResourcePermission extends TestAc
       assertThat(allResourceCreatePermissionsForResourceClassAndIntermediaryDomain, is(resourceCreatePermissions_forIntermediaryDomain));
 
       // authenticate accessor/creator resource
-      accessControlContext.authenticate(accessorResource, password);
+      accessControlContext.authenticate(PasswordCredentialsBuilder.newPasswordCredentials(accessorResource, password));
 
       // verify
       try {
@@ -332,7 +333,7 @@ public class TestAccessControl_assertPostCreateResourcePermission extends TestAc
       assertThat(allResourcePermissionsForAccessorResource, is(inheritanceResourcePermissions));
 
       // authenticate accessor/creator resource
-      accessControlContext.authenticate(accessorResource, password);
+      accessControlContext.authenticate(PasswordCredentialsBuilder.newPasswordCredentials(accessorResource, password));
 
       // verify
       try {
@@ -396,7 +397,7 @@ public class TestAccessControl_assertPostCreateResourcePermission extends TestAc
       assertThat(allGlobalResourcePermissionsForResourceClass, hasItem(globalResourcePermission));
 
       // authenticate accessor/creator resource
-      accessControlContext.authenticate(accessorResource, password);
+      accessControlContext.authenticate(PasswordCredentialsBuilder.newPasswordCredentials(accessorResource, password));
 
       // verify
       try {
@@ -469,7 +470,7 @@ public class TestAccessControl_assertPostCreateResourcePermission extends TestAc
       assertThat(allGlobalResourcePermissionsForResourceClass, hasItem(globalResourcePermission));
 
       // authenticate accessor/creator resource
-      accessControlContext.authenticate(accessorResource, password);
+      accessControlContext.authenticate(PasswordCredentialsBuilder.newPasswordCredentials(accessorResource, password));
 
       // verify
       try {

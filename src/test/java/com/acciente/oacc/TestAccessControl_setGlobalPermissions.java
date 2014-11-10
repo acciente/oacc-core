@@ -163,7 +163,7 @@ public class TestAccessControl_setGlobalPermissions extends TestAccessControlBas
       assertThat(accessControlContext.getEffectiveGlobalResourcePermissions(grantorResource, resourceClassName, domainName), is(grantorResourcePermissions));
 
       // authenticate grantor resource
-      accessControlContext.authenticate(grantorResource, password);
+      accessControlContext.authenticate(PasswordCredentialsBuilder.newPasswordCredentials(grantorResource, password));
 
       // set global permissions as grantor and verify
       accessControlContext.setGlobalResourcePermissions(accessorResource, resourceClassName,
@@ -201,7 +201,7 @@ public class TestAccessControl_setGlobalPermissions extends TestAccessControlBas
       assertThat(accessControlContext.getEffectiveGlobalResourcePermissions(grantorResource, resourceClassName, grantorDomainName), is(grantorResourcePermissions));
 
       // authenticate grantor resource
-      accessControlContext.authenticate(grantorResource, password);
+      accessControlContext.authenticate(PasswordCredentialsBuilder.newPasswordCredentials(grantorResource, password));
 
       // set global permissions as grantor and verify
       accessControlContext.setGlobalResourcePermissions(accessorResource, resourceClassName, permissions_pre);
@@ -425,7 +425,7 @@ public class TestAccessControl_setGlobalPermissions extends TestAccessControlBas
       permissions_pre.add(ResourcePermission.getInstance(customPermissionName));
 
       // authenticate grantor resource
-      accessControlContext.authenticate(grantorResource, password);
+      accessControlContext.authenticate(PasswordCredentialsBuilder.newPasswordCredentials(grantorResource, password));
       assertThat(accessControlContext.getEffectiveGlobalResourcePermissionsMap(grantorResource).isEmpty(), is(true));
 
       // attempt to set permissions as grantor without authorization

@@ -105,11 +105,13 @@ public class TestAccessControlBase {
    }
 
    private static void authenticateSystemAccessControlContext() throws AccessControlException {
-      systemAccessControlContext.authenticate(SYS_RESOURCE, Constants.OACC_ROOT_PWD);
+      systemAccessControlContext.authenticate(PasswordCredentialsBuilder.newPasswordCredentials(SYS_RESOURCE,
+                                                                                                Constants.OACC_ROOT_PWD));
    }
 
    protected void authenticateSystemResource() throws AccessControlException {
-      accessControlContext.authenticate(SYS_RESOURCE, Constants.OACC_ROOT_PWD);
+      accessControlContext.authenticate(PasswordCredentialsBuilder.newPasswordCredentials(SYS_RESOURCE,
+                                                                                          Constants.OACC_ROOT_PWD));
    }
 
    public static String generateUniqueDomainName() {
@@ -136,7 +138,8 @@ public class TestAccessControlBase {
       authenticateSystemAccessControlContext();
       final String password = generateUniquePassword();
       final Resource authenticatableResource = generateAuthenticatableResource(password);
-      accessControlContext.authenticate(authenticatableResource, password);
+      accessControlContext.authenticate(PasswordCredentialsBuilder.newPasswordCredentials(authenticatableResource,
+                                                                                          password));
       return authenticatableResource;
    }
 

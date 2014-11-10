@@ -35,7 +35,7 @@ public class TestAccessControl_setResourcePermissions extends TestAccessControlB
       authenticateSystemResource();
       final String resourceClassName = generateResourceClass(false, false);
       final Resource accessorResource = generateUnauthenticatableResource();
-      final Resource accessedResource = accessControlContext.createResource(resourceClassName, generateDomain());;
+      final Resource accessedResource = accessControlContext.createResource(resourceClassName, generateDomain());
       assertThat(accessControlContext.getEffectiveResourcePermissions(accessorResource, accessedResource).isEmpty(), is(true));
 
       Set<ResourcePermission> permissions_pre = new HashSet<>();
@@ -97,7 +97,7 @@ public class TestAccessControl_setResourcePermissions extends TestAccessControlB
       final String password = generateUniquePassword();
       final Resource grantorResource = generateAuthenticatableResource(password);
       final Resource accessorResource = generateUnauthenticatableResource();
-      final Resource accessedResource = accessControlContext.createResource(resourceClassName, generateDomain());;
+      final Resource accessedResource = accessControlContext.createResource(resourceClassName, generateDomain());
       assertThat(accessControlContext.getEffectiveResourcePermissions(accessorResource, accessedResource).isEmpty(), is(true));
 
       Set<ResourcePermission> grantorResourcePermissions = new HashSet<>();
@@ -113,7 +113,7 @@ public class TestAccessControl_setResourcePermissions extends TestAccessControlB
       assertThat(accessControlContext.getEffectiveResourcePermissions(grantorResource, accessedResource), is(grantorResourcePermissions));
 
       // authenticate grantor resource
-      accessControlContext.authenticate(grantorResource, password);
+      accessControlContext.authenticate(PasswordCredentialsBuilder.newPasswordCredentials(grantorResource, password));
 
       // set permissions as grantor and verify
       accessControlContext.setResourcePermissions(accessorResource, accessedResource, permissions_pre);
@@ -127,7 +127,7 @@ public class TestAccessControl_setResourcePermissions extends TestAccessControlB
       authenticateSystemResource();
       final String resourceClassName = generateResourceClass(false, false);
       final Resource accessorResource = generateUnauthenticatableResource();
-      final Resource accessedResource = accessControlContext.createResource(resourceClassName, generateDomain());;
+      final Resource accessedResource = accessControlContext.createResource(resourceClassName, generateDomain());
       assertThat(accessControlContext.getEffectiveResourcePermissions(accessorResource, accessedResource).isEmpty(), is(true));
 
       Set<ResourcePermission> permissions_pre1 = new HashSet<>();
@@ -152,7 +152,9 @@ public class TestAccessControl_setResourcePermissions extends TestAccessControlB
       assertThat(permissions_post2, is(permissions_pre2));
 
       // reset permissions to empty, i.e. remove all permissions
-      accessControlContext.setResourcePermissions(accessorResource, accessedResource, Collections.EMPTY_SET);
+      accessControlContext.setResourcePermissions(accessorResource,
+                                                  accessedResource,
+                                                  Collections.<ResourcePermission>emptySet());
 
       final Set<ResourcePermission> permissions_post3 = accessControlContext.getEffectiveResourcePermissions(accessorResource, accessedResource);
       assertThat(permissions_post3.isEmpty(), is(true));
@@ -163,7 +165,7 @@ public class TestAccessControl_setResourcePermissions extends TestAccessControlB
       authenticateSystemResource();
       final String resourceClassName = generateResourceClass(false, false);
       final Resource accessorResource = generateUnauthenticatableResource();
-      final Resource accessedResource = accessControlContext.createResource(resourceClassName, generateDomain());;
+      final Resource accessedResource = accessControlContext.createResource(resourceClassName, generateDomain());
       assertThat(accessControlContext.getEffectiveResourcePermissions(accessorResource, accessedResource).isEmpty(), is(true));
 
       Set<ResourcePermission> permissions_pre = new HashSet<>();
@@ -187,7 +189,7 @@ public class TestAccessControl_setResourcePermissions extends TestAccessControlB
       authenticateSystemResource();
       final String resourceClassName = generateResourceClass(false, false);
       final Resource accessorResource = generateUnauthenticatableResource();
-      final Resource accessedResource = accessControlContext.createResource(resourceClassName, generateDomain());;
+      final Resource accessedResource = accessControlContext.createResource(resourceClassName, generateDomain());
       assertThat(accessControlContext.getEffectiveResourcePermissions(accessorResource, accessedResource).isEmpty(), is(true));
 
       Set<ResourcePermission> permissions_valid = new HashSet<>();
@@ -230,7 +232,7 @@ public class TestAccessControl_setResourcePermissions extends TestAccessControlB
       authenticateSystemResource();
       final String resourceClassName = generateResourceClass(false, false);
       final Resource accessorResource = generateUnauthenticatableResource();
-      final Resource accessedResource = accessControlContext.createResource(resourceClassName, generateDomain());;
+      final Resource accessedResource = accessControlContext.createResource(resourceClassName, generateDomain());
       assertThat(accessControlContext.getEffectiveResourcePermissions(accessorResource, accessedResource).isEmpty(), is(true));
 
       Set<ResourcePermission> permissions_invalidName = new HashSet<>();
@@ -267,7 +269,7 @@ public class TestAccessControl_setResourcePermissions extends TestAccessControlB
       final String password = generateUniquePassword();
       final Resource grantorResource = generateAuthenticatableResource(password);
       final Resource accessorResource = generateUnauthenticatableResource();
-      final Resource accessedResource = accessControlContext.createResource(resourceClassName, generateDomain());;
+      final Resource accessedResource = accessControlContext.createResource(resourceClassName, generateDomain());
       assertThat(accessControlContext.getEffectiveResourcePermissions(accessorResource, accessedResource).isEmpty(), is(true));
 
       Set<ResourcePermission> permissions_pre = new HashSet<>();
@@ -275,7 +277,7 @@ public class TestAccessControl_setResourcePermissions extends TestAccessControlB
       permissions_pre.add(ResourcePermission.getInstance(customPermissionName));
 
       // authenticate grantor resource
-      accessControlContext.authenticate(grantorResource, password);
+      accessControlContext.authenticate(PasswordCredentialsBuilder.newPasswordCredentials(grantorResource, password));
       assertThat(accessControlContext.getEffectiveResourcePermissions(grantorResource, accessedResource).isEmpty(), is(true));
 
       // attempt to set permissions as grantor without authorization

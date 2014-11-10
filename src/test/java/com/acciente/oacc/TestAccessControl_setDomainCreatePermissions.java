@@ -45,7 +45,7 @@ public class TestAccessControl_setDomainCreatePermissions extends TestAccessCont
       Resource accessorResource = generateUnauthenticatableResource();
       assertThat(accessControlContext.getEffectiveDomainCreatePermissions(accessorResource).isEmpty(), is(true));
 
-      Set<DomainCreatePermission> domainCreatePermissions_pre = new HashSet();
+      Set<DomainCreatePermission> domainCreatePermissions_pre = new HashSet<>();
       domainCreatePermissions_pre.add(domCreatePerm_superuser);
       domainCreatePermissions_pre.add(domCreatePerm_create_withGrant);
       domainCreatePermissions_pre.add(domCreatePerm_child);
@@ -75,7 +75,7 @@ public class TestAccessControl_setDomainCreatePermissions extends TestAccessCont
       final String password = generateUniquePassword();
       final Resource authenticatableResource = generateAuthenticatableResource(password);
 
-      final Set<DomainCreatePermission> domainCreatePermissions_granter = new HashSet();
+      final Set<DomainCreatePermission> domainCreatePermissions_granter = new HashSet<>();
       domainCreatePermissions_granter.add(domCreatePerm_superuser_withGrant);
       domainCreatePermissions_granter.add(domCreatePerm_create_withGrant);
       domainCreatePermissions_granter.add(domCreatePerm_child_withGrant);
@@ -91,13 +91,14 @@ public class TestAccessControl_setDomainCreatePermissions extends TestAccessCont
       Resource accessorResource = generateUnauthenticatableResource();
       assertThat(accessControlContext.getEffectiveDomainCreatePermissions(accessorResource).isEmpty(), is(true));
 
-      Set<DomainCreatePermission> domainCreatePermissions_pre = new HashSet();
+      Set<DomainCreatePermission> domainCreatePermissions_pre = new HashSet<>();
       domainCreatePermissions_pre.add(domCreatePerm_superuser);
       domainCreatePermissions_pre.add(domCreatePerm_create_withGrant);
       domainCreatePermissions_pre.add(domCreatePerm_child);
       assertThat(domainCreatePermissions_pre, is(not(domainCreatePermissions_granter)));
 
-      accessControlContext.authenticate(authenticatableResource,password);
+      accessControlContext.authenticate(PasswordCredentialsBuilder.newPasswordCredentials(authenticatableResource,
+                                                                                          password));
       accessControlContext.setDomainCreatePermissions(accessorResource, domainCreatePermissions_pre);
 
       domainCreatePermissions_post = accessControlContext.getEffectiveDomainCreatePermissions(accessorResource);
@@ -121,7 +122,7 @@ public class TestAccessControl_setDomainCreatePermissions extends TestAccessCont
       Resource accessorResource = generateUnauthenticatableResource();
       assertThat(accessControlContext.getEffectiveDomainCreatePermissions(accessorResource).isEmpty(), is(true));
 
-      Set<DomainCreatePermission> domainCreatePermissions_pre = new HashSet();
+      Set<DomainCreatePermission> domainCreatePermissions_pre = new HashSet<>();
       domainCreatePermissions_pre.add(domCreatePerm_superuser);
       domainCreatePermissions_pre.add(domCreatePerm_create);
       domainCreatePermissions_pre.add(domCreatePerm_child_withGrant);
@@ -133,7 +134,7 @@ public class TestAccessControl_setDomainCreatePermissions extends TestAccessCont
       assertThat(domainCreatePermissions_post, is(domainCreatePermissions_pre));
 
       // reset domain create permissions and verify that only the latest apply
-      Set<DomainCreatePermission> domainCreatePermissions_pre2 = new HashSet();
+      Set<DomainCreatePermission> domainCreatePermissions_pre2 = new HashSet<>();
       domainCreatePermissions_pre2.add(domCreatePerm_create_withGrant);
       domainCreatePermissions_pre2.add(domCreatePerm_child);
 
@@ -160,7 +161,7 @@ public class TestAccessControl_setDomainCreatePermissions extends TestAccessCont
       Resource accessorResource = generateUnauthenticatableResource();
       assertThat(accessControlContext.getEffectiveDomainCreatePermissions(accessorResource).isEmpty(), is(true));
 
-      Set<DomainCreatePermission> domainCreatePermissions_pre = new HashSet();
+      Set<DomainCreatePermission> domainCreatePermissions_pre = new HashSet<>();
       domainCreatePermissions_pre.add(domCreatePerm_superuser);
       domainCreatePermissions_pre.add(domCreatePerm_child);
 
@@ -188,7 +189,7 @@ public class TestAccessControl_setDomainCreatePermissions extends TestAccessCont
       Resource accessorResource = generateUnauthenticatableResource();
       assertThat(accessControlContext.getEffectiveDomainCreatePermissions(accessorResource).isEmpty(), is(true));
 
-      Set<DomainCreatePermission> domainCreatePermissions_pre = new HashSet();
+      Set<DomainCreatePermission> domainCreatePermissions_pre = new HashSet<>();
       domainCreatePermissions_pre.add(domCreatePerm_superuser_trailingspaces);
       domainCreatePermissions_pre.add(domCreatePerm_create_withGrant);
 
@@ -210,7 +211,7 @@ public class TestAccessControl_setDomainCreatePermissions extends TestAccessCont
       final DomainCreatePermission domCreatePerm_create_withGrant
             = DomainCreatePermission.getInstance(DomainCreatePermission.CREATE, true);
 
-      Set<DomainCreatePermission> domainCreatePermissions = new HashSet();
+      Set<DomainCreatePermission> domainCreatePermissions = new HashSet<>();
       domainCreatePermissions.add(domCreatePerm_create_withGrant);
 
       Set<DomainCreatePermission> domainCreatePermission_nullElement = new HashSet<>();
@@ -257,7 +258,7 @@ public class TestAccessControl_setDomainCreatePermissions extends TestAccessCont
       final String password = generateUniquePassword();
       final Resource authenticatableResource = generateAuthenticatableResource(password);
 
-      final Set<DomainCreatePermission> domainCreatePermissions_granter = new HashSet();
+      final Set<DomainCreatePermission> domainCreatePermissions_granter = new HashSet<>();
       domainCreatePermissions_granter.add(domCreatePerm_superuser);
       domainCreatePermissions_granter.add(domCreatePerm_create);
 
@@ -272,13 +273,14 @@ public class TestAccessControl_setDomainCreatePermissions extends TestAccessCont
       Resource accessorResource = generateUnauthenticatableResource();
       assertThat(accessControlContext.getEffectiveDomainCreatePermissions(accessorResource).isEmpty(), is(true));
 
-      Set<DomainCreatePermission> domainCreatePermissions_pre = new HashSet();
+      Set<DomainCreatePermission> domainCreatePermissions_pre = new HashSet<>();
       domainCreatePermissions_pre.add(domCreatePerm_superuser);
       domainCreatePermissions_pre.add(domCreatePerm_create_withGrant);
       domainCreatePermissions_pre.add(domCreatePerm_child);
       assertThat(domainCreatePermissions_pre, is(not(domainCreatePermissions_granter)));
 
-      accessControlContext.authenticate(authenticatableResource,password);
+      accessControlContext.authenticate(PasswordCredentialsBuilder.newPasswordCredentials(authenticatableResource,
+                                                                                          password));
 
       try {
          accessControlContext.setDomainCreatePermissions(accessorResource, domainCreatePermissions_pre);

@@ -39,9 +39,7 @@ import java.util.Set;
  * <dd> The resource whose security credentials are associated with this session.
  * This is the same as the authenticated resource, unless another resource is being {@link #impersonate impersonated}.
  * </dl>
- * Unless a session is authenticated, all attempts to call any methods other than <code>authenticate</code> or
- * the special {@link #setResourcePassword(Resource, AuthenticationProvider, String)} will fail.
- *
+ * Unless a session is authenticated, all attempts to call any methods other than <code>authenticate</code> will fail.
  */
 public interface AccessControlContext {
    String SYSTEM_DOMAIN         = "SYSDOMAIN";
@@ -54,11 +52,10 @@ public interface AccessControlContext {
     * <p/>
     * Note: Unless a session is authenticated, all attempts to call any other methods (except <code>authenticate</code>) will fail.
     *
-    * @param resource the resource to be authenticated
-    * @param password the password associated with the resource
+    * @param credentials the credentials to be used for authentication
     * @throws AccessControlException if an error occurs
     */
-   public void authenticate(Resource resource, String password)
+   public void authenticate(Credentials credentials)
          throws AccessControlException;
 
    /**
@@ -96,63 +93,23 @@ public interface AccessControlContext {
          throws AccessControlException;
 
    /**
-    * Sets the password of the currently authenticated resource
-    * <p/>
-    * Note that this method uses the credentials of the originally authenticated resource,
-    * and not those of any currently impersonated resource.
-    *
-    * @param newPassword a new password for the currently authenticated resource
-    * @throws AccessControlException if an error occurs
-    */
-   public void setAuthenticatedResourcePassword(String newPassword)
-         throws AccessControlException;
-
-   /**
-    * Sets the password of the specified authenticatable resource (= a resource of a resource class
-    * that has been defined with the <code>isAuthenticatable</code> flag set).
-    * <p/>
-    * One of the following has to be true for this method to succeed:
+    * Updates the authentication credentials for the resource specified in the credentials object.
+    * The contained a resource must be of a resource class that has been defined with the
+    * <code>isAuthenticatable</code> flag set to true. Additionally one of the following has to be true for this method to succeed:
     * <ul>
-    * <li> the specified resource has to either be the currently authenticated resource or
+    * <li> the resource in the credentials has to either be the currently authenticated resource or
     * <li> the currently authenticated resource has to have SUPER-USER permission on the domain
-    * that contains the specified resource or
-    * <li> the currently authenticated resource has to have RESET-PASSWORD permission on the specified resource.
+    * that contains the resource specified in the credentials or
+    * <li> the currently authenticated resource has to have RESET-PASSWORD permission on the resource specified
+    * in the credentials .
     * </ul>
-    * Note that this method uses the credentials of the originally authenticated resource,
-    * and not those of any currently impersonated resource.
+    * Note that this method uses the originally authenticated resource for all of the above checks even if there
+    * is and active impersonated resource.
     *
-    * @param resource    the resource for which the password should be changed. The resource for which the password is
-    *                    to be changed must be the current auth resource, or the current auth resource must have SUPER-USER permissions
-    *                    to the domain containing the resource whose password is to be changed or must have RESET-PASSWORD
-    *                    permissions to the resource whose password is to be changed, otherwise an exception is thrown.
-    * @param newPassword the new password for the resource
+    * @param newCredentials the credentials
     * @throws AccessControlException if an error occurs
     */
-   public void setResourcePassword(Resource resource, String newPassword)
-         throws AccessControlException;
-
-   /**
-    * Sets the password of the specified authenticatable resource (= a resource of a resource class
-    * that has been defined with the <code>isAuthenticatable</code> flag set) by means of an <em>alternate
-    * specified authentication provider to this session</em>.
-    * <p/>
-    * Note that this method requires this session to be <strong>unauthenticated</strong>.
-    * <p/>
-    * This method is provided to allow for certain use cases, like a "forgotten password" reset,
-    * when a resource representing a "user" can not authenticate to this session.
-    * The specified alternate authentication provider provides a callback via the
-    * {@link AuthenticationProvider#isAuthenticated(Resource) isAuthenticated} method that allows this session
-    * to temporarily authenticate, for purposes of resetting the specified resource's password.
-    *
-    * @param resource               the resource for which the password should be changed.
-    * @param authenticationProvider a callback that allows OACC to hook into the alternate authentication mechanism
-    *                               used to clear the password reset.
-    * @param newPassword            the new password for the resource
-    * @throws AccessControlException if an error occurs
-    */
-   public void setResourcePassword(Resource resource,
-                                   AuthenticationProvider authenticationProvider,
-                                   String newPassword)
+   public void updateCredentials(Credentials newCredentials)
          throws AccessControlException;
 
    /**
