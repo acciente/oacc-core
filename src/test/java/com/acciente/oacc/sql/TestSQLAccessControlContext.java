@@ -19,7 +19,7 @@ package com.acciente.oacc.sql;
 
 import com.acciente.oacc.AccessControlContext;
 import com.acciente.oacc.AccessControlException;
-import com.acciente.oacc.PasswordCredentialsBuilder;
+import com.acciente.oacc.PasswordCredentials;
 import com.acciente.oacc.ResourceCreatePermission;
 import com.acciente.oacc.DomainCreatePermission;
 import com.acciente.oacc.DomainPermission;
@@ -45,6 +45,8 @@ public class TestSQLAccessControlContext extends TestSQLAccessControlContextBase
    private static final DomainPermission DomainPermission_CREATE_CHILD_DOMAIN_GRANT = DomainPermission.getInstance(DomainPermission.CREATE_CHILD_DOMAIN, true);
    private static final DomainPermission DomainPermission_SUPER_USER                = DomainPermission.getInstance(DomainPermission.SUPER_USER, false);
    private static final DomainPermission DomainPermission_SUPER_USER_GRANT          = DomainPermission.getInstance(DomainPermission.SUPER_USER, true);
+   public static final  char[]           PASSWORD                                   = "foobar".toCharArray();
+   public static final  char[]           PASSWORD2                                  = "goobar".toCharArray();
 
    public static void main(String args[]) throws SQLException, IOException, ClassNotFoundException, IllegalAccessException, InstantiationException, InterruptedException, AccessControlException {
       if (!checkDBConnectArgs(args)) {
@@ -80,10 +82,9 @@ public class TestSQLAccessControlContext extends TestSQLAccessControlContextBase
    private static void authSysResource(final AccessControlContext accessControlContext) {
       Resource sysAuthResource = Resource.getInstance(0);
 
-      setupName("ACS authenticate( SYSTEM, valid-password )");
+      setupName("authenticate( SYSTEM, valid-password )");
       try {
-         accessControlContext.authenticate(PasswordCredentialsBuilder.newPasswordCredentials(sysAuthResource,
-                                                                                             oaccRootPwd));
+         accessControlContext.authenticate(sysAuthResource, PasswordCredentials.newInstance(oaccRootPwd));
          setupOK();
       }
       catch (AccessControlException e) {
@@ -100,8 +101,7 @@ public class TestSQLAccessControlContext extends TestSQLAccessControlContextBase
 
       testName("authenticate( resource-0, <invalid-pwd> )");
       try {
-         accessControlContext.authenticate(PasswordCredentialsBuilder.newPasswordCredentials(sysAuthResource,
-                                                                                             "foobar"));
+         accessControlContext.authenticate(sysAuthResource, PasswordCredentials.newInstance(PASSWORD));
          testFail();
       }
       catch (AccessControlException e) {
@@ -115,8 +115,7 @@ public class TestSQLAccessControlContext extends TestSQLAccessControlContextBase
 
       testName("authenticate( resource-0, valid-password )");
       try {
-         accessControlContext.authenticate(PasswordCredentialsBuilder.newPasswordCredentials(sysAuthResource,
-                                                                                             oaccRootPwd));
+         accessControlContext.authenticate(sysAuthResource, PasswordCredentials.newInstance(oaccRootPwd));
 
          testOK();
       }
@@ -356,7 +355,7 @@ public class TestSQLAccessControlContext extends TestSQLAccessControlContextBase
       // we create a new user in the domain
       setupName("acmeRootUser = createAuthResource( USER, ACMECorp )");
       try {
-         acmeRootUser = accessControlContext.createAuthenticatableResource("USER", "ACMECorp", "foobar");
+         acmeRootUser = accessControlContext.createResource("USER", "ACMECorp", PasswordCredentials.newInstance(PASSWORD));
          setupOK();
       }
       catch (AccessControlException e) {
@@ -384,7 +383,7 @@ public class TestSQLAccessControlContext extends TestSQLAccessControlContextBase
       // next we auth as the new user in the ACMECorp domain
       setupName("authenticate( acmeRootUser, <valid-pwd> )");
       try {
-         accessControlContext.authenticate(PasswordCredentialsBuilder.newPasswordCredentials(acmeRootUser, "foobar"));
+         accessControlContext.authenticate(acmeRootUser, PasswordCredentials.newInstance(PASSWORD));
          setupOK();
       }
       catch (AccessControlException e) {
@@ -458,7 +457,7 @@ public class TestSQLAccessControlContext extends TestSQLAccessControlContextBase
       // we create a new user in the domain
       setupName("acmeRootUser = createAuthResource( USER, ACMECorp )");
       try {
-         acmeRootUser = accessControlContext.createAuthenticatableResource("USER", "ACMECorp", "foobar");
+         acmeRootUser = accessControlContext.createResource("USER", "ACMECorp", PasswordCredentials.newInstance(PASSWORD));
          setupOK();
       }
       catch (AccessControlException e) {
@@ -489,7 +488,7 @@ public class TestSQLAccessControlContext extends TestSQLAccessControlContextBase
       // next we auth as the new user in the ACMECorp domain
       setupName("authenticate( acmeRootUser, <valid-pwd> )");
       try {
-         accessControlContext.authenticate(PasswordCredentialsBuilder.newPasswordCredentials(acmeRootUser, "foobar"));
+         accessControlContext.authenticate(acmeRootUser, PasswordCredentials.newInstance(PASSWORD));
          setupOK();
       }
       catch (AccessControlException e) {
@@ -550,7 +549,9 @@ public class TestSQLAccessControlContext extends TestSQLAccessControlContextBase
       // we create a new user in the domain
       setupName("acmeRootUser = createAuthResource( USER, ACMECorp, <pwd> )");
       try {
-         acmeRootUser = accessControlContext.createAuthenticatableResource("USER", "ACMECorp", "foobar");
+         acmeRootUser = accessControlContext.createResource("USER",
+                                                            "ACMECorp",
+                                                            PasswordCredentials.newInstance(PASSWORD));
          setupOK();
       }
       catch (AccessControlException e) {
@@ -560,7 +561,7 @@ public class TestSQLAccessControlContext extends TestSQLAccessControlContextBase
       // next we auth as the new user in the ACMECorp domain
       setupName("authenticate( acmeRootUser, <valid-pwd> )");
       try {
-         accessControlContext.authenticate(PasswordCredentialsBuilder.newPasswordCredentials(acmeRootUser, "foobar"));
+         accessControlContext.authenticate(acmeRootUser, PasswordCredentials.newInstance(PASSWORD));
          setupOK();
       }
       catch (AccessControlException e) {
@@ -613,7 +614,9 @@ public class TestSQLAccessControlContext extends TestSQLAccessControlContextBase
       // we create a new user in the domain
       setupName("acmeRootUser = createAuthResource( USER, ACMECorp )");
       try {
-         acmeRootUser = accessControlContext.createAuthenticatableResource("USER", "ACMECorp", "foobar");
+         acmeRootUser = accessControlContext.createResource("USER",
+                                                            "ACMECorp",
+                                                            PasswordCredentials.newInstance(PASSWORD));
          setupOK();
       }
       catch (AccessControlException e) {
@@ -648,7 +651,7 @@ public class TestSQLAccessControlContext extends TestSQLAccessControlContextBase
       // next we re-auth as the new user in the ACMECorp domain
       setupName("authenticate( acmeRootUser, <valid-pwd> )");
       try {
-         accessControlContext.authenticate(PasswordCredentialsBuilder.newPasswordCredentials(acmeRootUser, "foobar"));
+         accessControlContext.authenticate(acmeRootUser, PasswordCredentials.newInstance(PASSWORD));
          setupOK();
       }
       catch (AccessControlException e) {
@@ -692,7 +695,7 @@ public class TestSQLAccessControlContext extends TestSQLAccessControlContextBase
       // we create new user #1
       setupName("newUser_1 = createAuthResource( USER, <pwd> )");
       try {
-         newUser_1 = accessControlContext.createAuthenticatableResource("USER", "foobar");
+         newUser_1 = accessControlContext.createResource("USER", PasswordCredentials.newInstance(PASSWORD));
          setupOK();
       }
       catch (AccessControlException e) {
@@ -702,7 +705,7 @@ public class TestSQLAccessControlContext extends TestSQLAccessControlContextBase
       // we create new user #2
       setupName("newUser_2 = createAuthResource( USER, <pwd> )");
       try {
-         newUser_2 = accessControlContext.createAuthenticatableResource("USER", "goobar");
+         newUser_2 = accessControlContext.createResource("USER", PasswordCredentials.newInstance(PASSWORD2));
          setupOK();
       }
       catch (AccessControlException e) {
@@ -815,7 +818,7 @@ public class TestSQLAccessControlContext extends TestSQLAccessControlContextBase
       // we create new user #1
       setupName("newUser_1 = createAuthResource( USER, <pwd> )");
       try {
-         newUser_1 = accessControlContext.createAuthenticatableResource("USER", "foobar");
+         newUser_1 = accessControlContext.createResource("USER", PasswordCredentials.newInstance(PASSWORD));
          setupOK();
       }
       catch (AccessControlException e) {
@@ -889,7 +892,7 @@ public class TestSQLAccessControlContext extends TestSQLAccessControlContextBase
       // we create new user #1
       setupName("newUser_1 = createAuthResource( USER, <pwd> )");
       try {
-         newUser_1 = accessControlContext.createAuthenticatableResource("USER", "foobar");
+         newUser_1 = accessControlContext.createResource("USER", PasswordCredentials.newInstance(PASSWORD));
          setupOK();
       }
       catch (AccessControlException e) {
@@ -899,7 +902,7 @@ public class TestSQLAccessControlContext extends TestSQLAccessControlContextBase
       // we create new user #2
       setupName("newUser_2 = createAuthResource( USER, <pwd> )");
       try {
-         newUser_2 = accessControlContext.createAuthenticatableResource("USER", "goobar");
+         newUser_2 = accessControlContext.createResource("USER", PasswordCredentials.newInstance(PASSWORD2));
          setupOK();
       }
       catch (AccessControlException e) {
@@ -923,8 +926,8 @@ public class TestSQLAccessControlContext extends TestSQLAccessControlContextBase
       // next we auth as user #1
       setupName("authenticate( newUser_1, <valid-pwd> )");
       try {
-         accessControlContext.authenticate(PasswordCredentialsBuilder.newPasswordCredentials(newUser_1, "foobar"));
-         accessControlContext.authenticate(PasswordCredentialsBuilder.newPasswordCredentials(newUser_1, "foobar"));
+         accessControlContext.authenticate(newUser_1, PasswordCredentials.newInstance(PASSWORD));
+         accessControlContext.authenticate(newUser_1, PasswordCredentials.newInstance(PASSWORD));
          setupOK();
       }
       catch (AccessControlException e) {
@@ -959,8 +962,8 @@ public class TestSQLAccessControlContext extends TestSQLAccessControlContextBase
       // next we auth as user #2
       setupName("authenticate( newUser_2, <valid-pwd> )");
       try {
-         accessControlContext.authenticate(PasswordCredentialsBuilder.newPasswordCredentials(newUser_2, "goobar"));
-         accessControlContext.authenticate(PasswordCredentialsBuilder.newPasswordCredentials(newUser_2, "goobar"));
+         accessControlContext.authenticate(newUser_2, PasswordCredentials.newInstance(PASSWORD2));
+         accessControlContext.authenticate(newUser_2, PasswordCredentials.newInstance(PASSWORD2));
          setupOK();
       }
       catch (AccessControlException e) {
@@ -995,8 +998,8 @@ public class TestSQLAccessControlContext extends TestSQLAccessControlContextBase
       // next we auth as user #2
       setupName("authenticate( newUser_2, <valid-pwd> )");
       try {
-         accessControlContext.authenticate(PasswordCredentialsBuilder.newPasswordCredentials(newUser_2, "goobar"));
-         accessControlContext.authenticate(PasswordCredentialsBuilder.newPasswordCredentials(newUser_2, "goobar"));
+         accessControlContext.authenticate(newUser_2, PasswordCredentials.newInstance(PASSWORD2));
+         accessControlContext.authenticate(newUser_2, PasswordCredentials.newInstance(PASSWORD2));
          setupOK();
       }
       catch (AccessControlException e) {

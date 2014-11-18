@@ -20,11 +20,9 @@ package com.acciente.oacc.sql.internal;
 import com.acciente.oacc.AccessControlContext;
 import com.acciente.oacc.AccessControlException;
 import com.acciente.oacc.AuthenticationProvider;
-import com.acciente.oacc.AuthenticationProviderContext;
 import com.acciente.oacc.Credentials;
 import com.acciente.oacc.DomainCreatePermission;
 import com.acciente.oacc.DomainPermission;
-import com.acciente.oacc.PasswordCredentials;
 import com.acciente.oacc.Resource;
 import com.acciente.oacc.ResourceClassInfo;
 import com.acciente.oacc.ResourceCreatePermission;
@@ -51,8 +49,6 @@ import com.acciente.oacc.sql.internal.persister.id.Id;
 import com.acciente.oacc.sql.internal.persister.id.ResourceClassId;
 import com.acciente.oacc.sql.internal.persister.id.ResourceId;
 import com.acciente.oacc.sql.internal.persister.id.ResourcePermissionId;
-import org.jasypt.util.password.PasswordEncryptor;
-import org.jasypt.util.password.StrongPasswordEncryptor;
 
 import javax.sql.DataSource;
 import java.io.Serializable;
@@ -67,19 +63,19 @@ import java.util.Set;
 @SuppressWarnings({"UnusedAssignment", "ThrowFromFinallyBlock"})
 public class SQLAccessControlContext implements AccessControlContext, Serializable {
    // services
-   private DataSource        dataSource;
-   private Connection        connection;
-   private PasswordEncryptor passwordEncryptor;
+   private DataSource dataSource;
+   private Connection connection;
 
    // state
-   private final AuthenticationProvider authenticationProvider;
+   private AuthenticationProvider authenticationProvider;
+   private boolean                hasDefaultAuthenticationProvider;
 
-   // The resource that authenticated in this session with a password
+   // The resource that authenticated in this session with a call to one of the authenticate() methods
    private Resource authenticatedResource;
    private String   authenticatedResourceDomainName;
 
    // The resource as which the session's credentials are checked. This would be the same as the resource
-   // that initially authenticated with a password unless a another resource is being impersonated
+   // that initially authenticated - UNLESS a another resource is being IMPERSONATED
    private Resource sessionResource;
    private String   sessionResourceDomainName;
 
@@ -105,10 +101,10 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
          = ResourcePermission.getInstance(ResourcePermission.IMPERSONATE, false);
    private static final ResourcePermission ResourcePermission_IMPERSONATE_GRANT
          = ResourcePermission.getInstance(ResourcePermission.IMPERSONATE, true);
-   private static final ResourcePermission ResourcePermission_RESET_PASSWORD
-         = ResourcePermission.getInstance(ResourcePermission.RESET_PASSWORD, false);
-   private static final ResourcePermission ResourcePermission_RESET_PASSWORD_GRANT
-         = ResourcePermission.getInstance(ResourcePermission.RESET_PASSWORD, true);
+   private static final ResourcePermission ResourcePermission_RESET_CREDENTIALS
+         = ResourcePermission.getInstance(ResourcePermission.RESET_CREDENTIALS, false);
+   private static final ResourcePermission ResourcePermission_RESET_CREDENTIALS_GRANT
+         = ResourcePermission.getInstance(ResourcePermission.RESET_CREDENTIALS, true);
 
    // persisters
    private final ResourceClassPersister                              resourceClassPersister;
@@ -130,14 +126,14 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
                                                               String schemaName,
                                                               SQLDialect sqlDialect)
          throws AccessControlException {
-      return new SQLAccessControlContext(connection, schemaName, sqlDialect, null);
+      return new SQLAccessControlContext(connection, schemaName, sqlDialect);
    }
 
    public static AccessControlContext getAccessControlContext(DataSource dataSource,
                                                               String schemaName,
                                                               SQLDialect sqlDialect)
          throws AccessControlException {
-      return new SQLAccessControlContext(dataSource, schemaName, sqlDialect, null);
+      return new SQLAccessControlContext(dataSource, schemaName, sqlDialect);
    }
 
    public static AccessControlContext getAccessControlContext(Connection connection,
@@ -179,33 +175,48 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
 
    private SQLAccessControlContext(Connection connection,
                                    String schemaName,
+                                   SQLDialect sqlDialect) throws AccessControlException {
+      this(schemaName, sqlDialect);
+      this.connection = connection;
+      // use the built-in authentication provider when no custom implementation is provided
+      this.authenticationProvider
+            = new SQLPasswordAuthenticationProvider(connection, schemaName, sqlDialect);
+      this.hasDefaultAuthenticationProvider = true;
+   }
+
+   private SQLAccessControlContext(Connection connection,
+                                   String schemaName,
                                    SQLDialect sqlDialect,
                                    AuthenticationProvider authenticationProvider) throws AccessControlException {
-      this(schemaName, sqlDialect, authenticationProvider);
+      this(schemaName, sqlDialect);
       this.connection = connection;
+      this.authenticationProvider = authenticationProvider;
+      this.hasDefaultAuthenticationProvider = false;
+   }
+
+   private SQLAccessControlContext(DataSource dataSource,
+                                   String schemaName,
+                                   SQLDialect sqlDialect) throws AccessControlException {
+      this(schemaName, sqlDialect);
+      this.dataSource = dataSource;
+      // use the built-in authentication provider when no custom implementation is provided
+      this.authenticationProvider
+            = new SQLPasswordAuthenticationProvider(dataSource, schemaName, sqlDialect);
+      this.hasDefaultAuthenticationProvider = true;
    }
 
    private SQLAccessControlContext(DataSource dataSource,
                                    String schemaName,
                                    SQLDialect sqlDialect,
                                    AuthenticationProvider authenticationProvider) throws AccessControlException {
-      this(schemaName, sqlDialect, authenticationProvider);
+      this(schemaName, sqlDialect);
       this.dataSource = dataSource;
+      this.authenticationProvider = authenticationProvider;
+      this.hasDefaultAuthenticationProvider = false;
    }
 
    private SQLAccessControlContext(String schemaName,
-                                   SQLDialect sqlDialect,
-                                   AuthenticationProvider authenticationProvider) throws AccessControlException {
-      this.passwordEncryptor = new StrongPasswordEncryptor();
-      if (authenticationProvider == null) {
-         // use the built-in authentication provider when no custom implementation is provided
-         this.authenticationProvider = new PasswordAuthenticationProvider();
-      }
-      else {
-         authenticationProvider.setContext(new AuthenticationProviderContextImpl(new PasswordAuthenticationProvider()));
-         this.authenticationProvider = authenticationProvider;
-      }
-
+                                   SQLDialect sqlDialect) throws AccessControlException {
       // generate all the SQLs the persisters need based on the database dialect
       SQLStrings sqlStrings = SQLStrings.getSQLStrings(schemaName, sqlDialect);
 
@@ -243,40 +254,60 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
    private void preSerialize() {
       this.dataSource = null;
       this.connection = null;
-      this.passwordEncryptor = null;
+      if (hasDefaultAuthenticationProvider) {
+         ((SQLPasswordAuthenticationProvider) authenticationProvider).preSerialize();
+      }
    }
 
    private void postDeserialize(DataSource dataSource) {
       this.dataSource = dataSource;
       this.connection = null;
-      this.passwordEncryptor = new StrongPasswordEncryptor();
+      if (hasDefaultAuthenticationProvider) {
+         ((SQLPasswordAuthenticationProvider) authenticationProvider).postDeserialize(dataSource);
+      }
    }
 
    private void postDeserialize(Connection connection) {
       this.dataSource = null;
       this.connection = connection;
-      this.passwordEncryptor = new StrongPasswordEncryptor();
+      if (hasDefaultAuthenticationProvider) {
+         ((SQLPasswordAuthenticationProvider) authenticationProvider).postDeserialize(connection);
+      }
    }
 
    @Override
-   public void authenticate(Credentials credentials) throws AccessControlException {
+   public void authenticate(Resource resource, Credentials credentials) throws AccessControlException {
+      assertResourceSpecified(resource);
+      assertCredentialsSpecified(credentials);
+
+      __authenticate(resource, credentials);
+   }
+
+   @Override
+   public void authenticate(Resource resource) throws AccessControlException {
+      assertResourceSpecified(resource);
+
+      __authenticate(resource, null);
+   }
+
+   private void __authenticate(Resource resource, Credentials credentials) throws AccessControlException {
       // before delegating to the authentication provider we do some basic validation
       SQLConnection connection = null;
+
       final String resourceDomainForResource;
       try {
          connection = getConnection();
 
          final ResourceClassInternalInfo resourceClassInternalInfo
-               = resourceClassPersister.getResourceClassInfoByResourceId(connection, credentials.getResource());
+               = resourceClassPersister.getResourceClassInfoByResourceId(connection, resource);
 
          // complain if the resource is not marked as supporting authentication
          if (!resourceClassInternalInfo.isAuthenticatable()) {
-            throw new AccessControlException(credentials.getResource()
+            throw new AccessControlException(resource
                                                    + " is not of an authenticatable type, type: "
                                                    + resourceClassInternalInfo.getResourceClassName());
          }
-         resourceDomainForResource = domainPersister.getResourceDomainNameByResourceId(connection,
-                                                                                       credentials.getResource());
+         resourceDomainForResource = domainPersister.getResourceDomainNameByResourceId(connection, resource);
       }
       catch (SQLException e) {
          throw new AccessControlException(e);
@@ -286,9 +317,14 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       }
 
       // now we delegate to the authentication provider
-      authenticationProvider.authenticate(credentials);
+      if (credentials != null) {
+         authenticationProvider.authenticate(resource, credentials);
+      }
+      else {
+         authenticationProvider.authenticate(resource);
+      }
 
-      authenticatedResource = credentials.getResource();
+      authenticatedResource = resource;
       authenticatedResourceDomainName = resourceDomainForResource;
 
       sessionResource = authenticatedResource;
@@ -332,7 +368,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
 
       final ResourceClassInternalInfo resourceClassInternalInfo = resourceClassPersister.getResourceClassInfoByResourceId(connection, resource);
 
-      // complain if the resource has no password set
+      // complain if the resource is not of an authenticatable resource-class
       if (!resourceClassInternalInfo.isAuthenticatable()) {
          throw new AccessControlException(resource
                                           + " is not of an authenticatable type, type: "
@@ -388,31 +424,32 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
    }
 
    @Override
-   public void updateCredentials(Credentials newCredentials) throws AccessControlException {
+   public void setCredentials(Resource resource, Credentials newCredentials) throws AccessControlException {
       SQLConnection connection = null;
 
       assertAuth();
 
+      assertCredentialsSpecified(newCredentials);
+      authenticationProvider.validateCredentials(newCredentials);
+
       try {
          connection = getConnection();
 
-         boolean resetPasswordPermissionOK = false;
+         boolean hasResetCredentialsPermission = false;
 
          // first check direct permissions
-         final Resource resource = newCredentials.getResource();
-
          final ResourceClassInternalInfo
                resourceClassInfo = resourceClassPersister.getResourceClassInfoByResourceId(connection, resource);
 
          final Set<ResourcePermission>
                resourcePermissions = __getEffectiveResourcePermissions(connection, authenticatedResource, resource);
 
-         if (resourcePermissions.contains(ResourcePermission_RESET_PASSWORD)
-               || resourcePermissions.contains(ResourcePermission_RESET_PASSWORD_GRANT)) {
-            resetPasswordPermissionOK = true;
+         if (resourcePermissions.contains(ResourcePermission_RESET_CREDENTIALS)
+               || resourcePermissions.contains(ResourcePermission_RESET_CREDENTIALS_GRANT)) {
+            hasResetCredentialsPermission = true;
          }
 
-         if (!resetPasswordPermissionOK) {
+         if (!hasResetCredentialsPermission) {
             // next check global direct permissions
             final String
                   domainName = domainPersister.getResourceDomainNameByResourceId(connection, resource);
@@ -422,22 +459,21 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
                                                                               resourceClassInfo.getResourceClassName(),
                                                                               domainName);
 
-            if (globalResourcePermissions.contains(ResourcePermission_RESET_PASSWORD)
-                  || globalResourcePermissions.contains(ResourcePermission_RESET_PASSWORD_GRANT)) {
-               resetPasswordPermissionOK = true;
+            if (globalResourcePermissions.contains(ResourcePermission_RESET_CREDENTIALS)
+                  || globalResourcePermissions.contains(ResourcePermission_RESET_CREDENTIALS_GRANT)) {
+               hasResetCredentialsPermission = true;
             }
          }
 
-         if (!resetPasswordPermissionOK) {
+         if (!hasResetCredentialsPermission) {
             // finally check for super user permissions
             if (__isSuperUserOfResource(connection, resource)) {
-               resetPasswordPermissionOK = true;
+               hasResetCredentialsPermission = true;
             }
          }
 
-         if (!resetPasswordPermissionOK) {
-            throw new AccessControlException("Not authorized to reset password for: " + resource,
-                                       true);
+         if (!hasResetCredentialsPermission) {
+            throw new AccessControlException("Not authorized to reset credentials for: " + resource, true);
          }
       }
       catch (SQLException e) {
@@ -447,7 +483,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
          closeConnection(connection);
       }
 
-      authenticationProvider.updateCredentials(newCredentials);
+      authenticationProvider.setCredentials(resource, newCredentials);
    }
 
    @Override
@@ -658,15 +694,15 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
    }
 
    @Override
-   public Resource createAuthenticatableResource(String resourceClassName, String password) throws AccessControlException {
+   public Resource createResource(String resourceClassName, Credentials credentials) throws AccessControlException {
       SQLConnection connection = null;
 
-      assertPasswordOK(password);
+      assertCredentialsSpecified(credentials);
 
       try {
          connection = getConnection();
 
-         return __createResource(connection, resourceClassName, sessionResourceDomainName, password);
+         return __createResource(connection, resourceClassName, sessionResourceDomainName, credentials);
       }
       catch (SQLException e) {
          throw new AccessControlException(e);
@@ -677,17 +713,17 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
    }
 
    @Override
-   public Resource createAuthenticatableResource(String resourceClassName,
-                                                 String domainName,
-                                                 String password) throws AccessControlException {
+   public Resource createResource(String resourceClassName,
+                                  String domainName,
+                                  Credentials credentials) throws AccessControlException {
       SQLConnection connection = null;
 
-      assertPasswordOK(password);
+      assertCredentialsSpecified(credentials);
 
       try {
          connection = getConnection();
 
-         return __createResource(connection, resourceClassName, domainName, password);
+         return __createResource(connection, resourceClassName, domainName, credentials);
       }
       catch (SQLException e) {
          throw new AccessControlException(e);
@@ -700,7 +736,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
    private Resource __createResource(SQLConnection connection,
                                      String resourceClassName,
                                      String domainName,
-                                     String password) throws AccessControlException {
+                                     Credentials credentials) throws AccessControlException {
       assertResourceClassNotBlank(resourceClassName);
       assertDomainSpecified(domainName);
 
@@ -718,15 +754,15 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
          assertAuth();
       }
 
-      // check if a password is required and if it is consistent with if a password was provided
       if (resourceClassInternalInfo.isAuthenticatable()) {
-         assertPasswordOK(password);
+         // if this resource class is authenticatable, then validate the credentials if present
+         if (credentials != null) {
+            authenticationProvider.validateCredentials(credentials);
+         }
       }
       else {
-         assertPasswordEmpty(password);
-
-         // if we came here the password was null or whitespace, so set it to null
-         password = null;
+         // if this resource class is NOT authenticatable, then specifying credentials is invalid
+         assertCredentialsNotSpecified(credentials);
       }
 
       // validate the domain
@@ -751,7 +787,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
          }
 
          if (resourceClassInternalInfo.isAuthenticatable()) {
-            newResourcePermissions.add(ResourcePermission.getInstance(ResourcePermission.RESET_PASSWORD, true));
+            newResourcePermissions.add(ResourcePermission.getInstance(ResourcePermission.RESET_CREDENTIALS, true));
             newResourcePermissions.add(ResourcePermission.getInstance(ResourcePermission.IMPERSONATE, true));
          }
       }
@@ -789,20 +825,10 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       }
 
       // create the new resource
-      final String encryptedBoundPassword;
-      if (password == null) {
-         encryptedBoundPassword = null;
-      }
-      else {
-         final String boundPassword = PasswordUtils.computeBoundPassword(newResourceId, password);
-
-         encryptedBoundPassword = passwordEncryptor.encryptPassword(boundPassword);
-      }
       resourcePersister.createResource(connection,
                                        newResourceId,
                                        Id.<ResourceClassId>from(resourceClassInternalInfo.getResourceClassId()),
-                                       domainId,
-                                       encryptedBoundPassword);
+                                       domainId);
 
       // set permissions on the new resource, if applicable
       final Resource newResource = Resource.getInstance(newResourceId.getValue());
@@ -825,6 +851,10 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
                                      newResource,
                                      true);
          }
+      }
+
+      if (credentials != null) {
+         authenticationProvider.setCredentials(newResource, credentials);
       }
 
       return newResource;
@@ -1639,7 +1669,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
          if (resourcePermission.isSystemPermission()) {
             if (!accessedResourceClassInternalInfo.isAuthenticatable()
                   && (resourcePermission.getPermissionName().equals(ResourcePermission.IMPERSONATE)
-                  || resourcePermission.getPermissionName().equals(ResourcePermission.RESET_PASSWORD))) {
+                  || resourcePermission.getPermissionName().equals(ResourcePermission.RESET_CREDENTIALS))) {
                throw new AccessControlException("Permission: " + resourcePermission + ", not valid for unauthenticatable resource");
             }
          }
@@ -1937,7 +1967,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
             }
             if (!resourceClassInternalInfo.isAuthenticatable()
                   && (resourcePermission.getPermissionName().equals(ResourcePermission.IMPERSONATE)
-                  || resourcePermission.getPermissionName().equals(ResourcePermission.RESET_PASSWORD))) {
+                  || resourcePermission.getPermissionName().equals(ResourcePermission.RESET_CREDENTIALS))) {
                throw new AccessControlException("Permission: " + resourcePermission + ", not valid for unauthenticatable resource");
             }
          }
@@ -2697,7 +2727,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
                __hasPermission(connection,
                                sessionResource,
                                accessorResource,
-                               ResourcePermission.getInstance(ResourcePermission.RESET_PASSWORD))) {
+                               ResourcePermission.getInstance(ResourcePermission.RESET_CREDENTIALS))) {
             return __getResourcesByPermission(connection,
                                               accessorResource,
                                               resourceClassName,
@@ -2706,7 +2736,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
             );
          }
          else {
-            throw new AccessControlException("Current resource must have IMPERSONATE, RESET_PASSWORD or INHERIT permission to: "
+            throw new AccessControlException("Current resource must have IMPERSONATE, RESET_CREDENTIALS or INHERIT permission to: "
                                              + accessorResource,
                                        true);
          }
@@ -2931,27 +2961,26 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       return resourcePermissions;
    }
 
-   // shared assets
+   // helper methods
 
-   private void assertPasswordOK(String password)
+   private void assertResourceSpecified(Resource resource)
          throws AccessControlException {
-      if (password == null) {
-         throw new AccessControlException("Password expected, none specified");
-      }
-
-      if (password.length() != password.trim().length()) {
-         throw new AccessControlException("Password may not contain leading/trailing spaces");
-      }
-
-      if (password.length() < 6) {
-         throw new AccessControlException("Password must have at least 6 characters");
+      if (resource == null) {
+         throw new AccessControlException("Resource required, none specified");
       }
    }
 
-   private void assertPasswordEmpty(String password)
+   private void assertCredentialsSpecified(Credentials credentials)
          throws AccessControlException {
-      if (password != null && !password.isEmpty()) {
-         throw new AccessControlException("Password not permitted for resources of specified class");
+      if (credentials == null) {
+         throw new AccessControlException("Credentials required, none specified");
+      }
+   }
+
+   private void assertCredentialsNotSpecified(Credentials credentials)
+         throws AccessControlException {
+      if (credentials != null) {
+         throw new AccessControlException("Credentials not supported, but specified");
       }
    }
 
@@ -3056,100 +3085,6 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
                throw new AccessControlException(e);
             }
          }
-      }
-   }
-
-   private class PasswordAuthenticationProvider implements AuthenticationProvider {
-      @Override
-      public void setContext(AuthenticationProviderContext context) throws AccessControlException {
-         // nothing to do here, since this method will not get called for this built-in implementation
-      }
-
-      @Override
-      public void authenticate(Credentials credentials) throws AccessControlException {
-         if (!(credentials instanceof PasswordCredentials)) {
-            throw new AccessControlException("Unsupported credentials implementation: " + credentials.getClass());
-         }
-
-         final PasswordCredentials passwordCredentials = ((PasswordCredentials) credentials);
-
-         SQLConnection connection = null;
-         try {
-            connection = getConnection();
-
-            __authenticate(connection, passwordCredentials.getResource(), passwordCredentials.getPassword());
-         }
-         catch (SQLException e) {
-            throw new AccessControlException(e);
-         }
-         finally {
-            closeConnection(connection);
-         }
-      }
-
-      private void __authenticate(SQLConnection connection, Resource resource, String password)
-            throws AccessControlException, SQLException {
-         // first locate the resource
-         final String encryptedBoundPassword = resourcePersister.getEncryptedBoundPasswordByResourceId(connection, resource);
-
-         final String plainBoundPassword = PasswordUtils.computeBoundPassword(resource, password);
-
-         if (!passwordEncryptor.checkPassword(plainBoundPassword, encryptedBoundPassword)) {
-            throw new AccessControlException("Invalid password, " + resource, true);
-         }
-      }
-
-      @Override
-      public void updateCredentials(Credentials credentials) throws AccessControlException {
-         if (!(credentials instanceof PasswordCredentials)) {
-            throw new AccessControlException("Unsupported credentials implementation: " + credentials.getClass());
-         }
-
-         final PasswordCredentials passwordCredentials = ((PasswordCredentials) credentials);
-
-         SQLConnection connection = null;
-         try {
-            connection = getConnection();
-
-            __setResourcePassword(connection,
-                                  passwordCredentials.getResource(),
-                                  passwordCredentials.getPassword());
-         }
-         catch (SQLException e) {
-            throw new AccessControlException(e);
-         }
-         finally {
-            closeConnection(connection);
-         }
-      }
-
-      private void __setResourcePassword(SQLConnection connection, Resource resource, String newPassword)
-            throws AccessControlException, SQLException {
-         final String encryptedBoundPassword = resourcePersister.getEncryptedBoundPasswordByResourceId(connection, resource);
-
-         // complain if the resource has no password set
-         if (encryptedBoundPassword == null) {
-            throw new AccessControlException(resource + " has no password set (assuming not authenticatable), cannot set new password");
-         }
-
-         // if all ok, set new password
-         final String newBoundPassword = PasswordUtils.computeBoundPassword(resource, newPassword);
-         final String newEncryptedBoundPassword = passwordEncryptor.encryptPassword(newBoundPassword);
-         resourcePersister.updateEncryptedBoundPasswordByResourceId(connection,
-                                                                    resource,
-                                                                    newEncryptedBoundPassword);
-      }
-   }
-
-   private static class AuthenticationProviderContextImpl implements AuthenticationProviderContext {
-      private final AuthenticationProvider builtInAuthenticationProvider;
-
-      private AuthenticationProviderContextImpl(AuthenticationProvider builtInAuthenticationProvider) {
-         this.builtInAuthenticationProvider = builtInAuthenticationProvider;
-      }
-
-      public AuthenticationProvider getBuiltInAuthenticationProvider() {
-         return builtInAuthenticationProvider;
       }
    }
 }

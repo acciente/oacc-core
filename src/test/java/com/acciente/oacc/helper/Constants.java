@@ -19,5 +19,5 @@ package com.acciente.oacc.helper;
 
 public interface Constants {
    public final String DB_SCHEMA     = "OACC";
-   public final String OACC_ROOT_PWD = "toomanysecrets";
+   public final char[] OACC_ROOT_PWD = "toomanysecrets".toCharArray();
 }

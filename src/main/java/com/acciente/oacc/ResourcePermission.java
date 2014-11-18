@@ -23,14 +23,14 @@ import java.util.List;
 
 public final class ResourcePermission implements Serializable {
    // constants for the important system permissions with pre-defined semantics
-   private static final SysPermission SYSPERMISSION_INHERIT        = new SysPermission(-101, "*INHERIT");
-   private static final SysPermission SYSPERMISSION_IMPERSONATE    = new SysPermission(-102, "*IMPERSONATE");
-   private static final SysPermission SYSPERMISSION_RESET_PASSWORD = new SysPermission(-103, "*RESET-PASSWORD");
+   private static final SysPermission SYSPERMISSION_INHERIT           = new SysPermission(-101, "*INHERIT");
+   private static final SysPermission SYSPERMISSION_IMPERSONATE       = new SysPermission(-102, "*IMPERSONATE");
+   private static final SysPermission SYSPERMISSION_RESET_CREDENTIALS = new SysPermission(-103, "*RESET-CREDENTIALS");
 
    // constants for the important system permissions with pre-defined semantics
-   public static final String INHERIT        = SYSPERMISSION_INHERIT.getPermissionName();
-   public static final String IMPERSONATE    = SYSPERMISSION_IMPERSONATE.getPermissionName();
-   public static final String RESET_PASSWORD = SYSPERMISSION_RESET_PASSWORD.getPermissionName();
+   public static final String INHERIT           = SYSPERMISSION_INHERIT.getPermissionName();
+   public static final String IMPERSONATE       = SYSPERMISSION_IMPERSONATE.getPermissionName();
+   public static final String RESET_CREDENTIALS = SYSPERMISSION_RESET_CREDENTIALS.getPermissionName();
 
    // permission data
    private final long    systemPermissionId;
@@ -40,7 +40,7 @@ public final class ResourcePermission implements Serializable {
    private final int     domainLevel;
 
    public static List<String> getSysPermissionNames() {
-      return Arrays.asList(INHERIT, IMPERSONATE, RESET_PASSWORD);
+      return Arrays.asList(INHERIT, IMPERSONATE, RESET_CREDENTIALS);
    }
 
    public static String getSysPermissionName(long systemPermissionId) {
@@ -50,8 +50,8 @@ public final class ResourcePermission implements Serializable {
       else if (systemPermissionId == SYSPERMISSION_IMPERSONATE.getSystemPermissionId()) {
          return SYSPERMISSION_IMPERSONATE.getPermissionName();
       }
-      else if (systemPermissionId == SYSPERMISSION_RESET_PASSWORD.getSystemPermissionId()) {
-         return SYSPERMISSION_RESET_PASSWORD.getPermissionName();
+      else if (systemPermissionId == SYSPERMISSION_RESET_CREDENTIALS.getSystemPermissionId()) {
+         return SYSPERMISSION_RESET_CREDENTIALS.getPermissionName();
       }
       else {
          throw new IllegalArgumentException("Invalid system permission ID: " + systemPermissionId);
@@ -207,8 +207,8 @@ public final class ResourcePermission implements Serializable {
       else if (SYSPERMISSION_IMPERSONATE.getPermissionName().equals(systemPermissionName)) {
          return SYSPERMISSION_IMPERSONATE;
       }
-      else if (SYSPERMISSION_RESET_PASSWORD.getPermissionName().equals(systemPermissionName)) {
-         return SYSPERMISSION_RESET_PASSWORD;
+      else if (SYSPERMISSION_RESET_CREDENTIALS.getPermissionName().equals(systemPermissionName)) {
+         return SYSPERMISSION_RESET_CREDENTIALS;
       }
       else {
          throw new IllegalArgumentException("Invalid system permission name: " + systemPermissionName);

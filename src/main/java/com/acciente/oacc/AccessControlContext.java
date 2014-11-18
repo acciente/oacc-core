@@ -34,7 +34,7 @@ import java.util.Set;
  * that is, security credentials have been associated with this session
  * <dt> "authenticated resource"
  * <dd> The resource that authenticated this session,
- * that is, the resource that logged into this session with a password, using the <code>authenticate</code> method
+ * that is, the resource that logged into this session with a call to one of the <code>authenticate</code> methods
  * <dt> "session resource"
  * <dd> The resource whose security credentials are associated with this session.
  * This is the same as the authenticated resource, unless another resource is being {@link #impersonate impersonated}.
@@ -52,10 +52,25 @@ public interface AccessControlContext {
     * <p/>
     * Note: Unless a session is authenticated, all attempts to call any other methods (except <code>authenticate</code>) will fail.
     *
-    * @param credentials the credentials to be used for authentication
+    * @param resource the resource to be authenticated
+    * @param credentials the credentials to authenticate the resource
     * @throws AccessControlException if an error occurs
     */
-   public void authenticate(Credentials credentials)
+   public void authenticate(Resource resource, Credentials credentials)
+         throws AccessControlException;
+
+   /**
+    * Authenticates this security session against an {@link AuthenticationProvider} without
+    * specifying authentication credentials, if that AuthenticationProvider supports such an operation.
+    * <p/>
+    * The security credentials for this session will be those of the specified and authenticated resource.
+    * <p/>
+    * Note: Unless a session is authenticated, all attempts to call any other methods (except <code>authenticate</code>) will fail.
+    *
+    * @param resource the resource to be authenticated
+    * @throws AccessControlException if the resource could not be authenticated, or if an error occurs
+    */
+   public void authenticate(Resource resource)
          throws AccessControlException;
 
    /**
@@ -93,23 +108,27 @@ public interface AccessControlContext {
          throws AccessControlException;
 
    /**
-    * Updates the authentication credentials for the resource specified in the credentials object.
-    * The contained a resource must be of a resource class that has been defined with the
-    * <code>isAuthenticatable</code> flag set to true. Additionally one of the following has to be true for this method to succeed:
+    * Sets the authentication credentials of the specified authenticatable resource (= a resource of a
+    * resource class that has been defined with the <code>isAuthenticatable</code> flag set to true).
+    * <p/>
+    * One of the following has to be true for this method to succeed:
     * <ul>
-    * <li> the resource in the credentials has to either be the currently authenticated resource or
+    * <li> the specified resource has to either be the currently authenticated resource or
     * <li> the currently authenticated resource has to have SUPER-USER permission on the domain
-    * that contains the resource specified in the credentials or
-    * <li> the currently authenticated resource has to have RESET-PASSWORD permission on the resource specified
-    * in the credentials .
+    * that contains the specified resource or
+    * <li> the currently authenticated resource has to have RESET-CREDENTIALS permission on the specified resource.
     * </ul>
-    * Note that this method uses the originally authenticated resource for all of the above checks even if there
-    * is and active impersonated resource.
+    * Note that this method uses the permissions granted to the originally authenticated resource - and not those of
+    * any currently impersonated resource - to check the items listed above.
     *
-    * @param newCredentials the credentials
+    * @param resource    the resource for which the credentials should be updated. The resource for which the credentials are
+    *                    to be changed must be the current auth resource, or the current auth resource must have SUPER-USER permissions
+    *                    to the domain containing the resource whose credentials are to be changed or must have RESET-CREDENTIALS
+    *                    permissions to the resource whose credentials are to be changed, otherwise an exception is thrown.
+    * @param newCredentials the new credentials for the resource
     * @throws AccessControlException if an error occurs
     */
-   public void updateCredentials(Credentials newCredentials)
+   public void setCredentials(Resource resource, Credentials newCredentials)
          throws AccessControlException;
 
    /**
@@ -441,11 +460,11 @@ public interface AccessControlContext {
     * Creates a new authenticatable resource in the same domain as the session resource.
     *
     * @param resourceClassName a string resource class name
-    * @param password          a string password with at least 6 characters and no leading or trailing spaces
+    * @param credentials       the credentials to authenticate the new resource
     * @return the integer resourceId of the newly created resource
     * @throws AccessControlException if an error occurs
     */
-   public Resource createAuthenticatableResource(String resourceClassName, String password)
+   public Resource createResource(String resourceClassName, Credentials credentials)
          throws AccessControlException;
 
    /**
@@ -456,11 +475,11 @@ public interface AccessControlContext {
     *
     * @param resourceClassName a string resource class name
     * @param domainName        a string domain name
-    * @param password          a string password with at least 6 characters and no leading or trailing spaces
+    * @param credentials       the credentials to authenticate the new resource
     * @return the integer resourceId of the newly created resource
     * @throws AccessControlException if an error occurs
     */
-   public Resource createAuthenticatableResource(String resourceClassName, String domainName, String password)
+   public Resource createResource(String resourceClassName, String domainName, Credentials credentials)
          throws AccessControlException;
 
    /**

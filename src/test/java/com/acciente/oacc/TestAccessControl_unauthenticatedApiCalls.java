@@ -17,7 +17,6 @@
  */
 package com.acciente.oacc;
 
-import com.acciente.oacc.helper.Constants;
 import org.junit.Test;
 
 import java.sql.SQLException;
@@ -187,7 +186,7 @@ public class TestAccessControl_unauthenticatedApiCalls extends TestAccessControl
 
       // verify setters
       try {
-         accessControlContext.updateCredentials(null);
+         accessControlContext.setCredentials(null, null);
       }
       catch (AccessControlException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("not authenticated"));
@@ -279,7 +278,9 @@ public class TestAccessControl_unauthenticatedApiCalls extends TestAccessControl
       }
 
       try {
-         accessControlContext.createAuthenticatableResource(authenticatableResourceClassName, domainName, "password");
+         accessControlContext.createResource(authenticatableResourceClassName,
+                                             domainName,
+                                             PasswordCredentials.newInstance("password".toCharArray()));
       }
       catch (AccessControlException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("not authenticated"));

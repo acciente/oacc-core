@@ -34,6 +34,7 @@ import com.acciente.oacc.helper.OACC_Resource;
 import com.acciente.oacc.helper.OACC_ResourceClassPermission;
 import com.acciente.oacc.helper.OACC_Grant_DomPerm_Sys;
 import com.acciente.oacc.helper.OACC_ResourceClass;
+import com.acciente.oacc.helper.OACC_ResourcePassword;
 import com.acciente.oacc.helper.SQLAccessControlSystemResetUtil;
 import com.acciente.oacc.helper.TestDataSourceFactory;
 import org.junit.AfterClass;
@@ -121,10 +122,16 @@ public class TestSQLAccessControlSystemInitializer {
       OACC_Resource sysResource = new OACC_Resource.Builder(0L)
             .resourceClassID(sysResourceClass.getResourceClassID())
             .domainID(sysDomain.getDomainID())
-            .password_plaintext(Constants.OACC_ROOT_PWD)
             .build();
       assertThat(OACC_Resource.Finder.getNumberOfRows(con, Constants.DB_SCHEMA), is(1));
       assertThat(OACC_Resource.Finder.findByID(con, Constants.DB_SCHEMA, 0), is(sysResource));
+
+      // verify system-resource password
+      OACC_ResourcePassword sysResourcePassword = new OACC_ResourcePassword.Builder(0L)
+            .password_plaintext(Constants.OACC_ROOT_PWD)
+            .build();
+      assertThat(OACC_ResourcePassword.Finder.getNumberOfRows(con, Constants.DB_SCHEMA), is(1));
+      assertThat(OACC_ResourcePassword.Finder.findByID(con, Constants.DB_SCHEMA, 0), is(sysResourcePassword));
 
       // verify system-resource's permissions on system-domain
       final DomainPermission sysDomainPermission_SuperUser = DomainPermission.getInstance(DomainPermission.SUPER_USER);

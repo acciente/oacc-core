@@ -72,7 +72,7 @@ public class TestAccessControl_assertPostCreateResourcePermission extends TestAc
       // setup permission without granting it to anything
       final String resourceClassName = generateResourceClass(false, false);
       final String customPermissionName = generateResourceClassPermission(resourceClassName);
-      final String password = generateUniquePassword();
+      final char[] password = generateUniquePassword();
       final Resource accessorResource = generateAuthenticatableResource(password);
 
       // verify setup
@@ -81,8 +81,7 @@ public class TestAccessControl_assertPostCreateResourcePermission extends TestAc
       assertThat(allResourceCreatePermissionsForResourceClass.isEmpty(), is(true));
 
       // authenticate accessor/creator resource
-      accessControlContext.authenticate(PasswordCredentialsBuilder.newPasswordCredentials(accessorResource,
-                                                                                          password));
+      accessControlContext.authenticate(accessorResource, PasswordCredentials.newInstance(password));
 
       // verify
       try {
@@ -120,7 +119,7 @@ public class TestAccessControl_assertPostCreateResourcePermission extends TestAc
       final String customPermissionName_forAccessedDomain = generateResourceClassPermission(resourceClassName);
       final ResourcePermission customPermission_forAccessorDomain = ResourcePermission.getInstance(customPermissionName_forAccessorDomain);
       final ResourcePermission customPermission_forAccessedDomain = ResourcePermission.getInstance(customPermissionName_forAccessedDomain);
-      final String password = generateUniquePassword();
+      final char[] password = generateUniquePassword();
       final Resource accessorResource = generateAuthenticatableResource(password);
       final String accessorDomainName = accessControlContext.getDomainNameByResource(accessorResource);
       final String accessedDomainName = generateDomain();
@@ -145,7 +144,7 @@ public class TestAccessControl_assertPostCreateResourcePermission extends TestAc
       assertThat(allResourceCreatePermissionsForResourceClassAndAccessedDomain, is(resourceCreatePermissions_forAccessedDomain));
 
       // authenticate accessor/creator resource
-      accessControlContext.authenticate(PasswordCredentialsBuilder.newPasswordCredentials(accessorResource, password));
+      accessControlContext.authenticate(accessorResource, PasswordCredentials.newInstance(password));
 
       // verify
       try {
@@ -172,7 +171,7 @@ public class TestAccessControl_assertPostCreateResourcePermission extends TestAc
       final String customPermissionName_forAccessedDomain = generateResourceClassPermission(resourceClassName);
       final ResourcePermission customPermission_forAccessorDomain = ResourcePermission.getInstance(customPermissionName_forAccessorDomain);
       final ResourcePermission customPermission_forAccessedDomain = ResourcePermission.getInstance(customPermissionName_forAccessedDomain);
-      final String password = generateUniquePassword();
+      final char[] password = generateUniquePassword();
       final Resource accessorResource = generateAuthenticatableResource(password);
       final Resource intermediaryResource = generateUnauthenticatableResource();
       final String accessorDomainName = accessControlContext.getDomainNameByResource(accessorResource);
@@ -206,7 +205,7 @@ public class TestAccessControl_assertPostCreateResourcePermission extends TestAc
       assertThat(allResourcePermissionsForAccessorResource, is(resourcePermissions));
 
       // authenticate accessor/creator resource
-      accessControlContext.authenticate(PasswordCredentialsBuilder.newPasswordCredentials(accessorResource, password));
+      accessControlContext.authenticate(accessorResource, PasswordCredentials.newInstance(password));
 
       // verify
       try {
@@ -233,7 +232,7 @@ public class TestAccessControl_assertPostCreateResourcePermission extends TestAc
       final String customPermissionName_forIntermediaryDomain = generateResourceClassPermission(resourceClassName);
       final ResourcePermission customPermission_forAccessorDomain = ResourcePermission.getInstance(customPermissionName_forAccessorDomain);
       final ResourcePermission customPermission_forIntermediaryDomain = ResourcePermission.getInstance(customPermissionName_forIntermediaryDomain);
-      final String password = generateUniquePassword();
+      final char[] password = generateUniquePassword();
       final Resource accessorResource = generateAuthenticatableResource(password);
       final String accessorDomainName = accessControlContext.getDomainNameByResource(accessorResource);
       final String intermediaryDomainName = generateUniqueDomainName();
@@ -262,7 +261,7 @@ public class TestAccessControl_assertPostCreateResourcePermission extends TestAc
       assertThat(allResourceCreatePermissionsForResourceClassAndIntermediaryDomain, is(resourceCreatePermissions_forIntermediaryDomain));
 
       // authenticate accessor/creator resource
-      accessControlContext.authenticate(PasswordCredentialsBuilder.newPasswordCredentials(accessorResource, password));
+      accessControlContext.authenticate(accessorResource, PasswordCredentials.newInstance(password));
 
       // verify
       try {
@@ -295,7 +294,7 @@ public class TestAccessControl_assertPostCreateResourcePermission extends TestAc
       final String customPermissionName_forIntermediaryDomain = generateResourceClassPermission(resourceClassName);
       final ResourcePermission customPermission_forAccessorDomain = ResourcePermission.getInstance(customPermissionName_forAccessorDomain);
       final ResourcePermission customPermission_forIntermediaryDomain = ResourcePermission.getInstance(customPermissionName_forIntermediaryDomain);
-      final String password = generateUniquePassword();
+      final char[] password = generateUniquePassword();
       final Resource accessorResource = generateAuthenticatableResource(password);
       final String accessorDomainName = accessControlContext.getDomainNameByResource(accessorResource);
       final Resource donorResource = accessControlContext.createResource(generateResourceClass(false, false),accessorDomainName);
@@ -333,7 +332,7 @@ public class TestAccessControl_assertPostCreateResourcePermission extends TestAc
       assertThat(allResourcePermissionsForAccessorResource, is(inheritanceResourcePermissions));
 
       // authenticate accessor/creator resource
-      accessControlContext.authenticate(PasswordCredentialsBuilder.newPasswordCredentials(accessorResource, password));
+      accessControlContext.authenticate(accessorResource, PasswordCredentials.newInstance(password));
 
       // verify
       try {
@@ -367,7 +366,7 @@ public class TestAccessControl_assertPostCreateResourcePermission extends TestAc
       final String resourceClassName = generateResourceClass(false, false);
       final String customPermissionName = generateResourceClassPermission(resourceClassName);
       final ResourcePermission globalResourcePermission = ResourcePermission.getInstance(customPermissionName);
-      final String password = generateUniquePassword();
+      final char[] password = generateUniquePassword();
       final Resource accessorResource = generateAuthenticatableResource(password);
       final String accessorDomainName = accessControlContext.getDomainNameByResource(accessorResource);
       // setup create permission
@@ -397,7 +396,7 @@ public class TestAccessControl_assertPostCreateResourcePermission extends TestAc
       assertThat(allGlobalResourcePermissionsForResourceClass, hasItem(globalResourcePermission));
 
       // authenticate accessor/creator resource
-      accessControlContext.authenticate(PasswordCredentialsBuilder.newPasswordCredentials(accessorResource, password));
+      accessControlContext.authenticate(accessorResource, PasswordCredentials.newInstance(password));
 
       // verify
       try {
@@ -433,8 +432,8 @@ public class TestAccessControl_assertPostCreateResourcePermission extends TestAc
       final String customPermissionName = generateResourceClassPermission(resourceClassName);
       final ResourcePermission globalResourcePermission = ResourcePermission.getInstance(globalPermissionName);
       final ResourcePermission customResourcePermission = ResourcePermission.getInstance(customPermissionName);
-      final ResourcePermission systemResourcePermission = ResourcePermission.getInstance(ResourcePermission.RESET_PASSWORD);
-      final String password = generateUniquePassword();
+      final ResourcePermission systemResourcePermission = ResourcePermission.getInstance(ResourcePermission.RESET_CREDENTIALS);
+      final char[] password = generateUniquePassword();
       final Resource accessorResource = generateAuthenticatableResource(password);
       final String accessorDomainName = accessControlContext.getDomainNameByResource(accessorResource);
       // setup direct resource create permissions
@@ -470,7 +469,7 @@ public class TestAccessControl_assertPostCreateResourcePermission extends TestAc
       assertThat(allGlobalResourcePermissionsForResourceClass, hasItem(globalResourcePermission));
 
       // authenticate accessor/creator resource
-      accessControlContext.authenticate(PasswordCredentialsBuilder.newPasswordCredentials(accessorResource, password));
+      accessControlContext.authenticate(accessorResource, PasswordCredentials.newInstance(password));
 
       // verify
       try {

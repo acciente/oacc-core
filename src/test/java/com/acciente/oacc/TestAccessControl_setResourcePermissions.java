@@ -57,12 +57,12 @@ public class TestAccessControl_setResourcePermissions extends TestAccessControlB
       assertThat(accessControlContext.getEffectiveResourcePermissions(accessorResource, accessedResource).isEmpty(), is(true));
 
       Set<ResourcePermission> permissions_pre = new HashSet<>();
-      permissions_pre.add(ResourcePermission.getInstance(ResourcePermission.RESET_PASSWORD));
+      permissions_pre.add(ResourcePermission.getInstance(ResourcePermission.RESET_CREDENTIALS));
 
-      // attempt to set *RESET_PASSWORD system permission
+      // attempt to set *RESET_CREDENTIALS system permission
       try {
          accessControlContext.setResourcePermissions(accessorResource, accessedResource, permissions_pre);
-         fail("granting *RESET_PASSWORD system permission to an unauthenticatable resource should have failed");
+         fail("granting *RESET_CREDENTIALS system permission to an unauthenticatable resource should have failed");
       }
       catch (AccessControlException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("not valid for unauthenticatable resource"));
@@ -94,7 +94,7 @@ public class TestAccessControl_setResourcePermissions extends TestAccessControlB
       authenticateSystemResource();
       final String resourceClassName = generateResourceClass(false, false);
       final String customPermissionName = generateResourceClassPermission(resourceClassName);
-      final String password = generateUniquePassword();
+      final char[] password = generateUniquePassword();
       final Resource grantorResource = generateAuthenticatableResource(password);
       final Resource accessorResource = generateUnauthenticatableResource();
       final Resource accessedResource = accessControlContext.createResource(resourceClassName, generateDomain());
@@ -113,7 +113,7 @@ public class TestAccessControl_setResourcePermissions extends TestAccessControlB
       assertThat(accessControlContext.getEffectiveResourcePermissions(grantorResource, accessedResource), is(grantorResourcePermissions));
 
       // authenticate grantor resource
-      accessControlContext.authenticate(PasswordCredentialsBuilder.newPasswordCredentials(grantorResource, password));
+      accessControlContext.authenticate(grantorResource, PasswordCredentials.newInstance(password));
 
       // set permissions as grantor and verify
       accessControlContext.setResourcePermissions(accessorResource, accessedResource, permissions_pre);
@@ -180,7 +180,7 @@ public class TestAccessControl_setResourcePermissions extends TestAccessControlB
          fail("setting permissions that include the same permission - by name - but with different grant-options, should have failed");
       }
       catch (AccessControlException e) {
-         assertThat(e.getMessage().toLowerCase(), containsString("duplicate permission"));   // todo: sync error message with code, once it is fixed
+         assertThat(e.getMessage().toLowerCase(), containsString("duplicate permission"));
       }
    }
 
@@ -266,7 +266,7 @@ public class TestAccessControl_setResourcePermissions extends TestAccessControlB
       authenticateSystemResource();
       final String resourceClassName = generateResourceClass(false, false);
       final String customPermissionName = generateResourceClassPermission(resourceClassName);
-      final String password = generateUniquePassword();
+      final char[] password = generateUniquePassword();
       final Resource grantorResource = generateAuthenticatableResource(password);
       final Resource accessorResource = generateUnauthenticatableResource();
       final Resource accessedResource = accessControlContext.createResource(resourceClassName, generateDomain());
@@ -277,7 +277,7 @@ public class TestAccessControl_setResourcePermissions extends TestAccessControlB
       permissions_pre.add(ResourcePermission.getInstance(customPermissionName));
 
       // authenticate grantor resource
-      accessControlContext.authenticate(PasswordCredentialsBuilder.newPasswordCredentials(grantorResource, password));
+      accessControlContext.authenticate(grantorResource, PasswordCredentials.newInstance(password));
       assertThat(accessControlContext.getEffectiveResourcePermissions(grantorResource, accessedResource).isEmpty(), is(true));
 
       // attempt to set permissions as grantor without authorization

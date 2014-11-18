@@ -25,13 +25,13 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
 public class SQLAccessControlSystemResetUtil {
-   public static void resetOACC(Connection connection, String dbSchema, String oaccRootPwd)
+   public static void resetOACC(Connection connection, String dbSchema, char[] oaccRootPwd)
          throws SQLException, InterruptedException {
       deleteAllOACCData(connection, dbSchema);
       SQLAccessControlSystemInitializer.initializeOACC(connection, dbSchema, oaccRootPwd);
    }
 
-   public static void resetOACC(DataSource dataSource, String dbSchema, String oaccRootPwd)
+   public static void resetOACC(DataSource dataSource, String dbSchema, char[] oaccRootPwd)
          throws SQLException, InterruptedException {
       try (Connection connection = dataSource.getConnection()) {
          deleteAllOACCData(connection, dbSchema);
@@ -64,6 +64,8 @@ public class SQLAccessControlSystemResetUtil {
       statement = connection.prepareStatement("DELETE FROM " + schemaNameAndTablePrefix + "Grant_ResCrPerm_PostCr_Sys");
       statement.executeUpdate();
       statement = connection.prepareStatement("DELETE FROM " + schemaNameAndTablePrefix + "Grant_ResCrPerm_PostCr");
+      statement.executeUpdate();
+      statement = connection.prepareStatement("DELETE FROM " + schemaNameAndTablePrefix + "ResourcePassword");
       statement.executeUpdate();
       statement = connection.prepareStatement("DELETE FROM " + schemaNameAndTablePrefix + "Resource");
       statement.executeUpdate();

@@ -32,7 +32,7 @@ public class TestSQLAccessControlContextBase {
    protected static String dbUser;
    protected static String dbPwd;
    protected static String dbSchema;
-   protected static String oaccRootPwd;
+   protected static char[] oaccRootPwd;
 
    protected static void testName(String testName) {
       System.out.print("Test: " + testName + "...");
@@ -98,7 +98,7 @@ public class TestSQLAccessControlContextBase {
       dbUser = initArgs.getProperty(PROP_DbUser);
       dbPwd = initArgs.getProperty(PROP_DbPwd);
       dbSchema = initArgs.getProperty(PROP_DbSchema, "TEST_OACC");
-      oaccRootPwd = initArgs.getProperty(PROP_OACCRootPwd);
+      oaccRootPwd = initArgs.getProperty(PROP_OACCRootPwd).toCharArray();
 
       // check if we have all the required parameters
       if (dbUrl == null) {

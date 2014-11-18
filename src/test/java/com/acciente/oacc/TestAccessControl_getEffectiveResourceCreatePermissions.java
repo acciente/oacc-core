@@ -71,7 +71,7 @@ public class TestAccessControl_getEffectiveResourceCreatePermissions extends Tes
             true);
       final ResourceCreatePermission createPerm_impersonate = ResourceCreatePermission.getInstance(ResourcePermission.getInstance(ResourcePermission.IMPERSONATE), false);
       final ResourceCreatePermission createPerm_inherit_withGrant = ResourceCreatePermission.getInstance(ResourcePermission.getInstance(ResourcePermission.INHERIT, true), true);
-      final ResourceCreatePermission createPerm_resetPwd = ResourceCreatePermission.getInstance(ResourcePermission.getInstance(ResourcePermission.RESET_PASSWORD, true));
+      final ResourceCreatePermission createPerm_resetPwd = ResourceCreatePermission.getInstance(ResourcePermission.getInstance(ResourcePermission.RESET_CREDENTIALS, true));
 
       final Resource accessorResource = generateUnauthenticatableResource();
       final String domainName = generateDomain();
@@ -124,7 +124,7 @@ public class TestAccessControl_getEffectiveResourceCreatePermissions extends Tes
             true);
       final ResourceCreatePermission createPerm_impersonate = ResourceCreatePermission.getInstance(ResourcePermission.getInstance(ResourcePermission.IMPERSONATE), false);
       final ResourceCreatePermission createPerm_inherit_withGrant = ResourceCreatePermission.getInstance(ResourcePermission.getInstance(ResourcePermission.INHERIT, true), true);
-      final ResourceCreatePermission createPerm_resetPwd = ResourceCreatePermission.getInstance(ResourcePermission.getInstance(ResourcePermission.RESET_PASSWORD, true));
+      final ResourceCreatePermission createPerm_resetPwd = ResourceCreatePermission.getInstance(ResourcePermission.getInstance(ResourcePermission.RESET_CREDENTIALS, true));
 
       final Resource accessorResource = generateUnauthenticatableResource();
       final String domainName = generateDomain();
@@ -144,7 +144,7 @@ public class TestAccessControl_getEffectiveResourceCreatePermissions extends Tes
       );
 
       // create a new authenticatable 'session' resource
-      final String password = generateUniquePassword();
+      final char[] password = generateUniquePassword();
       final Resource sessionResource = generateAuthenticatableResource(password);
       final String sessionDomainName = accessControlContext.getDomainNameByResource(sessionResource);
 
@@ -161,7 +161,7 @@ public class TestAccessControl_getEffectiveResourceCreatePermissions extends Tes
       );
 
       // authenticate the 'session' resource
-      accessControlContext.authenticate(PasswordCredentialsBuilder.newPasswordCredentials(sessionResource, password));
+      accessControlContext.authenticate(sessionResource, PasswordCredentials.newInstance(password));
 
       // get all create permissions and verify for each domain/resource-class combination
       final Set<ResourceCreatePermission> resourceCreatePermissions_post2 = accessControlContext.getEffectiveResourceCreatePermissions(accessorResource, resourceClassName);
@@ -185,8 +185,8 @@ public class TestAccessControl_getEffectiveResourceCreatePermissions extends Tes
             true);
       final ResourceCreatePermission createPerm_impersonate = ResourceCreatePermission.getInstance(ResourcePermission.getInstance(ResourcePermission.IMPERSONATE), false);
       final ResourceCreatePermission createPerm_inherit_withGrant = ResourceCreatePermission.getInstance(ResourcePermission.getInstance(ResourcePermission.INHERIT, true), true);
-      final ResourceCreatePermission createPerm_resetPwd = ResourceCreatePermission.getInstance(ResourcePermission.getInstance(ResourcePermission.RESET_PASSWORD, true));
-      final ResourceCreatePermission createPerm_resetPwd_withGrant = ResourceCreatePermission.getInstance(ResourcePermission.getInstance(ResourcePermission.RESET_PASSWORD, true), true);
+      final ResourceCreatePermission createPerm_resetPwd = ResourceCreatePermission.getInstance(ResourcePermission.getInstance(ResourcePermission.RESET_CREDENTIALS, true));
+      final ResourceCreatePermission createPerm_resetPwd_withGrant = ResourceCreatePermission.getInstance(ResourcePermission.getInstance(ResourcePermission.RESET_CREDENTIALS, true), true);
 
       final Resource accessorResource = generateUnauthenticatableResource();
       final String parentDomainName = generateDomain();

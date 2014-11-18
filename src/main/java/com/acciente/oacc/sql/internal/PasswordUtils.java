@@ -18,22 +18,38 @@
 package com.acciente.oacc.sql.internal;
 
 import com.acciente.oacc.Resource;
-import com.acciente.oacc.sql.internal.persister.id.Id;
-import com.acciente.oacc.sql.internal.persister.id.ResourceId;
 
-/**
- * Internal class.
- */
 public class PasswordUtils {
-   public static String computeBoundPassword(Resource resource, String password) {
-      return computeBoundPassword(resource.getId(), password);
+   /**
+    * Computes a password string that is bound to the resource with which the password is
+    * associated. As a result of this binding, if the encrypted password of resource A
+    * were used to overwrite the encrypted password of a resource B, it would still not be
+    * possible to authenticate as resource B using the password for resource A.
+    * @param resource
+    * @param password
+    * @return
+    */
+   public static char[] computeBoundPassword(Resource resource, char[] password) {
+      final char[] resIdAsCharArray = String.valueOf(resource.getId()).toCharArray();
+      final int tailLength = password.length - password.length / 2;
+      char[] boundPassword = new char[password.length + resIdAsCharArray.length + tailLength];
+
+      System.arraycopy(password, 0, boundPassword, 0, password.length);
+      System.arraycopy(resIdAsCharArray, 0, boundPassword, password.length, resIdAsCharArray.length);
+      System.arraycopy(password, password.length / 2, boundPassword, password.length + resIdAsCharArray.length, tailLength);
+
+      return boundPassword;
    }
 
-   public static String computeBoundPassword(Id<ResourceId> resourceId, String password) {
-      return computeBoundPassword(resourceId.getValue(), password);
-   }
-
-   public static String computeBoundPassword(long resourceId, String password) {
-      return password + resourceId + password.substring(password.length() / 2);
+   /**
+    * This method zeroes out all the elements of the passed in character array
+    * @param password a char array containing a password
+    */
+   public static void cleanPassword(char[] password) {
+      if (password != null) {
+         for (int i = 0; i < password.length; i++) {
+            password[i] = 0;
+         }
+      }
    }
 }

@@ -24,6 +24,7 @@ import java.util.Set;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
+import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
@@ -286,21 +287,19 @@ public class TestAccessControl_createResource extends TestAccessControlBase {
 
       // attempt to create resource for unauthenticatable resource class
       try {
-         accessControlContext.createResource(resourceClassName, domainName);
-         fail("creating resource without password for authenticatable resource class should have failed");
+         final Resource resource = accessControlContext.createResource(resourceClassName, domainName);
+         assertThat(resource, notNullValue());
       }
       catch (AccessControlException e) {
-         assertThat(e.getMessage().toLowerCase(), containsString("password expected"));   // the msg could confuse the user
-         //assertThat(e.getMessage().toLowerCase(), containsString("not permitted for resources of specified class"));
+         fail("creating resource without credentials for authenticatable resource class should have passed, error: " + e.getMessage());
       }
 
       try {
-         accessControlContext.createResource(resourceClassName);
-         fail("creating resource without password for authenticatable resource class should have failed");
+         final Resource resource = accessControlContext.createResource(resourceClassName);
+         assertThat(resource, notNullValue());
       }
       catch (AccessControlException e) {
-         assertThat(e.getMessage().toLowerCase(), containsString("password expected"));   // the msg could confuse the user
-         //assertThat(e.getMessage().toLowerCase(), containsString("not permitted for resources of specified class"));
+         fail("creating resource without credentials for authenticatable resource class should have passed, error: " + e.getMessage());
       }
    }
 
@@ -329,7 +328,7 @@ public class TestAccessControl_createResource extends TestAccessControlBase {
       }
 
       try {
-         accessControlContext.createResource(resourceClassName, null);
+         accessControlContext.createResource(resourceClassName, (String) null);
          fail("creating resource with null domain name should have failed");
       }
       catch (AccessControlException e) {

@@ -97,7 +97,7 @@ public class TestAccessControl_getEffectiveGlobalPermissions extends TestAccessC
       authenticateSystemResource();
       final String resourceClassName = generateResourceClass(true, false);
       final String customPermissionName = generateResourceClassPermission(resourceClassName);
-      final String password = generateUniquePassword();
+      final char[] password = generateUniquePassword();
       final Resource grantorResource = generateAuthenticatableResource(password);
       final Resource accessorResource = generateUnauthenticatableResource();
       final String grantorDomainName = accessControlContext.getDomainNameByResource(grantorResource);
@@ -121,7 +121,7 @@ public class TestAccessControl_getEffectiveGlobalPermissions extends TestAccessC
                                                         grantorDomainName);
 
       // authenticate grantor resource
-      accessControlContext.authenticate(PasswordCredentialsBuilder.newPasswordCredentials(grantorResource, password));
+      accessControlContext.authenticate(grantorResource, PasswordCredentials.newInstance(password));
 
       // verify
       final Set<ResourcePermission> permissions_post_specific = accessControlContext.getEffectiveGlobalResourcePermissions(accessorResource, resourceClassName, grantorDomainName);
@@ -149,7 +149,7 @@ public class TestAccessControl_getEffectiveGlobalPermissions extends TestAccessC
       // setup global permissions on system domain
       Set<ResourcePermission> permissions_parentDomain_pre = new HashSet<>();
       permissions_parentDomain_pre.add(ResourcePermission.getInstance(ResourcePermission.IMPERSONATE, true));
-      permissions_parentDomain_pre.add(ResourcePermission.getInstance(ResourcePermission.RESET_PASSWORD));
+      permissions_parentDomain_pre.add(ResourcePermission.getInstance(ResourcePermission.RESET_CREDENTIALS));
       final ResourcePermission resourcePermission_parentDomain = ResourcePermission.getInstance(generateResourceClassPermission(authenticatableResourceClassName));
       permissions_parentDomain_pre.add(resourcePermission_parentDomain);
       accessControlContext.setGlobalResourcePermissions(accessorResource, authenticatableResourceClassName,
@@ -159,7 +159,7 @@ public class TestAccessControl_getEffectiveGlobalPermissions extends TestAccessC
       // setup global permissions on child domain
       Set<ResourcePermission> permissions_childDomain_pre = new HashSet<>();
       permissions_childDomain_pre.add(ResourcePermission.getInstance(ResourcePermission.IMPERSONATE));
-      permissions_childDomain_pre.add(ResourcePermission.getInstance(ResourcePermission.RESET_PASSWORD, true));
+      permissions_childDomain_pre.add(ResourcePermission.getInstance(ResourcePermission.RESET_CREDENTIALS, true));
       final ResourcePermission resourcePermission_childDomain = ResourcePermission.getInstance(generateResourceClassPermission(authenticatableResourceClassName));
       permissions_childDomain_pre.add(resourcePermission_childDomain);
       accessControlContext.setGlobalResourcePermissions(accessorResource, authenticatableResourceClassName,
@@ -173,7 +173,7 @@ public class TestAccessControl_getEffectiveGlobalPermissions extends TestAccessC
       // note that currently grant/non-grantable permissions of the same name do not get squashed into
       // into the grantable version, so you can not expect the following permission set:
       //permissions_expected.add(new Permission(Permission.IMPERSONATE, true));
-      //permissions_expected.add(new Permission(Permission.RESET_PASSWORD, true));
+      //permissions_expected.add(new Permission(Permission.RESET_CREDENTIALS, true));
       //permissions_expected.add(permission_parentDomain);
       //permissions_expected.add(permission_childDomain);
 

@@ -18,34 +18,49 @@
 package com.acciente.oacc;
 
 /**
+ * Provides the mechanism to authenticate a resource based on specified credentials and to update those credentials.
+ * <p/>
  * An application can provide an implementation of this interface to provide a custom authentication
- * mechanism. Such a custom authentication provider is free to use password, biometric or any other means
- * for authentication.
+ * mechanism for resources. Such a custom authentication provider is free to use password, biometric or
+ * any other means for authentication.
  */
 public interface AuthenticationProvider {
    /**
-    * This method is called to provide a custom {@link AuthenticationProvider} implementation access to the
-    * built-in authentication provider.
+    * Authenticates the specified resource using the supplied credentials.
     *
-    * @param context an instance of {@link AuthenticationProviderContext}
-    * @throws AccessControlException if the implementation decides that an unrecoverable error has occurred.
+    * @param resource the resource to be authenticated
+    * @param credentials the credentials to authenticate the resource
+    * @throws AccessControlException if authentication failed or an error occurs
     */
-   void setContext(AuthenticationProviderContext context) throws AccessControlException;
+   void authenticate(Resource resource, Credentials credentials) throws AccessControlException;
 
    /**
-    * This method is called to request authentication using the supplied credentials.
+    * Verifies that the specified resource is authenticated.
+    * <p/>
+    * The authentication provider implementation should throw an AccessControlException if the
+    * specified resource is currently NOT authenticated, or should throw an UnsupportedOperationException
+    * if it does not support reporting of the authentication status without credentials.
     *
-    * @param credentials the credentials of the resource requesting authentication.
-    * @throws AccessControlException
+    * @param resource the resource to be authenticated
+    * @throws AccessControlException if the resource is not authenticated or if an error occurs
     */
-   void authenticate(Credentials credentials) throws AccessControlException;
+   void authenticate(Resource resource) throws AccessControlException;
 
    /**
-    * This method is called to request updating authentication credentials.
+    * Checks if the the authentication credentials are valid, for example this method may check if the credentials
+    * satisfy the minimum strength requirements.
     *
-    * @param credentials the new authentication credentials
-    * @throws AccessControlException if currently authenticated resource does not have permission to update
-    * the credentials or another error occurs.
+    * @param credentials the authentication credentials to validate
+    * @throws AccessControlException if the credentials are invalid.
     */
-   void updateCredentials(Credentials credentials) throws AccessControlException;
+   void validateCredentials(Credentials credentials) throws AccessControlException;
+
+   /**
+    * Sets (or resets) the authentication credentials of the specified resource.
+    *
+    * @param resource the resource for which the credentials should be set
+    * @param credentials the new authentication credentials for the resource
+    * @throws AccessControlException if an error occurs.
+    */
+   void setCredentials(Resource resource, Credentials credentials) throws AccessControlException;
 }

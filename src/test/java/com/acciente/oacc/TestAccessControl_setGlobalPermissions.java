@@ -100,14 +100,14 @@ public class TestAccessControl_setGlobalPermissions extends TestAccessControlBas
       assertThat(accessControlContext.getEffectiveGlobalResourcePermissionsMap(accessorResource).isEmpty(), is(true));
 
       Set<ResourcePermission> permissions_pre = new HashSet<>();
-      permissions_pre.add(ResourcePermission.getInstance(ResourcePermission.RESET_PASSWORD));
+      permissions_pre.add(ResourcePermission.getInstance(ResourcePermission.RESET_CREDENTIALS));
 
-      // attempt to set *RESET_PASSWORD system permission
+      // attempt to set *RESET_CREDENTIALS system permission
       try {
          accessControlContext.setGlobalResourcePermissions(accessorResource, resourceClassName,
                                                            permissions_pre,
                                                            domainName);
-         fail("granting *RESET_PASSWORD system permission globally to an unauthenticatable resource class should have failed");
+         fail("granting *RESET_CREDENTIALS system permission globally to an unauthenticatable resource class should have failed");
       }
       catch (AccessControlException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("not valid for unauthenticatable resource"));
@@ -142,7 +142,7 @@ public class TestAccessControl_setGlobalPermissions extends TestAccessControlBas
       authenticateSystemResource();
       final String resourceClassName = generateResourceClass(true, false);
       final String customPermissionName = generateResourceClassPermission(resourceClassName);
-      final String password = generateUniquePassword();
+      final char[] password = generateUniquePassword();
       final Resource grantorResource = generateAuthenticatableResource(password);
       final Resource accessorResource = generateUnauthenticatableResource();
       final String domainName = accessControlContext.getDomainNameByResource(accessorResource);
@@ -163,7 +163,7 @@ public class TestAccessControl_setGlobalPermissions extends TestAccessControlBas
       assertThat(accessControlContext.getEffectiveGlobalResourcePermissions(grantorResource, resourceClassName, domainName), is(grantorResourcePermissions));
 
       // authenticate grantor resource
-      accessControlContext.authenticate(PasswordCredentialsBuilder.newPasswordCredentials(grantorResource, password));
+      accessControlContext.authenticate(grantorResource, PasswordCredentials.newInstance(password));
 
       // set global permissions as grantor and verify
       accessControlContext.setGlobalResourcePermissions(accessorResource, resourceClassName,
@@ -179,7 +179,7 @@ public class TestAccessControl_setGlobalPermissions extends TestAccessControlBas
       authenticateSystemResource();
       final String resourceClassName = generateResourceClass(true, false);
       final String customPermissionName = generateResourceClassPermission(resourceClassName);
-      final String password = generateUniquePassword();
+      final char[] password = generateUniquePassword();
       final Resource grantorResource = generateAuthenticatableResource(password);
       final Resource accessorResource = generateUnauthenticatableResource();
       final String grantorDomainName = accessControlContext.getDomainNameByResource(grantorResource);
@@ -201,7 +201,7 @@ public class TestAccessControl_setGlobalPermissions extends TestAccessControlBas
       assertThat(accessControlContext.getEffectiveGlobalResourcePermissions(grantorResource, resourceClassName, grantorDomainName), is(grantorResourcePermissions));
 
       // authenticate grantor resource
-      accessControlContext.authenticate(PasswordCredentialsBuilder.newPasswordCredentials(grantorResource, password));
+      accessControlContext.authenticate(grantorResource, PasswordCredentials.newInstance(password));
 
       // set global permissions as grantor and verify
       accessControlContext.setGlobalResourcePermissions(accessorResource, resourceClassName, permissions_pre);
@@ -281,7 +281,7 @@ public class TestAccessControl_setGlobalPermissions extends TestAccessControlBas
          fail("setting global permissions that include the same permission - by name - but with different grant-options, should have failed");
       }
       catch (AccessControlException e) {
-         assertThat(e.getMessage().toLowerCase(), containsString("duplicate permission"));   // todo: sync error message with code, once it is fixed
+         assertThat(e.getMessage().toLowerCase(), containsString("duplicate permission"));
       }
    }
 
@@ -414,7 +414,7 @@ public class TestAccessControl_setGlobalPermissions extends TestAccessControlBas
       authenticateSystemResource();
       final String resourceClassName = generateResourceClass(true, false);
       final String customPermissionName = generateResourceClassPermission(resourceClassName);
-      final String password = generateUniquePassword();
+      final char[] password = generateUniquePassword();
       final Resource grantorResource = generateAuthenticatableResource(password);
       final Resource accessorResource = generateUnauthenticatableResource();
       final String domainName = accessControlContext.getDomainNameByResource(accessorResource);
@@ -425,7 +425,7 @@ public class TestAccessControl_setGlobalPermissions extends TestAccessControlBas
       permissions_pre.add(ResourcePermission.getInstance(customPermissionName));
 
       // authenticate grantor resource
-      accessControlContext.authenticate(PasswordCredentialsBuilder.newPasswordCredentials(grantorResource, password));
+      accessControlContext.authenticate(grantorResource, PasswordCredentials.newInstance(password));
       assertThat(accessControlContext.getEffectiveGlobalResourcePermissionsMap(grantorResource).isEmpty(), is(true));
 
       // attempt to set permissions as grantor without authorization

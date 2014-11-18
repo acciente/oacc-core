@@ -17,24 +17,33 @@
  */
 package com.acciente.oacc.helper;
 
+import com.acciente.oacc.Resource;
+import com.acciente.oacc.sql.internal.CleanablePasswordEncryptor;
+import com.acciente.oacc.sql.internal.PasswordUtils;
+import com.acciente.oacc.sql.internal.StrongCleanablePasswordEncryptor;
+
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-public class OACC_Resource extends DbBase {
+public class OACC_ResourcePassword extends DbBase {
    private final Long   resourceID;
-   private final Long   resourceClassID;
-   private final Long   domainID;
+   private final String password;
 
-   OACC_Resource(Builder builder) {
+   private final char[] password_plaintext;
+
+   private static final CleanablePasswordEncryptor __passwordEncryptor = new StrongCleanablePasswordEncryptor();
+
+   OACC_ResourcePassword(Builder builder) {
       resourceID = builder.resourceID;
-      resourceClassID = builder.resourceClassID;
-      domainID = builder.domainID;
+      password = builder.password;
+
+      password_plaintext = builder.password_plaintext;
    }
 
    public static String getQualifiedTableName(String schemaName) {
-      return getSchemaAndTableNamePrefix(schemaName) + "Resource";
+      return getSchemaAndTableNamePrefix(schemaName) + "ResourcePassword";
    }
 
    public static String getPKColumnNames() {
@@ -45,12 +54,8 @@ public class OACC_Resource extends DbBase {
       return resourceID;
    }
 
-   public Long getResourceClassID() {
-      return resourceClassID;
-   }
-
-   public Long getDomainID() {
-      return domainID;
+   public String getPassword() {
+      return password;
    }
 
    @Override
@@ -60,13 +65,31 @@ public class OACC_Resource extends DbBase {
       if (o == null || getClass() != o.getClass())
          return false;
 
-      OACC_Resource that = (OACC_Resource) o;
+      OACC_ResourcePassword that = (OACC_ResourcePassword) o;
 
-      if (resourceClassID != null ? !resourceClassID.equals(that.resourceClassID) : that.resourceClassID != null)
-         return false;
-      if (domainID != null ? !domainID.equals(that.domainID) : that.domainID != null)
-         return false;
       if (resourceID != null ? !resourceID.equals(that.resourceID) : that.resourceID != null) return false;
+
+      // comparing "passwords" (in either plaintext or digest form)
+      // Note: the db only stores a digest, and comparing two digests against each other provides no information
+      if (password_plaintext != null && that.password_plaintext != null) {
+         if (!password_plaintext.equals(that.password_plaintext)) return false;
+      }
+      else {
+         if (password_plaintext == null && that.password_plaintext == null) {
+            if (password != null || that.password != null) return false;
+         }
+
+         if (password_plaintext != null) {
+            if (that.password == null || !__passwordEncryptor.checkPassword(PasswordUtils.computeBoundPassword(Resource.getInstance(
+                  resourceID), password_plaintext), that.password))
+               return false;
+         }
+         else if (that.password_plaintext != null) {
+            if (password == null || !__passwordEncryptor.checkPassword(PasswordUtils.computeBoundPassword(Resource.getInstance(
+                  that.resourceID), that.password_plaintext), password))
+               return false;
+         }
+      }
 
       return true;
    }
@@ -74,9 +97,6 @@ public class OACC_Resource extends DbBase {
    @Override
    public int hashCode() {
       int result = resourceID != null ? resourceID.hashCode() : 0;
-      result = 31 * result + (resourceClassID != null ? resourceClassID.hashCode() : 0);
-      // don't include password in hashCode calculation!
-      result = 31 * result + (domainID != null ? domainID.hashCode() : 0);
       return result;
    }
 
@@ -84,32 +104,33 @@ public class OACC_Resource extends DbBase {
    public String toString() {
       return "OACC_Resource{" +
             "resourceID=" + resourceID +
-            ", resourceClassID=" + resourceClassID +
-            ", domainID=" + domainID +
+            ", password='" + password + '\'' +
+            ", password_plaintext='" + password_plaintext + '\'' +
             '}';
    }
 
    public static class Builder {
       private Long   resourceID;
-      private Long   resourceClassID;
-      private Long   domainID;
+      private String password;
+
+      private char[] password_plaintext;
 
       public Builder(Long resourceID) {
          this.resourceID = resourceID;
       }
 
-      public Builder resourceClassID(Long resourceClassID) {
-         this.resourceClassID = resourceClassID;
+      public Builder password(String password) {
+         this.password = password;
          return this;
       }
 
-      public Builder domainID(Long domainID) {
-         this.domainID = domainID;
+      public Builder password_plaintext(char[] plaintext) {
+         this.password_plaintext = plaintext;
          return this;
       }
 
-      public OACC_Resource build() {
-         return new OACC_Resource(this);
+      public OACC_ResourcePassword build() {
+         return new OACC_ResourcePassword(this);
       }
    }
 
@@ -125,11 +146,11 @@ public class OACC_Resource extends DbBase {
          }
       }
 
-      public static OACC_Resource findByID(Connection con, String dbSchema, int resourceID) throws SQLException {
+      public static OACC_ResourcePassword findByID(Connection con, String dbSchema, int resourceID) throws SQLException {
          try (PreparedStatement preparedStatement
                     = con.prepareStatement("SELECT * FROM " + getQualifiedTableName(dbSchema) + " WHERE ResourceID=?");
          ) {
-            OACC_Resource resource = null;
+            OACC_ResourcePassword resource = null;
             preparedStatement.setInt(1, resourceID);
             ResultSet resultSet = preparedStatement.executeQuery();
 
@@ -144,10 +165,9 @@ public class OACC_Resource extends DbBase {
          }
       }
 
-      private static OACC_Resource getDB_Resource(ResultSet resultSet) throws SQLException {
+      private static OACC_ResourcePassword getDB_Resource(ResultSet resultSet) throws SQLException {
          return new Builder(getLong(resultSet, "resourceID"))
-               .resourceClassID(getLong(resultSet, "resourceClassID"))
-               .domainID(getLong(resultSet, "domainID"))
+               .password(resultSet.getString("password"))
                .build();
       }
    }

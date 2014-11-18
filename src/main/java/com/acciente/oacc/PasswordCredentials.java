@@ -18,12 +18,36 @@
 package com.acciente.oacc;
 
 /**
- * This is a sub-interface of {@link Credentials} that may be used by an {@link AuthenticationProvider}
- * that provides password authentication. The built-in {@link AuthenticationProvider} requires that the
- * {@link Credentials} object passed in implements this interface. If you implement a custom password
- * authentication based {@link AuthenticationProvider}, you are free to accept instances of this interface
- * but you are not required.
+ * This is a {@link Credentials} implementation that may be used by an {@link AuthenticationProvider}
+ * that provides password-based authentication. The built-in {@link AuthenticationProvider} requires that the
+ * {@link Credentials} object passed be an instance of this class. If you implement a custom password-based
+ * {@link AuthenticationProvider}, it is recommended that you accept instances of this class, but you are
+ * not required to. If you accept instances of this class it allows switching to your implementation from
+ * the built-in implementation without any changes in the calling code.
+ * .
  */
-public interface PasswordCredentials extends Credentials {
-   String getPassword();
+public abstract class PasswordCredentials implements Credentials {
+   /**
+    * Returns the password contained in this credentials instance
+    *
+    * @return a password as a char array
+    */
+   public abstract char[] getPassword();
+
+   public static PasswordCredentials newInstance(char[] password) {
+      return new Impl(password);
+   }
+
+   private static class Impl extends PasswordCredentials {
+      private final char[] password;
+
+      private Impl(char[] password) {
+         this.password = password;
+      }
+
+      @Override
+      public char[] getPassword() {
+         return password;
+      }
+   }
 }

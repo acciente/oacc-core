@@ -25,50 +25,12 @@ import com.acciente.oacc.sql.internal.persister.id.ResourceClassId;
 import com.acciente.oacc.sql.internal.persister.id.ResourceId;
 
 import java.sql.SQLException;
-import java.sql.Types;
 
 public class ResourcePersister extends Persister {
    private final SQLStrings sqlStrings;
 
    public ResourcePersister(SQLStrings sqlStrings) {
       this.sqlStrings = sqlStrings;
-   }
-
-   public String getEncryptedBoundPasswordByResourceId(SQLConnection connection,
-                                                       Resource resource) throws AccessControlException {
-      SQLStatement statement = null;
-
-      try {
-         SQLResult resultSet;
-
-         statement = connection.prepareStatement(sqlStrings.SQL_findInResource_Password_BY_ResourceID);
-         statement.setResourceId(1, resource);
-         resultSet = statement.executeQuery();
-
-         // complain if we do not find the resource
-         if (!resultSet.next()) {
-            throw new AccessControlException(resource + " not found!");
-         }
-
-         // complain if the resource has no password set
-         final String encryptedBoundPassword = resultSet.getString("Password");
-         if (encryptedBoundPassword == null) {
-            throw new AccessControlException(resource + " has no password set!");
-         }
-
-         // complain if we found more than one resource!
-         // (assuming the PK constraint is being enforced by the DB, currently do not see how this can happen)
-         if (resultSet.next()) {
-            throw new AccessControlException(resource + " maps to more than one resource!");
-         }
-         return encryptedBoundPassword;
-      }
-      catch (SQLException e) {
-         throw new AccessControlException(e);
-      }
-      finally {
-         closeStatement(statement);
-      }
    }
 
    public void verifyResourceExists(SQLConnection connection,
@@ -78,7 +40,7 @@ public class ResourcePersister extends Persister {
       try {
          SQLResult resultSet;
 
-         statement = connection.prepareStatement(sqlStrings.SQL_findInResource_Password_BY_ResourceID);
+         statement = connection.prepareStatement(sqlStrings.SQL_findInResource_ResourceId_BY_ResourceID);
          statement.setResourceId(1, resource);
          resultSet = statement.executeQuery();
 
@@ -92,25 +54,6 @@ public class ResourcePersister extends Persister {
          if (resultSet.next()) {
             throw new AccessControlException(resource + " maps to more than one resource!");
          }
-      }
-      catch (SQLException e) {
-         throw new AccessControlException(e);
-      }
-      finally {
-         closeStatement(statement);
-      }
-   }
-
-   public void updateEncryptedBoundPasswordByResourceId(SQLConnection connection,
-                                                        Resource resource,
-                                                        String newEncryptedBoundPassword) throws AccessControlException {
-      SQLStatement statement = null;
-
-      try {
-         statement = connection.prepareStatement(sqlStrings.SQL_updateInResource_Password_BY_ResourceID);
-         statement.setString(1, newEncryptedBoundPassword);
-         statement.setResourceId(2, resource);
-         assertOneRowUpdated(statement.executeUpdate());
       }
       catch (SQLException e) {
          throw new AccessControlException(e);
@@ -154,22 +97,14 @@ public class ResourcePersister extends Persister {
    public void createResource(SQLConnection connection,
                               Id<ResourceId> newResourceId,
                               Id<ResourceClassId> resourceClassId,
-                              Id<DomainId> resourceDomainId,
-                              String encryptedBoundPassword) throws AccessControlException {
+                              Id<DomainId> resourceDomainId) throws AccessControlException {
       SQLStatement statement = null;
 
       try {
-         statement = connection.prepareStatement(sqlStrings.SQL_createInResource_WITH_ResourceID_ResourceClassID_DomainID_Password);
+         statement = connection.prepareStatement(sqlStrings.SQL_createInResource_WITH_ResourceID_ResourceClassID_DomainID);
          statement.setResourceId(1, newResourceId);
          statement.setResourceClassId(2, resourceClassId);
          statement.setResourceDomainId(3, resourceDomainId);
-
-         if (encryptedBoundPassword == null) {
-            statement.setNull(4, Types.VARCHAR);
-         }
-         else {
-            statement.setString(4, encryptedBoundPassword);
-         }
 
          assertOneRowInserted(statement.executeUpdate());
       }

@@ -31,7 +31,7 @@ public class TestResourcePermission {
       assertThat(ResourcePermission.getSysPermissionNames().size(), is(3));
       assertThat(ResourcePermission.getSysPermissionNames(), hasItem(ResourcePermission.IMPERSONATE));
       assertThat(ResourcePermission.getSysPermissionNames(), hasItem(ResourcePermission.INHERIT));
-      assertThat(ResourcePermission.getSysPermissionNames(), hasItem(ResourcePermission.RESET_PASSWORD));
+      assertThat(ResourcePermission.getSysPermissionNames(), hasItem(ResourcePermission.RESET_CREDENTIALS));
    }
 
    @Test

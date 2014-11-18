@@ -39,7 +39,7 @@ public class TestAccessControl_setResourceCreatePermissions extends TestAccessCo
             true);
       final ResourceCreatePermission createPerm_impersonate = ResourceCreatePermission.getInstance(ResourcePermission.getInstance(ResourcePermission.IMPERSONATE), false);
       final ResourceCreatePermission createPerm_inherit_withGrant = ResourceCreatePermission.getInstance(ResourcePermission.getInstance(ResourcePermission.INHERIT, true), true);
-      final ResourceCreatePermission createPerm_resetPwd = ResourceCreatePermission.getInstance(ResourcePermission.getInstance(ResourcePermission.RESET_PASSWORD, true));
+      final ResourceCreatePermission createPerm_resetPwd = ResourceCreatePermission.getInstance(ResourcePermission.getInstance(ResourcePermission.RESET_CREDENTIALS, true));
 
       final Resource accessorResource = generateUnauthenticatableResource();
       final String domainName = generateDomain();
@@ -72,7 +72,7 @@ public class TestAccessControl_setResourceCreatePermissions extends TestAccessCo
 
       // set up the grantorResource
       authenticateSystemResource();
-      final String password = generateUniquePassword();
+      final char[] password = generateUniquePassword();
       final Resource grantorResource = generateAuthenticatableResource(password);
       final String domainName = generateDomain();
       final String resourceClassName = generateResourceClass(false, false);
@@ -88,7 +88,7 @@ public class TestAccessControl_setResourceCreatePermissions extends TestAccessCo
       assertThat(accessControlContext.getEffectiveResourceCreatePermissions(grantorResource, resourceClassName, domainName), is(grantorPermissions));
 
       // now authenticate as the granterResource
-      accessControlContext.authenticate(PasswordCredentialsBuilder.newPasswordCredentials(grantorResource, password));
+      accessControlContext.authenticate(grantorResource, PasswordCredentials.newInstance(password));
 
       // prep for the createPermissions to be assigned to the accessorResource
       final Resource accessorResource = generateUnauthenticatableResource();
@@ -118,7 +118,7 @@ public class TestAccessControl_setResourceCreatePermissions extends TestAccessCo
 
       // set up the grantorResource
       authenticateSystemResource();
-      final String password = generateUniquePassword();
+      final char[] password = generateUniquePassword();
       final Resource grantorResource = generateAuthenticatableResource(password);
       final String domainName = accessControlContext.getDomainNameByResource(grantorResource);
       final String resourceClassName = generateResourceClass(false, false);
@@ -134,7 +134,7 @@ public class TestAccessControl_setResourceCreatePermissions extends TestAccessCo
       assertThat(accessControlContext.getEffectiveResourceCreatePermissions(grantorResource, resourceClassName, domainName), is(grantorPermissions));
 
       // now authenticate as the granterResource
-      accessControlContext.authenticate(PasswordCredentialsBuilder.newPasswordCredentials(grantorResource, password));
+      accessControlContext.authenticate(grantorResource, PasswordCredentials.newInstance(password));
 
       // prep for the createPermissions to be assigned to the accessorResource
       final Resource accessorResource = generateUnauthenticatableResource();
@@ -164,7 +164,7 @@ public class TestAccessControl_setResourceCreatePermissions extends TestAccessCo
       final ResourceCreatePermission createPerm_impersonate = ResourceCreatePermission.getInstance(ResourcePermission.getInstance(ResourcePermission.IMPERSONATE), false);
       final ResourceCreatePermission createPerm_inherit = ResourceCreatePermission.getInstance(ResourcePermission.getInstance(ResourcePermission.INHERIT, true));
       final ResourceCreatePermission createPerm_inherit_withGrant = ResourceCreatePermission.getInstance(ResourcePermission.getInstance(ResourcePermission.INHERIT, true), true);
-      final ResourceCreatePermission createPerm_resetPwd = ResourceCreatePermission.getInstance(ResourcePermission.getInstance(ResourcePermission.RESET_PASSWORD, true));
+      final ResourceCreatePermission createPerm_resetPwd = ResourceCreatePermission.getInstance(ResourcePermission.getInstance(ResourcePermission.RESET_CREDENTIALS, true));
 
       final Resource accessorResource = generateUnauthenticatableResource();
       final String domainName = generateDomain();
@@ -327,7 +327,7 @@ public class TestAccessControl_setResourceCreatePermissions extends TestAccessCo
          fail("setting create-permissions that include the same permission, but with different grant-options, should have failed");
       }
       catch (AccessControlException e) {
-         assertThat(e.getMessage().toLowerCase(), containsString("duplicate permission"));   // todo: sync error message with code, once it is fixed
+         assertThat(e.getMessage().toLowerCase(), containsString("duplicate permission"));
       }
    }
 
@@ -493,7 +493,7 @@ public class TestAccessControl_setResourceCreatePermissions extends TestAccessCo
 
       // set up the grantorResource
       authenticateSystemResource();
-      final String password = generateUniquePassword();
+      final char[] password = generateUniquePassword();
       final Resource grantorResource = generateAuthenticatableResource(password);
       final String domainName = generateDomain();
       final String resourceClassName = generateResourceClass(false, false);
@@ -509,7 +509,7 @@ public class TestAccessControl_setResourceCreatePermissions extends TestAccessCo
       assertThat(accessControlContext.getEffectiveResourceCreatePermissions(grantorResource, resourceClassName, domainName), is(grantorPermissions));
 
       // now authenticate as the granterResource
-      accessControlContext.authenticate(PasswordCredentialsBuilder.newPasswordCredentials(grantorResource, password));
+      accessControlContext.authenticate(grantorResource, PasswordCredentials.newInstance(password));
 
       // prep for the createPermissions to be assigned to the accessorResource
       final Resource accessorResource = generateUnauthenticatableResource();

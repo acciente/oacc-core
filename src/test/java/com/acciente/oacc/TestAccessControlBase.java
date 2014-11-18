@@ -105,13 +105,13 @@ public class TestAccessControlBase {
    }
 
    private static void authenticateSystemAccessControlContext() throws AccessControlException {
-      systemAccessControlContext.authenticate(PasswordCredentialsBuilder.newPasswordCredentials(SYS_RESOURCE,
-                                                                                                Constants.OACC_ROOT_PWD));
+      systemAccessControlContext.authenticate(SYS_RESOURCE,
+                                              PasswordCredentials.newInstance(Constants.OACC_ROOT_PWD));
    }
 
    protected void authenticateSystemResource() throws AccessControlException {
-      accessControlContext.authenticate(PasswordCredentialsBuilder.newPasswordCredentials(SYS_RESOURCE,
-                                                                                          Constants.OACC_ROOT_PWD));
+      accessControlContext.authenticate(SYS_RESOURCE,
+                                        PasswordCredentials.newInstance(Constants.OACC_ROOT_PWD));
    }
 
    public static String generateUniqueDomainName() {
@@ -126,8 +126,8 @@ public class TestAccessControlBase {
       return "p_" + generateUniqueID();
    }
 
-   public static String generateUniquePassword() {
-      return "pwd_" + generateUniqueID();
+   public static char[] generateUniquePassword() {
+      return ("pwd_" + generateUniqueID()).toCharArray();
    }
 
    private static long generateUniqueID() {
@@ -136,16 +136,17 @@ public class TestAccessControlBase {
 
    protected Resource generateResourceAndAuthenticate() throws AccessControlException {
       authenticateSystemAccessControlContext();
-      final String password = generateUniquePassword();
+      final char[] password = generateUniquePassword();
       final Resource authenticatableResource = generateAuthenticatableResource(password);
-      accessControlContext.authenticate(PasswordCredentialsBuilder.newPasswordCredentials(authenticatableResource,
-                                                                                          password));
+      accessControlContext.authenticate(authenticatableResource,
+                                        PasswordCredentials.newInstance(password));
       return authenticatableResource;
    }
 
-   protected Resource generateAuthenticatableResource(String password) throws AccessControlException {
+   protected Resource generateAuthenticatableResource(char[] password) throws AccessControlException {
       authenticateSystemAccessControlContext();
-      return systemAccessControlContext.createAuthenticatableResource(generateResourceClass(true, false), generateDomain(), password);
+      return systemAccessControlContext.createResource(generateResourceClass(true, false), generateDomain(),
+                                                       PasswordCredentials.newInstance(password));
    }
 
    protected Resource generateUnauthenticatableResource() throws AccessControlException {

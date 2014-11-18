@@ -20,8 +20,7 @@ package com.acciente.oacc.sql.internal;
 import com.acciente.oacc.AccessControlContext;
 import com.acciente.oacc.DomainCreatePermission;
 import com.acciente.oacc.DomainPermission;
-import org.jasypt.util.password.PasswordEncryptor;
-import org.jasypt.util.password.StrongPasswordEncryptor;
+import com.acciente.oacc.Resource;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -31,9 +30,9 @@ import java.sql.SQLException;
 public class SQLAccessControlSystemInitializer {
    public static void initializeOACC(Connection connection,
                                      String dbSchema,
-                                     String oaccRootPwd) throws SQLException {
+                                     char[] oaccRootPwd) throws SQLException {
       System.out.println("Initializing password encryptor...");
-      PasswordEncryptor passwordEncryptor = new StrongPasswordEncryptor();
+      CleanablePasswordEncryptor passwordEncryptor = new StrongCleanablePasswordEncryptor();
 
       PreparedStatement statement;
       ResultSet resultSet;
@@ -65,12 +64,20 @@ public class SQLAccessControlSystemInitializer {
       statement.executeUpdate();
 
       // create the system user
-      statement = connection.prepareStatement("INSERT INTO " + schemaNameAndTablePrefix + "Resource( ResourceId, ResourceClassId, Password, DomainId ) VALUES ( 0, 0, ?, 0 )");
-      final String boundPassword = PasswordUtils.computeBoundPassword(0, oaccRootPwd);
-      statement.setString(1,
-                          passwordEncryptor.encryptPassword(boundPassword)
-      );
+      statement = connection.prepareStatement("INSERT INTO " + schemaNameAndTablePrefix + "Resource( ResourceId, ResourceClassId, DomainId ) VALUES ( 0, 0, 0 )");
       statement.executeUpdate();
+
+      // set the system user's password
+      statement = connection.prepareStatement("INSERT INTO " + schemaNameAndTablePrefix + "ResourcePassword( ResourceId, Password ) VALUES ( 0, ? )");
+      char[] boundPassword = null;
+      try {
+         boundPassword = PasswordUtils.computeBoundPassword(Resource.getInstance(0), oaccRootPwd);
+         statement.setString(1, passwordEncryptor.encryptPassword(boundPassword));
+         statement.executeUpdate();
+      }
+      finally {
+         PasswordUtils.cleanPassword(boundPassword);
+      }
 
       // grant the system user [super user w/ grant] to the system domain
       statement = connection.prepareStatement("INSERT INTO " + schemaNameAndTablePrefix + "Grant_DomPerm_Sys( AccessorResourceId, GrantorResourceId, AccessedDomainId, SysPermissionId, IsWithGrant )"

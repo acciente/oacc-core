@@ -59,9 +59,6 @@ public class SQLStrings implements Serializable {
    public final String SQL_createInGrantDomainPermissionSys_WITH_AccessorID_GrantorID_AccessedDomainID_IsWithGrant_SysPermissionID;
    public final String SQL_removeInGrantDomainPermissionSys_BY_AccessorID_AccessedDomainID;
 
-   // Resource
-   public final String SQL_findInResource_Password_BY_ResourceID;
-
    // GrantResourcePermissionSys
    public final String SQL_findInGrantResourcePermissionSys_ResourceID_BY_AccessorID_ResourceClassID_SysPermissionID_IsWithGrant;
    public final String SQL_findInGrantResourcePermissionSys_ResourceID_BY_AccessorID_DomainID_ResourceClassID_SysPermissionID_IsWithGrant;
@@ -90,9 +87,8 @@ public class SQLStrings implements Serializable {
 
    // Resource
    public final String SQL_findInResource_COUNTResourceID_BY_ResourceClassID_DomainID;
-
-   public final String SQL_createInResource_WITH_ResourceID_ResourceClassID_DomainID_Password;
-   public final String SQL_updateInResource_Password_BY_ResourceID;
+   public final String SQL_createInResource_WITH_ResourceID_ResourceClassID_DomainID;
+   public final String SQL_findInResource_ResourceId_BY_ResourceID;
 
    // GrantResourceCreatePermissionSys
    public final String SQL_findInGrantResourceCreatePermissionSys_SysPermissionId_IsWithGrant_InheritLevel_DomainLevel_BY_AccessorID_AccessedDomainID_ResourceClassID;
@@ -344,10 +340,6 @@ public class SQLStrings implements Serializable {
             + schemaNameAndTablePrefix
             + "Grant_DomPerm_Sys WHERE AccessorResourceId = ? AND AccessedDomainId = ?";
 
-      // Resource
-      SQL_findInResource_Password_BY_ResourceID
-            = "SELECT Password FROM " + schemaNameAndTablePrefix + "Resource WHERE ResourceId = ?";
-
       // Resource: finder methods used getResourcesByResourcePermission()
       SQL_findInGrantResourcePermissionSys_ResourceID_BY_AccessorID_ResourceClassID_SysPermissionID_IsWithGrant
             = SQL_findRecursiveInGrantResourcePermissionSys_AccessorID_InheritLevel_BY_AccessorID
@@ -527,13 +519,14 @@ public class SQLStrings implements Serializable {
             + schemaNameAndTablePrefix
             + "Resource WHERE ResourceClassId = ? AND DomainId = ?";
 
-      SQL_createInResource_WITH_ResourceID_ResourceClassID_DomainID_Password
+      SQL_createInResource_WITH_ResourceID_ResourceClassID_DomainID
             = "INSERT INTO "
             + schemaNameAndTablePrefix
-            + "Resource ( ResourceId, ResourceClassId, DomainId, Password ) VALUES ( ?, ?, ?, ? )";
+            + "Resource ( ResourceId, ResourceClassId, DomainId ) VALUES ( ?, ?, ? )";
 
-      SQL_updateInResource_Password_BY_ResourceID
-            = "UPDATE " + schemaNameAndTablePrefix + "Resource SET Password = ? WHERE ResourceId = ?";
+      // Resource
+      SQL_findInResource_ResourceId_BY_ResourceID
+            = "SELECT ResourceId FROM " + schemaNameAndTablePrefix + "Resource WHERE ResourceId = ?";
 
       // GrantResourceCreatePermissionSys
       SQL_findInGrantResourceCreatePermissionSys_SysPermissionId_IsWithGrant_InheritLevel_DomainLevel_BY_AccessorID_AccessedDomainID_ResourceClassID

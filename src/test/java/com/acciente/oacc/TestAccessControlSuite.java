@@ -28,7 +28,7 @@ public class TestAccessControlSuite  {
       suite.addTest(new JUnit4TestAdapter(TestAccessControl_unauthenticatedApiCalls.class));
       suite.addTest(new JUnit4TestAdapter(TestAccessControl_authenticate.class));
       suite.addTest(new JUnit4TestAdapter(TestAccessControl_unauthenticate.class));
-      suite.addTest(new JUnit4TestAdapter(TestAccessControl_setAuthResourcePassword.class));
+      suite.addTest(new JUnit4TestAdapter(TestAccessControl_setCredentials.class));
       suite.addTest(new JUnit4TestAdapter(TestAccessControl_createResourceClass.class));
       suite.addTest(new JUnit4TestAdapter(TestAccessControl_getDomainDescendants.class));
       suite.addTest(new JUnit4TestAdapter(TestAccessControl_createDomain.class));

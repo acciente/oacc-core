@@ -76,14 +76,14 @@ public class SQLAccessControlSystemInitializer {
          throw new IllegalArgumentException(PROP_OACCRootPwd + " is required!");
       }
 
-      initializeOACC(dbUrl, dbUser, dbPwd, dbSchema, oaccRootPwd);
+      initializeOACC(dbUrl, dbUser, dbPwd, dbSchema, oaccRootPwd.toCharArray());
    }
 
    public static void initializeOACC(String dbUrl,
                                      String dbUser,
                                      String dbPwd,
                                      String dbSchema,
-                                     String oaccRootPwd) throws SQLException {
+                                     char[] oaccRootPwd) throws SQLException {
       System.out.println("Connecting to OACC database @ " + dbUrl);
       Connection connection = DriverManager.getConnection(dbUrl, dbUser, dbPwd);
 
@@ -103,7 +103,7 @@ public class SQLAccessControlSystemInitializer {
 
    public static void initializeOACC(Connection connection,
                                      String dbSchema,
-                                     String oaccRootPwd) throws SQLException {
+                                     char[] oaccRootPwd) throws SQLException {
       // delegate to internal handler
       com.acciente.oacc.sql.internal.SQLAccessControlSystemInitializer.initializeOACC(connection,
                                                                                       dbSchema,

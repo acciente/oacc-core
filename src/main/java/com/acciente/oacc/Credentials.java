@@ -20,14 +20,9 @@ package com.acciente.oacc;
 /**
  * This is the most general interface that is used to indicate that an object that contains OACC credentials.
  * The built-in {@link AuthenticationProvider} in OACC only supports the more specific {@link PasswordCredentials}
- * sub-interface of {@link Credentials}. Other custom implementations of {@link Credentials} must be paired with
- * an implementation of {@link AuthenticationProvider} that understands the respective implementation of the
- * {@link Credentials} interface.
+ * sub-interface of {@link Credentials}. Other custom implementations of Credentials must be paired with
+ * an implementation of AuthenticationProvider that understands the respective implementation of the
+ * Credentials interface.
  */
 public interface Credentials {
-   /**
-    * The resource requesting to be authenticated.
-    * @return a resource
-    */
-   Resource getResource();
 }
