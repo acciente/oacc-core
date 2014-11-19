@@ -26,15 +26,15 @@ public class SQLPasswordAuthenticationProvider implements AuthenticationProvider
 
    // protected constructors/methods
    protected SQLPasswordAuthenticationProvider(Connection connection,
-                                             String schemaName,
-                                             SQLDialect sqlDialect) throws AccessControlException {
+                                               String schemaName,
+                                               SQLDialect sqlDialect) throws AccessControlException {
       this(schemaName, sqlDialect);
       this.connection = connection;
    }
 
    protected SQLPasswordAuthenticationProvider(DataSource dataSource,
-                                             String schemaName,
-                                             SQLDialect sqlDialect) throws AccessControlException {
+                                               String schemaName,
+                                               SQLDialect sqlDialect) throws AccessControlException {
       this(schemaName, sqlDialect);
       this.dataSource = dataSource;
    }
@@ -53,16 +53,19 @@ public class SQLPasswordAuthenticationProvider implements AuthenticationProvider
    protected void preSerialize() {
       this.dataSource = null;
       this.connection = null;
+      this.passwordEncryptor = null;
    }
 
    protected void postDeserialize(DataSource dataSource) {
       this.dataSource = dataSource;
       this.connection = null;
+      this.passwordEncryptor = new StrongCleanablePasswordEncryptor();
    }
 
    protected void postDeserialize(Connection connection) {
       this.dataSource = null;
       this.connection = connection;
+      this.passwordEncryptor = new StrongCleanablePasswordEncryptor();
    }
 
    @Override

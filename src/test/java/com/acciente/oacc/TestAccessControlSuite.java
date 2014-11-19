@@ -25,6 +25,7 @@ public class TestAccessControlSuite  {
    public static TestSuite suite() {
       TestSuite suite = new TestSuite();
 
+      suite.addTest(new JUnit4TestAdapter(TestAccessControl_serialize.class));
       suite.addTest(new JUnit4TestAdapter(TestAccessControl_unauthenticatedApiCalls.class));
       suite.addTest(new JUnit4TestAdapter(TestAccessControl_authenticate.class));
       suite.addTest(new JUnit4TestAdapter(TestAccessControl_unauthenticate.class));

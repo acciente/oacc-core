@@ -19,12 +19,13 @@ package com.acciente.oacc.sql.internal.persister;
 
 import com.acciente.oacc.AccessControlException;
 
+import java.io.Serializable;
 import java.sql.SQLException;
 
 /**
  * Base class for persisters
  */
-public abstract class Persister {
+public abstract class Persister implements Serializable {
    protected static void closeStatement(SQLStatement statement)
          throws AccessControlException {
       try {
