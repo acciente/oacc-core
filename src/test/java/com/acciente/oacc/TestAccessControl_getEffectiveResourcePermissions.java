@@ -90,6 +90,186 @@ public class TestAccessControl_getEffectiveResourcePermissions extends TestAcces
    }
 
    @Test
+   public void getEffectiveResourcePermissions_validWithDirect() throws AccessControlException {
+      authenticateSystemResource();
+      final String resourceClassName = generateResourceClass(false, false);
+      final String directPermissionName = generateResourceClassPermission(resourceClassName);
+
+      final Resource accessorResource = generateUnauthenticatableResource();
+      final Resource accessedResource = accessControlContext.createResource(resourceClassName, generateDomain());
+
+      assertThat(accessControlContext.getEffectiveResourcePermissions(accessorResource, accessedResource).isEmpty(), is(true));
+
+      // setup direct permissions
+      Set<ResourcePermission> directPermissions = new HashSet<>();
+      directPermissions.add(ResourcePermission.getInstance(directPermissionName));
+
+      accessControlContext.setResourcePermissions(accessorResource, accessedResource, directPermissions);
+      assertThat(accessControlContext.getEffectiveResourcePermissions(accessorResource, accessedResource), is(directPermissions));
+
+      // verify
+      Set<ResourcePermission> expectedPermissions = new HashSet<>();
+      expectedPermissions.addAll(directPermissions);
+
+      assertThat(accessControlContext.getEffectiveResourcePermissions(accessorResource, accessedResource), is(expectedPermissions));
+   }
+
+   @Test
+   public void getEffectiveResourcePermissions_validWithInherited() throws AccessControlException {
+      authenticateSystemResource();
+      final String resourceClassName = generateResourceClass(false, false);
+      final String inheritedPermissionName = generateResourceClassPermission(resourceClassName);
+
+      final Resource accessorResource = generateUnauthenticatableResource();
+      final Resource donorResource = generateUnauthenticatableResource();
+      final Resource accessedResource = accessControlContext.createResource(resourceClassName, generateDomain());
+
+      assertThat(accessControlContext.getEffectiveResourcePermissions(accessorResource, accessedResource).isEmpty(), is(true));
+
+      // setup donor permissions
+      Set<ResourcePermission> donorResourcePermissions = new HashSet<>();
+      donorResourcePermissions.add(ResourcePermission.getInstance(inheritedPermissionName, true));
+
+      accessControlContext.setResourcePermissions(donorResource, accessedResource, donorResourcePermissions);
+      assertThat(accessControlContext.getEffectiveResourcePermissions(donorResource, accessedResource), is(donorResourcePermissions));
+
+      // inherit from donor
+      Set<ResourcePermission> inheritResourcePermissions = new HashSet<>();
+      inheritResourcePermissions.add(ResourcePermission.getInstance(ResourcePermission.INHERIT));
+
+      accessControlContext.setResourcePermissions(accessorResource, donorResource, inheritResourcePermissions);
+      assertThat(accessControlContext.getEffectiveResourcePermissions(accessorResource, donorResource), is(inheritResourcePermissions));
+
+      // verify
+      Set<ResourcePermission> expectedPermissions = new HashSet<>();
+      expectedPermissions.addAll(donorResourcePermissions);
+
+      assertThat(accessControlContext.getEffectiveResourcePermissions(accessorResource, accessedResource), is(expectedPermissions));
+   }
+
+   @Test
+   public void getEffectiveResourcePermissions_validWithGlobal() throws AccessControlException {
+      authenticateSystemResource();
+      final String resourceClassName = generateResourceClass(false, false);
+      final String directGlobalPermissionName = generateResourceClassPermission(resourceClassName);
+
+      final Resource accessorResource = generateUnauthenticatableResource();
+      final String accessedDomain = generateDomain();
+      final Resource accessedResource = accessControlContext.createResource(resourceClassName, accessedDomain);
+
+      assertThat(accessControlContext.getEffectiveResourcePermissions(accessorResource, accessedResource).isEmpty(), is(true));
+
+      // setup global permissions
+      Set<ResourcePermission> globalResourcePermissions = new HashSet<>();
+      globalResourcePermissions.add(ResourcePermission.getInstance(directGlobalPermissionName));
+
+      accessControlContext.setGlobalResourcePermissions(accessorResource, resourceClassName, globalResourcePermissions, accessedDomain);
+      assertThat(accessControlContext.getEffectiveGlobalResourcePermissions(accessorResource, resourceClassName, accessedDomain), is(globalResourcePermissions));
+
+      // verify
+      Set<ResourcePermission> permissions_expected = new HashSet<>();
+      permissions_expected.addAll(globalResourcePermissions);
+
+      final Set<ResourcePermission> permissions_post = accessControlContext.getEffectiveResourcePermissions(accessorResource, accessedResource);
+      assertThat(permissions_post, is(permissions_expected));
+   }
+
+   @Test
+   public void getEffectiveResourcePermissions_validWithDomainInherited() throws AccessControlException {
+      authenticateSystemResource();
+      final String resourceClassName = generateResourceClass(false, false);
+      final String domainInheritedGlobalPermissionName = generateResourceClassPermission(resourceClassName);
+
+      final String parentDomain = generateDomain();
+      final String childDomain = generateUniqueDomainName();
+      accessControlContext.createDomain(childDomain, parentDomain);
+
+      final Resource accessorResource = generateUnauthenticatableResource();
+      final Resource accessedResource = accessControlContext.createResource(resourceClassName, childDomain);
+
+      assertThat(accessControlContext.getEffectiveResourcePermissions(accessorResource, accessedResource).isEmpty(), is(true));
+
+      // setup domain-inherited global permissions
+      Set<ResourcePermission> domainInheritedGlobalResourcePermissions = new HashSet<>();
+      domainInheritedGlobalResourcePermissions.add(ResourcePermission.getInstance(domainInheritedGlobalPermissionName));
+
+      accessControlContext.setGlobalResourcePermissions(accessorResource, resourceClassName, domainInheritedGlobalResourcePermissions, parentDomain);
+      assertThat(accessControlContext.getEffectiveGlobalResourcePermissions(accessorResource, resourceClassName, parentDomain), is(domainInheritedGlobalResourcePermissions));
+
+      // verify
+      Set<ResourcePermission> permissions_expected = new HashSet<>();
+      permissions_expected.addAll(domainInheritedGlobalResourcePermissions);
+
+      final Set<ResourcePermission> permissions_post = accessControlContext.getEffectiveResourcePermissions(accessorResource, accessedResource);
+      assertThat(permissions_post, is(permissions_expected));
+   }
+
+   @Test
+   public void getEffectiveResourcePermissions_validWithDirectAndInheritedAndGlobalAndDomainInherited() throws AccessControlException {
+      authenticateSystemResource();
+      final String resourceClassName = generateResourceClass(false, false);
+      final String directPermissionName = generateResourceClassPermission(resourceClassName);
+      final String inheritedPermissionName = generateResourceClassPermission(resourceClassName);
+      final String directGlobalPermissionName = generateResourceClassPermission(resourceClassName);
+      final String domainInheritedGlobalPermissionName = generateResourceClassPermission(resourceClassName);
+
+      final String parentDomain = generateDomain();
+      final String childDomain = generateUniqueDomainName();
+      accessControlContext.createDomain(childDomain, parentDomain);
+
+      final Resource accessorResource = generateUnauthenticatableResource();
+      final Resource donorResource = generateUnauthenticatableResource();
+      final Resource accessedResource = accessControlContext.createResource(resourceClassName, childDomain);
+
+      assertThat(accessControlContext.getEffectiveResourcePermissions(accessorResource, accessedResource).isEmpty(), is(true));
+
+      // setup direct permissions
+      Set<ResourcePermission> directPermissions = new HashSet<>();
+      directPermissions.add(ResourcePermission.getInstance(directPermissionName));
+
+      accessControlContext.setResourcePermissions(accessorResource, accessedResource, directPermissions);
+      assertThat(accessControlContext.getEffectiveResourcePermissions(accessorResource, accessedResource), is(directPermissions));
+
+      // setup donor permissions
+      Set<ResourcePermission> donorResourcePermissions = new HashSet<>();
+      donorResourcePermissions.add(ResourcePermission.getInstance(inheritedPermissionName, true));
+
+      accessControlContext.setResourcePermissions(donorResource, accessedResource, donorResourcePermissions);
+      assertThat(accessControlContext.getEffectiveResourcePermissions(donorResource, accessedResource), is(donorResourcePermissions));
+
+      // inherit from donor
+      Set<ResourcePermission> inheritResourcePermissions = new HashSet<>();
+      inheritResourcePermissions.add(ResourcePermission.getInstance(ResourcePermission.INHERIT));
+
+      accessControlContext.setResourcePermissions(accessorResource, donorResource, inheritResourcePermissions);
+      assertThat(accessControlContext.getEffectiveResourcePermissions(accessorResource, donorResource), is(inheritResourcePermissions));
+
+      // setup global permissions
+      Set<ResourcePermission> globalResourcePermissions = new HashSet<>();
+      globalResourcePermissions.add(ResourcePermission.getInstance(directGlobalPermissionName));
+
+      accessControlContext.setGlobalResourcePermissions(accessorResource, resourceClassName, globalResourcePermissions, childDomain);
+      assertThat(accessControlContext.getEffectiveGlobalResourcePermissions(accessorResource, resourceClassName, childDomain), is(globalResourcePermissions));
+
+      // setup domain-inherited global permissions
+      Set<ResourcePermission> domainInheritedGlobalResourcePermissions = new HashSet<>();
+      domainInheritedGlobalResourcePermissions.add(ResourcePermission.getInstance(domainInheritedGlobalPermissionName));
+
+      accessControlContext.setGlobalResourcePermissions(accessorResource, resourceClassName, domainInheritedGlobalResourcePermissions, parentDomain);
+      assertThat(accessControlContext.getEffectiveGlobalResourcePermissions(accessorResource, resourceClassName, parentDomain), is(domainInheritedGlobalResourcePermissions));
+
+      // verify
+      Set<ResourcePermission> permissions_expected = new HashSet<>();
+      permissions_expected.addAll(directPermissions);
+      permissions_expected.addAll(donorResourcePermissions);
+      permissions_expected.addAll(globalResourcePermissions);
+      permissions_expected.addAll(domainInheritedGlobalResourcePermissions);
+
+      final Set<ResourcePermission> permissions_post = accessControlContext.getEffectiveResourcePermissions(accessorResource, accessedResource);
+      assertThat(permissions_post, is(permissions_expected));
+   }
+
+   @Test
    public void getEffectiveResourcePermissions_nulls_shouldFail() throws AccessControlException {
       authenticateSystemResource();
 
