@@ -89,6 +89,7 @@ public class SQLStrings implements Serializable {
    public final String SQL_findInResource_COUNTResourceID_BY_ResourceClassID_DomainID;
    public final String SQL_createInResource_WITH_ResourceID_ResourceClassID_DomainID;
    public final String SQL_findInResource_ResourceId_BY_ResourceID;
+   public final String SQL_findInResource_DomainID_BY_ResourceID;
 
    // GrantResourceCreatePermissionSys
    public final String SQL_findInGrantResourceCreatePermissionSys_SysPermissionId_IsWithGrant_InheritLevel_DomainLevel_BY_AccessorID_AccessedDomainID_ResourceClassID;
@@ -527,6 +528,9 @@ public class SQLStrings implements Serializable {
       // Resource
       SQL_findInResource_ResourceId_BY_ResourceID
             = "SELECT ResourceId FROM " + schemaNameAndTablePrefix + "Resource WHERE ResourceId = ?";
+
+      SQL_findInResource_DomainID_BY_ResourceID
+            = "SELECT DomainId FROM " + schemaNameAndTablePrefix + "Resource WHERE ResourceId = ? ";
 
       // GrantResourceCreatePermissionSys
       SQL_findInGrantResourceCreatePermissionSys_SysPermissionId_IsWithGrant_InheritLevel_DomainLevel_BY_AccessorID_AccessedDomainID_ResourceClassID

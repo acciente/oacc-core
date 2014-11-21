@@ -1749,7 +1749,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
                }
 
                unauthorizedRemovePermissions
-                     = __subtractPermissions(accessorResourcePermissions,
+                     = __subtractPermissions(accessorResourcePermissions,  // todo: this should really have been unauthorizedRemovePermissions
                                              grantorGlobalResourcePermissions);
 
             }
@@ -1873,11 +1873,28 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
                                                                                        accessorResource,
                                                                                        accessedResource));
 
-      // first collect the non-system permissions that the accessor has to the accessed resource
+      // collect the non-system permissions that the accessor has to the accessed resource
       resourcePermissions.addAll(grantResourcePermissionPersister.getPermissions(connection,
                                                                                  accessorResource,
                                                                                  accessedResource));
 
+      final Id<DomainId> accessedDomainId = resourcePersister.getDomainIdByResource(connection, accessedResource);
+      final Id<ResourceClassId> accessedResourceClassId
+            = Id.<ResourceClassId>from(resourceClassPersister
+                                             .getResourceClassInfoByResourceId(connection, accessedResource)
+                                             .getResourceClassId());
+
+      // collect the global system permissions that the accessor has to the accessed resource's domain
+      resourcePermissions.addAll(grantGlobalResourcePermissionSysPersister.getGlobalSysPermissions(connection,
+                                                                                                   accessorResource,
+                                                                                                   accessedResourceClassId,
+                                                                                                   accessedDomainId));
+
+      // first collect the global non-system permissions that the accessor this resource has to the accessed resource's domain
+      resourcePermissions.addAll(grantGlobalResourcePermissionPersister.getGlobalPermissions(connection,
+                                                                                             accessorResource,
+                                                                                             accessedResourceClassId,
+                                                                                             accessedDomainId));
       return resourcePermissions;
    }
 

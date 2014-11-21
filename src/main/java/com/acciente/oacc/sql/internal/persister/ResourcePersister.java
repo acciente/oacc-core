@@ -116,6 +116,35 @@ public class ResourcePersister extends Persister {
       }
    }
 
+   public Id<DomainId> getDomainIdByResource(SQLConnection connection,
+                                             Resource resource) throws AccessControlException {
+      SQLStatement statement = null;
+
+      try {
+         Id<DomainId> domainId = null;
+
+         statement = connection.prepareStatement(sqlStrings.SQL_findInResource_DomainID_BY_ResourceID);
+         statement.setResourceId(1, resource);
+         SQLResult resultSet = statement.executeQuery();
+
+         if (resultSet.next()) {
+            domainId = resultSet.getResourceDomainId("DomainId");
+         }
+
+         if (domainId == null) {
+            throw new AccessControlException("Could not determine resource domain for resource: " + resource);
+         }
+
+         return domainId;
+      }
+      catch (SQLException e) {
+         throw new AccessControlException(e);
+      }
+      finally {
+         closeStatement(statement);
+      }
+   }
+
    public Id<ResourceId> getNextResourceId(SQLConnection connection)
          throws AccessControlException {
       SQLStatement statement = null;
