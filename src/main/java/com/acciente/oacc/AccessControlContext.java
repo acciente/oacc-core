@@ -703,8 +703,8 @@ public interface AccessControlContext {
 
    /**
     * Gets the effective resource permissions that the specified accessor resource has to the
-    * specified accessed resource both directly and inherited, but does not take into
-    * account any global resource permissions.
+    * specified accessed resource.
+    * This method takes into account direct, inherited and global permissions of the session resource.
     *
     * @param accessorResource the resource relative to which the permissions should be returned
     * @param accessedResource the resource on which the privilege is granted
