@@ -109,10 +109,12 @@ public class SQLStrings implements Serializable {
 
    // GrantResourcePermissionSys
    public final String SQL_findInGrantResourcePermissionSys_ResourceClassName_SysPermissionID_IsWithGrant_InheritLevel_BY_AccessorID_AccessedID;
+   public final String SQL_findInGrantResourcePermissionSys_withoutInheritance_ResourceClassName_SysPermissionID_IsWithGrant_BY_AccessorID_AccessedID;
    public final String SQL_createInGrantResourcePermissionSys_WITH_AccessorID_GrantorID_AccessedID_IsWithGrant_ResourceClassID_SysPermissionID;
    public final String SQL_removeInGrantResourcePermissionSys_BY_AccessorID_AccessedID;
    // GrantResourcePermission
    public final String SQL_findInGrantResourcePermission_ResourceClassName_PermissionName_IsWithGrant_InheritLevel_BY_AccessorID_AccessedID;
+   public final String SQL_findInGrantResourcePermission_withoutInheritance_ResourceClassName_PermissionName_IsWithGrant_BY_AccessorID_AccessedID;
    public final String SQL_createInGrantResourcePermission_WITH_AccessorID_GrantorID_AccessedID_IsWithGrant_ResourceClassID_PermissionName;
    public final String SQL_removeInGrantResourcePermission_BY_AccessorID_AccessedID;
 
@@ -671,6 +673,14 @@ public class SQLStrings implements Serializable {
             + "JOIN N ON N.AccessorResourceId = A.AccessorResourceId "
             + "WHERE A.AccessedResourceId = ?";
 
+      SQL_findInGrantResourcePermissionSys_withoutInheritance_ResourceClassName_SysPermissionID_IsWithGrant_BY_AccessorID_AccessedID
+            = "SELECT B.ResourceClassName, A.SysPermissionId, A.IsWithGrant FROM "
+            + schemaNameAndTablePrefix
+            + "Grant_ResPerm_Sys A JOIN "
+            + schemaNameAndTablePrefix
+            + "ResourceClass B ON B.ResourceClassId = A.ResourceClassId "
+            + "WHERE A.AccessorResourceId = ? AND A.AccessedResourceId = ?";
+
       SQL_createInGrantResourcePermissionSys_WITH_AccessorID_GrantorID_AccessedID_IsWithGrant_ResourceClassID_SysPermissionID
             = "INSERT INTO "
             + schemaNameAndTablePrefix
@@ -694,6 +704,16 @@ public class SQLStrings implements Serializable {
             + "ResourceClass C ON C.ResourceClassId = A.ResourceClassId "
             + "JOIN N ON N.AccessorResourceId = A.AccessorResourceId "
             + "WHERE A.AccessedResourceId = ?";
+
+      SQL_findInGrantResourcePermission_withoutInheritance_ResourceClassName_PermissionName_IsWithGrant_BY_AccessorID_AccessedID
+            = "SELECT C.ResourceClassName, B.PermissionName, A.IsWithGrant FROM "
+            + schemaNameAndTablePrefix
+            + "Grant_ResPerm A JOIN "
+            + schemaNameAndTablePrefix
+            + "ResourceClassPermission B ON B.ResourceClassId = A.ResourceClassId AND B.PermissionId = A.PermissionId JOIN "
+            + schemaNameAndTablePrefix
+            + "ResourceClass C ON C.ResourceClassId = A.ResourceClassId "
+            + "WHERE A.AccessorResourceId = ? AND A.AccessedResourceId = ?";
 
       SQL_createInGrantResourcePermission_WITH_AccessorID_GrantorID_AccessedID_IsWithGrant_ResourceClassID_PermissionName
             = "INSERT INTO "

@@ -181,6 +181,40 @@ public class GrantResourcePermissionSysPersister extends Persister {
       }
    }
 
+   public Set<ResourcePermission> getDirectSysPermissions(SQLConnection connection,
+                                                          Resource accessorResource,
+                                                          Resource accessedResource)
+         throws AccessControlException {
+
+      SQLStatement statement = null;
+      try {
+         SQLResult resultSet;
+         Set<ResourcePermission> resourcePermissions = new HashSet<>();
+
+         // collect the system permissions that the accessor this resource has to the accessor resource
+         statement = connection.prepareStatement(sqlStrings.SQL_findInGrantResourcePermissionSys_withoutInheritance_ResourceClassName_SysPermissionID_IsWithGrant_BY_AccessorID_AccessedID);
+         statement.setResourceId(1, accessorResource);
+         statement.setResourceId(2, accessedResource);
+         resultSet = statement.executeQuery();
+
+         while (resultSet.next()) {
+            resourcePermissions.add(ResourcePermission.getInstance(resultSet.getResourceSysPermissionName("SysPermissionId"),
+                                                                   resultSet.getBoolean("IsWithGrant"),
+                                                                   0, // inherit level doesn't apply to direct permissions
+                                                                   0 /* zero since domain level does not apply in context of direct permissions */));
+         }
+         resultSet.close();
+
+         return resourcePermissions;
+      }
+      catch (SQLException e) {
+         throw new AccessControlException(e);
+      }
+      finally {
+         closeStatement(statement);
+      }
+   }
+
    public void addSysPermissions(SQLConnection connection,
                                  Resource accessorResource,
                                  Resource accessedResource,
