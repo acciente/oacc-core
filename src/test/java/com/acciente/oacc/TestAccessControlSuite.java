@@ -44,8 +44,8 @@ public class TestAccessControlSuite  {
       suite.addTest(new JUnit4TestAdapter(TestAccessControl_getEffectiveResourceCreatePermissions.class));
       suite.addTest(new JUnit4TestAdapter(TestAccessControl_setResourcePermissions.class));
       suite.addTest(new JUnit4TestAdapter(TestAccessControl_getEffectiveResourcePermissions.class));
-      suite.addTest(new JUnit4TestAdapter(TestAccessControl_setGlobalPermissions.class));
-      suite.addTest(new JUnit4TestAdapter(TestAccessControl_getEffectiveGlobalPermissions.class));
+      suite.addTest(new JUnit4TestAdapter(TestAccessControl_setGlobalResourcePermissions.class));
+      suite.addTest(new JUnit4TestAdapter(TestAccessControl_getEffectiveGlobalResourcePermissions.class));
       suite.addTest(new JUnit4TestAdapter(TestAccessControl_getResourcesByPermission.class));
       suite.addTest(new JUnit4TestAdapter(TestAccessControl_assertPostCreateResourcePermission.class));
 

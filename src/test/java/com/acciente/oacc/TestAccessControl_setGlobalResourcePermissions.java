@@ -30,9 +30,9 @@ import static org.hamcrest.CoreMatchers.not;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 
-public class TestAccessControl_setGlobalPermissions extends TestAccessControlBase {
+public class TestAccessControl_setGlobalResourcePermissions extends TestAccessControlBase {
    @Test
-   public void setGlobalPermissions_validAsSystemResource() throws AccessControlException {
+   public void setGlobalResourcePermissions_validAsSystemResource() throws AccessControlException {
       authenticateSystemResource();
       final String authenticatableResourceClassName = generateResourceClass(true, false);
       final Resource accessorResource = generateUnauthenticatableResource();
@@ -69,7 +69,7 @@ public class TestAccessControl_setGlobalPermissions extends TestAccessControlBas
    }
 
    @Test
-   public void setGlobalPermissions_inheritSystemPermission_shouldFail() throws AccessControlException {
+   public void setGlobalResourcePermissions_inheritSystemPermission_shouldFail() throws AccessControlException {
       authenticateSystemResource();
       final String resourceClassName = generateResourceClass(false, false);
       final Resource accessorResource = generateUnauthenticatableResource();
@@ -92,7 +92,7 @@ public class TestAccessControl_setGlobalPermissions extends TestAccessControlBas
    }
 
    @Test
-   public void setGlobalPermissions_resetPwdPermissionOnUnauthenticatables_shouldFail() throws AccessControlException {
+   public void setGlobalResourcePermissions_resetPwdPermissionOnUnauthenticatables_shouldFail() throws AccessControlException {
       authenticateSystemResource();
       final String resourceClassName = generateResourceClass(false, false);
       final Resource accessorResource = generateAuthenticatableResource(generateUniquePassword());
@@ -115,7 +115,7 @@ public class TestAccessControl_setGlobalPermissions extends TestAccessControlBas
    }
 
    @Test
-   public void setGlobalPermissions_impersonatePermissionOnUnauthenticatables_shouldFail() throws AccessControlException {
+   public void setGlobalResourcePermissions_impersonatePermissionOnUnauthenticatables_shouldFail() throws AccessControlException {
       authenticateSystemResource();
       final String resourceClassName = generateResourceClass(false, false);
       final Resource accessorResource = generateAuthenticatableResource(generateUniquePassword());
@@ -138,7 +138,7 @@ public class TestAccessControl_setGlobalPermissions extends TestAccessControlBas
    }
 
    @Test
-   public void setGlobalPermissions_validAsAuthorized() throws AccessControlException {
+   public void setGlobalResourcePermissions_validAsAuthorized() throws AccessControlException {
       authenticateSystemResource();
       final String resourceClassName = generateResourceClass(true, false);
       final String customPermissionName = generateResourceClassPermission(resourceClassName);
@@ -175,7 +175,7 @@ public class TestAccessControl_setGlobalPermissions extends TestAccessControlBas
    }
 
    @Test
-   public void setGlobalPermissions_validWithDefaultSessionDomain() throws AccessControlException {
+   public void setGlobalResourcePermissions_validWithDefaultSessionDomain() throws AccessControlException {
       authenticateSystemResource();
       final String resourceClassName = generateResourceClass(true, false);
       final String customPermissionName = generateResourceClassPermission(resourceClassName);
@@ -218,7 +218,7 @@ public class TestAccessControl_setGlobalPermissions extends TestAccessControlBas
 
 
    @Test
-   public void setGlobalPermissions_resetPermissions() throws AccessControlException {
+   public void setGlobalResourcePermissions_resetPermissions() throws AccessControlException {
       authenticateSystemResource();
       final String resourceClassName = generateResourceClass(true, false);
       final Resource accessorResource = generateUnauthenticatableResource();
@@ -260,7 +260,7 @@ public class TestAccessControl_setGlobalPermissions extends TestAccessControlBas
    }
 
    @Test
-   public void setGlobalPermissions_duplicatePermissionNames_shouldFail() throws AccessControlException {
+   public void setGlobalResourcePermissions_duplicatePermissionNames_shouldFail() throws AccessControlException {
       authenticateSystemResource();
       final String resourceClassName = generateResourceClass(true, false);
       final Resource accessorResource = generateUnauthenticatableResource();
@@ -286,7 +286,7 @@ public class TestAccessControl_setGlobalPermissions extends TestAccessControlBas
    }
 
    @Test
-   public void setGlobalPermissions_nulls_shouldFail() throws AccessControlException {
+   public void setGlobalResourcePermissions_nulls_shouldFail() throws AccessControlException {
       authenticateSystemResource();
       final String resourceClassName = generateResourceClass(true, false);
       final Resource accessorResource = generateUnauthenticatableResource();
@@ -340,7 +340,7 @@ public class TestAccessControl_setGlobalPermissions extends TestAccessControlBas
    }
 
    @Test
-   public void setGlobalPermissions_mismatchedResourceClassAndPermission_shouldFail() throws AccessControlException {
+   public void setGlobalResourcePermissions_mismatchedResourceClassAndPermission_shouldFail() throws AccessControlException {
       authenticateSystemResource();
       final String resourceClassName1 = generateResourceClass(true, false);
       final String resourceClassName2 = generateResourceClass(true, false);
@@ -364,7 +364,7 @@ public class TestAccessControl_setGlobalPermissions extends TestAccessControlBas
    }
 
    @Test
-   public void setGlobalPermissions_nonExistentReferences_shouldFail() throws AccessControlException {
+   public void setGlobalResourcePermissions_nonExistentReferences_shouldFail() throws AccessControlException {
       authenticateSystemResource();
       final String resourceClassName = generateResourceClass(true, false);
       final Resource accessorResource = generateUnauthenticatableResource();
@@ -410,7 +410,7 @@ public class TestAccessControl_setGlobalPermissions extends TestAccessControlBas
    }
 
    @Test
-   public void setGlobalPermissions_notAuthorized_shouldFail() throws AccessControlException {
+   public void setGlobalResourcePermissions_notAuthorized_shouldFail() throws AccessControlException {
       authenticateSystemResource();
       final String resourceClassName = generateResourceClass(true, false);
       final String customPermissionName = generateResourceClassPermission(resourceClassName);

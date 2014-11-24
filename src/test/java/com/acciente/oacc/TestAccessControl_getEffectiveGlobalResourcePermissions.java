@@ -28,9 +28,9 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 
-public class TestAccessControl_getEffectiveGlobalPermissions extends TestAccessControlBase {
+public class TestAccessControl_getEffectiveGlobalResourcePermissions extends TestAccessControlBase {
    @Test
-   public void getEffectiveGlobalPermissions_emptyAsSystemResource() throws AccessControlException {
+   public void getEffectiveGlobalResourcePermissions_emptyAsSystemResource() throws AccessControlException {
       authenticateSystemResource();
 
       final Resource accessorResource = generateUnauthenticatableResource();
@@ -47,7 +47,7 @@ public class TestAccessControl_getEffectiveGlobalPermissions extends TestAccessC
    }
 
    @Test
-   public void getEffectiveGlobalPermissions_emptyAsAuthenticated() throws AccessControlException {
+   public void getEffectiveGlobalResourcePermissions_emptyAsAuthenticated() throws AccessControlException {
       generateResourceAndAuthenticate();
 
       final Resource accessorResource = generateUnauthenticatableResource();
@@ -64,7 +64,7 @@ public class TestAccessControl_getEffectiveGlobalPermissions extends TestAccessC
    }
 
    @Test
-   public void getEffectiveGlobalPermissions_validAsSystemResource() throws AccessControlException {
+   public void getEffectiveGlobalResourcePermissions_validAsSystemResource() throws AccessControlException {
       authenticateSystemResource();
       final String authenticatableResourceClassName = generateResourceClass(true, false);
       final Resource accessorResource = generateUnauthenticatableResource();
@@ -93,7 +93,7 @@ public class TestAccessControl_getEffectiveGlobalPermissions extends TestAccessC
    }
 
    @Test
-   public void getEffectiveGlobalPermissions_validAsAuthenticatedResource() throws AccessControlException {
+   public void getEffectiveGlobalResourcePermissions_validAsAuthenticatedResource() throws AccessControlException {
       authenticateSystemResource();
       final String resourceClassName = generateResourceClass(true, false);
       final String customPermissionName = generateResourceClassPermission(resourceClassName);
@@ -137,7 +137,7 @@ public class TestAccessControl_getEffectiveGlobalPermissions extends TestAccessC
    }
 
    @Test
-   public void getEffectiveGlobalPermissions_validInheritFromParentDomain() throws AccessControlException {
+   public void getEffectiveGlobalResourcePermissions_validInheritFromParentDomain() throws AccessControlException {
       authenticateSystemResource();
       final String authenticatableResourceClassName = generateResourceClass(true, false);
       final Resource accessorResource = generateUnauthenticatableResource();
@@ -194,7 +194,7 @@ public class TestAccessControl_getEffectiveGlobalPermissions extends TestAccessC
    }
 
    @Test
-   public void getEffectiveGlobalPermissions_nulls_shouldFail() throws AccessControlException {
+   public void getEffectiveGlobalResourcePermissions_nulls_shouldFail() throws AccessControlException {
       authenticateSystemResource();
 
       try {
