@@ -1226,7 +1226,8 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
          __setResourceCreatePermissions(connection,
                                         accessorResource,
                                         resourceClassName,
-                                        resourceCreatePermissions, domainName
+                                        resourceCreatePermissions,
+                                        domainName
          );
       }
       catch (SQLException e) {
@@ -1665,20 +1666,14 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
          if (!__isSuperUserOfResource(connection, accessedResource)) {
             // next check if the grantor (i.e. session resource) has permissions to grant the requested permissions
             final Set<ResourcePermission>
+
                   grantorResourcePermissions
                   = __getEffectiveResourcePermissions(connection,
                                                       sessionResource,
                                                       accessedResource);
             final Set<ResourcePermission>
-                  unauthorizedAddPermissions
-                  = __subtractPermissions(requestedResourcePermissions,
-                                          grantorResourcePermissions);
-
-            if (unauthorizedAddPermissions.size() > 0) {
-               throw new AccessControlException("Not authorized to add the following permission(s): "
-                                                      + unauthorizedAddPermissions,
-                                                true);
-            }
+                  grantableResourcePermissions
+                  = __filterPermissionsWithGrantOnly(grantorResourcePermissions);
 
             final Set<ResourcePermission>
                   directAccessorResourcePermissions
@@ -1687,14 +1682,35 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
                                                    accessedResource);
 
             final Set<ResourcePermission>
-                  unauthorizedRemovePermissions
-                  = __subtractPermissions(directAccessorResourcePermissions,
-                                          grantorResourcePermissions);
+                  requestedAddPermissions
+                  = __subtract(requestedResourcePermissions, directAccessorResourcePermissions);
 
-            if (unauthorizedRemovePermissions.size() > 0) {
-               throw new AccessControlException("Not authorized to remove the following permission(s): "
-                                                      + unauthorizedRemovePermissions,
-                                                true);
+            if (requestedAddPermissions.size() > 0) {
+               final Set<ResourcePermission>
+                     unauthorizedAddPermissions
+                     = __subtractIgnoringGrant(requestedAddPermissions, grantableResourcePermissions);
+
+               if (unauthorizedAddPermissions.size() > 0) {
+                  throw new AccessControlException("Not authorized to add the following permission(s): "
+                                                         + unauthorizedAddPermissions,
+                                                   true);
+               }
+            }
+
+            final Set<ResourcePermission>
+                  requestedRemovePermissions
+                  = __subtract(directAccessorResourcePermissions, requestedResourcePermissions);
+
+            if (requestedRemovePermissions.size() > 0) {
+               final Set<ResourcePermission>
+                     unauthorizedRemovePermissions
+                     = __subtractIgnoringGrant(requestedRemovePermissions, grantableResourcePermissions);
+
+               if (unauthorizedRemovePermissions.size() > 0) {
+                  throw new AccessControlException("Not authorized to remove the following permission(s): "
+                                                         + unauthorizedRemovePermissions,
+                                                   true);
+               }
             }
          }
 
@@ -1776,8 +1792,19 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       }
    }
 
-   private Set<ResourcePermission> __subtractPermissions(Set<ResourcePermission> requestedResourcePermissions,
-                                                         Set<ResourcePermission> grantorResourcePermissions) {
+   private Set<ResourcePermission> __filterPermissionsWithGrantOnly(Set<ResourcePermission> resourcePermissions) {
+      final Set<ResourcePermission> filteredPermissions = new HashSet<>(resourcePermissions.size());
+
+      for (final ResourcePermission resourcePermission : resourcePermissions) {
+         if (resourcePermission.isWithGrant()) {
+            filteredPermissions.add(resourcePermission);
+         }
+      }
+      return filteredPermissions;
+   }
+
+   private Set<ResourcePermission> __subtractGrantedPermissions(Set<ResourcePermission> requestedResourcePermissions,
+                                                                Set<ResourcePermission> grantorResourcePermissions) {
       // we start with the assumption that all the requested permissions are unauthorized!
       Set<ResourcePermission> unauthorizedResourcePermissions = new HashSet<>(requestedResourcePermissions);
 
@@ -1789,8 +1816,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
                // is the permission to check against a system permission?
                if (grantorResourcePermission.isSystemPermission()) {
                   if (grantorResourcePermission.isWithGrant()
-                        && grantorResourcePermission.getSystemPermissionId() == requestedResourcePermission.getSystemPermissionId()
-                        ) {
+                        && grantorResourcePermission.getSystemPermissionId() == requestedResourcePermission.getSystemPermissionId()) {
                      unauthorizedResourcePermissions.remove(requestedResourcePermission);
                      break;
                   }
@@ -1812,6 +1838,70 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       }
 
       return unauthorizedResourcePermissions;
+   }
+
+   private Set<ResourcePermission> __subtract(Set<ResourcePermission> minuendSet,
+                                              Set<ResourcePermission> subtrahendSet) {
+      Set<ResourcePermission> differenceSet = new HashSet<>(minuendSet);
+
+      for (ResourcePermission minuendResourcePermission : minuendSet) {
+         // is the permission to check a system permission?
+         if (minuendResourcePermission.isSystemPermission()) {
+            for (ResourcePermission subtrahendResourcePermission : subtrahendSet) {
+               // is the permission to check against a system permission?
+               if (subtrahendResourcePermission.isSystemPermission()
+                     && subtrahendResourcePermission.isWithGrant() == minuendResourcePermission.isWithGrant()
+                     && subtrahendResourcePermission.getSystemPermissionId() == minuendResourcePermission.getSystemPermissionId()) {
+                  differenceSet.remove(minuendResourcePermission);
+                  break;
+               }
+            }
+         }
+         else {
+            for (ResourcePermission subtrahendResourcePermission : subtrahendSet) {
+               // is the permission to check against a non-system permission?
+               if (!subtrahendResourcePermission.isSystemPermission()
+                     && subtrahendResourcePermission.isWithGrant() == minuendResourcePermission.isWithGrant()
+                     && subtrahendResourcePermission.getPermissionName().equals(minuendResourcePermission.getPermissionName())) {
+                  differenceSet.remove(minuendResourcePermission);
+                  break;
+               }
+            }
+         }
+      }
+
+      return differenceSet;
+   }
+
+   private Set<ResourcePermission> __subtractIgnoringGrant(Set<ResourcePermission> minuendSet,
+                                                           Set<ResourcePermission> subtrahendSet) {
+      Set<ResourcePermission> differenceSet = new HashSet<>(minuendSet);
+
+      for (ResourcePermission minuendResourcePermission : minuendSet) {
+         // is the permission to check a system permission?
+         if (minuendResourcePermission.isSystemPermission()) {
+            for (ResourcePermission subtrahendResourcePermission : subtrahendSet) {
+               // is the permission to check against a system permission?
+               if (subtrahendResourcePermission.isSystemPermission()
+                     && subtrahendResourcePermission.getSystemPermissionId() == minuendResourcePermission.getSystemPermissionId()) {
+                  differenceSet.remove(minuendResourcePermission);
+                  break;
+               }
+            }
+         }
+         else {
+            for (ResourcePermission subtrahendResourcePermission : subtrahendSet) {
+               // is the permission to check against a non-system permission?
+               if (!subtrahendResourcePermission.isSystemPermission()
+                     && subtrahendResourcePermission.getPermissionName().equals(minuendResourcePermission.getPermissionName())) {
+                  differenceSet.remove(minuendResourcePermission);
+                  break;
+               }
+            }
+         }
+      }
+
+      return differenceSet;
    }
 
    @Override
@@ -2005,8 +2095,8 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
                                                  domainName);
          final Set<ResourcePermission>
                unauthorizedAddPermissions
-               = __subtractPermissions(requestedResourcePermissions,
-                                       grantorResourcePermissions);
+               = __subtractGrantedPermissions(requestedResourcePermissions,
+                                              grantorResourcePermissions);
 
          if (unauthorizedAddPermissions.size() > 0) {
             throw new AccessControlException("Not authorized to add the following permission(s): "
@@ -2016,11 +2106,11 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
 
          final Set<ResourcePermission>
                unauthorizedRemovePermissions
-               = __subtractPermissions(__getEffectiveGlobalPermissions(connection,
-                                                                       accessorResource,
-                                                                       resourceClassName,
-                                                                       domainName),
-                                       grantorResourcePermissions);
+               = __subtractGrantedPermissions(__getEffectiveGlobalPermissions(connection,
+                                                                              accessorResource,
+                                                                              resourceClassName,
+                                                                              domainName),
+                                              grantorResourcePermissions);
 
          if (unauthorizedRemovePermissions.size() > 0) {
             throw new AccessControlException("Not authorized to remove the following permission(s): "
