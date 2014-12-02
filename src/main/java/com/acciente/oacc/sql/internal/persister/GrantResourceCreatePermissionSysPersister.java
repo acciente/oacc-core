@@ -119,6 +119,39 @@ public class GrantResourceCreatePermissionSysPersister extends Persister {
       }
    }
 
+   public Set<ResourceCreatePermission> getDirectCreateSysPermissions(SQLConnection connection,
+                                                                      Resource accessorResource,
+                                                                      Id<ResourceClassId> resourceClassId,
+                                                                      Id<DomainId> resourceDomainId) throws AccessControlException {
+      SQLStatement statement = null;
+      try {
+         SQLResult resultSet;
+         Set<ResourceCreatePermission> resourceCreatePermissions = new HashSet<>();
+
+         // collect the system permissions the accessor has to the specified resource class
+         statement = connection.prepareStatement(sqlStrings.SQL_findInGrantResourceCreatePermissionSys_withoutInheritance_SysPermissionId_IsWithGrant_BY_AccessorID_AccessedDomainID_ResourceClassID);
+         statement.setResourceId(1, accessorResource);
+         statement.setResourceDomainId(2, resourceDomainId);
+         statement.setResourceClassId(3, resourceClassId);
+         resultSet = statement.executeQuery();
+
+         while (resultSet.next()) {
+            resourceCreatePermissions.add(
+                  ResourceCreatePermission.getInstance(resultSet.getResourceCreateSysPermissionName("SysPermissionId"),
+                                                       resultSet.getBoolean("IsWithGrant")));
+         }
+         resultSet.close();
+
+         return resourceCreatePermissions;
+      }
+      catch (SQLException e) {
+         throw new AccessControlException(e);
+      }
+      finally {
+         closeStatement(statement);
+      }
+   }
+
    public void addCreateSysPermissions(SQLConnection connection,
                                        Resource accessorResource,
                                        Id<ResourceClassId> accessedResourceClassId,

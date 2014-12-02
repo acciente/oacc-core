@@ -130,6 +130,44 @@ public class GrantResourceCreatePermissionPostCreateSysPersister extends Persist
       }
    }
 
+   public Set<ResourceCreatePermission> getDirectPostCreateSysPermissions(SQLConnection connection,
+                                                                          Resource accessorResource,
+                                                                          Id<ResourceClassId> resourceClassId,
+                                                                          Id<DomainId> resourceDomainId) throws AccessControlException {
+      SQLStatement statement = null;
+      try {
+         SQLResult resultSet;
+         Set<ResourceCreatePermission> resourceCreatePermissions = new HashSet<>();
+
+         // collect the system permissions the accessor has to the specified resource class
+         statement = connection.prepareStatement(sqlStrings.SQL_findInGrantResourceCreatePermissionPostCreateSys_withoutInheritance_PostCreateSysPermissionID_PostCreateIsWithGrant_IsWithGrant_BY_AccessorID_AccessedDomainID_ResourceClassID);
+         statement.setResourceId(1, accessorResource);
+         statement.setResourceDomainId(2, resourceDomainId);
+         statement.setResourceClassId(3, resourceClassId);
+         resultSet = statement.executeQuery();
+
+         while (resultSet.next()) {
+            ResourcePermission resourcePermission;
+
+            resourcePermission = ResourcePermission.getInstance(resultSet.getResourceSysPermissionName("PostCreateSysPermissionId"),
+                                                                resultSet.getBoolean("PostCreateIsWithGrant"),
+                                                                0,
+                                                                0);
+
+            resourceCreatePermissions.add(ResourceCreatePermission.getInstance(resourcePermission, resultSet.getBoolean("IsWithGrant")));
+         }
+         resultSet.close();
+
+         return resourceCreatePermissions;
+      }
+      catch (SQLException e) {
+         throw new AccessControlException(e);
+      }
+      finally {
+         closeStatement(statement);
+      }
+   }
+
    public void addPostCreateSysPermissions(SQLConnection connection,
                                            Resource accessorResource,
                                            Id<ResourceClassId> accessedResourceClassId,

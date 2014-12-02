@@ -1270,12 +1270,14 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
                                                String resourceClassName,
                                                Set<ResourceCreatePermission> requestedResourceCreatePermissions,
                                                String domainName) throws AccessControlException {
-      // verify that resource class is defined
+      // verify that resource class is defined and get its metadata
       final ResourceClassInternalInfo resourceClassInfo = resourceClassPersister.getResourceClassInfo(connection, resourceClassName);
 
       if (resourceClassInfo == null) {
          throw new AccessControlException("Could not find resource class: " + resourceClassName);
       }
+
+      final Id<ResourceClassId> resourceClassId = Id.from(resourceClassInfo.getResourceClassId());
 
       // verify that domain is defined
       final Id<DomainId> domainId = domainPersister.getResourceDomainId(connection, domainName);
@@ -1284,45 +1286,60 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
          throw new AccessControlException("Could not find domain: " + domainName);
       }
 
-      __assertSetContainsCreateSystemPermission(requestedResourceCreatePermissions);
+      // ensure that the *CREATE system permissions was specified
+      assertSetContainsCreateSystemPermission(requestedResourceCreatePermissions);
 
-      // next ensure that the post create permissions are all in the correct resource class
-      __validateUniquePostCreatePermissionsNamesForResourceClass(connection, requestedResourceCreatePermissions, resourceClassInfo);
+      // ensure that the post create permissions are all in the correct resource class
+      assertUniquePostCreatePermissionsNamesForResourceClass(connection, requestedResourceCreatePermissions, resourceClassInfo);
 
-      // next check if the auth resource (grantor) has permissions to grant the requested permissions
+      // check if the grantor (=session resource) is authorized to grant the requested permissions
       if (!__isSuperUserOfDomain(connection, domainName)) {
          final Set<ResourceCreatePermission>
-               grantorResourceCreatePermissions
+               grantorPermissions
                = __getEffectiveResourceCreatePermissions(connection,
                                                          sessionResource,
                                                          resourceClassName,
                                                          domainName);
-         final Set<ResourceCreatePermission>
-               unauthorizedAddResourceCreatePermissions
-               = __subtractResourceCreatePermissions(requestedResourceCreatePermissions, grantorResourceCreatePermissions);
 
-         if (unauthorizedAddResourceCreatePermissions.size() > 0) {
-            throw new AccessControlException("Not authorized to add the following permission(s): "
-                                             + unauthorizedAddResourceCreatePermissions,
-                                       true);
+         final Set<ResourceCreatePermission>
+               directAccessorPermissions
+               = __getDirectResourceCreatePermissions(connection,
+                                                      accessorResource,
+                                                      resourceClassId,
+                                                      domainId);
+
+         final Set<ResourceCreatePermission>
+               requestedAddPermissions
+               = __subtract(requestedResourceCreatePermissions, directAccessorPermissions);
+
+         if (!requestedAddPermissions.isEmpty()) {
+            final Set<ResourceCreatePermission>
+                  unauthorizedAddPermissions
+                  = __subtractResourceCreatePermissionsIfGrantableFrom(requestedAddPermissions, grantorPermissions);
+
+            if (unauthorizedAddPermissions.size() > 0) {
+               throw new AccessControlException("Not authorized to add the following permission(s): "
+                                                      + unauthorizedAddPermissions,
+                                                true);
+            }
          }
 
          final Set<ResourceCreatePermission>
-               unauthorizedRemoveResourceCreatePermissions
-               = __subtractResourceCreatePermissions(__getEffectiveResourceCreatePermissions(connection,
-                                                                                             accessorResource,
-                                                                                             resourceClassName,
-                                                                                             domainName),
-                                                     grantorResourceCreatePermissions);
+               requestedRemovePermissions
+               = __subtract(directAccessorPermissions, requestedResourceCreatePermissions);
 
-         if (unauthorizedRemoveResourceCreatePermissions.size() > 0) {
-            throw new AccessControlException("Not authorized to remove the following permission(s): "
-                                             + unauthorizedRemoveResourceCreatePermissions,
-                                       true);
+         if (!requestedRemovePermissions.isEmpty()) {
+            final Set<ResourceCreatePermission>
+                  unauthorizedRemovePermissions
+                  = __subtractResourceCreatePermissionsIfGrantableFrom(requestedRemovePermissions, grantorPermissions);
+
+            if (unauthorizedRemovePermissions.size() > 0) {
+               throw new AccessControlException("Not authorized to remove the following permission(s): "
+                                                      + unauthorizedRemovePermissions,
+                                                true);
+            }
          }
       }
-
-      final Id<ResourceClassId> resourceClassId = Id.from(resourceClassInfo.getResourceClassId());
 
       // revoke any existing *CREATE system permissions this accessor has to this resource class
       grantResourceCreatePermissionSysPersister.removeCreateSysPermissions(connection,
@@ -1368,12 +1385,12 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
                                                                                 sessionResource);
    }
 
-   private void __assertSetContainsCreateSystemPermission(Set<ResourceCreatePermission> requestedResourceCreatePermissions) throws AccessControlException {
-      if (!requestedResourceCreatePermissions.isEmpty()) {
+   private void assertSetContainsCreateSystemPermission(Set<ResourceCreatePermission> resourceCreatePermissions) throws AccessControlException {
+      if (!resourceCreatePermissions.isEmpty()) {
          boolean createSysPermissionFound = false;
-         for (final ResourceCreatePermission resourceCreatePermission : requestedResourceCreatePermissions) {
+         for (final ResourceCreatePermission resourceCreatePermission : resourceCreatePermissions) {
             if (resourceCreatePermission.isSystemPermission()
-                  && resourceCreatePermission.getSysPermissionName().equals(ResourceCreatePermission.CREATE)) {
+                  && ResourceCreatePermission.CREATE.equals(resourceCreatePermission.getSysPermissionName())) {
                createSysPermissionFound = true;
                break;
             }
@@ -1385,9 +1402,9 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       }
    }
 
-   private void __validateUniquePostCreatePermissionsNamesForResourceClass(SQLConnection connection,
-                                                                           Set<ResourceCreatePermission> resourceCreatePermissions,
-                                                                           ResourceClassInternalInfo resourceClassInternalInfo) throws AccessControlException {
+   private void assertUniquePostCreatePermissionsNamesForResourceClass(SQLConnection connection,
+                                                                       Set<ResourceCreatePermission> resourceCreatePermissions,
+                                                                       ResourceClassInternalInfo resourceClassInternalInfo) throws AccessControlException {
       final List<String> validPermissionNames
             = resourceClassPermissionPersister.getPermissionNames(connection, resourceClassInternalInfo.getResourceClassName());
       final Set<String> uniquePermissionNames = new HashSet<>(resourceCreatePermissions.size());
@@ -1403,8 +1420,8 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
          if (postCreateResourcePermission.isSystemPermission()) {
             // we allow impersonate and reset_credentials system permissions only for authenticatable resource classes
             if (!resourceClassInternalInfo.isAuthenticatable()
-                  && (postCreateResourcePermission.getPermissionName().equals(ResourcePermission.IMPERSONATE)
-                  || postCreateResourcePermission.getPermissionName().equals(ResourcePermission.RESET_CREDENTIALS))) {
+                  && (ResourcePermission.IMPERSONATE.equals(postCreateResourcePermission.getPermissionName())
+                  || ResourcePermission.RESET_CREDENTIALS.equals(postCreateResourcePermission.getPermissionName()))) {
                throw new AccessControlException("Permission: " + postCreateResourcePermission
                                                       + ", not valid for unauthenticatable resource");
             }
@@ -1427,62 +1444,59 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       }
    }
 
-   private Set<ResourceCreatePermission> __subtractResourceCreatePermissions(Set<ResourceCreatePermission> requestedResourceCreatePermissions,
-                                                                             Set<ResourceCreatePermission> grantorResourceCreatePermissions) {
-      // we start with the assumption that all the requested permissions are unauthorized!
-      Set<ResourceCreatePermission> unauthorizedResourceCreatePermissions = new HashSet<>(requestedResourceCreatePermissions);
+   private Set<ResourceCreatePermission> __subtractResourceCreatePermissionsIfGrantableFrom(Set<ResourceCreatePermission> candidatePermissionSet,
+                                                                                            Set<ResourceCreatePermission> grantorPermissionSet) {
+      Set<ResourceCreatePermission> differenceSet = new HashSet<>(candidatePermissionSet);
 
-      // check if the grantor has grant permissions to each permission
-      for (ResourceCreatePermission requestedResourceCreatePermission : requestedResourceCreatePermissions) {
-         // is the permission to check a system permission?
-         if (requestedResourceCreatePermission.isSystemPermission()) {
-            for (ResourceCreatePermission grantorResourceCreatePermission : grantorResourceCreatePermissions) {
-               // is the permission to check against a system permission?
-               if (grantorResourceCreatePermission.isSystemPermission()) {
-                  if (grantorResourceCreatePermission.isWithGrant()
-                        && grantorResourceCreatePermission.getSystemPermissionId()
-                        == requestedResourceCreatePermission.getSystemPermissionId()
-                        ) {
-                     unauthorizedResourceCreatePermissions.remove(requestedResourceCreatePermission);
-                     break;
-                  }
-               }
-            }
-         }
-         else {
-            // is the post create permission to check a system permission?
-            if (requestedResourceCreatePermission.getPostCreateResourcePermission().isSystemPermission()) {
-               for (ResourceCreatePermission grantorResourceCreatePermission : grantorResourceCreatePermissions) {
-                  // is the post create permission to check against a system permission?
-                  if (!grantorResourceCreatePermission.isSystemPermission()
-                        && grantorResourceCreatePermission.getPostCreateResourcePermission().isSystemPermission()) {
-                     if (grantorResourceCreatePermission.isWithGrant()
-                           && grantorResourceCreatePermission.getPostCreateResourcePermission().getSystemPermissionId()
-                           == requestedResourceCreatePermission.getPostCreateResourcePermission().getSystemPermissionId()
-                           ) {
-                        unauthorizedResourceCreatePermissions.remove(requestedResourceCreatePermission);
-                        break;
-                     }
-                  }
-               }
-            }
-            else {
-               for (ResourceCreatePermission grantorResourceCreatePermission : grantorResourceCreatePermissions) {
-                  // is the post create permission to check against a system permission?
-                  if (!grantorResourceCreatePermission.isSystemPermission()
-                        && !grantorResourceCreatePermission.getPostCreateResourcePermission().isSystemPermission()) {
-                     if (grantorResourceCreatePermission.isWithGrant()
-                           && grantorResourceCreatePermission.getPostCreateResourcePermission().getPermissionName().equals(requestedResourceCreatePermission.getPostCreateResourcePermission().getPermissionName())) {
-                        unauthorizedResourceCreatePermissions.remove(requestedResourceCreatePermission);
-                        break;
-                     }
-                  }
-               }
+      for (ResourceCreatePermission candidatePermission : candidatePermissionSet) {
+         for (ResourceCreatePermission grantorPermission : grantorPermissionSet) {
+            if (candidatePermission.isGrantableFrom(grantorPermission)) {
+               differenceSet.remove(candidatePermission);
+               break;
             }
          }
       }
 
-      return unauthorizedResourceCreatePermissions;
+      return differenceSet;
+   }
+
+   private Set __subtract(Set minuendSet, Set subtrahendSet) {
+      Set differenceSet = new HashSet<>(minuendSet);
+
+      differenceSet.removeAll(subtrahendSet);
+
+      return differenceSet;
+   }
+
+   private Set<ResourceCreatePermission> __getDirectResourceCreatePermissions(SQLConnection connection,
+                                                                              Resource accessorResource,
+                                                                              Id<ResourceClassId> resourceClassId,
+                                                                              Id<DomainId> domainId)
+         throws AccessControlException {
+      Set<ResourceCreatePermission> resourceCreatePermissions = new HashSet<>();
+
+      // first get the *CREATE system permission the accessor has directly to the specified resource class
+      resourceCreatePermissions
+            .addAll(grantResourceCreatePermissionSysPersister.getDirectCreateSysPermissions(connection,
+                                                                                            accessorResource,
+                                                                                            resourceClassId,
+                                                                                            domainId));
+
+      // next get the post create system permissions the accessor has directly to the specified resource class
+      resourceCreatePermissions
+            .addAll(grantResourceCreatePermissionPostCreateSysPersister.getDirectPostCreateSysPermissions(connection,
+                                                                                                          accessorResource,
+                                                                                                          resourceClassId,
+                                                                                                          domainId));
+
+      // next get the post create non-system permissions the accessor has directly to the specified resource class
+      resourceCreatePermissions
+            .addAll(grantResourceCreatePermissionPostCreatePersister.getDirectPostCreatePermissions(connection,
+                                                                                                    accessorResource,
+                                                                                                    resourceClassId,
+                                                                                                    domainId));
+
+      return resourceCreatePermissions;
    }
 
    @Override
@@ -1686,7 +1700,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
             = resourceClassPersister.getResourceClassInfoByResourceId(connection, accessedResource);
 
       // next ensure that the requested permissions are all in the correct resource class
-      __validateUniquePermissionsNamesForResourceClass(connection, requestedResourcePermissions, accessedResourceClassInternalInfo);
+      assertUniquePermissionsNamesForResourceClass(connection, requestedResourcePermissions, accessedResourceClassInternalInfo);
 
       // if this method is being called to set the post create permissions on a newly created resource
       // we do not perform the security checks below, since it would be incorrect
@@ -1694,14 +1708,10 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
          if (!__isSuperUserOfResource(connection, accessedResource)) {
             // next check if the grantor (i.e. session resource) has permissions to grant the requested permissions
             final Set<ResourcePermission>
-
                   grantorResourcePermissions
                   = __getEffectiveResourcePermissions(connection,
                                                       sessionResource,
                                                       accessedResource);
-            final Set<ResourcePermission>
-                  grantableResourcePermissions
-                  = __filterPermissionsWithGrantOnly(grantorResourcePermissions);
 
             final Set<ResourcePermission>
                   directAccessorResourcePermissions
@@ -1716,7 +1726,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
             if (requestedAddPermissions.size() > 0) {
                final Set<ResourcePermission>
                      unauthorizedAddPermissions
-                     = __subtractIgnoringGrant(requestedAddPermissions, grantableResourcePermissions);
+                     = __subtractResourcePermissionsIfGrantableFrom(requestedAddPermissions, grantorResourcePermissions);
 
                if (unauthorizedAddPermissions.size() > 0) {
                   throw new AccessControlException("Not authorized to add the following permission(s): "
@@ -1732,7 +1742,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
             if (requestedRemovePermissions.size() > 0) {
                final Set<ResourcePermission>
                      unauthorizedRemovePermissions
-                     = __subtractIgnoringGrant(requestedRemovePermissions, grantableResourcePermissions);
+                     = __subtractResourcePermissionsIfGrantableFrom(requestedRemovePermissions, grantorResourcePermissions);
 
                if (unauthorizedRemovePermissions.size() > 0) {
                   throw new AccessControlException("Not authorized to remove the following permission(s): "
@@ -1785,9 +1795,9 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
                                                       grantorResource);
    }
 
-   private void __validateUniquePermissionsNamesForResourceClass(SQLConnection connection,
-                                                                 Set<ResourcePermission> resourcePermissions,
-                                                                 ResourceClassInternalInfo resourceClassInternalInfo) throws AccessControlException {
+   private void assertUniquePermissionsNamesForResourceClass(SQLConnection connection,
+                                                             Set<ResourcePermission> resourcePermissions,
+                                                             ResourceClassInternalInfo resourceClassInternalInfo) throws AccessControlException {
       final List<String> validPermissionNames
             = resourceClassPermissionPersister.getPermissionNames(connection, resourceClassInternalInfo.getResourceClassName());
       final Set<String> uniquePermissionNames = new HashSet<>(resourcePermissions.size());
@@ -1796,8 +1806,8 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
          if (resourcePermission.isSystemPermission()) {
             // we allow impersonate and reset_credentials system permissions only for authenticatable resource classes
             if (!resourceClassInternalInfo.isAuthenticatable()
-                  && (resourcePermission.getPermissionName().equals(ResourcePermission.IMPERSONATE)
-                  || resourcePermission.getPermissionName().equals(ResourcePermission.RESET_CREDENTIALS))) {
+                  && (ResourcePermission.IMPERSONATE.equals(resourcePermission.getPermissionName())
+                  || ResourcePermission.RESET_CREDENTIALS.equals(resourcePermission.getPermissionName()))) {
                throw new AccessControlException("Permission: " + resourcePermission
                                                       + ", not valid for unauthenticatable resource");
             }
@@ -1818,17 +1828,6 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
             uniquePermissionNames.add(resourcePermission.getPermissionName());
          }
       }
-   }
-
-   private Set<ResourcePermission> __filterPermissionsWithGrantOnly(Set<ResourcePermission> resourcePermissions) {
-      final Set<ResourcePermission> filteredPermissions = new HashSet<>(resourcePermissions.size());
-
-      for (final ResourcePermission resourcePermission : resourcePermissions) {
-         if (resourcePermission.isWithGrant()) {
-            filteredPermissions.add(resourcePermission);
-         }
-      }
-      return filteredPermissions;
    }
 
    private Set<ResourcePermission> __subtractGrantedPermissions(Set<ResourcePermission> requestedResourcePermissions,
@@ -1868,63 +1867,15 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       return unauthorizedResourcePermissions;
    }
 
-   private Set<ResourcePermission> __subtract(Set<ResourcePermission> minuendSet,
-                                              Set<ResourcePermission> subtrahendSet) {
-      Set<ResourcePermission> differenceSet = new HashSet<>(minuendSet);
+   private Set<ResourcePermission> __subtractResourcePermissionsIfGrantableFrom(Set<ResourcePermission> candidatePermissionSet,
+                                                                                Set<ResourcePermission> grantorPermissionSet) {
+      Set<ResourcePermission> differenceSet = new HashSet<>(candidatePermissionSet);
 
-      for (ResourcePermission minuendResourcePermission : minuendSet) {
-         // is the permission to check a system permission?
-         if (minuendResourcePermission.isSystemPermission()) {
-            for (ResourcePermission subtrahendResourcePermission : subtrahendSet) {
-               // is the permission to check against a system permission?
-               if (subtrahendResourcePermission.isSystemPermission()
-                     && subtrahendResourcePermission.isWithGrant() == minuendResourcePermission.isWithGrant()
-                     && subtrahendResourcePermission.getSystemPermissionId() == minuendResourcePermission.getSystemPermissionId()) {
-                  differenceSet.remove(minuendResourcePermission);
-                  break;
-               }
-            }
-         }
-         else {
-            for (ResourcePermission subtrahendResourcePermission : subtrahendSet) {
-               // is the permission to check against a non-system permission?
-               if (!subtrahendResourcePermission.isSystemPermission()
-                     && subtrahendResourcePermission.isWithGrant() == minuendResourcePermission.isWithGrant()
-                     && subtrahendResourcePermission.getPermissionName().equals(minuendResourcePermission.getPermissionName())) {
-                  differenceSet.remove(minuendResourcePermission);
-                  break;
-               }
-            }
-         }
-      }
-
-      return differenceSet;
-   }
-
-   private Set<ResourcePermission> __subtractIgnoringGrant(Set<ResourcePermission> minuendSet,
-                                                           Set<ResourcePermission> subtrahendSet) {
-      Set<ResourcePermission> differenceSet = new HashSet<>(minuendSet);
-
-      for (ResourcePermission minuendResourcePermission : minuendSet) {
-         // is the permission to check a system permission?
-         if (minuendResourcePermission.isSystemPermission()) {
-            for (ResourcePermission subtrahendResourcePermission : subtrahendSet) {
-               // is the permission to check against a system permission?
-               if (subtrahendResourcePermission.isSystemPermission()
-                     && subtrahendResourcePermission.getSystemPermissionId() == minuendResourcePermission.getSystemPermissionId()) {
-                  differenceSet.remove(minuendResourcePermission);
-                  break;
-               }
-            }
-         }
-         else {
-            for (ResourcePermission subtrahendResourcePermission : subtrahendSet) {
-               // is the permission to check against a non-system permission?
-               if (!subtrahendResourcePermission.isSystemPermission()
-                     && subtrahendResourcePermission.getPermissionName().equals(minuendResourcePermission.getPermissionName())) {
-                  differenceSet.remove(minuendResourcePermission);
-                  break;
-               }
+      for (ResourcePermission candidatePermission : candidatePermissionSet) {
+         for (ResourcePermission grantorPermission : grantorPermissionSet) {
+            if (candidatePermission.isGrantableFrom(grantorPermission)) {
+               differenceSet.remove(candidatePermission);
+               break;
             }
          }
       }

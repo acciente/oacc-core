@@ -179,6 +179,18 @@ public final class ResourcePermission implements Serializable {
       }
    }
 
+   public boolean isGrantableFrom(ResourcePermission other) {
+      if (other == null) {
+         return false;
+      }
+
+      if (!other.isWithGrant()) {
+         return false;
+      }
+
+      return this.equalsIgnoreGrant(other);
+   }
+
    public String toString() {
       return (isSystemPermission() ? "SYS:" + permissionName : permissionName)
             + (withGrant ? " /G" : "")

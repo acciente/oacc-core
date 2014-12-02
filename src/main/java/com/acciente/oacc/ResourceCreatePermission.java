@@ -175,6 +175,30 @@ public class ResourceCreatePermission implements Serializable {
       return true;
    }
 
+   public boolean isGrantableFrom(ResourceCreatePermission other) {
+      if (other == null) {
+         return false;
+      }
+
+      if (!other.isWithGrant()) {
+         return false;
+      }
+
+      if (this.isSystemPermission() != other.isSystemPermission()) {
+         return false;
+      }
+
+      if (this.isSystemPermission()) {
+         return this.systemPermissionId == other.systemPermissionId;
+      }
+
+      if (this.postCreateResourcePermission.isWithGrant() && !other.postCreateResourcePermission.isWithGrant()) {
+         return false;
+      }
+
+      return this.postCreateResourcePermission.equalsIgnoreGrant(other.postCreateResourcePermission);
+   }
+
    // private static helper method to convert a sys permission name to a sys permission object
 
    private static SysPermission getSysPermission(String systemPermissionName) {
