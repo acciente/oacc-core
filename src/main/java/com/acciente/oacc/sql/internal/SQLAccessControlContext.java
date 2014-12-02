@@ -1271,9 +1271,9 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
                                                Set<ResourceCreatePermission> requestedResourceCreatePermissions,
                                                String domainName) throws AccessControlException {
       // verify that resource class is defined
-      final Id<ResourceClassId> resourceClassId = resourceClassPersister.getResourceClassId(connection, resourceClassName);
+      final ResourceClassInternalInfo resourceClassInfo = resourceClassPersister.getResourceClassInfo(connection, resourceClassName);
 
-      if (resourceClassId == null) {
+      if (resourceClassInfo == null) {
          throw new AccessControlException("Could not find resource class: " + resourceClassName);
       }
 
@@ -1284,43 +1284,10 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
          throw new AccessControlException("Could not find domain: " + domainName);
       }
 
-      final List<String> validPermissionNames = resourceClassPermissionPersister.getPermissionNames(connection, resourceClassName);
-      boolean createSysPermissionFound = false;
+      __assertSetContainsCreateSystemPermission(requestedResourceCreatePermissions);
 
       // next ensure that the post create permissions are all in the correct resource class
-      final HashSet<String> uniquePermissionNames = new HashSet<>(requestedResourceCreatePermissions.size());
-      for (final ResourceCreatePermission resourceCreatePermission : requestedResourceCreatePermissions) {
-         // track if there is a CREATE system permission in the list
-         if (resourceCreatePermission.isSystemPermission()
-               && resourceCreatePermission.getSysPermissionName().equals(ResourceCreatePermission.CREATE)) {
-            createSysPermissionFound = true;
-         }
-         else {
-            final ResourcePermission postCreateResourcePermission = resourceCreatePermission.getPostCreateResourcePermission();
-
-            if (!postCreateResourcePermission.isSystemPermission()) {
-               // every non-system permission must be defined for the resource class specified
-               if (!validPermissionNames.contains(postCreateResourcePermission.getPermissionName())) {
-                  throw new AccessControlException("Permission: " + postCreateResourcePermission.getPermissionName()
-                                                   + " does not exist for the specified resource class: "
-                                                   + resourceClassName);
-               }
-            }
-
-            if (uniquePermissionNames.contains(postCreateResourcePermission.getPermissionName())) {
-               throw new AccessControlException("Duplicate permission: "
-                                                + postCreateResourcePermission.getPermissionName() + " that only differs in 'withGrant' option");
-            }
-            else {
-               uniquePermissionNames.add(postCreateResourcePermission.getPermissionName());
-            }
-         }
-      }
-
-      // if at least one permission is specified, then there must be a *CREATE permission in the set
-      if (requestedResourceCreatePermissions.size() != 0 && !createSysPermissionFound) {
-         throw new AccessControlException("Permission: *CREATE must be specified");
-      }
+      __validateUniquePostCreatePermissionsNamesForResourceClass(connection, requestedResourceCreatePermissions, resourceClassInfo);
 
       // next check if the auth resource (grantor) has permissions to grant the requested permissions
       if (!__isSuperUserOfDomain(connection, domainName)) {
@@ -1354,6 +1321,8 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
                                        true);
          }
       }
+
+      final Id<ResourceClassId> resourceClassId = Id.from(resourceClassInfo.getResourceClassId());
 
       // revoke any existing *CREATE system permissions this accessor has to this resource class
       grantResourceCreatePermissionSysPersister.removeCreateSysPermissions(connection,
@@ -1397,6 +1366,65 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
                                                                                 domainId,
                                                                                 requestedResourceCreatePermissions,
                                                                                 sessionResource);
+   }
+
+   private void __assertSetContainsCreateSystemPermission(Set<ResourceCreatePermission> requestedResourceCreatePermissions) throws AccessControlException {
+      if (!requestedResourceCreatePermissions.isEmpty()) {
+         boolean createSysPermissionFound = false;
+         for (final ResourceCreatePermission resourceCreatePermission : requestedResourceCreatePermissions) {
+            if (resourceCreatePermission.isSystemPermission()
+                  && resourceCreatePermission.getSysPermissionName().equals(ResourceCreatePermission.CREATE)) {
+               createSysPermissionFound = true;
+               break;
+            }
+         }
+         // if at least one permission is specified, then there must be a *CREATE permission in the set
+         if (!createSysPermissionFound) {
+            throw new AccessControlException("Permission: *CREATE must be specified");
+         }
+      }
+   }
+
+   private void __validateUniquePostCreatePermissionsNamesForResourceClass(SQLConnection connection,
+                                                                           Set<ResourceCreatePermission> resourceCreatePermissions,
+                                                                           ResourceClassInternalInfo resourceClassInternalInfo) throws AccessControlException {
+      final List<String> validPermissionNames
+            = resourceClassPermissionPersister.getPermissionNames(connection, resourceClassInternalInfo.getResourceClassName());
+      final Set<String> uniquePermissionNames = new HashSet<>(resourceCreatePermissions.size());
+
+      for (final ResourceCreatePermission resourceCreatePermission : resourceCreatePermissions) {
+         if (resourceCreatePermission.isSystemPermission()
+               && ResourceCreatePermission.CREATE.equals(resourceCreatePermission.getSysPermissionName())) {
+            continue;
+         }
+
+         final ResourcePermission postCreateResourcePermission = resourceCreatePermission.getPostCreateResourcePermission();
+
+         if (postCreateResourcePermission.isSystemPermission()) {
+            // we allow impersonate and reset_credentials system permissions only for authenticatable resource classes
+            if (!resourceClassInternalInfo.isAuthenticatable()
+                  && (postCreateResourcePermission.getPermissionName().equals(ResourcePermission.IMPERSONATE)
+                  || postCreateResourcePermission.getPermissionName().equals(ResourcePermission.RESET_CREDENTIALS))) {
+               throw new AccessControlException("Permission: " + postCreateResourcePermission
+                                                      + ", not valid for unauthenticatable resource");
+            }
+         }
+         else {
+            // every non-system permission must be defined for the resource class specified
+            if (!validPermissionNames.contains(postCreateResourcePermission.getPermissionName())) {
+               throw new AccessControlException("Permission: " + postCreateResourcePermission.getPermissionName()
+                                                      + " does not exist for the specified resource class: "
+                                                      + resourceClassInternalInfo.getResourceClassName());
+            }
+         }
+         if (uniquePermissionNames.contains(postCreateResourcePermission.getPermissionName())) {
+            throw new AccessControlException("Duplicate permission: " + postCreateResourcePermission.getPermissionName()
+                                                   + " that only differs in 'withGrant' option");
+         }
+         else {
+            uniquePermissionNames.add(postCreateResourcePermission.getPermissionName());
+         }
+      }
    }
 
    private Set<ResourceCreatePermission> __subtractResourceCreatePermissions(Set<ResourceCreatePermission> requestedResourceCreatePermissions,

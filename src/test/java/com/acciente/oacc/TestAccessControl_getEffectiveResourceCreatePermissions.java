@@ -76,7 +76,7 @@ public class TestAccessControl_getEffectiveResourceCreatePermissions extends Tes
       final Resource accessorResource = generateUnauthenticatableResource();
       final String domainName = generateDomain();
       final String sysDomainName = accessControlContext.getDomainNameByResource(getSystemResource());
-      final String resourceClassName = generateResourceClass(false, false);
+      final String resourceClassName = generateResourceClass(true, false);
       assertThat(accessControlContext.getEffectiveResourceCreatePermissionsMap(accessorResource).isEmpty(), is(true));
 
       Set<ResourceCreatePermission> resourceCreatePermissions_pre1 = new HashSet<>();
@@ -128,7 +128,7 @@ public class TestAccessControl_getEffectiveResourceCreatePermissions extends Tes
 
       final Resource accessorResource = generateUnauthenticatableResource();
       final String domainName = generateDomain();
-      final String resourceClassName = generateResourceClass(false, false);
+      final String resourceClassName = generateResourceClass(true, false);
       assertThat(accessControlContext.getEffectiveResourceCreatePermissionsMap(accessorResource).isEmpty(), is(true));
 
       Set<ResourceCreatePermission> resourceCreatePermissions_pre1 = new HashSet<>();
@@ -192,7 +192,7 @@ public class TestAccessControl_getEffectiveResourceCreatePermissions extends Tes
       final String parentDomainName = generateDomain();
       final String childDomainName = generateUniqueDomainName();
       accessControlContext.createDomain(childDomainName, parentDomainName);
-      final String resourceClassName = generateResourceClass(false, false);
+      final String resourceClassName = generateResourceClass(true, false);
 
       // set create permissions on parent domain
       Set<ResourceCreatePermission> parentResourceCreatePermissions_pre = new HashSet<>();

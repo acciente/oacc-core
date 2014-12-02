@@ -34,16 +34,14 @@ public class TestAccessControl_setResourceCreatePermissions extends TestAccessCo
    @Test
    public void setResourceCreatePermissions_validAsSystemResource() throws AccessControlException {
       authenticateSystemResource();
-      final ResourceCreatePermission createPerm_create_withGrant = ResourceCreatePermission.getInstance(
-            ResourceCreatePermission.CREATE,
-            true);
+      final ResourceCreatePermission createPerm_create_withGrant = ResourceCreatePermission.getInstance(ResourceCreatePermission.CREATE, true);
       final ResourceCreatePermission createPerm_impersonate = ResourceCreatePermission.getInstance(ResourcePermission.getInstance(ResourcePermission.IMPERSONATE), false);
       final ResourceCreatePermission createPerm_inherit_withGrant = ResourceCreatePermission.getInstance(ResourcePermission.getInstance(ResourcePermission.INHERIT, true), true);
       final ResourceCreatePermission createPerm_resetPwd = ResourceCreatePermission.getInstance(ResourcePermission.getInstance(ResourcePermission.RESET_CREDENTIALS, true));
 
       final Resource accessorResource = generateUnauthenticatableResource();
       final String domainName = generateDomain();
-      final String resourceClassName = generateResourceClass(false, false);
+      final String resourceClassName = generateResourceClass(true, false);
       assertThat(accessControlContext.getEffectiveResourceCreatePermissionsMap(accessorResource).isEmpty(), is(true));
 
       Set<ResourceCreatePermission> resourceCreatePermissions_pre = new HashSet<>();
@@ -60,6 +58,48 @@ public class TestAccessControl_setResourceCreatePermissions extends TestAccessCo
 
       final Set<ResourceCreatePermission> resourceCreatePermissions_post = accessControlContext.getEffectiveResourceCreatePermissions(accessorResource, resourceClassName, domainName);
       assertThat(resourceCreatePermissions_post, is(resourceCreatePermissions_pre));
+   }
+
+   @Test
+   public void setResourceCreatePermission_resetCredentialsPermissionOnUnauthenticatables_shouldFail() throws AccessControlException {
+      authenticateSystemResource();
+      final String resourceClassName = generateResourceClass(false, false);
+      final Resource accessorResource = generateAuthenticatableResource(generateUniquePassword());
+      assertThat(accessControlContext.getEffectiveResourceCreatePermissions(accessorResource, resourceClassName).isEmpty(), is(true));
+
+      Set<ResourceCreatePermission> permissions_pre = new HashSet<>();
+      permissions_pre.add(ResourceCreatePermission.getInstance(ResourceCreatePermission.CREATE));
+      permissions_pre.add(ResourceCreatePermission.getInstance(ResourcePermission.getInstance(ResourcePermission.RESET_CREDENTIALS)));
+
+      // attempt to set *RESET_CREDENTIALS system permission
+      try {
+         accessControlContext.setResourceCreatePermissions(accessorResource, resourceClassName, permissions_pre);
+         fail("granting *RESET_CREDENTIALS system permission as a create permission on an unauthenticatable resource class should have failed");
+      }
+      catch (AccessControlException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("not valid for unauthenticatable resource"));
+      }
+   }
+
+   @Test
+   public void setResourceCreatePermission_impersonatePermissionOnUnauthenticatables_shouldFail() throws AccessControlException {
+      authenticateSystemResource();
+      final String resourceClassName = generateResourceClass(false, false);
+      final Resource accessorResource = generateAuthenticatableResource(generateUniquePassword());
+      assertThat(accessControlContext.getEffectiveResourceCreatePermissions(accessorResource, resourceClassName).isEmpty(), is(true));
+
+      Set<ResourceCreatePermission> permissions_pre = new HashSet<>();
+      permissions_pre.add(ResourceCreatePermission.getInstance(ResourceCreatePermission.CREATE));
+      permissions_pre.add(ResourceCreatePermission.getInstance(ResourcePermission.getInstance(ResourcePermission.IMPERSONATE)));
+
+      // attempt to set *IMPERSONATE system permission
+      try {
+         accessControlContext.setResourceCreatePermissions(accessorResource, resourceClassName, permissions_pre);
+         fail("granting *IMPERSONATE system permission as a create permission on an unauthenticatable resource class should have failed");
+      }
+      catch (AccessControlException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("not valid for unauthenticatable resource"));
+      }
    }
 
    @Test
@@ -168,7 +208,7 @@ public class TestAccessControl_setResourceCreatePermissions extends TestAccessCo
 
       final Resource accessorResource = generateUnauthenticatableResource();
       final String domainName = generateDomain();
-      final String resourceClassName = generateResourceClass(false, false);
+      final String resourceClassName = generateResourceClass(true, false);
       assertThat(accessControlContext.getEffectiveResourceCreatePermissionsMap(accessorResource).isEmpty(), is(true));
 
       Set<ResourceCreatePermission> resourceCreatePermissions_pre1 = new HashSet<>();
@@ -179,8 +219,8 @@ public class TestAccessControl_setResourceCreatePermissions extends TestAccessCo
       // set create permissions and verify
       accessControlContext.setResourceCreatePermissions(accessorResource,
                                                         resourceClassName,
-                                                        resourceCreatePermissions_pre1, domainName
-      );
+                                                        resourceCreatePermissions_pre1,
+                                                        domainName);
 
       final Set<ResourceCreatePermission> resourceCreatePermissions_post1 = accessControlContext.getEffectiveResourceCreatePermissions(accessorResource, resourceClassName, domainName);
       assertThat(resourceCreatePermissions_post1, is(resourceCreatePermissions_pre1));
@@ -193,8 +233,8 @@ public class TestAccessControl_setResourceCreatePermissions extends TestAccessCo
 
       accessControlContext.setResourceCreatePermissions(accessorResource,
                                                         resourceClassName,
-                                                        resourceCreatePermissions_pre2, domainName
-      );
+                                                        resourceCreatePermissions_pre2,
+                                                        domainName);
 
       final Set<ResourceCreatePermission> resourceCreatePermissions_post2 = accessControlContext.getEffectiveResourceCreatePermissions(accessorResource, resourceClassName, domainName);
       assertThat(resourceCreatePermissions_post2, is(resourceCreatePermissions_pre2));
