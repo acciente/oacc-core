@@ -92,7 +92,7 @@ public class TestAccessControl_setGlobalResourcePermissions extends TestAccessCo
    }
 
    @Test
-   public void setGlobalResourcePermissions_resetPwdPermissionOnUnauthenticatables_shouldFail() throws AccessControlException {
+   public void setGlobalResourcePermissions_resetCredentialsPermissionOnUnauthenticatables_shouldFail() throws AccessControlException {
       authenticateSystemResource();
       final String resourceClassName = generateResourceClass(false, false);
       final Resource accessorResource = generateAuthenticatableResource(generateUniquePassword());
@@ -257,6 +257,274 @@ public class TestAccessControl_setGlobalResourcePermissions extends TestAccessCo
 
       final Set<ResourcePermission> permissions_post3 = accessControlContext.getEffectiveGlobalResourcePermissions(accessorResource, resourceClassName, domainName);
       assertThat(permissions_post3.isEmpty(), is(true));
+   }
+
+   @Test
+   public void setGlobalResourcePermission_addPermission_withUnauthorizedPermissionsGrantedElsewhere_shouldSucceedAsAuthorized() throws AccessControlException {
+      authenticateSystemResource();
+      final String resourceClassName = generateResourceClass(true, false);
+      final String grantedPermissionName = generateResourceClassPermission(resourceClassName);
+      final String ungrantedPermissionName = ResourcePermission.IMPERSONATE;
+      final char[] password = generateUniquePassword();
+      final Resource grantorResource = generateAuthenticatableResource(password);
+      final Resource accessorResource = generateUnauthenticatableResource();
+      final String domainName = generateDomain();
+
+      // setup accessor permissions
+      Set<ResourcePermission> accessorPermissions_pre = new HashSet<>();
+      accessorPermissions_pre.add(ResourcePermission.getInstance(ungrantedPermissionName));
+
+      accessControlContext.setGlobalResourcePermissions(accessorResource, resourceClassName, accessorPermissions_pre, domainName);
+      assertThat(accessControlContext.getEffectiveGlobalResourcePermissions(accessorResource, resourceClassName, domainName),
+                 is(accessorPermissions_pre));
+
+      // setup grantor permissions
+      Set<ResourcePermission> grantorPermissions = new HashSet<>();
+      grantorPermissions.add(ResourcePermission.getInstance(grantedPermissionName, true));
+
+      accessControlContext.setGlobalResourcePermissions(grantorResource, resourceClassName, grantorPermissions, domainName);
+      assertThat(accessControlContext.getEffectiveGlobalResourcePermissions(grantorResource, resourceClassName, domainName),
+                 is(grantorPermissions));
+
+      // authenticate grantor resource
+      accessControlContext.authenticate(grantorResource, PasswordCredentials.newInstance(password));
+
+      // set permissions as grantor and verify
+      Set<ResourcePermission> requestedPermissions = new HashSet<>();
+      requestedPermissions.add(ResourcePermission.getInstance(grantedPermissionName));
+      requestedPermissions.add(ResourcePermission.getInstance(ungrantedPermissionName));
+
+      accessControlContext.setGlobalResourcePermissions(accessorResource, resourceClassName, requestedPermissions, domainName);
+
+      Set<ResourcePermission> permissions_expected = new HashSet<>();
+      permissions_expected.add(ResourcePermission.getInstance(grantedPermissionName, false));
+      permissions_expected.add(ResourcePermission.getInstance(ungrantedPermissionName, false));
+
+      final Set<ResourcePermission> permissions_post
+            = accessControlContext.getEffectiveGlobalResourcePermissions(accessorResource, resourceClassName, domainName);
+      assertThat(permissions_post, is(permissions_expected));
+   }
+   @Test
+   public void setGlobalResourcePermission_removePermission_withUnauthorizedPermissionsGrantedElsewhere_shouldSucceedAsAuthorized() throws AccessControlException {
+      authenticateSystemResource();
+      final String resourceClassName = generateResourceClass(true, false);
+      final String grantedPermissionName = generateResourceClassPermission(resourceClassName);
+      final String ungrantedPermissionName = ResourcePermission.IMPERSONATE;
+      final char[] password = generateUniquePassword();
+      final Resource grantorResource = generateAuthenticatableResource(password);
+      final Resource accessorResource = generateUnauthenticatableResource();
+      final String domainName = generateDomain();
+
+      // setup accessor permissions
+      Set<ResourcePermission> accessorPermissions_pre = new HashSet<>();
+      accessorPermissions_pre.add(ResourcePermission.getInstance(grantedPermissionName));
+      accessorPermissions_pre.add(ResourcePermission.getInstance(ungrantedPermissionName));
+
+      accessControlContext.setGlobalResourcePermissions(accessorResource, resourceClassName, accessorPermissions_pre, domainName);
+      assertThat(accessControlContext.getEffectiveGlobalResourcePermissions(accessorResource, resourceClassName, domainName),
+                 is(accessorPermissions_pre));
+
+      // setup grantor permissions
+      Set<ResourcePermission> grantorPermissions = new HashSet<>();
+      grantorPermissions.add(ResourcePermission.getInstance(grantedPermissionName, true));
+
+      accessControlContext.setGlobalResourcePermissions(grantorResource, resourceClassName, grantorPermissions, domainName);
+      assertThat(accessControlContext.getEffectiveGlobalResourcePermissions(grantorResource, resourceClassName, domainName),
+                 is(grantorPermissions));
+
+      // authenticate grantor resource
+      accessControlContext.authenticate(grantorResource, PasswordCredentials.newInstance(password));
+
+      // set permissions as grantor and verify
+      Set<ResourcePermission> requestedPermissions = new HashSet<>();
+      requestedPermissions.add(ResourcePermission.getInstance(ungrantedPermissionName));
+
+      accessControlContext.setGlobalResourcePermissions(accessorResource, resourceClassName, requestedPermissions, domainName);
+
+      Set<ResourcePermission> permissions_expected = new HashSet<>();
+      permissions_expected.add(ResourcePermission.getInstance(ungrantedPermissionName, false));
+
+      final Set<ResourcePermission> permissions_post
+            = accessControlContext.getEffectiveGlobalResourcePermissions(accessorResource, resourceClassName, domainName);
+      assertThat(permissions_post, is(permissions_expected));
+   }
+
+   @Test
+   public void setGlobalResourcePermission_downgradeGrantingRights_shouldSucceedAsAuthorized() throws AccessControlException {
+      authenticateSystemResource();
+      final String resourceClassName = generateResourceClass(false, false);
+      final String grantedPermissionName = generateResourceClassPermission(resourceClassName);
+      final char[] password = generateUniquePassword();
+      final Resource grantorResource = generateAuthenticatableResource(password);
+      final Resource accessorResource = generateUnauthenticatableResource();
+      final String domainName = generateDomain();
+
+      // setup accessor permissions
+      Set<ResourcePermission> accessorPermissions_pre = new HashSet<>();
+      accessorPermissions_pre.add(ResourcePermission.getInstance(grantedPermissionName, true));
+
+      accessControlContext.setGlobalResourcePermissions(accessorResource, resourceClassName, accessorPermissions_pre, domainName);
+      assertThat(accessControlContext.getEffectiveGlobalResourcePermissions(accessorResource, resourceClassName, domainName),
+                 is(accessorPermissions_pre));
+
+      // setup grantor permissions
+      Set<ResourcePermission> grantorResourcePermissions = new HashSet<>();
+      grantorResourcePermissions.add(ResourcePermission.getInstance(grantedPermissionName, true));
+
+      accessControlContext.setGlobalResourcePermissions(grantorResource, resourceClassName, grantorResourcePermissions, domainName);
+      assertThat(accessControlContext.getEffectiveGlobalResourcePermissions(grantorResource, resourceClassName, domainName),
+                 is(grantorResourcePermissions));
+
+      // authenticate grantor resource
+      accessControlContext.authenticate(grantorResource, PasswordCredentials.newInstance(password));
+
+      // set permissions as grantor and verify
+      Set<ResourcePermission> requestedPermissions = new HashSet<>();
+      requestedPermissions.add(ResourcePermission.getInstance(grantedPermissionName));
+
+      accessControlContext.setGlobalResourcePermissions(accessorResource, resourceClassName, requestedPermissions, domainName);
+
+      Set<ResourcePermission> permissions_expected = new HashSet<>();
+      permissions_expected.add(ResourcePermission.getInstance(grantedPermissionName));
+
+      final Set<ResourcePermission> permissions_post
+            = accessControlContext.getEffectiveGlobalResourcePermissions(accessorResource, resourceClassName, domainName);
+      assertThat(permissions_post, is(permissions_expected));
+   }
+
+   @Test
+   public void setGlobalResourcePermission_downgradeGrantingRights_forUnauthorizedPermissionGrantedElsewhere_shouldFail() throws AccessControlException {
+      authenticateSystemResource();
+      final String resourceClassName = generateResourceClass(true, false);
+      final String grantedPermissionName = generateResourceClassPermission(resourceClassName);
+      final String ungrantedPermissionName = ResourcePermission.IMPERSONATE;
+      final char[] password = generateUniquePassword();
+      final Resource grantorResource = generateAuthenticatableResource(password);
+      final Resource accessorResource = generateUnauthenticatableResource();
+      final String domainName = generateDomain();
+
+      // setup accessor permissions
+      Set<ResourcePermission> accessorPermissions_pre = new HashSet<>();
+      accessorPermissions_pre.add(ResourcePermission.getInstance(ungrantedPermissionName, true));
+
+      accessControlContext.setGlobalResourcePermissions(accessorResource, resourceClassName, accessorPermissions_pre, domainName);
+      assertThat(accessControlContext.getEffectiveGlobalResourcePermissions(accessorResource, resourceClassName, domainName),
+                 is(accessorPermissions_pre));
+
+      // setup grantor permissions
+      Set<ResourcePermission> grantorResourcePermissions = new HashSet<>();
+      grantorResourcePermissions.add(ResourcePermission.getInstance(grantedPermissionName, true));
+
+      accessControlContext.setGlobalResourcePermissions(grantorResource, resourceClassName, grantorResourcePermissions, domainName);
+      assertThat(accessControlContext.getEffectiveGlobalResourcePermissions(grantorResource, resourceClassName, domainName),
+                 is(grantorResourcePermissions));
+
+      // authenticate grantor resource
+      accessControlContext.authenticate(grantorResource, PasswordCredentials.newInstance(password));
+
+      // set permissions as grantor and verify
+      Set<ResourcePermission> requestedPermissions = new HashSet<>();
+      requestedPermissions.add(ResourcePermission.getInstance(grantedPermissionName));
+      requestedPermissions.add(ResourcePermission.getInstance(ungrantedPermissionName));
+
+      try {
+         accessControlContext.setGlobalResourcePermissions(accessorResource, resourceClassName, requestedPermissions, domainName);
+         fail("Downgrading (=removal of granting rights) of global permission granted elsewhere, to which I have no granting rights, should have failed");
+      }
+      catch (AccessControlException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("not authorized"));
+         assertThat(e.getMessage().toLowerCase(), containsString(ungrantedPermissionName.toLowerCase()));
+         assertThat(e.getMessage().toLowerCase(), not(containsString(grantedPermissionName)));
+      }
+   }
+
+   @Test
+   public void setResourcePermission_upgradeGrantingRights_shouldSucceedAsAuthorized() throws AccessControlException {
+      authenticateSystemResource();
+      final String resourceClassName = generateResourceClass(false, false);
+      final String grantedPermissionName = generateResourceClassPermission(resourceClassName);
+      final char[] password = generateUniquePassword();
+      final Resource grantorResource = generateAuthenticatableResource(password);
+      final Resource accessorResource = generateUnauthenticatableResource();
+      final String domainName = generateDomain();
+
+      // setup accessor permissions
+      Set<ResourcePermission> accessorPermissions_pre = new HashSet<>();
+      accessorPermissions_pre.add(ResourcePermission.getInstance(grantedPermissionName));
+
+      accessControlContext.setGlobalResourcePermissions(accessorResource, resourceClassName, accessorPermissions_pre, domainName);
+      assertThat(accessControlContext.getEffectiveGlobalResourcePermissions(accessorResource, resourceClassName, domainName),
+                 is(accessorPermissions_pre));
+
+      // setup grantor permissions
+      Set<ResourcePermission> grantorResourcePermissions = new HashSet<>();
+      grantorResourcePermissions.add(ResourcePermission.getInstance(grantedPermissionName, true));
+
+      accessControlContext.setGlobalResourcePermissions(grantorResource, resourceClassName, grantorResourcePermissions, domainName);
+      assertThat(accessControlContext.getEffectiveGlobalResourcePermissions(grantorResource, resourceClassName, domainName),
+                 is(grantorResourcePermissions));
+
+      // authenticate grantor resource
+      accessControlContext.authenticate(grantorResource, PasswordCredentials.newInstance(password));
+
+      // set permissions as grantor and verify
+      Set<ResourcePermission> requestedPermissions = new HashSet<>();
+      requestedPermissions.add(ResourcePermission.getInstance(grantedPermissionName, true));
+
+      accessControlContext.setGlobalResourcePermissions(accessorResource, resourceClassName, requestedPermissions, domainName);
+
+      Set<ResourcePermission> permissions_expected = new HashSet<>();
+      permissions_expected.add(ResourcePermission.getInstance(grantedPermissionName, true));
+
+      final Set<ResourcePermission> permissions_post
+            = accessControlContext.getEffectiveGlobalResourcePermissions(accessorResource, resourceClassName, domainName);
+      assertThat(permissions_post, is(permissions_expected));
+   }
+
+   @Test
+   public void setResourcePermission_upgradeGrantingRights_forUnauthorizedPermissionGrantedElsewhere_shouldFail() throws AccessControlException {
+      authenticateSystemResource();
+      final String resourceClassName = generateResourceClass(true, false);
+      final String grantedPermissionName = generateResourceClassPermission(resourceClassName);
+      final String ungrantedPermissionName = ResourcePermission.IMPERSONATE;
+      final char[] password = generateUniquePassword();
+      final Resource grantorResource = generateAuthenticatableResource(password);
+      final Resource accessorResource = generateUnauthenticatableResource();
+      final String domainName = generateDomain();
+
+      // setup accessor permissions
+      Set<ResourcePermission> accessorPermissions_pre = new HashSet<>();
+      accessorPermissions_pre.add(ResourcePermission.getInstance(ungrantedPermissionName));
+
+      accessControlContext.setGlobalResourcePermissions(accessorResource, resourceClassName, accessorPermissions_pre, domainName);
+      assertThat(accessControlContext.getEffectiveGlobalResourcePermissions(accessorResource, resourceClassName, domainName),
+                 is(accessorPermissions_pre));
+
+      // setup grantor permissions
+      Set<ResourcePermission> grantorResourcePermissions = new HashSet<>();
+      grantorResourcePermissions.add(ResourcePermission.getInstance(grantedPermissionName, true));
+
+      accessControlContext.setGlobalResourcePermissions(grantorResource, resourceClassName, grantorResourcePermissions, domainName);
+      assertThat(accessControlContext.getEffectiveGlobalResourcePermissions(grantorResource, resourceClassName, domainName),
+                 is(grantorResourcePermissions));
+
+      // authenticate grantor resource
+      accessControlContext.authenticate(grantorResource, PasswordCredentials.newInstance(password));
+
+      // set permissions as grantor and verify
+      Set<ResourcePermission> requestedPermissions = new HashSet<>();
+      requestedPermissions.add(ResourcePermission.getInstance(grantedPermissionName));
+      requestedPermissions.add(ResourcePermission.getInstance(ungrantedPermissionName, true));
+
+      try {
+         accessControlContext.setGlobalResourcePermissions(accessorResource, resourceClassName, requestedPermissions, domainName);
+         fail("Upgrading (=addition of granting rights) of global permission granted elsewhere, to which I have no granting rights, should have failed");
+      }
+      catch (AccessControlException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("not authorized"));
+         assertThat(e.getMessage().toLowerCase(), containsString(ungrantedPermissionName.toLowerCase()));
+         assertThat(e.getMessage().toLowerCase(), not(containsString(grantedPermissionName)));
+      }
    }
 
    @Test

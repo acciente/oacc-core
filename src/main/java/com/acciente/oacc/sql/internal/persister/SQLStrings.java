@@ -123,11 +123,13 @@ public class SQLStrings implements Serializable {
 
    // GrantGlobalResourcePermissionSys
    public final String SQL_findInGrantGlobalResourcePermissionSys_SysPermissionID_IsWithGrant_InheritLevel_DomainLevel_BY_AccessorID_AccessedDomainID_ResourceClassID;
+   public final String SQL_findInGrantGlobalResourcePermissionSys_withoutInheritance_SysPermissionID_IsWithGrant_BY_AccessorID_AccessedDomainID_ResourceClassID;
    public final String SQL_findInGrantGlobalResourcePermissionSys_ResourceDomainName_ResourceClassName_SysPermissionID_IsWithGrant_InheritLevel_DomainLevel_BY_AccessorID;
    public final String SQL_createInGrantGlobalResourcePermissionSys_WITH_AccessorID_GrantorID_AccessedDomainID_IsWithGrant_ResourceClassID_SysPermissionID;
    public final String SQL_removeInGrantGlobalResourcePermissionSys_BY_AccessorID_AccessedDomainID_ResourceClassID;
    // GrantGlobalResourcePermission
    public final String SQL_findInGrantGlobalResourcePermission_PermissionName_IsWithGrant_InheritLevel_DomainLevel_BY_AccessorID_AccessedDomainID_ResourceClassID;
+   public final String SQL_findInGrantGlobalResourcePermission_withoutInheritance_PermissionName_IsWithGrant_BY_AccessorID_AccessedDomainID_ResourceClassID;
    public final String SQL_findInGrantGlobalResourcePermission_ResourceDomainName_ResourceClassName_PermissionName_IsWithGrant_InheritLevel_DomainLevel_BY_AccessorID;
    public final String SQL_createInGrantGlobalResourcePermission_WITH_AccessorID_GrantorID_AccessedDomainID_IsWithGrant_ResourceClassID_PermissionName;
    public final String SQL_removeInGrantGlobalResourcePermission_BY_AccessorID_AccessedDomainID_ResourceClassID;
@@ -762,6 +764,12 @@ public class SQLStrings implements Serializable {
             + "JOIN R ON R.DomainId = A.AccessedDomainId "
             + "WHERE A.ResourceClassId = ?";
 
+      SQL_findInGrantGlobalResourcePermissionSys_withoutInheritance_SysPermissionID_IsWithGrant_BY_AccessorID_AccessedDomainID_ResourceClassID
+            = "SELECT A.SysPermissionId, A.IsWithGrant FROM "
+            + schemaNameAndTablePrefix
+            + "Grant_Global_ResPerm_Sys A "
+            + "WHERE A.AccessorResourceId = ? AND A.AccessedDomainId = ? AND A.ResourceClassId = ?";
+
       SQL_findInGrantGlobalResourcePermissionSys_ResourceDomainName_ResourceClassName_SysPermissionID_IsWithGrant_InheritLevel_DomainLevel_BY_AccessorID
             = SQL_findRecursiveInGrantResourcePermissionSys_AccessorID_InheritLevel_BY_AccessorID
             + ", P( AccessedDomainId, ResourceClassId, SysPermissionId, IsWithGrant, InheritLevel, DomainLevel ) AS "
@@ -803,6 +811,14 @@ public class SQLStrings implements Serializable {
             + "JOIN N ON N.AccessorResourceId = A.AccessorResourceId "
             + "JOIN R ON R.DomainId = A.AccessedDomainId "
             + "WHERE A.ResourceClassId = ?";
+
+      SQL_findInGrantGlobalResourcePermission_withoutInheritance_PermissionName_IsWithGrant_BY_AccessorID_AccessedDomainID_ResourceClassID
+            = "SELECT B.PermissionName, A.IsWithGrant FROM "
+            + schemaNameAndTablePrefix
+            + "Grant_Global_ResPerm A JOIN "
+            + schemaNameAndTablePrefix
+            + "ResourceClassPermission B ON B.ResourceClassId = A.ResourceClassId AND B.PermissionId = A.PermissionId "
+            + "WHERE A.AccessorResourceId = ? AND A.AccessedDomainId = ? AND A.ResourceClassId = ?";
 
       SQL_findInGrantGlobalResourcePermission_ResourceDomainName_ResourceClassName_PermissionName_IsWithGrant_InheritLevel_DomainLevel_BY_AccessorID
             = SQL_findRecursiveInGrantResourcePermissionSys_AccessorID_InheritLevel_BY_AccessorID

@@ -145,6 +145,40 @@ public class GrantGlobalResourcePermissionSysPersister extends Persister {
       }
    }
 
+   public Set<ResourcePermission> getDirectGlobalSysPermissions(SQLConnection connection,
+                                                                Resource accessorResource,
+                                                                Id<ResourceClassId> resourceClassId,
+                                                                Id<DomainId> resourceDomainId) throws AccessControlException {
+      SQLStatement statement = null;
+      try {
+         // collect the system permissions that the accessor has to the accessed resource directly
+         SQLResult resultSet;
+         Set<ResourcePermission> resourcePermissions = new HashSet<>();
+
+         statement = connection.prepareStatement(sqlStrings.SQL_findInGrantGlobalResourcePermissionSys_withoutInheritance_SysPermissionID_IsWithGrant_BY_AccessorID_AccessedDomainID_ResourceClassID);
+         statement.setResourceId(1, accessorResource);
+         statement.setResourceDomainId(2, resourceDomainId);
+         statement.setResourceClassId(3, resourceClassId);
+         resultSet = statement.executeQuery();
+
+         while (resultSet.next()) {
+            resourcePermissions.add(ResourcePermission.getInstance(resultSet.getResourceSysPermissionName("SysPermissionId"),
+                                                                   resultSet.getBoolean("IsWithGrant"),
+                                                                   0,
+                                                                   0));
+         }
+         resultSet.close();
+
+         return resourcePermissions;
+      }
+      catch (SQLException e) {
+         throw new AccessControlException(e);
+      }
+      finally {
+         closeStatement(statement);
+      }
+   }
+
    public Map<String, Map<String, Set<ResourcePermission>>> getGlobalSysPermissions(SQLConnection connection,
                                                                                     Resource accessorResource)
          throws AccessControlException {

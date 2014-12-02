@@ -1700,7 +1700,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
             = resourceClassPersister.getResourceClassInfoByResourceId(connection, accessedResource);
 
       // next ensure that the requested permissions are all in the correct resource class
-      assertUniquePermissionsNamesForResourceClass(connection, requestedResourcePermissions, accessedResourceClassInternalInfo);
+      assertUniqueResourcePermissionsNamesForResourceClass(connection, requestedResourcePermissions, accessedResourceClassInternalInfo);
 
       // if this method is being called to set the post create permissions on a newly created resource
       // we do not perform the security checks below, since it would be incorrect
@@ -1795,9 +1795,9 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
                                                       grantorResource);
    }
 
-   private void assertUniquePermissionsNamesForResourceClass(SQLConnection connection,
-                                                             Set<ResourcePermission> resourcePermissions,
-                                                             ResourceClassInternalInfo resourceClassInternalInfo) throws AccessControlException {
+   private void assertUniqueResourcePermissionsNamesForResourceClass(SQLConnection connection,
+                                                                     Set<ResourcePermission> resourcePermissions,
+                                                                     ResourceClassInternalInfo resourceClassInternalInfo) throws AccessControlException {
       final List<String> validPermissionNames
             = resourceClassPermissionPersister.getPermissionNames(connection, resourceClassInternalInfo.getResourceClassName());
       final Set<String> uniquePermissionNames = new HashSet<>(resourcePermissions.size());
@@ -2024,6 +2024,8 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
          throw new AccessControlException("Could not find resource class: " + resourceClassName);
       }
 
+      final ResourceClassInternalInfo resourceClassInternalInfo = resourceClassPersister.getResourceClassInfo(connection, resourceClassName);
+
       // verify the domain
       final Id<DomainId> domainId = domainPersister.getResourceDomainId(connection, domainName);
 
@@ -2031,70 +2033,54 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
          throw new AccessControlException("Could not find domain: " + domainName);
       }
 
-      // next ensure that the post create permissions are all in the correct resource class
-      final List<String> validPermissionNames = resourceClassPermissionPersister.getPermissionNames(connection, resourceClassName);
-      final ResourceClassInternalInfo resourceClassInternalInfo = resourceClassPersister.getResourceClassInfo(connection, resourceClassName);
-      final HashSet<String> uniquePermissionNames = new HashSet<>(requestedResourcePermissions.size());
-
-      for (final ResourcePermission resourcePermission : requestedResourcePermissions) {
-         // we prohibit granting the system INHERIT permission, since cycle checking may be prohibitively compute intensive
-         if (resourcePermission.isSystemPermission()) {
-            if (resourcePermission.equals(ResourcePermission_INHERIT)) {
-               throw new AccessControlException("Permission: " + resourcePermission + ", not valid in this context");
-            }
-            if (!resourceClassInternalInfo.isAuthenticatable()
-                  && (resourcePermission.getPermissionName().equals(ResourcePermission.IMPERSONATE)
-                  || resourcePermission.getPermissionName().equals(ResourcePermission.RESET_CREDENTIALS))) {
-               throw new AccessControlException("Permission: " + resourcePermission + ", not valid for unauthenticatable resource");
-            }
-         }
-         else {
-            // every non-system permission must be defined for the resource class specified
-            if (!validPermissionNames.contains(resourcePermission.getPermissionName())) {
-               throw new AccessControlException("Permission: " + resourcePermission.getPermissionName()
-                                                + " does not exist for the specified resource class: "
-                                                + resourceClassName);
-            }
-         }
-         if (uniquePermissionNames.contains(resourcePermission.getPermissionName())) {
-            throw new AccessControlException("Duplicate permission: "
-                                             + resourcePermission.getPermissionName() + " that only differs in 'withGrant' option");
-         }
-         else {
-            uniquePermissionNames.add(resourcePermission.getPermissionName());
-         }
-      }
+      // next ensure that the requested permissions are all in the correct resource class
+      assertUniqueGlobalResourcePermissionNamesForResourceClass(connection, requestedResourcePermissions, resourceClassInternalInfo);
 
       if (!__isSuperUserOfDomain(connection, domainName)) {
+         // check if the grantor (=session resource) is authorized to grant the requested permissions
          final Set<ResourcePermission>
-               grantorResourcePermissions
+               grantorPermissions
                = __getEffectiveGlobalPermissions(connection,
                                                  sessionResource,
                                                  resourceClassName,
                                                  domainName);
          final Set<ResourcePermission>
-               unauthorizedAddPermissions
-               = __subtractGrantedPermissions(requestedResourcePermissions,
-                                              grantorResourcePermissions);
+               directAccessorPermissions
+               = __getDirectGlobalResourcePermissions(connection,
+                                                      accessorResource,
+                                                      resourceClassId,
+                                                      domainId);
 
-         if (unauthorizedAddPermissions.size() > 0) {
-            throw new AccessControlException("Not authorized to add the following permission(s): "
-                                             + unauthorizedAddPermissions,
-                                       true);
+         final Set<ResourcePermission>
+               requestedAddPermissions
+               = __subtract(requestedResourcePermissions, directAccessorPermissions);
+
+         if (!requestedAddPermissions.isEmpty()) {
+            final Set<ResourcePermission>
+                  unauthorizedAddPermissions
+                  = __subtractResourcePermissionsIfGrantableFrom(requestedAddPermissions, grantorPermissions);
+
+            if (unauthorizedAddPermissions.size() > 0) {
+               throw new AccessControlException("Not authorized to add the following permission(s): "
+                                                      + unauthorizedAddPermissions,
+                                                true);
+            }
          }
 
          final Set<ResourcePermission>
-               unauthorizedRemovePermissions
-               = __subtractGrantedPermissions(__getEffectiveGlobalPermissions(connection,
-                                                                              accessorResource,
-                                                                              resourceClassName,
-                                                                              domainName),
-                                              grantorResourcePermissions);
+               requestedRemovePermissions
+               = __subtract(directAccessorPermissions, requestedResourcePermissions);
 
-         if (unauthorizedRemovePermissions.size() > 0) {
-            throw new AccessControlException("Not authorized to remove the following permission(s): "
-                                             + unauthorizedRemovePermissions,
-                                       true);
+         if (!requestedRemovePermissions.isEmpty()) {
+            final Set<ResourcePermission>
+                  unauthorizedRemovePermissions
+                  = __subtractResourcePermissionsIfGrantableFrom(requestedRemovePermissions, grantorPermissions);
+
+            if (unauthorizedRemovePermissions.size() > 0) {
+               throw new AccessControlException("Not authorized to remove the following permission(s): "
+                                                      + unauthorizedRemovePermissions,
+                                                true);
+            }
          }
       }
 
@@ -2125,6 +2111,64 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
                                                                   domainId,
                                                                   requestedResourcePermissions,
                                                                   sessionResource);
+   }
+
+   private Set<ResourcePermission> __getDirectGlobalResourcePermissions(SQLConnection connection,
+                                                                        Resource accessorResource,
+                                                                        Id<ResourceClassId> resourceClassId,
+                                                                        Id<DomainId> domainId) throws AccessControlException {
+      Set<ResourcePermission> resourcePermissions = new HashSet<>();
+
+      // collect the global system permissions that the accessor resource has to the accessed resource class & domain directly
+      resourcePermissions.addAll(grantGlobalResourcePermissionSysPersister.getDirectGlobalSysPermissions(connection,
+                                                                                                         accessorResource,
+                                                                                                         resourceClassId,
+                                                                                                         domainId));
+
+      // collect the global non-system permissions that the accessor has to the accessed resource class & domain directly
+      resourcePermissions.addAll(grantGlobalResourcePermissionPersister.getDirectGlobalPermissions(connection,
+                                                                                                   accessorResource,
+                                                                                                   resourceClassId,
+                                                                                                   domainId));
+
+      return resourcePermissions;
+   }
+
+   private void assertUniqueGlobalResourcePermissionNamesForResourceClass(SQLConnection connection,
+                                                                          Set<ResourcePermission> requestedResourcePermissions,
+                                                                          ResourceClassInternalInfo resourceClassInternalInfo) throws AccessControlException {
+      final List<String> validPermissionNames
+            = resourceClassPermissionPersister.getPermissionNames(connection, resourceClassInternalInfo.getResourceClassName());
+      final HashSet<String> uniquePermissionNames = new HashSet<>(requestedResourcePermissions.size());
+
+      for (final ResourcePermission resourcePermission : requestedResourcePermissions) {
+         // we prohibit granting the system INHERIT permission, since cycle checking may be prohibitively compute intensive
+         if (resourcePermission.isSystemPermission()) {
+            if (ResourcePermission_INHERIT.equals(resourcePermission)) {
+               throw new AccessControlException("Permission: " + resourcePermission + ", not valid in this context");
+            }
+            if (!resourceClassInternalInfo.isAuthenticatable()
+                  && (ResourcePermission.IMPERSONATE.equals(resourcePermission.getPermissionName())
+                  || ResourcePermission.RESET_CREDENTIALS.equals(resourcePermission.getPermissionName()))) {
+               throw new AccessControlException("Permission: " + resourcePermission + ", not valid for unauthenticatable resource");
+            }
+         }
+         else {
+            // every non-system permission must be defined for the resource class specified
+            if (!validPermissionNames.contains(resourcePermission.getPermissionName())) {
+               throw new AccessControlException("Permission: " + resourcePermission.getPermissionName()
+                                                + " does not exist for the specified resource class: "
+                                                + resourceClassInternalInfo.getResourceClassName());
+            }
+         }
+         if (uniquePermissionNames.contains(resourcePermission.getPermissionName())) {
+            throw new AccessControlException("Duplicate permission: "
+                                             + resourcePermission.getPermissionName() + " that only differs in 'withGrant' option");
+         }
+         else {
+            uniquePermissionNames.add(resourcePermission.getPermissionName());
+         }
+      }
    }
 
    @Override
