@@ -899,41 +899,55 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       }
 
       if (!newDomainMode) {
-         // check if the auth resource (grantor) has permissions to grant the requested permissions
-         final Set<DomainPermission> grantorDomainPermissions;
-         final Set<DomainPermission> unauthorizedAddPermissions;
-         final Set<DomainPermission> unauthorizedRemovePermissions;
+         // check if the grantor (=session resource) has permissions to grant the requested permissions
+         final Set<DomainPermission>
+               grantorPermissions
+               = __getEffectiveDomainPermissions(connection,
+                                                 sessionResource,
+                                                 domainName);
 
-         grantorDomainPermissions = __getEffectiveDomainPermissions(connection,
-                                                                    sessionResource,
-                                                                    domainName);
+         // check if the grantor (=session resource) has super user permissions to the target domain
+         if (!grantorPermissions.contains(DomainPermission_SUPER_USER)
+               && !grantorPermissions.contains(DomainPermission_SUPER_USER_GRANT)) {
 
-         // check if the auth resource has super user permissions to the target domain
-         if (!grantorDomainPermissions.contains(DomainPermission_SUPER_USER)
-               && !grantorDomainPermissions.contains(DomainPermission_SUPER_USER_GRANT)) {
-            unauthorizedAddPermissions
-                  = __subtractDomainPermissions(requestedDomainPermissions, grantorDomainPermissions);
+            final Set<DomainPermission>
+                  directAccessorPermissions
+                  = __getDirectDomainPermissions(connection, accessorResource, domainId);
 
-            if (unauthorizedAddPermissions.size() > 0) {
-               throw new AccessControlException("Not authorized to add the following domain permission(s): "
-                                                + unauthorizedAddPermissions,
-                                          true);
+            final Set<DomainPermission>
+                  requestedAddPermissions
+                  = __subtract(requestedDomainPermissions, directAccessorPermissions);
+
+            if (!requestedAddPermissions.isEmpty()) {
+               final Set<DomainPermission> unauthorizedAddPermissions;
+               unauthorizedAddPermissions
+                     = __subtractDomainPermissionsIfGrantableFrom(requestedAddPermissions, grantorPermissions);
+
+               if (unauthorizedAddPermissions.size() > 0) {
+                  throw new AccessControlException("Not authorized to add the following domain permission(s): "
+                                                         + unauthorizedAddPermissions,
+                                                   true);
+               }
             }
 
-            unauthorizedRemovePermissions
-                  = __subtractDomainPermissions(__getEffectiveDomainPermissions(connection,
-                                                                                accessorResource,
-                                                                                domainName),
-                                                grantorDomainPermissions);
+            final Set<DomainPermission>
+                  requestedRemovePermissions
+                  = __subtract(directAccessorPermissions, requestedDomainPermissions);
 
-            if (unauthorizedRemovePermissions.size() > 0) {
-               throw new AccessControlException("Not authorized to remove the following domain permission(s): "
-                                                + unauthorizedRemovePermissions,
-                                          true);
+            if (!requestedRemovePermissions.isEmpty()) {
+               final Set<DomainPermission> unauthorizedRemovePermissions;
+               unauthorizedRemovePermissions
+                     = __subtractDomainPermissionsIfGrantableFrom(requestedRemovePermissions, grantorPermissions);
+
+               if (unauthorizedRemovePermissions.size() > 0) {
+                  throw new AccessControlException("Not authorized to remove the following domain permission(s): "
+                                                         + unauthorizedRemovePermissions,
+                                                   true);
+               }
             }
          }
 
-         // revoke any existing permissions that this grantor gave this accessor to this domain
+         // revoke any existing permissions that accessor to has to this domain directly
          grantDomainPermissionSysPersister.removeDomainSysPermissions(connection, accessorResource, domainId);
       }
 
@@ -945,42 +959,27 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
                                                                         requestedDomainPermissions);
    }
 
-   private Set<DomainPermission> __subtractDomainPermissions(Set<DomainPermission> requestedDomainPermissions,
-                                                             Set<DomainPermission> grantorDomainPermissions) {
-      // we start with the assumption that all the requested permissions are unauthorized!
-      Set<DomainPermission> unauthorizedDomainPermissions = new HashSet<>(requestedDomainPermissions);
+   private Set<DomainPermission> __getDirectDomainPermissions(SQLConnection connection,
+                                                              Resource accessorResource,
+                                                              Id<DomainId> domainId) throws AccessControlException {
+      // only system permissions are possible on a domain
+      return grantDomainPermissionSysPersister.getDirectDomainSysPermissions(connection, accessorResource, domainId);
+   }
 
-      // check if the grantor has grant permissions to each permission
-      for (DomainPermission requestedDomainPermission : requestedDomainPermissions) {
-         // is the permission to check a system permission?
-         if (requestedDomainPermission.isSystemPermission()) {
-            for (DomainPermission grantorDomainPermission : grantorDomainPermissions) {
-               // is the permission to check against a system permission?
-               if (grantorDomainPermission.isSystemPermission()) {
-                  if (grantorDomainPermission.isWithGrant()
-                        && grantorDomainPermission.getSystemPermissionId() == requestedDomainPermission.getSystemPermissionId()
-                        ) {
-                     unauthorizedDomainPermissions.remove(requestedDomainPermission);
-                     break;
-                  }
-               }
-            }
-         }
-         else {
-            for (DomainPermission grantorDomainPermission : grantorDomainPermissions) {
-               // is the permission to check against a system permission?
-               if (!grantorDomainPermission.isSystemPermission()) {
-                  if (grantorDomainPermission.isWithGrant()
-                        && grantorDomainPermission.getPermissionName().equals(requestedDomainPermission.getPermissionName())) {
-                     unauthorizedDomainPermissions.remove(requestedDomainPermission);
-                     break;
-                  }
-               }
+   private Set<DomainPermission> __subtractDomainPermissionsIfGrantableFrom(Set<DomainPermission> candidatePermissionSet,
+                                                                            Set<DomainPermission> grantorPermissionSet) {
+      Set<DomainPermission> differenceSet = new HashSet<>(candidatePermissionSet);
+
+      for (DomainPermission candidatePermission : candidatePermissionSet) {
+         for (DomainPermission grantorPermission : grantorPermissionSet) {
+            if (candidatePermission.isGrantableFrom(grantorPermission)) {
+               differenceSet.remove(candidatePermission);
+               break;
             }
          }
       }
 
-      return unauthorizedDomainPermissions;
+      return differenceSet;
    }
 
    @Override

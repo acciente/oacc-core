@@ -141,6 +141,18 @@ public final class DomainPermission implements Serializable {
       return true;
    }
 
+   public boolean isGrantableFrom(DomainPermission other) {
+      if (other == null) {
+         return false;
+      }
+
+      if (!other.isWithGrant()) {
+         return false;
+      }
+
+      return permissionName.equals(other.permissionName);
+   }
+
    @Override
    public int hashCode() {
       int result = permissionName.hashCode();

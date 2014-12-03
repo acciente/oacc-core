@@ -136,6 +136,39 @@ public class GrantDomainPermissionSysPersister extends Persister {
       }
    }
 
+   public Set<DomainPermission> getDirectDomainSysPermissions(SQLConnection connection,
+                                                              Resource accessorResource,
+                                                              Id<DomainId> resourceDomainId) throws AccessControlException {
+      SQLStatement statement = null;
+
+      try {
+         statement = connection.prepareStatement(sqlStrings.SQL_findInGrantDomainPermissionSys_withoutInheritance_SysPermissionID_IsWithGrant_BY_AccessorID_DomainID);
+         statement.setResourceId(1, accessorResource);
+         statement.setResourceDomainId(2, resourceDomainId);
+         SQLResult resultSet = statement.executeQuery();
+
+         // collect the create permissions that this resource has to the resource domain directly
+         Set<DomainPermission> domainPermissions = new HashSet<>();
+         while (resultSet.next()) {
+            // on the resource domains only pre-defined system permissions are expected
+            domainPermissions
+                  .add(DomainPermission.getInstance(resultSet.getDomainSysPermissionName("SysPermissionId"),
+                                                    resultSet.getBoolean("IsWithGrant"),
+                                                    0,
+                                                    0));
+         }
+         resultSet.close();
+
+         return domainPermissions;
+      }
+      catch (SQLException e) {
+         throw new AccessControlException(e);
+      }
+      finally {
+         closeStatement(statement);
+      }
+   }
+
    public Map<String, Set<DomainPermission>> getDomainSysPermissions(SQLConnection connection,
                                                                      Resource accessorResource) throws AccessControlException {
       SQLStatement statement = null;
