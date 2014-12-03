@@ -141,6 +141,23 @@ public final class DomainPermission implements Serializable {
       return true;
    }
 
+   public boolean equalsIgnoreGrant(Object other) {
+      if (this == other) {
+         return true;
+      }
+      if (other == null || getClass() != other.getClass()) {
+         return false;
+      }
+
+      DomainPermission otherDomainPermission = (DomainPermission) other;
+
+      if (!permissionName.equals(otherDomainPermission.permissionName)) {
+         return false;
+      }
+
+      return true;
+   }
+
    public boolean isGrantableFrom(DomainPermission other) {
       if (other == null) {
          return false;

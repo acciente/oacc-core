@@ -64,6 +64,37 @@ public class GrantDomainCreatePermissionPostCreateSysPersister extends Persister
       }
    }
 
+   public Set<DomainCreatePermission> getDirectDomainPostCreatePermissions(SQLConnection connection,
+                                                                           Resource accessorResource) throws AccessControlException {
+      SQLStatement statement = null;
+
+      try {
+         statement = connection.prepareStatement(sqlStrings.SQL_findInGrantDomainCreatePermissionPostCreateSys_withoutInheritance_PostCreateSysPermissionID_PostCreateIsWithGrant_IsWithGrant_BY_AccessorID);
+         statement.setResourceId(1, accessorResource);
+         SQLResult resultSet = statement.executeQuery();
+
+         // collect the create permissions that this resource has to resource domains directly
+         Set<DomainCreatePermission> domainCreatePermissions = new HashSet<>();
+         while (resultSet.next()) {
+            domainCreatePermissions
+                  .add(DomainCreatePermission.getInstance(DomainPermission.getInstance(resultSet.getDomainSysPermissionName("PostCreateSysPermissionId"),
+                                                                                       resultSet.getBoolean("PostCreateIsWithGrant"),
+                                                                                       0,
+                                                                                       0 /* zero since level does not apply here */),
+                                                          resultSet.getBoolean("IsWithGrant")));
+         }
+         resultSet.close();
+
+         return domainCreatePermissions;
+      }
+      catch (SQLException e) {
+         throw new AccessControlException(e);
+      }
+      finally {
+         closeStatement(statement);
+      }
+   }
+
    public void removeDomainPostCreatePermissions(SQLConnection connection,
                                                  Resource accessorResource) throws AccessControlException {
       SQLStatement statement = null;

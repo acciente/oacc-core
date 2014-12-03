@@ -162,6 +162,30 @@ public class DomainCreatePermission implements Serializable {
       return true;
    }
 
+   public boolean isGrantableFrom(DomainCreatePermission other) {
+      if (other == null) {
+         return false;
+      }
+
+      if (!other.isWithGrant()) {
+         return false;
+      }
+
+      if (this.isSystemPermission() != other.isSystemPermission()) {
+         return false;
+      }
+
+      if (this.isSystemPermission()) {
+         return this.systemPermissionId == other.systemPermissionId;
+      }
+
+      if (this.postCreateDomainPermission.isWithGrant() && !other.postCreateDomainPermission.isWithGrant()) {
+         return false;
+      }
+
+      return this.postCreateDomainPermission.equalsIgnoreGrant(other.postCreateDomainPermission);
+   }
+
    // private static helper method to convert a sys permission name to a sys permission object
 
    private static SysPermission getSysPermission(String systemPermissionName) {

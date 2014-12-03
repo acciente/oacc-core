@@ -1057,56 +1057,47 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
    private void __setDomainCreatePermissions(SQLConnection connection,
                                              Resource accessorResource,
                                              Set<DomainCreatePermission> requestedDomainCreatePermissions) throws AccessControlException {
-      boolean createSysPermissionFound = false;
+      assertSetContainsDomainCreateSystemPermission(requestedDomainCreatePermissions);
 
-      // first check that the CREATE permission is specified
-      for (DomainCreatePermission domainCreatePermission : requestedDomainCreatePermissions) {
-         if (domainCreatePermission.isSystemPermission()
-               && domainCreatePermission.getSysPermissionName().equals(DomainCreatePermission.CREATE)) {
-            createSysPermissionFound = true;
+      // check if grantor (=session resource) is authorized to add/remove requested permissions
+      final Set<DomainCreatePermission>
+            grantorPermissions
+            = __getEffectiveDomainCreatePermissions(connection, sessionResource);
+
+      final Set<DomainCreatePermission>
+            directAccessorPermissions
+            = __getDirectDomainCreatePermissions(connection, accessorResource);
+
+      final Set<DomainCreatePermission>
+            requestedAddPermissions
+            = __subtract(requestedDomainCreatePermissions, directAccessorPermissions);
+
+      if (!requestedAddPermissions.isEmpty()) {
+         final Set<DomainCreatePermission>
+               unauthorizedAddPermissions
+               = __subtractDomainCreatePermissionsIfGrantableFrom(requestedAddPermissions, grantorPermissions);
+
+         if (unauthorizedAddPermissions.size() > 0) {
+            throw new AccessControlException("Not authorized to add the following domain permission(s): "
+                                                   + unauthorizedAddPermissions,
+                                             true);
          }
       }
 
-      if (requestedDomainCreatePermissions.size() > 0 && !createSysPermissionFound) {
-         throw new AccessControlException("Domain create permission *CREATE must be specified");
-      }
-
-      // check if grantor is authorized to add/remove requisite permissions
-      final Set<DomainCreatePermission> grantorPermissions = new HashSet<>();
-      grantorPermissions
-            .addAll(grantDomainCreatePermissionSysPersister.getDomainCreatePermissions(connection,
-                                                                                       sessionResource));
-      grantorPermissions
-            .addAll(grantDomainCreatePermissionPostCreateSysPersister.getDomainPostCreatePermissions(connection,
-                                                                                                     sessionResource));
-
-      // check if the auth resource (grantor) has permissions to add the new permissions
       final Set<DomainCreatePermission>
-            unauthorizedAddPermissions
-            = __subtractDomainCreatePermissions(requestedDomainCreatePermissions,
-                                                grantorPermissions);
-      if (unauthorizedAddPermissions.size() > 0) {
-         throw new AccessControlException("Not authorized to add the following domain permission(s): "
-                                          + unauthorizedAddPermissions,
-                                    true);
-      }
+            requestedRemovePermissions
+            = __subtract(directAccessorPermissions, requestedDomainCreatePermissions);
 
-      // check if the auth resource (grantor) has permissions to remove the current permissions
-      final Set<DomainCreatePermission> accessorCurrentPermissions = new HashSet<>();
-      accessorCurrentPermissions
-            .addAll(grantDomainCreatePermissionSysPersister.getDomainCreatePermissions(connection,
-                                                                                       accessorResource));
-      accessorCurrentPermissions
-            .addAll(grantDomainCreatePermissionPostCreateSysPersister.getDomainPostCreatePermissions(connection,
-                                                                                                     accessorResource));
-      final Set<DomainCreatePermission>
-            unauthorizedRemovePermissions
-            = __subtractDomainCreatePermissions(accessorCurrentPermissions,
-                                                grantorPermissions);
-      if (unauthorizedRemovePermissions.size() > 0) {
-         throw new AccessControlException("Not authorized to remove the following domain permission(s): "
-                                          + unauthorizedRemovePermissions,
-                                    true);
+      if (!requestedRemovePermissions.isEmpty()) {
+         final Set<DomainCreatePermission>
+               unauthorizedRemovePermissions
+               = __subtractDomainCreatePermissionsIfGrantableFrom(requestedRemovePermissions, grantorPermissions);
+
+         if (unauthorizedRemovePermissions.size() > 0) {
+            throw new AccessControlException("Not authorized to remove the following domain permission(s): "
+                                                   + unauthorizedRemovePermissions,
+                                             true);
+         }
       }
 
       // NOTE: our current data model only support system permissions for domains
@@ -1128,59 +1119,49 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
                                                                                        requestedDomainCreatePermissions);
    }
 
-   private Set<DomainCreatePermission> __subtractDomainCreatePermissions(Set<DomainCreatePermission> requestedDomainCreatePermissions,
-                                                                         Set<DomainCreatePermission> grantorDomainCreatePermissions) {
-      // we start with the assumption that all the requested permissions are unauthorized!
-      Set<DomainCreatePermission> unauthorizedDomainCreatePermissions = new HashSet<>(requestedDomainCreatePermissions);
+   private void assertSetContainsDomainCreateSystemPermission(Set<DomainCreatePermission> domainCreatePermissions) throws AccessControlException {
+      if (!domainCreatePermissions.isEmpty()) {
+         boolean createSysPermissionFound = false;
+         for (final DomainCreatePermission domainCreatePermission : domainCreatePermissions) {
+            if (domainCreatePermission.isSystemPermission()
+                  && DomainCreatePermission.CREATE.equals(domainCreatePermission.getSysPermissionName())) {
+               createSysPermissionFound = true;
+               break;
+            }
+         }
+         // if at least one permission is specified, then there must be a *CREATE permission in the set
+         if (!createSysPermissionFound) {
+            throw new AccessControlException("Domain create permission *CREATE must be specified");
+         }
+      }
+   }
 
-      // check if the grantor has grant permissions to each permission
-      for (DomainCreatePermission requestedDomainCreatePermission : requestedDomainCreatePermissions) {
-         // is the permission to check a system permission?
-         if (requestedDomainCreatePermission.isSystemPermission()) {
-            for (DomainCreatePermission grantorDomainCreatePermission : grantorDomainCreatePermissions) {
-               // is the permission to check against a system permission?
-               if (grantorDomainCreatePermission.isSystemPermission()) {
-                  if (grantorDomainCreatePermission.isWithGrant()
-                        && grantorDomainCreatePermission.getSystemPermissionId()
-                        == requestedDomainCreatePermission.getSystemPermissionId()
-                        ) {
-                     unauthorizedDomainCreatePermissions.remove(requestedDomainCreatePermission);
-                     break;
-                  }
-               }
-            }
-         }
-         // is the permission to check a post create system permission?
-         else if (requestedDomainCreatePermission.getPostCreateDomainPermission().isSystemPermission()) {
-            for (DomainCreatePermission grantorDomainCreatePermission : grantorDomainCreatePermissions) {
-               // is the permission to check against a post create system permission?
-               if (!grantorDomainCreatePermission.isSystemPermission()
-                     && grantorDomainCreatePermission.getPostCreateDomainPermission().isSystemPermission()) {
-                  if (grantorDomainCreatePermission.isWithGrant()
-                        && grantorDomainCreatePermission.getPostCreateDomainPermission().getSystemPermissionId()
-                        == requestedDomainCreatePermission.getPostCreateDomainPermission().getSystemPermissionId()
-                        ) {
-                     unauthorizedDomainCreatePermissions.remove(requestedDomainCreatePermission);
-                     break;
-                  }
-               }
-            }
-         }
-         else {
-            for (DomainCreatePermission grantorDomainCreatePermission : grantorDomainCreatePermissions) {
-               // is the permission to check against a system permission?
-               if (!grantorDomainCreatePermission.getPostCreateDomainPermission().isSystemPermission()) {
-                  if (grantorDomainCreatePermission.isWithGrant()
-                        && grantorDomainCreatePermission.getPostCreateDomainPermission().getPermissionName().equals(requestedDomainCreatePermission.getPostCreateDomainPermission().getPermissionName())) {
-                     unauthorizedDomainCreatePermissions.remove(requestedDomainCreatePermission);
-                     break;
-                  }
-               }
+   private Set<DomainCreatePermission> __getDirectDomainCreatePermissions(SQLConnection connection,
+                                                                          Resource accessorResource) throws AccessControlException {
+      final Set<DomainCreatePermission> domainCreatePermissions = new HashSet<>();
+      domainCreatePermissions
+            .addAll(grantDomainCreatePermissionSysPersister.getDirectDomainCreatePermissions(connection,
+                                                                                             accessorResource));
+      domainCreatePermissions
+            .addAll(grantDomainCreatePermissionPostCreateSysPersister.getDirectDomainPostCreatePermissions(connection,
+                                                                                                           accessorResource));
+      return domainCreatePermissions;
+   }
+
+   private Set<DomainCreatePermission> __subtractDomainCreatePermissionsIfGrantableFrom(Set<DomainCreatePermission> candidatePermissionSet,
+                                                                                        Set<DomainCreatePermission> grantorPermissionSet) {
+      Set<DomainCreatePermission> differenceSet = new HashSet<>(candidatePermissionSet);
+
+      for (DomainCreatePermission candidatePermission : candidatePermissionSet) {
+         for (DomainCreatePermission grantorPermission : grantorPermissionSet) {
+            if (candidatePermission.isGrantableFrom(grantorPermission)) {
+               differenceSet.remove(candidatePermission);
+               break;
             }
          }
       }
 
-      return unauthorizedDomainCreatePermissions;
+      return differenceSet;
    }
 
    @Override
@@ -1192,14 +1173,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       try {
          connection = getConnection();
 
-         final Set<DomainCreatePermission> domainCreatePermissions = new HashSet<>();
-         domainCreatePermissions
-               .addAll(grantDomainCreatePermissionSysPersister.getDomainCreatePermissions(connection,
-                                                                                          accessorResource));
-         domainCreatePermissions
-               .addAll(grantDomainCreatePermissionPostCreateSysPersister.getDomainPostCreatePermissions(connection,
-                                                                                                        accessorResource));
-         return domainCreatePermissions;
+         return __getEffectiveDomainCreatePermissions(connection, accessorResource);
       }
       catch (SQLException e) {
          throw new AccessControlException(e);
@@ -1207,6 +1181,18 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       finally {
          closeConnection(connection);
       }
+   }
+
+   private Set<DomainCreatePermission> __getEffectiveDomainCreatePermissions(SQLConnection connection,
+                                                                             Resource accessorResource) throws AccessControlException {
+      final Set<DomainCreatePermission> domainCreatePermissions = new HashSet<>();
+      domainCreatePermissions
+            .addAll(grantDomainCreatePermissionSysPersister.getDomainCreatePermissions(connection,
+                                                                                       accessorResource));
+      domainCreatePermissions
+            .addAll(grantDomainCreatePermissionPostCreateSysPersister.getDomainPostCreatePermissions(connection,
+                                                                                                     accessorResource));
+      return domainCreatePermissions;
    }
 
    @Override
@@ -1286,7 +1272,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       }
 
       // ensure that the *CREATE system permissions was specified
-      assertSetContainsCreateSystemPermission(requestedResourceCreatePermissions);
+      assertSetContainsResourceCreateSystemPermission(requestedResourceCreatePermissions);
 
       // ensure that the post create permissions are all in the correct resource class
       assertUniquePostCreatePermissionsNamesForResourceClass(connection, requestedResourceCreatePermissions, resourceClassInfo);
@@ -1384,7 +1370,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
                                                                                 sessionResource);
    }
 
-   private void assertSetContainsCreateSystemPermission(Set<ResourceCreatePermission> resourceCreatePermissions) throws AccessControlException {
+   private void assertSetContainsResourceCreateSystemPermission(Set<ResourceCreatePermission> resourceCreatePermissions) throws AccessControlException {
       if (!resourceCreatePermissions.isEmpty()) {
          boolean createSysPermissionFound = false;
          for (final ResourceCreatePermission resourceCreatePermission : resourceCreatePermissions) {

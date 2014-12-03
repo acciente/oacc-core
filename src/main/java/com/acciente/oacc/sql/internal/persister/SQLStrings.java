@@ -46,10 +46,12 @@ public class SQLStrings implements Serializable {
 
    // GrantDomainCreatePermissionSys
    public final String SQL_findInGrantDomainCreatePermissionSys_SysPermissionID_IsWithGrant_InheritLevel_BY_AccessorID;
+   public final String SQL_findInGrantDomainCreatePermissionSys_withoutInheritance_SysPermissionID_BY_AccessorID;
    public final String SQL_removeInGrantDomainCreatePermissionSys_BY_AccessorID;
    public final String SQL_createInGrantDomainCreatePermissionSys_WITH_AccessorID_GrantorID_IsWithGrant_SysPermissionID;
    // GrantDomainCreatePermissionPostCreateSys
    public final String SQL_findInGrantDomainCreatePermissionPostCreateSys_PostCreateSysPermissionID_PostCreateIsWithGrant_IsWithGrant_InheritLevel_BY_AccessorID;
+   public final String SQL_findInGrantDomainCreatePermissionPostCreateSys_withoutInheritance_PostCreateSysPermissionID_PostCreateIsWithGrant_IsWithGrant_BY_AccessorID;
    public final String SQL_removeInGrantDomainCreatePermissionPostCreateSys_BY_AccessorID;
    public final String SQL_createInGrantDomainCreatePermissionPostCreateSys_WITH_AccessorID_GrantorID_IsWithGrant_PostCreateIsWithGrant_PostCreateSysPermissionID;
 
@@ -283,6 +285,12 @@ public class SQLStrings implements Serializable {
             + "Grant_DomCrPerm_Sys A "
             + "JOIN N ON N.AccessorResourceId = A.AccessorResourceId ";
 
+      SQL_findInGrantDomainCreatePermissionSys_withoutInheritance_SysPermissionID_BY_AccessorID
+            = "SELECT A.SysPermissionId, A.IsWithGrant FROM "
+            + schemaNameAndTablePrefix
+            + "Grant_DomCrPerm_Sys A "
+            + "WHERE A.AccessorResourceId = ?";
+
       SQL_createInGrantDomainCreatePermissionSys_WITH_AccessorID_GrantorID_IsWithGrant_SysPermissionID
             = "INSERT INTO "
             + schemaNameAndTablePrefix
@@ -301,6 +309,12 @@ public class SQLStrings implements Serializable {
             + schemaNameAndTablePrefix
             + "Grant_DomCrPerm_PostCr_Sys A "
             + "JOIN N ON N.AccessorResourceId = A.AccessorResourceId ";
+
+      SQL_findInGrantDomainCreatePermissionPostCreateSys_withoutInheritance_PostCreateSysPermissionID_PostCreateIsWithGrant_IsWithGrant_BY_AccessorID
+            = "SELECT A.PostCreateSysPermissionId, A.PostCreateIsWithGrant, A.IsWithGrant FROM "
+            + schemaNameAndTablePrefix
+            + "Grant_DomCrPerm_PostCr_Sys A "
+            + "WHERE A.AccessorResourceId = ?";
 
       SQL_createInGrantDomainCreatePermissionPostCreateSys_WITH_AccessorID_GrantorID_IsWithGrant_PostCreateIsWithGrant_PostCreateSysPermissionID
             = "INSERT INTO "

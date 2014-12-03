@@ -150,6 +150,278 @@ public class TestAccessControl_setDomainCreatePermissions extends TestAccessCont
    }
 
    @Test
+   public void setDomainCreatePermission_addPermission_withUnauthorizedPermissionsGrantedElsewhere_shouldSucceedAsAuthorized() throws AccessControlException {
+      authenticateSystemResource();
+      final String grantedPermissionName = DomainPermission.CREATE_CHILD_DOMAIN;
+      final String ungrantedPermissionName = DomainPermission.SUPER_USER;
+      final char[] password = generateUniquePassword();
+      final Resource grantorResource = generateAuthenticatableResource(password);
+      final Resource accessorResource = generateUnauthenticatableResource();
+      final String domainName = generateDomain();
+
+      // setup accessor permissions
+      Set<DomainCreatePermission> accessorPermissions_pre = new HashSet<>();
+      accessorPermissions_pre.add(DomainCreatePermission.getInstance(DomainCreatePermission.CREATE));
+      accessorPermissions_pre.add(DomainCreatePermission.getInstance(DomainPermission.getInstance(ungrantedPermissionName)));
+
+      accessControlContext.setDomainCreatePermissions(accessorResource, accessorPermissions_pre);
+      assertThat(accessControlContext.getEffectiveDomainCreatePermissions(accessorResource), is(accessorPermissions_pre));
+
+      // setup grantor permissions
+      Set<DomainCreatePermission> grantorPermissions = new HashSet<>();
+      grantorPermissions.add(DomainCreatePermission.getInstance(DomainCreatePermission.CREATE, true));
+      grantorPermissions.add(DomainCreatePermission.getInstance(DomainPermission.getInstance(grantedPermissionName), true));
+
+      accessControlContext.setDomainCreatePermissions(grantorResource, grantorPermissions);
+      assertThat(accessControlContext.getEffectiveDomainCreatePermissions(grantorResource), is(grantorPermissions));
+
+      // authenticate grantor resource
+      accessControlContext.authenticate(grantorResource, PasswordCredentials.newInstance(password));
+
+      // set permissions as grantor and verify
+      Set<DomainCreatePermission> requestedPermissions = new HashSet<>();
+      requestedPermissions.add(DomainCreatePermission.getInstance(DomainCreatePermission.CREATE));
+      requestedPermissions.add(DomainCreatePermission.getInstance(DomainPermission.getInstance(grantedPermissionName)));
+      requestedPermissions.add(DomainCreatePermission.getInstance(DomainPermission.getInstance(ungrantedPermissionName)));
+
+      accessControlContext.setDomainCreatePermissions(accessorResource, requestedPermissions);
+
+      Set<DomainCreatePermission> permissions_expected = new HashSet<>();
+      permissions_expected.add(DomainCreatePermission.getInstance(DomainCreatePermission.CREATE));
+      permissions_expected.add(DomainCreatePermission.getInstance(DomainPermission.getInstance(grantedPermissionName, false)));
+      permissions_expected.add(DomainCreatePermission.getInstance(DomainPermission.getInstance(ungrantedPermissionName, false)));
+
+      final Set<DomainCreatePermission> permissions_post
+            = accessControlContext.getEffectiveDomainCreatePermissions(accessorResource);
+      assertThat(permissions_post, is(permissions_expected));
+   }
+   @Test
+   public void setDomainCreatePermission_removePermission_withUnauthorizedPermissionsGrantedElsewhere_shouldSucceedAsAuthorized() throws AccessControlException {
+      authenticateSystemResource();
+      final String grantedPermissionName = DomainPermission.CREATE_CHILD_DOMAIN;
+      final String ungrantedPermissionName = DomainPermission.SUPER_USER;
+      final char[] password = generateUniquePassword();
+      final Resource grantorResource = generateAuthenticatableResource(password);
+      final Resource accessorResource = generateUnauthenticatableResource();
+      final String domainName = generateDomain();
+
+      // setup accessor permissions
+      Set<DomainCreatePermission> accessorPermissions_pre = new HashSet<>();
+      accessorPermissions_pre.add(DomainCreatePermission.getInstance(DomainCreatePermission.CREATE));
+      accessorPermissions_pre.add(DomainCreatePermission.getInstance(DomainPermission.getInstance(grantedPermissionName)));
+      accessorPermissions_pre.add(DomainCreatePermission.getInstance(DomainPermission.getInstance(ungrantedPermissionName)));
+
+      accessControlContext.setDomainCreatePermissions(accessorResource, accessorPermissions_pre);
+      assertThat(accessControlContext.getEffectiveDomainCreatePermissions(accessorResource), is(accessorPermissions_pre));
+
+      // setup grantor permissions
+      Set<DomainCreatePermission> grantorPermissions = new HashSet<>();
+      grantorPermissions.add(DomainCreatePermission.getInstance(DomainCreatePermission.CREATE, true));
+      grantorPermissions.add(DomainCreatePermission.getInstance(DomainPermission.getInstance(grantedPermissionName), true));
+
+      accessControlContext.setDomainCreatePermissions(grantorResource, grantorPermissions);
+      assertThat(accessControlContext.getEffectiveDomainCreatePermissions(grantorResource), is(grantorPermissions));
+
+      // authenticate grantor resource
+      accessControlContext.authenticate(grantorResource, PasswordCredentials.newInstance(password));
+
+      // set permissions as grantor and verify
+      Set<DomainCreatePermission> requestedPermissions = new HashSet<>();
+      requestedPermissions.add(DomainCreatePermission.getInstance(DomainCreatePermission.CREATE));
+      requestedPermissions.add(DomainCreatePermission.getInstance(DomainPermission.getInstance(ungrantedPermissionName)));
+
+      accessControlContext.setDomainCreatePermissions(accessorResource, requestedPermissions);
+
+      Set<DomainCreatePermission> permissions_expected = new HashSet<>();
+      permissions_expected.add(DomainCreatePermission.getInstance(DomainCreatePermission.CREATE));
+      permissions_expected.add(DomainCreatePermission.getInstance(DomainPermission.getInstance(ungrantedPermissionName, false)));
+
+      final Set<DomainCreatePermission> permissions_post
+            = accessControlContext.getEffectiveDomainCreatePermissions(accessorResource);
+      assertThat(permissions_post, is(permissions_expected));
+   }
+
+   @Test
+   public void setDomainCreatePermission_downgradeGrantingRights_shouldSucceedAsAuthorized() throws AccessControlException {
+      authenticateSystemResource();
+      final String grantedPermissionName = DomainPermission.CREATE_CHILD_DOMAIN;
+      final char[] password = generateUniquePassword();
+      final Resource grantorResource = generateAuthenticatableResource(password);
+      final Resource accessorResource = generateUnauthenticatableResource();
+      final String domainName = generateDomain();
+
+      // setup accessor permissions
+      Set<DomainCreatePermission> accessorPermissions_pre = new HashSet<>();
+      accessorPermissions_pre.add(DomainCreatePermission.getInstance(DomainCreatePermission.CREATE));
+      accessorPermissions_pre.add(DomainCreatePermission.getInstance(DomainPermission.getInstance(grantedPermissionName), true));
+
+      accessControlContext.setDomainCreatePermissions(accessorResource, accessorPermissions_pre);
+      assertThat(accessControlContext.getEffectiveDomainCreatePermissions(accessorResource), is(accessorPermissions_pre));
+
+      // setup grantor permissions
+      Set<DomainCreatePermission> grantorPermissions = new HashSet<>();
+      grantorPermissions.add(DomainCreatePermission.getInstance(DomainCreatePermission.CREATE, true));
+      grantorPermissions.add(DomainCreatePermission.getInstance(DomainPermission.getInstance(grantedPermissionName), true));
+
+      accessControlContext.setDomainCreatePermissions(grantorResource, grantorPermissions);
+      assertThat(accessControlContext.getEffectiveDomainCreatePermissions(grantorResource), is(grantorPermissions));
+
+      // authenticate grantor resource
+      accessControlContext.authenticate(grantorResource, PasswordCredentials.newInstance(password));
+
+      // set permissions as grantor and verify
+      Set<DomainCreatePermission> requestedPermissions = new HashSet<>();
+      requestedPermissions.add(DomainCreatePermission.getInstance(DomainCreatePermission.CREATE));
+      requestedPermissions.add(DomainCreatePermission.getInstance(DomainPermission.getInstance(grantedPermissionName)));
+
+      accessControlContext.setDomainCreatePermissions(accessorResource, requestedPermissions);
+
+      Set<DomainCreatePermission> permissions_expected = new HashSet<>();
+      permissions_expected.add(DomainCreatePermission.getInstance(DomainCreatePermission.CREATE));
+      permissions_expected.add(DomainCreatePermission.getInstance(DomainPermission.getInstance(grantedPermissionName)));
+
+      final Set<DomainCreatePermission> permissions_post
+            = accessControlContext.getEffectiveDomainCreatePermissions(accessorResource);
+      assertThat(permissions_post, is(permissions_expected));
+   }
+
+   @Test
+   public void setDomainCreatePermission_downgradeGrantingRights_forUnauthorizedPermissionGrantedElsewhere_shouldFail() throws AccessControlException {
+      authenticateSystemResource();
+      final String grantedPermissionName = DomainPermission.CREATE_CHILD_DOMAIN;
+      final String ungrantedPermissionName = DomainPermission.SUPER_USER;
+      final char[] password = generateUniquePassword();
+      final Resource grantorResource = generateAuthenticatableResource(password);
+      final Resource accessorResource = generateUnauthenticatableResource();
+      final String domainName = generateDomain();
+
+      // setup accessor permissions
+      Set<DomainCreatePermission> accessorPermissions_pre = new HashSet<>();
+      accessorPermissions_pre.add(DomainCreatePermission.getInstance(DomainCreatePermission.CREATE));
+      accessorPermissions_pre.add(DomainCreatePermission.getInstance(DomainPermission.getInstance(ungrantedPermissionName), true));
+
+      accessControlContext.setDomainCreatePermissions(accessorResource, accessorPermissions_pre);
+      assertThat(accessControlContext.getEffectiveDomainCreatePermissions(accessorResource), is(accessorPermissions_pre));
+
+      // setup grantor permissions
+      Set<DomainCreatePermission> grantorPermissions = new HashSet<>();
+      grantorPermissions.add(DomainCreatePermission.getInstance(DomainCreatePermission.CREATE, true));
+      grantorPermissions.add(DomainCreatePermission.getInstance(DomainPermission.getInstance(grantedPermissionName), true));
+
+      accessControlContext.setDomainCreatePermissions(grantorResource, grantorPermissions);
+      assertThat(accessControlContext.getEffectiveDomainCreatePermissions(grantorResource), is(grantorPermissions));
+
+      // authenticate grantor resource
+      accessControlContext.authenticate(grantorResource, PasswordCredentials.newInstance(password));
+
+      // set permissions as grantor and verify
+      Set<DomainCreatePermission> requestedPermissions = new HashSet<>();
+      requestedPermissions.add(DomainCreatePermission.getInstance(DomainCreatePermission.CREATE));
+      requestedPermissions.add(DomainCreatePermission.getInstance(DomainPermission.getInstance(grantedPermissionName)));
+      requestedPermissions.add(DomainCreatePermission.getInstance(DomainPermission.getInstance(ungrantedPermissionName)));
+
+      try {
+         accessControlContext.setDomainCreatePermissions(accessorResource, requestedPermissions);
+         fail("Downgrading (=removal of granting rights) of domain create-permission granted elsewhere, to which I have no granting rights, should have failed");
+      }
+      catch (AccessControlException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("not authorized"));
+         assertThat(e.getMessage().toLowerCase(), containsString(ungrantedPermissionName.toLowerCase()));
+         assertThat(e.getMessage().toLowerCase(), not(containsString(grantedPermissionName)));
+      }
+   }
+
+   @Test
+   public void setDomainCreatePermission_upgradeGrantingRightsAndPostCreateGrantingRights_shouldSucceedAsAuthorized() throws AccessControlException {
+      authenticateSystemResource();
+      final String grantedPermissionName = DomainPermission.CREATE_CHILD_DOMAIN;
+      final char[] password = generateUniquePassword();
+      final Resource grantorResource = generateAuthenticatableResource(password);
+      final Resource accessorResource = generateUnauthenticatableResource();
+      final String domainName = generateDomain();
+
+      // setup accessor permissions
+      Set<DomainCreatePermission> accessorPermissions_pre = new HashSet<>();
+      accessorPermissions_pre.add(DomainCreatePermission.getInstance(DomainCreatePermission.CREATE));
+      accessorPermissions_pre.add(DomainCreatePermission.getInstance(DomainPermission.getInstance(grantedPermissionName)));
+
+      accessControlContext.setDomainCreatePermissions(accessorResource, accessorPermissions_pre);
+      assertThat(accessControlContext.getEffectiveDomainCreatePermissions(accessorResource), is(accessorPermissions_pre));
+
+      // setup grantor permissions
+      Set<DomainCreatePermission> grantorPermissions = new HashSet<>();
+      grantorPermissions.add(DomainCreatePermission.getInstance(DomainCreatePermission.CREATE, true));
+      grantorPermissions.add(DomainCreatePermission.getInstance(DomainPermission.getInstance(grantedPermissionName,true ), true));
+
+      accessControlContext.setDomainCreatePermissions(grantorResource, grantorPermissions);
+      assertThat(accessControlContext.getEffectiveDomainCreatePermissions(grantorResource), is(grantorPermissions));
+
+      // authenticate grantor resource
+      accessControlContext.authenticate(grantorResource, PasswordCredentials.newInstance(password));
+
+      // set permissions as grantor and verify
+      Set<DomainCreatePermission> requestedPermissions = new HashSet<>();
+      requestedPermissions.add(DomainCreatePermission.getInstance(DomainCreatePermission.CREATE));
+      requestedPermissions.add(DomainCreatePermission.getInstance(DomainPermission.getInstance(grantedPermissionName, true)));
+
+      accessControlContext.setDomainCreatePermissions(accessorResource, requestedPermissions);
+
+      Set<DomainCreatePermission> permissions_expected = new HashSet<>();
+      permissions_expected.add(DomainCreatePermission.getInstance(DomainCreatePermission.CREATE));
+      permissions_expected.add(DomainCreatePermission.getInstance(DomainPermission.getInstance(grantedPermissionName, true)));
+
+      final Set<DomainCreatePermission> permissions_post
+            = accessControlContext.getEffectiveDomainCreatePermissions(accessorResource);
+      assertThat(permissions_post, is(permissions_expected));
+   }
+
+   @Test
+   public void setDomainCreatePermission_upgradeGrantingRights_forUnauthorizedPermissionGrantedElsewhere_shouldFail() throws AccessControlException {
+      authenticateSystemResource();
+      final String grantedPermissionName = DomainPermission.CREATE_CHILD_DOMAIN;
+      final String ungrantedPermissionName = DomainPermission.SUPER_USER;
+      final char[] password = generateUniquePassword();
+      final Resource grantorResource = generateAuthenticatableResource(password);
+      final Resource accessorResource = generateUnauthenticatableResource();
+      final String domainName = generateDomain();
+
+      // setup accessor permissions
+      Set<DomainCreatePermission> accessorPermissions_pre = new HashSet<>();
+      accessorPermissions_pre.add(DomainCreatePermission.getInstance(DomainCreatePermission.CREATE));
+      accessorPermissions_pre.add(DomainCreatePermission.getInstance(DomainPermission.getInstance(ungrantedPermissionName)));
+
+      accessControlContext.setDomainCreatePermissions(accessorResource, accessorPermissions_pre);
+      assertThat(accessControlContext.getEffectiveDomainCreatePermissions(accessorResource), is(accessorPermissions_pre));
+
+      // setup grantor permissions
+      Set<DomainCreatePermission> grantorPermissions = new HashSet<>();
+      grantorPermissions.add(DomainCreatePermission.getInstance(DomainCreatePermission.CREATE));
+      grantorPermissions.add(DomainCreatePermission.getInstance(DomainPermission.getInstance(grantedPermissionName), true));
+
+      accessControlContext.setDomainCreatePermissions(grantorResource, grantorPermissions);
+      assertThat(accessControlContext.getEffectiveDomainCreatePermissions(grantorResource), is(grantorPermissions));
+
+      // authenticate grantor resource
+      accessControlContext.authenticate(grantorResource, PasswordCredentials.newInstance(password));
+
+      // set permissions as grantor and verify
+      Set<DomainCreatePermission> requestedPermissions = new HashSet<>();
+      requestedPermissions.add(DomainCreatePermission.getInstance(DomainCreatePermission.CREATE));
+      requestedPermissions.add(DomainCreatePermission.getInstance(DomainPermission.getInstance(grantedPermissionName)));
+      requestedPermissions.add(DomainCreatePermission.getInstance(DomainPermission.getInstance(ungrantedPermissionName, true)));
+
+      try {
+         accessControlContext.setDomainCreatePermissions(accessorResource, requestedPermissions);
+         fail("Upgrading (=addition of granting rights) of domain create-permission granted elsewhere, to which I have no granting rights, should have failed");
+      }
+      catch (AccessControlException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("not authorized"));
+         assertThat(e.getMessage().toLowerCase(), containsString(ungrantedPermissionName.toLowerCase()));
+         assertThat(e.getMessage().toLowerCase(), not(containsString(grantedPermissionName)));
+      }
+   }
+
+   @Test
    public void setDomainCreatePermissions_withoutCreatePermission_shouldFail() throws AccessControlException {
       authenticateSystemResource();
       final DomainCreatePermission domCreatePerm_superuser
