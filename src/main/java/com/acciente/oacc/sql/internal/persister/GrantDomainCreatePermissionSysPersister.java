@@ -46,7 +46,8 @@ public class GrantDomainCreatePermissionSysPersister extends Persister {
          while (resultSet.next()) {
             domainCreatePermissions
                   .add(DomainCreatePermission.getInstance(resultSet.getDomainCreateSysPermissionName("SysPermissionId"),
-                                                          resultSet.getBoolean("IsWithGrant")));
+                                                          resultSet.getBoolean("IsWithGrant"),
+                                                          resultSet.getInteger("InheritLevel")));
          }
          resultSet.close();
 
@@ -74,7 +75,8 @@ public class GrantDomainCreatePermissionSysPersister extends Persister {
          while (resultSet.next()) {
             domainCreatePermissions
                   .add(DomainCreatePermission.getInstance(resultSet.getDomainCreateSysPermissionName("SysPermissionId"),
-                                                          resultSet.getBoolean("IsWithGrant")));
+                                                          resultSet.getBoolean("IsWithGrant"),
+                                                          0));
          }
          resultSet.close();
 

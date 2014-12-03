@@ -47,10 +47,9 @@ public class GrantDomainCreatePermissionPostCreateSysPersister extends Persister
          while (resultSet.next()) {
             domainCreatePermissions
                   .add(DomainCreatePermission.getInstance(DomainPermission.getInstance(resultSet.getDomainSysPermissionName("PostCreateSysPermissionId"),
-                                                                                       resultSet.getBoolean("PostCreateIsWithGrant"),
-                                                                                       resultSet.getInteger("InheritLevel"),
-                                                                                       0 /* zero since level does not apply here */),
-                                                          resultSet.getBoolean("IsWithGrant")));
+                                                                                       resultSet.getBoolean("PostCreateIsWithGrant")),
+                                                          resultSet.getBoolean("IsWithGrant"),
+                                                          resultSet.getInteger("InheritLevel")));
          }
          resultSet.close();
 
@@ -78,10 +77,9 @@ public class GrantDomainCreatePermissionPostCreateSysPersister extends Persister
          while (resultSet.next()) {
             domainCreatePermissions
                   .add(DomainCreatePermission.getInstance(DomainPermission.getInstance(resultSet.getDomainSysPermissionName("PostCreateSysPermissionId"),
-                                                                                       resultSet.getBoolean("PostCreateIsWithGrant"),
-                                                                                       0,
-                                                                                       0 /* zero since level does not apply here */),
-                                                          resultSet.getBoolean("IsWithGrant")));
+                                                                                       resultSet.getBoolean("PostCreateIsWithGrant")),
+                                                          resultSet.getBoolean("IsWithGrant"),
+                                                          0));
          }
          resultSet.close();
 

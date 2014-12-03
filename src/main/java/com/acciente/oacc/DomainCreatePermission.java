@@ -33,6 +33,7 @@ public class DomainCreatePermission implements Serializable {
    private final String           sysPermissionName;
    private final DomainPermission postCreateDomainPermission;
    private final boolean          withGrant;
+   private final int              inheritLevel;
 
    public static List<String> getSysPermissionNames() {
       return Arrays.asList(CREATE);
@@ -48,35 +49,45 @@ public class DomainCreatePermission implements Serializable {
    }
 
    public static DomainCreatePermission getInstance(String sysPermissionName, boolean withGrant) {
-      return new DomainCreatePermission(sysPermissionName, withGrant);
+      return new DomainCreatePermission(sysPermissionName, withGrant, 0);
    }
 
    public static DomainCreatePermission getInstance(String sysPermissionName) {
-      return new DomainCreatePermission(sysPermissionName, false);
+      return new DomainCreatePermission(sysPermissionName, false, 0);
+   }
+
+   public static DomainCreatePermission getInstance(String sysPermissionName, boolean withGrant, int inheritLevel) {
+      return new DomainCreatePermission(sysPermissionName, withGrant, inheritLevel);
    }
 
    public static DomainCreatePermission getInstance(DomainPermission domainPostCreatePermission) {
-      return new DomainCreatePermission(domainPostCreatePermission, false);
+      return new DomainCreatePermission(domainPostCreatePermission, false, 0);
    }
 
    public static DomainCreatePermission getInstance(DomainPermission domainPostCreatePermission, boolean withGrant) {
-      return new DomainCreatePermission(domainPostCreatePermission, withGrant);
+      return new DomainCreatePermission(domainPostCreatePermission, withGrant, 0);
    }
 
-   private DomainCreatePermission(String sysPermissionName, boolean withGrant) {
+   public static DomainCreatePermission getInstance(DomainPermission domainPostCreatePermission, boolean withGrant, int inheritLevel) {
+      return new DomainCreatePermission(domainPostCreatePermission, withGrant, inheritLevel);
+   }
+
+   private DomainCreatePermission(String sysPermissionName, boolean withGrant, int inheritLevel) {
       SysPermission sysPermission = getSysPermission(sysPermissionName);
 
       this.systemPermissionId = sysPermission.getSystemPermissionId();
       this.sysPermissionName = sysPermission.getPermissionName();
       this.postCreateDomainPermission = null;
       this.withGrant = withGrant;
+      this.inheritLevel = inheritLevel;
    }
 
-   private DomainCreatePermission(DomainPermission postCreateDomainPermission, boolean withGrant) {
+   private DomainCreatePermission(DomainPermission postCreateDomainPermission, boolean withGrant, int inheritLevel) {
       this.systemPermissionId = 0;
       this.sysPermissionName = null;
       this.postCreateDomainPermission = postCreateDomainPermission;
       this.withGrant = withGrant;
+      this.inheritLevel = inheritLevel;
    }
 
    public DomainPermission getPostCreateDomainPermission() {
@@ -112,12 +123,22 @@ public class DomainCreatePermission implements Serializable {
       return withGrant;
    }
 
+   public int getInheritLevel() {
+      return inheritLevel;
+   }
+
    public String toString() {
       if (postCreateDomainPermission == null) {
-         return "*CREATE[" + (withGrant ? "] (G)" : "]");
+         return "*CREATE["
+               + (withGrant ? " /G" : "")
+               + (inheritLevel != 0 ? " /I:" + inheritLevel : "")
+               + "]";
       }
       else {
-         return "*CREATE[" + postCreateDomainPermission.toString() + (withGrant ? "] (G)" : "]");
+         return "*CREATE[" + postCreateDomainPermission.toString()
+               + (withGrant ? " /G" : "")
+               + (inheritLevel != 0 ? " /I:" + inheritLevel : "")
+               + "]";
       }
    }
 
