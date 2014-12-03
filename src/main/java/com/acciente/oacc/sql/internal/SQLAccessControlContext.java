@@ -1445,8 +1445,8 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       return differenceSet;
    }
 
-   private Set __subtract(Set minuendSet, Set subtrahendSet) {
-      Set differenceSet = new HashSet<>(minuendSet);
+   private <T> Set<T> __subtract(Set<T> minuendSet, Set<T> subtrahendSet) {
+      Set<T> differenceSet = new HashSet<>(minuendSet);
 
       differenceSet.removeAll(subtrahendSet);
 
