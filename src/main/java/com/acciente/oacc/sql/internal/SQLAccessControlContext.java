@@ -1815,43 +1815,6 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       }
    }
 
-   private Set<ResourcePermission> __subtractGrantedPermissions(Set<ResourcePermission> requestedResourcePermissions,
-                                                                Set<ResourcePermission> grantorResourcePermissions) {
-      // we start with the assumption that all the requested permissions are unauthorized!
-      Set<ResourcePermission> unauthorizedResourcePermissions = new HashSet<>(requestedResourcePermissions);
-
-      // check if the grantor has grant permissions to each permission
-      for (ResourcePermission requestedResourcePermission : requestedResourcePermissions) {
-         // is the permission to check a system permission?
-         if (requestedResourcePermission.isSystemPermission()) {
-            for (ResourcePermission grantorResourcePermission : grantorResourcePermissions) {
-               // is the permission to check against a system permission?
-               if (grantorResourcePermission.isSystemPermission()) {
-                  if (grantorResourcePermission.isWithGrant()
-                        && grantorResourcePermission.getSystemPermissionId() == requestedResourcePermission.getSystemPermissionId()) {
-                     unauthorizedResourcePermissions.remove(requestedResourcePermission);
-                     break;
-                  }
-               }
-            }
-         }
-         else {
-            for (ResourcePermission grantorResourcePermission : grantorResourcePermissions) {
-               // is the permission to check against a system permission?
-               if (!grantorResourcePermission.isSystemPermission()) {
-                  if (grantorResourcePermission.isWithGrant()
-                        && grantorResourcePermission.getPermissionName().equals(requestedResourcePermission.getPermissionName())) {
-                     unauthorizedResourcePermissions.remove(requestedResourcePermission);
-                     break;
-                  }
-               }
-            }
-         }
-      }
-
-      return unauthorizedResourcePermissions;
-   }
-
    private Set<ResourcePermission> __subtractResourcePermissionsIfGrantableFrom(Set<ResourcePermission> candidatePermissionSet,
                                                                                 Set<ResourcePermission> grantorPermissionSet) {
       Set<ResourcePermission> differenceSet = new HashSet<>(candidatePermissionSet);
@@ -1906,9 +1869,9 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
 
       final Id<DomainId> accessedDomainId = resourcePersister.getDomainIdByResource(connection, accessedResource);
       final Id<ResourceClassId> accessedResourceClassId
-            = Id.<ResourceClassId>from(resourceClassPersister
-                                             .getResourceClassInfoByResourceId(connection, accessedResource)
-                                             .getResourceClassId());
+            = Id.from(resourceClassPersister
+                            .getResourceClassInfoByResourceId(connection, accessedResource)
+                            .getResourceClassId());
 
       // collect the global system permissions that the accessor has to the accessed resource's domain
       resourcePermissions.addAll(grantGlobalResourcePermissionSysPersister.getGlobalSysPermissions(connection,
