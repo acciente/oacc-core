@@ -29,12 +29,12 @@ import static org.hamcrest.CoreMatchers.not;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 
-public class TestAccessControl_createResourceClassPermission extends TestAccessControlBase {
-   // creating resource classes and resource class permissions is only allowed
+public class TestAccessControl_createResourcePermission extends TestAccessControlBase {
+   // creating resource classes and resource permissions is only allowed
    // as a system resource, hence there won't be a ..._validAsAuthorized() test
 
    @Test
-   public void createResourceClassPermission_validAsSystemResource() throws AccessControlException {
+   public void createResourcePermission_validAsSystemResource() throws AccessControlException {
       authenticateSystemResource();
 
       final String resourceClassName = generateResourceClass(false, false);
@@ -58,7 +58,7 @@ public class TestAccessControl_createResourceClassPermission extends TestAccessC
    }
 
    @Test
-   public void createResourceClassPermission_whitespaceConsistent() throws AccessControlException {
+   public void createResourcePermission_whitespaceConsistent() throws AccessControlException {
       authenticateSystemResource();
 
       final String resourceClassNameTrimmed = generateResourceClass(false, false).trim();
@@ -77,7 +77,7 @@ public class TestAccessControl_createResourceClassPermission extends TestAccessC
    }
 
    @Test
-   public void createResourceClassPermission_caseSensitiveConsistent() throws AccessControlException {
+   public void createResourcePermission_caseSensitiveConsistent() throws AccessControlException {
       authenticateSystemResource();
 
       final String permissionNameBase = generateUniquePermissionName();
@@ -142,14 +142,14 @@ public class TestAccessControl_createResourceClassPermission extends TestAccessC
    }
 
    @Test
-   public void createResourceClassPermission_notAuthorized_shouldFail() throws AccessControlException {
+   public void createResourcePermission_notAuthorized_shouldFail() throws AccessControlException {
       final String resourceClassName = generateResourceClass(false, false);
       final String permissionName = generateUniquePermissionName().trim();
 
       generateResourceAndAuthenticate();
       try {
          accessControlContext.createResourcePermission(resourceClassName, permissionName);
-         fail("creating resource class permission without authorization should fail");
+         fail("creating resource permission without authorization should fail");
       }
       catch (AccessControlException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("authenticated by the system resource"));
@@ -157,7 +157,7 @@ public class TestAccessControl_createResourceClassPermission extends TestAccessC
    }
 
    @Test
-   public void createResourceClassPermission_nulls_shouldFail() throws AccessControlException {
+   public void createResourcePermission_nulls_shouldFail() throws AccessControlException {
       authenticateSystemResource();
 
       final String resourceClassName = generateResourceClass(false, false);
@@ -165,13 +165,13 @@ public class TestAccessControl_createResourceClassPermission extends TestAccessC
 
       try {
          accessControlContext.createResourcePermission(null, permissionName);
-         fail("creating resource class permission with NULL resource class name should fail");
+         fail("creating resource permission with NULL resource class name should fail");
       }
       catch (NullPointerException e) {
       }
       try {
          accessControlContext.createResourcePermission(resourceClassName, null);
-         fail("creating resource class permission with NULL permission name should fail");
+         fail("creating resource permission with NULL permission name should fail");
       }
       catch (AccessControlException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("permission name may not be null or blank"));
@@ -179,14 +179,14 @@ public class TestAccessControl_createResourceClassPermission extends TestAccessC
    }
 
    @Test
-   public void createResourceClassPermission_nonExistantResourceClass_shouldFail() throws AccessControlException {
+   public void createResourcePermission_nonExistantResourceClass_shouldFail() throws AccessControlException {
       authenticateSystemResource();
 
       final String permissionName = generateUniquePermissionName();
 
       try {
          accessControlContext.createResourcePermission("does_not_exist", permissionName);
-         fail("creating resource class permission with non-existant resource class name should fail");
+         fail("creating resource permission with non-existant resource class name should fail");
       }
       catch (AccessControlException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("could not find resource class"));
@@ -194,7 +194,7 @@ public class TestAccessControl_createResourceClassPermission extends TestAccessC
    }
 
    @Test
-   public void createResourceClassPermission_asteriskPermissionPrefix_shouldFail() throws AccessControlException {
+   public void createResourcePermission_asteriskPermissionPrefix_shouldFail() throws AccessControlException {
       authenticateSystemResource();
 
       final String resourceClassName = generateResourceClass(false, false);
@@ -202,7 +202,7 @@ public class TestAccessControl_createResourceClassPermission extends TestAccessC
 
       try {
          accessControlContext.createResourcePermission(resourceClassName, permissionName);
-         fail("creating resource class permission with asterisk-prefixed permission name should fail");
+         fail("creating resource permission with asterisk-prefixed permission name should fail");
       }
       catch (AccessControlException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("asterisk"));
@@ -210,14 +210,14 @@ public class TestAccessControl_createResourceClassPermission extends TestAccessC
    }
 
    @Test
-   public void createResourceClassPermission_emptyPermission_shouldFail() throws AccessControlException {
+   public void createResourcePermission_emptyPermission_shouldFail() throws AccessControlException {
       authenticateSystemResource();
 
       final String resourceClassName = generateResourceClass(false, false);
 
       try {
          accessControlContext.createResourcePermission(resourceClassName, "");
-         fail("creating resource class permission with empty permission name should fail");
+         fail("creating resource permission with empty permission name should fail");
       }
       catch (AccessControlException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("permission name may not be null or blank"));
@@ -225,7 +225,7 @@ public class TestAccessControl_createResourceClassPermission extends TestAccessC
    }
 
    @Test
-   public void createResourceClassPermission_duplicatePermission_shouldFail() throws AccessControlException {
+   public void createResourcePermission_duplicatePermission_shouldFail() throws AccessControlException {
       authenticateSystemResource();
 
       final String resourceClassName = generateResourceClass(false, false);
@@ -235,7 +235,7 @@ public class TestAccessControl_createResourceClassPermission extends TestAccessC
 
       try {
          accessControlContext.createResourcePermission(resourceClassName, permissionName);
-         fail("creating resource class permission with duplicate permission name should fail");
+         fail("creating resource permission with duplicate permission name should fail");
       }
       catch (AccessControlException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("duplicate"));
@@ -246,7 +246,7 @@ public class TestAccessControl_createResourceClassPermission extends TestAccessC
       // check if whitespace makes a difference
       try {
          accessControlContext.createResourcePermission(resourceClassName, " " + permissionName + "\t");
-         fail("creating resource class permission with duplicate permission name should fail");
+         fail("creating resource permission with duplicate permission name should fail");
       }
       catch (AccessControlException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("duplicate"));

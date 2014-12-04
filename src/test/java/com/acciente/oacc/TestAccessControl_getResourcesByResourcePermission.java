@@ -23,11 +23,10 @@ import java.util.Set;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
-import static org.junit.Assert.fail;
 
-public class TestAccessControl_getResourcesByPermission extends TestAccessControlBase {
+public class TestAccessControl_getResourcesByResourcePermission extends TestAccessControlBase {
    @Test
-   public void getResourcesByPermission_emptyAsSystemResource() throws AccessControlException {
+   public void getResourcesByResourcePermission_emptyAsSystemResource() throws AccessControlException {
       authenticateSystemResource();
 
       final String resourceClassName = generateResourceClass(false, false);
