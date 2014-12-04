@@ -58,11 +58,12 @@ public class GrantResourceCreatePermissionPostCreateSysPersister extends Persist
             ResourcePermission resourcePermission;
 
             resourcePermission = ResourcePermission.getInstance(resultSet.getResourceSysPermissionName("PostCreateSysPermissionId"),
-                                                                resultSet.getBoolean("PostCreateIsWithGrant"),
-                                                                resultSet.getInteger("InheritLevel"),
-                                                                resultSet.getInteger("DomainLevel"));
+                                                                resultSet.getBoolean("PostCreateIsWithGrant"));
 
-            resourceCreatePermissions.add(ResourceCreatePermission.getInstance(resourcePermission, resultSet.getBoolean("IsWithGrant")));
+            resourceCreatePermissions.add(ResourceCreatePermission.getInstance(resourcePermission,
+                                                                               resultSet.getBoolean("IsWithGrant"),
+                                                                               resultSet.getInteger("InheritLevel"),
+                                                                               resultSet.getInteger("DomainLevel")));
          }
          resultSet.close();
 
@@ -112,11 +113,12 @@ public class GrantResourceCreatePermissionPostCreateSysPersister extends Persist
             ResourcePermission resourcePermission;
 
             resourcePermission = ResourcePermission.getInstance(resultSet.getResourceSysPermissionName("PostCreateSysPermissionId"),
-                                                                resultSet.getBoolean("PostCreateIsWithGrant"),
-                                                                resultSet.getInteger("InheritLevel"),
-                                                                resultSet.getInteger("DomainLevel"));
+                                                                resultSet.getBoolean("PostCreateIsWithGrant"));
 
-            permissionsForResourceClass.add(ResourceCreatePermission.getInstance(resourcePermission, resultSet.getBoolean("IsWithGrant")));
+            permissionsForResourceClass.add(ResourceCreatePermission.getInstance(resourcePermission,
+                                                                                 resultSet.getBoolean("IsWithGrant"),
+                                                                                 resultSet.getInteger("InheritLevel"),
+                                                                                 resultSet.getInteger("DomainLevel")));
          }
          resultSet.close();
 
@@ -150,11 +152,12 @@ public class GrantResourceCreatePermissionPostCreateSysPersister extends Persist
             ResourcePermission resourcePermission;
 
             resourcePermission = ResourcePermission.getInstance(resultSet.getResourceSysPermissionName("PostCreateSysPermissionId"),
-                                                                resultSet.getBoolean("PostCreateIsWithGrant"),
-                                                                0,
-                                                                0);
+                                                                resultSet.getBoolean("PostCreateIsWithGrant"));
 
-            resourceCreatePermissions.add(ResourceCreatePermission.getInstance(resourcePermission, resultSet.getBoolean("IsWithGrant")));
+            resourceCreatePermissions.add(ResourceCreatePermission.getInstance(resourcePermission,
+                                                                               resultSet.getBoolean("IsWithGrant"),
+                                                                               0,
+                                                                               0));
          }
          resultSet.close();
 

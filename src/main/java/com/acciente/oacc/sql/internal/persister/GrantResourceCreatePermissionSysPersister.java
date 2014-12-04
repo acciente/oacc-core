@@ -56,7 +56,9 @@ public class GrantResourceCreatePermissionSysPersister extends Persister {
          while (resultSet.next()) {
             resourceCreatePermissions.add(
                   ResourceCreatePermission.getInstance(resultSet.getResourceCreateSysPermissionName("SysPermissionId"),
-                                                       resultSet.getBoolean("IsWithGrant")));
+                                                       resultSet.getBoolean("IsWithGrant"),
+                                                       0,
+                                                       0));
          }
          resultSet.close();
 
@@ -105,7 +107,9 @@ public class GrantResourceCreatePermissionSysPersister extends Persister {
 
             permissionsForResourceClass.add(
                   ResourceCreatePermission.getInstance(resultSet.getResourceCreateSysPermissionName("SysPermissionId"),
-                                                       resultSet.getBoolean("IsWithGrant")));
+                                                       resultSet.getBoolean("IsWithGrant"),
+                                                       resultSet.getInteger("InheritLevel"),
+                                                       resultSet.getInteger("DomainLevel")));
          }
          resultSet.close();
 
