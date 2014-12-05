@@ -129,16 +129,14 @@ public class DomainCreatePermission implements Serializable {
 
    public String toString() {
       if (postCreateDomainPermission == null) {
-         return "*CREATE["
+         return "*CREATE[]"
                + (withGrant ? " /G" : "")
-               + (inheritLevel != 0 ? " /I:" + inheritLevel : "")
-               + "]";
+               + (inheritLevel != 0 ? " /I:" + inheritLevel : "");
       }
       else {
-         return "*CREATE[" + postCreateDomainPermission.toString()
+         return "*CREATE[" + postCreateDomainPermission.toString() + "]"
                + (withGrant ? " /G" : "")
-               + (inheritLevel != 0 ? " /I:" + inheritLevel : "")
-               + "]";
+               + (inheritLevel != 0 ? " /I:" + inheritLevel : "");
       }
    }
 

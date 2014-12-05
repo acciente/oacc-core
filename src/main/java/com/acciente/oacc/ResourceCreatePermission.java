@@ -160,18 +160,16 @@ public class ResourceCreatePermission implements Serializable {
 
    public String toString() {
       if (postCreateResourcePermission == null) {
-         return "*CREATE["
+         return "*CREATE[]"
                + (withGrant ? " /G" : "")
                + (inheritLevel != 0 ? " /I:" + inheritLevel : "")
-               + (domainLevel != 0 ? " /D:" + domainLevel : "")
-               + "]";
+               + (domainLevel != 0 ? " /D:" + domainLevel : "");
       }
       else {
-         return "*CREATE[" + postCreateResourcePermission.toString()
+         return "*CREATE[" + postCreateResourcePermission.toString() + "]"
                + (withGrant ? " /G" : "")
                + (inheritLevel != 0 ? " /I:" + inheritLevel : "")
-               + (domainLevel != 0 ? " /D:" + domainLevel : "")
-               + "]";
+               + (domainLevel != 0 ? " /D:" + domainLevel : "");
       }
    }
 
