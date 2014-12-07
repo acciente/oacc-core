@@ -24,6 +24,7 @@ import com.acciente.oacc.Credentials;
 import com.acciente.oacc.DomainCreatePermission;
 import com.acciente.oacc.DomainCreatePermissions;
 import com.acciente.oacc.DomainPermission;
+import com.acciente.oacc.DomainPermissions;
 import com.acciente.oacc.Resource;
 import com.acciente.oacc.ResourceClassInfo;
 import com.acciente.oacc.ResourceCreatePermission;
@@ -86,13 +87,13 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
 
    // domain permissions constants
    private static final DomainPermission DomainPermission_CREATE_CHILD_DOMAIN
-         = DomainPermission.getInstance(DomainPermission.CREATE_CHILD_DOMAIN, false);
+         = DomainPermissions.getInstance(DomainPermissions.CREATE_CHILD_DOMAIN, false);
    private static final DomainPermission DomainPermission_CREATE_CHILD_DOMAIN_GRANT
-         = DomainPermission.getInstance(DomainPermission.CREATE_CHILD_DOMAIN, true);
+         = DomainPermissions.getInstance(DomainPermissions.CREATE_CHILD_DOMAIN, true);
    private static final DomainPermission DomainPermission_SUPER_USER
-         = DomainPermission.getInstance(DomainPermission.SUPER_USER, false);
+         = DomainPermissions.getInstance(DomainPermissions.SUPER_USER, false);
    private static final DomainPermission DomainPermission_SUPER_USER_GRANT
-         = DomainPermission.getInstance(DomainPermission.SUPER_USER, true);
+         = DomainPermissions.getInstance(DomainPermissions.SUPER_USER, true);
 
    // resource permissions constants
    private static final ResourcePermission ResourcePermission_INHERIT

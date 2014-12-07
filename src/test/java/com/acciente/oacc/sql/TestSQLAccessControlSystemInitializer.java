@@ -21,6 +21,7 @@ import com.acciente.oacc.AccessControlContext;
 import com.acciente.oacc.DomainCreatePermission;
 import com.acciente.oacc.DomainCreatePermissions;
 import com.acciente.oacc.DomainPermission;
+import com.acciente.oacc.DomainPermissions;
 import com.acciente.oacc.helper.Constants;
 import com.acciente.oacc.helper.OACC_Domain;
 import com.acciente.oacc.helper.OACC_Grant_DomCreatePerm_PostCreate_Sys;
@@ -135,7 +136,7 @@ public class TestSQLAccessControlSystemInitializer {
       assertThat(OACC_ResourcePassword.Finder.findByID(con, Constants.DB_SCHEMA, 0), is(sysResourcePassword));
 
       // verify system-resource's permissions on system-domain
-      final DomainPermission sysDomainPermission_SuperUser = DomainPermission.getInstance(DomainPermission.SUPER_USER);
+      final DomainPermission sysDomainPermission_SuperUser = DomainPermissions.getInstance(DomainPermissions.SUPER_USER);
 
       OACC_Grant_DomPerm_Sys sysDomainSuperUserPermission
             = new OACC_Grant_DomPerm_Sys.Builder(sysResource.getResourceID(),
@@ -157,7 +158,7 @@ public class TestSQLAccessControlSystemInitializer {
       // verify system-resource's create-permissions on system-domain
       final DomainCreatePermission sysDomainCreatePermission_Create = DomainCreatePermissions.getInstance(
             DomainCreatePermissions.CREATE);
-      final DomainPermission sysDomainPermission_CreateChildDomain = DomainPermission.getInstance(DomainPermission.CREATE_CHILD_DOMAIN);
+      final DomainPermission sysDomainPermission_CreateChildDomain = DomainPermissions.getInstance(DomainPermissions.CREATE_CHILD_DOMAIN);
 
       OACC_Grant_DomCreatePerm_PostCreate_Sys createSysDomainSuperUserPermission
             = new OACC_Grant_DomCreatePerm_PostCreate_Sys.Builder(sysResource.getResourceID(),

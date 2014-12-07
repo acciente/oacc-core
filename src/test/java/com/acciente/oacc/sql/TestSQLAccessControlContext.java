@@ -20,6 +20,7 @@ package com.acciente.oacc.sql;
 import com.acciente.oacc.AccessControlContext;
 import com.acciente.oacc.AccessControlException;
 import com.acciente.oacc.DomainCreatePermissions;
+import com.acciente.oacc.DomainPermissions;
 import com.acciente.oacc.PasswordCredentials;
 import com.acciente.oacc.ResourceCreatePermission;
 import com.acciente.oacc.DomainCreatePermission;
@@ -43,10 +44,18 @@ import java.util.Set;
 
 public class TestSQLAccessControlContext extends TestSQLAccessControlContextBase {
    // domain permissions constants
-   private static final DomainPermission DomainPermission_CREATE_CHILD_DOMAIN       = DomainPermission.getInstance(DomainPermission.CREATE_CHILD_DOMAIN, false);
-   private static final DomainPermission DomainPermission_CREATE_CHILD_DOMAIN_GRANT = DomainPermission.getInstance(DomainPermission.CREATE_CHILD_DOMAIN, true);
-   private static final DomainPermission DomainPermission_SUPER_USER                = DomainPermission.getInstance(DomainPermission.SUPER_USER, false);
-   private static final DomainPermission DomainPermission_SUPER_USER_GRANT          = DomainPermission.getInstance(DomainPermission.SUPER_USER, true);
+   private static final DomainPermission DomainPermission_CREATE_CHILD_DOMAIN       = DomainPermissions.getInstance(
+         DomainPermissions.CREATE_CHILD_DOMAIN,
+         false);
+   private static final DomainPermission DomainPermission_CREATE_CHILD_DOMAIN_GRANT = DomainPermissions.getInstance(
+         DomainPermissions.CREATE_CHILD_DOMAIN,
+         true);
+   private static final DomainPermission DomainPermission_SUPER_USER                = DomainPermissions.getInstance(
+         DomainPermissions.SUPER_USER,
+         false);
+   private static final DomainPermission DomainPermission_SUPER_USER_GRANT          = DomainPermissions.getInstance(
+         DomainPermissions.SUPER_USER,
+         true);
    public static final  char[]           PASSWORD                                   = "foobar".toCharArray();
    public static final  char[]           PASSWORD2                                  = "goobar".toCharArray();
 

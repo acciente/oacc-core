@@ -19,7 +19,7 @@ package com.acciente.oacc.sql.internal;
 
 import com.acciente.oacc.AccessControlContext;
 import com.acciente.oacc.DomainCreatePermissions;
-import com.acciente.oacc.DomainPermission;
+import com.acciente.oacc.DomainPermissions;
 import com.acciente.oacc.Resources;
 
 import java.sql.Connection;
@@ -82,7 +82,7 @@ public class SQLAccessControlSystemInitializer {
       // grant the system user [super user w/ grant] to the system domain
       statement = connection.prepareStatement("INSERT INTO " + schemaNameAndTablePrefix + "Grant_DomPerm_Sys( AccessorResourceId, GrantorResourceId, AccessedDomainId, SysPermissionId, IsWithGrant )"
                                                     + " VALUES ( 0, 0, 0, ?, 1 )");
-      statement.setLong(1, DomainPermission.getInstance(DomainPermission.SUPER_USER).getSystemPermissionId());
+      statement.setLong(1, DomainPermissions.getInstance(DomainPermissions.SUPER_USER).getSystemPermissionId());
       statement.executeUpdate();
 
       // grant the system user [create w/ grant], and [super user w/ grant] to any domains it creates
@@ -92,9 +92,9 @@ public class SQLAccessControlSystemInitializer {
       statement.executeUpdate();
       statement = connection.prepareStatement("INSERT INTO " + schemaNameAndTablePrefix + "Grant_DomCrPerm_PostCr_Sys( AccessorResourceId, GrantorResourceId, PostCreateSysPermissionId, PostCreateIsWithGrant, IsWithGrant )"
                                                     + " VALUES ( 0, 0, ?, 1, 1 )");
-      statement.setLong(1, DomainPermission.getInstance(DomainPermission.SUPER_USER).getSystemPermissionId());
+      statement.setLong(1, DomainPermissions.getInstance(DomainPermissions.SUPER_USER).getSystemPermissionId());
       statement.executeUpdate();
-      statement.setLong(1, DomainPermission.getInstance(DomainPermission.CREATE_CHILD_DOMAIN).getSystemPermissionId());
+      statement.setLong(1, DomainPermissions.getInstance(DomainPermissions.CREATE_CHILD_DOMAIN).getSystemPermissionId());
       statement.executeUpdate();
    }
 }

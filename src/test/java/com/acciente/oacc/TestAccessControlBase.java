@@ -175,7 +175,7 @@ public class TestAccessControlBase {
       Set<DomainCreatePermission> domainCreatePermissions = new HashSet<>();
       domainCreatePermissions.add(DomainCreatePermissions.getInstance(DomainCreatePermissions.CREATE,
                                                                       false));
-      domainCreatePermissions.add(DomainCreatePermissions.getInstance(DomainPermission.getInstance(DomainPermission.CREATE_CHILD_DOMAIN),
+      domainCreatePermissions.add(DomainCreatePermissions.getInstance(DomainPermissions.getInstance(DomainPermissions.CREATE_CHILD_DOMAIN),
                                                                       false));
 
       systemAccessControlContext.setDomainCreatePermissions(accessorResource, domainCreatePermissions);

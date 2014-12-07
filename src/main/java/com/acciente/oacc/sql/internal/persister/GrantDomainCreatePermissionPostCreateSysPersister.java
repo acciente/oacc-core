@@ -20,7 +20,7 @@ package com.acciente.oacc.sql.internal.persister;
 import com.acciente.oacc.AccessControlException;
 import com.acciente.oacc.DomainCreatePermission;
 import com.acciente.oacc.DomainCreatePermissions;
-import com.acciente.oacc.DomainPermission;
+import com.acciente.oacc.DomainPermissions;
 import com.acciente.oacc.Resource;
 
 import java.sql.SQLException;
@@ -47,10 +47,10 @@ public class GrantDomainCreatePermissionPostCreateSysPersister extends Persister
          Set<DomainCreatePermission> domainCreatePermissions = new HashSet<>();
          while (resultSet.next()) {
             domainCreatePermissions
-                  .add(DomainCreatePermissions.getInstance(DomainPermission.getInstance(resultSet.getDomainSysPermissionName(
+                  .add(DomainCreatePermissions.getInstance(DomainPermissions.getInstance(resultSet.getDomainSysPermissionName(
                         "PostCreateSysPermissionId"),
-                                                                                        resultSet.getBoolean(
-                                                                                              "PostCreateIsWithGrant")),
+                                                                                         resultSet.getBoolean(
+                                                                                               "PostCreateIsWithGrant")),
                                                            resultSet.getBoolean("IsWithGrant"),
                                                            resultSet.getInteger("InheritLevel")));
          }
@@ -79,10 +79,10 @@ public class GrantDomainCreatePermissionPostCreateSysPersister extends Persister
          Set<DomainCreatePermission> domainCreatePermissions = new HashSet<>();
          while (resultSet.next()) {
             domainCreatePermissions
-                  .add(DomainCreatePermissions.getInstance(DomainPermission.getInstance(resultSet.getDomainSysPermissionName(
+                  .add(DomainCreatePermissions.getInstance(DomainPermissions.getInstance(resultSet.getDomainSysPermissionName(
                         "PostCreateSysPermissionId"),
-                                                                                        resultSet.getBoolean(
-                                                                                              "PostCreateIsWithGrant")),
+                                                                                         resultSet.getBoolean(
+                                                                                               "PostCreateIsWithGrant")),
                                                            resultSet.getBoolean("IsWithGrant"),
                                                            0));
          }

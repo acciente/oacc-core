@@ -18,7 +18,7 @@
 package com.acciente.oacc.sql.internal.persister;
 
 import com.acciente.oacc.DomainCreatePermissions;
-import com.acciente.oacc.DomainPermission;
+import com.acciente.oacc.DomainPermissions;
 import com.acciente.oacc.Resource;
 import com.acciente.oacc.ResourceCreatePermission;
 import com.acciente.oacc.ResourcePermission;
@@ -76,7 +76,7 @@ public class SQLResult {
    }
 
    public String getDomainSysPermissionName(String columnLabel) throws SQLException {
-      return DomainPermission.getSysPermissionName(resultSet.getLong(columnLabel));
+      return DomainPermissions.getSysPermissionName(resultSet.getLong(columnLabel));
    }
 
    public Long getSysPermissionId(String columnLabel) throws SQLException {

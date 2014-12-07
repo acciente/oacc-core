@@ -28,42 +28,42 @@ import static org.junit.Assert.fail;
 public class TestDomainPermission {
    @Test
    public void getSysPermissionNames() {
-      assertThat(DomainPermission.getSysPermissionNames().size(), is(2));
-      assertThat(DomainPermission.getSysPermissionNames(), hasItem(DomainPermission.CREATE_CHILD_DOMAIN));
-      assertThat(DomainPermission.getSysPermissionNames(), hasItem(DomainPermission.SUPER_USER));
+      assertThat(DomainPermissions.getSysPermissionNames().size(), is(2));
+      assertThat(DomainPermissions.getSysPermissionNames(), hasItem(DomainPermissions.CREATE_CHILD_DOMAIN));
+      assertThat(DomainPermissions.getSysPermissionNames(), hasItem(DomainPermissions.SUPER_USER));
    }
 
    @Test
    public void construct_valid() throws AccessControlException {
-      for(String systemPermissionName : DomainPermission.getSysPermissionNames()) {
-         DomainPermission.getInstance(systemPermissionName);
+      for(String systemPermissionName : DomainPermissions.getSysPermissionNames()) {
+         DomainPermissions.getInstance(systemPermissionName);
       }
    }
 
    @Test
    public void construct_withGrant_valid() {
-      for(String systemPermissionName : DomainPermission.getSysPermissionNames()) {
-         DomainPermission.getInstance(systemPermissionName, true);
+      for(String systemPermissionName : DomainPermissions.getSysPermissionNames()) {
+         DomainPermissions.getInstance(systemPermissionName, true);
       }
    }
 
    @Test
    public void construct_whitespaceConsistent() throws AccessControlException {
-      for(String systemPermissionName : DomainPermission.getSysPermissionNames()) {
-         DomainPermission.getInstance(" " + systemPermissionName + "\t");
-         DomainPermission.getInstance(" " + systemPermissionName + "\t", false);
-         DomainPermission.getInstance(" " + systemPermissionName + "\t", true);
+      for(String systemPermissionName : DomainPermissions.getSysPermissionNames()) {
+         DomainPermissions.getInstance(" " + systemPermissionName + "\t");
+         DomainPermissions.getInstance(" " + systemPermissionName + "\t", false);
+         DomainPermissions.getInstance(" " + systemPermissionName + "\t", true);
       }
    }
 
    @Test
    public void construct_caseSensitiveConsistent() throws AccessControlException {
-      for(String systemPermissionName : DomainPermission.getSysPermissionNames()) {
+      for(String systemPermissionName : DomainPermissions.getSysPermissionNames()) {
          String mixedCasePermissionName
                = systemPermissionName.substring(0, systemPermissionName.length()/2).toLowerCase()
                + systemPermissionName.substring(systemPermissionName.length()/2).toUpperCase();
          try {
-            DomainPermission.getInstance(mixedCasePermissionName);
+            DomainPermissions.getInstance(mixedCasePermissionName);
             fail("domain permission names are case sensitive - creation of domain permission with case insensitive name should have failed");
          }
          catch (Exception e) {
@@ -71,7 +71,7 @@ public class TestDomainPermission {
          }
          // now attempt with grant
          try {
-            DomainPermission.getInstance(mixedCasePermissionName, true);
+            DomainPermissions.getInstance(mixedCasePermissionName, true);
             fail("domain permission names are case sensitive - creation of domain permission with case insensitive name should have failed");
          }
          catch (Exception e) {
@@ -83,7 +83,7 @@ public class TestDomainPermission {
    @Test
    public void construct_nulls_shouldFail() throws AccessControlException {
       try {
-         DomainPermission.getInstance(null);
+         DomainPermissions.getInstance(null);
          fail("creation of domain permission with null name should have failed");
       }
       catch (Exception e) {
@@ -91,7 +91,7 @@ public class TestDomainPermission {
       }
       // now attempt with grant
       try {
-         DomainPermission.getInstance(null, true);
+         DomainPermissions.getInstance(null, true);
          fail("creation of domain permission with null name should have failed");
       }
       catch (Exception e) {
@@ -102,7 +102,7 @@ public class TestDomainPermission {
    @Test
    public void construct_asteriskPermissionPrefix_shouldFail() throws AccessControlException {
       try {
-         DomainPermission.getInstance("*invalid");
+         DomainPermissions.getInstance("*invalid");
          fail("creation of domain permission with asterisk-prefixed name should have failed");
       }
       catch (Exception e) {
@@ -110,7 +110,7 @@ public class TestDomainPermission {
       }
       // now attempt with grant
       try {
-         DomainPermission.getInstance("*invalid", true);
+         DomainPermissions.getInstance("*invalid", true);
          fail("creation of domain permission with asterisk-prefixed name should have failed");
       }
       catch (Exception e) {
@@ -121,14 +121,14 @@ public class TestDomainPermission {
    @Test
    public void construct_blankNames_shouldFail() throws AccessControlException {
       try {
-         DomainPermission.getInstance("");
+         DomainPermissions.getInstance("");
          fail("creation of domain permission with empty name should have failed");
       }
       catch (Exception e) {
          assertThat(e.getMessage().toLowerCase(), containsString("system permission name is required"));
       }
       try {
-         DomainPermission.getInstance(" \t");
+         DomainPermissions.getInstance(" \t");
          fail("creation of domain permission with empty name should have failed");
       }
       catch (Exception e) {
@@ -136,14 +136,14 @@ public class TestDomainPermission {
       }
       // now attempt with grant
       try {
-         DomainPermission.getInstance("", true);
+         DomainPermissions.getInstance("", true);
          fail("creation of domain permission with empty name should have failed");
       }
       catch (Exception e) {
          assertThat(e.getMessage().toLowerCase(), containsString("system permission name is required"));
       }
       try {
-         DomainPermission.getInstance(" \t", true);
+         DomainPermissions.getInstance(" \t", true);
          fail("creation of domain permission with empty name should have failed");
       }
       catch (Exception e) {
@@ -154,7 +154,7 @@ public class TestDomainPermission {
    @Test
    public void construct_nonSystemDomainPermission_shouldFail() throws AccessControlException {
       try {
-         DomainPermission.getInstance("invalid");
+         DomainPermissions.getInstance("invalid");
          fail("creation of domain permission non-system domain permission name should have failed");
       }
       catch (Exception e) {
@@ -162,7 +162,7 @@ public class TestDomainPermission {
       }
       // now attempt with grant
       try {
-         DomainPermission.getInstance("invalid", true);
+         DomainPermissions.getInstance("invalid", true);
          fail("creation of domain permission non-system domain permission name should have failed");
       }
       catch (Exception e) {

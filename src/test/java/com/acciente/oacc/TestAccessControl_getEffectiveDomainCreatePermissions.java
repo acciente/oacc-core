@@ -50,11 +50,11 @@ public class TestAccessControl_getEffectiveDomainCreatePermissions extends TestA
    public void getEffectiveDomainCreatePermissions_validAsSystemResource() throws AccessControlException {
       authenticateSystemResource();
       final DomainCreatePermission domCreatePerm_superuser
-            = DomainCreatePermissions.getInstance(DomainPermission.getInstance(DomainPermission.SUPER_USER));
+            = DomainCreatePermissions.getInstance(DomainPermissions.getInstance(DomainPermissions.SUPER_USER));
       final DomainCreatePermission domCreatePerm_create_withGrant
             = DomainCreatePermissions.getInstance(DomainCreatePermissions.CREATE, true);
       final DomainCreatePermission domCreatePerm_child
-            = DomainCreatePermissions.getInstance(DomainPermission.getInstance(DomainPermission.CREATE_CHILD_DOMAIN),
+            = DomainCreatePermissions.getInstance(DomainPermissions.getInstance(DomainPermissions.CREATE_CHILD_DOMAIN),
                                                   false);
 
       // set domain create permissions

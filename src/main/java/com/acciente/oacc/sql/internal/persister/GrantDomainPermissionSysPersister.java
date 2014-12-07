@@ -19,6 +19,7 @@ package com.acciente.oacc.sql.internal.persister;
 
 import com.acciente.oacc.AccessControlException;
 import com.acciente.oacc.DomainPermission;
+import com.acciente.oacc.DomainPermissions;
 import com.acciente.oacc.Resource;
 import com.acciente.oacc.sql.internal.persister.id.DomainId;
 import com.acciente.oacc.sql.internal.persister.id.Id;
@@ -33,7 +34,7 @@ import java.util.Set;
 public class GrantDomainPermissionSysPersister extends Persister {
    private final SQLStrings sqlStrings;
 
-   public static final DomainPermission DOMAIN_PERMISSION_SUPER_USER = DomainPermission.getInstance(DomainPermission.SUPER_USER);
+   public static final DomainPermission DOMAIN_PERMISSION_SUPER_USER = DomainPermissions.getInstance(DomainPermissions.SUPER_USER);
 
    public GrantDomainPermissionSysPersister(SQLStrings sqlStrings) {
       this.sqlStrings = sqlStrings;
@@ -119,10 +120,10 @@ public class GrantDomainPermissionSysPersister extends Persister {
          while (resultSet.next()) {
             // on the resource domains only pre-defined system permissions are expected
             domainPermissions
-                  .add(DomainPermission.getInstance(resultSet.getDomainSysPermissionName("SysPermissionId"),
-                                                    resultSet.getBoolean("IsWithGrant"),
-                                                    resultSet.getInteger("InheritLevel"),
-                                                    resultSet.getInteger("DomainLevel")));
+                  .add(DomainPermissions.getInstance(resultSet.getDomainSysPermissionName("SysPermissionId"),
+                                                     resultSet.getBoolean("IsWithGrant"),
+                                                     resultSet.getInteger("InheritLevel"),
+                                                     resultSet.getInteger("DomainLevel")));
          }
          resultSet.close();
 
@@ -152,10 +153,10 @@ public class GrantDomainPermissionSysPersister extends Persister {
          while (resultSet.next()) {
             // on the resource domains only pre-defined system permissions are expected
             domainPermissions
-                  .add(DomainPermission.getInstance(resultSet.getDomainSysPermissionName("SysPermissionId"),
-                                                    resultSet.getBoolean("IsWithGrant"),
-                                                    0,
-                                                    0));
+                  .add(DomainPermissions.getInstance(resultSet.getDomainSysPermissionName("SysPermissionId"),
+                                                     resultSet.getBoolean("IsWithGrant"),
+                                                     0,
+                                                     0));
          }
          resultSet.close();
 
@@ -193,10 +194,10 @@ public class GrantDomainPermissionSysPersister extends Persister {
 
             // on the resource domains only pre-defined system permissions are expected
             domainPermissions
-                  .add(DomainPermission.getInstance(resultSet.getDomainSysPermissionName("SysPermissionId"),
-                                                    resultSet.getBoolean("IsWithGrant"),
-                                                    resultSet.getInteger("InheritLevel"),
-                                                    resultSet.getInteger("DomainLevel")));
+                  .add(DomainPermissions.getInstance(resultSet.getDomainSysPermissionName("SysPermissionId"),
+                                                     resultSet.getBoolean("IsWithGrant"),
+                                                     resultSet.getInteger("InheritLevel"),
+                                                     resultSet.getInteger("DomainLevel")));
          }
          resultSet.close();
 

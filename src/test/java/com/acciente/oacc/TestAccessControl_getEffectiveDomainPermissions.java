@@ -59,11 +59,11 @@ public class TestAccessControl_getEffectiveDomainPermissions extends TestAccessC
    public void getEffectiveDomainPermissions_validAsSystemResource() throws AccessControlException {
       authenticateSystemResource();
       final DomainPermission domCreatePerm_superuser
-            = DomainPermission.getInstance(DomainPermission.SUPER_USER);
+            = DomainPermissions.getInstance(DomainPermissions.SUPER_USER);
       final DomainPermission domCreatePerm_child
-            = DomainPermission.getInstance(DomainPermission.CREATE_CHILD_DOMAIN);
+            = DomainPermissions.getInstance(DomainPermissions.CREATE_CHILD_DOMAIN);
       final DomainPermission domCreatePerm_child_withGrant
-            = DomainPermission.getInstance(DomainPermission.CREATE_CHILD_DOMAIN, true);
+            = DomainPermissions.getInstance(DomainPermissions.CREATE_CHILD_DOMAIN, true);
 
       final String domainName1 = generateDomain();
       final String domainName2 = generateDomain();
@@ -102,13 +102,13 @@ public class TestAccessControl_getEffectiveDomainPermissions extends TestAccessC
    public void getEffectiveDomainPermissions_validWithInheritFromParentDomain() throws AccessControlException {
       authenticateSystemResource();
       final DomainPermission domPerm_superuser
-            = DomainPermission.getInstance(DomainPermission.SUPER_USER);
+            = DomainPermissions.getInstance(DomainPermissions.SUPER_USER);
       final DomainPermission domPerm_superuser_withGrant
-            = DomainPermission.getInstance(DomainPermission.SUPER_USER, true);
+            = DomainPermissions.getInstance(DomainPermissions.SUPER_USER, true);
       final DomainPermission domPerm_createchilddomain
-            = DomainPermission.getInstance(DomainPermission.CREATE_CHILD_DOMAIN);
+            = DomainPermissions.getInstance(DomainPermissions.CREATE_CHILD_DOMAIN);
       final DomainPermission domPerm_createchilddomain_withGrant
-            = DomainPermission.getInstance(DomainPermission.CREATE_CHILD_DOMAIN, true);
+            = DomainPermissions.getInstance(DomainPermissions.CREATE_CHILD_DOMAIN, true);
 
       final String childDomain = generateUniqueDomainName();
       final String parentDomain = generateDomain();
@@ -145,13 +145,13 @@ public class TestAccessControl_getEffectiveDomainPermissions extends TestAccessC
    public void getEffectiveDomainPermissions_validWithInheritFromAncestorDomainWithEmptyIntermediaryAncestors() throws AccessControlException {
       authenticateSystemResource();
       final DomainPermission domPerm_superuser
-            = DomainPermission.getInstance(DomainPermission.SUPER_USER);
+            = DomainPermissions.getInstance(DomainPermissions.SUPER_USER);
       final DomainPermission domPerm_superuser_withGrant
-            = DomainPermission.getInstance(DomainPermission.SUPER_USER, true);
+            = DomainPermissions.getInstance(DomainPermissions.SUPER_USER, true);
       final DomainPermission domPerm_createchilddomain
-            = DomainPermission.getInstance(DomainPermission.CREATE_CHILD_DOMAIN);
+            = DomainPermissions.getInstance(DomainPermissions.CREATE_CHILD_DOMAIN);
       final DomainPermission domPerm_createchilddomain_withGrant
-            = DomainPermission.getInstance(DomainPermission.CREATE_CHILD_DOMAIN, true);
+            = DomainPermissions.getInstance(DomainPermissions.CREATE_CHILD_DOMAIN, true);
 
       final String parentDomain = generateDomain();
       final String childDomain = generateUniqueDomainName();
