@@ -19,6 +19,7 @@ package com.acciente.oacc.sql;
 
 import com.acciente.oacc.AccessControlContext;
 import com.acciente.oacc.AccessControlException;
+import com.acciente.oacc.DomainCreatePermissions;
 import com.acciente.oacc.PasswordCredentials;
 import com.acciente.oacc.ResourceCreatePermission;
 import com.acciente.oacc.DomainCreatePermission;
@@ -638,8 +639,8 @@ public class TestSQLAccessControlContext extends TestSQLAccessControlContextBase
 
       // we permit the new user to new create new domains
       Set<DomainCreatePermission> domainCreatePermissions = new HashSet<>();
-      domainCreatePermissions.add(DomainCreatePermission.getInstance(DomainCreatePermission.CREATE, false));
-      domainCreatePermissions.add(DomainCreatePermission.getInstance(DomainPermission_SUPER_USER, false));
+      domainCreatePermissions.add(DomainCreatePermissions.getInstance(DomainCreatePermissions.CREATE, false));
+      domainCreatePermissions.add(DomainCreatePermissions.getInstance(DomainPermission_SUPER_USER, false));
       setupName("setDomainCreatePermissions( acmeRootUser, \"" + domainCreatePermissions + "\" )");
       try {
          accessControlContext.setDomainCreatePermissions(acmeRootUser, domainCreatePermissions);
@@ -715,8 +716,8 @@ public class TestSQLAccessControlContext extends TestSQLAccessControlContextBase
 
       // next we give user 1 some domain create permissions
       Set<DomainCreatePermission> domainCreatePermissions = new HashSet<>();
-      domainCreatePermissions.add(DomainCreatePermission.getInstance(DomainCreatePermission.CREATE, false));
-      domainCreatePermissions.add(DomainCreatePermission.getInstance(DomainPermission_SUPER_USER, false));
+      domainCreatePermissions.add(DomainCreatePermissions.getInstance(DomainCreatePermissions.CREATE, false));
+      domainCreatePermissions.add(DomainCreatePermissions.getInstance(DomainPermission_SUPER_USER, false));
       setupName("setDomainCreatePermissions( newUser_1, \"" + domainCreatePermissions + "\" )");
       try {
          accessControlContext.setDomainCreatePermissions(newUser_1, domainCreatePermissions);

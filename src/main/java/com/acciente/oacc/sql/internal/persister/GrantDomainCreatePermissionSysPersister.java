@@ -19,6 +19,7 @@ package com.acciente.oacc.sql.internal.persister;
 
 import com.acciente.oacc.AccessControlException;
 import com.acciente.oacc.DomainCreatePermission;
+import com.acciente.oacc.DomainCreatePermissions;
 import com.acciente.oacc.Resource;
 
 import java.sql.SQLException;
@@ -45,9 +46,9 @@ public class GrantDomainCreatePermissionSysPersister extends Persister {
          Set<DomainCreatePermission> domainCreatePermissions = new HashSet<>();
          while (resultSet.next()) {
             domainCreatePermissions
-                  .add(DomainCreatePermission.getInstance(resultSet.getDomainCreateSysPermissionName("SysPermissionId"),
-                                                          resultSet.getBoolean("IsWithGrant"),
-                                                          resultSet.getInteger("InheritLevel")));
+                  .add(DomainCreatePermissions.getInstance(resultSet.getDomainCreateSysPermissionName("SysPermissionId"),
+                                                           resultSet.getBoolean("IsWithGrant"),
+                                                           resultSet.getInteger("InheritLevel")));
          }
          resultSet.close();
 
@@ -74,9 +75,9 @@ public class GrantDomainCreatePermissionSysPersister extends Persister {
          Set<DomainCreatePermission> domainCreatePermissions = new HashSet<>();
          while (resultSet.next()) {
             domainCreatePermissions
-                  .add(DomainCreatePermission.getInstance(resultSet.getDomainCreateSysPermissionName("SysPermissionId"),
-                                                          resultSet.getBoolean("IsWithGrant"),
-                                                          0));
+                  .add(DomainCreatePermissions.getInstance(resultSet.getDomainCreateSysPermissionName("SysPermissionId"),
+                                                           resultSet.getBoolean("IsWithGrant"),
+                                                           0));
          }
          resultSet.close();
 

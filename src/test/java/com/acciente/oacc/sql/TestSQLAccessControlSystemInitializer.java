@@ -19,6 +19,7 @@ package com.acciente.oacc.sql;
 
 import com.acciente.oacc.AccessControlContext;
 import com.acciente.oacc.DomainCreatePermission;
+import com.acciente.oacc.DomainCreatePermissions;
 import com.acciente.oacc.DomainPermission;
 import com.acciente.oacc.helper.Constants;
 import com.acciente.oacc.helper.OACC_Domain;
@@ -154,7 +155,8 @@ public class TestSQLAccessControlSystemInitializer {
       assertThat(permissions, hasItems(sysDomainSuperUserPermission));
 
       // verify system-resource's create-permissions on system-domain
-      final DomainCreatePermission sysDomainCreatePermission_Create = DomainCreatePermission.getInstance(DomainCreatePermission.CREATE);
+      final DomainCreatePermission sysDomainCreatePermission_Create = DomainCreatePermissions.getInstance(
+            DomainCreatePermissions.CREATE);
       final DomainPermission sysDomainPermission_CreateChildDomain = DomainPermission.getInstance(DomainPermission.CREATE_CHILD_DOMAIN);
 
       OACC_Grant_DomCreatePerm_PostCreate_Sys createSysDomainSuperUserPermission

@@ -164,8 +164,8 @@ public class TestAccessControlBase {
    protected void grantDomainCreatePermission(Resource accessorResource) throws AccessControlException {
       authenticateSystemAccessControlContext();
       Set<DomainCreatePermission> domainCreatePermissions = new HashSet<>();
-      domainCreatePermissions.add(DomainCreatePermission.getInstance(DomainCreatePermission.CREATE,
-                                                               false));
+      domainCreatePermissions.add(DomainCreatePermissions.getInstance(DomainCreatePermissions.CREATE,
+                                                                      false));
 
       systemAccessControlContext.setDomainCreatePermissions(accessorResource, domainCreatePermissions);
    }
@@ -173,10 +173,10 @@ public class TestAccessControlBase {
    protected void grantDomainAndChildCreatePermission(Resource accessorResource) throws AccessControlException {
       authenticateSystemAccessControlContext();
       Set<DomainCreatePermission> domainCreatePermissions = new HashSet<>();
-      domainCreatePermissions.add(DomainCreatePermission.getInstance(DomainCreatePermission.CREATE,
-                                                               false));
-      domainCreatePermissions.add(DomainCreatePermission.getInstance(DomainPermission.getInstance(DomainPermission.CREATE_CHILD_DOMAIN),
-                                                               false));
+      domainCreatePermissions.add(DomainCreatePermissions.getInstance(DomainCreatePermissions.CREATE,
+                                                                      false));
+      domainCreatePermissions.add(DomainCreatePermissions.getInstance(DomainPermission.getInstance(DomainPermission.CREATE_CHILD_DOMAIN),
+                                                                      false));
 
       systemAccessControlContext.setDomainCreatePermissions(accessorResource, domainCreatePermissions);
    }

@@ -22,6 +22,7 @@ import com.acciente.oacc.AccessControlException;
 import com.acciente.oacc.AuthenticationProvider;
 import com.acciente.oacc.Credentials;
 import com.acciente.oacc.DomainCreatePermission;
+import com.acciente.oacc.DomainCreatePermissions;
 import com.acciente.oacc.DomainPermission;
 import com.acciente.oacc.Resource;
 import com.acciente.oacc.ResourceClassInfo;
@@ -1125,7 +1126,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
          boolean createSysPermissionFound = false;
          for (final DomainCreatePermission domainCreatePermission : domainCreatePermissions) {
             if (domainCreatePermission.isSystemPermission()
-                  && DomainCreatePermission.CREATE.equals(domainCreatePermission.getSysPermissionName())) {
+                  && DomainCreatePermissions.CREATE.equals(domainCreatePermission.getSysPermissionName())) {
                createSysPermissionFound = true;
                break;
             }

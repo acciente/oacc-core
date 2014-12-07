@@ -18,7 +18,7 @@
 package com.acciente.oacc.sql.internal;
 
 import com.acciente.oacc.AccessControlContext;
-import com.acciente.oacc.DomainCreatePermission;
+import com.acciente.oacc.DomainCreatePermissions;
 import com.acciente.oacc.DomainPermission;
 import com.acciente.oacc.Resources;
 
@@ -88,7 +88,7 @@ public class SQLAccessControlSystemInitializer {
       // grant the system user [create w/ grant], and [super user w/ grant] to any domains it creates
       statement = connection.prepareStatement("INSERT INTO " + schemaNameAndTablePrefix + "Grant_DomCrPerm_Sys( AccessorResourceId, GrantorResourceId, SysPermissionId, IsWithGrant )"
                                                     + " VALUES ( 0, 0, ?, 1 )");
-      statement.setLong(1, DomainCreatePermission.getInstance(DomainCreatePermission.CREATE).getSystemPermissionId());
+      statement.setLong(1, DomainCreatePermissions.getInstance(DomainCreatePermissions.CREATE).getSystemPermissionId());
       statement.executeUpdate();
       statement = connection.prepareStatement("INSERT INTO " + schemaNameAndTablePrefix + "Grant_DomCrPerm_PostCr_Sys( AccessorResourceId, GrantorResourceId, PostCreateSysPermissionId, PostCreateIsWithGrant, IsWithGrant )"
                                                     + " VALUES ( 0, 0, ?, 1, 1 )");
