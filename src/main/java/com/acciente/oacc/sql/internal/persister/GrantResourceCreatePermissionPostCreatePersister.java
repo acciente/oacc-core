@@ -22,6 +22,7 @@ import com.acciente.oacc.Resource;
 import com.acciente.oacc.ResourceCreatePermission;
 import com.acciente.oacc.ResourceCreatePermissions;
 import com.acciente.oacc.ResourcePermission;
+import com.acciente.oacc.ResourcePermissions;
 import com.acciente.oacc.sql.internal.persister.id.DomainId;
 import com.acciente.oacc.sql.internal.persister.id.Id;
 import com.acciente.oacc.sql.internal.persister.id.ResourceClassId;
@@ -58,7 +59,7 @@ public class GrantResourceCreatePermissionPostCreatePersister extends Persister 
          while (resultSet.next()) {
             ResourcePermission resourcePermission;
 
-            resourcePermission = ResourcePermission.getInstance(
+            resourcePermission = ResourcePermissions.getInstance(
                   resultSet.getString("PostCreatePermissionName"),
                   resultSet.getBoolean("PostCreateIsWithGrant"));
 
@@ -115,8 +116,8 @@ public class GrantResourceCreatePermissionPostCreatePersister extends Persister 
 
             ResourcePermission
                   resourcePermission
-                  = ResourcePermission.getInstance(resultSet.getString("PostCreatePermissionName"),
-                                                   resultSet.getBoolean("PostCreateIsWithGrant"));
+                  = ResourcePermissions.getInstance(resultSet.getString("PostCreatePermissionName"),
+                                                    resultSet.getBoolean("PostCreateIsWithGrant"));
 
             permissionsForResourceClass
                   .add(ResourceCreatePermissions.getInstance(resourcePermission,
@@ -155,7 +156,7 @@ public class GrantResourceCreatePermissionPostCreatePersister extends Persister 
          while (resultSet.next()) {
             ResourcePermission resourcePermission;
 
-            resourcePermission = ResourcePermission.getInstance(
+            resourcePermission = ResourcePermissions.getInstance(
                   resultSet.getString("PostCreatePermissionName"),
                   resultSet.getBoolean("PostCreateIsWithGrant"));
 

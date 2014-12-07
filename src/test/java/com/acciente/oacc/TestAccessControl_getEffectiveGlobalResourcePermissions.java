@@ -73,8 +73,9 @@ public class TestAccessControl_getEffectiveGlobalResourcePermissions extends Tes
 
       // setup global permissions
       Set<ResourcePermission> permissions_pre = new HashSet<>();
-      permissions_pre.add(ResourcePermission.getInstance(ResourcePermission.IMPERSONATE));
-      permissions_pre.add(ResourcePermission.getInstance(generateResourceClassPermission(authenticatableResourceClassName)));
+      permissions_pre.add(ResourcePermissions.getInstance(ResourcePermissions.IMPERSONATE));
+      permissions_pre.add(ResourcePermissions.getInstance(generateResourceClassPermission(
+            authenticatableResourceClassName)));
       accessControlContext.setGlobalResourcePermissions(accessorResource, authenticatableResourceClassName,
                                                         permissions_pre,
                                                         sysDomainName);
@@ -104,12 +105,12 @@ public class TestAccessControl_getEffectiveGlobalResourcePermissions extends Tes
       assertThat(accessControlContext.getEffectiveGlobalResourcePermissionsMap(accessorResource).isEmpty(), is(true));
 
       Set<ResourcePermission> grantorResourcePermissions = new HashSet<>();
-      grantorResourcePermissions.add(ResourcePermission.getInstance(ResourcePermission.IMPERSONATE, true));
-      grantorResourcePermissions.add(ResourcePermission.getInstance(customPermissionName, true));
+      grantorResourcePermissions.add(ResourcePermissions.getInstance(ResourcePermissions.IMPERSONATE, true));
+      grantorResourcePermissions.add(ResourcePermissions.getInstance(customPermissionName, true));
 
       Set<ResourcePermission> permissions_pre = new HashSet<>();
-      permissions_pre.add(ResourcePermission.getInstance(ResourcePermission.IMPERSONATE));
-      permissions_pre.add(ResourcePermission.getInstance(customPermissionName));
+      permissions_pre.add(ResourcePermissions.getInstance(ResourcePermissions.IMPERSONATE));
+      permissions_pre.add(ResourcePermissions.getInstance(customPermissionName));
 
       // setup grantor permissions
       accessControlContext.setGlobalResourcePermissions(grantorResource, resourceClassName,
@@ -148,9 +149,10 @@ public class TestAccessControl_getEffectiveGlobalResourcePermissions extends Tes
 
       // setup global permissions on system domain
       Set<ResourcePermission> permissions_parentDomain_pre = new HashSet<>();
-      permissions_parentDomain_pre.add(ResourcePermission.getInstance(ResourcePermission.IMPERSONATE, true));
-      permissions_parentDomain_pre.add(ResourcePermission.getInstance(ResourcePermission.RESET_CREDENTIALS));
-      final ResourcePermission resourcePermission_parentDomain = ResourcePermission.getInstance(generateResourceClassPermission(authenticatableResourceClassName));
+      permissions_parentDomain_pre.add(ResourcePermissions.getInstance(ResourcePermissions.IMPERSONATE, true));
+      permissions_parentDomain_pre.add(ResourcePermissions.getInstance(ResourcePermissions.RESET_CREDENTIALS));
+      final ResourcePermission resourcePermission_parentDomain = ResourcePermissions.getInstance(
+            generateResourceClassPermission(authenticatableResourceClassName));
       permissions_parentDomain_pre.add(resourcePermission_parentDomain);
       accessControlContext.setGlobalResourcePermissions(accessorResource, authenticatableResourceClassName,
                                                         permissions_parentDomain_pre,
@@ -158,9 +160,10 @@ public class TestAccessControl_getEffectiveGlobalResourcePermissions extends Tes
 
       // setup global permissions on child domain
       Set<ResourcePermission> permissions_childDomain_pre = new HashSet<>();
-      permissions_childDomain_pre.add(ResourcePermission.getInstance(ResourcePermission.IMPERSONATE));
-      permissions_childDomain_pre.add(ResourcePermission.getInstance(ResourcePermission.RESET_CREDENTIALS, true));
-      final ResourcePermission resourcePermission_childDomain = ResourcePermission.getInstance(generateResourceClassPermission(authenticatableResourceClassName));
+      permissions_childDomain_pre.add(ResourcePermissions.getInstance(ResourcePermissions.IMPERSONATE));
+      permissions_childDomain_pre.add(ResourcePermissions.getInstance(ResourcePermissions.RESET_CREDENTIALS, true));
+      final ResourcePermission resourcePermission_childDomain = ResourcePermissions.getInstance(
+            generateResourceClassPermission(authenticatableResourceClassName));
       permissions_childDomain_pre.add(resourcePermission_childDomain);
       accessControlContext.setGlobalResourcePermissions(accessorResource, authenticatableResourceClassName,
                                                         permissions_childDomain_pre,

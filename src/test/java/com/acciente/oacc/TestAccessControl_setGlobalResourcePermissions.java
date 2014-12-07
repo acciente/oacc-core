@@ -45,8 +45,9 @@ public class TestAccessControl_setGlobalResourcePermissions extends TestAccessCo
 
       // set permissions and verify
       Set<ResourcePermission> permissions_pre = new HashSet<>();
-      permissions_pre.add(ResourcePermission.getInstance(ResourcePermission.IMPERSONATE));
-      permissions_pre.add(ResourcePermission.getInstance(generateResourceClassPermission(authenticatableResourceClassName)));
+      permissions_pre.add(ResourcePermissions.getInstance(ResourcePermissions.IMPERSONATE));
+      permissions_pre.add(ResourcePermissions.getInstance(generateResourceClassPermission(
+            authenticatableResourceClassName)));
 
       accessControlContext.setGlobalResourcePermissions(accessorResource,
                                                         authenticatableResourceClassName,
@@ -78,7 +79,7 @@ public class TestAccessControl_setGlobalResourcePermissions extends TestAccessCo
       assertThat(accessControlContext.getEffectiveGlobalResourcePermissionsMap(accessorResource).isEmpty(), is(true));
 
       Set<ResourcePermission> permissions_pre = new HashSet<>();
-      permissions_pre.add(ResourcePermission.getInstance(ResourcePermission.INHERIT));
+      permissions_pre.add(ResourcePermissions.getInstance(ResourcePermissions.INHERIT));
 
       // attempt to set *INHERIT system permission
       try {
@@ -102,7 +103,7 @@ public class TestAccessControl_setGlobalResourcePermissions extends TestAccessCo
       assertThat(accessControlContext.getEffectiveGlobalResourcePermissionsMap(accessorResource).isEmpty(), is(true));
 
       Set<ResourcePermission> permissions_pre = new HashSet<>();
-      permissions_pre.add(ResourcePermission.getInstance(ResourcePermission.RESET_CREDENTIALS));
+      permissions_pre.add(ResourcePermissions.getInstance(ResourcePermissions.RESET_CREDENTIALS));
 
       // attempt to set *RESET_CREDENTIALS system permission
       try {
@@ -126,7 +127,7 @@ public class TestAccessControl_setGlobalResourcePermissions extends TestAccessCo
       assertThat(accessControlContext.getEffectiveGlobalResourcePermissionsMap(accessorResource).isEmpty(), is(true));
 
       Set<ResourcePermission> permissions_pre = new HashSet<>();
-      permissions_pre.add(ResourcePermission.getInstance(ResourcePermission.IMPERSONATE));
+      permissions_pre.add(ResourcePermissions.getInstance(ResourcePermissions.IMPERSONATE));
 
       // attempt to set *IMPERSONATE system permission
       try {
@@ -153,12 +154,12 @@ public class TestAccessControl_setGlobalResourcePermissions extends TestAccessCo
       assertThat(accessControlContext.getEffectiveGlobalResourcePermissionsMap(accessorResource).isEmpty(), is(true));
 
       Set<ResourcePermission> grantorResourcePermissions = new HashSet<>();
-      grantorResourcePermissions.add(ResourcePermission.getInstance(ResourcePermission.IMPERSONATE, true));
-      grantorResourcePermissions.add(ResourcePermission.getInstance(customPermissionName, true));
+      grantorResourcePermissions.add(ResourcePermissions.getInstance(ResourcePermissions.IMPERSONATE, true));
+      grantorResourcePermissions.add(ResourcePermissions.getInstance(customPermissionName, true));
 
       Set<ResourcePermission> permissions_pre = new HashSet<>();
-      permissions_pre.add(ResourcePermission.getInstance(ResourcePermission.IMPERSONATE));
-      permissions_pre.add(ResourcePermission.getInstance(customPermissionName));
+      permissions_pre.add(ResourcePermissions.getInstance(ResourcePermissions.IMPERSONATE));
+      permissions_pre.add(ResourcePermissions.getInstance(customPermissionName));
 
       // setup grantor permissions
       accessControlContext.setGlobalResourcePermissions(grantorResource,
@@ -193,12 +194,12 @@ public class TestAccessControl_setGlobalResourcePermissions extends TestAccessCo
       assertThat(accessControlContext.getEffectiveGlobalResourcePermissionsMap(accessorResource).isEmpty(), is(true));
 
       Set<ResourcePermission> grantorResourcePermissions = new HashSet<>();
-      grantorResourcePermissions.add(ResourcePermission.getInstance(ResourcePermission.IMPERSONATE, true));
-      grantorResourcePermissions.add(ResourcePermission.getInstance(customPermissionName, true));
+      grantorResourcePermissions.add(ResourcePermissions.getInstance(ResourcePermissions.IMPERSONATE, true));
+      grantorResourcePermissions.add(ResourcePermissions.getInstance(customPermissionName, true));
 
       Set<ResourcePermission> permissions_pre = new HashSet<>();
-      permissions_pre.add(ResourcePermission.getInstance(ResourcePermission.IMPERSONATE));
-      permissions_pre.add(ResourcePermission.getInstance(customPermissionName));
+      permissions_pre.add(ResourcePermissions.getInstance(ResourcePermissions.IMPERSONATE));
+      permissions_pre.add(ResourcePermissions.getInstance(customPermissionName));
 
       // setup grantor permissions
       accessControlContext.setGlobalResourcePermissions(grantorResource,
@@ -233,8 +234,8 @@ public class TestAccessControl_setGlobalResourcePermissions extends TestAccessCo
       assertThat(accessControlContext.getEffectiveGlobalResourcePermissionsMap(accessorResource).isEmpty(), is(true));
 
       Set<ResourcePermission> permissions_pre1 = new HashSet<>();
-      permissions_pre1.add(ResourcePermission.getInstance(ResourcePermission.IMPERSONATE, true));
-      permissions_pre1.add(ResourcePermission.getInstance(generateResourceClassPermission(resourceClassName)));
+      permissions_pre1.add(ResourcePermissions.getInstance(ResourcePermissions.IMPERSONATE, true));
+      permissions_pre1.add(ResourcePermissions.getInstance(generateResourceClassPermission(resourceClassName)));
 
       // set permissions and verify
       accessControlContext.setGlobalResourcePermissions(accessorResource, resourceClassName,
@@ -246,8 +247,8 @@ public class TestAccessControl_setGlobalResourcePermissions extends TestAccessCo
 
       // reset permissions and verify they only contain the latest
       Set<ResourcePermission> permissions_pre2 = new HashSet<>();
-      permissions_pre2.add(ResourcePermission.getInstance(ResourcePermission.IMPERSONATE, false));
-      permissions_pre2.add(ResourcePermission.getInstance(generateResourceClassPermission(resourceClassName)));
+      permissions_pre2.add(ResourcePermissions.getInstance(ResourcePermissions.IMPERSONATE, false));
+      permissions_pre2.add(ResourcePermissions.getInstance(generateResourceClassPermission(resourceClassName)));
       assertThat(permissions_pre1, is(not(permissions_pre2)));
 
       accessControlContext.setGlobalResourcePermissions(accessorResource,
@@ -273,7 +274,7 @@ public class TestAccessControl_setGlobalResourcePermissions extends TestAccessCo
       authenticateSystemResource();
       final String resourceClassName = generateResourceClass(true, false);
       final String grantedPermissionName = generateResourceClassPermission(resourceClassName);
-      final String ungrantedPermissionName = ResourcePermission.IMPERSONATE;
+      final String ungrantedPermissionName = ResourcePermissions.IMPERSONATE;
       final char[] password = generateUniquePassword();
       final Resource grantorResource = generateAuthenticatableResource(password);
       final Resource accessorResource = generateUnauthenticatableResource();
@@ -281,7 +282,7 @@ public class TestAccessControl_setGlobalResourcePermissions extends TestAccessCo
 
       // setup accessor permissions
       Set<ResourcePermission> accessorPermissions_pre = new HashSet<>();
-      accessorPermissions_pre.add(ResourcePermission.getInstance(ungrantedPermissionName));
+      accessorPermissions_pre.add(ResourcePermissions.getInstance(ungrantedPermissionName));
 
       accessControlContext.setGlobalResourcePermissions(accessorResource, resourceClassName, accessorPermissions_pre, domainName);
       assertThat(accessControlContext.getEffectiveGlobalResourcePermissions(accessorResource, resourceClassName, domainName),
@@ -289,7 +290,7 @@ public class TestAccessControl_setGlobalResourcePermissions extends TestAccessCo
 
       // setup grantor permissions
       Set<ResourcePermission> grantorPermissions = new HashSet<>();
-      grantorPermissions.add(ResourcePermission.getInstance(grantedPermissionName, true));
+      grantorPermissions.add(ResourcePermissions.getInstance(grantedPermissionName, true));
 
       accessControlContext.setGlobalResourcePermissions(grantorResource, resourceClassName, grantorPermissions, domainName);
       assertThat(accessControlContext.getEffectiveGlobalResourcePermissions(grantorResource, resourceClassName, domainName),
@@ -300,14 +301,14 @@ public class TestAccessControl_setGlobalResourcePermissions extends TestAccessCo
 
       // set permissions as grantor and verify
       Set<ResourcePermission> requestedPermissions = new HashSet<>();
-      requestedPermissions.add(ResourcePermission.getInstance(grantedPermissionName));
-      requestedPermissions.add(ResourcePermission.getInstance(ungrantedPermissionName));
+      requestedPermissions.add(ResourcePermissions.getInstance(grantedPermissionName));
+      requestedPermissions.add(ResourcePermissions.getInstance(ungrantedPermissionName));
 
       accessControlContext.setGlobalResourcePermissions(accessorResource, resourceClassName, requestedPermissions, domainName);
 
       Set<ResourcePermission> permissions_expected = new HashSet<>();
-      permissions_expected.add(ResourcePermission.getInstance(grantedPermissionName, false));
-      permissions_expected.add(ResourcePermission.getInstance(ungrantedPermissionName, false));
+      permissions_expected.add(ResourcePermissions.getInstance(grantedPermissionName, false));
+      permissions_expected.add(ResourcePermissions.getInstance(ungrantedPermissionName, false));
 
       final Set<ResourcePermission> permissions_post
             = accessControlContext.getEffectiveGlobalResourcePermissions(accessorResource, resourceClassName, domainName);
@@ -318,7 +319,7 @@ public class TestAccessControl_setGlobalResourcePermissions extends TestAccessCo
       authenticateSystemResource();
       final String resourceClassName = generateResourceClass(true, false);
       final String grantedPermissionName = generateResourceClassPermission(resourceClassName);
-      final String ungrantedPermissionName = ResourcePermission.IMPERSONATE;
+      final String ungrantedPermissionName = ResourcePermissions.IMPERSONATE;
       final char[] password = generateUniquePassword();
       final Resource grantorResource = generateAuthenticatableResource(password);
       final Resource accessorResource = generateUnauthenticatableResource();
@@ -326,8 +327,8 @@ public class TestAccessControl_setGlobalResourcePermissions extends TestAccessCo
 
       // setup accessor permissions
       Set<ResourcePermission> accessorPermissions_pre = new HashSet<>();
-      accessorPermissions_pre.add(ResourcePermission.getInstance(grantedPermissionName));
-      accessorPermissions_pre.add(ResourcePermission.getInstance(ungrantedPermissionName));
+      accessorPermissions_pre.add(ResourcePermissions.getInstance(grantedPermissionName));
+      accessorPermissions_pre.add(ResourcePermissions.getInstance(ungrantedPermissionName));
 
       accessControlContext.setGlobalResourcePermissions(accessorResource, resourceClassName, accessorPermissions_pre, domainName);
       assertThat(accessControlContext.getEffectiveGlobalResourcePermissions(accessorResource, resourceClassName, domainName),
@@ -335,7 +336,7 @@ public class TestAccessControl_setGlobalResourcePermissions extends TestAccessCo
 
       // setup grantor permissions
       Set<ResourcePermission> grantorPermissions = new HashSet<>();
-      grantorPermissions.add(ResourcePermission.getInstance(grantedPermissionName, true));
+      grantorPermissions.add(ResourcePermissions.getInstance(grantedPermissionName, true));
 
       accessControlContext.setGlobalResourcePermissions(grantorResource, resourceClassName, grantorPermissions, domainName);
       assertThat(accessControlContext.getEffectiveGlobalResourcePermissions(grantorResource, resourceClassName, domainName),
@@ -346,12 +347,12 @@ public class TestAccessControl_setGlobalResourcePermissions extends TestAccessCo
 
       // set permissions as grantor and verify
       Set<ResourcePermission> requestedPermissions = new HashSet<>();
-      requestedPermissions.add(ResourcePermission.getInstance(ungrantedPermissionName));
+      requestedPermissions.add(ResourcePermissions.getInstance(ungrantedPermissionName));
 
       accessControlContext.setGlobalResourcePermissions(accessorResource, resourceClassName, requestedPermissions, domainName);
 
       Set<ResourcePermission> permissions_expected = new HashSet<>();
-      permissions_expected.add(ResourcePermission.getInstance(ungrantedPermissionName, false));
+      permissions_expected.add(ResourcePermissions.getInstance(ungrantedPermissionName, false));
 
       final Set<ResourcePermission> permissions_post
             = accessControlContext.getEffectiveGlobalResourcePermissions(accessorResource, resourceClassName, domainName);
@@ -370,7 +371,7 @@ public class TestAccessControl_setGlobalResourcePermissions extends TestAccessCo
 
       // setup accessor permissions
       Set<ResourcePermission> accessorPermissions_pre = new HashSet<>();
-      accessorPermissions_pre.add(ResourcePermission.getInstance(grantedPermissionName, true));
+      accessorPermissions_pre.add(ResourcePermissions.getInstance(grantedPermissionName, true));
 
       accessControlContext.setGlobalResourcePermissions(accessorResource, resourceClassName, accessorPermissions_pre, domainName);
       assertThat(accessControlContext.getEffectiveGlobalResourcePermissions(accessorResource, resourceClassName, domainName),
@@ -378,7 +379,7 @@ public class TestAccessControl_setGlobalResourcePermissions extends TestAccessCo
 
       // setup grantor permissions
       Set<ResourcePermission> grantorResourcePermissions = new HashSet<>();
-      grantorResourcePermissions.add(ResourcePermission.getInstance(grantedPermissionName, true));
+      grantorResourcePermissions.add(ResourcePermissions.getInstance(grantedPermissionName, true));
 
       accessControlContext.setGlobalResourcePermissions(grantorResource, resourceClassName, grantorResourcePermissions, domainName);
       assertThat(accessControlContext.getEffectiveGlobalResourcePermissions(grantorResource, resourceClassName, domainName),
@@ -389,12 +390,12 @@ public class TestAccessControl_setGlobalResourcePermissions extends TestAccessCo
 
       // set permissions as grantor and verify
       Set<ResourcePermission> requestedPermissions = new HashSet<>();
-      requestedPermissions.add(ResourcePermission.getInstance(grantedPermissionName));
+      requestedPermissions.add(ResourcePermissions.getInstance(grantedPermissionName));
 
       accessControlContext.setGlobalResourcePermissions(accessorResource, resourceClassName, requestedPermissions, domainName);
 
       Set<ResourcePermission> permissions_expected = new HashSet<>();
-      permissions_expected.add(ResourcePermission.getInstance(grantedPermissionName));
+      permissions_expected.add(ResourcePermissions.getInstance(grantedPermissionName));
 
       final Set<ResourcePermission> permissions_post
             = accessControlContext.getEffectiveGlobalResourcePermissions(accessorResource, resourceClassName, domainName);
@@ -406,7 +407,7 @@ public class TestAccessControl_setGlobalResourcePermissions extends TestAccessCo
       authenticateSystemResource();
       final String resourceClassName = generateResourceClass(true, false);
       final String grantedPermissionName = generateResourceClassPermission(resourceClassName);
-      final String ungrantedPermissionName = ResourcePermission.IMPERSONATE;
+      final String ungrantedPermissionName = ResourcePermissions.IMPERSONATE;
       final char[] password = generateUniquePassword();
       final Resource grantorResource = generateAuthenticatableResource(password);
       final Resource accessorResource = generateUnauthenticatableResource();
@@ -414,7 +415,7 @@ public class TestAccessControl_setGlobalResourcePermissions extends TestAccessCo
 
       // setup accessor permissions
       Set<ResourcePermission> accessorPermissions_pre = new HashSet<>();
-      accessorPermissions_pre.add(ResourcePermission.getInstance(ungrantedPermissionName, true));
+      accessorPermissions_pre.add(ResourcePermissions.getInstance(ungrantedPermissionName, true));
 
       accessControlContext.setGlobalResourcePermissions(accessorResource, resourceClassName, accessorPermissions_pre, domainName);
       assertThat(accessControlContext.getEffectiveGlobalResourcePermissions(accessorResource, resourceClassName, domainName),
@@ -422,7 +423,7 @@ public class TestAccessControl_setGlobalResourcePermissions extends TestAccessCo
 
       // setup grantor permissions
       Set<ResourcePermission> grantorResourcePermissions = new HashSet<>();
-      grantorResourcePermissions.add(ResourcePermission.getInstance(grantedPermissionName, true));
+      grantorResourcePermissions.add(ResourcePermissions.getInstance(grantedPermissionName, true));
 
       accessControlContext.setGlobalResourcePermissions(grantorResource, resourceClassName, grantorResourcePermissions, domainName);
       assertThat(accessControlContext.getEffectiveGlobalResourcePermissions(grantorResource, resourceClassName, domainName),
@@ -433,8 +434,8 @@ public class TestAccessControl_setGlobalResourcePermissions extends TestAccessCo
 
       // set permissions as grantor and verify
       Set<ResourcePermission> requestedPermissions = new HashSet<>();
-      requestedPermissions.add(ResourcePermission.getInstance(grantedPermissionName));
-      requestedPermissions.add(ResourcePermission.getInstance(ungrantedPermissionName));
+      requestedPermissions.add(ResourcePermissions.getInstance(grantedPermissionName));
+      requestedPermissions.add(ResourcePermissions.getInstance(ungrantedPermissionName));
 
       try {
          accessControlContext.setGlobalResourcePermissions(accessorResource, resourceClassName, requestedPermissions, domainName);
@@ -459,7 +460,7 @@ public class TestAccessControl_setGlobalResourcePermissions extends TestAccessCo
 
       // setup accessor permissions
       Set<ResourcePermission> accessorPermissions_pre = new HashSet<>();
-      accessorPermissions_pre.add(ResourcePermission.getInstance(grantedPermissionName));
+      accessorPermissions_pre.add(ResourcePermissions.getInstance(grantedPermissionName));
 
       accessControlContext.setGlobalResourcePermissions(accessorResource, resourceClassName, accessorPermissions_pre, domainName);
       assertThat(accessControlContext.getEffectiveGlobalResourcePermissions(accessorResource, resourceClassName, domainName),
@@ -467,7 +468,7 @@ public class TestAccessControl_setGlobalResourcePermissions extends TestAccessCo
 
       // setup grantor permissions
       Set<ResourcePermission> grantorResourcePermissions = new HashSet<>();
-      grantorResourcePermissions.add(ResourcePermission.getInstance(grantedPermissionName, true));
+      grantorResourcePermissions.add(ResourcePermissions.getInstance(grantedPermissionName, true));
 
       accessControlContext.setGlobalResourcePermissions(grantorResource, resourceClassName, grantorResourcePermissions, domainName);
       assertThat(accessControlContext.getEffectiveGlobalResourcePermissions(grantorResource, resourceClassName, domainName),
@@ -478,12 +479,12 @@ public class TestAccessControl_setGlobalResourcePermissions extends TestAccessCo
 
       // set permissions as grantor and verify
       Set<ResourcePermission> requestedPermissions = new HashSet<>();
-      requestedPermissions.add(ResourcePermission.getInstance(grantedPermissionName, true));
+      requestedPermissions.add(ResourcePermissions.getInstance(grantedPermissionName, true));
 
       accessControlContext.setGlobalResourcePermissions(accessorResource, resourceClassName, requestedPermissions, domainName);
 
       Set<ResourcePermission> permissions_expected = new HashSet<>();
-      permissions_expected.add(ResourcePermission.getInstance(grantedPermissionName, true));
+      permissions_expected.add(ResourcePermissions.getInstance(grantedPermissionName, true));
 
       final Set<ResourcePermission> permissions_post
             = accessControlContext.getEffectiveGlobalResourcePermissions(accessorResource, resourceClassName, domainName);
@@ -495,7 +496,7 @@ public class TestAccessControl_setGlobalResourcePermissions extends TestAccessCo
       authenticateSystemResource();
       final String resourceClassName = generateResourceClass(true, false);
       final String grantedPermissionName = generateResourceClassPermission(resourceClassName);
-      final String ungrantedPermissionName = ResourcePermission.IMPERSONATE;
+      final String ungrantedPermissionName = ResourcePermissions.IMPERSONATE;
       final char[] password = generateUniquePassword();
       final Resource grantorResource = generateAuthenticatableResource(password);
       final Resource accessorResource = generateUnauthenticatableResource();
@@ -503,7 +504,7 @@ public class TestAccessControl_setGlobalResourcePermissions extends TestAccessCo
 
       // setup accessor permissions
       Set<ResourcePermission> accessorPermissions_pre = new HashSet<>();
-      accessorPermissions_pre.add(ResourcePermission.getInstance(ungrantedPermissionName));
+      accessorPermissions_pre.add(ResourcePermissions.getInstance(ungrantedPermissionName));
 
       accessControlContext.setGlobalResourcePermissions(accessorResource, resourceClassName, accessorPermissions_pre, domainName);
       assertThat(accessControlContext.getEffectiveGlobalResourcePermissions(accessorResource, resourceClassName, domainName),
@@ -511,7 +512,7 @@ public class TestAccessControl_setGlobalResourcePermissions extends TestAccessCo
 
       // setup grantor permissions
       Set<ResourcePermission> grantorResourcePermissions = new HashSet<>();
-      grantorResourcePermissions.add(ResourcePermission.getInstance(grantedPermissionName, true));
+      grantorResourcePermissions.add(ResourcePermissions.getInstance(grantedPermissionName, true));
 
       accessControlContext.setGlobalResourcePermissions(grantorResource, resourceClassName, grantorResourcePermissions, domainName);
       assertThat(accessControlContext.getEffectiveGlobalResourcePermissions(grantorResource, resourceClassName, domainName),
@@ -522,8 +523,8 @@ public class TestAccessControl_setGlobalResourcePermissions extends TestAccessCo
 
       // set permissions as grantor and verify
       Set<ResourcePermission> requestedPermissions = new HashSet<>();
-      requestedPermissions.add(ResourcePermission.getInstance(grantedPermissionName));
-      requestedPermissions.add(ResourcePermission.getInstance(ungrantedPermissionName, true));
+      requestedPermissions.add(ResourcePermissions.getInstance(grantedPermissionName));
+      requestedPermissions.add(ResourcePermissions.getInstance(ungrantedPermissionName, true));
 
       try {
          accessControlContext.setGlobalResourcePermissions(accessorResource, resourceClassName, requestedPermissions, domainName);
@@ -545,10 +546,10 @@ public class TestAccessControl_setGlobalResourcePermissions extends TestAccessCo
       assertThat(accessControlContext.getEffectiveGlobalResourcePermissionsMap(accessorResource).isEmpty(), is(true));
 
       Set<ResourcePermission> permissions_pre = new HashSet<>();
-      permissions_pre.add(ResourcePermission.getInstance(ResourcePermission.IMPERSONATE));
+      permissions_pre.add(ResourcePermissions.getInstance(ResourcePermissions.IMPERSONATE));
       final String permissionName = generateResourceClassPermission(resourceClassName);
-      permissions_pre.add(ResourcePermission.getInstance(permissionName, true));
-      permissions_pre.add(ResourcePermission.getInstance(permissionName, false));
+      permissions_pre.add(ResourcePermissions.getInstance(permissionName, true));
+      permissions_pre.add(ResourcePermissions.getInstance(permissionName, false));
 
       // attempt to set permissions with duplicate permission names
       try {
@@ -572,7 +573,7 @@ public class TestAccessControl_setGlobalResourcePermissions extends TestAccessCo
       assertThat(accessControlContext.getEffectiveGlobalResourcePermissionsMap(accessorResource).isEmpty(), is(true));
 
       Set<ResourcePermission> permissions_valid = new HashSet<>();
-      permissions_valid.add(ResourcePermission.getInstance(ResourcePermission.IMPERSONATE));
+      permissions_valid.add(ResourcePermissions.getInstance(ResourcePermissions.IMPERSONATE));
       Set<ResourcePermission> permissions_nullElement = new HashSet<>();
       permissions_nullElement.add(null);
 
@@ -628,7 +629,7 @@ public class TestAccessControl_setGlobalResourcePermissions extends TestAccessCo
       assertThat(accessControlContext.getEffectiveGlobalResourcePermissionsMap(accessorResource).isEmpty(), is(true));
 
       Set<ResourcePermission> permissions_pre = new HashSet<>();
-      permissions_pre.add(ResourcePermission.getInstance(generateResourceClassPermission(resourceClassName1)));
+      permissions_pre.add(ResourcePermissions.getInstance(generateResourceClassPermission(resourceClassName1)));
 
       // attempt to set global permissions for mismatched resource class and permission
       try {
@@ -652,10 +653,11 @@ public class TestAccessControl_setGlobalResourcePermissions extends TestAccessCo
       assertThat(accessControlContext.getEffectiveGlobalResourcePermissionsMap(accessorResource).isEmpty(), is(true));
 
       Set<ResourcePermission> permissions_invalidName = new HashSet<>();
-      permissions_invalidName.add(ResourcePermission.getInstance("invalid_permission"));
+      permissions_invalidName.add(ResourcePermissions.getInstance("invalid_permission"));
 
       Set<ResourcePermission> resourcePermissions_invalidResourceClass = new HashSet<>();
-      resourcePermissions_invalidResourceClass.add(ResourcePermission.getInstance(generateResourceClassPermission(resourceClassName)));
+      resourcePermissions_invalidResourceClass.add(ResourcePermissions.getInstance(generateResourceClassPermission(
+            resourceClassName)));
 
       // attempt to set permissions with non-existent references
       try {
@@ -704,8 +706,8 @@ public class TestAccessControl_setGlobalResourcePermissions extends TestAccessCo
       assertThat(accessControlContext.getEffectiveGlobalResourcePermissionsMap(accessorResource).isEmpty(), is(true));
 
       Set<ResourcePermission> permissions_pre = new HashSet<>();
-      permissions_pre.add(ResourcePermission.getInstance(ResourcePermission.IMPERSONATE));
-      permissions_pre.add(ResourcePermission.getInstance(customPermissionName));
+      permissions_pre.add(ResourcePermissions.getInstance(ResourcePermissions.IMPERSONATE));
+      permissions_pre.add(ResourcePermissions.getInstance(customPermissionName));
 
       // authenticate grantor resource
       accessControlContext.authenticate(grantorResource, PasswordCredentials.newInstance(password));

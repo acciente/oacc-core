@@ -20,6 +20,7 @@ package com.acciente.oacc.sql.internal.persister;
 import com.acciente.oacc.AccessControlException;
 import com.acciente.oacc.Resource;
 import com.acciente.oacc.ResourcePermission;
+import com.acciente.oacc.ResourcePermissions;
 import com.acciente.oacc.sql.internal.persister.id.DomainId;
 import com.acciente.oacc.sql.internal.persister.id.Id;
 import com.acciente.oacc.sql.internal.persister.id.ResourceClassId;
@@ -128,10 +129,11 @@ public class GrantGlobalResourcePermissionSysPersister extends Persister {
          resultSet = statement.executeQuery();
 
          while (resultSet.next()) {
-            resourcePermissions.add(ResourcePermission.getInstance(resultSet.getResourceSysPermissionName("SysPermissionId"),
-                                                                   resultSet.getBoolean("IsWithGrant"),
-                                                                   resultSet.getInteger("InheritLevel"),
-                                                                   resultSet.getInteger("DomainLevel")));
+            resourcePermissions.add(ResourcePermissions.getInstance(resultSet.getResourceSysPermissionName(
+                  "SysPermissionId"),
+                                                                    resultSet.getBoolean("IsWithGrant"),
+                                                                    resultSet.getInteger("InheritLevel"),
+                                                                    resultSet.getInteger("DomainLevel")));
          }
          resultSet.close();
 
@@ -162,10 +164,11 @@ public class GrantGlobalResourcePermissionSysPersister extends Persister {
          resultSet = statement.executeQuery();
 
          while (resultSet.next()) {
-            resourcePermissions.add(ResourcePermission.getInstance(resultSet.getResourceSysPermissionName("SysPermissionId"),
-                                                                   resultSet.getBoolean("IsWithGrant"),
-                                                                   0,
-                                                                   0));
+            resourcePermissions.add(ResourcePermissions.getInstance(resultSet.getResourceSysPermissionName(
+                  "SysPermissionId"),
+                                                                    resultSet.getBoolean("IsWithGrant"),
+                                                                    0,
+                                                                    0));
          }
          resultSet.close();
 
@@ -211,10 +214,11 @@ public class GrantGlobalResourcePermissionSysPersister extends Persister {
                                                 resourcePermissionsForResourceClass = new HashSet<>());
             }
 
-            resourcePermissionsForResourceClass.add(ResourcePermission.getInstance(resultSet.getResourceSysPermissionName("SysPermissionId"),
-                                                                                   resultSet.getBoolean("IsWithGrant"),
-                                                                                   resultSet.getInteger("InheritLevel"),
-                                                                                   resultSet.getInteger("DomainLevel")));
+            resourcePermissionsForResourceClass.add(ResourcePermissions.getInstance(resultSet.getResourceSysPermissionName(
+                  "SysPermissionId"),
+                                                                                    resultSet.getBoolean("IsWithGrant"),
+                                                                                    resultSet.getInteger("InheritLevel"),
+                                                                                    resultSet.getInteger("DomainLevel")));
          }
          resultSet.close();
 

@@ -20,6 +20,7 @@ package com.acciente.oacc.sql.internal.persister;
 import com.acciente.oacc.AccessControlException;
 import com.acciente.oacc.Resource;
 import com.acciente.oacc.ResourcePermission;
+import com.acciente.oacc.ResourcePermissions;
 import com.acciente.oacc.sql.internal.persister.id.DomainId;
 import com.acciente.oacc.sql.internal.persister.id.Id;
 import com.acciente.oacc.sql.internal.persister.id.ResourceClassId;
@@ -164,10 +165,11 @@ public class GrantResourcePermissionSysPersister extends Persister {
          resultSet = statement.executeQuery();
 
          while (resultSet.next()) {
-            resourcePermissions.add(ResourcePermission.getInstance(resultSet.getResourceSysPermissionName("SysPermissionId"),
-                                                                   resultSet.getBoolean("IsWithGrant"),
-                                                                   resultSet.getInteger("InheritLevel"),
-                                                                   0 /* zero since domain level does not apply in context of direct permissions */));
+            resourcePermissions.add(ResourcePermissions.getInstance(resultSet.getResourceSysPermissionName(
+                  "SysPermissionId"),
+                                                                    resultSet.getBoolean("IsWithGrant"),
+                                                                    resultSet.getInteger("InheritLevel"),
+                                                                    0 /* zero since domain level does not apply in context of direct permissions */));
          }
          resultSet.close();
 
@@ -198,10 +200,12 @@ public class GrantResourcePermissionSysPersister extends Persister {
          resultSet = statement.executeQuery();
 
          while (resultSet.next()) {
-            resourcePermissions.add(ResourcePermission.getInstance(resultSet.getResourceSysPermissionName("SysPermissionId"),
-                                                                   resultSet.getBoolean("IsWithGrant"),
-                                                                   0, // inherit level doesn't apply to direct permissions
-                                                                   0 /* zero since domain level does not apply in context of direct permissions */));
+            resourcePermissions.add(ResourcePermissions.getInstance(resultSet.getResourceSysPermissionName(
+                  "SysPermissionId"),
+                                                                    resultSet.getBoolean("IsWithGrant"),
+                                                                    0,
+                                                                    // inherit level doesn't apply to direct permissions
+                                                                    0 /* zero since domain level does not apply in context of direct permissions */));
          }
          resultSet.close();
 

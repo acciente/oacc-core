@@ -69,13 +69,13 @@ public class TestAccessControl_getEffectiveResourceCreatePermissions extends Tes
       final ResourceCreatePermission createPerm_create_withGrant = ResourceCreatePermissions.getInstance(
             ResourceCreatePermissions.CREATE,
             true);
-      final ResourceCreatePermission createPerm_impersonate = ResourceCreatePermissions.getInstance(ResourcePermission.getInstance(
-            ResourcePermission.IMPERSONATE), false);
+      final ResourceCreatePermission createPerm_impersonate = ResourceCreatePermissions.getInstance(ResourcePermissions.getInstance(
+            ResourcePermissions.IMPERSONATE), false);
       final ResourceCreatePermission createPerm_inherit_withGrant = ResourceCreatePermissions.getInstance(
-            ResourcePermission.getInstance(ResourcePermission.INHERIT, true),
+            ResourcePermissions.getInstance(ResourcePermissions.INHERIT, true),
             true);
-      final ResourceCreatePermission createPerm_resetPwd = ResourceCreatePermissions.getInstance(ResourcePermission.getInstance(
-            ResourcePermission.RESET_CREDENTIALS,
+      final ResourceCreatePermission createPerm_resetPwd = ResourceCreatePermissions.getInstance(ResourcePermissions.getInstance(
+            ResourcePermissions.RESET_CREDENTIALS,
             true));
 
       final Resource accessorResource = generateUnauthenticatableResource();
@@ -127,13 +127,13 @@ public class TestAccessControl_getEffectiveResourceCreatePermissions extends Tes
       final ResourceCreatePermission createPerm_create_withGrant = ResourceCreatePermissions.getInstance(
             ResourceCreatePermissions.CREATE,
             true);
-      final ResourceCreatePermission createPerm_impersonate = ResourceCreatePermissions.getInstance(ResourcePermission.getInstance(
-            ResourcePermission.IMPERSONATE), false);
+      final ResourceCreatePermission createPerm_impersonate = ResourceCreatePermissions.getInstance(ResourcePermissions.getInstance(
+            ResourcePermissions.IMPERSONATE), false);
       final ResourceCreatePermission createPerm_inherit_withGrant = ResourceCreatePermissions.getInstance(
-            ResourcePermission.getInstance(ResourcePermission.INHERIT, true),
+            ResourcePermissions.getInstance(ResourcePermissions.INHERIT, true),
             true);
-      final ResourceCreatePermission createPerm_resetPwd = ResourceCreatePermissions.getInstance(ResourcePermission.getInstance(
-            ResourcePermission.RESET_CREDENTIALS,
+      final ResourceCreatePermission createPerm_resetPwd = ResourceCreatePermissions.getInstance(ResourcePermissions.getInstance(
+            ResourcePermissions.RESET_CREDENTIALS,
             true));
 
       final Resource accessorResource = generateUnauthenticatableResource();
@@ -193,16 +193,16 @@ public class TestAccessControl_getEffectiveResourceCreatePermissions extends Tes
       final ResourceCreatePermission createPerm_create_withGrant = ResourceCreatePermissions.getInstance(
             ResourceCreatePermissions.CREATE,
             true);
-      final ResourceCreatePermission createPerm_impersonate = ResourceCreatePermissions.getInstance(ResourcePermission.getInstance(
-            ResourcePermission.IMPERSONATE), false);
+      final ResourceCreatePermission createPerm_impersonate = ResourceCreatePermissions.getInstance(ResourcePermissions.getInstance(
+            ResourcePermissions.IMPERSONATE), false);
       final ResourceCreatePermission createPerm_inherit_withGrant = ResourceCreatePermissions.getInstance(
-            ResourcePermission.getInstance(ResourcePermission.INHERIT, true),
+            ResourcePermissions.getInstance(ResourcePermissions.INHERIT, true),
             true);
-      final ResourceCreatePermission createPerm_resetPwd = ResourceCreatePermissions.getInstance(ResourcePermission.getInstance(
-            ResourcePermission.RESET_CREDENTIALS,
+      final ResourceCreatePermission createPerm_resetPwd = ResourceCreatePermissions.getInstance(ResourcePermissions.getInstance(
+            ResourcePermissions.RESET_CREDENTIALS,
             true));
       final ResourceCreatePermission createPerm_resetPwd_withGrant = ResourceCreatePermissions.getInstance(
-            ResourcePermission.getInstance(ResourcePermission.RESET_CREDENTIALS, true),
+            ResourcePermissions.getInstance(ResourcePermissions.RESET_CREDENTIALS, true),
             true);
 
       final Resource accessorResource = generateUnauthenticatableResource();
@@ -216,7 +216,8 @@ public class TestAccessControl_getEffectiveResourceCreatePermissions extends Tes
       parentResourceCreatePermissions_pre.add(createPerm_create_withGrant);
       parentResourceCreatePermissions_pre.add(createPerm_inherit_withGrant);
       parentResourceCreatePermissions_pre.add(createPerm_resetPwd);
-      final ResourcePermission parentResourcePermission_custom = ResourcePermission.getInstance(generateResourceClassPermission(resourceClassName));
+      final ResourcePermission parentResourcePermission_custom = ResourcePermissions.getInstance(
+            generateResourceClassPermission(resourceClassName));
       final ResourceCreatePermission parentResourceCreatePermission_custom = ResourceCreatePermissions.getInstance(
             parentResourcePermission_custom,
             true);

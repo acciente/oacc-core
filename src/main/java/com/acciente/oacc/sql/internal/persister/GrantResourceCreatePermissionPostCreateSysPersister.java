@@ -22,6 +22,7 @@ import com.acciente.oacc.Resource;
 import com.acciente.oacc.ResourceCreatePermission;
 import com.acciente.oacc.ResourceCreatePermissions;
 import com.acciente.oacc.ResourcePermission;
+import com.acciente.oacc.ResourcePermissions;
 import com.acciente.oacc.sql.internal.persister.id.DomainId;
 import com.acciente.oacc.sql.internal.persister.id.Id;
 import com.acciente.oacc.sql.internal.persister.id.ResourceClassId;
@@ -58,8 +59,9 @@ public class GrantResourceCreatePermissionPostCreateSysPersister extends Persist
          while (resultSet.next()) {
             ResourcePermission resourcePermission;
 
-            resourcePermission = ResourcePermission.getInstance(resultSet.getResourceSysPermissionName("PostCreateSysPermissionId"),
-                                                                resultSet.getBoolean("PostCreateIsWithGrant"));
+            resourcePermission = ResourcePermissions.getInstance(resultSet.getResourceSysPermissionName(
+                  "PostCreateSysPermissionId"),
+                                                                 resultSet.getBoolean("PostCreateIsWithGrant"));
 
             resourceCreatePermissions.add(ResourceCreatePermissions.getInstance(resourcePermission,
                                                                                 resultSet.getBoolean("IsWithGrant"),
@@ -113,8 +115,9 @@ public class GrantResourceCreatePermissionPostCreateSysPersister extends Persist
 
             ResourcePermission resourcePermission;
 
-            resourcePermission = ResourcePermission.getInstance(resultSet.getResourceSysPermissionName("PostCreateSysPermissionId"),
-                                                                resultSet.getBoolean("PostCreateIsWithGrant"));
+            resourcePermission = ResourcePermissions.getInstance(resultSet.getResourceSysPermissionName(
+                  "PostCreateSysPermissionId"),
+                                                                 resultSet.getBoolean("PostCreateIsWithGrant"));
 
             permissionsForResourceClass.add(ResourceCreatePermissions.getInstance(resourcePermission,
                                                                                   resultSet.getBoolean("IsWithGrant"),
@@ -152,8 +155,9 @@ public class GrantResourceCreatePermissionPostCreateSysPersister extends Persist
          while (resultSet.next()) {
             ResourcePermission resourcePermission;
 
-            resourcePermission = ResourcePermission.getInstance(resultSet.getResourceSysPermissionName("PostCreateSysPermissionId"),
-                                                                resultSet.getBoolean("PostCreateIsWithGrant"));
+            resourcePermission = ResourcePermissions.getInstance(resultSet.getResourceSysPermissionName(
+                  "PostCreateSysPermissionId"),
+                                                                 resultSet.getBoolean("PostCreateIsWithGrant"));
 
             resourceCreatePermissions.add(ResourceCreatePermissions.getInstance(resourcePermission,
                                                                                 resultSet.getBoolean("IsWithGrant"),

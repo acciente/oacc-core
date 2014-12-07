@@ -30,6 +30,7 @@ import com.acciente.oacc.ResourceClassInfo;
 import com.acciente.oacc.ResourceCreatePermission;
 import com.acciente.oacc.ResourceCreatePermissions;
 import com.acciente.oacc.ResourcePermission;
+import com.acciente.oacc.ResourcePermissions;
 import com.acciente.oacc.Resources;
 import com.acciente.oacc.sql.SQLDialect;
 import com.acciente.oacc.sql.internal.persister.DomainPersister;
@@ -98,17 +99,17 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
 
    // resource permissions constants
    private static final ResourcePermission ResourcePermission_INHERIT
-         = ResourcePermission.getInstance(ResourcePermission.INHERIT, false);
+         = ResourcePermissions.getInstance(ResourcePermissions.INHERIT, false);
    private static final ResourcePermission ResourcePermission_INHERIT_GRANT
-         = ResourcePermission.getInstance(ResourcePermission.INHERIT, true);
+         = ResourcePermissions.getInstance(ResourcePermissions.INHERIT, true);
    private static final ResourcePermission ResourcePermission_IMPERSONATE
-         = ResourcePermission.getInstance(ResourcePermission.IMPERSONATE, false);
+         = ResourcePermissions.getInstance(ResourcePermissions.IMPERSONATE, false);
    private static final ResourcePermission ResourcePermission_IMPERSONATE_GRANT
-         = ResourcePermission.getInstance(ResourcePermission.IMPERSONATE, true);
+         = ResourcePermissions.getInstance(ResourcePermissions.IMPERSONATE, true);
    private static final ResourcePermission ResourcePermission_RESET_CREDENTIALS
-         = ResourcePermission.getInstance(ResourcePermission.RESET_CREDENTIALS, false);
+         = ResourcePermissions.getInstance(ResourcePermissions.RESET_CREDENTIALS, false);
    private static final ResourcePermission ResourcePermission_RESET_CREDENTIALS_GRANT
-         = ResourcePermission.getInstance(ResourcePermission.RESET_CREDENTIALS, true);
+         = ResourcePermissions.getInstance(ResourcePermissions.RESET_CREDENTIALS, true);
 
    // persisters
    private final ResourceClassPersister                              resourceClassPersister;
@@ -787,12 +788,12 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
          newResourcePermissions = new HashSet<>();
 
          for (String permissionName : resourceClassPermissionPersister.getPermissionNames(connection, resourceClassName)) {
-            newResourcePermissions.add(ResourcePermission.getInstance(permissionName, true));
+            newResourcePermissions.add(ResourcePermissions.getInstance(permissionName, true));
          }
 
          if (resourceClassInternalInfo.isAuthenticatable()) {
-            newResourcePermissions.add(ResourcePermission.getInstance(ResourcePermission.RESET_CREDENTIALS, true));
-            newResourcePermissions.add(ResourcePermission.getInstance(ResourcePermission.IMPERSONATE, true));
+            newResourcePermissions.add(ResourcePermissions.getInstance(ResourcePermissions.RESET_CREDENTIALS, true));
+            newResourcePermissions.add(ResourcePermissions.getInstance(ResourcePermissions.IMPERSONATE, true));
          }
       }
       else {
@@ -1409,8 +1410,8 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
          if (postCreateResourcePermission.isSystemPermission()) {
             // we allow impersonate and reset_credentials system permissions only for authenticatable resource classes
             if (!resourceClassInternalInfo.isAuthenticatable()
-                  && (ResourcePermission.IMPERSONATE.equals(postCreateResourcePermission.getPermissionName())
-                  || ResourcePermission.RESET_CREDENTIALS.equals(postCreateResourcePermission.getPermissionName()))) {
+                  && (ResourcePermissions.IMPERSONATE.equals(postCreateResourcePermission.getPermissionName())
+                  || ResourcePermissions.RESET_CREDENTIALS.equals(postCreateResourcePermission.getPermissionName()))) {
                throw new AccessControlException("Permission: " + postCreateResourcePermission
                                                       + ", not valid for unauthenticatable resource");
             }
@@ -1795,8 +1796,8 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
          if (resourcePermission.isSystemPermission()) {
             // we allow impersonate and reset_credentials system permissions only for authenticatable resource classes
             if (!resourceClassInternalInfo.isAuthenticatable()
-                  && (ResourcePermission.IMPERSONATE.equals(resourcePermission.getPermissionName())
-                  || ResourcePermission.RESET_CREDENTIALS.equals(resourcePermission.getPermissionName()))) {
+                  && (ResourcePermissions.IMPERSONATE.equals(resourcePermission.getPermissionName())
+                  || ResourcePermissions.RESET_CREDENTIALS.equals(resourcePermission.getPermissionName()))) {
                throw new AccessControlException("Permission: " + resourcePermission
                                                       + ", not valid for unauthenticatable resource");
             }
@@ -2100,8 +2101,8 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
                throw new AccessControlException("Permission: " + resourcePermission + ", not valid in this context");
             }
             if (!resourceClassInternalInfo.isAuthenticatable()
-                  && (ResourcePermission.IMPERSONATE.equals(resourcePermission.getPermissionName())
-                  || ResourcePermission.RESET_CREDENTIALS.equals(resourcePermission.getPermissionName()))) {
+                  && (ResourcePermissions.IMPERSONATE.equals(resourcePermission.getPermissionName())
+                  || ResourcePermissions.RESET_CREDENTIALS.equals(resourcePermission.getPermissionName()))) {
                throw new AccessControlException("Permission: " + resourcePermission + ", not valid for unauthenticatable resource");
             }
          }
@@ -2790,17 +2791,17 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
          if (__hasPermission(connection,
                              sessionResource,
                              accessorResource,
-                             ResourcePermission.getInstance(ResourcePermission.IMPERSONATE))
+                             ResourcePermissions.getInstance(ResourcePermissions.IMPERSONATE))
                ||
                __hasPermission(connection,
                                sessionResource,
                                accessorResource,
-                               ResourcePermission.getInstance(ResourcePermission.INHERIT))
+                               ResourcePermissions.getInstance(ResourcePermissions.INHERIT))
                ||
                __hasPermission(connection,
                                sessionResource,
                                accessorResource,
-                               ResourcePermission.getInstance(ResourcePermission.RESET_CREDENTIALS))) {
+                               ResourcePermissions.getInstance(ResourcePermissions.RESET_CREDENTIALS))) {
             return __getResourcesByPermission(connection,
                                               accessorResource,
                                               resourceClassName,

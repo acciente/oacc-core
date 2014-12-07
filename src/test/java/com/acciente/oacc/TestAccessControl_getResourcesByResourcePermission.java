@@ -32,7 +32,8 @@ public class TestAccessControl_getResourcesByResourcePermission extends TestAcce
       final String resourceClassName = generateResourceClass(false, false);
       final String permissionName = generateResourceClassPermission(resourceClassName);
 
-      Set<Resource> resourcesByPermission = accessControlContext.getResourcesByResourcePermission(resourceClassName, ResourcePermission.getInstance(permissionName));
+      Set<Resource> resourcesByPermission = accessControlContext.getResourcesByResourcePermission(resourceClassName, ResourcePermissions.getInstance(
+            permissionName));
       assertThat(resourcesByPermission.isEmpty(), is(true));
    }
 }

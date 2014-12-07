@@ -192,7 +192,7 @@ public class TestAccessControlBase {
       Set<String> uniquePermissionNames = new HashSet<>();
       Collections.addAll(uniquePermissionNames, permissionNames);
       for (String permissionName : uniquePermissionNames) {
-         resourceCreatePermissions.add(ResourceCreatePermissions.getInstance(ResourcePermission.getInstance(
+         resourceCreatePermissions.add(ResourceCreatePermissions.getInstance(ResourcePermissions.getInstance(
                permissionName)));
       }
 

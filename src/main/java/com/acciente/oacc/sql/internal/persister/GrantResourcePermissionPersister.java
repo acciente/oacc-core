@@ -20,6 +20,7 @@ package com.acciente.oacc.sql.internal.persister;
 import com.acciente.oacc.Resource;
 import com.acciente.oacc.ResourcePermission;
 import com.acciente.oacc.AccessControlException;
+import com.acciente.oacc.ResourcePermissions;
 import com.acciente.oacc.sql.internal.persister.id.DomainId;
 import com.acciente.oacc.sql.internal.persister.id.Id;
 import com.acciente.oacc.sql.internal.persister.id.ResourceClassId;
@@ -166,7 +167,7 @@ public class GrantResourcePermissionPersister extends Persister {
          resultSet = statement.executeQuery();
 
          while (resultSet.next()) {
-            resourcePermissions.add(ResourcePermission.getInstance(
+            resourcePermissions.add(ResourcePermissions.getInstance(
                   resultSet.getString("PermissionName"),
                   resultSet.getBoolean("IsWithGrant"),
                   resultSet.getInteger("InheritLevel"),
@@ -200,7 +201,7 @@ public class GrantResourcePermissionPersister extends Persister {
          resultSet = statement.executeQuery();
 
          while (resultSet.next()) {
-            resourcePermissions.add(ResourcePermission.getInstance(
+            resourcePermissions.add(ResourcePermissions.getInstance(
                   resultSet.getString("PermissionName"),
                   resultSet.getBoolean("IsWithGrant"),
                   0, // inherit level does not apply to direct permissions
