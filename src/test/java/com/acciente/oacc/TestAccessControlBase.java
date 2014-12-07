@@ -187,12 +187,13 @@ public class TestAccessControlBase {
                                                 String... permissionNames) throws AccessControlException {
       authenticateSystemAccessControlContext();
       Set<ResourceCreatePermission> resourceCreatePermissions = new HashSet<>();
-      resourceCreatePermissions.add(ResourceCreatePermission.getInstance(ResourceCreatePermission.CREATE, false));
+      resourceCreatePermissions.add(ResourceCreatePermissions.getInstance(ResourceCreatePermissions.CREATE, false));
       // create & add each unique permission
       Set<String> uniquePermissionNames = new HashSet<>();
       Collections.addAll(uniquePermissionNames, permissionNames);
       for (String permissionName : uniquePermissionNames) {
-         resourceCreatePermissions.add(ResourceCreatePermission.getInstance(ResourcePermission.getInstance(permissionName)));
+         resourceCreatePermissions.add(ResourceCreatePermissions.getInstance(ResourcePermission.getInstance(
+               permissionName)));
       }
 
       systemAccessControlContext.setResourceCreatePermissions(accessorResource,

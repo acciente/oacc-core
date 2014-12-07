@@ -66,12 +66,17 @@ public class TestAccessControl_getEffectiveResourceCreatePermissions extends Tes
    @Test
    public void getEffectiveResourceCreatePermissions_validAsSystemResource() throws AccessControlException {
       authenticateSystemResource();
-      final ResourceCreatePermission createPerm_create_withGrant = ResourceCreatePermission.getInstance(
-            ResourceCreatePermission.CREATE,
+      final ResourceCreatePermission createPerm_create_withGrant = ResourceCreatePermissions.getInstance(
+            ResourceCreatePermissions.CREATE,
             true);
-      final ResourceCreatePermission createPerm_impersonate = ResourceCreatePermission.getInstance(ResourcePermission.getInstance(ResourcePermission.IMPERSONATE), false);
-      final ResourceCreatePermission createPerm_inherit_withGrant = ResourceCreatePermission.getInstance(ResourcePermission.getInstance(ResourcePermission.INHERIT, true), true);
-      final ResourceCreatePermission createPerm_resetPwd = ResourceCreatePermission.getInstance(ResourcePermission.getInstance(ResourcePermission.RESET_CREDENTIALS, true));
+      final ResourceCreatePermission createPerm_impersonate = ResourceCreatePermissions.getInstance(ResourcePermission.getInstance(
+            ResourcePermission.IMPERSONATE), false);
+      final ResourceCreatePermission createPerm_inherit_withGrant = ResourceCreatePermissions.getInstance(
+            ResourcePermission.getInstance(ResourcePermission.INHERIT, true),
+            true);
+      final ResourceCreatePermission createPerm_resetPwd = ResourceCreatePermissions.getInstance(ResourcePermission.getInstance(
+            ResourcePermission.RESET_CREDENTIALS,
+            true));
 
       final Resource accessorResource = generateUnauthenticatableResource();
       final String domainName = generateDomain();
@@ -119,12 +124,17 @@ public class TestAccessControl_getEffectiveResourceCreatePermissions extends Tes
    @Test
    public void getEffectiveResourceCreatePermissions_validAsAuthenticatedResource() throws AccessControlException {
       authenticateSystemResource();
-      final ResourceCreatePermission createPerm_create_withGrant = ResourceCreatePermission.getInstance(
-            ResourceCreatePermission.CREATE,
+      final ResourceCreatePermission createPerm_create_withGrant = ResourceCreatePermissions.getInstance(
+            ResourceCreatePermissions.CREATE,
             true);
-      final ResourceCreatePermission createPerm_impersonate = ResourceCreatePermission.getInstance(ResourcePermission.getInstance(ResourcePermission.IMPERSONATE), false);
-      final ResourceCreatePermission createPerm_inherit_withGrant = ResourceCreatePermission.getInstance(ResourcePermission.getInstance(ResourcePermission.INHERIT, true), true);
-      final ResourceCreatePermission createPerm_resetPwd = ResourceCreatePermission.getInstance(ResourcePermission.getInstance(ResourcePermission.RESET_CREDENTIALS, true));
+      final ResourceCreatePermission createPerm_impersonate = ResourceCreatePermissions.getInstance(ResourcePermission.getInstance(
+            ResourcePermission.IMPERSONATE), false);
+      final ResourceCreatePermission createPerm_inherit_withGrant = ResourceCreatePermissions.getInstance(
+            ResourcePermission.getInstance(ResourcePermission.INHERIT, true),
+            true);
+      final ResourceCreatePermission createPerm_resetPwd = ResourceCreatePermissions.getInstance(ResourcePermission.getInstance(
+            ResourcePermission.RESET_CREDENTIALS,
+            true));
 
       final Resource accessorResource = generateUnauthenticatableResource();
       final String domainName = generateDomain();
@@ -180,13 +190,20 @@ public class TestAccessControl_getEffectiveResourceCreatePermissions extends Tes
    @Test
    public void getEffectiveResourceCreatePermissions_validWithInheritFromParentDomain() throws AccessControlException {
       authenticateSystemResource();
-      final ResourceCreatePermission createPerm_create_withGrant = ResourceCreatePermission.getInstance(
-            ResourceCreatePermission.CREATE,
+      final ResourceCreatePermission createPerm_create_withGrant = ResourceCreatePermissions.getInstance(
+            ResourceCreatePermissions.CREATE,
             true);
-      final ResourceCreatePermission createPerm_impersonate = ResourceCreatePermission.getInstance(ResourcePermission.getInstance(ResourcePermission.IMPERSONATE), false);
-      final ResourceCreatePermission createPerm_inherit_withGrant = ResourceCreatePermission.getInstance(ResourcePermission.getInstance(ResourcePermission.INHERIT, true), true);
-      final ResourceCreatePermission createPerm_resetPwd = ResourceCreatePermission.getInstance(ResourcePermission.getInstance(ResourcePermission.RESET_CREDENTIALS, true));
-      final ResourceCreatePermission createPerm_resetPwd_withGrant = ResourceCreatePermission.getInstance(ResourcePermission.getInstance(ResourcePermission.RESET_CREDENTIALS, true), true);
+      final ResourceCreatePermission createPerm_impersonate = ResourceCreatePermissions.getInstance(ResourcePermission.getInstance(
+            ResourcePermission.IMPERSONATE), false);
+      final ResourceCreatePermission createPerm_inherit_withGrant = ResourceCreatePermissions.getInstance(
+            ResourcePermission.getInstance(ResourcePermission.INHERIT, true),
+            true);
+      final ResourceCreatePermission createPerm_resetPwd = ResourceCreatePermissions.getInstance(ResourcePermission.getInstance(
+            ResourcePermission.RESET_CREDENTIALS,
+            true));
+      final ResourceCreatePermission createPerm_resetPwd_withGrant = ResourceCreatePermissions.getInstance(
+            ResourcePermission.getInstance(ResourcePermission.RESET_CREDENTIALS, true),
+            true);
 
       final Resource accessorResource = generateUnauthenticatableResource();
       final String parentDomainName = generateDomain();
@@ -200,7 +217,9 @@ public class TestAccessControl_getEffectiveResourceCreatePermissions extends Tes
       parentResourceCreatePermissions_pre.add(createPerm_inherit_withGrant);
       parentResourceCreatePermissions_pre.add(createPerm_resetPwd);
       final ResourcePermission parentResourcePermission_custom = ResourcePermission.getInstance(generateResourceClassPermission(resourceClassName));
-      final ResourceCreatePermission parentResourceCreatePermission_custom = ResourceCreatePermission.getInstance(parentResourcePermission_custom, true);
+      final ResourceCreatePermission parentResourceCreatePermission_custom = ResourceCreatePermissions.getInstance(
+            parentResourcePermission_custom,
+            true);
       parentResourceCreatePermissions_pre.add(parentResourceCreatePermission_custom);
       accessControlContext.setResourceCreatePermissions(accessorResource,
                                                         resourceClassName,

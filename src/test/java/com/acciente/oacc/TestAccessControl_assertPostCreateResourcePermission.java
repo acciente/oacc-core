@@ -130,15 +130,21 @@ public class TestAccessControl_assertPostCreateResourcePermission extends TestAc
 
       // verify permissions
       Set<ResourceCreatePermission> resourceCreatePermissions_forAccessorDomain = new HashSet<>();
-      resourceCreatePermissions_forAccessorDomain.add(ResourceCreatePermission.getInstance(ResourceCreatePermission.CREATE, false));
-      resourceCreatePermissions_forAccessorDomain.add(ResourceCreatePermission.getInstance(customPermission_forAccessorDomain, false));
+      resourceCreatePermissions_forAccessorDomain.add(ResourceCreatePermissions.getInstance(ResourceCreatePermissions.CREATE,
+                                                                                            false));
+      resourceCreatePermissions_forAccessorDomain.add(ResourceCreatePermissions.getInstance(
+            customPermission_forAccessorDomain,
+            false));
       final Set<ResourceCreatePermission> allResourceCreatePermissionsForResourceClassAndAccessorDomain
             = accessControlContext.getEffectiveResourceCreatePermissions(accessorResource, resourceClassName, accessorDomainName);
       assertThat(allResourceCreatePermissionsForResourceClassAndAccessorDomain, is(resourceCreatePermissions_forAccessorDomain));
 
       Set<ResourceCreatePermission> resourceCreatePermissions_forAccessedDomain = new HashSet<>();
-      resourceCreatePermissions_forAccessedDomain.add(ResourceCreatePermission.getInstance(ResourceCreatePermission.CREATE, false));
-      resourceCreatePermissions_forAccessedDomain.add(ResourceCreatePermission.getInstance(customPermission_forAccessedDomain, false));
+      resourceCreatePermissions_forAccessedDomain.add(ResourceCreatePermissions.getInstance(ResourceCreatePermissions.CREATE,
+                                                                                            false));
+      resourceCreatePermissions_forAccessedDomain.add(ResourceCreatePermissions.getInstance(
+            customPermission_forAccessedDomain,
+            false));
       final Set<ResourceCreatePermission> allResourceCreatePermissionsForResourceClassAndAccessedDomain
             = accessControlContext.getEffectiveResourceCreatePermissions(accessorResource, resourceClassName, accessedDomainName);
       assertThat(allResourceCreatePermissionsForResourceClassAndAccessedDomain, is(resourceCreatePermissions_forAccessedDomain));
@@ -187,15 +193,21 @@ public class TestAccessControl_assertPostCreateResourcePermission extends TestAc
 
       // verify permissions
       Set<ResourceCreatePermission> resourceCreatePermissions_forAccessorDomain = new HashSet<>();
-      resourceCreatePermissions_forAccessorDomain.add(ResourceCreatePermission.getInstance(ResourceCreatePermission.CREATE, false));
-      resourceCreatePermissions_forAccessorDomain.add(ResourceCreatePermission.getInstance(customPermission_forAccessorDomain, false));
+      resourceCreatePermissions_forAccessorDomain.add(ResourceCreatePermissions.getInstance(ResourceCreatePermissions.CREATE,
+                                                                                            false));
+      resourceCreatePermissions_forAccessorDomain.add(ResourceCreatePermissions.getInstance(
+            customPermission_forAccessorDomain,
+            false));
       final Set<ResourceCreatePermission> allResourceCreatePermissionsForResourceClassAndAccessorDomain
             = accessControlContext.getEffectiveResourceCreatePermissions(intermediaryResource, resourceClassName, accessorDomainName);
       assertThat(allResourceCreatePermissionsForResourceClassAndAccessorDomain, is(resourceCreatePermissions_forAccessorDomain));
 
       Set<ResourceCreatePermission> resourceCreatePermissions_forAccessedDomain = new HashSet<>();
-      resourceCreatePermissions_forAccessedDomain.add(ResourceCreatePermission.getInstance(ResourceCreatePermission.CREATE, false));
-      resourceCreatePermissions_forAccessedDomain.add(ResourceCreatePermission.getInstance(customPermission_forAccessedDomain, false));
+      resourceCreatePermissions_forAccessedDomain.add(ResourceCreatePermissions.getInstance(ResourceCreatePermissions.CREATE,
+                                                                                            false));
+      resourceCreatePermissions_forAccessedDomain.add(ResourceCreatePermissions.getInstance(
+            customPermission_forAccessedDomain,
+            false));
       final Set<ResourceCreatePermission> allResourceCreatePermissionsForResourceClassAndAccessedDomain
             = accessControlContext.getEffectiveResourceCreatePermissions(intermediaryResource, resourceClassName, accessedDomainName);
       assertThat(allResourceCreatePermissionsForResourceClassAndAccessedDomain, is(resourceCreatePermissions_forAccessedDomain));
@@ -246,15 +258,22 @@ public class TestAccessControl_assertPostCreateResourcePermission extends TestAc
 
       // verify permissions
       Set<ResourceCreatePermission> resourceCreatePermissions_forAccessorDomain = new HashSet<>();
-      resourceCreatePermissions_forAccessorDomain.add(ResourceCreatePermission.getInstance(ResourceCreatePermission.CREATE, false));
-      resourceCreatePermissions_forAccessorDomain.add(ResourceCreatePermission.getInstance(customPermission_forAccessorDomain, false));
+      resourceCreatePermissions_forAccessorDomain.add(ResourceCreatePermissions.getInstance(ResourceCreatePermissions.CREATE,
+                                                                                            false));
+      resourceCreatePermissions_forAccessorDomain.add(ResourceCreatePermissions.getInstance(
+            customPermission_forAccessorDomain,
+            false));
       final Set<ResourceCreatePermission> allResourceCreatePermissionsForResourceClassAndAccessorDomain
             = accessControlContext.getEffectiveResourceCreatePermissions(accessorResource, resourceClassName, accessorDomainName);
       assertThat(allResourceCreatePermissionsForResourceClassAndAccessorDomain, is(resourceCreatePermissions_forAccessorDomain));
 
       Set<ResourceCreatePermission> resourceCreatePermissions_forIntermediaryDomain = new HashSet<>();
-      resourceCreatePermissions_forIntermediaryDomain.add(ResourceCreatePermission.getInstance(ResourceCreatePermission.CREATE, false));
-      resourceCreatePermissions_forIntermediaryDomain.add(ResourceCreatePermission.getInstance(customPermission_forIntermediaryDomain, false));
+      resourceCreatePermissions_forIntermediaryDomain.add(ResourceCreatePermissions.getInstance(
+            ResourceCreatePermissions.CREATE,
+            false));
+      resourceCreatePermissions_forIntermediaryDomain.add(ResourceCreatePermissions.getInstance(
+            customPermission_forIntermediaryDomain,
+            false));
       resourceCreatePermissions_forIntermediaryDomain.addAll(resourceCreatePermissions_forAccessorDomain);
       final Set<ResourceCreatePermission> allResourceCreatePermissionsForResourceClassAndIntermediaryDomain
             = accessControlContext.getEffectiveResourceCreatePermissions(accessorResource, resourceClassName, intermediaryDomainName);
@@ -313,15 +332,22 @@ public class TestAccessControl_assertPostCreateResourcePermission extends TestAc
 
       // verify permissions
       Set<ResourceCreatePermission> resourceCreatePermissions_forDonorDomain = new HashSet<>();
-      resourceCreatePermissions_forDonorDomain.add(ResourceCreatePermission.getInstance(ResourceCreatePermission.CREATE, false));
-      resourceCreatePermissions_forDonorDomain.add(ResourceCreatePermission.getInstance(customPermission_forAccessorDomain, false));
+      resourceCreatePermissions_forDonorDomain.add(ResourceCreatePermissions.getInstance(ResourceCreatePermissions.CREATE,
+                                                                                         false));
+      resourceCreatePermissions_forDonorDomain.add(ResourceCreatePermissions.getInstance(
+            customPermission_forAccessorDomain,
+            false));
       final Set<ResourceCreatePermission> allResourceCreatePermissionsForResourceClassAndDonorDomain
             = accessControlContext.getEffectiveResourceCreatePermissions(donorResource, resourceClassName, accessorDomainName);
       assertThat(allResourceCreatePermissionsForResourceClassAndDonorDomain, is(resourceCreatePermissions_forDonorDomain));
 
       Set<ResourceCreatePermission> resourceCreatePermissions_forIntermediaryDomain = new HashSet<>();
-      resourceCreatePermissions_forIntermediaryDomain.add(ResourceCreatePermission.getInstance(ResourceCreatePermission.CREATE, false));
-      resourceCreatePermissions_forIntermediaryDomain.add(ResourceCreatePermission.getInstance(customPermission_forIntermediaryDomain, false));
+      resourceCreatePermissions_forIntermediaryDomain.add(ResourceCreatePermissions.getInstance(
+            ResourceCreatePermissions.CREATE,
+            false));
+      resourceCreatePermissions_forIntermediaryDomain.add(ResourceCreatePermissions.getInstance(
+            customPermission_forIntermediaryDomain,
+            false));
       resourceCreatePermissions_forIntermediaryDomain.addAll(resourceCreatePermissions_forDonorDomain);
       final Set<ResourceCreatePermission> allResourceCreatePermissionsForResourceClassAndIntermediaryDomain
             = accessControlContext.getEffectiveResourceCreatePermissions(donorResource, resourceClassName, intermediaryDomainName);
@@ -438,9 +464,15 @@ public class TestAccessControl_assertPostCreateResourcePermission extends TestAc
       final String accessorDomainName = accessControlContext.getDomainNameByResource(accessorResource);
       // setup direct resource create permissions
       Set<ResourceCreatePermission> resourceCreatePermissions = new HashSet<>();
-      final ResourceCreatePermission createPermission_create = ResourceCreatePermission.getInstance(ResourceCreatePermission.CREATE, false);
-      final ResourceCreatePermission createPermission_custom = ResourceCreatePermission.getInstance(customResourcePermission, false);
-      final ResourceCreatePermission createPermission_system = ResourceCreatePermission.getInstance(systemResourcePermission, false);
+      final ResourceCreatePermission createPermission_create = ResourceCreatePermissions.getInstance(
+            ResourceCreatePermissions.CREATE,
+            false);
+      final ResourceCreatePermission createPermission_custom = ResourceCreatePermissions.getInstance(
+            customResourcePermission,
+            false);
+      final ResourceCreatePermission createPermission_system = ResourceCreatePermissions.getInstance(
+            systemResourcePermission,
+            false);
       resourceCreatePermissions.add(createPermission_create);
       resourceCreatePermissions.add(createPermission_custom);
       resourceCreatePermissions.add(createPermission_system);

@@ -25,6 +25,7 @@ import com.acciente.oacc.PasswordCredentials;
 import com.acciente.oacc.ResourceCreatePermission;
 import com.acciente.oacc.DomainCreatePermission;
 import com.acciente.oacc.DomainPermission;
+import com.acciente.oacc.ResourceCreatePermissions;
 import com.acciente.oacc.ResourcePermission;
 import com.acciente.oacc.Resource;
 import com.acciente.oacc.Resources;
@@ -375,9 +376,11 @@ public class TestSQLAccessControlContext extends TestSQLAccessControlContextBase
 
       // we grant the new user permission to create BLOGs
       Set<ResourceCreatePermission> resourceCreatePermissions = new HashSet<>();
-      resourceCreatePermissions.add(ResourceCreatePermission.getInstance(ResourceCreatePermission.CREATE, true));
-      resourceCreatePermissions.add(ResourceCreatePermission.getInstance(ResourcePermission.getInstance(ResourcePermission.INHERIT), true));
-      resourceCreatePermissions.add(ResourceCreatePermission.getInstance(ResourcePermission.getInstance("CREATE-POST"), true));
+      resourceCreatePermissions.add(ResourceCreatePermissions.getInstance(ResourceCreatePermissions.CREATE, true));
+      resourceCreatePermissions.add(ResourceCreatePermissions.getInstance(ResourcePermission.getInstance(
+            ResourcePermission.INHERIT), true));
+      resourceCreatePermissions.add(ResourceCreatePermissions.getInstance(ResourcePermission.getInstance("CREATE-POST"),
+                                                                          true));
 
       setupName("setResourceCreatePermissions( acmeRootUser, BLOG, " + resourceCreatePermissions + " )");
       try {
@@ -480,9 +483,11 @@ public class TestSQLAccessControlContext extends TestSQLAccessControlContextBase
 
       // we grant the new user permission to create BLOGs
       Set<ResourceCreatePermission> resourceCreatePermissions = new HashSet<>();
-      resourceCreatePermissions.add(ResourceCreatePermission.getInstance(ResourceCreatePermission.CREATE, true));
-      resourceCreatePermissions.add(ResourceCreatePermission.getInstance(ResourcePermission.getInstance(ResourcePermission.INHERIT), true));
-      resourceCreatePermissions.add(ResourceCreatePermission.getInstance(ResourcePermission.getInstance("CREATE-POST"), true));
+      resourceCreatePermissions.add(ResourceCreatePermissions.getInstance(ResourceCreatePermissions.CREATE, true));
+      resourceCreatePermissions.add(ResourceCreatePermissions.getInstance(ResourcePermission.getInstance(
+            ResourcePermission.INHERIT), true));
+      resourceCreatePermissions.add(ResourceCreatePermissions.getInstance(ResourcePermission.getInstance("CREATE-POST"),
+                                                                          true));
 
       setupName("setResourceCreatePermissions( acmeRootUser, BLOG, " + resourceCreatePermissions + " )");
       try {
@@ -922,9 +927,11 @@ public class TestSQLAccessControlContext extends TestSQLAccessControlContextBase
 
       // next we give user 1 some create permissions
       Set<ResourceCreatePermission> resourceCreatePermissions = new HashSet<>();
-      resourceCreatePermissions.add(ResourceCreatePermission.getInstance(ResourceCreatePermission.CREATE, true));
-      resourceCreatePermissions.add(ResourceCreatePermission.getInstance(ResourcePermission.getInstance("CREATE-POST", true), false));
-      resourceCreatePermissions.add(ResourceCreatePermission.getInstance(ResourcePermission.getInstance("EDIT-POST", false), false));
+      resourceCreatePermissions.add(ResourceCreatePermissions.getInstance(ResourceCreatePermissions.CREATE, true));
+      resourceCreatePermissions.add(ResourceCreatePermissions.getInstance(ResourcePermission.getInstance("CREATE-POST",
+                                                                                                         true), false));
+      resourceCreatePermissions.add(ResourceCreatePermissions.getInstance(ResourcePermission.getInstance("EDIT-POST",
+                                                                                                         false), false));
       setupName("setCreatePermission( newUser_1, \"" + resourceCreatePermissions + "\" )");
       try {
          accessControlContext.setResourceCreatePermissions(newUser_1, "BLOG", resourceCreatePermissions);

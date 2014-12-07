@@ -20,6 +20,7 @@ package com.acciente.oacc.sql.internal.persister;
 import com.acciente.oacc.AccessControlException;
 import com.acciente.oacc.Resource;
 import com.acciente.oacc.ResourceCreatePermission;
+import com.acciente.oacc.ResourceCreatePermissions;
 import com.acciente.oacc.ResourcePermission;
 import com.acciente.oacc.sql.internal.persister.id.DomainId;
 import com.acciente.oacc.sql.internal.persister.id.Id;
@@ -60,10 +61,10 @@ public class GrantResourceCreatePermissionPostCreateSysPersister extends Persist
             resourcePermission = ResourcePermission.getInstance(resultSet.getResourceSysPermissionName("PostCreateSysPermissionId"),
                                                                 resultSet.getBoolean("PostCreateIsWithGrant"));
 
-            resourceCreatePermissions.add(ResourceCreatePermission.getInstance(resourcePermission,
-                                                                               resultSet.getBoolean("IsWithGrant"),
-                                                                               resultSet.getInteger("InheritLevel"),
-                                                                               resultSet.getInteger("DomainLevel")));
+            resourceCreatePermissions.add(ResourceCreatePermissions.getInstance(resourcePermission,
+                                                                                resultSet.getBoolean("IsWithGrant"),
+                                                                                resultSet.getInteger("InheritLevel"),
+                                                                                resultSet.getInteger("DomainLevel")));
          }
          resultSet.close();
 
@@ -115,10 +116,10 @@ public class GrantResourceCreatePermissionPostCreateSysPersister extends Persist
             resourcePermission = ResourcePermission.getInstance(resultSet.getResourceSysPermissionName("PostCreateSysPermissionId"),
                                                                 resultSet.getBoolean("PostCreateIsWithGrant"));
 
-            permissionsForResourceClass.add(ResourceCreatePermission.getInstance(resourcePermission,
-                                                                                 resultSet.getBoolean("IsWithGrant"),
-                                                                                 resultSet.getInteger("InheritLevel"),
-                                                                                 resultSet.getInteger("DomainLevel")));
+            permissionsForResourceClass.add(ResourceCreatePermissions.getInstance(resourcePermission,
+                                                                                  resultSet.getBoolean("IsWithGrant"),
+                                                                                  resultSet.getInteger("InheritLevel"),
+                                                                                  resultSet.getInteger("DomainLevel")));
          }
          resultSet.close();
 
@@ -154,10 +155,10 @@ public class GrantResourceCreatePermissionPostCreateSysPersister extends Persist
             resourcePermission = ResourcePermission.getInstance(resultSet.getResourceSysPermissionName("PostCreateSysPermissionId"),
                                                                 resultSet.getBoolean("PostCreateIsWithGrant"));
 
-            resourceCreatePermissions.add(ResourceCreatePermission.getInstance(resourcePermission,
-                                                                               resultSet.getBoolean("IsWithGrant"),
-                                                                               0,
-                                                                               0));
+            resourceCreatePermissions.add(ResourceCreatePermissions.getInstance(resourcePermission,
+                                                                                resultSet.getBoolean("IsWithGrant"),
+                                                                                0,
+                                                                                0));
          }
          resultSet.close();
 

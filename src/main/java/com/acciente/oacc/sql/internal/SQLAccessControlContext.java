@@ -28,6 +28,7 @@ import com.acciente.oacc.DomainPermissions;
 import com.acciente.oacc.Resource;
 import com.acciente.oacc.ResourceClassInfo;
 import com.acciente.oacc.ResourceCreatePermission;
+import com.acciente.oacc.ResourceCreatePermissions;
 import com.acciente.oacc.ResourcePermission;
 import com.acciente.oacc.Resources;
 import com.acciente.oacc.sql.SQLDialect;
@@ -1378,7 +1379,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
          boolean createSysPermissionFound = false;
          for (final ResourceCreatePermission resourceCreatePermission : resourceCreatePermissions) {
             if (resourceCreatePermission.isSystemPermission()
-                  && ResourceCreatePermission.CREATE.equals(resourceCreatePermission.getSysPermissionName())) {
+                  && ResourceCreatePermissions.CREATE.equals(resourceCreatePermission.getSysPermissionName())) {
                createSysPermissionFound = true;
                break;
             }
@@ -1399,7 +1400,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
 
       for (final ResourceCreatePermission resourceCreatePermission : resourceCreatePermissions) {
          if (resourceCreatePermission.isSystemPermission()
-               && ResourceCreatePermission.CREATE.equals(resourceCreatePermission.getSysPermissionName())) {
+               && ResourceCreatePermissions.CREATE.equals(resourceCreatePermission.getSysPermissionName())) {
             continue;
          }
 
@@ -2435,7 +2436,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
 
       for (ResourceCreatePermission resourceCreatePermission : effectiveResourceCreatePermissions) {
          if (resourceCreatePermission.isSystemPermission()
-               && ResourceCreatePermission.CREATE.equals(resourceCreatePermission.getSysPermissionName())) {
+               && ResourceCreatePermissions.CREATE.equals(resourceCreatePermission.getSysPermissionName())) {
             createSysPermissionFound = true;
             break;
          }
