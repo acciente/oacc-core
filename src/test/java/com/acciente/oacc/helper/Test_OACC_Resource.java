@@ -17,7 +17,7 @@
  */
 package com.acciente.oacc.helper;
 
-import com.acciente.oacc.Resource;
+import com.acciente.oacc.Resources;
 import com.acciente.oacc.sql.internal.CleanablePasswordEncryptor;
 import com.acciente.oacc.sql.internal.PasswordUtils;
 import com.acciente.oacc.sql.internal.StrongCleanablePasswordEncryptor;
@@ -45,9 +45,9 @@ public class Test_OACC_Resource {
       CleanablePasswordEncryptor passwordEncryptor = new StrongCleanablePasswordEncryptor();
       final char[] plaintext = "abc".toCharArray();
       final String digest_01 = passwordEncryptor.encryptPassword(PasswordUtils.computeBoundPassword(
-            Resource.getInstance(0), plaintext));
+            Resources.getInstance(0), plaintext));
       final String digest_02 = passwordEncryptor.encryptPassword(PasswordUtils.computeBoundPassword(
-            Resource.getInstance(0), plaintext));
+            Resources.getInstance(0), plaintext));
 
       final OACC_ResourcePassword resource_01_digest = new OACC_ResourcePassword.Builder(0L).password(digest_01).build();
       final OACC_ResourcePassword resource_01_plain = new OACC_ResourcePassword.Builder(0L).password_plaintext(plaintext).build();

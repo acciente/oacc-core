@@ -27,6 +27,7 @@ import com.acciente.oacc.Resource;
 import com.acciente.oacc.ResourceClassInfo;
 import com.acciente.oacc.ResourceCreatePermission;
 import com.acciente.oacc.ResourcePermission;
+import com.acciente.oacc.Resources;
 import com.acciente.oacc.sql.SQLDialect;
 import com.acciente.oacc.sql.internal.persister.DomainPersister;
 import com.acciente.oacc.sql.internal.persister.GrantDomainCreatePermissionPostCreateSysPersister;
@@ -831,7 +832,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
                                        domainId);
 
       // set permissions on the new resource, if applicable
-      final Resource newResource = Resource.getInstance(newResourceId.getValue());
+      final Resource newResource = Resources.getInstance(newResourceId.getValue());
 
       if (newResourcePermissions != null && newResourcePermissions.size() > 0) {
          if (sessionResource != null) {

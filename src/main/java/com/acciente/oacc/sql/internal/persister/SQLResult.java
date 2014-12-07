@@ -22,6 +22,7 @@ import com.acciente.oacc.DomainPermission;
 import com.acciente.oacc.Resource;
 import com.acciente.oacc.ResourceCreatePermission;
 import com.acciente.oacc.ResourcePermission;
+import com.acciente.oacc.Resources;
 import com.acciente.oacc.sql.internal.persister.id.DomainId;
 import com.acciente.oacc.sql.internal.persister.id.Id;
 import com.acciente.oacc.sql.internal.persister.id.ResourceClassId;
@@ -43,7 +44,7 @@ public class SQLResult {
    }
 
    public Resource getResource(String columnLabel) throws SQLException {
-      return Resource.getInstance(resultSet.getLong(columnLabel));
+      return Resources.getInstance(resultSet.getLong(columnLabel));
    }
 
    public Id<ResourceId> getNextResourceId(int columnIndex) throws SQLException {

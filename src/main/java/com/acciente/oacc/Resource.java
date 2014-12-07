@@ -17,47 +17,6 @@
  */
 package com.acciente.oacc;
 
-import java.io.Serializable;
-
-public class Resource implements Serializable {
-   private final Long resourceId;
-
-   public static Resource getInstance(long resourceId) {
-      return new Resource(resourceId);
-   }
-
-   private Resource(long resourceId) {
-      this.resourceId = resourceId;
-   }
-
-   public long getId() {
-      return resourceId;
-   }
-
-   public String toString() {
-      return "R(" + Long.toString(resourceId) + ")";
-   }
-
-   @Override
-   public boolean equals(Object other) {
-      if (this == other) {
-         return true;
-      }
-      if (other == null || getClass() != other.getClass()) {
-         return false;
-      }
-
-      Resource otherResource = (Resource) other;
-
-      if (!resourceId.equals(otherResource.resourceId)) {
-         return false;
-      }
-
-      return true;
-   }
-
-   @Override
-   public int hashCode() {
-      return resourceId.hashCode();
-   }
+public interface Resource {
+   long getId();
 }

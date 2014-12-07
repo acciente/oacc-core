@@ -17,7 +17,7 @@
  */
 package com.acciente.oacc.helper;
 
-import com.acciente.oacc.Resource;
+import com.acciente.oacc.Resources;
 import com.acciente.oacc.sql.internal.CleanablePasswordEncryptor;
 import com.acciente.oacc.sql.internal.PasswordUtils;
 import com.acciente.oacc.sql.internal.StrongCleanablePasswordEncryptor;
@@ -80,12 +80,12 @@ public class OACC_ResourcePassword extends DbBase {
          }
 
          if (password_plaintext != null) {
-            if (that.password == null || !__passwordEncryptor.checkPassword(PasswordUtils.computeBoundPassword(Resource.getInstance(
+            if (that.password == null || !__passwordEncryptor.checkPassword(PasswordUtils.computeBoundPassword(Resources.getInstance(
                   resourceID), password_plaintext), that.password))
                return false;
          }
          else if (that.password_plaintext != null) {
-            if (password == null || !__passwordEncryptor.checkPassword(PasswordUtils.computeBoundPassword(Resource.getInstance(
+            if (password == null || !__passwordEncryptor.checkPassword(PasswordUtils.computeBoundPassword(Resources.getInstance(
                   that.resourceID), that.password_plaintext), password))
                return false;
          }

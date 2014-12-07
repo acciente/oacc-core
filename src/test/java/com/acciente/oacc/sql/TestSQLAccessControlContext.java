@@ -25,6 +25,7 @@ import com.acciente.oacc.DomainCreatePermission;
 import com.acciente.oacc.DomainPermission;
 import com.acciente.oacc.ResourcePermission;
 import com.acciente.oacc.Resource;
+import com.acciente.oacc.Resources;
 import com.acciente.oacc.helper.SQLAccessControlSystemResetUtil;
 
 import java.io.ByteArrayOutputStream;
@@ -80,7 +81,7 @@ public class TestSQLAccessControlContext extends TestSQLAccessControlContextBase
    }
 
    private static void authSysResource(final AccessControlContext accessControlContext) {
-      Resource sysAuthResource = Resource.getInstance(0);
+      Resource sysAuthResource = Resources.getInstance(0);
 
       setupName("authenticate( SYSTEM, valid-password )");
       try {
@@ -97,7 +98,7 @@ public class TestSQLAccessControlContext extends TestSQLAccessControlContextBase
 
       final AccessControlContext accessControlContext = newSQLAccessControlContext();
 
-      Resource sysAuthResource = Resource.getInstance(0);
+      Resource sysAuthResource = Resources.getInstance(0);
 
       testName("authenticate( resource-0, <invalid-pwd> )");
       try {

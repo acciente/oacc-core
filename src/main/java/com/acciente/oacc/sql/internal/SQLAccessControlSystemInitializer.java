@@ -20,7 +20,7 @@ package com.acciente.oacc.sql.internal;
 import com.acciente.oacc.AccessControlContext;
 import com.acciente.oacc.DomainCreatePermission;
 import com.acciente.oacc.DomainPermission;
-import com.acciente.oacc.Resource;
+import com.acciente.oacc.Resources;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -71,7 +71,7 @@ public class SQLAccessControlSystemInitializer {
       statement = connection.prepareStatement("INSERT INTO " + schemaNameAndTablePrefix + "ResourcePassword( ResourceId, Password ) VALUES ( 0, ? )");
       char[] boundPassword = null;
       try {
-         boundPassword = PasswordUtils.computeBoundPassword(Resource.getInstance(0), oaccRootPwd);
+         boundPassword = PasswordUtils.computeBoundPassword(Resources.getInstance(0), oaccRootPwd);
          statement.setString(1, passwordEncryptor.encryptPassword(boundPassword));
          statement.executeUpdate();
       }

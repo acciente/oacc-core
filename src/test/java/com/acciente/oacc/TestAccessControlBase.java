@@ -32,7 +32,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 public class TestAccessControlBase {
-   public static final Resource SYS_RESOURCE = Resource.getInstance(0);
+   public static final Resource SYS_RESOURCE = Resources.getInstance(0);
 
    private static SQLDialect           sqlDialect;
    private static DataSource           dataSource;
