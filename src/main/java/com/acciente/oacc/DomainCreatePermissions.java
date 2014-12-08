@@ -90,63 +90,71 @@ public class DomainCreatePermissions {
          this.inheritLevel = inheritLevel;
       }
 
-      public DomainPermission getPostCreateDomainPermission() {
-         if (isSystemPermission()) {
-            throw new IllegalArgumentException(
-                  "No post create domain permission may be retrieved for system domain create permission: " + this + ", please check your code");
-         }
-         return postCreateDomainPermission;
+      @Override
+      public boolean isSystemPermission() {
+         return systemPermissionId != 0;
       }
 
+      @Override
       public String getSysPermissionName() {
          if (!isSystemPermission()) {
-            throw new IllegalArgumentException(
+            throw new IllegalStateException(
                   "No system permission name may be retrieved for non-system domain create permission: " + this + ", please check your code");
          }
 
          return sysPermissionName;
       }
 
+      @Override
       public long getSystemPermissionId() {
          if (!isSystemPermission()) {
-            throw new IllegalArgumentException(
+            throw new IllegalStateException(
                   "No system permission ID may be retrieved for non-system domain create permission: " + this + ", please check your code");
          }
          return systemPermissionId;
       }
 
-      public boolean isSystemPermission() {
-         return systemPermissionId != 0;
+      @Override
+      public DomainPermission getPostCreateDomainPermission() {
+         if (isSystemPermission()) {
+            throw new IllegalStateException(
+                  "No post create domain permission may be retrieved for system domain create permission: " + this + ", please check your code");
+         }
+         return postCreateDomainPermission;
       }
 
+      @Override
       public boolean isWithGrant() {
          return withGrant;
       }
 
+      @Override
+      public boolean isGrantableFrom(DomainCreatePermission other) {
+         if (other == null) {
+            return false;
+         }
+
+         if (!other.isWithGrant()) {
+            return false;
+         }
+
+         if (this.isSystemPermission() != other.isSystemPermission()) {
+            return false;
+         }
+
+         if (this.isSystemPermission()) {
+            return this.systemPermissionId == other.getSystemPermissionId();
+         }
+
+         if (this.postCreateDomainPermission.isWithGrant() && !other.getPostCreateDomainPermission().isWithGrant()) {
+            return false;
+         }
+
+         return this.postCreateDomainPermission.equalsIgnoreGrant(other.getPostCreateDomainPermission());
+      }
+
       public int getInheritLevel() {
          return inheritLevel;
-      }
-
-      public String toString() {
-         if (postCreateDomainPermission == null) {
-            return "*CREATE[]"
-                  + (withGrant ? " /G" : "")
-                  + (inheritLevel != 0 ? " /I:" + inheritLevel : "");
-         }
-         else {
-            return "*CREATE[" + postCreateDomainPermission.toString() + "]"
-                  + (withGrant ? " /G" : "")
-                  + (inheritLevel != 0 ? " /I:" + inheritLevel : "");
-         }
-      }
-
-      @Override
-      public int hashCode() {
-         int result = (int) (systemPermissionId ^ (systemPermissionId >>> 32));
-         result = 31 * result + (sysPermissionName != null ? sysPermissionName.hashCode() : 0);
-         result = 31 * result + (postCreateDomainPermission != null ? postCreateDomainPermission.hashCode() : 0);
-         result = 31 * result + (withGrant ? 1 : 0);
-         return result;
       }
 
       @Override
@@ -180,28 +188,57 @@ public class DomainCreatePermissions {
          return true;
       }
 
-      public boolean isGrantableFrom(DomainCreatePermission other) {
-         if (other == null) {
+      @Override
+      public boolean equalsIgnoreGrant(Object other) {
+         if (this == other) {
+            return true;
+         }
+         if (other == null || getClass() != other.getClass()) {
             return false;
          }
 
-         if (!other.isWithGrant()) {
+         DomainCreatePermissionImpl otherDomainCreatePermission = (DomainCreatePermissionImpl) other;
+
+         if (systemPermissionId != otherDomainCreatePermission.systemPermissionId) {
             return false;
          }
 
-         if (this.isSystemPermission() != other.isSystemPermission()) {
+         if (postCreateDomainPermission != null
+             ? !postCreateDomainPermission.equals(otherDomainCreatePermission.postCreateDomainPermission)
+             : otherDomainCreatePermission.postCreateDomainPermission != null) {
             return false;
          }
 
-         if (this.isSystemPermission()) {
-            return this.systemPermissionId == other.getSystemPermissionId();
-         }
-
-         if (this.postCreateDomainPermission.isWithGrant() && !other.getPostCreateDomainPermission().isWithGrant()) {
+         if (sysPermissionName != null
+             ? !sysPermissionName.equals(otherDomainCreatePermission.sysPermissionName)
+             : otherDomainCreatePermission.sysPermissionName != null) {
             return false;
          }
 
-         return this.postCreateDomainPermission.equalsIgnoreGrant(other.getPostCreateDomainPermission());
+         return true;
+      }
+
+      @Override
+      public int hashCode() {
+         int result = (int) (systemPermissionId ^ (systemPermissionId >>> 32));
+         result = 31 * result + (sysPermissionName != null ? sysPermissionName.hashCode() : 0);
+         result = 31 * result + (postCreateDomainPermission != null ? postCreateDomainPermission.hashCode() : 0);
+         result = 31 * result + (withGrant ? 1 : 0);
+         return result;
+      }
+
+      @Override
+      public String toString() {
+         if (postCreateDomainPermission == null) {
+            return "*CREATE[]"
+                  + (withGrant ? " /G" : "")
+                  + (inheritLevel != 0 ? " /I:" + inheritLevel : "");
+         }
+         else {
+            return "*CREATE[" + postCreateDomainPermission.toString() + "]"
+                  + (withGrant ? " /G" : "")
+                  + (inheritLevel != 0 ? " /I:" + inheritLevel : "");
+         }
       }
 
       // private static helper method to convert a sys permission name to a sys permission object
