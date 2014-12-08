@@ -1129,7 +1129,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
          boolean createSysPermissionFound = false;
          for (final DomainCreatePermission domainCreatePermission : domainCreatePermissions) {
             if (domainCreatePermission.isSystemPermission()
-                  && DomainCreatePermissions.CREATE.equals(domainCreatePermission.getSysPermissionName())) {
+                  && DomainCreatePermissions.CREATE.equals(domainCreatePermission.getPermissionName())) {
                createSysPermissionFound = true;
                break;
             }

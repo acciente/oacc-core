@@ -50,7 +50,7 @@ public interface DomainCreatePermission {
     * @return the name of the system permission.
     * @throws IllegalStateException if this method is called on a non-system permission.
     */
-   String getSysPermissionName();
+   String getPermissionName();
 
    /**
     * Property to retrieve the system permission id, if this is not a system permission an

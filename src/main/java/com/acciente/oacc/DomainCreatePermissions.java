@@ -96,7 +96,7 @@ public class DomainCreatePermissions {
       }
 
       @Override
-      public String getSysPermissionName() {
+      public String getPermissionName() {
          if (!isSystemPermission()) {
             throw new IllegalStateException(
                   "No system permission name may be retrieved for non-system domain create permission: " + this + ", please check your code");
