@@ -36,10 +36,6 @@ public class Resources {
          return resourceId;
       }
 
-      public String toString() {
-         return "R(" + Long.toString(resourceId) + ")";
-      }
-
       @Override
       public boolean equals(Object other) {
          if (this == other) {
@@ -61,6 +57,11 @@ public class Resources {
       @Override
       public int hashCode() {
          return resourceId.hashCode();
+      }
+
+      @Override
+      public String toString() {
+         return "R(" + Long.toString(resourceId) + ")";
       }
    }
 }
