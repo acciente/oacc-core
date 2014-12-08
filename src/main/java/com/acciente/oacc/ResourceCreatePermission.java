@@ -17,20 +17,82 @@
  */
 package com.acciente.oacc;
 
+/**
+ * A ResourceCreatePermission is the type of permission used to grant an accessor permission to
+ * create resources. This permission type is also used to grant an accessor the resource permissions
+ * the accessor is granted on the newly created resource (these are called post-create permissions).
+ * The use of post-create permissions is optional. Post-create permissions should only be used
+ * when other more manageable means, such as the global permissions mechanism, are not adequate
+ * to grant the accessor permissions on newly created resources.
+ * <p/>
+ * A non-post-create ResourceCreatePermission is a system permission. The only system permission
+ * supported by a ResourceCreatePermission is the *CREATE system permission. The *CREATE permission
+ * allows the accessor to create resources. As mentioned previously, an accessor with the *CREATE
+ * permission may also be granted post-create permissions to specify what permissions are granted
+ * to the accessor on a resource the accessor creates. Having the *CREATE permission is a pre-requisite
+ * for having post-create permissions.
+ * <p/>
+ * To create an instance of this class use {@link ResourceCreatePermissions#getInstance(String)}
+ * or one of its variants.
+ */
 public interface ResourceCreatePermission {
-   ResourcePermission getPostCreateResourcePermission();
-
-   String getSysPermissionName();
-
-   long getSystemPermissionId();
-
+   /**
+    * Property to determine if this is system permission.
+    *
+    * @return true if this is a system permission, false otherwise.
+    */
    boolean isSystemPermission();
 
+   /**
+    * Property to retrieve the system permission name, if this is not a system permission an
+    * exception is thrown.
+    *
+    * @return the name of the system permission.
+    * @throws IllegalStateException if this method is called on a non-system permission.
+    */
+   String getPermissionName();
+
+   /**
+    * Property to retrieve the system permission id, if this is not a system permission an
+    * exception is thrown.
+    *
+    * @return the internal id of the system permission. Applications should not use this id.
+    * @throws IllegalStateException if this method is called on a non-system permission.
+    */
+   long getSystemPermissionId();
+
+   /**
+    * Property to retrieve the post-create permission, if this is a system permission an
+    * exception is thrown.
+    *
+    * @return the post create resource permission associated with this permission, if any.
+    * @throws IllegalStateException if this method is called on a system permission.
+    */
+   ResourcePermission getPostCreateResourcePermission();
+
+   /**
+    * Property to retrieve the "with grant" option.
+    *
+    * @return true if this permission includes the privilege to grant, false otherwise.
+    */
    boolean isWithGrant();
 
-   int getInheritLevel();
-
-   int getDomainLevel();
-
+   /**
+    * Used to determine if this permission can be granted by an grantor holding the specified
+    * permission.
+    *
+    * @param other another permission to compare with
+    * @return true if this permission can be granted by a holder of the passed in permission,
+    *         false otherwise.
+    */
    boolean isGrantableFrom(ResourceCreatePermission other);
+
+   /**
+    * Compare this permission with the specified permission ignoring the grant option.
+    *
+    * @param other another permission to compare with
+    * @return true if the passed in permission is equal to this permission ignoring the
+    *         value of the {@link #isWithGrant()} property.
+    */
+   boolean equalsIgnoreGrant(Object other);
 }

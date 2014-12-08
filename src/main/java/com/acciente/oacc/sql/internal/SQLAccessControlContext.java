@@ -1380,7 +1380,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
          boolean createSysPermissionFound = false;
          for (final ResourceCreatePermission resourceCreatePermission : resourceCreatePermissions) {
             if (resourceCreatePermission.isSystemPermission()
-                  && ResourceCreatePermissions.CREATE.equals(resourceCreatePermission.getSysPermissionName())) {
+                  && ResourceCreatePermissions.CREATE.equals(resourceCreatePermission.getPermissionName())) {
                createSysPermissionFound = true;
                break;
             }
@@ -1401,7 +1401,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
 
       for (final ResourceCreatePermission resourceCreatePermission : resourceCreatePermissions) {
          if (resourceCreatePermission.isSystemPermission()
-               && ResourceCreatePermissions.CREATE.equals(resourceCreatePermission.getSysPermissionName())) {
+               && ResourceCreatePermissions.CREATE.equals(resourceCreatePermission.getPermissionName())) {
             continue;
          }
 
@@ -2437,7 +2437,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
 
       for (ResourceCreatePermission resourceCreatePermission : effectiveResourceCreatePermissions) {
          if (resourceCreatePermission.isSystemPermission()
-               && ResourceCreatePermissions.CREATE.equals(resourceCreatePermission.getSysPermissionName())) {
+               && ResourceCreatePermissions.CREATE.equals(resourceCreatePermission.getPermissionName())) {
             createSysPermissionFound = true;
             break;
          }

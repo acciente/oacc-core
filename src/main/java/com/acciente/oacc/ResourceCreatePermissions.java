@@ -120,15 +120,13 @@ public class ResourceCreatePermissions {
          this.domainLevel = domainLevel;
       }
 
-      public ResourcePermission getPostCreateResourcePermission() {
-         if (isSystemPermission()) {
-            throw new IllegalArgumentException(
-                  "No post create resource permission may be retrieved for system resource create permission: " + this + ", please check your code");
-         }
-         return postCreateResourcePermission;
+      @Override
+      public boolean isSystemPermission() {
+         return systemPermissionId != 0;
       }
 
-      public String getSysPermissionName() {
+      @Override
+      public String getPermissionName() {
          if (!isSystemPermission()) {
             throw new IllegalArgumentException(
                   "No system permission name may be retrieved for non-system resource create permission: " + this + ", please check your code");
@@ -136,6 +134,7 @@ public class ResourceCreatePermissions {
          return sysPermissionName;
       }
 
+      @Override
       public long getSystemPermissionId() {
          if (!isSystemPermission()) {
             throw new IllegalArgumentException(
@@ -144,77 +143,21 @@ public class ResourceCreatePermissions {
          return systemPermissionId;
       }
 
-      public boolean isSystemPermission() {
-         return systemPermissionId != 0;
+      @Override
+      public ResourcePermission getPostCreateResourcePermission() {
+         if (isSystemPermission()) {
+            throw new IllegalArgumentException(
+                  "No post create resource permission may be retrieved for system resource create permission: " + this + ", please check your code");
+         }
+         return postCreateResourcePermission;
       }
 
+      @Override
       public boolean isWithGrant() {
          return withGrant;
       }
 
-      public int getInheritLevel() {
-         return inheritLevel;
-      }
-
-      public int getDomainLevel() {
-         return domainLevel;
-      }
-
-      public String toString() {
-         if (postCreateResourcePermission == null) {
-            return "*CREATE[]"
-                  + (withGrant ? " /G" : "")
-                  + (inheritLevel != 0 ? " /I:" + inheritLevel : "")
-                  + (domainLevel != 0 ? " /D:" + domainLevel : "");
-         }
-         else {
-            return "*CREATE[" + postCreateResourcePermission.toString() + "]"
-                  + (withGrant ? " /G" : "")
-                  + (inheritLevel != 0 ? " /I:" + inheritLevel : "")
-                  + (domainLevel != 0 ? " /D:" + domainLevel : "");
-         }
-      }
-
       @Override
-      public int hashCode() {
-         int result = (int) (systemPermissionId ^ (systemPermissionId >>> 32));
-         result = 31 * result + (sysPermissionName != null ? sysPermissionName.hashCode() : 0);
-         result = 31 * result + (postCreateResourcePermission != null ? postCreateResourcePermission.hashCode() : 0);
-         result = 31 * result + (withGrant ? 1 : 0);
-         return result;
-      }
-
-      @Override
-      public boolean equals(Object other) {
-         if (this == other) {
-            return true;
-         }
-         if (other == null || getClass() != other.getClass()) {
-            return false;
-         }
-
-         ResourceCreatePermissionImpl otherResourceCreatePermission = (ResourceCreatePermissionImpl) other;
-
-         if (systemPermissionId != otherResourceCreatePermission.systemPermissionId) {
-            return false;
-         }
-         if (withGrant != otherResourceCreatePermission.withGrant) {
-            return false;
-         }
-         if (postCreateResourcePermission != null
-             ? !postCreateResourcePermission.equals(otherResourceCreatePermission.postCreateResourcePermission)
-             : otherResourceCreatePermission.postCreateResourcePermission != null) {
-            return false;
-         }
-         if (sysPermissionName != null
-             ? !sysPermissionName.equals(otherResourceCreatePermission.sysPermissionName)
-             : otherResourceCreatePermission.sysPermissionName != null) {
-            return false;
-         }
-
-         return true;
-      }
-
       public boolean isGrantableFrom(ResourceCreatePermission other) {
          if (other == null) {
             return false;
@@ -237,6 +180,98 @@ public class ResourceCreatePermissions {
          }
 
          return this.postCreateResourcePermission.equalsIgnoreGrant(other.getPostCreateResourcePermission());
+      }
+
+      public int getInheritLevel() {
+         return inheritLevel;
+      }
+
+      public int getDomainLevel() {
+         return domainLevel;
+      }
+
+      @Override
+      public boolean equals(Object other) {
+         if (this == other) {
+            return true;
+         }
+         if (other == null || getClass() != other.getClass()) {
+            return false;
+         }
+
+         ResourceCreatePermissionImpl otherResourceCreatePermission = (ResourceCreatePermissionImpl) other;
+
+         if (systemPermissionId != otherResourceCreatePermission.systemPermissionId) {
+            return false;
+         }
+         if (sysPermissionName != null
+             ? !sysPermissionName.equals(otherResourceCreatePermission.sysPermissionName)
+             : otherResourceCreatePermission.sysPermissionName != null) {
+            return false;
+         }
+         if (postCreateResourcePermission != null
+             ? !postCreateResourcePermission.equals(otherResourceCreatePermission.postCreateResourcePermission)
+             : otherResourceCreatePermission.postCreateResourcePermission != null) {
+            return false;
+         }
+         if (withGrant != otherResourceCreatePermission.withGrant) {
+            return false;
+         }
+
+         return true;
+      }
+
+      @Override
+      public boolean equalsIgnoreGrant(Object other) {
+         if (this == other) {
+            return true;
+         }
+         if (other == null || getClass() != other.getClass()) {
+            return false;
+         }
+
+         ResourceCreatePermissionImpl otherResourceCreatePermission = (ResourceCreatePermissionImpl) other;
+
+         if (systemPermissionId != otherResourceCreatePermission.systemPermissionId) {
+            return false;
+         }
+         if (sysPermissionName != null
+             ? !sysPermissionName.equals(otherResourceCreatePermission.sysPermissionName)
+             : otherResourceCreatePermission.sysPermissionName != null) {
+            return false;
+         }
+         if (postCreateResourcePermission != null
+             ? !postCreateResourcePermission.equals(otherResourceCreatePermission.postCreateResourcePermission)
+             : otherResourceCreatePermission.postCreateResourcePermission != null) {
+            return false;
+         }
+
+         return true;
+      }
+
+      @Override
+      public int hashCode() {
+         int result = (int) (systemPermissionId ^ (systemPermissionId >>> 32));
+         result = 31 * result + (sysPermissionName != null ? sysPermissionName.hashCode() : 0);
+         result = 31 * result + (postCreateResourcePermission != null ? postCreateResourcePermission.hashCode() : 0);
+         result = 31 * result + (withGrant ? 1 : 0);
+         return result;
+      }
+
+      @Override
+      public String toString() {
+         if (postCreateResourcePermission == null) {
+            return "*CREATE[]"
+                  + (withGrant ? " /G" : "")
+                  + (inheritLevel != 0 ? " /I:" + inheritLevel : "")
+                  + (domainLevel != 0 ? " /D:" + domainLevel : "");
+         }
+         else {
+            return "*CREATE[" + postCreateResourcePermission.toString() + "]"
+                  + (withGrant ? " /G" : "")
+                  + (inheritLevel != 0 ? " /I:" + inheritLevel : "")
+                  + (domainLevel != 0 ? " /D:" + domainLevel : "");
+         }
       }
 
       // private static helper method to convert a sys permission name to a sys permission object
