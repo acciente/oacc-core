@@ -105,14 +105,17 @@ public class ResourcePermissions {
          this.domainLevel = domainLevel;
       }
 
+      @Override
+      public boolean isSystemPermission() {
+         return systemPermissionId != 0;
+      }
+
+      @Override
       public String getPermissionName() {
          return permissionName;
       }
 
-      public boolean isWithGrant() {
-         return withGrant;
-      }
-
+      @Override
       public long getSystemPermissionId() {
          if (!isSystemPermission()) {
             throw new IllegalArgumentException("No system permission ID may be retrieved for user permission: " + permissionName + ", please check your code");
@@ -121,8 +124,22 @@ public class ResourcePermissions {
          return systemPermissionId;
       }
 
-      public boolean isSystemPermission() {
-         return systemPermissionId != 0;
+      @Override
+      public boolean isWithGrant() {
+         return withGrant;
+      }
+
+      @Override
+      public boolean isGrantableFrom(ResourcePermission other) {
+         if (other == null) {
+            return false;
+         }
+
+         if (!other.isWithGrant()) {
+            return false;
+         }
+
+         return this.equalsIgnoreGrant(other);
       }
 
       public int getInheritLevel() {
@@ -131,13 +148,6 @@ public class ResourcePermissions {
 
       public int getDomainLevel() {
          return domainLevel;
-      }
-
-      @Override
-      public int hashCode() {
-         int result = permissionName.hashCode();
-         result = 31 * result + (withGrant ? 1 : 0);
-         return result;
       }
 
       @Override
@@ -151,9 +161,27 @@ public class ResourcePermissions {
 
          ResourcePermissionImpl otherResourcePermission = (ResourcePermissionImpl) other;
 
+         if (!permissionName.equals(otherResourcePermission.permissionName)) {
+            return false;
+         }
          if (withGrant != otherResourcePermission.withGrant) {
             return false;
          }
+
+         return true;
+      }
+
+      @Override
+      public boolean equalsIgnoreGrant(Object other) {
+         if (this == other) {
+            return true;
+         }
+         if (other == null || getClass() != other.getClass()) {
+            return false;
+         }
+
+         ResourcePermissionImpl otherResourcePermission = (ResourcePermissionImpl) other;
+
          if (!permissionName.equals(otherResourcePermission.permissionName)) {
             return false;
          }
@@ -161,43 +189,22 @@ public class ResourcePermissions {
          return true;
       }
 
-      public boolean equalsIgnoreGrant(Object other) {
-         if (this == other) {   // optimization for self-reference
-            return true;
-         }
-         else {
-            if (other == null || !(other instanceof ResourcePermissionImpl)) {
-               return false;
-            }
-            else {
-               ResourcePermissionImpl otherResourcePermission = (ResourcePermissionImpl) other;
-
-               // note optimization below for interned strings
-               return ((this.permissionName == otherResourcePermission.permissionName || this.permissionName.equals(
-                     otherResourcePermission.permissionName))
-                     && (this.systemPermissionId == otherResourcePermission.systemPermissionId));
-            }
-         }
+      @Override
+      public int hashCode() {
+         int result = permissionName.hashCode();
+         result = 31 * result + (withGrant ? 1 : 0);
+         return result;
       }
 
-      public boolean isGrantableFrom(ResourcePermission other) {
-         if (other == null) {
-            return false;
-         }
-
-         if (!other.isWithGrant()) {
-            return false;
-         }
-
-         return this.equalsIgnoreGrant(other);
-      }
-
+      @Override
       public String toString() {
          return (isSystemPermission() ? "SYS:" + permissionName : permissionName)
                + (withGrant ? " /G" : "")
                + (inheritLevel != 0 ? " /I:" + inheritLevel : "")
                + (domainLevel != 0 ? " /D:" + domainLevel : "");
       }
+
+      // private helper methods
 
       private void assertPermissionNameSpecified(String permissionName) {
          if (permissionName == null || permissionName.trim().isEmpty()) {
