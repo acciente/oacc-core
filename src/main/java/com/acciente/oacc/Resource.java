@@ -17,6 +17,16 @@
  */
 package com.acciente.oacc;
 
+/**
+ * A resource is the abstraction for an application object. A resource is created and
+ * associated with every object in the application that needs to have access control.
+ * All security relationships for the application object are defined using the using
+ * its corresponding resource.
+ */
 public interface Resource {
+   /**
+    * @return The id of this resource. This id is typically persisted as an attribute
+    * of the application object that it is associated with.
+    */
    long getId();
 }
