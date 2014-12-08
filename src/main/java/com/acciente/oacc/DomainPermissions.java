@@ -91,14 +91,17 @@ public class DomainPermissions {
          this.domainLevel = domainLevel;
       }
 
+      @Override
+      public boolean isSystemPermission() {
+         return systemPermissionId != 0;
+      }
+
+      @Override
       public String getPermissionName() {
          return permissionName;
       }
 
-      public boolean isWithGrant() {
-         return withGrant;
-      }
-
+      @Override
       public long getSystemPermissionId() {
          if (!isSystemPermission()) {
             throw new IllegalArgumentException("No system permission ID may be retrieved for user permission: " + permissionName + ", please check your code");
@@ -107,8 +110,22 @@ public class DomainPermissions {
          return systemPermissionId;
       }
 
-      public boolean isSystemPermission() {
-         return systemPermissionId != 0;
+      @Override
+      public boolean isWithGrant() {
+         return withGrant;
+      }
+
+      @Override
+      public boolean isGrantableFrom(DomainPermission other) {
+         if (other == null) {
+            return false;
+         }
+
+         if (!other.isWithGrant()) {
+            return false;
+         }
+
+         return permissionName.equals(other.getPermissionName());
       }
 
       public int getInheritLevel() {
@@ -142,6 +159,7 @@ public class DomainPermissions {
          return true;
       }
 
+      @Override
       public boolean equalsIgnoreGrant(Object other) {
          if (this == other) {
             return true;
@@ -159,18 +177,6 @@ public class DomainPermissions {
          return true;
       }
 
-      public boolean isGrantableFrom(DomainPermission other) {
-         if (other == null) {
-            return false;
-         }
-
-         if (!other.isWithGrant()) {
-            return false;
-         }
-
-         return permissionName.equals(other.getPermissionName());
-      }
-
       @Override
       public int hashCode() {
          int result = permissionName.hashCode();
@@ -178,6 +184,7 @@ public class DomainPermissions {
          return result;
       }
 
+      @Override
       public String toString() {
          if (isSystemPermission()) {
             return "DOMAIN:SYS:" + permissionName
