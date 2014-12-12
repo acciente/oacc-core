@@ -93,7 +93,8 @@ public class TestAccessControl_getEffectiveResourceCreatePermissions extends Tes
       // set create permissions on custom domain explicitly and verify
       accessControlContext.setResourceCreatePermissions(accessorResource,
                                                         resourceClassName,
-                                                        resourceCreatePermissions_pre1, domainName
+                                                        resourceCreatePermissions_pre1,
+                                                        domainName
       );
 
       final Set<ResourceCreatePermission> resourceCreatePermissions_post = accessControlContext.getEffectiveResourceCreatePermissions(accessorResource, resourceClassName, domainName);
@@ -150,7 +151,8 @@ public class TestAccessControl_getEffectiveResourceCreatePermissions extends Tes
       // set create permissions on custom domain explicitly and verify
       accessControlContext.setResourceCreatePermissions(accessorResource,
                                                         resourceClassName,
-                                                        resourceCreatePermissions_pre1, domainName
+                                                        resourceCreatePermissions_pre1,
+                                                        domainName
       );
 
       // create a new authenticatable 'session' resource
@@ -167,7 +169,8 @@ public class TestAccessControl_getEffectiveResourceCreatePermissions extends Tes
       resourceCreatePermissions_pre2.add(createPerm_resetPwd);
       accessControlContext.setResourceCreatePermissions(accessorResource,
                                                         resourceClassName,
-                                                        resourceCreatePermissions_pre2, sessionDomainName
+                                                        resourceCreatePermissions_pre2,
+                                                        sessionDomainName
       );
 
       // authenticate the 'session' resource
@@ -190,20 +193,16 @@ public class TestAccessControl_getEffectiveResourceCreatePermissions extends Tes
    @Test
    public void getEffectiveResourceCreatePermissions_validWithInheritFromParentDomain() throws AccessControlException {
       authenticateSystemResource();
-      final ResourceCreatePermission createPerm_create_withGrant = ResourceCreatePermissions.getInstance(
-            ResourceCreatePermissions.CREATE,
-            true);
-      final ResourceCreatePermission createPerm_impersonate = ResourceCreatePermissions.getInstance(ResourcePermissions.getInstance(
-            ResourcePermissions.IMPERSONATE), false);
-      final ResourceCreatePermission createPerm_inherit_withGrant = ResourceCreatePermissions.getInstance(
-            ResourcePermissions.getInstance(ResourcePermissions.INHERIT, true),
-            true);
-      final ResourceCreatePermission createPerm_resetPwd = ResourceCreatePermissions.getInstance(ResourcePermissions.getInstance(
-            ResourcePermissions.RESET_CREDENTIALS,
-            true));
-      final ResourceCreatePermission createPerm_resetPwd_withGrant = ResourceCreatePermissions.getInstance(
-            ResourcePermissions.getInstance(ResourcePermissions.RESET_CREDENTIALS, true),
-            true);
+      final ResourceCreatePermission createPerm_create_withGrant
+            = ResourceCreatePermissions.getInstance(ResourceCreatePermissions.CREATE, true);
+      final ResourceCreatePermission createPerm_impersonate
+            = ResourceCreatePermissions.getInstance(ResourcePermissions.getInstance(ResourcePermissions.IMPERSONATE), false);
+      final ResourceCreatePermission createPerm_inheritGrantable_withGrant
+            = ResourceCreatePermissions.getInstance(ResourcePermissions.getInstance(ResourcePermissions.INHERIT, true), true);
+      final ResourceCreatePermission createPerm_resetPwdGrantable
+            = ResourceCreatePermissions.getInstance(ResourcePermissions.getInstance(ResourcePermissions.RESET_CREDENTIALS, true));
+      final ResourceCreatePermission createPerm_resetPwdGrantable_withGrant
+            = ResourceCreatePermissions.getInstance(ResourcePermissions.getInstance(ResourcePermissions.RESET_CREDENTIALS, true), true);
 
       final Resource accessorResource = generateUnauthenticatableResource();
       final String parentDomainName = generateDomain();
@@ -214,8 +213,8 @@ public class TestAccessControl_getEffectiveResourceCreatePermissions extends Tes
       // set create permissions on parent domain
       Set<ResourceCreatePermission> parentResourceCreatePermissions_pre = new HashSet<>();
       parentResourceCreatePermissions_pre.add(createPerm_create_withGrant);
-      parentResourceCreatePermissions_pre.add(createPerm_inherit_withGrant);
-      parentResourceCreatePermissions_pre.add(createPerm_resetPwd);
+      parentResourceCreatePermissions_pre.add(createPerm_inheritGrantable_withGrant);
+      parentResourceCreatePermissions_pre.add(createPerm_resetPwdGrantable);
       final ResourcePermission parentResourcePermission_custom = ResourcePermissions.getInstance(
             generateResourceClassPermission(resourceClassName));
       final ResourceCreatePermission parentResourceCreatePermission_custom = ResourceCreatePermissions.getInstance(
@@ -224,23 +223,28 @@ public class TestAccessControl_getEffectiveResourceCreatePermissions extends Tes
       parentResourceCreatePermissions_pre.add(parentResourceCreatePermission_custom);
       accessControlContext.setResourceCreatePermissions(accessorResource,
                                                         resourceClassName,
-                                                        parentResourceCreatePermissions_pre, parentDomainName
+                                                        parentResourceCreatePermissions_pre,
+                                                        parentDomainName
       );
 
       // set create permissions on child domain
       Set<ResourceCreatePermission> childResourceCreatePermissions_pre = new HashSet<>();
       childResourceCreatePermissions_pre.add(createPerm_create_withGrant);
       childResourceCreatePermissions_pre.add(createPerm_impersonate);
-      childResourceCreatePermissions_pre.add(createPerm_resetPwd_withGrant);
+      childResourceCreatePermissions_pre.add(createPerm_resetPwdGrantable_withGrant);
       accessControlContext.setResourceCreatePermissions(accessorResource,
                                                         resourceClassName,
-                                                        childResourceCreatePermissions_pre, childDomainName
+                                                        childResourceCreatePermissions_pre,
+                                                        childDomainName
       );
 
       // verify
       Set<ResourceCreatePermission> childResourceCreatePermissions_expected = new HashSet<>();
-      childResourceCreatePermissions_expected.addAll(parentResourceCreatePermissions_pre);
-      childResourceCreatePermissions_expected.addAll(childResourceCreatePermissions_pre);
+      childResourceCreatePermissions_expected.add(createPerm_create_withGrant);
+      childResourceCreatePermissions_expected.add(createPerm_impersonate);
+      childResourceCreatePermissions_expected.add(createPerm_resetPwdGrantable_withGrant);
+      childResourceCreatePermissions_expected.add(createPerm_inheritGrantable_withGrant);
+      childResourceCreatePermissions_expected.add(parentResourceCreatePermission_custom);
 
       final Set<ResourceCreatePermission> parentResourceCreatePermissions_post = accessControlContext.getEffectiveResourceCreatePermissions(accessorResource, resourceClassName, parentDomainName);
       assertThat(parentResourceCreatePermissions_post, is(parentResourceCreatePermissions_pre));
@@ -256,6 +260,287 @@ public class TestAccessControl_getEffectiveResourceCreatePermissions extends Tes
       final Map<String, Set<ResourceCreatePermission>> createPermsByResourceClass_sysDomain = allCreatePermissions.get(childDomainName);
       assertThat(createPermsByResourceClass_sysDomain.size(), is(1));
       assertThat(createPermsByResourceClass_sysDomain.get(resourceClassName), is(childResourceCreatePermissions_expected));
+   }
+
+   @Test
+   public void getEffectiveResourceCreatePermissions_inheritSysPermissionWithDifferentGrantingRights_shouldSucceedAsAuthorized() throws AccessControlException {
+      authenticateSystemResource();
+      final char[] password = generateUniquePassword();
+      final Resource accessorResource = generateAuthenticatableResource(password);
+      final Resource donorResource = generateUnauthenticatableResource();
+      final String resourceClass = generateResourceClass(true, false);
+      final String domainName = generateDomain();
+
+      // setup donor domain create permissions
+      Set<ResourceCreatePermission> donorPermissions = new HashSet<>();
+      donorPermissions.add(ResourceCreatePermissions.getInstance(ResourceCreatePermissions.CREATE));
+
+      accessControlContext.setResourceCreatePermissions(donorResource, resourceClass, donorPermissions, domainName);
+      assertThat(accessControlContext.getEffectiveResourceCreatePermissions(donorResource, resourceClass, domainName), is(donorPermissions));
+
+      // setup accessor domain create permissions
+      Set<ResourceCreatePermission> accessorPermissions = new HashSet<>();
+      accessorPermissions.add(ResourceCreatePermissions.getInstance(ResourceCreatePermissions.CREATE, true));
+
+      accessControlContext.setResourceCreatePermissions(accessorResource, resourceClass, accessorPermissions, domainName);
+      assertThat(accessControlContext.getEffectiveResourceCreatePermissions(accessorResource, resourceClass, domainName), is(accessorPermissions));
+
+      // setup inheritor --INHERIT--> donor
+      Set<ResourcePermission> accessor2donorPermissions = new HashSet<>();
+      accessor2donorPermissions.add(ResourcePermissions.getInstance(ResourcePermissions.INHERIT));
+      accessControlContext.setResourcePermissions(accessorResource, donorResource, accessor2donorPermissions);
+
+      // authenticate accessor resource
+      accessControlContext.authenticate(accessorResource, PasswordCredentials.newInstance(password));
+
+      Set<ResourceCreatePermission> permissions_expected = new HashSet<>();
+      permissions_expected.add(ResourceCreatePermissions.getInstance(ResourceCreatePermissions.CREATE, true));
+
+      final Set<ResourceCreatePermission> permissions_post
+            = accessControlContext.getEffectiveResourceCreatePermissions(accessorResource, resourceClass, domainName);
+      assertThat(permissions_post, is(permissions_expected));
+   }
+
+   @Test
+   public void getEffectiveDomainCreatePermissions_inheritWithDifferentGrantingRights_shouldSucceedAsAuthorized() throws AccessControlException {
+      authenticateSystemResource();
+      final String donorPermissionName_impersonate = ResourcePermissions.IMPERSONATE;
+      final String donorPermissionName_resetCredentials = ResourcePermissions.RESET_CREDENTIALS;
+      final String accessorPermissionName_impersonate = donorPermissionName_impersonate;
+      final String accessorPermissionName_resetCredentials = donorPermissionName_resetCredentials;
+      final char[] password = generateUniquePassword();
+      final Resource accessorResource = generateAuthenticatableResource(password);
+      final Resource donorResource = generateUnauthenticatableResource();
+      final String resourceClass = generateResourceClass(true, false);
+      final String domainName = generateDomain();
+
+      // setup donor domain create permissions
+      Set<ResourceCreatePermission> donorPermissions = new HashSet<>();
+      donorPermissions.add(ResourceCreatePermissions.getInstance(ResourceCreatePermissions.CREATE));
+      donorPermissions.add(ResourceCreatePermissions.getInstance(ResourcePermissions.getInstance(donorPermissionName_impersonate, true), true));
+      donorPermissions.add(ResourceCreatePermissions.getInstance(ResourcePermissions.getInstance(donorPermissionName_resetCredentials, false), false));
+
+      accessControlContext.setResourceCreatePermissions(donorResource, resourceClass, donorPermissions, domainName);
+      assertThat(accessControlContext.getEffectiveResourceCreatePermissions(donorResource, resourceClass, domainName), is(donorPermissions));
+
+      // setup accessor domain create permissions
+      Set<ResourceCreatePermission> accessorPermissions = new HashSet<>();
+      accessorPermissions.add(ResourceCreatePermissions.getInstance(ResourceCreatePermissions.CREATE, true));
+      accessorPermissions.add(ResourceCreatePermissions
+                                    .getInstance(ResourcePermissions.getInstance(accessorPermissionName_impersonate, false), false));
+      accessorPermissions.add(ResourceCreatePermissions
+                                    .getInstance(ResourcePermissions.getInstance(accessorPermissionName_resetCredentials, true), true));
+
+      accessControlContext.setResourceCreatePermissions(accessorResource, resourceClass, accessorPermissions, domainName);
+      assertThat(accessControlContext.getEffectiveResourceCreatePermissions(accessorResource, resourceClass, domainName), is(accessorPermissions));
+
+      // setup inheritor --INHERIT--> donor
+      Set<ResourcePermission> accessor2donorPermissions = new HashSet<>();
+      accessor2donorPermissions.add(ResourcePermissions.getInstance(ResourcePermissions.INHERIT));
+      accessControlContext.setResourcePermissions(accessorResource, donorResource, accessor2donorPermissions);
+
+      // authenticate accessor resource
+      accessControlContext.authenticate(accessorResource, PasswordCredentials.newInstance(password));
+
+      Set<ResourceCreatePermission> permissions_expected = new HashSet<>();
+      permissions_expected.add(ResourceCreatePermissions.getInstance(ResourceCreatePermissions.CREATE, true));
+      permissions_expected.add(ResourceCreatePermissions
+                                     .getInstance(ResourcePermissions.getInstance(accessorPermissionName_impersonate, true), true));
+      permissions_expected.add(ResourceCreatePermissions
+                                     .getInstance(ResourcePermissions.getInstance(accessorPermissionName_resetCredentials, true), true));
+
+      final Set<ResourceCreatePermission> permissions_post
+            = accessControlContext.getEffectiveResourceCreatePermissions(accessorResource, resourceClass, domainName);
+      assertThat(permissions_post, is(permissions_expected));
+   }
+
+   @Test
+   public void getEffectiveDomainCreatePermissions_inheritFromTwoResourcesWithDifferentGrantingRights_shouldSucceedAsAuthorized() throws AccessControlException {
+      authenticateSystemResource();
+      final String donorPermissionName_impersonate = ResourcePermissions.IMPERSONATE;
+      final String donorPermissionName_resetCredentials = ResourcePermissions.RESET_CREDENTIALS;
+      final char[] password = generateUniquePassword();
+      final Resource accessorResource = generateAuthenticatableResource(password);
+      final Resource donor1Resource = generateUnauthenticatableResource();
+      final Resource donor2Resource = generateUnauthenticatableResource();
+      final String resourceClass = generateResourceClass(true, false);
+      final String domainName = generateDomain();
+
+      // setup donor 1 domain create permissions
+      Set<ResourceCreatePermission> donor1Permissions = new HashSet<>();
+      donor1Permissions.add(ResourceCreatePermissions.getInstance(ResourceCreatePermissions.CREATE));
+      donor1Permissions.add(ResourceCreatePermissions.getInstance(ResourcePermissions.getInstance(donorPermissionName_impersonate, false), true));
+      donor1Permissions.add(ResourceCreatePermissions.getInstance(ResourcePermissions.getInstance(donorPermissionName_resetCredentials, true), false));
+
+      accessControlContext.setResourceCreatePermissions(donor1Resource, resourceClass, donor1Permissions, domainName);
+      assertThat(accessControlContext.getEffectiveResourceCreatePermissions(donor1Resource, resourceClass, domainName), is(donor1Permissions));
+
+      // setup donor 2 domain create permissions
+      Set<ResourceCreatePermission> donor2Permissions = new HashSet<>();
+      donor2Permissions.add(ResourceCreatePermissions.getInstance(ResourceCreatePermissions.CREATE));
+      donor2Permissions.add(ResourceCreatePermissions.getInstance(ResourcePermissions.getInstance(donorPermissionName_impersonate, true), true));
+      donor2Permissions.add(ResourceCreatePermissions.getInstance(ResourcePermissions.getInstance(donorPermissionName_resetCredentials, false), true));
+
+      accessControlContext.setResourceCreatePermissions(donor2Resource, resourceClass, donor2Permissions, domainName);
+      assertThat(accessControlContext.getEffectiveResourceCreatePermissions(donor2Resource, resourceClass, domainName), is(donor2Permissions));
+
+      // setup no accessor domain create permissions
+      Set<ResourceCreatePermission> accessorPermissions = new HashSet<>();
+      accessorPermissions.add(ResourceCreatePermissions.getInstance(ResourceCreatePermissions.CREATE));
+
+      accessControlContext.setResourceCreatePermissions(accessorResource, resourceClass, accessorPermissions, domainName);
+      assertThat(accessControlContext.getEffectiveResourceCreatePermissions(accessorResource, resourceClass, domainName), is(accessorPermissions));
+
+      // setup inheritor --INHERIT--> donor1
+      Set<ResourcePermission> accessor2donorPermissions = new HashSet<>();
+      accessor2donorPermissions.add(ResourcePermissions.getInstance(ResourcePermissions.INHERIT));
+      accessControlContext.setResourcePermissions(accessorResource, donor1Resource, accessor2donorPermissions);
+
+      // setup inheritor --INHERIT--> donor2
+      accessControlContext.setResourcePermissions(accessorResource, donor2Resource, accessor2donorPermissions);
+
+      // authenticate accessor resource
+      accessControlContext.authenticate(accessorResource, PasswordCredentials.newInstance(password));
+
+      Set<ResourceCreatePermission> permissions_expected = new HashSet<>();
+      permissions_expected.add(ResourceCreatePermissions.getInstance(ResourceCreatePermissions.CREATE));
+      permissions_expected.add(ResourceCreatePermissions
+                                     .getInstance(ResourcePermissions.getInstance(donorPermissionName_impersonate, true), true));
+      permissions_expected.add(ResourceCreatePermissions
+                                     .getInstance(ResourcePermissions.getInstance(donorPermissionName_resetCredentials, false), true));
+      permissions_expected.add(ResourceCreatePermissions
+                                     .getInstance(ResourcePermissions.getInstance(donorPermissionName_resetCredentials, true), false));
+
+      final Set<ResourceCreatePermission> permissions_post
+            = accessControlContext.getEffectiveResourceCreatePermissions(accessorResource, resourceClass, domainName);
+      assertThat(permissions_post, is(permissions_expected));
+   }
+
+   @Test
+   public void getEffectiveResourceCreatePermissions_multiLevelInheritance_shouldSucceedAsAuthorized() throws AccessControlException {
+      authenticateSystemResource();
+      final String donorPermissionName_impersonate = ResourcePermissions.IMPERSONATE;
+      final String inheritorPermissionName_impersonate = ResourcePermissions.IMPERSONATE;
+      final String inheritorPermissionName_resetCredentials = ResourcePermissions.RESET_CREDENTIALS;
+      final String accessorPermissionName_resetCredentials = inheritorPermissionName_resetCredentials;
+      final char[] password = generateUniquePassword();
+      final Resource accessorResource = generateAuthenticatableResource(password);
+      final Resource inheritorResource = generateUnauthenticatableResource();
+      final Resource donorResource = generateUnauthenticatableResource();
+      final String resourceClass = generateResourceClass(true, false);
+      final String domainName = generateDomain();
+
+      // setup donor domain create permissions
+      Set<ResourceCreatePermission> donorPermissions = new HashSet<>();
+      donorPermissions.add(ResourceCreatePermissions.getInstance(ResourceCreatePermissions.CREATE));
+      donorPermissions.add(ResourceCreatePermissions.getInstance(ResourcePermissions.getInstance(donorPermissionName_impersonate, true), true));
+
+      accessControlContext.setResourceCreatePermissions(donorResource, resourceClass, donorPermissions, domainName);
+      assertThat(accessControlContext.getEffectiveResourceCreatePermissions(donorResource, resourceClass, domainName), is(donorPermissions));
+
+      // setup inheritor domain create permissions
+      Set<ResourceCreatePermission> inheritorPermissions = new HashSet<>();
+      inheritorPermissions.add(ResourceCreatePermissions.getInstance(ResourceCreatePermissions.CREATE));
+      inheritorPermissions.add(ResourceCreatePermissions
+                                     .getInstance(ResourcePermissions.getInstance(inheritorPermissionName_impersonate, false),
+                                                  true));
+      inheritorPermissions.add(ResourceCreatePermissions
+                                     .getInstance(ResourcePermissions.getInstance(inheritorPermissionName_resetCredentials, true),
+                                                  false));
+
+      accessControlContext.setResourceCreatePermissions(inheritorResource, resourceClass, inheritorPermissions, domainName);
+      assertThat(accessControlContext.getEffectiveResourceCreatePermissions(inheritorResource, resourceClass, domainName), is(inheritorPermissions));
+
+      // setup accessor domain create permissions
+      Set<ResourceCreatePermission> accessorPermissions = new HashSet<>();
+      accessorPermissions.add(ResourceCreatePermissions.getInstance(ResourceCreatePermissions.CREATE));
+      accessorPermissions.add(ResourceCreatePermissions
+                                    .getInstance(ResourcePermissions.getInstance(accessorPermissionName_resetCredentials),
+                                                 true));
+
+      accessControlContext.setResourceCreatePermissions(accessorResource, resourceClass, accessorPermissions, domainName);
+      assertThat(accessControlContext.getEffectiveResourceCreatePermissions(accessorResource, resourceClass, domainName), is(accessorPermissions));
+
+      // setup inheritor --INHERIT--> donor
+      Set<ResourcePermission> inheritor2donorPermissions = new HashSet<>();
+      inheritor2donorPermissions.add(ResourcePermissions.getInstance(ResourcePermissions.INHERIT));
+      accessControlContext.setResourcePermissions(inheritorResource, donorResource, inheritor2donorPermissions);
+
+      // setup accessor --INHERIT--> inheritor
+      Set<ResourcePermission> accessor2inheritorPermissions = new HashSet<>();
+      accessor2inheritorPermissions.add(ResourcePermissions.getInstance(ResourcePermissions.INHERIT));
+      accessControlContext.setResourcePermissions(accessorResource, inheritorResource, accessor2inheritorPermissions);
+
+      // authenticate accessor resource
+      accessControlContext.authenticate(accessorResource, PasswordCredentials.newInstance(password));
+
+      Set<ResourceCreatePermission> permissions_expected = new HashSet<>();
+      permissions_expected.add(ResourceCreatePermissions.getInstance(ResourceCreatePermissions.CREATE));
+      permissions_expected.add(ResourceCreatePermissions
+                                     .getInstance(ResourcePermissions.getInstance(donorPermissionName_impersonate, true), true));
+      permissions_expected.add(ResourceCreatePermissions
+                                     .getInstance(ResourcePermissions.getInstance(accessorPermissionName_resetCredentials, true), false));
+      permissions_expected.add(ResourceCreatePermissions
+                                     .getInstance(ResourcePermissions.getInstance(accessorPermissionName_resetCredentials, false), true));
+
+      final Set<ResourceCreatePermission> permissions_post
+            = accessControlContext.getEffectiveResourceCreatePermissions(accessorResource, resourceClass, domainName);
+      assertThat(permissions_post, is(permissions_expected));
+   }
+
+   @Test
+   public void getEffectiveResourceCreatePermissions_multiLevelInheritanceWithEmptyIntermediaryLevel_shouldSucceedAsAuthorized() throws AccessControlException {
+      authenticateSystemResource();
+      final String donorPermissionName_impersonate = ResourcePermissions.IMPERSONATE;
+      final String accessorPermissionName_resetCredentials = ResourcePermissions.RESET_CREDENTIALS;
+      final char[] password = generateUniquePassword();
+      final Resource accessorResource = generateAuthenticatableResource(password);
+      final Resource inheritorResource = generateUnauthenticatableResource();
+      final Resource donorResource = generateUnauthenticatableResource();
+      final String resourceClass = generateResourceClass(true, false);
+      final String domainName = generateDomain();
+
+      // setup donor domain create permissions
+      Set<ResourceCreatePermission> donorPermissions = new HashSet<>();
+      donorPermissions.add(ResourceCreatePermissions.getInstance(ResourceCreatePermissions.CREATE));
+      donorPermissions.add(ResourceCreatePermissions.getInstance(ResourcePermissions.getInstance(donorPermissionName_impersonate)));
+
+      accessControlContext.setResourceCreatePermissions(donorResource, resourceClass, donorPermissions, domainName);
+      assertThat(accessControlContext.getEffectiveResourceCreatePermissions(donorResource, resourceClass, domainName), is(donorPermissions));
+
+      // no inheritor domain create permissions to set up
+
+      // setup accessor domain create permissions
+      Set<ResourceCreatePermission> accessorPermissions = new HashSet<>();
+      accessorPermissions.add(ResourceCreatePermissions.getInstance(ResourceCreatePermissions.CREATE));
+      accessorPermissions.add(ResourceCreatePermissions
+                                    .getInstance(ResourcePermissions.getInstance(accessorPermissionName_resetCredentials),
+                                                 true));
+
+      accessControlContext.setResourceCreatePermissions(accessorResource, resourceClass, accessorPermissions, domainName);
+      assertThat(accessControlContext.getEffectiveResourceCreatePermissions(accessorResource, resourceClass, domainName), is(accessorPermissions));
+
+      // setup inheritor --INHERIT--> donor
+      Set<ResourcePermission> inheritor2donorPermissions = new HashSet<>();
+      inheritor2donorPermissions.add(ResourcePermissions.getInstance(ResourcePermissions.INHERIT));
+      accessControlContext.setResourcePermissions(inheritorResource, donorResource, inheritor2donorPermissions);
+
+      // setup accessor --INHERIT--> inheritor
+      Set<ResourcePermission> accessor2inheritorPermissions = new HashSet<>();
+      accessor2inheritorPermissions.add(ResourcePermissions.getInstance(ResourcePermissions.INHERIT));
+      accessControlContext.setResourcePermissions(accessorResource, inheritorResource, accessor2inheritorPermissions);
+
+      // authenticate accessor resource
+      accessControlContext.authenticate(accessorResource, PasswordCredentials.newInstance(password));
+
+      Set<ResourceCreatePermission> permissions_expected = new HashSet<>();
+      permissions_expected.add(ResourceCreatePermissions.getInstance(ResourceCreatePermissions.CREATE));
+      permissions_expected.add(ResourceCreatePermissions.getInstance(ResourcePermissions.getInstance(donorPermissionName_impersonate)));
+      permissions_expected.add(ResourceCreatePermissions.getInstance(ResourcePermissions.getInstance(accessorPermissionName_resetCredentials), true));
+
+      final Set<ResourceCreatePermission> permissions_post
+            = accessControlContext.getEffectiveResourceCreatePermissions(accessorResource, resourceClass, domainName);
+      assertThat(permissions_post, is(permissions_expected));
    }
 
    @Test
@@ -289,13 +574,39 @@ public class TestAccessControl_getEffectiveResourceCreatePermissions extends Tes
    }
 
    @Test
+   public void getEffectiveResourceCreatePermissions_notExistentReferences_shouldSucceed() throws AccessControlException {
+      authenticateSystemResource();
+
+      final String resourceClassName = generateResourceClass(false, false);
+      final String domainName = generateDomain();
+      final Resource invalidResource = Resources.getInstance(-999L);
+
+      final Set<ResourceCreatePermission> resourceCreatePermissions1
+            = accessControlContext.getEffectiveResourceCreatePermissions(invalidResource, resourceClassName);
+      assertThat(resourceCreatePermissions1.isEmpty(), is(true));
+
+      final Set<ResourceCreatePermission> resourceCreatePermissions2
+            = accessControlContext.getEffectiveResourceCreatePermissions(invalidResource, resourceClassName, domainName);
+      assertThat(resourceCreatePermissions2.isEmpty(), is(true));
+   }
+
+   @Test
    public void getEffectiveResourceCreatePermissions_notExistentReferences_shouldFail() throws AccessControlException {
       authenticateSystemResource();
 
       final Resource accessorResource = generateUnauthenticatableResource();
+      final String domainName = generateDomain();
 
       try {
          accessControlContext.getEffectiveResourceCreatePermissions(accessorResource, "invalid_resource_class");
+         fail("getting create-permissions with reference to non-existent resource class name should have failed");
+      }
+      catch (AccessControlException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("could not find resource class"));
+      }
+
+      try {
+         accessControlContext.getEffectiveResourceCreatePermissions(accessorResource, "invalid_resource_class", domainName);
          fail("getting create-permissions with reference to non-existent resource class name should have failed");
       }
       catch (AccessControlException e) {

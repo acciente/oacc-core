@@ -1017,7 +1017,24 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       }
 
       // only system permissions are possible on a domain
-      return grantDomainPermissionSysPersister.getDomainSysPermissions(connection, accessorResource, domainId);
+      return collapseDomainPermissions(grantDomainPermissionSysPersister.getDomainSysPermissions(connection,
+                                                                                                 accessorResource,
+                                                                                                 domainId));
+   }
+
+   private Set<DomainPermission> collapseDomainPermissions(Set<DomainPermission> domainPermissions) {
+      final Set<DomainPermission> collapsedPermissions = new HashSet<>(domainPermissions);
+
+      for (DomainPermission permission : domainPermissions) {
+         for (DomainPermission grantEquivalentPermission : domainPermissions) {
+            if (permission.isGrantableFrom(grantEquivalentPermission) && !permission.equals(grantEquivalentPermission)) {
+               collapsedPermissions.remove(permission);
+               break;
+            }
+         }
+      }
+
+      return collapsedPermissions;
    }
 
    @Override
@@ -1029,7 +1046,8 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       try {
          connection = getConnection();
 
-         return grantDomainPermissionSysPersister.getDomainSysPermissions(connection, accessorResource);
+         return collapseDomainPermissions(grantDomainPermissionSysPersister.getDomainSysPermissions(connection,
+                                                                                                    accessorResource));
       }
       catch (SQLException e) {
          throw new AccessControlException(e);
@@ -1037,6 +1055,16 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       finally {
          closeConnection(connection);
       }
+   }
+
+   private Map<String, Set<DomainPermission>> collapseDomainPermissions(Map<String, Set<DomainPermission>> domainPermissionsMap) {
+      Map<String, Set<DomainPermission>> collapsedDomainPermissionsMap = new HashMap<>(domainPermissionsMap.size());
+
+      for (String domainName : domainPermissionsMap.keySet()) {
+         collapsedDomainPermissionsMap.put(domainName, collapseDomainPermissions(domainPermissionsMap.get(domainName)));
+      }
+
+      return collapsedDomainPermissionsMap;
    }
 
    @Override
@@ -1197,7 +1225,22 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       domainCreatePermissions
             .addAll(grantDomainCreatePermissionPostCreateSysPersister.getDomainPostCreatePermissions(connection,
                                                                                                      accessorResource));
-      return domainCreatePermissions;
+      return collapseDomainCreatePermissions(domainCreatePermissions);
+   }
+
+   private Set<DomainCreatePermission> collapseDomainCreatePermissions(Set<DomainCreatePermission> domainCreatePermissions) {
+      final Set<DomainCreatePermission> collapsedPermissions = new HashSet<>(domainCreatePermissions);
+
+      for (DomainCreatePermission permission : domainCreatePermissions) {
+         for (DomainCreatePermission grantEquivalentPermission : domainCreatePermissions) {
+            if (permission.isGrantableFrom(grantEquivalentPermission) && !permission.equals(grantEquivalentPermission)) {
+               collapsedPermissions.remove(permission);
+               break;
+            }
+         }
+      }
+
+      return collapsedPermissions;
    }
 
    @Override
@@ -1579,7 +1622,22 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
                                                                                       accessorResource,
                                                                                       resourceClassId,
                                                                                       domainId));
-      return resourceCreatePermissions;
+      return collapseResourceCreatePermissions(resourceCreatePermissions);
+   }
+
+   private Set<ResourceCreatePermission> collapseResourceCreatePermissions(Set<ResourceCreatePermission> resourceCreatePermissions) {
+      final Set<ResourceCreatePermission> collapsedPermissions = new HashSet<>(resourceCreatePermissions);
+
+      for (ResourceCreatePermission permission : resourceCreatePermissions) {
+         for (ResourceCreatePermission grantEquivalentPermission : resourceCreatePermissions) {
+            if (permission.isGrantableFrom(grantEquivalentPermission) && !permission.equals(grantEquivalentPermission)) {
+               collapsedPermissions.remove(permission);
+               break;
+            }
+         }
+      }
+
+      return collapsedPermissions;
    }
 
    @Override
@@ -1625,7 +1683,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
             grantResourceCreatePermissionPostCreatePersister.getPostCreatePermissions(connection, accessorResource),
             allResourceCreatePermissionsMap);
 
-      return allResourceCreatePermissionsMap;
+      return collapseResourceCreatePermissions(allResourceCreatePermissionsMap);
    }
 
    private void mergeSourceCreatePermissionsMapIntoTargetCreatePermissionsMap(Map<String, Map<String, Set<ResourceCreatePermission>>> sourceCreatePermissionsMap,
@@ -1652,6 +1710,21 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
             targetCreatePermsForClassSet.addAll(sourceCreatePermsForClassSet);
          }
       }
+   }
+
+   private Map<String, Map<String, Set<ResourceCreatePermission>>> collapseResourceCreatePermissions(Map<String, Map<String, Set<ResourceCreatePermission>>> resourceCreatePermissionsMap) {
+      for (String domainName : resourceCreatePermissionsMap.keySet()) {
+         final Map<String, Set<ResourceCreatePermission>> createPermissionsByDomainMap
+               = resourceCreatePermissionsMap.get(domainName);
+
+         for (String resourceClassName : createPermissionsByDomainMap.keySet()) {
+            final Set<ResourceCreatePermission> createPermissionsByResourceClassMap
+                  = createPermissionsByDomainMap.get(resourceClassName);
+            createPermissionsByDomainMap.put(resourceClassName, collapseResourceCreatePermissions(createPermissionsByResourceClassMap));
+         }
+      }
+
+      return resourceCreatePermissionsMap;
    }
 
    @Override
@@ -1889,7 +1962,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
                                                                                              accessorResource,
                                                                                              accessedResourceClassId,
                                                                                              accessedDomainId));
-      return resourcePermissions;
+      return collapseResourcePermissions(resourcePermissions);
    }
 
    private Set<ResourcePermission> __getDirectResourcePermissions(SQLConnection connection,
@@ -2205,7 +2278,22 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
                                                                                              accessorResource,
                                                                                              resourceClassId,
                                                                                              domainId));
-      return resourcePermissions;
+      return collapseResourcePermissions(resourcePermissions);
+   }
+
+   private Set<ResourcePermission> collapseResourcePermissions(Set<ResourcePermission> resourcePermissions) {
+      final Set<ResourcePermission> collapsedPermissions = new HashSet<>(resourcePermissions);
+
+      for (ResourcePermission permission : resourcePermissions) {
+         for (ResourcePermission grantEquivalentPermission : resourcePermissions) {
+            if (permission.isGrantableFrom(grantEquivalentPermission) && !permission.equals(grantEquivalentPermission)) {
+               collapsedPermissions.remove(permission);
+               break;
+            }
+         }
+      }
+
+      return collapsedPermissions;
    }
 
    @Override
@@ -2243,7 +2331,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
             grantGlobalResourcePermissionPersister.getGlobalPermissions(connection, accessorResource),
             globalALLPermissionsMap);
 
-      return globalALLPermissionsMap;
+      return collapseResourcePermissions(globalALLPermissionsMap);
    }
 
    private void mergeSourcePermissionsMapIntoTargetPermissionsMap(Map<String, Map<String, Set<ResourcePermission>>> sourcePermissionsMap,
@@ -2270,6 +2358,20 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
             targetPermsForClassSet.addAll(sourcePermissionsForClassSet);
          }
       }
+   }
+
+   private Map<String, Map<String, Set<ResourcePermission>>> collapseResourcePermissions(Map<String, Map<String, Set<ResourcePermission>>> resourcePermissionsMap) {
+      for (String domainName : resourcePermissionsMap.keySet()) {
+         final Map<String, Set<ResourcePermission>> createPermissionsByDomainMap = resourcePermissionsMap.get(domainName);
+
+         for (String resourceClassName : createPermissionsByDomainMap.keySet()) {
+            final Set<ResourcePermission> createPermissionsByResourceClassMap
+                  = createPermissionsByDomainMap.get(resourceClassName);
+            createPermissionsByDomainMap.put(resourceClassName, collapseResourcePermissions(createPermissionsByResourceClassMap));
+         }
+      }
+
+      return resourcePermissionsMap;
    }
 
    @Override

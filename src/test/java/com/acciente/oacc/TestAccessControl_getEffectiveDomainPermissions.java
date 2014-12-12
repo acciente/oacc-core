@@ -26,6 +26,7 @@ import java.util.Set;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.fail;
 
 public class TestAccessControl_getEffectiveDomainPermissions extends TestAccessControlBase {
    @Test
@@ -129,8 +130,8 @@ public class TestAccessControl_getEffectiveDomainPermissions extends TestAccessC
 
       // verify
       Set<DomainPermission> childDomainPermissions_expected = new HashSet<>();
-      childDomainPermissions_expected.addAll(parentDomainPermissions_pre);
-      childDomainPermissions_expected.addAll(childDomainPermissions_pre);
+      childDomainPermissions_expected.add(domPerm_superuser_withGrant);
+      childDomainPermissions_expected.add(domPerm_createchilddomain_withGrant);
 
       final Set<DomainPermission> childDomainPermissions_post = accessControlContext.getEffectiveDomainPermissions(accessorResource, childDomain);
       assertThat(childDomainPermissions_post, is(childDomainPermissions_expected));
@@ -184,21 +185,20 @@ public class TestAccessControl_getEffectiveDomainPermissions extends TestAccessC
 
       // verify
       Set<DomainPermission> childDomainPermissions_expected = new HashSet<>();
-      childDomainPermissions_expected.addAll(parentDomainPermissions_pre);
-      childDomainPermissions_expected.addAll(childDomainPermissions_pre);
+      childDomainPermissions_expected.add(domPerm_superuser_withGrant);
+      childDomainPermissions_expected.add(domPerm_createchilddomain);
 
       Set<DomainPermission> grandChildDomainPermissions_expected = new HashSet<>();
-      grandChildDomainPermissions_expected.addAll(parentDomainPermissions_pre);
-      grandChildDomainPermissions_expected.addAll(childDomainPermissions_pre);
+      grandChildDomainPermissions_expected.add(domPerm_superuser_withGrant);
+      grandChildDomainPermissions_expected.add(domPerm_createchilddomain);
 
       Set<DomainPermission> greatGrandChildDomainPermissions_expected = new HashSet<>();
-      greatGrandChildDomainPermissions_expected.addAll(parentDomainPermissions_pre);
-      greatGrandChildDomainPermissions_expected.addAll(childDomainPermissions_pre);
+      greatGrandChildDomainPermissions_expected.add(domPerm_superuser_withGrant);
+      greatGrandChildDomainPermissions_expected.add(domPerm_createchilddomain);
 
       Set<DomainPermission> greatGreatGrandChildDomainPermissions_expected = new HashSet<>();
-      greatGreatGrandChildDomainPermissions_expected.addAll(parentDomainPermissions_pre);
-      greatGreatGrandChildDomainPermissions_expected.addAll(childDomainPermissions_pre);
-      greatGreatGrandChildDomainPermissions_expected.addAll(greatGreatGrandChildDomainPermissions_pre);
+      greatGreatGrandChildDomainPermissions_expected.add(domPerm_superuser_withGrant);
+      greatGreatGrandChildDomainPermissions_expected.add(domPerm_createchilddomain_withGrant);
 
       final Set<DomainPermission> greatGreatGrandChildDomainPermissions_post = accessControlContext.getEffectiveDomainPermissions(accessorResource, greatGreatGrandChildDomain);
       assertThat(greatGreatGrandChildDomainPermissions_post, is(greatGreatGrandChildDomainPermissions_expected));
@@ -210,6 +210,107 @@ public class TestAccessControl_getEffectiveDomainPermissions extends TestAccessC
       assertThat(allDomainPermissions.get(grandChildDomain), is(grandChildDomainPermissions_expected));
       assertThat(allDomainPermissions.get(greatGrandChildDomain), is(greatGrandChildDomainPermissions_expected));
       assertThat(allDomainPermissions.get(greatGreatGrandChildDomain), is(greatGreatGrandChildDomainPermissions_expected));
+   }
+
+   @Test
+   public void getEffectiveDomainPermissions_validWithInheritFromResource() throws AccessControlException {
+      authenticateSystemResource();
+      final DomainPermission domPerm_superuser
+            = DomainPermissions.getInstance(DomainPermissions.SUPER_USER);
+      final DomainPermission domPerm_superuser_withGrant
+            = DomainPermissions.getInstance(DomainPermissions.SUPER_USER, true);
+      final DomainPermission domPerm_createchilddomain
+            = DomainPermissions.getInstance(DomainPermissions.CREATE_CHILD_DOMAIN);
+      final DomainPermission domPerm_createchilddomain_withGrant
+            = DomainPermissions.getInstance(DomainPermissions.CREATE_CHILD_DOMAIN, true);
+
+      final String domainName = generateDomain();
+      Resource accessorResource = generateUnauthenticatableResource();
+
+      // set child domain permissions
+      Set<DomainPermission> directDomainPermissions_pre = new HashSet<>();
+      directDomainPermissions_pre.add(domPerm_superuser_withGrant);
+      directDomainPermissions_pre.add(domPerm_createchilddomain);
+      accessControlContext.setDomainPermissions(accessorResource, domainName, directDomainPermissions_pre);
+
+      // set donor permissions
+      Resource donorResource = generateUnauthenticatableResource();
+      Set<DomainPermission> donorDomainPermissions_pre = new HashSet<>();
+      donorDomainPermissions_pre.add(domPerm_superuser);
+      donorDomainPermissions_pre.add(domPerm_createchilddomain_withGrant);
+      accessControlContext.setDomainPermissions(donorResource, domainName, donorDomainPermissions_pre);
+
+      // set accessor --INHERIT-> donor
+      Set<ResourcePermission> inheritanceResourcePermisions = new HashSet<>();
+      inheritanceResourcePermisions.add(ResourcePermissions.getInstance(ResourcePermissions.INHERIT));
+      accessControlContext.setResourcePermissions(accessorResource, donorResource, inheritanceResourcePermisions);
+
+      // verify
+      Set<DomainPermission> domainPermissions_expected = new HashSet<>();
+      domainPermissions_expected.add(domPerm_superuser_withGrant);
+      domainPermissions_expected.add(domPerm_createchilddomain_withGrant);
+
+      final Set<DomainPermission> domainPermissions_post = accessControlContext.getEffectiveDomainPermissions(accessorResource, domainName);
+      assertThat(domainPermissions_post, is(domainPermissions_expected));
+
+      final Map<String,Set<DomainPermission>> allDomainPermissions = accessControlContext.getEffectiveDomainPermissionsMap(accessorResource);
+      assertThat(allDomainPermissions.size(), is(1));
+      assertThat(allDomainPermissions.get(domainName), is(domainPermissions_expected));
+   }
+
+   @Test
+   public void getEffectiveDomainPermissions_validWithInheritFromAncestorDomainAndResource() throws AccessControlException {
+      authenticateSystemResource();
+      final DomainPermission domPerm_superuser_withGrant
+            = DomainPermissions.getInstance(DomainPermissions.SUPER_USER, true);
+      final DomainPermission domPerm_createchilddomain
+            = DomainPermissions.getInstance(DomainPermissions.CREATE_CHILD_DOMAIN);
+      final DomainPermission domPerm_createchilddomain_withGrant
+            = DomainPermissions.getInstance(DomainPermissions.CREATE_CHILD_DOMAIN, true);
+
+      final String childDomain = generateUniqueDomainName();
+      final String parentDomain = generateDomain();
+      accessControlContext.createDomain(childDomain, parentDomain);
+
+      // set parent domain create permissions
+      Resource accessorResource = generateUnauthenticatableResource();
+      Set<DomainPermission> parentDomainPermissions_pre = new HashSet<>();
+      parentDomainPermissions_pre.add(domPerm_superuser_withGrant);
+      parentDomainPermissions_pre.add(domPerm_createchilddomain);
+      accessControlContext.setDomainPermissions(accessorResource, parentDomain, parentDomainPermissions_pre);
+
+      // set child domain permissions
+      Set<DomainPermission> childDomainPermissions_pre = new HashSet<>();
+      childDomainPermissions_pre.add(domPerm_createchilddomain);
+      accessControlContext.setDomainPermissions(accessorResource, childDomain, childDomainPermissions_pre);
+
+      // set donor permissions
+      Resource donorResource = generateUnauthenticatableResource();
+      Set<DomainPermission> parentDomainDonorPermissions_pre = new HashSet<>();
+      parentDomainDonorPermissions_pre.add(domPerm_createchilddomain_withGrant);
+      accessControlContext.setDomainPermissions(donorResource, childDomain, parentDomainDonorPermissions_pre);
+
+      // set accessor --INHERIT-> donor
+      Set<ResourcePermission> inheritanceResourcePermisions = new HashSet<>();
+      inheritanceResourcePermisions.add(ResourcePermissions.getInstance(ResourcePermissions.INHERIT));
+      accessControlContext.setResourcePermissions(accessorResource, donorResource, inheritanceResourcePermisions);
+
+      // verify
+      Set<DomainPermission> childDomainPermissions_expected = new HashSet<>();
+      childDomainPermissions_expected.add(domPerm_superuser_withGrant);
+      childDomainPermissions_expected.add(domPerm_createchilddomain_withGrant);
+
+      Set<DomainPermission> parentDomainPermissions_expected = new HashSet<>();
+      parentDomainPermissions_expected.add(domPerm_superuser_withGrant);
+      parentDomainPermissions_expected.add(domPerm_createchilddomain);
+
+      final Set<DomainPermission> childDomainPermissions_post = accessControlContext.getEffectiveDomainPermissions(accessorResource, childDomain);
+      assertThat(childDomainPermissions_post, is(childDomainPermissions_expected));
+
+      final Map<String,Set<DomainPermission>> allDomainPermissions = accessControlContext.getEffectiveDomainPermissionsMap(accessorResource);
+      assertThat(allDomainPermissions.size(), is(2));
+      assertThat(allDomainPermissions.get(parentDomain), is(parentDomainPermissions_expected));
+      assertThat(allDomainPermissions.get(childDomain), is(childDomainPermissions_expected));
    }
 
    @Test
@@ -233,6 +334,32 @@ public class TestAccessControl_getEffectiveDomainPermissions extends TestAccessC
       }
       catch (AccessControlException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("domain name must not be null"));
+      }
+   }
+
+   @Test
+   public void getEffectiveDomainPermissions_nonExistentReferences_shouldSucceed() throws AccessControlException {
+      authenticateSystemResource();
+
+      final String domainName = generateDomain();
+      final Resource invalidResource = Resources.getInstance(-999L);
+
+      final Set<DomainPermission> domainPermissions1 = accessControlContext.getEffectiveDomainPermissions(invalidResource, domainName);
+      assertThat(domainPermissions1.isEmpty(), is(true));
+   }
+
+   @Test
+   public void getEffectiveDomainPermissions_nonExistentReferences_shouldFail() throws AccessControlException {
+      authenticateSystemResource();
+
+      final Resource accessorResource = generateUnauthenticatableResource();
+
+      try {
+         accessControlContext.getEffectiveDomainPermissions(accessorResource, "invalid_domain");
+         fail("getting effective domain permissions with invalid domain name should have failed");
+      }
+      catch (AccessControlException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("could not find domain"));
       }
    }
 }
