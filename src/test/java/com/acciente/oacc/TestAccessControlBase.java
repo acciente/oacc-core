@@ -145,7 +145,15 @@ public class TestAccessControlBase {
 
    protected Resource generateAuthenticatableResource(char[] password) throws AccessControlException {
       authenticateSystemAccessControlContext();
-      return systemAccessControlContext.createResource(generateResourceClass(true, false), generateDomain(),
+      return systemAccessControlContext.createResource(generateResourceClass(true, false),
+                                                       generateDomain(),
+                                                       PasswordCredentials.newInstance(password));
+   }
+
+   protected Resource generateAuthenticatableResource(char[] password, String domainName) throws AccessControlException {
+      authenticateSystemAccessControlContext();
+      return systemAccessControlContext.createResource(generateResourceClass(true, false),
+                                                       domainName,
                                                        PasswordCredentials.newInstance(password));
    }
 
