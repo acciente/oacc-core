@@ -27,8 +27,10 @@ import org.junit.Before;
 
 import javax.sql.DataSource;
 import java.sql.SQLException;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 public class TestAccessControlBase {
@@ -73,6 +75,17 @@ public class TestAccessControlBase {
 
    protected static boolean isDatabaseCaseSensitive() {
       return isDBCaseSensitive;
+   }
+
+   protected static <T> Set<T> setOf(T... elements) {
+      final HashSet<T> resultSet = new HashSet<>(Arrays.asList(elements));
+
+      // safety check to catch bugs in tests
+      if (resultSet.size() != elements.length) {
+         throw new IllegalArgumentException("you can only build a set of *UNIQUE* elements!");
+      }
+
+      return resultSet;
    }
 
    protected static String generateDomain() throws AccessControlException {
