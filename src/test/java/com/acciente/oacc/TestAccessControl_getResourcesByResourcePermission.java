@@ -22,8 +22,10 @@ import org.junit.Test;
 import java.util.HashSet;
 import java.util.Set;
 
+import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.fail;
 
 public class TestAccessControl_getResourcesByResourcePermission extends TestAccessControlBase {
    @Test
@@ -177,6 +179,99 @@ public class TestAccessControl_getResourcesByResourcePermission extends TestAcce
                                                                     ResourcePermissions.getInstance(queriedPermission),
                                                                     queriedDomain);
       assertThat(resourcesByPermissionAndDomain, is(expectedResources_queriedDomain));
+   }
+
+   @Test
+   public void getResourcesByResourcePermission_directWithAndWithoutGrant_validAsAuthorized() throws AccessControlException {
+      authenticateSystemResource();
+
+      final char[] password = generateUniquePassword();
+      final Resource accessorResource = generateAuthenticatableResource(password);
+
+      final String queriedDomain = generateDomain();
+      final String queriedResourceClass = generateResourceClass(false, false);
+      final String permissionName = generateResourceClassPermission(queriedResourceClass);
+      final ResourcePermission permission_withoutGrant
+            = ResourcePermissions.getInstance(permissionName);
+      final ResourcePermission permission_withGrant
+            = ResourcePermissions.getInstance(permissionName, true);
+      final Resource resource_queriedDomain
+            = accessControlContext.createResource(queriedResourceClass, queriedDomain);
+      final Resource resource_unqueriedDomain
+            = accessControlContext.createResource(queriedResourceClass, generateDomain());
+      final Resource resource_queriedDomainWithGrant
+            = accessControlContext.createResource(queriedResourceClass, queriedDomain);
+
+      // set permission between accessor and accessed resources
+      Set<ResourcePermission> permissions_withoutGrant = setOf(permission_withoutGrant);
+      accessControlContext.setResourcePermissions(accessorResource,
+                                                  resource_queriedDomain,
+                                                  permissions_withoutGrant);
+      accessControlContext.setResourcePermissions(accessorResource,
+                                                  resource_unqueriedDomain,
+                                                  permissions_withoutGrant);
+      accessControlContext.setResourcePermissions(accessorResource,
+                                                  resource_queriedDomainWithGrant,
+                                                  setOf(permission_withGrant));
+
+      // verify as system resource
+      final Set<Resource> expectedResources_withoutGrant_anyDomain = setOf(resource_queriedDomain,
+                                                                           resource_unqueriedDomain,
+                                                                           resource_queriedDomainWithGrant);
+      final Set<Resource> expectedResources_withoutGrant_queriedDomain = setOf(resource_queriedDomain,
+                                                                               resource_queriedDomainWithGrant);
+      final Set<Resource> expectedResources_withGrant_queriedDomain = setOf(resource_queriedDomainWithGrant);
+
+      Set<Resource> resourcesByAccessorAndPermissionWithoutGrant
+            = accessControlContext.getResourcesByResourcePermission(accessorResource,
+                                                                    queriedResourceClass,
+                                                                    permission_withoutGrant);
+      assertThat(resourcesByAccessorAndPermissionWithoutGrant, is(expectedResources_withoutGrant_anyDomain));
+
+      Set<Resource> resourcesByAccessorAndPermissionWithGrant
+            = accessControlContext.getResourcesByResourcePermission(accessorResource,
+                                                                    queriedResourceClass,
+                                                                    permission_withGrant);
+      assertThat(resourcesByAccessorAndPermissionWithGrant, is(expectedResources_withGrant_queriedDomain));
+
+      Set<Resource> resourcesByAccessorAndPermissionAndDomainWithoutGrant
+            = accessControlContext.getResourcesByResourcePermission(accessorResource,
+                                                                    queriedResourceClass,
+                                                                    permission_withoutGrant,
+                                                                    queriedDomain);
+      assertThat(resourcesByAccessorAndPermissionAndDomainWithoutGrant, is(expectedResources_withoutGrant_queriedDomain));
+
+      Set<Resource> resourcesByAccessorAndPermissionAndDomainWithGrant
+            = accessControlContext.getResourcesByResourcePermission(accessorResource,
+                                                                    queriedResourceClass,
+                                                                    permission_withGrant,
+                                                                    queriedDomain);
+      assertThat(resourcesByAccessorAndPermissionAndDomainWithGrant, is(expectedResources_withGrant_queriedDomain));
+
+      // authenticate as accessor and verify
+      accessControlContext.authenticate(accessorResource, PasswordCredentials.newInstance(password));
+
+      Set<Resource> resourcesByPermissionWithoutGrant
+            = accessControlContext.getResourcesByResourcePermission(queriedResourceClass,
+                                                                    permission_withoutGrant);
+      assertThat(resourcesByPermissionWithoutGrant, is(expectedResources_withoutGrant_anyDomain));
+
+      Set<Resource> resourcesByPermissionWithGrant
+            = accessControlContext.getResourcesByResourcePermission(queriedResourceClass,
+                                                                    permission_withGrant);
+      assertThat(resourcesByPermissionWithGrant, is(expectedResources_withGrant_queriedDomain));
+
+      Set<Resource> resourcesByPermissionAndDomainWithoutGrant
+            = accessControlContext.getResourcesByResourcePermission(queriedResourceClass,
+                                                                    permission_withoutGrant,
+                                                                    queriedDomain);
+      assertThat(resourcesByPermissionAndDomainWithoutGrant, is(expectedResources_withoutGrant_queriedDomain));
+
+      Set<Resource> resourcesByPermissionAndDomainWithGrant
+            = accessControlContext.getResourcesByResourcePermission(queriedResourceClass,
+                                                                    permission_withGrant,
+                                                                    queriedDomain);
+      assertThat(resourcesByPermissionAndDomainWithGrant, is(expectedResources_withGrant_queriedDomain));
    }
 
    @Test
@@ -411,5 +506,328 @@ public class TestAccessControl_getResourcesByResourcePermission extends TestAcce
                                                                     ResourcePermissions.getInstance(queriedPermission),
                                                                     childDomain1);
       assertThat(resourcesByPermissionAndChildDomain1, is(expectedResources_childDomain1));
+   }
+
+   @Test
+   public void getResourcesByResourcePermission_superUser_validAsAuthorized() throws AccessControlException {
+      authenticateSystemResource();
+
+      final char[] password = generateUniquePassword();
+      final Resource accessorResource = generateAuthenticatableResource(password);
+
+      final String parentDomain = generateDomain();
+      final String childDomain = generateChildDomain(parentDomain);
+      final String otherDomain = generateDomain();
+      final String queriedResourceClass = generateResourceClass(false, false);
+      final String queriedPermission = generateResourceClassPermission(queriedResourceClass);
+      final String unqueriedPermissionName = generateResourceClassPermission(queriedResourceClass);
+      final Resource resource_parentDomain = accessControlContext.createResource(queriedResourceClass, parentDomain);
+      final Resource resource_childDomain = accessControlContext.createResource(queriedResourceClass, childDomain);
+      final Resource resource_otherDomain = accessControlContext.createResource(queriedResourceClass, otherDomain);
+
+      final String unqueriedDomain = generateDomain();
+      final String unqueriedResourceClass = generateResourceClass(false, false);
+      accessControlContext.createResourcePermission(unqueriedResourceClass, unqueriedPermissionName);
+      final Resource resource_unqueriedClassChildDomain
+            = accessControlContext.createResource(unqueriedResourceClass, childDomain);
+      final Resource resource_unqueriedClassUnqueriedDomain
+            = accessControlContext.createResource(unqueriedResourceClass, unqueriedDomain);
+      final Resource resource_queriedClassUnqueriedDomain
+            = accessControlContext.createResource(queriedResourceClass, unqueriedDomain);
+
+      // set super-user permission for accessor
+      accessControlContext.setDomainPermissions(accessorResource,
+                                                parentDomain,
+                                                setOf(DomainPermissions.getInstance(DomainPermissions.SUPER_USER)));
+      accessControlContext.setDomainPermissions(accessorResource,
+                                                otherDomain,
+                                                setOf(DomainPermissions.getInstance(DomainPermissions.SUPER_USER)));
+
+      // verify as system resource
+      final Set<Resource> expectedResources_anyDomain = setOf(resource_parentDomain,
+                                                              resource_childDomain,
+                                                              resource_otherDomain);
+      final Set<Resource> expectedResources_parentDomain = setOf(resource_parentDomain,
+                                                              resource_childDomain);
+      final Set<Resource> expectedResources_childDomain = setOf(resource_childDomain);
+      final Set<Resource> expectedResources_otherDomain = setOf(resource_otherDomain);
+
+
+      Set<Resource> resourcesByAccessorAndPermission
+            = accessControlContext.getResourcesByResourcePermission(accessorResource,
+                                                                    queriedResourceClass,
+                                                                    ResourcePermissions.getInstance(queriedPermission));
+      assertThat(resourcesByAccessorAndPermission, is(expectedResources_anyDomain));
+
+      Set<Resource> resourcesByAccessorAndPermissionAndParentDomain
+            = accessControlContext.getResourcesByResourcePermission(accessorResource,
+                                                                    queriedResourceClass,
+                                                                    ResourcePermissions.getInstance(queriedPermission),
+                                                                    parentDomain);
+      assertThat(resourcesByAccessorAndPermissionAndParentDomain, is(expectedResources_parentDomain));
+
+      Set<Resource> resourcesByAccessorAndPermissionAndChildDomain
+            = accessControlContext.getResourcesByResourcePermission(accessorResource,
+                                                                    queriedResourceClass,
+                                                                    ResourcePermissions.getInstance(queriedPermission),
+                                                                    childDomain);
+      assertThat(resourcesByAccessorAndPermissionAndChildDomain, is(expectedResources_childDomain));
+
+      Set<Resource> resourcesByAccessorAndPermissionAndOtherDomain
+            = accessControlContext.getResourcesByResourcePermission(accessorResource,
+                                                                    queriedResourceClass,
+                                                                    ResourcePermissions.getInstance(queriedPermission),
+                                                                    otherDomain);
+      assertThat(resourcesByAccessorAndPermissionAndOtherDomain, is(expectedResources_otherDomain));
+
+      // authenticate as accessor and verify
+      accessControlContext.authenticate(accessorResource, PasswordCredentials.newInstance(password));
+
+      Set<Resource> resourcesByPermission
+            = accessControlContext.getResourcesByResourcePermission(queriedResourceClass,
+                                                                    ResourcePermissions.getInstance(queriedPermission));
+      assertThat(resourcesByPermission, is(expectedResources_anyDomain));
+
+      Set<Resource> resourcesByPermissionAndParentDomain
+            = accessControlContext.getResourcesByResourcePermission(queriedResourceClass,
+                                                                    ResourcePermissions.getInstance(queriedPermission),
+                                                                    parentDomain);
+      assertThat(resourcesByPermissionAndParentDomain, is(expectedResources_parentDomain));
+
+      Set<Resource> resourcesByPermissionAndChildDomain
+            = accessControlContext.getResourcesByResourcePermission(queriedResourceClass,
+                                                                    ResourcePermissions.getInstance(queriedPermission),
+                                                                    childDomain);
+      assertThat(resourcesByPermissionAndChildDomain, is(expectedResources_childDomain));
+
+      Set<Resource> resourcesByPermissionAndOtherDomain
+            = accessControlContext.getResourcesByResourcePermission(queriedResourceClass,
+                                                                    ResourcePermissions.getInstance(queriedPermission),
+                                                                    otherDomain);
+      assertThat(resourcesByPermissionAndOtherDomain, is(expectedResources_otherDomain));
+   }
+
+   @Test
+   public void getResourcesByResourcePermission_nulls_shouldFail() throws AccessControlException {
+      authenticateSystemResource();
+
+      final char[] password = generateUniquePassword();
+      final Resource accessorResource = generateAuthenticatableResource(password);
+      final String domain = generateDomain();
+      final String resourceClass = generateResourceClass(false, false);
+      final ResourcePermission resourcePermission
+            = ResourcePermissions.getInstance(generateResourceClassPermission(resourceClass));
+
+      try {
+         accessControlContext.getResourcesByResourcePermission(null, resourceClass, resourcePermission);
+         fail("getting resources by resource permission with null accessor resource should have failed");
+      }
+      catch (NullPointerException e) {
+      }
+
+      try {
+         accessControlContext.getResourcesByResourcePermission(null, resourceClass, resourcePermission, domain);
+         fail("getting resources by resource permission with null accessor resource should have failed");
+      }
+      catch (NullPointerException e) {
+      }
+
+      try {
+         accessControlContext.getResourcesByResourcePermission(accessorResource, null, resourcePermission);
+         fail("getting resources by resource permission with null resource class name should have failed");
+      }
+      catch (AccessControlException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("could not find resource class"));
+      }
+
+      try {
+         accessControlContext.getResourcesByResourcePermission(accessorResource, null, resourcePermission, domain);
+         fail("getting resources by resource permission with null resource class name should have failed");
+      }
+      catch (AccessControlException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("could not find resource class"));
+      }
+
+      try {
+         accessControlContext.getResourcesByResourcePermission(accessorResource, resourceClass, null);
+         fail("getting resources by resource permission with null resource permission should have failed");
+      }
+      catch (NullPointerException e) {
+      }
+
+      try {
+         accessControlContext.getResourcesByResourcePermission(accessorResource, resourceClass, null, domain);
+         fail("getting resources by resource permission with null resource permission should have failed");
+      }
+      catch (NullPointerException e) {
+      }
+
+      try {
+         accessControlContext.getResourcesByResourcePermission(accessorResource, resourceClass, resourcePermission, null);
+         fail("getting resources by resource permission with null domain should have failed");
+      }
+      catch (AccessControlException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("domain name must not be null"));
+      }
+
+      // authenticate as accessor
+      accessControlContext.authenticate(accessorResource, PasswordCredentials.newInstance(password));
+
+      try {
+         accessControlContext.getResourcesByResourcePermission(null, resourcePermission);
+         fail("getting resources by resource permission with null resource class name should have failed");
+      }
+      catch (AccessControlException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("could not find resource class"));
+      }
+
+      try {
+         accessControlContext.getResourcesByResourcePermission(null, resourcePermission, domain);
+         fail("getting resources by resource permission with null resource class name should have failed");
+      }
+      catch (AccessControlException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("could not find resource class"));
+      }
+
+      try {
+         accessControlContext.getResourcesByResourcePermission(resourceClass, null);
+         fail("getting resources by resource permission with null resource permission should have failed");
+      }
+      catch (NullPointerException e) {
+      }
+
+      try {
+         accessControlContext.getResourcesByResourcePermission(resourceClass, null, domain);
+         fail("getting resources by resource permission with null resource permission should have failed");
+      }
+      catch (NullPointerException e) {
+      }
+
+      try {
+         accessControlContext.getResourcesByResourcePermission(resourceClass, resourcePermission, null);
+         fail("getting resources by resource permission with null domain should have failed");
+      }
+      catch (AccessControlException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("domain name must not be null"));
+      }
+   }
+
+   @Test
+   public void getResourcesByResourcePermission_nonExistentReferences_shouldFail() throws AccessControlException {
+      authenticateSystemResource();
+
+      final char[] password = generateUniquePassword();
+      final Resource accessorResource = generateAuthenticatableResource(password);
+      final Resource nonExistentResource = Resources.getInstance(-999L);
+      final String domain = generateDomain();
+      final String resourceClass = generateResourceClass(false, false);
+      final ResourcePermission resourcePermission
+            = ResourcePermissions.getInstance(generateResourceClassPermission(resourceClass));
+      final ResourcePermission nonExistentPermission = ResourcePermissions.getInstance("does_not_exist");
+
+      try {
+         accessControlContext.getResourcesByResourcePermission(nonExistentResource, resourceClass, resourcePermission, domain);
+         fail("getting resources by resource permission with non-existent accessor resource should have failed");
+      }
+      catch (AccessControlException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("could not determine resource domain for resource"));
+      }
+
+      try {
+         accessControlContext.getResourcesByResourcePermission(accessorResource, "does_not_exit", resourcePermission);
+         fail("getting resources by resource permission with non-existent resource class name should have failed");
+      }
+      catch (AccessControlException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("could not find resource class"));
+      }
+
+      try {
+         accessControlContext.getResourcesByResourcePermission(accessorResource, "does_not_exit", resourcePermission, domain);
+         fail("getting resources by resource permission with non-existent resource class name should have failed");
+      }
+      catch (AccessControlException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("could not find resource class"));
+      }
+
+      try {
+         accessControlContext.getResourcesByResourcePermission(accessorResource, resourceClass, nonExistentPermission);
+         fail("getting resources by resource permission with non-existent resource permission should have failed");
+      }
+      catch (AccessControlException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("is not defined for resource class"));
+      }
+
+      try {
+         accessControlContext.getResourcesByResourcePermission(accessorResource, resourceClass, nonExistentPermission, domain);
+         fail("getting resources by resource permission with non-existent resource permission should have failed");
+      }
+      catch (AccessControlException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("is not defined for resource class"));
+      }
+
+      try {
+         accessControlContext.getResourcesByResourcePermission(accessorResource, resourceClass, resourcePermission, "does_not_exist");
+         fail("getting resources by resource permission with non-existent domain should have failed");
+      }
+      catch (AccessControlException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("could not find domain"));
+      }
+
+      // authenticate as accessor
+      accessControlContext.authenticate(accessorResource, PasswordCredentials.newInstance(password));
+
+      try {
+         accessControlContext.getResourcesByResourcePermission("does_not_exit", resourcePermission);
+         fail("getting resources by resource permission with non-existent resource class name should have failed");
+      }
+      catch (AccessControlException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("could not find resource class"));
+      }
+
+      try {
+         accessControlContext.getResourcesByResourcePermission("does_not_exit", resourcePermission, domain);
+         fail("getting resources by resource permission with non-existent resource class name should have failed");
+      }
+      catch (AccessControlException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("could not find resource class"));
+      }
+
+      try {
+         accessControlContext.getResourcesByResourcePermission(resourceClass, nonExistentPermission);
+         fail("getting resources by resource permission with non-existent resource permission should have failed");
+      }
+      catch (AccessControlException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("is not defined for resource class"));
+      }
+
+      try {
+         accessControlContext.getResourcesByResourcePermission(resourceClass, nonExistentPermission, domain);
+         fail("getting resources by resource permission with non-existent resource permission should have failed");
+      }
+      catch (AccessControlException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("is not defined for resource class"));
+      }
+
+      try {
+         accessControlContext.getResourcesByResourcePermission(resourceClass, resourcePermission, "does_not_exist");
+         fail("getting resources by resource permission with non-existent domain should have failed");
+      }
+      catch (AccessControlException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("could not find domain"));
+      }
+   }
+
+   @Test
+   public void getResourcesByResourcePermission_nonExistentReferences_shouldSucceed() throws AccessControlException {
+      authenticateSystemResource();
+
+      final Resource nonExistentResource = Resources.getInstance(-999L);
+      final String resourceClass = generateResourceClass(false, false);
+      final ResourcePermission resourcePermission
+            = ResourcePermissions.getInstance(generateResourceClassPermission(resourceClass));
+
+      final Set<Resource> nonExistentAccessorResources
+            = accessControlContext.getResourcesByResourcePermission(nonExistentResource, resourceClass, resourcePermission);
+      assertThat(nonExistentAccessorResources.isEmpty(), is(true));
    }
 }
