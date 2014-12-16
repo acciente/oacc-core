@@ -875,6 +875,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       SQLConnection connection = null;
 
       assertAuth();
+      assertDomainSpecified(domainName);
 
       try {
          connection = getConnection();

@@ -493,7 +493,7 @@ public class TestAccessControl_setDomainPermissions extends TestAccessControlBas
          fail("setting domain create permissions with null domain name should have failed");
       }
       catch (AccessControlException e) {
-         assertThat(e.getMessage().toLowerCase(), containsString("domain name must not be null"));
+         assertThat(e.getMessage().toLowerCase(), containsString("domain required"));
       }
 
       try {
