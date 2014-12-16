@@ -153,7 +153,6 @@ public class TestAccessControl_createDomain extends TestAccessControlBase {
       final String domainName = generateUniqueDomainName().trim();
       final String domainNameWhitespaced = " " + domainName + "\t";
       assertThat(accessControlContext.getDomainDescendants(domainName).isEmpty(), is(true));
-//      assertThat(accessControlContext.getDomainDescendants(domainNameWhitespaced).isEmpty(), is(true));
 
       accessControlContext.createDomain(domainNameWhitespaced);
 
@@ -162,6 +161,23 @@ public class TestAccessControl_createDomain extends TestAccessControlBase {
 
       assertThat(accessControlContext.getDomainDescendants(domainNameWhitespaced).size(), is(1));
       assertThat(accessControlContext.getDomainDescendants(domainNameWhitespaced), hasItem(domainName));
+
+      final String parentDomain = generateDomain();
+      final String parentDomainWhitespaced = " " + parentDomain + "\t";
+      final String childDomainName = generateUniqueDomainName().trim();
+      final String childDomainNameWhitespaced = " " + childDomainName + "\t";
+
+      accessControlContext.createDomain(childDomainNameWhitespaced, parentDomainWhitespaced);
+
+      assertThat(accessControlContext.getDomainDescendants(parentDomain).size(), is(2));
+      assertThat(accessControlContext.getDomainDescendants(parentDomain), hasItem(parentDomain));
+      assertThat(accessControlContext.getDomainDescendants(parentDomain), hasItem(childDomainName));
+
+      assertThat(accessControlContext.getDomainDescendants(childDomainName).size(), is(1));
+      assertThat(accessControlContext.getDomainDescendants(childDomainName), hasItem(childDomainName));
+
+      assertThat(accessControlContext.getDomainDescendants(childDomainNameWhitespaced).size(), is(1));
+      assertThat(accessControlContext.getDomainDescendants(childDomainNameWhitespaced), hasItem(childDomainName));
    }
 
    @Test
@@ -212,6 +228,14 @@ public class TestAccessControl_createDomain extends TestAccessControlBase {
          assertThat(e.getMessage().toLowerCase(), containsString("duplicate"));
       }
 
+      try {
+         accessControlContext.createDomain(domainName, domainName);
+         fail("creating a duplicate child domain should fail");
+      }
+      catch (AccessControlException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("duplicate"));
+      }
+
       assertThat(accessControlContext.getDomainDescendants(domainName).size(), is(1));
       assertThat(accessControlContext.getDomainDescendants(domainName), hasItem(domainName));
    }
@@ -228,8 +252,6 @@ public class TestAccessControl_createDomain extends TestAccessControlBase {
       catch (AccessControlException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("none specified"));
       }
-//      catch (NullPointerException e) {
-//      }
    }
 
    @Test

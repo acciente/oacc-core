@@ -592,6 +592,9 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       try {
          connection = getConnection();
 
+         domainName = domainName.trim();
+         parentDomainName = parentDomainName.trim();
+
          __createDomain(connection, domainName, parentDomainName);
       }
       catch (SQLException e) {
@@ -3177,7 +3180,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
 
    private void assertParentDomainSpecified(String domainName)
          throws AccessControlException {
-      if (domainName == null || domainName.isEmpty()) {
+      if (domainName == null || domainName.trim().isEmpty()) {
          throw new AccessControlException("Parent domain required, none specified");
       }
    }
