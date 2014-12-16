@@ -961,10 +961,10 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
 
       // add the new permissions
       grantDomainPermissionSysPersister.addDomainSysPermissions(connection,
-                                                                        accessorResource,
-                                                                        sessionResource,
-                                                                        domainId,
-                                                                        requestedDomainPermissions);
+                                                                accessorResource,
+                                                                sessionResource,
+                                                                domainId,
+                                                                requestedDomainPermissions);
    }
 
    private Set<DomainPermission> __getDirectDomainPermissions(SQLConnection connection,
@@ -2029,7 +2029,8 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
          __setGlobalPermissions(connection,
                                 accessorResource,
                                 resourceClassName,
-                                resourcePermissions, sessionResourceDomainName
+                                resourcePermissions,
+                                sessionResourceDomainName
          );
       }
       catch (SQLException e) {
