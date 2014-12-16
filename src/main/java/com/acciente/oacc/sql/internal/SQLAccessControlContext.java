@@ -1544,9 +1544,12 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
 
       assertAuth();
       assertResourceClassNotBlank(resourceClassName);
+      assertDomainSpecified(domainName);
 
       try {
          connection = getConnection();
+         resourceClassName = resourceClassName.trim();
+         domainName = domainName.trim();
 
          return __getEffectiveResourceCreatePermissions(connection,
                                                         accessorResource,
@@ -1571,6 +1574,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
 
       try {
          connection = getConnection();
+         resourceClassName = resourceClassName.trim();
 
          return __getEffectiveResourceCreatePermissions(connection,
                                                         accessorResource,

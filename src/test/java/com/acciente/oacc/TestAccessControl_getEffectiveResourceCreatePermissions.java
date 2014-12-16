@@ -632,6 +632,59 @@ public class TestAccessControl_getEffectiveResourceCreatePermissions extends Tes
    }
 
    @Test
+   public void getEffectiveResourceCreatePermissions_whitespaceConsistent() throws AccessControlException {
+      authenticateSystemResource();
+      final ResourceCreatePermission createPerm_create_withGrant
+            = ResourceCreatePermissions.getInstance(ResourceCreatePermissions.CREATE, true);
+      final ResourceCreatePermission createPerm_impersonate
+            = ResourceCreatePermissions.getInstance(ResourcePermissions.getInstance(ResourcePermissions.IMPERSONATE),
+                                                    false);
+      final ResourceCreatePermission createPerm_inherit_withGrant
+            = ResourceCreatePermissions.getInstance(ResourcePermissions.getInstance(ResourcePermissions.INHERIT, true),
+                                                    true);
+      final ResourceCreatePermission createPerm_resetPwd
+            = ResourceCreatePermissions.getInstance(ResourcePermissions.getInstance(ResourcePermissions.RESET_CREDENTIALS, true));
+
+      final Resource accessorResource = generateUnauthenticatableResource();
+      final String domainName = generateDomain();
+      final String domainName_whitespaced = " " + domainName + "\t";
+      final String resourceClassName = generateResourceClass(true, false);
+      final String resourceClassName_whitespaced = " " + resourceClassName + "\t";
+      assertThat(accessControlContext.getEffectiveResourceCreatePermissionsMap(accessorResource).isEmpty(), is(true));
+
+      Set<ResourceCreatePermission> resourceCreatePermissions_pre1 = new HashSet<>();
+      resourceCreatePermissions_pre1.add(createPerm_create_withGrant);
+      resourceCreatePermissions_pre1.add(createPerm_impersonate);
+      resourceCreatePermissions_pre1.add(createPerm_inherit_withGrant);
+      resourceCreatePermissions_pre1.add(createPerm_resetPwd);
+
+      // set create permissions on custom domain explicitly and verify
+      accessControlContext.setResourceCreatePermissions(accessorResource,
+                                                        resourceClassName,
+                                                        resourceCreatePermissions_pre1,
+                                                        domainName
+      );
+
+      final Set<ResourceCreatePermission> resourceCreatePermissions_post
+            = accessControlContext.getEffectiveResourceCreatePermissions(accessorResource,
+                                                                         resourceClassName_whitespaced,
+                                                                         domainName_whitespaced);
+      assertThat(resourceCreatePermissions_post, is(resourceCreatePermissions_pre1));
+
+      // set create permissions on session's domain and verify
+      Set<ResourceCreatePermission> resourceCreatePermissions_pre2 = new HashSet<>();
+      resourceCreatePermissions_pre2.add(createPerm_create_withGrant);
+      resourceCreatePermissions_pre2.add(createPerm_resetPwd);
+      accessControlContext.setResourceCreatePermissions(accessorResource,
+                                                        resourceClassName,
+                                                        resourceCreatePermissions_pre2);
+
+      final Set<ResourceCreatePermission> resourceCreatePermissions_post2
+            = accessControlContext.getEffectiveResourceCreatePermissions(accessorResource, resourceClassName_whitespaced);
+      assertThat(resourceCreatePermissions_post2, is(resourceCreatePermissions_pre2));
+   }
+
+   @Test
    public void getEffectiveResourceCreatePermissions_nulls_shouldFail() throws AccessControlException {
       authenticateSystemResource();
 
@@ -657,7 +710,7 @@ public class TestAccessControl_getEffectiveResourceCreatePermissions extends Tes
          fail("getting create permissions with null domain name should have failed");
       }
       catch (AccessControlException e) {
-         assertThat(e.getMessage().toLowerCase(), containsString("domain name must not be null"));
+         assertThat(e.getMessage().toLowerCase(), containsString("domain required"));
       }
    }
 
