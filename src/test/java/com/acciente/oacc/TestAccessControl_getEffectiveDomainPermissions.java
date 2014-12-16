@@ -314,6 +314,30 @@ public class TestAccessControl_getEffectiveDomainPermissions extends TestAccessC
    }
 
    @Test
+   public void getEffectiveDomainPermissions_whitespaceConsistent() throws AccessControlException {
+      authenticateSystemResource();
+      final DomainPermission domCreatePerm_superuser
+            = DomainPermissions.getInstance(DomainPermissions.SUPER_USER);
+      final DomainPermission domCreatePerm_child
+            = DomainPermissions.getInstance(DomainPermissions.CREATE_CHILD_DOMAIN);
+
+      final String domainName = generateDomain();
+      final String domainName_whitespaced = " " + domainName + "\t";
+
+      // set domain create permissions
+      Resource accessorResource = generateUnauthenticatableResource();
+      Set<DomainPermission> domainPermissions_pre = new HashSet<>();
+      domainPermissions_pre.add(domCreatePerm_superuser);
+      domainPermissions_pre.add(domCreatePerm_child);
+      accessControlContext.setDomainPermissions(accessorResource, domainName, domainPermissions_pre);
+
+      // get domain create permissions and verify
+      final Set<DomainPermission> domainPermissions_post
+            = accessControlContext.getEffectiveDomainPermissions(accessorResource, domainName_whitespaced);
+      assertThat(domainPermissions_post, is(domainPermissions_pre));
+   }
+
+   @Test
    public void getEffectiveDomainPermissions_nulls_shouldFail() throws AccessControlException {
       authenticateSystemResource();
 
@@ -333,7 +357,7 @@ public class TestAccessControl_getEffectiveDomainPermissions extends TestAccessC
          accessControlContext.getEffectiveDomainPermissions(generateUnauthenticatableResource(), null);
       }
       catch (AccessControlException e) {
-         assertThat(e.getMessage().toLowerCase(), containsString("domain name must not be null"));
+         assertThat(e.getMessage().toLowerCase(), containsString("domain required"));
       }
    }
 
