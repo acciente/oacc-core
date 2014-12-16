@@ -565,6 +565,47 @@ public class TestAccessControl_setGlobalResourcePermissions extends TestAccessCo
    }
 
    @Test
+   public void setGlobalResourcePermissions_whitespaceConsistent() throws AccessControlException {
+      authenticateSystemResource();
+      final String resourceClassName = generateResourceClass(true, false);
+      final String resourceClassName_whitespaced = " " + resourceClassName + "\t";
+      final Resource accessorResource = generateUnauthenticatableResource();
+      final String domainName = accessControlContext.getDomainNameByResource(accessorResource);
+      final String domainName_whitespaced = " " + domainName + "\t";
+      assertThat(accessControlContext.getEffectiveGlobalResourcePermissionsMap(accessorResource).isEmpty(), is(true));
+
+      // set permissions and verify
+      Set<ResourcePermission> permissions_pre = new HashSet<>();
+      permissions_pre.add(ResourcePermissions.getInstance(ResourcePermissions.IMPERSONATE));
+      permissions_pre.add(ResourcePermissions.getInstance(generateResourceClassPermission(
+            resourceClassName)));
+
+      accessControlContext.setGlobalResourcePermissions(accessorResource,
+                                                        resourceClassName_whitespaced,
+                                                        permissions_pre,
+                                                        domainName_whitespaced);
+
+      final Set<ResourcePermission> permissions_post_specific
+            = accessControlContext.getEffectiveGlobalResourcePermissions(accessorResource, resourceClassName, domainName);
+      assertThat(permissions_post_specific, is(permissions_pre));
+
+      // set permissions for implicit domain and verify
+      Set<ResourcePermission> permissions_pre2 = new HashSet<>();
+      permissions_pre2.add(ResourcePermissions.getInstance(ResourcePermissions.RESET_CREDENTIALS));
+      permissions_pre2.add(ResourcePermissions.getInstance(generateResourceClassPermission(
+            resourceClassName)));
+
+      accessControlContext.setGlobalResourcePermissions(accessorResource,
+                                                        resourceClassName_whitespaced,
+                                                        permissions_pre2);
+
+      final Set<ResourcePermission> permissions_post_implicit
+            = accessControlContext.getEffectiveGlobalResourcePermissions(accessorResource, resourceClassName);
+      assertThat(permissions_post_implicit, is(permissions_pre2));
+
+   }
+
+   @Test
    public void setGlobalResourcePermissions_nulls_shouldFail() throws AccessControlException {
       authenticateSystemResource();
       final String resourceClassName = generateResourceClass(true, false);
@@ -590,7 +631,7 @@ public class TestAccessControl_setGlobalResourcePermissions extends TestAccessCo
          fail("setting permissions for null resource class name should have failed");
       }
       catch (AccessControlException e) {
-         assertThat(e.getMessage().toLowerCase(), containsString("could not find resource class"));
+         assertThat(e.getMessage().toLowerCase(), containsString("resource class required"));
       }
 
       try {
@@ -598,7 +639,7 @@ public class TestAccessControl_setGlobalResourcePermissions extends TestAccessCo
          fail("setting permissions with null domain should have failed");
       }
       catch (AccessControlException e) {
-         assertThat(e.getMessage().toLowerCase(), containsString("domain name must not be null"));
+         assertThat(e.getMessage().toLowerCase(), containsString("domain required"));
       }
 
       try {
