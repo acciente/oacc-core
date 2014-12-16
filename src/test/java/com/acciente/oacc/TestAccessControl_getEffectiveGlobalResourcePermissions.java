@@ -357,6 +357,37 @@ public class TestAccessControl_getEffectiveGlobalResourcePermissions extends Tes
    }
 
    @Test
+   public void getEffectiveGlobalResourcePermissions_whitespaceConsistent() throws AccessControlException {
+      authenticateSystemResource();
+      final String resourceClassName = generateResourceClass(true, false);
+      final String resourceClassName_whitespaced = " " + resourceClassName + "\t";
+      final Resource accessorResource = generateUnauthenticatableResource();
+      final String domainName = accessControlContext.getDomainNameByResource(SYS_RESOURCE);
+      final String domainName_whitespaced = " " + domainName + "\t";
+      assertThat(accessControlContext.getEffectiveGlobalResourcePermissionsMap(accessorResource).isEmpty(), is(true));
+
+      // setup global permissions
+      Set<ResourcePermission> permissions_pre = new HashSet<>();
+      permissions_pre.add(ResourcePermissions.getInstance(ResourcePermissions.IMPERSONATE));
+      permissions_pre.add(ResourcePermissions.getInstance(generateResourceClassPermission(
+            resourceClassName)));
+      accessControlContext.setGlobalResourcePermissions(accessorResource, resourceClassName,
+                                                        permissions_pre,
+                                                        domainName);
+
+      // verify
+      final Set<ResourcePermission> permissions_post_specific
+            = accessControlContext.getEffectiveGlobalResourcePermissions(accessorResource,
+                                                                         resourceClassName_whitespaced,
+                                                                         domainName_whitespaced);
+      assertThat(permissions_post_specific, is(permissions_pre));
+
+      final Set<ResourcePermission> permissions_post_sessionDomain
+            = accessControlContext.getEffectiveGlobalResourcePermissions(accessorResource, resourceClassName_whitespaced);
+      assertThat(permissions_post_sessionDomain, is(permissions_pre));
+   }
+
+   @Test
    public void getEffectiveGlobalResourcePermissions_nulls_shouldFail() throws AccessControlException {
       authenticateSystemResource();
 
@@ -373,7 +404,7 @@ public class TestAccessControl_getEffectiveGlobalResourcePermissions extends Tes
          fail("getting create permissions with null resource class name should have failed");
       }
       catch (AccessControlException e) {
-         assertThat(e.getMessage().toLowerCase(), containsString("could not find resource class"));
+         assertThat(e.getMessage().toLowerCase(), containsString("resource class required"));
       }
 
       final String resourceClassName = generateResourceClass(false, false);
@@ -382,7 +413,7 @@ public class TestAccessControl_getEffectiveGlobalResourcePermissions extends Tes
          fail("getting create permissions with null domain name should have failed");
       }
       catch (AccessControlException e) {
-         assertThat(e.getMessage().toLowerCase(), containsString("domain name must not be null"));
+         assertThat(e.getMessage().toLowerCase(), containsString("domain required"));
       }
    }
 
