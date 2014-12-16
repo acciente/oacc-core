@@ -608,6 +608,58 @@ public class TestAccessControl_getResourcesByResourcePermission extends TestAcce
    }
 
    @Test
+   public void getResourcesByResourcePermission_whitespaceConsistent() throws AccessControlException {
+      authenticateSystemResource();
+
+      final char[] password = generateUniquePassword();
+      final Resource accessorResource = generateAuthenticatableResource(password);
+
+      final String domain = generateDomain();
+      final String resourceClass = generateResourceClass(false, false);
+      final String permission = generateResourceClassPermission(resourceClass);
+      final Resource resource = accessControlContext.createResource(resourceClass, domain);
+
+      // set permission between accessor and accessed resources
+      accessControlContext.setResourcePermissions(accessorResource,
+                                                  resource,
+                                                  setOf(ResourcePermissions.getInstance(permission)));
+
+      final String resourceClass_whitespaced = " " + resourceClass + "\t";
+      final String permission_whitespaced = " " + permission + "\t";
+      final String domain_whitespaced = " " + domain + "\t";
+
+      // verify as system resource
+      final Set<Resource> expectedResources = setOf(resource);
+
+      Set<Resource> resourcesByAccessorAndPermission
+            = accessControlContext.getResourcesByResourcePermission(accessorResource,
+                                                                    resourceClass_whitespaced,
+                                                                    ResourcePermissions.getInstance(permission_whitespaced));
+      assertThat(resourcesByAccessorAndPermission, is(expectedResources));
+
+      Set<Resource> resourcesByAccessorAndPermissionAndDomain
+            = accessControlContext.getResourcesByResourcePermission(accessorResource,
+                                                                    resourceClass_whitespaced,
+                                                                    ResourcePermissions.getInstance(permission_whitespaced),
+                                                                    domain_whitespaced);
+      assertThat(resourcesByAccessorAndPermissionAndDomain, is(expectedResources));
+
+      // authenticate as accessor and verify
+      accessControlContext.authenticate(accessorResource, PasswordCredentials.newInstance(password));
+
+      Set<Resource> resourcesByPermission
+            = accessControlContext.getResourcesByResourcePermission(resourceClass_whitespaced,
+                                                                    ResourcePermissions.getInstance(permission_whitespaced));
+      assertThat(resourcesByPermission, is(expectedResources));
+
+      Set<Resource> resourcesByPermissionAndDomain
+            = accessControlContext.getResourcesByResourcePermission(resourceClass_whitespaced,
+                                                                    ResourcePermissions.getInstance(permission_whitespaced),
+                                                                    domain_whitespaced);
+      assertThat(resourcesByPermissionAndDomain, is(expectedResources));
+   }
+
+   @Test
    public void getResourcesByResourcePermission_nulls_shouldFail() throws AccessControlException {
       authenticateSystemResource();
 
@@ -636,17 +688,21 @@ public class TestAccessControl_getResourcesByResourcePermission extends TestAcce
          accessControlContext.getResourcesByResourcePermission(accessorResource, null, resourcePermission);
          fail("getting resources by resource permission with null resource class name should have failed");
       }
-      catch (AccessControlException e) {
-         assertThat(e.getMessage().toLowerCase(), containsString("could not find resource class"));
+      catch (NullPointerException e) {
       }
+//      catch (AccessControlException e) {
+//         assertThat(e.getMessage().toLowerCase(), containsString("could not find resource class"));
+//      }
 
       try {
          accessControlContext.getResourcesByResourcePermission(accessorResource, null, resourcePermission, domain);
          fail("getting resources by resource permission with null resource class name should have failed");
       }
-      catch (AccessControlException e) {
-         assertThat(e.getMessage().toLowerCase(), containsString("could not find resource class"));
+      catch (NullPointerException e) {
       }
+//      catch (AccessControlException e) {
+//         assertThat(e.getMessage().toLowerCase(), containsString("could not find resource class"));
+//      }
 
       try {
          accessControlContext.getResourcesByResourcePermission(accessorResource, resourceClass, null);
@@ -677,17 +733,21 @@ public class TestAccessControl_getResourcesByResourcePermission extends TestAcce
          accessControlContext.getResourcesByResourcePermission(null, resourcePermission);
          fail("getting resources by resource permission with null resource class name should have failed");
       }
-      catch (AccessControlException e) {
-         assertThat(e.getMessage().toLowerCase(), containsString("could not find resource class"));
+      catch (NullPointerException e) {
       }
+//      catch (AccessControlException e) {
+//         assertThat(e.getMessage().toLowerCase(), containsString("could not find resource class"));
+//      }
 
       try {
          accessControlContext.getResourcesByResourcePermission(null, resourcePermission, domain);
          fail("getting resources by resource permission with null resource class name should have failed");
       }
-      catch (AccessControlException e) {
-         assertThat(e.getMessage().toLowerCase(), containsString("could not find resource class"));
+      catch (NullPointerException e) {
       }
+//      catch (AccessControlException e) {
+//         assertThat(e.getMessage().toLowerCase(), containsString("could not find resource class"));
+//      }
 
       try {
          accessControlContext.getResourcesByResourcePermission(resourceClass, null);

@@ -2761,6 +2761,8 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       try {
          connection = getConnection();
 
+         resourceClassName = resourceClassName.trim();
+
          return __getResourcesByPermission(connection, sessionResource, resourceClassName, resourcePermission);
       }
       catch (SQLException e) {
@@ -2781,6 +2783,8 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
 
       try {
          connection = getConnection();
+
+         resourceClassName = resourceClassName.trim();
 
          return __getResourcesByPermission(connection, accessorResource, resourceClassName, resourcePermission);
       }
@@ -2863,6 +2867,8 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       try {
          connection = getConnection();
 
+         resourceClassName = resourceClassName.trim();
+
          return __getResourcesByPermission(connection,
                                            sessionResource,
                                            resourceClassName,
@@ -2889,6 +2895,8 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
 
       try {
          connection = getConnection();
+
+         resourceClassName = resourceClassName.trim();
 
          if (__hasPermission(connection,
                              sessionResource,
