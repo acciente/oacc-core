@@ -442,6 +442,7 @@ public class TestAccessControl_setDomainPermissions extends TestAccessControlBas
       // todo: arguably, system permissions should match in name exactly, but the API uses Strings, not Enums, and is otherwise whitespace-consistent
       //       this could pose some complications depending on if the system permission name is persisted from the passed string or derived from an authoritative source
       final String domainName = generateDomain();
+      final String domainName_whitespaced = " " + domainName + "\t";
       Resource accessorResource = generateUnauthenticatableResource();
       assertThat(accessControlContext.getEffectiveDomainPermissionsMap(accessorResource).isEmpty(), is(true));
 
@@ -450,7 +451,7 @@ public class TestAccessControl_setDomainPermissions extends TestAccessControlBas
       domainPermissions_pre.add(domCreatePerm_child_withGrant);
 
       // set domain permissions and verify
-      accessControlContext.setDomainPermissions(accessorResource, domainName, domainPermissions_pre);
+      accessControlContext.setDomainPermissions(accessorResource, domainName_whitespaced, domainPermissions_pre);
 
       final Set<DomainPermission> domainPermissions_post = accessControlContext.getEffectiveDomainPermissions(accessorResource, domainName);
       assertThat(domainPermissions_post.size(), is(2));
