@@ -26,6 +26,25 @@ import static org.junit.Assert.fail;
 
 public class TestAccessControl_getDomainDescendants extends TestAccessControlBase {
    @Test
+   public void getDomainDescendents_validAsSystemResource() throws AccessControlException {
+      authenticateSystemResource();
+
+      final String sysDomainName = accessControlContext.getDomainNameByResource(SYS_RESOURCE);
+
+      assertThat(accessControlContext.getDomainDescendants(sysDomainName), is(setOf(sysDomainName)));
+   }
+
+   @Test
+   public void getDomainDescendents_whitespaceConsistent() throws AccessControlException {
+      authenticateSystemResource();
+
+      final String sysDomainName = accessControlContext.getDomainNameByResource(SYS_RESOURCE);
+      final String sysDomainName_whitespaced = " " + sysDomainName + "\t";
+
+      assertThat(accessControlContext.getDomainDescendants(sysDomainName_whitespaced), is(setOf(sysDomainName)));
+   }
+
+   @Test
    public void getDomainDescendents_nonExistingDomain() throws AccessControlException {
       authenticateSystemResource();
 
