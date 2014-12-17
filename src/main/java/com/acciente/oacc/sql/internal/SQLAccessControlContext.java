@@ -3047,9 +3047,11 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       SQLConnection connection = null;
 
       assertAuth();
+      assertResourceClassSpecified(resourceClassName);
 
       try {
          connection = getConnection();
+         resourceClassName = resourceClassName.trim();
 
          return __getAccessorResourcesByPermission(connection, accessedResource, resourceClassName, resourcePermission);
       }
