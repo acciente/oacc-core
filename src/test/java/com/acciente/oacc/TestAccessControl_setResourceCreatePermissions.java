@@ -274,7 +274,9 @@ public class TestAccessControl_setResourceCreatePermissions extends TestAccessCo
       authenticateSystemResource();
       final Resource accessorResource = generateUnauthenticatableResource();
       final String domainName = generateDomain();
+      final String domainName_whitespaced = " " + domainName + "\t";
       final String resourceClassName = generateResourceClass(false, false);
+      final String resourceClassName_whitespaced = " " + resourceClassName + "\t";
       final String permissionName = generateResourceClassPermission(resourceClassName);
       final ResourceCreatePermission createPerm_create
             = ResourceCreatePermissions.getInstance(ResourceCreatePermissions.CREATE, false);
@@ -291,9 +293,9 @@ public class TestAccessControl_setResourceCreatePermissions extends TestAccessCo
 
       // set create permissions and verify
       accessControlContext.setResourceCreatePermissions(accessorResource,
-                                                        resourceClassName,
+                                                        resourceClassName_whitespaced,
                                                         resourceCreatePermissions_pre,
-                                                        domainName);
+                                                        domainName_whitespaced);
 
       final Set<ResourceCreatePermission> resourceCreatePermissions_post
             = accessControlContext.getEffectiveResourceCreatePermissions(accessorResource, resourceClassName, domainName);
@@ -301,6 +303,18 @@ public class TestAccessControl_setResourceCreatePermissions extends TestAccessCo
       assertThat(resourceCreatePermissions_post, hasItem(createPerm_create));
       assertThat(resourceCreatePermissions_post, hasItem(createPerm_customPerm));     // whitespace is trimmed upon permission creation
       assertThat(resourceCreatePermissions_post, hasItem(createPerm_customPerm_ws));
+
+      // set create permissions with implicit domain and verify
+      accessControlContext.setResourceCreatePermissions(accessorResource,
+                                                        resourceClassName_whitespaced,
+                                                        resourceCreatePermissions_pre);
+
+      final Set<ResourceCreatePermission> resourceCreatePermissions_implicitDomain_post
+            = accessControlContext.getEffectiveResourceCreatePermissions(accessorResource, resourceClassName);
+      assertThat(resourceCreatePermissions_implicitDomain_post, is(resourceCreatePermissions_pre));
+      assertThat(resourceCreatePermissions_implicitDomain_post, hasItem(createPerm_create));
+      assertThat(resourceCreatePermissions_implicitDomain_post, hasItem(createPerm_customPerm));     // whitespace is trimmed upon permission creation
+      assertThat(resourceCreatePermissions_implicitDomain_post, hasItem(createPerm_customPerm_ws));
    }
 
    @Test
@@ -1006,7 +1020,7 @@ public class TestAccessControl_setResourceCreatePermissions extends TestAccessCo
          fail("setting create-permissions with null domain name should have failed");
       }
       catch (AccessControlException e) {
-         assertThat(e.getMessage().toLowerCase(), containsString("domain name must not be null"));
+         assertThat(e.getMessage().toLowerCase(), containsString("domain required"));
       }
       try {
          accessControlContext.setResourceCreatePermissions(accessorResource, resourceClassName, null, domainName);
