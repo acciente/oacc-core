@@ -2510,8 +2510,10 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
 
       try {
          connection = getConnection();
+         resourceClassName = resourceClassName.trim();
 
-         __assertPostCreateResourcePermission(connection, resourceClassName,
+         __assertPostCreateResourcePermission(connection,
+                                              resourceClassName,
                                               requestedResourcePermission,
                                               sessionResourceDomainName);
       }
@@ -2536,6 +2538,8 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
 
       try {
          connection = getConnection();
+         resourceClassName = resourceClassName.trim();
+         domainName = domainName.trim();
 
          __assertPostCreateResourcePermission(connection, resourceClassName, requestedResourcePermission, domainName);
       }

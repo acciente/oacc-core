@@ -562,6 +562,43 @@ public class TestAccessControl_assertPostCreateResourcePermission extends TestAc
    }
 
    @Test
+   public void assertPostCreateResourcePermission_whitespaceConsistent() throws AccessControlException {
+      authenticateSystemResource();
+      // setup permission without granting it to anything
+      final String resourceClassName = generateResourceClass(false, false);
+      final String resourceClassName_whitespaced = " " + resourceClassName + "\t";
+      final String customPermissionName = generateResourceClassPermission(resourceClassName);
+
+      // verify setup
+      final Set<ResourceCreatePermission> allResourceCreatePermissionsForResourceClass
+            = accessControlContext.getEffectiveResourceCreatePermissions(SYS_RESOURCE, resourceClassName);
+      assertThat(allResourceCreatePermissionsForResourceClass.isEmpty(), is(true));
+
+      // verify
+      try {
+         accessControlContext.assertPostCreateResourcePermission(resourceClassName_whitespaced,
+                                                                 ResourcePermissions.getInstance(customPermissionName));
+      }
+      catch (AccessControlException e) {
+         fail("asserting post-create resource permission (even when none has been granted) should have succeeded for system resource");
+      }
+
+      final String domainName = generateDomain();
+      final String domainName_whitespaced = " " + domainName + "\t";
+      final Set<ResourceCreatePermission> allResourceCreatePermissionsForResourceClassAndDomain
+            = accessControlContext.getEffectiveResourceCreatePermissions(SYS_RESOURCE, resourceClassName, domainName);
+      assertThat(allResourceCreatePermissionsForResourceClassAndDomain.isEmpty(), is(true));
+      try {
+         accessControlContext.assertPostCreateResourcePermission(resourceClassName_whitespaced,
+                                                                 ResourcePermissions.getInstance(customPermissionName),
+                                                                 domainName_whitespaced);
+      }
+      catch (AccessControlException e) {
+         fail("asserting post-create resource permission for domain (even when none has been granted) should have succeeded for system resource");
+      }
+   }
+
+   @Test
    public void assertPostCreateResourcePermission_nulls_shouldFail() throws AccessControlException {
       authenticateSystemResource();
 
