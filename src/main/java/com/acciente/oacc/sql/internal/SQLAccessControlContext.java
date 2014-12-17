@@ -745,7 +745,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
                                      String resourceClassName,
                                      String domainName,
                                      Credentials credentials) throws AccessControlException {
-      assertResourceClassNotBlank(resourceClassName);
+      assertResourceClassSpecified(resourceClassName);
       assertDomainSpecified(domainName);
 
       // validate the resource class
@@ -1256,7 +1256,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       SQLConnection connection = null;
 
       assertAuth();
-      assertResourceClassNotBlank(resourceClassName);
+      assertResourceClassSpecified(resourceClassName);
       assertDomainSpecified(domainName);
 
       try {
@@ -1284,7 +1284,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       SQLConnection connection = null;
 
       assertAuth();
-      assertResourceClassNotBlank(resourceClassName);
+      assertResourceClassSpecified(resourceClassName);
 
       try {
          connection = getConnection();
@@ -1545,7 +1545,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       SQLConnection connection = null;
 
       assertAuth();
-      assertResourceClassNotBlank(resourceClassName);
+      assertResourceClassSpecified(resourceClassName);
       assertDomainSpecified(domainName);
 
       try {
@@ -1572,7 +1572,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       SQLConnection connection = null;
 
       assertAuth();
-      assertResourceClassNotBlank(resourceClassName);
+      assertResourceClassSpecified(resourceClassName);
 
       try {
          connection = getConnection();
@@ -2003,7 +2003,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       SQLConnection connection = null;
 
       assertAuth();
-      assertResourceClassNotBlank(resourceClassName);
+      assertResourceClassSpecified(resourceClassName);
       assertDomainSpecified(domainName);
 
       try {
@@ -2033,7 +2033,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       SQLConnection connection = null;
 
       assertAuth();
-      assertResourceClassNotBlank(resourceClassName);
+      assertResourceClassSpecified(resourceClassName);
 
       try {
          connection = getConnection();
@@ -2222,7 +2222,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       SQLConnection connection = null;
 
       assertAuth();
-      assertResourceClassNotBlank(resourceClassName);
+      assertResourceClassSpecified(resourceClassName);
       assertDomainSpecified(domainName);
 
       try {
@@ -2250,7 +2250,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       SQLConnection connection = null;
 
       assertAuth();
-      assertResourceClassNotBlank(resourceClassName);
+      assertResourceClassSpecified(resourceClassName);
 
       try {
          connection = getConnection();
@@ -2442,7 +2442,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       SQLConnection connection = null;
 
       assertAuth();
-      assertResourceClassNotBlank(resourceClassName);
+      assertResourceClassSpecified(resourceClassName);
 
       try {
          connection = getConnection();
@@ -2505,7 +2505,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       SQLConnection connection = null;
 
       assertAuth();
-      assertResourceClassNotBlank(resourceClassName);
+      assertResourceClassSpecified(resourceClassName);
       assertPermissionSpecified(requestedResourcePermission);
 
       try {
@@ -2532,7 +2532,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       SQLConnection connection = null;
 
       assertAuth();
-      assertResourceClassNotBlank(resourceClassName);
+      assertResourceClassSpecified(resourceClassName);
       assertPermissionSpecified(requestedResourcePermission);
       assertDomainSpecified(domainName);
 
@@ -2785,7 +2785,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       SQLConnection connection = null;
 
       assertAuth();
-      assertResourceClassNotBlank(resourceClassName);
+      assertResourceClassSpecified(resourceClassName);
 
       try {
          connection = getConnection();
@@ -2809,7 +2809,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       SQLConnection connection = null;
 
       assertAuth();
-      assertResourceClassNotBlank(resourceClassName);
+      assertResourceClassSpecified(resourceClassName);
 
       try {
          connection = getConnection();
@@ -2893,7 +2893,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       SQLConnection connection = null;
 
       assertAuth();
-      assertResourceClassNotBlank(resourceClassName);
+      assertResourceClassSpecified(resourceClassName);
       assertDomainSpecified(domainName);
 
       try {
@@ -2924,7 +2924,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       SQLConnection connection = null;
 
       assertAuth();
-      assertResourceClassNotBlank(resourceClassName);
+      assertResourceClassSpecified(resourceClassName);
       assertDomainSpecified(domainName);
 
       try {
@@ -3127,7 +3127,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       SQLConnection connection = null;
 
       assertAuth();
-      assertResourceClassNotBlank(resourceClassName);
+      assertResourceClassSpecified(resourceClassName);
 
       try {
          connection = getConnection();
@@ -3240,7 +3240,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       }
    }
 
-   private void assertResourceClassNotBlank(String resourceClassName) throws AccessControlException {
+   private void assertResourceClassSpecified(String resourceClassName) throws AccessControlException {
       if (resourceClassName == null || resourceClassName.trim().isEmpty()) {
          throw new AccessControlException("Resource class required, none specified");
       }
