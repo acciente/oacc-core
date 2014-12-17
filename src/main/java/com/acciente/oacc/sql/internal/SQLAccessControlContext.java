@@ -2785,6 +2785,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       SQLConnection connection = null;
 
       assertAuth();
+      assertResourceClassNotBlank(resourceClassName);
 
       try {
          connection = getConnection();
@@ -2808,6 +2809,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       SQLConnection connection = null;
 
       assertAuth();
+      assertResourceClassNotBlank(resourceClassName);
 
       try {
          connection = getConnection();
@@ -2891,6 +2893,8 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       SQLConnection connection = null;
 
       assertAuth();
+      assertResourceClassNotBlank(resourceClassName);
+      assertDomainSpecified(domainName);
 
       try {
          connection = getConnection();
@@ -2920,6 +2924,8 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       SQLConnection connection = null;
 
       assertAuth();
+      assertResourceClassNotBlank(resourceClassName);
+      assertDomainSpecified(domainName);
 
       try {
          connection = getConnection();

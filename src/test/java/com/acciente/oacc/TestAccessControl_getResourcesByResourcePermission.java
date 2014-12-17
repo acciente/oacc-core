@@ -688,21 +688,17 @@ public class TestAccessControl_getResourcesByResourcePermission extends TestAcce
          accessControlContext.getResourcesByResourcePermission(accessorResource, null, resourcePermission);
          fail("getting resources by resource permission with null resource class name should have failed");
       }
-      catch (NullPointerException e) {
+      catch (AccessControlException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("resource class required"));
       }
-//      catch (AccessControlException e) {
-//         assertThat(e.getMessage().toLowerCase(), containsString("could not find resource class"));
-//      }
 
       try {
          accessControlContext.getResourcesByResourcePermission(accessorResource, null, resourcePermission, domain);
          fail("getting resources by resource permission with null resource class name should have failed");
       }
-      catch (NullPointerException e) {
+      catch (AccessControlException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("resource class required"));
       }
-//      catch (AccessControlException e) {
-//         assertThat(e.getMessage().toLowerCase(), containsString("could not find resource class"));
-//      }
 
       try {
          accessControlContext.getResourcesByResourcePermission(accessorResource, resourceClass, null);
@@ -723,7 +719,7 @@ public class TestAccessControl_getResourcesByResourcePermission extends TestAcce
          fail("getting resources by resource permission with null domain should have failed");
       }
       catch (AccessControlException e) {
-         assertThat(e.getMessage().toLowerCase(), containsString("domain name must not be null"));
+         assertThat(e.getMessage().toLowerCase(), containsString("domain required"));
       }
 
       // authenticate as accessor
@@ -733,21 +729,17 @@ public class TestAccessControl_getResourcesByResourcePermission extends TestAcce
          accessControlContext.getResourcesByResourcePermission(null, resourcePermission);
          fail("getting resources by resource permission with null resource class name should have failed");
       }
-      catch (NullPointerException e) {
+      catch (AccessControlException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("resource class required"));
       }
-//      catch (AccessControlException e) {
-//         assertThat(e.getMessage().toLowerCase(), containsString("could not find resource class"));
-//      }
 
       try {
          accessControlContext.getResourcesByResourcePermission(null, resourcePermission, domain);
          fail("getting resources by resource permission with null resource class name should have failed");
       }
-      catch (NullPointerException e) {
+      catch (AccessControlException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("resource class required"));
       }
-//      catch (AccessControlException e) {
-//         assertThat(e.getMessage().toLowerCase(), containsString("could not find resource class"));
-//      }
 
       try {
          accessControlContext.getResourcesByResourcePermission(resourceClass, null);
@@ -768,7 +760,7 @@ public class TestAccessControl_getResourcesByResourcePermission extends TestAcce
          fail("getting resources by resource permission with null domain should have failed");
       }
       catch (AccessControlException e) {
-         assertThat(e.getMessage().toLowerCase(), containsString("domain name must not be null"));
+         assertThat(e.getMessage().toLowerCase(), containsString("domain required"));
       }
    }
 
