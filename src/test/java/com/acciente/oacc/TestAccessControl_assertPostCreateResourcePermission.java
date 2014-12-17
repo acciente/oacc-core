@@ -599,6 +599,50 @@ public class TestAccessControl_assertPostCreateResourcePermission extends TestAc
    }
 
    @Test
+   public void assertPostCreateResourcePermission_whitespaceConsistent_asAuthenticatedResource() throws AccessControlException {
+      authenticateSystemResource();
+
+      final String resourceClassName = generateResourceClass(false, false);
+      final String resourceClassName_whitespaced = " " + resourceClassName + "\t";
+      final String customPermissionName_forAccessorDomain = generateResourceClassPermission(resourceClassName);
+      final String customPermissionName_forAccessedDomain = generateResourceClassPermission(resourceClassName);
+      final ResourcePermission customPermission_forAccessorDomain = ResourcePermissions.getInstance(
+            customPermissionName_forAccessorDomain);
+      final ResourcePermission customPermission_forAccessedDomain = ResourcePermissions.getInstance(
+            customPermissionName_forAccessedDomain);
+      final char[] password = generateUniquePassword();
+      final Resource accessorResource = generateAuthenticatableResource(password);
+      final String accessorDomainName = accessControlContext.getDomainNameByResource(accessorResource);
+      final String accessedDomainName = generateDomain();
+      final String accessedDomainName_whitespaced = " " + accessedDomainName + "\t";
+
+      // setup create permissions
+      grantResourceCreatePermission(accessorResource, resourceClassName, accessorDomainName, customPermissionName_forAccessorDomain);
+      grantResourceCreatePermission(accessorResource, resourceClassName, accessedDomainName, customPermissionName_forAccessedDomain);
+
+      // authenticate accessor/creator resource
+      accessControlContext.authenticate(accessorResource, PasswordCredentials.newInstance(password));
+
+      // verify
+      try {
+         accessControlContext.assertPostCreateResourcePermission(resourceClassName_whitespaced,
+                                                                 customPermission_forAccessorDomain);
+      }
+      catch (AccessControlException e) {
+         fail("asserting post-create resource permission for a direct create permission should have succeeded for authenticated resource");
+      }
+
+      try {
+         accessControlContext.assertPostCreateResourcePermission(resourceClassName_whitespaced,
+                                                                 customPermission_forAccessedDomain,
+                                                                 accessedDomainName_whitespaced);
+      }
+      catch (AccessControlException e) {
+         fail("asserting post-create resource permission for a direct create permission (for a domain) should have succeeded for authenticated resource");
+      }
+   }
+
+   @Test
    public void assertPostCreateResourcePermission_nulls_shouldFail() throws AccessControlException {
       authenticateSystemResource();
 
