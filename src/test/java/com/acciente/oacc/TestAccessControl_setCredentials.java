@@ -328,7 +328,7 @@ public class TestAccessControl_setCredentials extends TestAccessControlBase {
       final char[] accessorPassword = generateUniquePassword();
       final Resource accessorResource = generateAuthenticatableResource(accessorPassword);
 
-      // set up global permissions: accessor --SUPER-USER-> parent domain
+      // set up domain permissions: accessor --SUPER-USER-> parent domain
       accessControlContext.setDomainPermissions(accessorResource,
                                                 parentDomainName,
                                                 setOf(DomainPermissions.getInstance(DomainPermissions.SUPER_USER)));
@@ -343,4 +343,40 @@ public class TestAccessControl_setCredentials extends TestAccessControlBase {
       accessControlContext.unauthenticate();
       accessControlContext.authenticate(authenticatableResource, PasswordCredentials.newInstance(newPassword));
    }
+
+   @Test
+   public void setCredentials_impersonateResetAuthorization_shouldFail() throws Exception {
+      authenticateSystemResource();
+
+      final char[] password = generateUniquePassword();
+      final Resource authenticatableResource = generateAuthenticatableResource(password);
+      final char[] accessorPassword = generateUniquePassword();
+      final Resource donorResource = generateAuthenticatableResource(generateUniquePassword());
+      final Resource accessorResource = generateAuthenticatableResource(accessorPassword);
+      final Set<ResourcePermission> resetCredentialsPermissions = setOf(ResourcePermissions.getInstance(ResourcePermissions.RESET_CREDENTIALS));
+
+      // set up resource permissions: donor --RESET-CREDENTIALS-> authenticatable
+      accessControlContext.setResourcePermissions(donorResource, authenticatableResource, resetCredentialsPermissions);
+
+      // set up impersonate authorization : accessor --IMPERSONATE-> donor
+      accessControlContext.setResourcePermissions(accessorResource,
+                                                  donorResource,
+                                                  setOf(ResourcePermissions.getInstance(ResourcePermissions.IMPERSONATE)));
+
+      // authenticate and impersonate
+      accessControlContext.authenticate(accessorResource, PasswordCredentials.newInstance(accessorPassword));
+      accessControlContext.impersonate(donorResource);
+
+      // attempt to set credentials
+      final char[] newPassword = (password + "_modified").toCharArray();
+      try {
+         accessControlContext.setCredentials(authenticatableResource,
+                                             PasswordCredentials.newInstance(newPassword));
+         fail("setting credentials while impersonating another resource should have failed");
+      }
+      catch (AccessControlException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("while impersonating another resource"));
+      }
+   }
+   // todo: set with impersonate
 }

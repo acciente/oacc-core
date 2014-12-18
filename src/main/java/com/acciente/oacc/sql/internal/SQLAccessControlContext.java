@@ -432,6 +432,10 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
    public void setCredentials(Resource resource, Credentials newCredentials) throws AccessControlException {
       assertAuth();
 
+      if (!authenticatedResource.equals(sessionResource)) {
+         throw new AccessControlException("Calling setCredentials while impersonating another resource is not valid");
+      }
+
       assertCredentialsSpecified(newCredentials);
       authenticationProvider.validateCredentials(newCredentials);
 
@@ -3235,21 +3239,21 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
          throws AccessControlException {
       if (sessionResource.getId() != SYSTEM_RESOURCE_ID) {
          throw new AccessControlException("Operation requires this session be authenticated by the SYSTEM resource",
-                                    true);
+                                          true);
       }
    }
 
    private void assertAuth() throws AccessControlException {
       if (sessionResource == null) {
          throw new AccessControlException("Session not authenticated",
-                                    true);
+                                          true);
       }
    }
 
    private void assertNotAuth() throws AccessControlException {
       if (sessionResource != null) {
          throw new AccessControlException("This call is not valid when the session is authenticated",
-                                    true);
+                                          true);
       }
    }
 

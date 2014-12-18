@@ -119,7 +119,9 @@ public interface AccessControlContext {
     * <li> the currently authenticated resource has to have RESET-CREDENTIALS permission on the specified resource.
     * </ul>
     * Note that this method uses the permissions granted to the originally authenticated resource - and not those of
-    * any currently impersonated resource - to check the items listed above.
+    * any currently impersonated resource - to check the items listed above. This method will actually throw an exception
+    * if called while impersonating another resource, in order to prevent any way of setting another resource's credentials
+    * without having the explicit RESET-CREDENTIALS or SUPER-USER permissions.
     *
     * @param resource    the resource for which the credentials should be updated. The resource for which the credentials are
     *                    to be changed must be the current auth resource, or the current auth resource must have SUPER-USER permissions

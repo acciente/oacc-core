@@ -80,6 +80,4 @@ public class TestAccessControl_getResourcePermissionNames extends TestAccessCont
          assertThat(e.getMessage().toLowerCase(), containsString("resource class required"));
       }
    }
-
-   // todo:
 }
