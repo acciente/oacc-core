@@ -430,12 +430,21 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
 
    @Override
    public void setCredentials(Resource resource, Credentials newCredentials) throws AccessControlException {
-      SQLConnection connection = null;
-
       assertAuth();
 
       assertCredentialsSpecified(newCredentials);
       authenticationProvider.validateCredentials(newCredentials);
+
+      // skip permission checks if the authenticated resource is trying to set its own credentials
+      if (!authenticatedResource.equals(resource)) {
+         assertResetCredentialsResourcePermission(resource);
+      }
+
+      authenticationProvider.setCredentials(resource, newCredentials);
+   }
+
+   private void assertResetCredentialsResourcePermission(Resource resource) throws AccessControlException {
+      SQLConnection connection = null;
 
       try {
          connection = getConnection();
@@ -445,6 +454,10 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
          // first check direct permissions
          final ResourceClassInternalInfo
                resourceClassInfo = resourceClassPersister.getResourceClassInfoByResourceId(connection, resource);
+
+         if (!resourceClassInfo.isAuthenticatable()) {
+            throw new AccessControlException("Calling setCredentials for an unauthenticatable resource is not valid");
+         }
 
          final Set<ResourcePermission>
                resourcePermissions = __getEffectiveResourcePermissions(connection, authenticatedResource, resource);
@@ -487,8 +500,6 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       finally {
          closeConnection(connection);
       }
-
-      authenticationProvider.setCredentials(resource, newCredentials);
    }
 
    @Override

@@ -20,55 +20,37 @@ package com.acciente.oacc;
 import com.acciente.oacc.helper.Constants;
 import org.junit.Test;
 
+import java.util.Set;
+
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.fail;
 
 public class TestAccessControl_setCredentials extends TestAccessControlBase {
    @Test
-   public void setAuthResourcePassword_authenticatedUser() throws Exception {
+   public void setCredentials_onSystemResource() throws Exception {
       authenticateSystemResource();
 
-      // optional: explicit check of password stored in DB
-//      final DB_Resource helperResource_preChange = new DB_Resource.Builder( systemResource.getID() )
-//            .resourceClassID( 0 )
-//            .domainID( 0 )
-//            .password_plaintext( Constants.OACC_ROOT_PWD )
-//            .build();
-//      final Resource authenticatedResource_preChange = accessControlContext.getAuthenticatedResource();
-//      final DB_Resource helperResourceFromDB_preChange = DB_Resource.Finder.findByID( con, Constants.DB_SCHEMA, authenticatedResource_preChange.getID() );
-//
-//      // use DB_Resource.equals() to verify password matches prior to change
-//      assertThat( helperResourceFromDB_preChange, is( helperResource_preChange ) );
-
-      // update password and verify
+      // update credentials and verify
       final char[] newPwd = (Constants.OACC_ROOT_PWD + "_modified").toCharArray();
       accessControlContext.setCredentials(getSystemResource(), PasswordCredentials.newInstance(newPwd));
       accessControlContext.unauthenticate();
       try {
          accessControlContext.authenticate(getSystemResource(),
                                            PasswordCredentials.newInstance(Constants.OACC_ROOT_PWD));
+         fail("authenticating with old credentials should have failed");
       }
       catch (AccessControlException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("invalid password"));
       }
       accessControlContext.authenticate(getSystemResource(), PasswordCredentials.newInstance(newPwd));
 
-      // optional: explicit check of password stored in DB
-//      final DB_Resource helperResource_postChange = new DB_Resource.Builder( systemResource.getID() )
-//            .resourceClassID( 0 )
-//            .domainID( 0 )
-//            .password_plaintext( newPwd )
-//            .build();
-//      final Resource authenticatedResource_postChange = accessControlContext.getAuthenticatedResource();
-//      final DB_Resource helperResourceFromDB_postChange = DB_Resource.Finder.findByID( con, Constants.DB_SCHEMA, authenticatedResource_postChange.getID() );
-//      assertThat( authenticatedResource_postChange, is( authenticatedResource_preChange ) );
-//      assertThat( helperResourceFromDB_postChange, is( helperResource_postChange ) );
-
-      // update password and verify
+      // update credentials and verify
       final char[] intermediatePwd = (Constants.OACC_ROOT_PWD + "_intermediate").toCharArray();
       accessControlContext.setCredentials(getSystemResource(), PasswordCredentials.newInstance(intermediatePwd));
       try {
          accessControlContext.authenticate(getSystemResource(), PasswordCredentials.newInstance(newPwd));
+         fail("authenticating with old credentials should have failed");
       }
       catch (AccessControlException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("invalid password"));
@@ -76,6 +58,7 @@ public class TestAccessControl_setCredentials extends TestAccessControlBase {
       try {
          accessControlContext.authenticate(getSystemResource(),
                                            PasswordCredentials.newInstance(Constants.OACC_ROOT_PWD));
+         fail("authenticating with old credentials should have failed");
       }
       catch (AccessControlException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("invalid password"));
@@ -88,27 +71,46 @@ public class TestAccessControl_setCredentials extends TestAccessControlBase {
    }
 
    @Test
-   public void setAuthResourcePassword_authenticatedUser_invalidPassword() throws Exception {
+   public void setCredentials_invalidPassword_shouldFail() throws Exception {
       authenticateSystemResource();
 
-      // update password and verify
+      // attempt to set credentials
       try {
          accessControlContext.setCredentials(getSystemResource(),
                                              PasswordCredentials.newInstance(null));
+         fail("setting password credentials with null password should have failed");
       }
       catch (AccessControlException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("password required, none specified"));
       }
+
+      try {
+         accessControlContext.setCredentials(getSystemResource(),
+                                             PasswordCredentials.newInstance("".toCharArray()));
+         fail("setting password credentials with empty password should have failed");
+      }
+      catch (AccessControlException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("password cannot be zero length"));
+      }
+
+      try {
+         accessControlContext.setCredentials(getSystemResource(),
+                                             PasswordCredentials.newInstance("\t ".toCharArray()));
+         fail("setting password credentials with blank password should have failed");
+      }
+      catch (AccessControlException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("password cannot be blank"));
+      }
    }
 
    @Test
-   public void setAuthResourcePassword_onNonAuthenticatedResource() throws Exception {
+   public void setCredentials_onNonAuthenticatedResource() throws Exception {
       authenticateSystemResource();
 
       final char[] password = generateUniquePassword();
       final Resource authenticatableResource = generateAuthenticatableResource(password);
 
-      // set password and verify
+      // set credentials and verify
       final char[] newPassword = (password + "_modified").toCharArray();
       accessControlContext.setCredentials(authenticatableResource,
                                           PasswordCredentials.newInstance(newPassword));
@@ -116,6 +118,7 @@ public class TestAccessControl_setCredentials extends TestAccessControlBase {
       try {
          accessControlContext.authenticate(authenticatableResource,
                                            PasswordCredentials.newInstance(password));
+         fail("authenticating with old credentials should have failed");
       }
       catch (AccessControlException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("invalid password"));
@@ -124,6 +127,220 @@ public class TestAccessControl_setCredentials extends TestAccessControlBase {
                                         PasswordCredentials.newInstance(newPassword));
    }
 
-   // todo: try setting pwd on resource we don't have permissions on
+   @Test
+   public void setCredentials_onUnauthenticatableResource_shouldFail() throws Exception {
+      authenticateSystemResource();
 
+      final Resource unauthenticatableResource = generateUnauthenticatableResource();
+
+      // attempt to set credentials
+      final char[] newPassword = generateUniquePassword();
+      try {
+         accessControlContext.setCredentials(unauthenticatableResource,
+                                             PasswordCredentials.newInstance(newPassword));
+         fail("setting credentials on an unauthenticatable resource should have failed");
+      }
+      catch (AccessControlException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("unauthenticatable resource is not valid"));
+      }
+   }
+
+   @Test
+   public void setCredentials_withoutResetAuthorization_shouldFail() throws Exception {
+      authenticateSystemResource();
+
+      final char[] password = generateUniquePassword();
+      final Resource authenticatableResource = generateAuthenticatableResource(password);
+      final char[] accessorPassword = generateUniquePassword();
+      final Resource accessorResource = generateAuthenticatableResource(accessorPassword);
+
+      // authenticate and attempt to set credentials
+      accessControlContext.authenticate(accessorResource, PasswordCredentials.newInstance(accessorPassword));
+
+      final char[] newPassword = (password + "_modified").toCharArray();
+      try {
+         accessControlContext.setCredentials(authenticatableResource,
+                                             PasswordCredentials.newInstance(newPassword));
+         fail("setting credentials without authorization should have failed");
+      }
+      catch (AccessControlException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("not authorized"));
+      }
+   }
+
+   @Test
+   public void setCredentials_withoutResetAuthorization_shouldSucceed() throws Exception {
+      authenticateSystemResource();
+
+      final char[] password = generateUniquePassword();
+      final Resource authenticatableResource = generateAuthenticatableResource(password);
+
+      // authenticate and attempt to set credentials on oneself
+      accessControlContext.authenticate(authenticatableResource, PasswordCredentials.newInstance(password));
+
+      final char[] newPassword = (password + "_modified").toCharArray();
+      accessControlContext.setCredentials(authenticatableResource, PasswordCredentials.newInstance(newPassword));
+
+      // verify
+      accessControlContext.unauthenticate();
+      try {
+         accessControlContext.authenticate(authenticatableResource,
+                                           PasswordCredentials.newInstance(password));
+         fail("authenticating with old credentials should have failed");
+      }
+      catch (AccessControlException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("invalid password"));
+      }
+      accessControlContext.authenticate(authenticatableResource,
+                                        PasswordCredentials.newInstance(newPassword));
+   }
+
+   @Test
+   public void setCredentials_directResetAuthorization_shouldSucceed() throws Exception {
+      authenticateSystemResource();
+
+      final char[] password = generateUniquePassword();
+      final Resource authenticatableResource = generateAuthenticatableResource(password);
+      final char[] accessorPassword = generateUniquePassword();
+      final Resource accessorResource = generateAuthenticatableResource(accessorPassword);
+      final Set<ResourcePermission> resetCredentialsPermissions = setOf(ResourcePermissions.getInstance(ResourcePermissions.RESET_CREDENTIALS));
+
+      // set up resource permissions: accessor --RESET-CREDENTIALS-> authenticatable
+      accessControlContext.setResourcePermissions(accessorResource, authenticatableResource, resetCredentialsPermissions);
+
+      // authenticate and set credentials
+      accessControlContext.authenticate(accessorResource, PasswordCredentials.newInstance(accessorPassword));
+
+      final char[] newPassword = (password + "_modified").toCharArray();
+      accessControlContext.setCredentials(authenticatableResource, PasswordCredentials.newInstance(newPassword));
+
+      // verify
+      accessControlContext.unauthenticate();
+      accessControlContext.authenticate(authenticatableResource, PasswordCredentials.newInstance(newPassword));
+   }
+
+   @Test
+   public void setCredentials_globalResetAuthorization_shouldSucceed() throws Exception {
+      authenticateSystemResource();
+
+      final char[] password = generateUniquePassword();
+      final Resource authenticatableResource = generateAuthenticatableResource(password);
+      final String authenticatableResourceClassName = accessControlContext.getResourceClassInfoByResource(authenticatableResource).getResourceClassName();
+      final String authenticatableDomainName = accessControlContext.getDomainNameByResource(authenticatableResource);
+      final char[] accessorPassword = generateUniquePassword();
+      final Resource accessorResource = generateAuthenticatableResource(accessorPassword);
+      final Set<ResourcePermission> resetCredentialsPermissions = setOf(ResourcePermissions.getInstance(ResourcePermissions.RESET_CREDENTIALS));
+
+      // set up global permissions: accessor --RESET-CREDENTIALS-> {authenticatable class, authenticatable domain}
+      accessControlContext.setGlobalResourcePermissions(accessorResource,
+                                                        authenticatableResourceClassName,
+                                                        resetCredentialsPermissions,
+                                                        authenticatableDomainName);
+
+      // authenticate and set credentials
+      accessControlContext.authenticate(accessorResource, PasswordCredentials.newInstance(accessorPassword));
+
+      final char[] newPassword = (password + "_modified").toCharArray();
+      accessControlContext.setCredentials(authenticatableResource, PasswordCredentials.newInstance(newPassword));
+
+      // verify
+      accessControlContext.unauthenticate();
+      accessControlContext.authenticate(authenticatableResource, PasswordCredentials.newInstance(newPassword));
+   }
+
+   @Test
+   public void setCredentials_domainInheritedResetAuthorization_shouldSucceed() throws Exception {
+      authenticateSystemResource();
+
+      final String parentDomainName = generateDomain();
+      final String childDomainName = generateUniqueDomainName();
+      accessControlContext.createDomain(childDomainName, parentDomainName);
+
+      final char[] password = generateUniquePassword();
+      final Resource authenticatableResource = generateAuthenticatableResource(password, childDomainName);
+      final String authenticatableResourceClassName = accessControlContext.getResourceClassInfoByResource(authenticatableResource).getResourceClassName();
+      final char[] accessorPassword = generateUniquePassword();
+      final Resource accessorResource = generateAuthenticatableResource(accessorPassword);
+      final Set<ResourcePermission> resetCredentialsPermissions = setOf(ResourcePermissions.getInstance(ResourcePermissions.RESET_CREDENTIALS));
+
+      // set up global permissions: accessor --RESET-CREDENTIALS-> {authenticatable class, parent domain}
+      accessControlContext.setGlobalResourcePermissions(accessorResource,
+                                                        authenticatableResourceClassName,
+                                                        resetCredentialsPermissions,
+                                                        parentDomainName);
+
+      // authenticate and set credentials
+      accessControlContext.authenticate(accessorResource, PasswordCredentials.newInstance(accessorPassword));
+
+      final char[] newPassword = (password + "_modified").toCharArray();
+      accessControlContext.setCredentials(authenticatableResource, PasswordCredentials.newInstance(newPassword));
+
+      // verify
+      accessControlContext.unauthenticate();
+      accessControlContext.authenticate(authenticatableResource, PasswordCredentials.newInstance(newPassword));
+   }
+
+   @Test
+   public void setCredentials_inheritResetAuthorization_shouldSucceed() throws Exception {
+      authenticateSystemResource();
+
+      final char[] password = generateUniquePassword();
+      final Resource authenticatableResource = generateAuthenticatableResource(password);
+      final String authenticatableResourceClassName = accessControlContext.getResourceClassInfoByResource(authenticatableResource).getResourceClassName();
+      final String authenticatableDomainName = accessControlContext.getDomainNameByResource(authenticatableResource);
+      final char[] accessorPassword = generateUniquePassword();
+      final Resource donorResource = generateUnauthenticatableResource();
+      final Resource accessorResource = generateAuthenticatableResource(accessorPassword);
+      final Set<ResourcePermission> resetCredentialsPermissions = setOf(ResourcePermissions.getInstance(ResourcePermissions.RESET_CREDENTIALS));
+
+      // set up global permissions: accessor --RESET-CREDENTIALS-> {authenticatable class, authenticatable domain}
+      accessControlContext.setGlobalResourcePermissions(donorResource,
+                                                        authenticatableResourceClassName,
+                                                        resetCredentialsPermissions,
+                                                        authenticatableDomainName);
+
+      // set up inheritance : accessor --INHERIT-> donor
+      accessControlContext.setResourcePermissions(accessorResource,
+                                                  donorResource,
+                                                  setOf(ResourcePermissions.getInstance(ResourcePermissions.INHERIT)));
+
+      // authenticate and set credentials
+      accessControlContext.authenticate(accessorResource, PasswordCredentials.newInstance(accessorPassword));
+
+      final char[] newPassword = (password + "_modified").toCharArray();
+      accessControlContext.setCredentials(authenticatableResource, PasswordCredentials.newInstance(newPassword));
+
+      // verify
+      accessControlContext.unauthenticate();
+      accessControlContext.authenticate(authenticatableResource, PasswordCredentials.newInstance(newPassword));
+   }
+
+   @Test
+   public void setCredentials_superUserAuthorization_shouldSucceed() throws Exception {
+      authenticateSystemResource();
+
+      final String parentDomainName = generateDomain();
+      final String childDomainName = generateUniqueDomainName();
+      accessControlContext.createDomain(childDomainName, parentDomainName);
+
+      final char[] password = generateUniquePassword();
+      final Resource authenticatableResource = generateAuthenticatableResource(password, childDomainName);
+      final char[] accessorPassword = generateUniquePassword();
+      final Resource accessorResource = generateAuthenticatableResource(accessorPassword);
+
+      // set up global permissions: accessor --SUPER-USER-> parent domain
+      accessControlContext.setDomainPermissions(accessorResource,
+                                                parentDomainName,
+                                                setOf(DomainPermissions.getInstance(DomainPermissions.SUPER_USER)));
+
+      // authenticate and set credentials
+      accessControlContext.authenticate(accessorResource, PasswordCredentials.newInstance(accessorPassword));
+
+      final char[] newPassword = (password + "_modified").toCharArray();
+      accessControlContext.setCredentials(authenticatableResource, PasswordCredentials.newInstance(newPassword));
+
+      // verify
+      accessControlContext.unauthenticate();
+      accessControlContext.authenticate(authenticatableResource, PasswordCredentials.newInstance(newPassword));
+   }
 }
