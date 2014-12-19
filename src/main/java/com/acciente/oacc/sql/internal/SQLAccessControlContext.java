@@ -2615,18 +2615,22 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       }
 
       if (createSysPermissionFound) {
+         // check if the requested permission is permissible from the set of effective post-create permissions
          final Set<ResourcePermission> postCreateResourcePermissions
                = __getPostCreateResourcePermissions(effectiveResourceCreatePermissions);
 
-         if (__containsIgnoringGrant(postCreateResourcePermissions, requestedResourcePermission)) {
+         if (isPermissible(requestedResourcePermission, postCreateResourcePermissions)) {
             return;
          }
 
-         if (__containsIgnoringGrant(__getEffectiveGlobalPermissions(connection,
-                                                                     sessionResource,
-                                                                     resourceClassName,
-                                                                     domainName),
-                                     requestedResourcePermission)) {
+         // check if the requested permission is permissible from the set of effective global permissions
+         final Set<ResourcePermission> globalResourcePermissions
+               = __getEffectiveGlobalPermissions(connection,
+                                                 sessionResource,
+                                                 resourceClassName,
+                                                 domainName);
+
+         if (isPermissible(requestedResourcePermission, globalResourcePermissions)) {
             return;
          }
       }
@@ -2643,6 +2647,17 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
          throw new AccessControlException("No *CREATE permission to create any " + resourceClassName
                                                 + " resources in domain " + domainName, true);
       }
+   }
+
+   private boolean isPermissible(ResourcePermission queriedResourcePermission,
+                                 Set<ResourcePermission> resourcePermissions) {
+      for (ResourcePermission resourcePermission : resourcePermissions) {
+         if (queriedResourcePermission.equals(resourcePermission)
+               || queriedResourcePermission.isGrantableFrom(resourcePermission)) {
+            return true;
+         }
+      }
+      return false;
    }
 
    @Override

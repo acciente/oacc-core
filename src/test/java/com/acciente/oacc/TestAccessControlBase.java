@@ -219,7 +219,23 @@ public class TestAccessControlBase {
 
       systemAccessControlContext.setResourceCreatePermissions(accessorResource,
                                                               resourceClassName,
-                                                              resourceCreatePermissions, domainName
-      );
+                                                              resourceCreatePermissions,
+                                                              domainName);
+   }
+
+   protected void grantResourceCreatePermission(Resource accessorResource,
+                                                String resourceClassName,
+                                                String domainName,
+                                                ResourceCreatePermission firstCreatePermission,
+                                                ResourceCreatePermission... otherCreatePermissions) throws AccessControlException {
+      authenticateSystemAccessControlContext();
+      Set<ResourceCreatePermission> resourceCreatePermissions = new HashSet<>();
+      resourceCreatePermissions.add(firstCreatePermission);
+      Collections.addAll(resourceCreatePermissions, otherCreatePermissions);
+
+      systemAccessControlContext.setResourceCreatePermissions(accessorResource,
+                                                              resourceClassName,
+                                                              resourceCreatePermissions,
+                                                              domainName);
    }
 }
