@@ -36,10 +36,10 @@ public class GrantResourcePermissionSysPersister extends Persister {
       this.sqlStrings = sqlStrings;
    }
 
-   public Set<Resource> getResourcesBySysPermission(SQLConnection connection,
-                                                    Resource accessorResource,
-                                                    Id<ResourceClassId> resourceClassId,
-                                                    ResourcePermission resourcePermission) throws AccessControlException {
+   public Set<Resource> getResourcesBySysResourcePermission(SQLConnection connection,
+                                                            Resource accessorResource,
+                                                            Id<ResourceClassId> resourceClassId,
+                                                            ResourcePermission resourcePermission) throws AccessControlException {
       if (!resourcePermission.isSystemPermission()) {
          throw new AccessControlException("Permission: " + resourcePermission + " is not a system permission");
       }
@@ -73,11 +73,11 @@ public class GrantResourcePermissionSysPersister extends Persister {
       }
    }
 
-   public Set<Resource> getResourcesBySysPermission(SQLConnection connection,
-                                                    Resource accessorResource,
-                                                    Id<ResourceClassId> resourceClassId,
-                                                    Id<DomainId> resourceDomainId,
-                                                    ResourcePermission resourcePermission) throws AccessControlException {
+   public Set<Resource> getResourcesBySysResourcePermission(SQLConnection connection,
+                                                            Resource accessorResource,
+                                                            Id<ResourceClassId> resourceClassId,
+                                                            Id<DomainId> resourceDomainId,
+                                                            ResourcePermission resourcePermission) throws AccessControlException {
       if (!resourcePermission.isSystemPermission()) {
          throw new AccessControlException("Permission: " + resourcePermission + " is not a system permission");
       }
@@ -111,10 +111,10 @@ public class GrantResourcePermissionSysPersister extends Persister {
       }
    }
 
-   public Set<Resource> getAccessorResourcesBySysPermission(SQLConnection connection,
-                                                            Resource accessedResource,
-                                                            Id<ResourceClassId> resourceClassId,
-                                                            ResourcePermission resourcePermission) throws AccessControlException {
+   public Set<Resource> getAccessorResourcesBySysResourcePermission(SQLConnection connection,
+                                                                    Resource accessedResource,
+                                                                    Id<ResourceClassId> resourceClassId,
+                                                                    ResourcePermission resourcePermission) throws AccessControlException {
 
       if (!resourcePermission.isSystemPermission()) {
          throw new AccessControlException("Permission: " + resourcePermission + " is not a system permission");
@@ -148,9 +148,9 @@ public class GrantResourcePermissionSysPersister extends Persister {
       }
    }
 
-   public Set<ResourcePermission> getSysPermissions(SQLConnection connection,
-                                                    Resource accessorResource,
-                                                    Resource accessedResource)
+   public Set<ResourcePermission> getSysResourcePermissionsIncludeInherited(SQLConnection connection,
+                                                                            Resource accessorResource,
+                                                                            Resource accessedResource)
          throws AccessControlException {
 
       SQLStatement statement = null;
@@ -183,9 +183,9 @@ public class GrantResourcePermissionSysPersister extends Persister {
       }
    }
 
-   public Set<ResourcePermission> getDirectSysPermissions(SQLConnection connection,
-                                                          Resource accessorResource,
-                                                          Resource accessedResource)
+   public Set<ResourcePermission> getSysResourcePermissions(SQLConnection connection,
+                                                            Resource accessorResource,
+                                                            Resource accessedResource)
          throws AccessControlException {
 
       SQLStatement statement = null;
@@ -219,12 +219,12 @@ public class GrantResourcePermissionSysPersister extends Persister {
       }
    }
 
-   public void addSysPermissions(SQLConnection connection,
-                                 Resource accessorResource,
-                                 Resource accessedResource,
-                                 Id<ResourceClassId> accessedResourceClassId,
-                                 Set<ResourcePermission> requestedResourcePermissions,
-                                 Resource grantorResource) throws AccessControlException {
+   public void addSysResourcePermissions(SQLConnection connection,
+                                         Resource accessorResource,
+                                         Resource accessedResource,
+                                         Id<ResourceClassId> accessedResourceClassId,
+                                         Set<ResourcePermission> requestedResourcePermissions,
+                                         Resource grantorResource) throws AccessControlException {
 
       SQLStatement statement = null;
       try {
@@ -251,9 +251,9 @@ public class GrantResourcePermissionSysPersister extends Persister {
       }
    }
 
-   public void removeSysPermissions(SQLConnection connection,
-                                    Resource accessorResource,
-                                    Resource accessedResource) throws AccessControlException {
+   public void removeSysResourcePermissions(SQLConnection connection,
+                                            Resource accessorResource,
+                                            Resource accessedResource) throws AccessControlException {
 
       SQLStatement statement = null;
       try {
