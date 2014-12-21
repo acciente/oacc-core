@@ -104,9 +104,9 @@ public class GrantDomainPermissionSysPersister extends Persister {
       }
    }
 
-   public Set<DomainPermission> getDomainSysPermissions(SQLConnection connection,
-                                                        Resource accessorResource,
-                                                        Id<DomainId> resourceDomainId) throws AccessControlException {
+   public Set<DomainPermission> getDomainSysPermissionsIncludeInherited(SQLConnection connection,
+                                                                        Resource accessorResource,
+                                                                        Id<DomainId> resourceDomainId) throws AccessControlException {
       SQLStatement statement = null;
 
       try {
@@ -137,9 +137,9 @@ public class GrantDomainPermissionSysPersister extends Persister {
       }
    }
 
-   public Set<DomainPermission> getDirectDomainSysPermissions(SQLConnection connection,
-                                                              Resource accessorResource,
-                                                              Id<DomainId> resourceDomainId) throws AccessControlException {
+   public Set<DomainPermission> getDomainSysPermissions(SQLConnection connection,
+                                                        Resource accessorResource,
+                                                        Id<DomainId> resourceDomainId) throws AccessControlException {
       SQLStatement statement = null;
 
       try {
@@ -170,8 +170,8 @@ public class GrantDomainPermissionSysPersister extends Persister {
       }
    }
 
-   public Map<String, Set<DomainPermission>> getDomainSysPermissions(SQLConnection connection,
-                                                                     Resource accessorResource) throws AccessControlException {
+   public Map<String, Set<DomainPermission>> getDomainSysPermissionsIncludeInherited(SQLConnection connection,
+                                                                                     Resource accessorResource) throws AccessControlException {
       SQLStatement statement = null;
 
       try {

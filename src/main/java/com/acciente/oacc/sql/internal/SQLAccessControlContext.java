@@ -989,7 +989,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
                                                               Resource accessorResource,
                                                               Id<DomainId> domainId) throws AccessControlException {
       // only system permissions are possible on a domain
-      return grantDomainPermissionSysPersister.getDirectDomainSysPermissions(connection, accessorResource, domainId);
+      return grantDomainPermissionSysPersister.getDomainSysPermissions(connection, accessorResource, domainId);
    }
 
    private Set<DomainPermission> __subtractDomainPermissionsIfGrantableFrom(Set<DomainPermission> candidatePermissionSet,
@@ -1039,9 +1039,10 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       }
 
       // only system permissions are possible on a domain
-      return collapseDomainPermissions(grantDomainPermissionSysPersister.getDomainSysPermissions(connection,
-                                                                                                 accessorResource,
-                                                                                                 domainId));
+      return collapseDomainPermissions(grantDomainPermissionSysPersister.getDomainSysPermissionsIncludeInherited(
+            connection,
+            accessorResource,
+            domainId));
    }
 
    private Set<DomainPermission> collapseDomainPermissions(Set<DomainPermission> domainPermissions) {
@@ -1068,8 +1069,9 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       try {
          connection = getConnection();
 
-         return collapseDomainPermissions(grantDomainPermissionSysPersister.getDomainSysPermissions(connection,
-                                                                                                    accessorResource));
+         return collapseDomainPermissions(grantDomainPermissionSysPersister.getDomainSysPermissionsIncludeInherited(
+               connection,
+               accessorResource));
       }
       catch (SQLException e) {
          throw new AccessControlException(e);
