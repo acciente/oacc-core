@@ -40,11 +40,12 @@ public class GrantResourceCreatePermissionPostCreatePersister extends Persister 
       this.sqlStrings = sqlStrings;
    }
 
-   public Set<ResourceCreatePermission> getPostCreatePermissions(SQLConnection connection,
-                                                                 Resource accessorResource,
-                                                                 Id<ResourceClassId> resourceClassId,
-                                                                 Id<DomainId> resourceDomainId) throws AccessControlException {
+   public Set<ResourceCreatePermission> getResourceCreatePostCreatePermissionsIncludeInherited(SQLConnection connection,
+                                                                                               Resource accessorResource,
+                                                                                               Id<ResourceClassId> resourceClassId,
+                                                                                               Id<DomainId> resourceDomainId) throws AccessControlException {
       SQLStatement statement = null;
+
       try {
          SQLResult resultSet;
          Set<ResourceCreatePermission> resourceCreatePermissions = new HashSet<>();
@@ -81,8 +82,9 @@ public class GrantResourceCreatePermissionPostCreatePersister extends Persister 
       }
    }
 
-   public Map<String, Map<String, Set<ResourceCreatePermission>>> getPostCreatePermissions(SQLConnection connection,
-                                                                                           Resource accessorResource)
+   public Map<String, Map<String, Set<ResourceCreatePermission>>> getResourceCreatePostCreatePermissionsIncludeInherited(
+         SQLConnection connection,
+         Resource accessorResource)
          throws AccessControlException {
       SQLStatement statement = null;
 
@@ -137,10 +139,10 @@ public class GrantResourceCreatePermissionPostCreatePersister extends Persister 
       }
    }
 
-   public Set<ResourceCreatePermission> getDirectPostCreatePermissions(SQLConnection connection,
-                                                                       Resource accessorResource,
-                                                                       Id<ResourceClassId> resourceClassId,
-                                                                       Id<DomainId> resourceDomainId) throws AccessControlException {
+   public Set<ResourceCreatePermission> getResourceCreatePostCreatePermissions(SQLConnection connection,
+                                                                               Resource accessorResource,
+                                                                               Id<ResourceClassId> resourceClassId,
+                                                                               Id<DomainId> resourceDomainId) throws AccessControlException {
       SQLStatement statement = null;
       try {
          SQLResult resultSet;
@@ -178,12 +180,12 @@ public class GrantResourceCreatePermissionPostCreatePersister extends Persister 
       }
    }
 
-   public void addPostCreatePermissions(SQLConnection connection,
-                                        Resource accessorResource,
-                                        Id<ResourceClassId> accessedResourceClassId,
-                                        Id<DomainId> accessedResourceDomainId,
-                                        Set<ResourceCreatePermission> requestedResourceCreatePermissions,
-                                        Resource grantorResource) throws AccessControlException {
+   public void addResourceCreatePostCreatePermissions(SQLConnection connection,
+                                                      Resource accessorResource,
+                                                      Id<ResourceClassId> accessedResourceClassId,
+                                                      Id<DomainId> accessedResourceDomainId,
+                                                      Set<ResourceCreatePermission> requestedResourceCreatePermissions,
+                                                      Resource grantorResource) throws AccessControlException {
       SQLStatement statement = null;
       try {
          // add the new create non-system permissions
@@ -211,10 +213,10 @@ public class GrantResourceCreatePermissionPostCreatePersister extends Persister 
       }
    }
 
-   public void removePostCreatePermissions(SQLConnection connection,
-                                           Resource accessorResource,
-                                           Id<ResourceClassId> accessedResourceClassId,
-                                           Id<DomainId> accessedResourceDomainId) throws AccessControlException {
+   public void removeResourceCreatePostCreatePermissions(SQLConnection connection,
+                                                         Resource accessorResource,
+                                                         Id<ResourceClassId> accessedResourceClassId,
+                                                         Id<DomainId> accessedResourceDomainId) throws AccessControlException {
       SQLStatement statement = null;
       try {
          // revoke any existing create non-system permissions this accessor has to this resource domain + resource class

@@ -1416,10 +1416,10 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
                                                                                          domainId);
 
       // revoke any existing post create non-system permissions this accessor has to this resource class
-      grantResourceCreatePermissionPostCreatePersister.removePostCreatePermissions(connection,
-                                                                                   accessorResource,
-                                                                                   resourceClassId,
-                                                                                   domainId);
+      grantResourceCreatePermissionPostCreatePersister.removeResourceCreatePostCreatePermissions(connection,
+                                                                                                 accessorResource,
+                                                                                                 resourceClassId,
+                                                                                                 domainId);
 
       // grant the *CREATE system permissions
       grantResourceCreatePermissionSysPersister.addCreateSysPermissions(connection,
@@ -1438,12 +1438,12 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
                                                                                       sessionResource);
 
       // grant the post create non-system permissions
-      grantResourceCreatePermissionPostCreatePersister.addPostCreatePermissions(connection,
-                                                                                accessorResource,
-                                                                                resourceClassId,
-                                                                                domainId,
-                                                                                requestedResourceCreatePermissions,
-                                                                                sessionResource);
+      grantResourceCreatePermissionPostCreatePersister.addResourceCreatePostCreatePermissions(connection,
+                                                                                              accessorResource,
+                                                                                              resourceClassId,
+                                                                                              domainId,
+                                                                                              requestedResourceCreatePermissions,
+                                                                                              sessionResource);
    }
 
    private void assertSetContainsResourceCreateSystemPermission(Set<ResourceCreatePermission> resourceCreatePermissions) throws AccessControlException {
@@ -1552,10 +1552,11 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
 
       // next get the post create non-system permissions the accessor has directly to the specified resource class
       resourceCreatePermissions
-            .addAll(grantResourceCreatePermissionPostCreatePersister.getDirectPostCreatePermissions(connection,
-                                                                                                    accessorResource,
-                                                                                                    resourceClassId,
-                                                                                                    domainId));
+            .addAll(grantResourceCreatePermissionPostCreatePersister.getResourceCreatePostCreatePermissions(
+                  connection,
+                  accessorResource,
+                  resourceClassId,
+                  domainId));
 
       return resourceCreatePermissions;
    }
@@ -1650,10 +1651,11 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
 
       // next read the post create non-system permissions the accessor has to the specified resource class
       resourceCreatePermissions.addAll(
-            grantResourceCreatePermissionPostCreatePersister.getPostCreatePermissions(connection,
-                                                                                      accessorResource,
-                                                                                      resourceClassId,
-                                                                                      domainId));
+            grantResourceCreatePermissionPostCreatePersister.getResourceCreatePostCreatePermissionsIncludeInherited(
+                  connection,
+                  accessorResource,
+                  resourceClassId,
+                  domainId));
       return collapseResourceCreatePermissions(resourceCreatePermissions);
    }
 
@@ -1712,7 +1714,9 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
 
       // read the post create non-system permissions and add to createALLPermissionsMap
       mergeSourceCreatePermissionsMapIntoTargetCreatePermissionsMap(
-            grantResourceCreatePermissionPostCreatePersister.getPostCreatePermissions(connection, accessorResource),
+            grantResourceCreatePermissionPostCreatePersister.getResourceCreatePostCreatePermissionsIncludeInherited(
+                  connection,
+                  accessorResource),
             allResourceCreatePermissionsMap);
 
       return collapseResourceCreatePermissions(allResourceCreatePermissionsMap);
