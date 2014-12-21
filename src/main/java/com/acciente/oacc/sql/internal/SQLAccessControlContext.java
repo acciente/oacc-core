@@ -1403,10 +1403,10 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       }
 
       // revoke any existing *CREATE system permissions this accessor has to this resource class
-      grantResourceCreatePermissionSysPersister.removeCreateSysPermissions(connection,
-                                                                           accessorResource,
-                                                                           resourceClassId,
-                                                                           domainId);
+      grantResourceCreatePermissionSysPersister.removeResourceCreateSysPermissions(connection,
+                                                                                   accessorResource,
+                                                                                   resourceClassId,
+                                                                                   domainId);
 
 
       // revoke any existing post create system permissions this accessor has to this resource class
@@ -1422,12 +1422,12 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
                                                                                                  domainId);
 
       // grant the *CREATE system permissions
-      grantResourceCreatePermissionSysPersister.addCreateSysPermissions(connection,
-                                                                        accessorResource,
-                                                                        resourceClassId,
-                                                                        domainId,
-                                                                        requestedResourceCreatePermissions,
-                                                                        sessionResource);
+      grantResourceCreatePermissionSysPersister.addResourceCreateSysPermissions(connection,
+                                                                                accessorResource,
+                                                                                resourceClassId,
+                                                                                domainId,
+                                                                                requestedResourceCreatePermissions,
+                                                                                sessionResource);
 
       // grant the post create system permissions
       grantResourceCreatePermissionPostCreateSysPersister.addResourceCreatePostCreateSysPermissions(connection,
@@ -1538,10 +1538,10 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
 
       // first get the *CREATE system permission the accessor has directly to the specified resource class
       resourceCreatePermissions
-            .addAll(grantResourceCreatePermissionSysPersister.getDirectCreateSysPermissions(connection,
-                                                                                            accessorResource,
-                                                                                            resourceClassId,
-                                                                                            domainId));
+            .addAll(grantResourceCreatePermissionSysPersister.getResourceCreateSysPermissions(connection,
+                                                                                              accessorResource,
+                                                                                              resourceClassId,
+                                                                                              domainId));
 
       // next get the post create system permissions the accessor has directly to the specified resource class
       resourceCreatePermissions
@@ -1638,10 +1638,10 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
 
       // first read the *CREATE system permission the accessor has to the specified resource class
       resourceCreatePermissions.addAll(
-            grantResourceCreatePermissionSysPersister.getCreateSysPermissions(connection,
-                                                                              accessorResource,
-                                                                              resourceClassId,
-                                                                              domainId));
+            grantResourceCreatePermissionSysPersister.getResourceCreateSysPermissionsIncludeInherited(connection,
+                                                                                                      accessorResource,
+                                                                                                      resourceClassId,
+                                                                                                      domainId));
 
       // next read the post create system permissions the accessor has to the specified resource class
       resourceCreatePermissions.addAll(
@@ -1706,7 +1706,8 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
 
       // read the *CREATE system permissions and add to createALLPermissionsMap
       mergeSourceCreatePermissionsMapIntoTargetCreatePermissionsMap(
-            grantResourceCreatePermissionSysPersister.getCreateSysPermissions(connection, accessorResource),
+            grantResourceCreatePermissionSysPersister.getResourceCreateSysPermissionsIncludeInherited(connection,
+                                                                                                      accessorResource),
             allResourceCreatePermissionsMap);
 
       // read the post create system permissions and add to createALLPermissionsMap
