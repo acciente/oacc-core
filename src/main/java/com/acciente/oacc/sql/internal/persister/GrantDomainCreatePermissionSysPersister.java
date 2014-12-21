@@ -33,8 +33,8 @@ public class GrantDomainCreatePermissionSysPersister extends Persister {
       this.sqlStrings = sqlStrings;
    }
 
-   public Set<DomainCreatePermission> getDomainCreatePermissions(SQLConnection connection,
-                                                                 Resource accessorResource) throws AccessControlException {
+   public Set<DomainCreatePermission> getDomainCreateSysPermissionsIncludeInherited(SQLConnection connection,
+                                                                                    Resource accessorResource) throws AccessControlException {
       SQLStatement statement = null;
 
       try {
@@ -62,8 +62,8 @@ public class GrantDomainCreatePermissionSysPersister extends Persister {
       }
    }
 
-   public Set<DomainCreatePermission> getDirectDomainCreatePermissions(SQLConnection connection,
-                                                                       Resource accessorResource) throws AccessControlException {
+   public Set<DomainCreatePermission> getDomainCreateSysPermissions(SQLConnection connection,
+                                                                    Resource accessorResource) throws AccessControlException {
       SQLStatement statement = null;
 
       try {
@@ -91,10 +91,10 @@ public class GrantDomainCreatePermissionSysPersister extends Persister {
       }
    }
 
-   public void addDomainCreatePermissions(SQLConnection connection,
-                                          Resource accessorResource,
-                                          Resource grantorResource,
-                                          Set<DomainCreatePermission> domainCreatePermissions) throws AccessControlException {
+   public void addDomainCreateSysPermissions(SQLConnection connection,
+                                             Resource accessorResource,
+                                             Resource grantorResource,
+                                             Set<DomainCreatePermission> domainCreatePermissions) throws AccessControlException {
       SQLStatement statement = null;
 
       try {
@@ -118,8 +118,8 @@ public class GrantDomainCreatePermissionSysPersister extends Persister {
       }
    }
 
-   public void removeDomainCreatePermissions(SQLConnection connection,
-                                             Resource accessorResource) throws AccessControlException {
+   public void removeDomainCreateSysPermissions(SQLConnection connection,
+                                                Resource accessorResource) throws AccessControlException {
       SQLStatement statement = null;
 
       try {

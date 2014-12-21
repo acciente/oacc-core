@@ -625,7 +625,8 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
                                String parentDomainName) throws AccessControlException {
       // we need to check if the currently authenticated resource is allowed to create domains
       final Set<DomainCreatePermission> domainCreatePermissions
-            = grantDomainCreatePermissionSysPersister.getDomainCreatePermissions(connection, sessionResource);
+            = grantDomainCreatePermissionSysPersister.getDomainCreateSysPermissionsIncludeInherited(connection,
+                                                                                                    sessionResource);
 
       // if there is at least one permission, then it implies that this resource is allow to create domains
       if (domainCreatePermissions.isEmpty()) {
@@ -1157,16 +1158,16 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       // NOTE: our current data model only support system permissions for domains
 
       // revoke any existing domain system permission (*CREATE) this accessor has to this domain
-      grantDomainCreatePermissionSysPersister.removeDomainCreatePermissions(connection, accessorResource);
+      grantDomainCreatePermissionSysPersister.removeDomainCreateSysPermissions(connection, accessorResource);
       // revoke any existing domain post create system permissions this accessor has to this domain
       grantDomainCreatePermissionPostCreateSysPersister.removeDomainCreatePostCreateSysPermissions(connection,
                                                                                                    accessorResource);
 
       // add the domain system permissions (*CREATE)
-      grantDomainCreatePermissionSysPersister.addDomainCreatePermissions(connection,
-                                                                         accessorResource,
-                                                                         sessionResource,
-                                                                         requestedDomainCreatePermissions);
+      grantDomainCreatePermissionSysPersister.addDomainCreateSysPermissions(connection,
+                                                                            accessorResource,
+                                                                            sessionResource,
+                                                                            requestedDomainCreatePermissions);
       // add the domain post create system permissions
       grantDomainCreatePermissionPostCreateSysPersister.addDomainCreatePostCreateSysPermissions(connection,
                                                                                                 accessorResource,
@@ -1195,8 +1196,8 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
                                                                           Resource accessorResource) throws AccessControlException {
       final Set<DomainCreatePermission> domainCreatePermissions = new HashSet<>();
       domainCreatePermissions
-            .addAll(grantDomainCreatePermissionSysPersister.getDirectDomainCreatePermissions(connection,
-                                                                                             accessorResource));
+            .addAll(grantDomainCreatePermissionSysPersister.getDomainCreateSysPermissions(connection,
+                                                                                          accessorResource));
       domainCreatePermissions
             .addAll(grantDomainCreatePermissionPostCreateSysPersister.getDomainCreatePostCreateSysPermissions(
                   connection,
@@ -1243,8 +1244,8 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
                                                                              Resource accessorResource) throws AccessControlException {
       final Set<DomainCreatePermission> domainCreatePermissions = new HashSet<>();
       domainCreatePermissions
-            .addAll(grantDomainCreatePermissionSysPersister.getDomainCreatePermissions(connection,
-                                                                                       accessorResource));
+            .addAll(grantDomainCreatePermissionSysPersister.getDomainCreateSysPermissionsIncludeInherited(connection,
+                                                                                                          accessorResource));
       domainCreatePermissions
             .addAll(grantDomainCreatePermissionPostCreateSysPersister.getDomainCreatePostCreateSysPermissionsIncludeInherited(
                   connection,
