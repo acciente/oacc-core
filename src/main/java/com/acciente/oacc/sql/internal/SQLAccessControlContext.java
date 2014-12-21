@@ -635,8 +635,9 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
 
       // determine the post create permissions on the new domain
       final Set<DomainPermission> newDomainPermissions = __getPostCreateDomainPermissions(
-            grantDomainCreatePermissionPostCreateSysPersister.getDomainPostCreatePermissions(connection,
-                                                                                             sessionResource));
+            grantDomainCreatePermissionPostCreateSysPersister.getDomainCreatePostCreateSysPermissionsIncludeInherited(
+                  connection,
+                  sessionResource));
       // check to ensure that the requested domain name does not already exist
       if (domainPersister.getResourceDomainId(connection, domainName) != null) {
          throw new AccessControlException("Duplicate domain: " + domainName);
@@ -1158,7 +1159,8 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       // revoke any existing domain system permission (*CREATE) this accessor has to this domain
       grantDomainCreatePermissionSysPersister.removeDomainCreatePermissions(connection, accessorResource);
       // revoke any existing domain post create system permissions this accessor has to this domain
-      grantDomainCreatePermissionPostCreateSysPersister.removeDomainPostCreatePermissions(connection, accessorResource);
+      grantDomainCreatePermissionPostCreateSysPersister.removeDomainCreatePostCreateSysPermissions(connection,
+                                                                                                   accessorResource);
 
       // add the domain system permissions (*CREATE)
       grantDomainCreatePermissionSysPersister.addDomainCreatePermissions(connection,
@@ -1166,10 +1168,10 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
                                                                          sessionResource,
                                                                          requestedDomainCreatePermissions);
       // add the domain post create system permissions
-      grantDomainCreatePermissionPostCreateSysPersister.addDomainPostCreatePermissions(connection,
-                                                                                       accessorResource,
-                                                                                       sessionResource,
-                                                                                       requestedDomainCreatePermissions);
+      grantDomainCreatePermissionPostCreateSysPersister.addDomainCreatePostCreateSysPermissions(connection,
+                                                                                                accessorResource,
+                                                                                                sessionResource,
+                                                                                                requestedDomainCreatePermissions);
    }
 
    private void assertSetContainsDomainCreateSystemPermission(Set<DomainCreatePermission> domainCreatePermissions) throws AccessControlException {
@@ -1196,8 +1198,9 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
             .addAll(grantDomainCreatePermissionSysPersister.getDirectDomainCreatePermissions(connection,
                                                                                              accessorResource));
       domainCreatePermissions
-            .addAll(grantDomainCreatePermissionPostCreateSysPersister.getDirectDomainPostCreatePermissions(connection,
-                                                                                                           accessorResource));
+            .addAll(grantDomainCreatePermissionPostCreateSysPersister.getDomainCreatePostCreateSysPermissions(
+                  connection,
+                  accessorResource));
       return domainCreatePermissions;
    }
 
@@ -1243,8 +1246,9 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
             .addAll(grantDomainCreatePermissionSysPersister.getDomainCreatePermissions(connection,
                                                                                        accessorResource));
       domainCreatePermissions
-            .addAll(grantDomainCreatePermissionPostCreateSysPersister.getDomainPostCreatePermissions(connection,
-                                                                                                     accessorResource));
+            .addAll(grantDomainCreatePermissionPostCreateSysPersister.getDomainCreatePostCreateSysPermissionsIncludeInherited(
+                  connection,
+                  accessorResource));
       return collapseDomainCreatePermissions(domainCreatePermissions);
    }
 

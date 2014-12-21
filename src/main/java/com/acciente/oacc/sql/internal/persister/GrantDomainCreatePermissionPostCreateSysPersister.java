@@ -34,8 +34,8 @@ public class GrantDomainCreatePermissionPostCreateSysPersister extends Persister
       this.sqlStrings = sqlStrings;
    }
 
-   public Set<DomainCreatePermission> getDomainPostCreatePermissions(SQLConnection connection,
-                                                                     Resource accessorResource) throws AccessControlException {
+   public Set<DomainCreatePermission> getDomainCreatePostCreateSysPermissionsIncludeInherited(SQLConnection connection,
+                                                                                              Resource accessorResource) throws AccessControlException {
       SQLStatement statement = null;
 
       try {
@@ -66,8 +66,8 @@ public class GrantDomainCreatePermissionPostCreateSysPersister extends Persister
       }
    }
 
-   public Set<DomainCreatePermission> getDirectDomainPostCreatePermissions(SQLConnection connection,
-                                                                           Resource accessorResource) throws AccessControlException {
+   public Set<DomainCreatePermission> getDomainCreatePostCreateSysPermissions(SQLConnection connection,
+                                                                              Resource accessorResource) throws AccessControlException {
       SQLStatement statement = null;
 
       try {
@@ -98,8 +98,8 @@ public class GrantDomainCreatePermissionPostCreateSysPersister extends Persister
       }
    }
 
-   public void removeDomainPostCreatePermissions(SQLConnection connection,
-                                                 Resource accessorResource) throws AccessControlException {
+   public void removeDomainCreatePostCreateSysPermissions(SQLConnection connection,
+                                                          Resource accessorResource) throws AccessControlException {
       SQLStatement statement = null;
 
       try {
@@ -115,10 +115,10 @@ public class GrantDomainCreatePermissionPostCreateSysPersister extends Persister
       }
    }
 
-   public void addDomainPostCreatePermissions(SQLConnection connection,
-                                              Resource accessorResource,
-                                              Resource grantorResource,
-                                              Set<DomainCreatePermission> domainCreatePermissions) throws AccessControlException {
+   public void addDomainCreatePostCreateSysPermissions(SQLConnection connection,
+                                                       Resource accessorResource,
+                                                       Resource grantorResource,
+                                                       Set<DomainCreatePermission> domainCreatePermissions) throws AccessControlException {
       SQLStatement statement = null;
 
       try {
