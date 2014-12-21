@@ -1990,10 +1990,11 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
                                                                                                    accessedDomainId));
 
       // first collect the global non-system permissions that the accessor this resource has to the accessed resource's domain
-      resourcePermissions.addAll(grantGlobalResourcePermissionPersister.getGlobalPermissions(connection,
-                                                                                             accessorResource,
-                                                                                             accessedResourceClassId,
-                                                                                             accessedDomainId));
+      resourcePermissions.addAll(grantGlobalResourcePermissionPersister.getGlobalResourcePermissionsIncludeInherited(
+            connection,
+            accessorResource,
+            accessedResourceClassId,
+            accessedDomainId));
       return collapseResourcePermissions(resourcePermissions);
    }
 
@@ -2156,10 +2157,10 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
                                                                            domainId);
 
       // revoke any existing non-system permissions that this grantor gave this accessor to this domain to the resource class
-      grantGlobalResourcePermissionPersister.removeGlobalPermissions(connection,
-                                                                     accessorResource,
-                                                                     resourceClassId,
-                                                                     domainId);
+      grantGlobalResourcePermissionPersister.removeGlobalResourcePermissions(connection,
+                                                                             accessorResource,
+                                                                             resourceClassId,
+                                                                             domainId);
 
       // add the new system permissions
       grantGlobalResourcePermissionSysPersister.addGlobalSysPermissions(connection,
@@ -2170,12 +2171,12 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
                                                                         sessionResource);
 
       // add the new non-system permissions
-      grantGlobalResourcePermissionPersister.addGlobalPermissions(connection,
-                                                                  accessorResource,
-                                                                  resourceClassId,
-                                                                  domainId,
-                                                                  requestedResourcePermissions,
-                                                                  sessionResource);
+      grantGlobalResourcePermissionPersister.addGlobalResourcePermissions(connection,
+                                                                          accessorResource,
+                                                                          resourceClassId,
+                                                                          domainId,
+                                                                          requestedResourcePermissions,
+                                                                          sessionResource);
    }
 
    private Set<ResourcePermission> __getDirectGlobalResourcePermissions(SQLConnection connection,
@@ -2191,10 +2192,10 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
                                                                                                          domainId));
 
       // collect the global non-system permissions that the accessor has to the accessed resource class & domain directly
-      resourcePermissions.addAll(grantGlobalResourcePermissionPersister.getDirectGlobalPermissions(connection,
-                                                                                                   accessorResource,
-                                                                                                   resourceClassId,
-                                                                                                   domainId));
+      resourcePermissions.addAll(grantGlobalResourcePermissionPersister.getGlobalResourcePermissions(connection,
+                                                                                                     accessorResource,
+                                                                                                     resourceClassId,
+                                                                                                     domainId));
 
       return resourcePermissions;
    }
@@ -2319,10 +2320,11 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
                                                                                                    domainId));
 
       // first collect the non-system permissions that the accessor this resource has to the accessor resource
-      resourcePermissions.addAll(grantGlobalResourcePermissionPersister.getGlobalPermissions(connection,
-                                                                                             accessorResource,
-                                                                                             resourceClassId,
-                                                                                             domainId));
+      resourcePermissions.addAll(grantGlobalResourcePermissionPersister.getGlobalResourcePermissionsIncludeInherited(
+            connection,
+            accessorResource,
+            resourceClassId,
+            domainId));
       return collapseResourcePermissions(resourcePermissions);
    }
 
@@ -2373,7 +2375,8 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
 
       // next collect the non-system permissions that the accessor has and add it into the globalALLPermissionsMap
       mergeSourcePermissionsMapIntoTargetPermissionsMap(
-            grantGlobalResourcePermissionPersister.getGlobalPermissions(connection, accessorResource),
+            grantGlobalResourcePermissionPersister.getGlobalResourcePermissionsIncludeInherited(connection,
+                                                                                                accessorResource),
             globalALLPermissionsMap);
 
       return collapseResourcePermissions(globalALLPermissionsMap);
@@ -2893,11 +2896,12 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
                                                                                     permissionId));
 
          // get the list of objects of the specified type that the session has access to via global permissions
-         resources.addAll(grantGlobalResourcePermissionPersister.getResourcesByPermission(connection,
-                                                                                          accessorResource,
-                                                                                          resourceClassId,
-                                                                                          resourcePermission,
-                                                                                          permissionId));
+         resources.addAll(grantGlobalResourcePermissionPersister.getResourcesByGlobalResourcePermission(
+               connection,
+               accessorResource,
+               resourceClassId,
+               resourcePermission,
+               permissionId));
       }
 
       // finally get the list of objects of the specified type that the session has access to via super user permissions
@@ -3046,12 +3050,13 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
                                                                                     permissionId));
 
          // get the list of objects of the specified type that the session has access to via global permissions
-         resources.addAll(grantGlobalResourcePermissionPersister.getResourcesByPermission(connection,
-                                                                                          accessorResource,
-                                                                                          resourceClassId,
-                                                                                          domainId,
-                                                                                          resourcePermission,
-                                                                                          permissionId));
+         resources.addAll(grantGlobalResourcePermissionPersister.getResourcesByGlobalResourcePermission(
+               connection,
+               accessorResource,
+               resourceClassId,
+               domainId,
+               resourcePermission,
+               permissionId));
       }
 
       // finally get the list of objects of the specified type that the session has access to via super user permissions
