@@ -1984,10 +1984,11 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
                             .getResourceClassId());
 
       // collect the global system permissions that the accessor has to the accessed resource's domain
-      resourcePermissions.addAll(grantGlobalResourcePermissionSysPersister.getGlobalSysPermissions(connection,
-                                                                                                   accessorResource,
-                                                                                                   accessedResourceClassId,
-                                                                                                   accessedDomainId));
+      resourcePermissions.addAll(grantGlobalResourcePermissionSysPersister.getGlobalSysPermissionsIncludeInherited(
+            connection,
+            accessorResource,
+            accessedResourceClassId,
+            accessedDomainId));
 
       // first collect the global non-system permissions that the accessor this resource has to the accessed resource's domain
       resourcePermissions.addAll(grantGlobalResourcePermissionPersister.getGlobalResourcePermissionsIncludeInherited(
@@ -2186,10 +2187,10 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       Set<ResourcePermission> resourcePermissions = new HashSet<>();
 
       // collect the global system permissions that the accessor resource has to the accessed resource class & domain directly
-      resourcePermissions.addAll(grantGlobalResourcePermissionSysPersister.getDirectGlobalSysPermissions(connection,
-                                                                                                         accessorResource,
-                                                                                                         resourceClassId,
-                                                                                                         domainId));
+      resourcePermissions.addAll(grantGlobalResourcePermissionSysPersister.getGlobalSysPermissions(connection,
+                                                                                                   accessorResource,
+                                                                                                   resourceClassId,
+                                                                                                   domainId));
 
       // collect the global non-system permissions that the accessor has to the accessed resource class & domain directly
       resourcePermissions.addAll(grantGlobalResourcePermissionPersister.getGlobalResourcePermissions(connection,
@@ -2314,10 +2315,11 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       Set<ResourcePermission> resourcePermissions = new HashSet<>();
 
       // first collect the system permissions that the accessor has to the accessed resource
-      resourcePermissions.addAll(grantGlobalResourcePermissionSysPersister.getGlobalSysPermissions(connection,
-                                                                                                   accessorResource,
-                                                                                                   resourceClassId,
-                                                                                                   domainId));
+      resourcePermissions.addAll(grantGlobalResourcePermissionSysPersister.getGlobalSysPermissionsIncludeInherited(
+            connection,
+            accessorResource,
+            resourceClassId,
+            domainId));
 
       // first collect the non-system permissions that the accessor this resource has to the accessor resource
       resourcePermissions.addAll(grantGlobalResourcePermissionPersister.getGlobalResourcePermissionsIncludeInherited(
@@ -2370,7 +2372,8 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
 
       // collect the system permissions that the accessor has and add it into the globalALLPermissionsMap
       mergeSourcePermissionsMapIntoTargetPermissionsMap(
-            grantGlobalResourcePermissionSysPersister.getGlobalSysPermissions(connection, accessorResource),
+            grantGlobalResourcePermissionSysPersister.getGlobalSysPermissionsIncludeInherited(connection,
+                                                                                              accessorResource),
             globalALLPermissionsMap);
 
       // next collect the non-system permissions that the accessor has and add it into the globalALLPermissionsMap

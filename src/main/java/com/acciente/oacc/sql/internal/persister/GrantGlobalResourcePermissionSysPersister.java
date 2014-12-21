@@ -112,10 +112,10 @@ public class GrantGlobalResourcePermissionSysPersister extends Persister {
       }
    }
 
-   public Set<ResourcePermission> getGlobalSysPermissions(SQLConnection connection,
-                                                          Resource accessorResource,
-                                                          Id<ResourceClassId> resourceClassId,
-                                                          Id<DomainId> resourceDomainId) throws AccessControlException {
+   public Set<ResourcePermission> getGlobalSysPermissionsIncludeInherited(SQLConnection connection,
+                                                                          Resource accessorResource,
+                                                                          Id<ResourceClassId> resourceClassId,
+                                                                          Id<DomainId> resourceDomainId) throws AccessControlException {
       SQLStatement statement = null;
       try {
          // collect the system permissions that the accessor has to the accessed resource
@@ -147,10 +147,10 @@ public class GrantGlobalResourcePermissionSysPersister extends Persister {
       }
    }
 
-   public Set<ResourcePermission> getDirectGlobalSysPermissions(SQLConnection connection,
-                                                                Resource accessorResource,
-                                                                Id<ResourceClassId> resourceClassId,
-                                                                Id<DomainId> resourceDomainId) throws AccessControlException {
+   public Set<ResourcePermission> getGlobalSysPermissions(SQLConnection connection,
+                                                          Resource accessorResource,
+                                                          Id<ResourceClassId> resourceClassId,
+                                                          Id<DomainId> resourceDomainId) throws AccessControlException {
       SQLStatement statement = null;
       try {
          // collect the system permissions that the accessor has to the accessed resource directly
@@ -182,8 +182,8 @@ public class GrantGlobalResourcePermissionSysPersister extends Persister {
       }
    }
 
-   public Map<String, Map<String, Set<ResourcePermission>>> getGlobalSysPermissions(SQLConnection connection,
-                                                                                    Resource accessorResource)
+   public Map<String, Map<String, Set<ResourcePermission>>> getGlobalSysPermissionsIncludeInherited(SQLConnection connection,
+                                                                                                    Resource accessorResource)
          throws AccessControlException {
       SQLStatement statement = null;
       try {
