@@ -2666,9 +2666,12 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       SQLConnection connection = null;
 
       assertAuth();
+      assertResourceClassSpecified(resourceClassName);
+      assertPermissionSpecified(requestedResourcePermission);
 
       try {
          connection = getConnection();
+         resourceClassName = resourceClassName.trim();
 
          __assertGlobalPermission(connection, resourceClassName, requestedResourcePermission, sessionResourceDomainName);
       }
@@ -2687,9 +2690,14 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       SQLConnection connection = null;
 
       assertAuth();
+      assertResourceClassSpecified(resourceClassName);
+      assertPermissionSpecified(requestedResourcePermission);
+      assertDomainSpecified(domainName);
 
       try {
          connection = getConnection();
+         resourceClassName = resourceClassName.trim();
+         domainName = domainName.trim();
 
          __assertGlobalPermission(connection, resourceClassName, requestedResourcePermission, domainName);
       }
@@ -2705,13 +2713,15 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
                                          String resourceClassName,
                                          ResourcePermission requestedResourcePermission, String domainName)
          throws AccessControlException {
+      assertPermissionValid(connection, resourceClassName, requestedResourcePermission);
+
       final Set<ResourcePermission>
             globalResourcePermissions = __getEffectiveGlobalPermissions(connection,
                                                                         sessionResource,
                                                                         resourceClassName,
                                                                         domainName);
 
-      if (__containsIgnoringGrant(globalResourcePermissions, requestedResourcePermission)) {
+      if (isPermissible(requestedResourcePermission, globalResourcePermissions)) {
          return;
       }
 

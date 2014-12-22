@@ -52,6 +52,7 @@ public class TestAccessControlSuite  {
       suite.addTest(new JUnit4TestAdapter(TestAccessControl_getAccessorResourcesByResourcePermission.class));
       suite.addTest(new JUnit4TestAdapter(TestAccessControl_getAuthenticatedResource.class));
       suite.addTest(new JUnit4TestAdapter(TestAccessControl_getSessionResource.class));
+      suite.addTest(new JUnit4TestAdapter(TestAccessControl_assertGlobalResourcePermission.class));
 
       return suite;
    }
