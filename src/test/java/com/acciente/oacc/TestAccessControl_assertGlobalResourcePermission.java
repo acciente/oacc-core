@@ -386,6 +386,143 @@ public class TestAccessControl_assertGlobalResourcePermission extends TestAccess
    }
 
    @Test
+   public void assertGlobalResourcePermission_superUser_succeedsAsAuthenticatedResource() throws AccessControlException {
+      authenticateSystemResource();
+      final String parentDomainName = generateDomain();
+      final String intermediaryDomainName = generateUniqueDomainName();
+      final String accessorDomainName = generateUniqueDomainName();
+      final String otherDomainName = generateUniqueDomainName();
+      accessControlContext.createDomain(intermediaryDomainName, parentDomainName);
+      accessControlContext.createDomain(accessorDomainName, intermediaryDomainName);
+      accessControlContext.createDomain(otherDomainName, intermediaryDomainName);
+      final char[] password = generateUniquePassword();
+      final Resource accessorResource = generateAuthenticatableResource(password, accessorDomainName);
+      final String resourceClassName = generateResourceClass(false, false);
+
+      final String customPermissionName_parentDomain = generateResourceClassPermission(resourceClassName);
+      final ResourcePermission customPermission_forParentDomain
+            = ResourcePermissions.getInstance(customPermissionName_parentDomain);
+
+      final String customPermissionName_accessorDomain = generateResourceClassPermission(resourceClassName);
+      final ResourcePermission customPermission_forAccessorDomain
+            = ResourcePermissions.getInstance(customPermissionName_accessorDomain);
+
+      final String customPermissionName_otherDomain = generateResourceClassPermission(resourceClassName);
+      final ResourcePermission customPermission_forOtherDomain
+            = ResourcePermissions.getInstance(customPermissionName_otherDomain);
+
+      // setup super-user domain permissions
+      accessControlContext.setDomainPermissions(accessorResource,
+                                                parentDomainName,
+                                                setOf(DomainPermissions.getInstance(DomainPermissions.SUPER_USER)));
+
+      // authenticate accessor resource
+      accessControlContext.authenticate(accessorResource, PasswordCredentials.newInstance(password));
+
+      // verify
+      accessControlContext.assertGlobalResourcePermission(resourceClassName,
+                                                          customPermission_forParentDomain);
+
+      accessControlContext.assertGlobalResourcePermission(resourceClassName,
+                                                          customPermission_forAccessorDomain);
+
+      accessControlContext.assertGlobalResourcePermission(resourceClassName,
+                                                          customPermission_forParentDomain,
+                                                          parentDomainName);
+
+      accessControlContext.assertGlobalResourcePermission(resourceClassName,
+                                                          customPermission_forParentDomain,
+                                                          intermediaryDomainName);
+
+      accessControlContext.assertGlobalResourcePermission(resourceClassName,
+                                                          customPermission_forParentDomain,
+                                                          accessorDomainName);
+
+      accessControlContext.assertGlobalResourcePermission(resourceClassName,
+                                                          customPermission_forAccessorDomain,
+                                                          accessorDomainName);
+
+      accessControlContext.assertGlobalResourcePermission(resourceClassName,
+                                                          customPermission_forOtherDomain,
+                                                          otherDomainName);
+
+      accessControlContext.assertGlobalResourcePermission(resourceClassName,
+                                                          customPermission_forParentDomain,
+                                                          otherDomainName);
+   }
+
+   @Test
+   public void assertGlobalResourcePermission_superUserInherited_succeedsAsAuthenticatedResource() throws AccessControlException {
+      authenticateSystemResource();
+      final String parentDomainName = generateDomain();
+      final String intermediaryDomainName = generateUniqueDomainName();
+      final String accessorDomainName = generateUniqueDomainName();
+      final String otherDomainName = generateUniqueDomainName();
+      accessControlContext.createDomain(intermediaryDomainName, parentDomainName);
+      accessControlContext.createDomain(accessorDomainName, intermediaryDomainName);
+      accessControlContext.createDomain(otherDomainName, intermediaryDomainName);
+      final char[] password = generateUniquePassword();
+      final Resource accessorResource = generateAuthenticatableResource(password, accessorDomainName);
+      final String resourceClassName = generateResourceClass(false, false);
+
+      final String customPermissionName_parentDomain = generateResourceClassPermission(resourceClassName);
+      final ResourcePermission customPermission_forParentDomain
+            = ResourcePermissions.getInstance(customPermissionName_parentDomain);
+
+      final String customPermissionName_accessorDomain = generateResourceClassPermission(resourceClassName);
+      final ResourcePermission customPermission_forAccessorDomain
+            = ResourcePermissions.getInstance(customPermissionName_accessorDomain);
+
+      final String customPermissionName_otherDomain = generateResourceClassPermission(resourceClassName);
+      final ResourcePermission customPermission_forOtherDomain
+            = ResourcePermissions.getInstance(customPermissionName_otherDomain);
+
+      // setup super-user domain permissions
+      final Resource donorResource = generateAuthenticatableResource(password, accessorDomainName);
+      accessControlContext.setDomainPermissions(donorResource,
+                                                parentDomainName,
+                                                setOf(DomainPermissions.getInstance(DomainPermissions.SUPER_USER)));
+
+      // setup accessor --INHERIT-> donor
+      accessControlContext.setResourcePermissions(accessorResource,
+                                                  donorResource,
+                                                  setOf(ResourcePermissions.getInstance(ResourcePermissions.INHERIT)));
+      // authenticate accessor resource
+      accessControlContext.authenticate(accessorResource, PasswordCredentials.newInstance(password));
+
+      // verify
+      accessControlContext.assertGlobalResourcePermission(resourceClassName,
+                                                          customPermission_forParentDomain);
+
+      accessControlContext.assertGlobalResourcePermission(resourceClassName,
+                                                          customPermission_forAccessorDomain);
+
+      accessControlContext.assertGlobalResourcePermission(resourceClassName,
+                                                          customPermission_forParentDomain,
+                                                          parentDomainName);
+
+      accessControlContext.assertGlobalResourcePermission(resourceClassName,
+                                                          customPermission_forParentDomain,
+                                                          intermediaryDomainName);
+
+      accessControlContext.assertGlobalResourcePermission(resourceClassName,
+                                                          customPermission_forParentDomain,
+                                                          accessorDomainName);
+
+      accessControlContext.assertGlobalResourcePermission(resourceClassName,
+                                                          customPermission_forAccessorDomain,
+                                                          accessorDomainName);
+
+      accessControlContext.assertGlobalResourcePermission(resourceClassName,
+                                                          customPermission_forOtherDomain,
+                                                          otherDomainName);
+
+      accessControlContext.assertGlobalResourcePermission(resourceClassName,
+                                                          customPermission_forParentDomain,
+                                                          otherDomainName);
+   }
+
+   @Test
    public void assertGlobalResourcePermission_whitespaceConsistent() throws AccessControlException {
       authenticateSystemResource();
       // setup permission without granting it to anything
