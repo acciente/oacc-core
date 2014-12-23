@@ -645,6 +645,68 @@ public class TestAccessControl_assertPostCreateResourcePermission extends TestAc
    }
 
    @Test
+   public void assertPostCreateResourcePermission_superUser_succeedsAsAuthenticatedResource() throws AccessControlException {
+      authenticateSystemResource();
+
+      final String resourceClassName = generateResourceClass(false, false);
+      final String customPermissionName = generateResourceClassPermission(resourceClassName);
+      final ResourcePermission globalResourcePermission = ResourcePermissions.getInstance(customPermissionName);
+      final char[] password = generateUniquePassword();
+      final Resource accessorResource = generateAuthenticatableResource(password);
+      final String accessorDomainName = accessControlContext.getDomainNameByResource(accessorResource);
+
+      // setup super-user domain permission
+      accessControlContext.setDomainPermissions(accessorResource,
+                                                accessorDomainName,
+                                                setOf(DomainPermissions.getInstance(DomainPermissions.SUPER_USER)));
+
+      // authenticate accessor/creator resource
+      accessControlContext.authenticate(accessorResource, PasswordCredentials.newInstance(password));
+
+      // verify
+      accessControlContext.assertPostCreateResourcePermission(resourceClassName,
+                                                              globalResourcePermission);
+
+      accessControlContext.assertPostCreateResourcePermission(resourceClassName,
+                                                              globalResourcePermission,
+                                                              accessorDomainName);
+   }
+
+   @Test
+   public void assertPostCreateResourcePermission_superUserInherited_succeedsAsAuthenticatedResource() throws AccessControlException {
+      authenticateSystemResource();
+
+      final String resourceClassName = generateResourceClass(false, false);
+      final String customPermissionName = generateResourceClassPermission(resourceClassName);
+      final ResourcePermission globalResourcePermission = ResourcePermissions.getInstance(customPermissionName);
+      final char[] password = generateUniquePassword();
+      final Resource accessorResource = generateAuthenticatableResource(password);
+      final String accessorDomainName = accessControlContext.getDomainNameByResource(accessorResource);
+
+      // setup super-user domain permission
+      final Resource donorResource = generateUnauthenticatableResource();
+      accessControlContext.setDomainPermissions(donorResource,
+                                                accessorDomainName,
+                                                setOf(DomainPermissions.getInstance(DomainPermissions.SUPER_USER)));
+
+      // setup accessor --INHERIT-> donor
+      accessControlContext.setResourcePermissions(accessorResource,
+                                                  donorResource,
+                                                  setOf(ResourcePermissions.getInstance(ResourcePermissions.INHERIT)));
+
+      // authenticate accessor/creator resource
+      accessControlContext.authenticate(accessorResource, PasswordCredentials.newInstance(password));
+
+      // verify
+      accessControlContext.assertPostCreateResourcePermission(resourceClassName,
+                                                              globalResourcePermission);
+
+      accessControlContext.assertPostCreateResourcePermission(resourceClassName,
+                                                              globalResourcePermission,
+                                                              accessorDomainName);
+   }
+
+   @Test
    public void assertPostCreateResourcePermission_whitespaceConsistent() throws AccessControlException {
       authenticateSystemResource();
       // setup permission without granting it to anything
