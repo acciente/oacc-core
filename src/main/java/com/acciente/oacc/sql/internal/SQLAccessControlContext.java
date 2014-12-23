@@ -2740,22 +2740,17 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       SQLConnection connection = null;
 
       assertAuth();
+      assertResourceSpecified(accessedResource);
+      assertPermissionSpecified(requestedResourcePermission);
 
       try {
          connection = getConnection();
 
          if (!__hasPermission(connection, sessionResource, accessedResource, requestedResourcePermission)) {
             // if none of the above then complain...
-            if (sessionResource.equals(sessionResource)) {
-               throw new AccessControlException("Current resource does not have requested permission: "
-                                                + requestedResourcePermission,
-                                          true);
-            }
-            else {
-               throw new AccessControlException("Resource " + sessionResource + " does not have requested permission: "
-                                                + requestedResourcePermission,
-                                          true);
-            }
+            throw new AccessControlException("Current resource " + sessionResource + " does not have requested permission: "
+                                                   + requestedResourcePermission,
+                                             true);
          }
       }
       catch (SQLException e) {
@@ -2774,6 +2769,9 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       SQLConnection connection = null;
 
       assertAuth();
+      assertResourceSpecified(accessorResource);
+      assertResourceSpecified(accessedResource);
+      assertPermissionSpecified(requestedResourcePermission);
 
       try {
          connection = getConnection();
@@ -2781,7 +2779,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
          if (!__hasPermission(connection, accessorResource, accessedResource, requestedResourcePermission)) {
             // if none of the above then complain...
             if (sessionResource.equals(accessorResource)) {
-               throw new AccessControlException("Current resource does not have requested permission: "
+               throw new AccessControlException("Current resource " + sessionResource + " does not have requested permission: "
                                                 + requestedResourcePermission,
                                           true);
             }
@@ -2806,39 +2804,24 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
                                    ResourcePermission requestedResourcePermission)
          throws AccessControlException, SQLException {
       // first check for direct resource permissions
-      if (__containsIgnoringGrant(__getEffectiveResourcePermissions(connection, accessorResource, accessedResource),
-                                  requestedResourcePermission)) {
+      if (isPermissible(requestedResourcePermission,
+                        __getEffectiveResourcePermissions(connection, accessorResource, accessedResource))) {
          return true;
       }
 
       // next check for global permissions to the domain of the accessed resource
-      final String
-            resourceClassName = resourceClassPersister.getResourceClassInfoByResourceId(connection,
-                                                                                        accessedResource).getResourceClassName();
-      final String
-            domainName = domainPersister.getResourceDomainNameByResourceId(connection, accessedResource);
+      final String resourceClassName
+            = resourceClassPersister.getResourceClassInfoByResourceId(connection, accessedResource).getResourceClassName();
+      final String domainName
+            = domainPersister.getResourceDomainNameByResourceId(connection, accessedResource);
 
-      if (__containsIgnoringGrant(__getEffectiveGlobalPermissions(connection,
-                                                                  accessorResource,
-                                                                  resourceClassName,
-                                                                  domainName),
-                                  requestedResourcePermission)) {
+      if (isPermissible(requestedResourcePermission,
+                        __getEffectiveGlobalPermissions(connection, accessorResource, resourceClassName, domainName))) {
          return true;
       }
 
       if (__isSuperUserOfDomain(connection, domainName)) {
          return true;
-      }
-
-      return false;
-   }
-
-   private boolean __containsIgnoringGrant(Set<ResourcePermission> resourcePermissions,
-                                           ResourcePermission checkResourcePermission) {
-      for (ResourcePermission resourcePermission : resourcePermissions) {
-         if (resourcePermission.equalsIgnoreGrant(checkResourcePermission)) {
-            return true;
-         }
       }
 
       return false;
