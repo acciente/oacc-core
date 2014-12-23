@@ -2489,6 +2489,11 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
          connection = getConnection();
 
          final ResourceClassInternalInfo resourceClassInternalInfo = resourceClassPersister.getResourceClassInfo(connection, resourceClassName);
+
+         if (resourceClassInternalInfo == null) {
+            throw new AccessControlException("Could not find resource class: " + resourceClassName);
+         }
+
          return new ResourceClassInfo(resourceClassInternalInfo.getResourceClassName(),
                                       resourceClassInternalInfo.isAuthenticatable(),
                                       resourceClassInternalInfo.isUnauthenticatedCreateAllowed());
