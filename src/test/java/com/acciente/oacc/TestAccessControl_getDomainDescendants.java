@@ -35,6 +35,61 @@ public class TestAccessControl_getDomainDescendants extends TestAccessControlBas
    }
 
    @Test
+   public void getDomainDescendents_validAsAuthenticatedResource() throws AccessControlException {
+      authenticateSystemResource();
+
+      final char[] password = generateUniquePassword();
+      final String domainName = generateDomain();
+      final Resource accessorResource = generateAuthenticatableResource(password, domainName);
+
+      // authenticate and verify
+      accessControlContext.authenticate(accessorResource, PasswordCredentials.newInstance(password));
+
+      final String sysDomainName = accessControlContext.getDomainNameByResource(SYS_RESOURCE);
+      assertThat(accessControlContext.getDomainDescendants(sysDomainName), is(setOf(sysDomainName)));
+
+      final String accessorDomainName = accessControlContext.getDomainNameByResource(accessorResource);
+      assertThat(accessControlContext.getDomainDescendants(accessorDomainName), is(setOf(domainName)));
+   }
+
+   @Test
+   public void getDomainDescendents_hierarchy_succeedsAsAuthenticatedResource() throws AccessControlException {
+      authenticateSystemResource();
+
+      final char[] password = generateUniquePassword();
+      final Resource accessorResource = generateAuthenticatableResource(password);
+
+      final String parentDomain = generateDomain();
+      final String childDomain_1 = generateUniqueDomainName();
+      final String childDomain_2 = generateUniqueDomainName();
+      final String grandChildDomain_1 = generateUniqueDomainName();
+      final String grandChildDomain_2 = generateUniqueDomainName();
+
+      accessControlContext.createDomain(childDomain_1, parentDomain);
+      accessControlContext.createDomain(childDomain_2, parentDomain);
+      accessControlContext.createDomain(grandChildDomain_1, childDomain_2);
+      accessControlContext.createDomain(grandChildDomain_2, childDomain_2);
+
+      // authenticate and verify
+      accessControlContext.authenticate(accessorResource, PasswordCredentials.newInstance(password));
+
+      assertThat(accessControlContext.getDomainDescendants(parentDomain),
+                 is(setOf(parentDomain, childDomain_1, childDomain_2, grandChildDomain_1, grandChildDomain_2)));
+
+      assertThat(accessControlContext.getDomainDescendants(childDomain_1),
+                 is(setOf(childDomain_1)));
+
+      assertThat(accessControlContext.getDomainDescendants(childDomain_2),
+                 is(setOf(childDomain_2, grandChildDomain_1, grandChildDomain_2)));
+
+      assertThat(accessControlContext.getDomainDescendants(grandChildDomain_1),
+                 is(setOf(grandChildDomain_1)));
+
+      assertThat(accessControlContext.getDomainDescendants(grandChildDomain_2),
+                 is(setOf(grandChildDomain_2)));
+   }
+
+   @Test
    public void getDomainDescendents_whitespaceConsistent() throws AccessControlException {
       authenticateSystemResource();
 
@@ -64,6 +119,4 @@ public class TestAccessControl_getDomainDescendants extends TestAccessControlBas
          assertThat(e.getMessage().toLowerCase(), containsString("domain required"));
       }
    }
-
-   // todo: still need to test: sysdomain, leaf domain, non-leaf domain
 }
