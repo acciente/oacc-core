@@ -349,6 +349,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       SQLConnection connection = null;
 
       assertAuth();
+      assertResourceSpecified(resource);
 
       try {
          connection = getConnection();
@@ -377,8 +378,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       if (!resourceClassInternalInfo.isAuthenticatable()) {
          throw new AccessControlException(resource
                                           + " is not of an authenticatable type, type: "
-                                          + resourceClassInternalInfo.getResourceClassName(),
-                                    true);
+                                          + resourceClassInternalInfo.getResourceClassName());
       }
 
       boolean impersonatePermissionOK = false;
@@ -410,7 +410,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
 
       if (!impersonatePermissionOK) {
          // finally check for super user permissions
-         if (__isSuperUserOfResource(connection, resource)) {
+         if (__isSuperUserOfResource(connection, authenticatedResource, resource)) {
             impersonatePermissionOK = true;
          }
       }
@@ -3213,9 +3213,25 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
    }
 
    private boolean __isSuperUserOfDomain(SQLConnection connection, String domainName) throws AccessControlException {
+      return __isSuperUserOfDomain(connection, sessionResource, domainName);
+   }
+
+   private boolean __isSuperUserOfResource(SQLConnection connection,
+                                           Resource accessorResource,
+                                           Resource accessedResource) throws AccessControlException {
+      final String accessedResourceDomain
+            = domainPersister.getResourceDomainNameByResourceId(connection, accessedResource);
+
+      return __isSuperUserOfDomain(connection, accessorResource, accessedResourceDomain);
+   }
+
+
+   private boolean __isSuperUserOfDomain(SQLConnection connection,
+                                         Resource accessorResource,
+                                         String queriedDomain) throws AccessControlException {
       Set<DomainPermission> domainPermissions = __getEffectiveDomainPermissions(connection,
-                                                                                sessionResource,
-                                                                                domainName);
+                                                                                accessorResource,
+                                                                                queriedDomain);
 
       return domainPermissions.contains(DomainPermission_SUPER_USER)
             || domainPermissions.contains(DomainPermission_SUPER_USER_GRANT);

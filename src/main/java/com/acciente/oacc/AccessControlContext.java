@@ -86,8 +86,8 @@ public interface AccessControlContext {
     * <p/>
     * The currently authenticated resource has to have IMPERSONATE permissions to the specified resource.
     * <p/>
-    * Note that this method itself will use the credentials of the originally authenticated resource,
-    * and not those of any currently impersonated resource.
+    * Note that this method is idempotent and will use the authorization credentials of
+    * the originally authenticated resource, and not those of any currently impersonated resource.
     *
     * @param resource the resource to be impersonated
     * @throws AccessControlException if an error occurs
