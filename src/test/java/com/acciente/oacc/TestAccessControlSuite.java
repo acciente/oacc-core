@@ -57,6 +57,7 @@ public class TestAccessControlSuite  {
       suite.addTest(new JUnit4TestAdapter(TestAccessControl_getResourceClassInfo.class));
       suite.addTest(new JUnit4TestAdapter(TestAccessControl_getResourceClassInfoByResource.class));
       suite.addTest(new JUnit4TestAdapter(TestAccessControl_getResourceClassNames.class));
+      suite.addTest(new JUnit4TestAdapter(TestAccessControl_getDomainNameByResource.class));
 
       return suite;
    }
