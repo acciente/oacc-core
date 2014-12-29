@@ -75,8 +75,10 @@ public interface AccessControlContext {
 
    /**
     * Logs out of this session, to be specific, disassociates any security credentials from this session.
+    * <p/>
+    * If no resource is currently authenticated, this call has no effect.
     *
-    * @throws AccessControlException if no resource is currently authenticated, or if an error occurs
+    * @throws AccessControlException if an error occurs
     */
    public void unauthenticate()
          throws AccessControlException;

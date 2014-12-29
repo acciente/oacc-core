@@ -21,7 +21,10 @@ import com.acciente.oacc.helper.Constants;
 import org.junit.Test;
 
 import static org.hamcrest.CoreMatchers.containsString;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.fail;
 
 public class TestAccessControl_unauthenticate extends TestAccessControlBase {
    @Test
@@ -29,19 +32,32 @@ public class TestAccessControl_unauthenticate extends TestAccessControlBase {
       accessControlContext.authenticate(getSystemResource(),
                                         PasswordCredentials.newInstance(Constants.OACC_ROOT_PWD));
 
+      assertThat(accessControlContext.getAuthenticatedResource(), is(SYS_RESOURCE));
+      assertThat(accessControlContext.getSessionResource(), is(SYS_RESOURCE));
+
       // unauthenticate and verify
       accessControlContext.unauthenticate();
+
+      // the current contract specifies the getting authenticated or session resources should fail when unauthenticated
+//      assertThat(accessControlContext.getAuthenticatedResource(), is(nullValue()));
+//      assertThat(accessControlContext.getSessionResource(), is(nullValue()));
       try {
          accessControlContext.getAuthenticatedResource();
+         fail("calling getAuthenticatedResource() from an unauthenticated context should have failed");
       }
       catch (AccessControlException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("not authenticated"));
       }
+
       try {
          accessControlContext.getSessionResource();
+         fail("calling getSessionResource() from an unauthenticated context should have failed");
       }
       catch (AccessControlException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("not authenticated"));
       }
+
+      // check idempotency
+      accessControlContext.unauthenticate();
    }
 }
