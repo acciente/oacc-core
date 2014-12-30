@@ -18,7 +18,6 @@
 package com.acciente.oacc;
 
 import com.acciente.oacc.helper.Constants;
-import org.junit.Assert;
 import org.junit.Test;
 
 import java.sql.SQLException;
@@ -28,97 +27,137 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.fail;
 
 public class TestAccessControl_authenticate extends TestAccessControlBase {
    @Test
    public void authenticateSystemUser_validPwd_shouldSucceed() throws AccessControlException {
-      Resource systemAuthResource = getSystemResource();
-      accessControlContext.authenticate(systemAuthResource,
+      accessControlContext.authenticate(SYS_RESOURCE,
                                         PasswordCredentials.newInstance(Constants.OACC_ROOT_PWD));
-      assertThat(accessControlContext.getAuthenticatedResource(), is(systemAuthResource));
-      assertThat(accessControlContext.getSessionResource(), is(systemAuthResource));
+      assertThat(accessControlContext.getAuthenticatedResource(), is(SYS_RESOURCE));
+      assertThat(accessControlContext.getSessionResource(), is(SYS_RESOURCE));
 
-      assertThat(accessControlContext.getResourceClassInfoByResource(systemAuthResource), is(not(nullValue())));
+      assertThat(accessControlContext.getResourceClassInfoByResource(SYS_RESOURCE), is(not(nullValue())));
    }
 
    @Test
    public void authenticateSystemUser_reAuthenticate_shouldSucceed() throws AccessControlException {
-      Resource systemAuthResource = getSystemResource();
-      accessControlContext.authenticate(systemAuthResource,
+      accessControlContext.authenticate(SYS_RESOURCE,
                                         PasswordCredentials.newInstance(Constants.OACC_ROOT_PWD));
       // authenticate again
-      accessControlContext.authenticate(systemAuthResource,
+      accessControlContext.authenticate(SYS_RESOURCE,
                                         PasswordCredentials.newInstance(Constants.OACC_ROOT_PWD));
-      assertThat(accessControlContext.getAuthenticatedResource(), is(systemAuthResource));
-      assertThat(accessControlContext.getSessionResource(), is(systemAuthResource));
+      assertThat(accessControlContext.getAuthenticatedResource(), is(SYS_RESOURCE));
+      assertThat(accessControlContext.getSessionResource(), is(SYS_RESOURCE));
+   }
 
-      // todo: impersonate, then re-authenticate and ensure sessionResource got reset
+   @Test
+   public void authenticateSystemUser_reAuthenticateAfterImpersonate_shouldSucceed() throws AccessControlException {
+      accessControlContext.authenticate(SYS_RESOURCE,
+                                        PasswordCredentials.newInstance(Constants.OACC_ROOT_PWD));
+
+      // impersonate
+      accessControlContext.impersonate(generateAuthenticatableResource(generateUniquePassword()));
+
+      // authenticate again
+      accessControlContext.authenticate(SYS_RESOURCE,
+                                        PasswordCredentials.newInstance(Constants.OACC_ROOT_PWD));
+      assertThat(accessControlContext.getAuthenticatedResource(), is(SYS_RESOURCE));
+      assertThat(accessControlContext.getSessionResource(), is(SYS_RESOURCE));
    }
 
    @Test
    public void authenticateSystemUser_invalidPwd_shouldFail() throws SQLException, InterruptedException {
-      Resource oSysAuthResource = getSystemResource();
       try {
-         accessControlContext.authenticate(oSysAuthResource,
+         accessControlContext.authenticate(SYS_RESOURCE,
                                            PasswordCredentials.newInstance("invalid".toCharArray()));
-         Assert.fail("authentication of system resource with invalid password should not have succeeded");
+         fail("authentication of system resource with invalid password should not have succeeded");
       }
       catch (AccessControlException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("invalid password"));
       }
 
       try {
-         accessControlContext.authenticate(oSysAuthResource, PasswordCredentials.newInstance("".toCharArray()));
-         Assert.fail("authentication of system resource with invalid empty password should not have succeeded");
+         accessControlContext.authenticate(SYS_RESOURCE, PasswordCredentials.newInstance("".toCharArray()));
+         fail("authentication of system resource with invalid empty password should not have succeeded");
       }
       catch (AccessControlException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("invalid password"));
       }
 
       try {
-         accessControlContext.authenticate(oSysAuthResource, PasswordCredentials.newInstance(" \t".toCharArray()));
-         Assert.fail("authentication of system resource with invalid blank password should not have succeeded");
+         accessControlContext.authenticate(SYS_RESOURCE, PasswordCredentials.newInstance(" \t".toCharArray()));
+         fail("authentication of system resource with invalid blank password should not have succeeded");
       }
       catch (AccessControlException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("invalid password"));
       }
    }
 
-   // todo: test passwords are whitespace- and case-sensitive
+   @Test
+   public void authenticate_whitespaceAndCaseSensitivePasswords() throws SQLException, InterruptedException, AccessControlException {
+      final String oaccRootPwd = new String(Constants.OACC_ROOT_PWD);
+      final String oaccRootPwd_whitespaced = " " + oaccRootPwd + "\t";
+      final String oaccRootPwd_mixedCase
+            = oaccRootPwd.toLowerCase().substring(0, oaccRootPwd.length()/2)
+            + oaccRootPwd.toUpperCase().substring(oaccRootPwd.length()/2);
+
+      // ensure the passwords variations are sound
+      assertThat(oaccRootPwd.toLowerCase(), is(oaccRootPwd_mixedCase.toLowerCase()));
+      accessControlContext.authenticate(SYS_RESOURCE,
+                                        PasswordCredentials.newInstance(oaccRootPwd.toCharArray()));
+
+      // verify
+      try {
+         accessControlContext.authenticate(SYS_RESOURCE,
+                                           PasswordCredentials.newInstance(oaccRootPwd_whitespaced.toCharArray()));
+         fail("authentication of sys resource with whitespaced password should not have succeeded");
+      }
+      catch (AccessControlException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("invalid password"));
+      }
+      try {
+         accessControlContext.authenticate(SYS_RESOURCE,
+                                           PasswordCredentials.newInstance(oaccRootPwd_mixedCase.toCharArray()));
+         fail("authentication of sys resource with different cased password should not have succeeded");
+      }
+      catch (AccessControlException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("invalid password"));
+      }
+   }
 
    @Test
    public void authenticateSystemUser_nulls() throws SQLException, InterruptedException, AccessControlException {
       try {
          accessControlContext.authenticate(null, PasswordCredentials.newInstance(null));
-         Assert.fail("authentication of null-resource should not have succeeded");
+         fail("authentication of null-resource should not have succeeded");
       }
       catch (AccessControlException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("resource required, none specified"));
       }
       try {
          accessControlContext.authenticate(getSystemResource(), null);
-         Assert.fail("authentication of system resource with null password credentials should not have succeeded");
+         fail("authentication of system resource with null password credentials should not have succeeded");
       }
       catch (AccessControlException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("credentials required, none specified"));
       }
       try {
          accessControlContext.authenticate(getSystemResource(), PasswordCredentials.newInstance(null));
-         Assert.fail("authentication of system resource with null password should not have succeeded");
+         fail("authentication of system resource with null password should not have succeeded");
       }
       catch (AccessControlException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("password required, none specified"));
       }
    }
 
-   // todo: temporarily ignored until setupScenario() can handle createPermissions for nested domains
    @Test
    public void authenticate_unauthenticatableResource_shouldFail() throws InterruptedException, AccessControlException, SQLException {
       Resource unauthenticatableResource = generateUnauthenticatableResource();
       try {
          accessControlContext.authenticate(unauthenticatableResource,
                                            PasswordCredentials.newInstance("any_password".toCharArray()));
-         Assert.fail("authentication of unauthenticatable resource should not have succeeded");
+         fail("authentication of unauthenticatable resource should not have succeeded");
       }
       catch (AccessControlException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("is not of an authenticatable type"));
