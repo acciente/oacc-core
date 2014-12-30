@@ -128,7 +128,7 @@ public class TestAccessControlBase {
    }
 
    public static String generateUniqueDomainName() {
-      return "rd_" + generateUniqueID();
+      return "d_" + generateUniqueID();
    }
 
    public static String generateUniqueResourceClassName() {
@@ -156,33 +156,33 @@ public class TestAccessControlBase {
       return authenticatableResource;
    }
 
-   protected Resource generateAuthenticatableResource(char[] password) throws AccessControlException {
+   protected static Resource generateAuthenticatableResource(char[] password) throws AccessControlException {
       authenticateSystemAccessControlContext();
       return systemAccessControlContext.createResource(generateResourceClass(true, false),
                                                        generateDomain(),
                                                        PasswordCredentials.newInstance(password));
    }
 
-   protected Resource generateAuthenticatableResource(char[] password, String domainName) throws AccessControlException {
+   protected static Resource generateAuthenticatableResource(char[] password, String domainName) throws AccessControlException {
       authenticateSystemAccessControlContext();
       return systemAccessControlContext.createResource(generateResourceClass(true, false),
                                                        domainName,
                                                        PasswordCredentials.newInstance(password));
    }
 
-   protected Resource generateUnauthenticatableResource() throws AccessControlException {
+   protected static Resource generateUnauthenticatableResource() throws AccessControlException {
       authenticateSystemAccessControlContext();
       return systemAccessControlContext.createResource(generateResourceClass(false, true), generateDomain());
    }
 
-   protected String generateResourceClassSingleton(String domainName) throws AccessControlException {
+   protected static String generateResourceClassSingleton(String domainName) throws AccessControlException {
       authenticateSystemAccessControlContext();
       final String resourceClassName = generateResourceClass(false, true);
       systemAccessControlContext.createResource(resourceClassName, domainName);
       return resourceClassName;
    }
 
-   protected void grantDomainCreatePermission(Resource accessorResource) throws AccessControlException {
+   protected static void grantDomainCreatePermission(Resource accessorResource) throws AccessControlException {
       authenticateSystemAccessControlContext();
       Set<DomainCreatePermission> domainCreatePermissions = new HashSet<>();
       domainCreatePermissions.add(DomainCreatePermissions.getInstance(DomainCreatePermissions.CREATE,
@@ -191,7 +191,7 @@ public class TestAccessControlBase {
       systemAccessControlContext.setDomainCreatePermissions(accessorResource, domainCreatePermissions);
    }
 
-   protected void grantDomainAndChildCreatePermission(Resource accessorResource) throws AccessControlException {
+   protected static void grantDomainAndChildCreatePermission(Resource accessorResource) throws AccessControlException {
       authenticateSystemAccessControlContext();
       Set<DomainCreatePermission> domainCreatePermissions = new HashSet<>();
       domainCreatePermissions.add(DomainCreatePermissions.getInstance(DomainCreatePermissions.CREATE,
@@ -202,7 +202,7 @@ public class TestAccessControlBase {
       systemAccessControlContext.setDomainCreatePermissions(accessorResource, domainCreatePermissions);
    }
 
-   protected void grantResourceCreatePermission(Resource accessorResource,
+   protected static void grantResourceCreatePermission(Resource accessorResource,
                                                 String resourceClassName,
                                                 String domainName,
                                                 String... permissionNames) throws AccessControlException {
@@ -223,7 +223,7 @@ public class TestAccessControlBase {
                                                               domainName);
    }
 
-   protected void grantResourceCreatePermission(Resource accessorResource,
+   protected static void grantResourceCreatePermission(Resource accessorResource,
                                                 String resourceClassName,
                                                 String domainName,
                                                 ResourceCreatePermission firstCreatePermission,
