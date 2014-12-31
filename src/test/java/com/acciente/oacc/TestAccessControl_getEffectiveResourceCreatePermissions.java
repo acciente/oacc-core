@@ -692,10 +692,28 @@ public class TestAccessControl_getEffectiveResourceCreatePermissions extends Tes
          accessControlContext.getEffectiveResourceCreatePermissionsMap(null);
          fail("getting create permissions with null accessor resource should have failed");
       }
-      catch (NullPointerException e) {
+      catch (AccessControlException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("resource required"));
       }
 
       final Resource accessorResource = generateUnauthenticatableResource();
+      final String resourceClassName = generateResourceClass(false, false);
+      final String domainName = generateDomain();
+      try {
+         accessControlContext.getEffectiveResourceCreatePermissions(null, resourceClassName);
+         fail("getting create permissions with null resource class name should have failed");
+      }
+      catch (AccessControlException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("resource required"));
+      }
+      try {
+         accessControlContext.getEffectiveResourceCreatePermissions(null, resourceClassName, domainName);
+         fail("getting create permissions with null resource class name should have failed");
+      }
+      catch (AccessControlException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("resource required"));
+      }
+
       try {
          accessControlContext.getEffectiveResourceCreatePermissions(accessorResource, null);
          fail("getting create permissions with null resource class name should have failed");
@@ -703,8 +721,14 @@ public class TestAccessControl_getEffectiveResourceCreatePermissions extends Tes
       catch (AccessControlException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("resource class required"));
       }
+      try {
+         accessControlContext.getEffectiveResourceCreatePermissions(accessorResource, null, domainName);
+         fail("getting create permissions with null resource class name should have failed");
+      }
+      catch (AccessControlException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("resource class required"));
+      }
 
-      final String resourceClassName = generateResourceClass(false, false);
       try {
          accessControlContext.getEffectiveResourceCreatePermissions(accessorResource, resourceClassName, null);
          fail("getting create permissions with null domain name should have failed");

@@ -344,13 +344,15 @@ public class TestAccessControl_getEffectiveDomainPermissions extends TestAccessC
       try {
          accessControlContext.getEffectiveDomainPermissionsMap(null);
       }
-      catch (NullPointerException e) {
+      catch (AccessControlException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("resource required"));
       }
 
       try {
          accessControlContext.getEffectiveDomainPermissions(null, generateDomain());
       }
-      catch (NullPointerException e) {
+      catch (AccessControlException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("resource required"));
       }
 
       try {

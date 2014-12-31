@@ -620,18 +620,68 @@ public class TestAccessControl_setGlobalResourcePermissions extends TestAccessCo
 
       // attempt to set global permissions with null references
       try {
+         accessControlContext.setGlobalResourcePermissions(null, resourceClassName, permissions_valid);
+         fail("setting permissions for null accessor resource should have failed");
+      }
+      catch (AccessControlException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("resource required"));
+      }
+      try {
          accessControlContext.setGlobalResourcePermissions(null, resourceClassName, permissions_valid, domainName);
          fail("setting permissions for null accessor resource should have failed");
       }
-      catch (NullPointerException e) {
+      catch (AccessControlException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("resource required"));
       }
 
+      try {
+         accessControlContext.setGlobalResourcePermissions(accessorResource, null, permissions_valid);
+         fail("setting permissions for null resource class name should have failed");
+      }
+      catch (AccessControlException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("resource class required"));
+      }
       try {
          accessControlContext.setGlobalResourcePermissions(accessorResource, null, permissions_valid, domainName);
          fail("setting permissions for null resource class name should have failed");
       }
       catch (AccessControlException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("resource class required"));
+      }
+
+      try {
+         accessControlContext.setGlobalResourcePermissions(accessorResource, resourceClassName, null);
+         fail("setting permissions with null permission set should have failed");
+      }
+      catch (AccessControlException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("permissions required"));
+      }
+      try {
+         accessControlContext.setGlobalResourcePermissions(accessorResource, resourceClassName, null, domainName);
+         fail("setting permissions with null permission set should have failed");
+      }
+      catch (AccessControlException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("permissions required"));
+      }
+
+      try {
+         accessControlContext.setGlobalResourcePermissions(accessorResource,
+                                                           resourceClassName,
+                                                           permissions_nullElement);
+         fail("setting permissions with null permission should have failed");
+      }
+      catch (AccessControlException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("set of permissions contains null element"));
+      }
+      try {
+         accessControlContext.setGlobalResourcePermissions(accessorResource,
+                                                           resourceClassName,
+                                                           permissions_nullElement,
+                                                           domainName);
+         fail("setting permissions with null permission should have failed");
+      }
+      catch (AccessControlException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("set of permissions contains null element"));
       }
 
       try {
@@ -642,22 +692,6 @@ public class TestAccessControl_setGlobalResourcePermissions extends TestAccessCo
          assertThat(e.getMessage().toLowerCase(), containsString("domain required"));
       }
 
-      try {
-         accessControlContext.setGlobalResourcePermissions(accessorResource, resourceClassName, null, domainName);
-         fail("setting permissions with null permission set should have failed");
-      }
-      catch (NullPointerException e) {
-      }
-
-      try {
-         accessControlContext.setGlobalResourcePermissions(accessorResource,
-                                                           resourceClassName,
-                                                           permissions_nullElement,
-                                                           domainName);
-         fail("setting permissions with null permission should have failed");
-      }
-      catch (NullPointerException e) {
-      }
    }
 
    @Test

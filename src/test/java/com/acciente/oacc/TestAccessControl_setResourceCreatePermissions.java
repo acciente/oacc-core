@@ -996,17 +996,27 @@ public class TestAccessControl_setResourceCreatePermissions extends TestAccessCo
       try {
          accessControlContext.setResourceCreatePermissions(null,
                                                            resourceClassName,
-                                                           resourceCreatePermissions_pre, domainName
-         );
+                                                           resourceCreatePermissions_pre);
          fail("setting create-permissions with null accessor resource should have failed");
       }
-      catch (NullPointerException e) {
+      catch (AccessControlException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("resource required"));
       }
+      try {
+         accessControlContext.setResourceCreatePermissions(null,
+                                                           resourceClassName,
+                                                           resourceCreatePermissions_pre,
+                                                           domainName);
+         fail("setting create-permissions with null accessor resource should have failed");
+      }
+      catch (AccessControlException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("resource required"));
+      }
+
       try {
          accessControlContext.setResourceCreatePermissions(accessorResource,
                                                            null,
-                                                           resourceCreatePermissions_pre, domainName
-         );
+                                                           resourceCreatePermissions_pre);
          fail("setting create-permissions with null resource class name should have failed");
       }
       catch (AccessControlException e) {
@@ -1014,28 +1024,65 @@ public class TestAccessControl_setResourceCreatePermissions extends TestAccessCo
       }
       try {
          accessControlContext.setResourceCreatePermissions(accessorResource,
+                                                           null,
+                                                           resourceCreatePermissions_pre,
+                                                           domainName);
+         fail("setting create-permissions with null resource class name should have failed");
+      }
+      catch (AccessControlException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("resource class required"));
+      }
+
+      try {
+         accessControlContext.setResourceCreatePermissions(accessorResource,
                                                            resourceClassName,
-                                                           resourceCreatePermissions_pre, null
+                                                           null);
+         fail("setting create-permissions with null permission set should have failed");
+      }
+      catch (AccessControlException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("permissions required"));
+      }
+      try {
+         accessControlContext.setResourceCreatePermissions(accessorResource,
+                                                           resourceClassName,
+                                                           null,
+                                                           domainName);
+         fail("setting create-permissions with null permission set should have failed");
+      }
+      catch (AccessControlException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("permissions required"));
+      }
+
+      try {
+         accessControlContext.setResourceCreatePermissions(accessorResource,
+                                                           resourceClassName,
+                                                           resourceCreatePermissions_nullElement);
+         fail("setting create-permissions with null element in permission set should have failed");
+      }
+      catch (AccessControlException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("set of permissions contains null element"));
+      }
+      try {
+         accessControlContext.setResourceCreatePermissions(accessorResource,
+                                                           resourceClassName,
+                                                           resourceCreatePermissions_nullElement,
+                                                           domainName);
+         fail("setting create-permissions with null element in permission set should have failed");
+      }
+      catch (AccessControlException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("set of permissions contains null element"));
+      }
+
+      try {
+         accessControlContext.setResourceCreatePermissions(accessorResource,
+                                                           resourceClassName,
+                                                           resourceCreatePermissions_pre,
+                                                           null
          );
          fail("setting create-permissions with null domain name should have failed");
       }
       catch (AccessControlException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("domain required"));
-      }
-      try {
-         accessControlContext.setResourceCreatePermissions(accessorResource, resourceClassName, null, domainName);
-         fail("setting create-permissions with null permission set should have failed");
-      }
-      catch (NullPointerException e) {
-      }
-      try {
-         accessControlContext.setResourceCreatePermissions(accessorResource,
-                                                           resourceClassName,
-                                                           resourceCreatePermissions_nullElement, domainName
-         );
-         fail("setting create-permissions with null element in permission set should have failed");
-      }
-      catch (NullPointerException e) {
       }
    }
 

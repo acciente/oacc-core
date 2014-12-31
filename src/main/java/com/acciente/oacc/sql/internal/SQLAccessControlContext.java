@@ -343,7 +343,6 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       sessionResourceDomainName = authenticatedResourceDomainName = null;
    }
 
-
    @Override
    public void impersonate(Resource resource) throws AccessControlException {
       SQLConnection connection = null;
@@ -372,13 +371,14 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       // this call will throw an exception if the resource is not found
       resourcePersister.verifyResourceExists(connection, resource);
 
-      final ResourceClassInternalInfo resourceClassInternalInfo = resourceClassPersister.getResourceClassInfoByResourceId(connection, resource);
+      final ResourceClassInternalInfo resourceClassInternalInfo
+            = resourceClassPersister.getResourceClassInfoByResourceId(connection, resource);
 
       // complain if the resource is not of an authenticatable resource-class
       if (!resourceClassInternalInfo.isAuthenticatable()) {
          throw new AccessControlException(resource
-                                          + " is not of an authenticatable type, type: "
-                                          + resourceClassInternalInfo.getResourceClassName());
+                                                + " is not of an authenticatable type, type: "
+                                                + resourceClassInternalInfo.getResourceClassName());
       }
 
       boolean impersonatePermissionOK = false;
@@ -431,6 +431,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
    @Override
    public void setCredentials(Resource resource, Credentials newCredentials) throws AccessControlException {
       assertAuth();
+      assertResourceSpecified(resource);
 
       if (!authenticatedResource.equals(sessionResource)) {
          throw new AccessControlException("Calling setCredentials while impersonating another resource is not valid");
@@ -542,6 +543,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
 
       assertAuth();
       assertSysAuth();  // check if the auth resource is permitted to create resource classes
+      assertResourceClassSpecified(resourceClassName);
       assertPermissionNameValid(permissionName);
 
       try {
@@ -558,7 +560,8 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
          }
 
          // check if the permission name is already defined!
-         Id<ResourcePermissionId> permissionId = resourceClassPermissionPersister.getResourceClassPermissionId(connection, resourceClassId, permissionName);
+         Id<ResourcePermissionId> permissionId
+               = resourceClassPermissionPersister.getResourceClassPermissionId(connection, resourceClassId, permissionName);
 
          if (permissionId != null) {
             throw new AccessControlException("Duplicate permission: " + permissionName + " for resource class: " + resourceClassName);
@@ -635,10 +638,10 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       }
 
       // determine the post create permissions on the new domain
-      final Set<DomainPermission> newDomainPermissions = __getPostCreateDomainPermissions(
-            grantDomainCreatePermissionPostCreateSysPersister.getDomainCreatePostCreateSysPermissionsIncludeInherited(
-                  connection,
-                  sessionResource));
+      final Set<DomainPermission> newDomainPermissions
+            = __getPostCreateDomainPermissions(grantDomainCreatePermissionPostCreateSysPersister
+                                                     .getDomainCreatePostCreateSysPermissionsIncludeInherited(connection,
+                                                                                                              sessionResource));
       // check to ensure that the requested domain name does not already exist
       if (domainPersister.getResourceDomainId(connection, domainName) != null) {
          throw new AccessControlException("Duplicate domain: " + domainName);
@@ -892,7 +895,9 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       SQLConnection connection = null;
 
       assertAuth();
+      assertResourceSpecified(accessorResource);
       assertDomainSpecified(domainName);
+      assertPermissionsSpecified(permissions);
 
       try {
          connection = getConnection();
@@ -1014,6 +1019,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       SQLConnection connection = null;
 
       assertAuth();
+      assertResourceSpecified(accessorResource);
       assertDomainSpecified(domainName);
 
       try {
@@ -1039,10 +1045,10 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       }
 
       // only system permissions are possible on a domain
-      return collapseDomainPermissions(grantDomainPermissionSysPersister.getDomainSysPermissionsIncludeInherited(
-            connection,
-            accessorResource,
-            domainId));
+      return collapseDomainPermissions(grantDomainPermissionSysPersister
+                                             .getDomainSysPermissionsIncludeInherited(connection,
+                                                                                      accessorResource,
+                                                                                      domainId));
    }
 
    private Set<DomainPermission> collapseDomainPermissions(Set<DomainPermission> domainPermissions) {
@@ -1065,6 +1071,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       SQLConnection connection = null;
 
       assertAuth();
+      assertResourceSpecified(accessorResource);
 
       try {
          connection = getConnection();
@@ -1097,6 +1104,8 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       SQLConnection connection = null;
 
       assertAuth();
+      assertResourceSpecified(accessorResource);
+      assertPermissionsSpecified(domainCreatePermissions);
 
       try {
          connection = getConnection();
@@ -1171,10 +1180,11 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
                                                                             sessionResource,
                                                                             requestedDomainCreatePermissions);
       // add the domain post create system permissions
-      grantDomainCreatePermissionPostCreateSysPersister.addDomainCreatePostCreateSysPermissions(connection,
-                                                                                                accessorResource,
-                                                                                                sessionResource,
-                                                                                                requestedDomainCreatePermissions);
+      grantDomainCreatePermissionPostCreateSysPersister
+            .addDomainCreatePostCreateSysPermissions(connection,
+                                                     accessorResource,
+                                                     sessionResource,
+                                                     requestedDomainCreatePermissions);
    }
 
    private void assertSetContainsDomainCreateSystemPermission(Set<DomainCreatePermission> domainCreatePermissions) throws AccessControlException {
@@ -1228,6 +1238,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       SQLConnection connection = null;
 
       assertAuth();
+      assertResourceSpecified(accessorResource);
 
       try {
          connection = getConnection();
@@ -1249,9 +1260,9 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
             .addAll(grantDomainCreatePermissionSysPersister.getDomainCreateSysPermissionsIncludeInherited(connection,
                                                                                                           accessorResource));
       domainCreatePermissions
-            .addAll(grantDomainCreatePermissionPostCreateSysPersister.getDomainCreatePostCreateSysPermissionsIncludeInherited(
-                  connection,
-                  accessorResource));
+            .addAll(grantDomainCreatePermissionPostCreateSysPersister
+                          .getDomainCreatePostCreateSysPermissionsIncludeInherited(connection,
+                                                                                   accessorResource));
       return collapseDomainCreatePermissions(domainCreatePermissions);
    }
 
@@ -1278,7 +1289,9 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       SQLConnection connection = null;
 
       assertAuth();
+      assertResourceSpecified(accessorResource);
       assertResourceClassSpecified(resourceClassName);
+      assertPermissionsSpecified(resourceCreatePermissions);
       assertDomainSpecified(domainName);
 
       try {
@@ -1306,7 +1319,9 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       SQLConnection connection = null;
 
       assertAuth();
+      assertResourceSpecified(accessorResource);
       assertResourceClassSpecified(resourceClassName);
+      assertPermissionsSpecified(resourceCreatePermissions);
 
       try {
          connection = getConnection();
@@ -1332,7 +1347,8 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
                                                Set<ResourceCreatePermission> requestedResourceCreatePermissions,
                                                String domainName) throws AccessControlException {
       // verify that resource class is defined and get its metadata
-      final ResourceClassInternalInfo resourceClassInfo = resourceClassPersister.getResourceClassInfo(connection, resourceClassName);
+      final ResourceClassInternalInfo resourceClassInfo
+            = resourceClassPersister.getResourceClassInfo(connection, resourceClassName);
 
       if (resourceClassInfo == null) {
          throw new AccessControlException("Could not find resource class: " + resourceClassName);
@@ -1569,6 +1585,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       SQLConnection connection = null;
 
       assertAuth();
+      assertResourceSpecified(accessorResource);
       assertResourceClassSpecified(resourceClassName);
       assertDomainSpecified(domainName);
 
@@ -1596,6 +1613,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       SQLConnection connection = null;
 
       assertAuth();
+      assertResourceSpecified(accessorResource);
       assertResourceClassSpecified(resourceClassName);
 
       try {
@@ -1682,6 +1700,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       SQLConnection connection = null;
 
       assertAuth();
+      assertResourceSpecified(accessorResource);
 
       try {
          connection = getConnection();
@@ -1712,16 +1731,14 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
 
       // read the post create system permissions and add to createALLPermissionsMap
       mergeSourceCreatePermissionsMapIntoTargetCreatePermissionsMap(
-            grantResourceCreatePermissionPostCreateSysPersister.getResourceCreatePostCreateSysPermissionsIncludeInherited(
-                  connection,
-                  accessorResource),
+            grantResourceCreatePermissionPostCreateSysPersister
+                  .getResourceCreatePostCreateSysPermissionsIncludeInherited(connection, accessorResource),
             allResourceCreatePermissionsMap);
 
       // read the post create non-system permissions and add to createALLPermissionsMap
       mergeSourceCreatePermissionsMapIntoTargetCreatePermissionsMap(
-            grantResourceCreatePermissionPostCreatePersister.getResourceCreatePostCreatePermissionsIncludeInherited(
-                  connection,
-                  accessorResource),
+            grantResourceCreatePermissionPostCreatePersister
+                  .getResourceCreatePostCreatePermissionsIncludeInherited(connection, accessorResource),
             allResourceCreatePermissionsMap);
 
       return collapseResourceCreatePermissions(allResourceCreatePermissionsMap);
@@ -1761,7 +1778,8 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
          for (String resourceClassName : createPermissionsByDomainMap.keySet()) {
             final Set<ResourceCreatePermission> createPermissionsByResourceClassMap
                   = createPermissionsByDomainMap.get(resourceClassName);
-            createPermissionsByDomainMap.put(resourceClassName, collapseResourceCreatePermissions(createPermissionsByResourceClassMap));
+            createPermissionsByDomainMap.put(resourceClassName,
+                                             collapseResourceCreatePermissions(createPermissionsByResourceClassMap));
          }
       }
 
@@ -1775,6 +1793,9 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       SQLConnection connection = null;
 
       assertAuth();
+      assertResourceSpecified(accessorResource);
+      assertResourceSpecified(accessedResource);
+      assertPermissionsSpecified(resourcePermissions);
 
       try {
          connection = getConnection();
@@ -1804,7 +1825,9 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
             = resourceClassPersister.getResourceClassInfoByResourceId(connection, accessedResource);
 
       // next ensure that the requested permissions are all in the correct resource class
-      assertUniqueResourcePermissionsNamesForResourceClass(connection, requestedResourcePermissions, accessedResourceClassInternalInfo);
+      assertUniqueResourcePermissionsNamesForResourceClass(connection,
+                                                           requestedResourcePermissions,
+                                                           accessedResourceClassInternalInfo);
 
       // if this method is being called to set the post create permissions on a newly created resource
       // we do not perform the security checks below, since it would be incorrect
@@ -1959,6 +1982,8 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       SQLConnection connection = null;
 
       assertAuth();
+      assertResourceSpecified(accessorResource);
+      assertResourceSpecified(accessedResource);
 
       try {
          connection = getConnection();
@@ -1980,10 +2005,10 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       Set<ResourcePermission> resourcePermissions = new HashSet<>();
 
       // collect the system permissions that the accessor resource has to the accessed resource
-      resourcePermissions.addAll(grantResourcePermissionSysPersister.getSysResourcePermissionsIncludeInherited(
-            connection,
-            accessorResource,
-            accessedResource));
+      resourcePermissions.addAll(grantResourcePermissionSysPersister
+                                       .getSysResourcePermissionsIncludeInherited(connection,
+                                                                                  accessorResource,
+                                                                                  accessedResource));
 
       // collect the non-system permissions that the accessor has to the accessed resource
       resourcePermissions.addAll(grantResourcePermissionPersister.getResourcePermissionsIncludeInherited(connection,
@@ -2040,7 +2065,9 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       SQLConnection connection = null;
 
       assertAuth();
+      assertResourceSpecified(accessorResource);
       assertResourceClassSpecified(resourceClassName);
+      assertPermissionsSpecified(resourcePermissions);
       assertDomainSpecified(domainName);
 
       try {
@@ -2070,7 +2097,9 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       SQLConnection connection = null;
 
       assertAuth();
+      assertResourceSpecified(accessorResource);
       assertResourceClassSpecified(resourceClassName);
+      assertPermissionsSpecified(resourcePermissions);
 
       try {
          connection = getConnection();
@@ -2259,6 +2288,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       SQLConnection connection = null;
 
       assertAuth();
+      assertResourceSpecified(accessorResource);
       assertResourceClassSpecified(resourceClassName);
       assertDomainSpecified(domainName);
 
@@ -2287,6 +2317,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       SQLConnection connection = null;
 
       assertAuth();
+      assertResourceSpecified(accessorResource);
       assertResourceClassSpecified(resourceClassName);
 
       try {
@@ -2328,18 +2359,18 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       Set<ResourcePermission> resourcePermissions = new HashSet<>();
 
       // first collect the system permissions that the accessor has to the accessed resource
-      resourcePermissions.addAll(grantGlobalResourcePermissionSysPersister.getGlobalSysPermissionsIncludeInherited(
-            connection,
-            accessorResource,
-            resourceClassId,
-            domainId));
+      resourcePermissions.addAll(grantGlobalResourcePermissionSysPersister
+                                       .getGlobalSysPermissionsIncludeInherited(connection,
+                                                                                accessorResource,
+                                                                                resourceClassId,
+                                                                                domainId));
 
       // first collect the non-system permissions that the accessor this resource has to the accessor resource
-      resourcePermissions.addAll(grantGlobalResourcePermissionPersister.getGlobalResourcePermissionsIncludeInherited(
-            connection,
-            accessorResource,
-            resourceClassId,
-            domainId));
+      resourcePermissions.addAll(grantGlobalResourcePermissionPersister
+                                       .getGlobalResourcePermissionsIncludeInherited(connection,
+                                                                                     accessorResource,
+                                                                                     resourceClassId,
+                                                                                     domainId));
       return collapseResourcePermissions(resourcePermissions);
    }
 
@@ -2364,6 +2395,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       SQLConnection connection = null;
 
       assertAuth();
+      assertResourceSpecified(accessorResource);
 
       try {
          connection = getConnection();
@@ -2431,7 +2463,8 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
          for (String resourceClassName : createPermissionsByDomainMap.keySet()) {
             final Set<ResourcePermission> createPermissionsByResourceClassMap
                   = createPermissionsByDomainMap.get(resourceClassName);
-            createPermissionsByDomainMap.put(resourceClassName, collapseResourcePermissions(createPermissionsByResourceClassMap));
+            createPermissionsByDomainMap.put(resourceClassName,
+                                             collapseResourcePermissions(createPermissionsByResourceClassMap));
          }
       }
 
@@ -2489,7 +2522,8 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       try {
          connection = getConnection();
 
-         final ResourceClassInternalInfo resourceClassInternalInfo = resourceClassPersister.getResourceClassInfo(connection, resourceClassName);
+         final ResourceClassInternalInfo resourceClassInternalInfo
+               = resourceClassPersister.getResourceClassInfo(connection, resourceClassName);
 
          if (resourceClassInternalInfo == null) {
             throw new AccessControlException("Could not find resource class: " + resourceClassName);
@@ -2517,7 +2551,8 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       try {
          connection = getConnection();
 
-         final ResourceClassInternalInfo resourceClassInternalInfo = resourceClassPersister.getResourceClassInfoByResourceId(connection, resource);
+         final ResourceClassInternalInfo resourceClassInternalInfo
+               = resourceClassPersister.getResourceClassInfoByResourceId(connection, resource);
          return new ResourceClassInfo(resourceClassInternalInfo.getResourceClassName(),
                                       resourceClassInternalInfo.isAuthenticatable(),
                                       resourceClassInternalInfo.isUnauthenticatedCreateAllowed());
@@ -2842,6 +2877,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
 
       assertAuth();
       assertResourceClassSpecified(resourceClassName);
+      assertPermissionSpecified(resourcePermission);
 
       try {
          connection = getConnection();
@@ -2865,7 +2901,9 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       SQLConnection connection = null;
 
       assertAuth();
+      assertResourceSpecified(accessorResource);
       assertResourceClassSpecified(resourceClassName);
+      assertPermissionSpecified(resourcePermission);
 
       try {
          connection = getConnection();
@@ -2927,18 +2965,18 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
                                                                                             permissionId));
 
          // get the list of objects of the specified type that the session has access to via global permissions
-         resources.addAll(grantGlobalResourcePermissionPersister.getResourcesByGlobalResourcePermission(
-               connection,
-               accessorResource,
-               resourceClassId,
-               resourcePermission,
-               permissionId));
+         resources.addAll(grantGlobalResourcePermissionPersister
+                                .getResourcesByGlobalResourcePermission(connection,
+                                                                        accessorResource,
+                                                                        resourceClassId,
+                                                                        resourcePermission,
+                                                                        permissionId));
       }
 
       // finally get the list of objects of the specified type that the session has access to via super user permissions
       resources.addAll(grantDomainPermissionSysPersister.getResourcesByDomainSuperUserPermission(connection,
-                                                                                                         accessorResource,
-                                                                                                         resourceClassId));
+                                                                                                 accessorResource,
+                                                                                                 resourceClassId));
       return resources;
    }
 
@@ -2951,6 +2989,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
 
       assertAuth();
       assertResourceClassSpecified(resourceClassName);
+      assertPermissionSpecified(resourcePermission);
       assertDomainSpecified(domainName);
 
       try {
@@ -2962,8 +3001,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
                                            sessionResource,
                                            resourceClassName,
                                            resourcePermission,
-                                           domainName
-         );
+                                           domainName);
       }
       catch (SQLException e) {
          throw new AccessControlException(e);
@@ -2981,7 +3019,9 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       SQLConnection connection = null;
 
       assertAuth();
+      assertResourceSpecified(accessorResource);
       assertResourceClassSpecified(resourceClassName);
+      assertPermissionSpecified(resourcePermission);
       assertDomainSpecified(domainName);
 
       try {
@@ -3066,7 +3106,9 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       }
       else {
          // check if the non-system permission name is valid
-         permissionId = resourceClassPermissionPersister.getResourceClassPermissionId(connection, resourceClassId, resourcePermission.getPermissionName());
+         permissionId = resourceClassPermissionPersister.getResourceClassPermissionId(connection,
+                                                                                      resourceClassId,
+                                                                                      resourcePermission.getPermissionName());
 
          if (permissionId == null) {
             throw new AccessControlException("Permission: " + resourcePermission + " is not defined for resource class: " + resourceClassName);
@@ -3081,20 +3123,20 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
                                                                                             permissionId));
 
          // get the list of objects of the specified type that the session has access to via global permissions
-         resources.addAll(grantGlobalResourcePermissionPersister.getResourcesByGlobalResourcePermission(
-               connection,
-               accessorResource,
-               resourceClassId,
-               domainId,
-               resourcePermission,
-               permissionId));
+         resources.addAll(grantGlobalResourcePermissionPersister
+                                .getResourcesByGlobalResourcePermission(connection,
+                                                                        accessorResource,
+                                                                        resourceClassId,
+                                                                        domainId,
+                                                                        resourcePermission,
+                                                                        permissionId));
       }
 
       // finally get the list of objects of the specified type that the session has access to via super user permissions
       resources.addAll(grantDomainPermissionSysPersister.getResourcesByDomainSuperUserPermission(connection,
-                                                                                                         accessorResource,
-                                                                                                         resourceClassId,
-                                                                                                         domainId));
+                                                                                                 accessorResource,
+                                                                                                 resourceClassId,
+                                                                                                 domainId));
       return resources;
    }
 
@@ -3105,7 +3147,9 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       SQLConnection connection = null;
 
       assertAuth();
+      assertResourceSpecified(accessedResource);
       assertResourceClassSpecified(resourceClassName);
+      assertPermissionSpecified(resourcePermission);
 
       try {
          connection = getConnection();
@@ -3208,8 +3252,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
    private boolean __isSuperUserOfResource(SQLConnection connection, Resource resource)
          throws AccessControlException {
       return __isSuperUserOfDomain(connection,
-                                   domainPersister.getResourceDomainNameByResourceId(connection,
-                                                                                     resource));
+                                   domainPersister.getResourceDomainNameByResourceId(connection, resource));
    }
 
    private boolean __isSuperUserOfDomain(SQLConnection connection, String domainName) throws AccessControlException {
@@ -3229,9 +3272,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
    private boolean __isSuperUserOfDomain(SQLConnection connection,
                                          Resource accessorResource,
                                          String queriedDomain) throws AccessControlException {
-      Set<DomainPermission> domainPermissions = __getEffectiveDomainPermissions(connection,
-                                                                                accessorResource,
-                                                                                queriedDomain);
+      Set<DomainPermission> domainPermissions = __getEffectiveDomainPermissions(connection, accessorResource, queriedDomain);
 
       return domainPermissions.contains(DomainPermission_SUPER_USER)
             || domainPermissions.contains(DomainPermission_SUPER_USER_GRANT);
@@ -3325,6 +3366,16 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
    private void assertPermissionSpecified(ResourcePermission resourcePermission) throws AccessControlException {
       if (resourcePermission == null) {
          throw new AccessControlException("Resource permission required, none specified");
+      }
+   }
+
+   private void assertPermissionsSpecified(Set permissionSet) throws AccessControlException {
+      if (permissionSet == null) {
+         throw new AccessControlException("Set of permissions required, none specified");
+      }
+
+      if (permissionSet.contains(null)) {
+         throw new AccessControlException("Set of permissions contains null element");
       }
    }
 

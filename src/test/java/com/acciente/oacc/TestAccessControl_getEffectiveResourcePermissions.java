@@ -383,16 +383,17 @@ public class TestAccessControl_getEffectiveResourcePermissions extends TestAcces
          accessControlContext.getEffectiveResourcePermissions(null, accessedResource);
          fail("getting permissions with null accessor resource should have failed");
       }
-      catch (NullPointerException e) {
+      catch (AccessControlException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("resource required"));
       }
 
       final Resource accessorResource = generateUnauthenticatableResource();
       try {
-         accessControlContext.getEffectiveResourceCreatePermissions(accessorResource, null);
+         accessControlContext.getEffectiveResourcePermissions(accessorResource, null);
          fail("getting permissions with null accessed resource should have failed");
       }
       catch (AccessControlException e) {
-         assertThat(e.getMessage().toLowerCase(), containsString("resource class required"));
+         assertThat(e.getMessage().toLowerCase(), containsString("resource required"));
       }
    }
 

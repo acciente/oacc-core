@@ -827,28 +827,32 @@ public class TestAccessControl_setResourcePermissions extends TestAccessControlB
          accessControlContext.setResourcePermissions(null, accessedResource, permissions_valid);
          fail("setting permissions for null accessor resource should have failed");
       }
-      catch (NullPointerException e) {
+      catch (AccessControlException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("resource required"));
       }
 
       try {
          accessControlContext.setResourcePermissions(accessedResource, null, permissions_valid);
          fail("setting permissions for null accessed resource should have failed");
       }
-      catch (NullPointerException e) {
+      catch (AccessControlException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("resource required"));
       }
 
       try {
          accessControlContext.setResourcePermissions(accessedResource, accessedResource, null);
          fail("setting permissions with null permission set should have failed");
       }
-      catch (NullPointerException e) {
+      catch (AccessControlException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("permissions required"));
       }
 
       try {
          accessControlContext.setResourcePermissions(accessedResource, accessedResource, permissions_nullElement);
          fail("setting permissions with null permission should have failed");
       }
-      catch (NullPointerException e) {
+      catch (AccessControlException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("set of permissions contains null element"));
       }
    }
 

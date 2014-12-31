@@ -378,5 +378,29 @@ public class TestAccessControl_setCredentials extends TestAccessControlBase {
          assertThat(e.getMessage().toLowerCase(), containsString("while impersonating another resource"));
       }
    }
+
+   @Test
+   public void setCredentials_nulls() throws Exception {
+      authenticateSystemResource();
+
+      // attempt to update credentials
+      final char[] newPwd = "new_password".toCharArray();
+      try {
+         accessControlContext.setCredentials(null, PasswordCredentials.newInstance(newPwd));
+         fail("setting credentials with null resource should have failed");
+      }
+      catch (AccessControlException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("resource required"));
+      }
+
+      try {
+         accessControlContext.setCredentials(getSystemResource(), null);
+         fail("setting credentials with null credentials should have failed");
+      }
+      catch (AccessControlException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("credentials required"));
+      }
+   }
+
    // todo: set with impersonate
 }

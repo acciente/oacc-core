@@ -521,21 +521,24 @@ public class TestAccessControl_setDomainCreatePermissions extends TestAccessCont
          accessControlContext.setDomainCreatePermissions(null, domainCreatePermissions);
          fail("setting domain create permissions with null accessor resource should have failed");
       }
-      catch (NullPointerException e) {
+      catch (AccessControlException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("resource required"));
       }
 
       try {
          accessControlContext.setDomainCreatePermissions(accessorResource, null);
          fail("setting domain create permissions with null domain permission set should have failed");
       }
-      catch (NullPointerException e) {
+      catch (AccessControlException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("permissions required"));
       }
 
       try {
          accessControlContext.setDomainCreatePermissions(accessorResource, domainCreatePermission_nullElement);
          fail("setting domain create permissions with null element in domain permission set should have failed");
       }
-      catch (NullPointerException e) {
+      catch (AccessControlException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("contains null element"));
       }
    }
 

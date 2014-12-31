@@ -167,7 +167,8 @@ public class TestAccessControl_createResourcePermission extends TestAccessContro
          accessControlContext.createResourcePermission(null, permissionName);
          fail("creating resource permission with NULL resource class name should fail");
       }
-      catch (NullPointerException e) {
+      catch (AccessControlException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("resource class required"));
       }
       try {
          accessControlContext.createResourcePermission(resourceClassName, null);

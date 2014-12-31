@@ -22,6 +22,7 @@ import org.junit.Test;
 import java.util.HashSet;
 import java.util.Set;
 
+import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 
@@ -347,7 +348,8 @@ public class TestAccessControl_getEffectiveDomainCreatePermissions extends TestA
       try {
          accessControlContext.getEffectiveDomainCreatePermissions(null);
       }
-      catch (NullPointerException e) {
+      catch (AccessControlException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("resource required"));
       }
    }
 
