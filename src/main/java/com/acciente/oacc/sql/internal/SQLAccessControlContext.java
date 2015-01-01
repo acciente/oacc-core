@@ -490,7 +490,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
 
          if (!hasResetCredentialsPermission) {
             // finally check for super user permissions
-            if (__isSuperUserOfResource(connection, resource)) {
+            if (__isSuperUserOfResource(connection, authenticatedResource, resource)) {
                hasResetCredentialsPermission = true;
             }
          }
@@ -836,12 +836,11 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
          // if that did not work, next we check the session resource has super user permissions
          // to the domain of the new resource
          if (!createPermissionOK) {
-            createPermissionOK = __isSuperUserOfDomain(connection, domainName);
+            createPermissionOK = __isSuperUserOfDomain(connection, sessionResource, domainName);
          }
 
          if (!createPermissionOK) {
-            throw new AccessControlException("Not authorized to create resource, class: " + resourceClassName,
-                                       true);
+            throw new AccessControlException("Not authorized to create resource, class: " + resourceClassName, true);
          }
       }
 
@@ -1370,7 +1369,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       assertUniquePostCreatePermissionsNamesForResourceClass(connection, requestedResourceCreatePermissions, resourceClassInfo);
 
       // check if the grantor (=session resource) is authorized to grant the requested permissions
-      if (!__isSuperUserOfDomain(connection, domainName)) {
+      if (!__isSuperUserOfDomain(connection, sessionResource, domainName)) {
          final Set<ResourceCreatePermission>
                grantorPermissions
                = __getEffectiveResourceCreatePermissions(connection,
@@ -1832,12 +1831,12 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       // if this method is being called to set the post create permissions on a newly created resource
       // we do not perform the security checks below, since it would be incorrect
       if (!newResourceMode) {
-         if (!__isSuperUserOfResource(connection, accessedResource)) {
+         if (!__isSuperUserOfResource(connection, grantorResource, accessedResource)) {
             // next check if the grantor (i.e. session resource) has permissions to grant the requested permissions
             final Set<ResourcePermission>
                   grantorResourcePermissions
                   = __getEffectiveResourcePermissions(connection,
-                                                      sessionResource,
+                                                      grantorResource,
                                                       accessedResource);
 
             final Set<ResourcePermission>
@@ -2145,7 +2144,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       // next ensure that the requested permissions are all in the correct resource class
       assertUniqueGlobalResourcePermissionNamesForResourceClass(connection, requestedResourcePermissions, resourceClassInternalInfo);
 
-      if (!__isSuperUserOfDomain(connection, domainName)) {
+      if (!__isSuperUserOfDomain(connection, sessionResource, domainName)) {
          // check if the grantor (=session resource) is authorized to grant the requested permissions
          final Set<ResourcePermission>
                grantorPermissions
@@ -2677,7 +2676,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
          }
       }
 
-      if (__isSuperUserOfDomain(connection, domainName)) {
+      if (__isSuperUserOfDomain(connection, sessionResource, domainName)) {
          return;
       }
 
@@ -2767,7 +2766,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
          return;
       }
 
-      if (__isSuperUserOfDomain(connection, domainName)) {
+      if (__isSuperUserOfDomain(connection, sessionResource, domainName)) {
          return;
       }
 
@@ -2862,7 +2861,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
          return true;
       }
 
-      if (__isSuperUserOfDomain(connection, domainName)) {
+      if (__isSuperUserOfDomain(connection, accessorResource, domainName)) {
          return true;
       }
 
@@ -3249,23 +3248,12 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
 
    // private shared helper methods
 
-   private boolean __isSuperUserOfResource(SQLConnection connection, Resource resource)
-         throws AccessControlException {
-      return __isSuperUserOfDomain(connection,
-                                   domainPersister.getResourceDomainNameByResourceId(connection, resource));
-   }
-
-   private boolean __isSuperUserOfDomain(SQLConnection connection, String domainName) throws AccessControlException {
-      return __isSuperUserOfDomain(connection, sessionResource, domainName);
-   }
-
    private boolean __isSuperUserOfResource(SQLConnection connection,
                                            Resource accessorResource,
                                            Resource accessedResource) throws AccessControlException {
-      final String accessedResourceDomain
-            = domainPersister.getResourceDomainNameByResourceId(connection, accessedResource);
-
-      return __isSuperUserOfDomain(connection, accessorResource, accessedResourceDomain);
+      return __isSuperUserOfDomain(connection,
+                                   accessorResource,
+                                   domainPersister.getResourceDomainNameByResourceId(connection, accessedResource));
    }
 
 
