@@ -110,7 +110,7 @@ public class TestAccessControl_getResourcesByResourcePermission extends TestAcce
    }
 
    @Test
-   public void getResourcesByResourcePermission_direct_validAsAuthorized() throws AccessControlException {
+   public void getResourcesByResourcePermission_direct_validAsAuthenticated() throws AccessControlException {
       authenticateSystemResource();
 
       final char[] password = generateUniquePassword();
@@ -179,10 +179,191 @@ public class TestAccessControl_getResourcesByResourcePermission extends TestAcce
                                                                     ResourcePermissions.getInstance(queriedPermission),
                                                                     queriedDomain);
       assertThat(resourcesByPermissionAndDomain, is(expectedResources_queriedDomain));
+
+      Set<Resource> resourcesByAuthenticatedAccessorAndPermissionAndDomain
+            = accessControlContext.getResourcesByResourcePermission(accessorResource,
+                                                                    queriedResourceClass,
+                                                                    ResourcePermissions.getInstance(queriedPermission),
+                                                                    queriedDomain);
+      assertThat(resourcesByAuthenticatedAccessorAndPermissionAndDomain, is(expectedResources_queriedDomain));
+
    }
 
    @Test
-   public void getResourcesByResourcePermission_directWithAndWithoutGrant_validAsAuthorized() throws AccessControlException {
+   public void getResourcesByResourcePermission_unauthorized_shouldFail() throws AccessControlException {
+      authenticateSystemResource();
+
+      final char[] password = generateUniquePassword();
+      final Resource authenticatableResource= generateAuthenticatableResource(password);
+      final Resource accessorResource = generateUnauthenticatableResource();
+
+      final String queriedDomain = generateDomain();
+      final String queriedResourceClass = generateResourceClass(false, false);
+      final String queriedPermission = generateResourceClassPermission(queriedResourceClass);
+      final String unqueriedPermission = generateResourceClassPermission(queriedResourceClass);
+      final Resource resource_queriedClassQueriedDomain
+            = accessControlContext.createResource(queriedResourceClass, queriedDomain);
+      final Resource resource_queriedClassUnqueriedDomain
+            = accessControlContext.createResource(queriedResourceClass, generateDomain());
+      final Resource resource_unqueriedPermission
+            = accessControlContext.createResource(queriedResourceClass, queriedDomain);
+
+      final String unqueriedResourceClass = generateResourceClass(false, false);
+      final String unqueriedResourceClassPermissionName = generateResourceClassPermission(unqueriedResourceClass);
+      final Resource resource_unqueriedClassQueriedDomain
+            = accessControlContext.createResource(unqueriedResourceClass, queriedDomain);
+
+      // set permission between accessor and accessed resources
+      Set<ResourcePermission> queriedResourcePermissions
+            = setOf(ResourcePermissions.getInstance(queriedPermission));
+      accessControlContext.setResourcePermissions(accessorResource,
+                                                  resource_queriedClassQueriedDomain,
+                                                  queriedResourcePermissions);
+      accessControlContext.setResourcePermissions(accessorResource,
+                                                  resource_queriedClassUnqueriedDomain,
+                                                  queriedResourcePermissions);
+      accessControlContext.setResourcePermissions(accessorResource,
+                                                  resource_unqueriedPermission,
+                                                  setOf(ResourcePermissions.getInstance(unqueriedPermission)));
+      accessControlContext.setResourcePermissions(accessorResource,
+                                                  resource_unqueriedClassQueriedDomain,
+                                                  setOf(ResourcePermissions.getInstance(unqueriedResourceClassPermissionName)));
+
+      // authenticate as accessor and verify
+      accessControlContext.authenticate(authenticatableResource, PasswordCredentials.newInstance(password));
+
+      try {
+         accessControlContext.getResourcesByResourcePermission(accessorResource,
+                                                               queriedResourceClass,
+                                                               ResourcePermissions.getInstance(queriedPermission));
+      }
+      catch (AccessControlException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("resource must have impersonate, reset_credentials or inherit permission"));
+      }
+
+      try {
+         accessControlContext.getResourcesByResourcePermission(accessorResource,
+                                                               queriedResourceClass,
+                                                               ResourcePermissions.getInstance(queriedPermission),
+                                                               queriedDomain);
+      }
+      catch (AccessControlException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("resource must have impersonate, reset_credentials or inherit permission"));
+      }
+   }
+
+   @Test
+   public void getResourcesByResourcePermission_authorized_shouldSucceed() throws AccessControlException {
+      authenticateSystemResource();
+
+      final char[] password = generateUniquePassword();
+      final Resource authenticatableResource= generateAuthenticatableResource(password);
+      final Resource accessorResource = generateAuthenticatableResource(generateUniquePassword());
+
+      final String queriedDomain = generateDomain();
+      final String queriedResourceClass = generateResourceClass(false, false);
+      final String queriedPermission = generateResourceClassPermission(queriedResourceClass);
+      final String unqueriedPermission = generateResourceClassPermission(queriedResourceClass);
+      final Resource resource_queriedClassQueriedDomain
+            = accessControlContext.createResource(queriedResourceClass, queriedDomain);
+      final Resource resource_queriedClassUnqueriedDomain
+            = accessControlContext.createResource(queriedResourceClass, generateDomain());
+      final Resource resource_unqueriedPermission
+            = accessControlContext.createResource(queriedResourceClass, queriedDomain);
+
+      final String unqueriedResourceClass = generateResourceClass(false, false);
+      final String unqueriedResourceClassPermissionName = generateResourceClassPermission(unqueriedResourceClass);
+      final Resource resource_unqueriedClassQueriedDomain
+            = accessControlContext.createResource(unqueriedResourceClass, queriedDomain);
+
+      // set permission between accessor and accessed resources
+      Set<ResourcePermission> queriedResourcePermissions
+            = setOf(ResourcePermissions.getInstance(queriedPermission));
+      accessControlContext.setResourcePermissions(accessorResource,
+                                                  resource_queriedClassQueriedDomain,
+                                                  queriedResourcePermissions);
+      accessControlContext.setResourcePermissions(accessorResource,
+                                                  resource_queriedClassUnqueriedDomain,
+                                                  queriedResourcePermissions);
+      accessControlContext.setResourcePermissions(accessorResource,
+                                                  resource_unqueriedPermission,
+                                                  setOf(ResourcePermissions.getInstance(unqueriedPermission)));
+      accessControlContext.setResourcePermissions(accessorResource,
+                                                  resource_unqueriedClassQueriedDomain,
+                                                  setOf(ResourcePermissions.getInstance(unqueriedResourceClassPermissionName)));
+
+      final Set<Resource> expectedResources_anyDomain = setOf(resource_queriedClassQueriedDomain,
+                                                              resource_queriedClassUnqueriedDomain);
+      final Set<Resource> expectedResources_queriedDomain = setOf(resource_queriedClassQueriedDomain);
+
+      // set permission: authenticatable --IMPERSONATE--> accessor
+      accessControlContext.setResourcePermissions(authenticatableResource,
+                                                  accessorResource,
+                                                  setOf(ResourcePermissions.getInstance(ResourcePermissions.IMPERSONATE)));
+
+      // authenticate as accessor and verify
+      accessControlContext.authenticate(authenticatableResource, PasswordCredentials.newInstance(password));
+
+      Set<Resource> resourcesByAccessorAndPermission
+            = accessControlContext.getResourcesByResourcePermission(accessorResource,
+                                                                    queriedResourceClass,
+                                                                    ResourcePermissions.getInstance(queriedPermission));
+      assertThat(resourcesByAccessorAndPermission, is(expectedResources_anyDomain));
+
+      Set<Resource> resourcesByAccessorAndPermissionAndDomain
+            = accessControlContext.getResourcesByResourcePermission(accessorResource,
+                                                                    queriedResourceClass,
+                                                                    ResourcePermissions.getInstance(queriedPermission),
+                                                                    queriedDomain);
+      assertThat(resourcesByAccessorAndPermissionAndDomain, is(expectedResources_queriedDomain));
+
+      // set permission: authenticatable --INHERIT--> accessor
+      authenticateSystemResource();
+      accessControlContext.setResourcePermissions(authenticatableResource,
+                                                  accessorResource,
+                                                  setOf(ResourcePermissions.getInstance(ResourcePermissions.INHERIT)));
+
+      // authenticate as accessor and verify
+      accessControlContext.authenticate(authenticatableResource, PasswordCredentials.newInstance(password));
+
+      resourcesByAccessorAndPermission
+            = accessControlContext.getResourcesByResourcePermission(accessorResource,
+                                                                    queriedResourceClass,
+                                                                    ResourcePermissions.getInstance(queriedPermission));
+      assertThat(resourcesByAccessorAndPermission, is(expectedResources_anyDomain));
+
+      resourcesByAccessorAndPermissionAndDomain
+            = accessControlContext.getResourcesByResourcePermission(accessorResource,
+                                                                    queriedResourceClass,
+                                                                    ResourcePermissions.getInstance(queriedPermission),
+                                                                    queriedDomain);
+      assertThat(resourcesByAccessorAndPermissionAndDomain, is(expectedResources_queriedDomain));
+
+      // set permission: authenticatable --RESET_CREDENTIALS--> accessor
+      authenticateSystemResource();
+      accessControlContext.setResourcePermissions(authenticatableResource,
+                                                  accessorResource,
+                                                  setOf(ResourcePermissions.getInstance(ResourcePermissions.RESET_CREDENTIALS)));
+
+      // authenticate as accessor and verify
+      accessControlContext.authenticate(authenticatableResource, PasswordCredentials.newInstance(password));
+
+      resourcesByAccessorAndPermission
+            = accessControlContext.getResourcesByResourcePermission(accessorResource,
+                                                                    queriedResourceClass,
+                                                                    ResourcePermissions.getInstance(queriedPermission));
+      assertThat(resourcesByAccessorAndPermission, is(expectedResources_anyDomain));
+
+      resourcesByAccessorAndPermissionAndDomain
+            = accessControlContext.getResourcesByResourcePermission(accessorResource,
+                                                                    queriedResourceClass,
+                                                                    ResourcePermissions.getInstance(queriedPermission),
+                                                                    queriedDomain);
+      assertThat(resourcesByAccessorAndPermissionAndDomain, is(expectedResources_queriedDomain));
+   }
+
+   @Test
+   public void getResourcesByResourcePermission_directWithAndWithoutGrant_validAsAuthenticated() throws AccessControlException {
       authenticateSystemResource();
 
       final char[] password = generateUniquePassword();
@@ -272,10 +453,17 @@ public class TestAccessControl_getResourcesByResourcePermission extends TestAcce
                                                                     permission_withGrant,
                                                                     queriedDomain);
       assertThat(resourcesByPermissionAndDomainWithGrant, is(expectedResources_withGrant_queriedDomain));
+
+      Set<Resource> resourcesByAuthenticatedAccessorAndPermissionAndDomainWithGrant
+            = accessControlContext.getResourcesByResourcePermission(accessorResource,
+                                                                    queriedResourceClass,
+                                                                    permission_withGrant,
+                                                                    queriedDomain);
+      assertThat(resourcesByAuthenticatedAccessorAndPermissionAndDomainWithGrant, is(expectedResources_withGrant_queriedDomain));
    }
 
    @Test
-   public void getResourcesByResourcePermission_inherited_validAsAuthorized() throws AccessControlException {
+   public void getResourcesByResourcePermission_inherited_validAsAuthenticated() throws AccessControlException {
       authenticateSystemResource();
 
       final char[] password = generateUniquePassword();
@@ -350,10 +538,17 @@ public class TestAccessControl_getResourcesByResourcePermission extends TestAcce
                                                                     ResourcePermissions.getInstance(queriedPermission),
                                                                     queriedDomain);
       assertThat(resourcesByPermissionAndDomain, is(expectedResources_queriedDomain));
+
+      Set<Resource> resourcesByAuthenticatedAccessorAndPermissionAndDomain
+            = accessControlContext.getResourcesByResourcePermission(accessorResource,
+                                                                    queriedResourceClass,
+                                                                    ResourcePermissions.getInstance(queriedPermission),
+                                                                    queriedDomain);
+      assertThat(resourcesByAuthenticatedAccessorAndPermissionAndDomain, is(expectedResources_queriedDomain));
    }
 
    @Test
-   public void getResourcesByResourcePermission_global_validAsAuthorized() throws AccessControlException {
+   public void getResourcesByResourcePermission_global_validAsAuthenticated() throws AccessControlException {
       authenticateSystemResource();
 
       final char[] password = generateUniquePassword();
@@ -419,10 +614,18 @@ public class TestAccessControl_getResourcesByResourcePermission extends TestAcce
                                                                     ResourcePermissions.getInstance(queriedPermission),
                                                                     queriedDomain);
       assertThat(resourcesByPermissionAndDomain, is(expectedResources_queriedDomain));
+
+      Set<Resource> resourcesByAuthenticatedAccessorAndPermissionAndDomain
+            = accessControlContext.getResourcesByResourcePermission(accessorResource,
+                                                                    queriedResourceClass,
+                                                                    ResourcePermissions.getInstance(queriedPermission),
+                                                                    queriedDomain);
+      assertThat(resourcesByAuthenticatedAccessorAndPermissionAndDomain, is(expectedResources_queriedDomain));
+
    }
 
    @Test
-   public void getResourcesByResourcePermission_domainInherited_validAsAuthorized() throws AccessControlException {
+   public void getResourcesByResourcePermission_domainInherited_validAsAuthenticated() throws AccessControlException {
       authenticateSystemResource();
 
       final char[] password = generateUniquePassword();
@@ -506,10 +709,17 @@ public class TestAccessControl_getResourcesByResourcePermission extends TestAcce
                                                                     ResourcePermissions.getInstance(queriedPermission),
                                                                     childDomain1);
       assertThat(resourcesByPermissionAndChildDomain1, is(expectedResources_childDomain1));
+
+      Set<Resource> resourcesByAuthenticatedAccessorAndPermissionAndChildDomain1
+            = accessControlContext.getResourcesByResourcePermission(accessorResource,
+                                                                    queriedResourceClass,
+                                                                    ResourcePermissions.getInstance(queriedPermission),
+                                                                    childDomain1);
+      assertThat(resourcesByAuthenticatedAccessorAndPermissionAndChildDomain1, is(expectedResources_childDomain1));
    }
 
    @Test
-   public void getResourcesByResourcePermission_superUser_validAsAuthorized() throws AccessControlException {
+   public void getResourcesByResourcePermission_superUser_validAsAuthenticated() throws AccessControlException {
       authenticateSystemResource();
 
       final char[] password = generateUniquePassword();
@@ -605,6 +815,13 @@ public class TestAccessControl_getResourcesByResourcePermission extends TestAcce
                                                                     ResourcePermissions.getInstance(queriedPermission),
                                                                     otherDomain);
       assertThat(resourcesByPermissionAndOtherDomain, is(expectedResources_otherDomain));
+
+      Set<Resource> resourcesByAuthenticatedAccessorAndPermissionAndOtherDomain
+            = accessControlContext.getResourcesByResourcePermission(accessorResource,
+                                                                    queriedResourceClass,
+                                                                    ResourcePermissions.getInstance(queriedPermission),
+                                                                    otherDomain);
+      assertThat(resourcesByAuthenticatedAccessorAndPermissionAndOtherDomain, is(expectedResources_otherDomain));
    }
 
    @Test

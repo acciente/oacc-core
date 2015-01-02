@@ -2868,6 +2868,42 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       return false;
    }
 
+   private boolean __hasAnyPermissions(SQLConnection connection,
+                                       Resource accessorResource,
+                                       Resource accessedResource,
+                                       Set<ResourcePermission> requestedResourcePermissions)
+         throws AccessControlException, SQLException {
+      // first check for direct resource permissions
+      final Set<ResourcePermission> effectiveResourcePermissions
+            = __getEffectiveResourcePermissions(connection, accessorResource, accessedResource);
+
+      for (ResourcePermission requestedResourcePermission : requestedResourcePermissions) {
+         if (isPermissible(requestedResourcePermission, effectiveResourcePermissions)) {
+            return true;
+         }
+      }
+
+      // next check for global permissions to the domain of the accessed resource
+      final String resourceClassName
+            = resourceClassPersister.getResourceClassInfoByResourceId(connection, accessedResource).getResourceClassName();
+      final String domainName
+            = domainPersister.getResourceDomainNameByResourceId(connection, accessedResource);
+      final Set<ResourcePermission> effectiveGlobalPermissions
+            = __getEffectiveGlobalPermissions(connection, accessorResource, resourceClassName, domainName);
+
+      for (ResourcePermission requestedResourcePermission : requestedResourcePermissions) {
+         if (isPermissible(requestedResourcePermission, effectiveGlobalPermissions)) {
+            return true;
+         }
+      }
+
+      if (__isSuperUserOfDomain(connection, accessorResource, domainName)) {
+         return true;
+      }
+
+      return false;
+   }
+
    @Override
    public Set<Resource> getResourcesByResourcePermission(String resourceClassName,
                                                          ResourcePermission resourcePermission)
@@ -3027,21 +3063,16 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
          connection = getConnection();
 
          resourceClassName = resourceClassName.trim();
+         Set<ResourcePermission> anyRequiredResourcePermissions = new HashSet<>(3);
+         anyRequiredResourcePermissions.add(ResourcePermissions.getInstance(ResourcePermissions.IMPERSONATE));
+         anyRequiredResourcePermissions.add(ResourcePermissions.getInstance(ResourcePermissions.INHERIT));
+         anyRequiredResourcePermissions.add(ResourcePermissions.getInstance(ResourcePermissions.RESET_CREDENTIALS));
 
-         if (__hasPermission(connection,
-                             sessionResource,
-                             accessorResource,
-                             ResourcePermissions.getInstance(ResourcePermissions.IMPERSONATE))
-               ||
-               __hasPermission(connection,
-                               sessionResource,
-                               accessorResource,
-                               ResourcePermissions.getInstance(ResourcePermissions.INHERIT))
-               ||
-               __hasPermission(connection,
-                               sessionResource,
-                               accessorResource,
-                               ResourcePermissions.getInstance(ResourcePermissions.RESET_CREDENTIALS))) {
+         if ( sessionResource.equals(accessorResource)
+               || __hasAnyPermissions(connection,
+                                      sessionResource,
+                                      accessorResource,
+                                      anyRequiredResourcePermissions)) {
             return __getResourcesByPermission(connection,
                                               accessorResource,
                                               resourceClassName,
