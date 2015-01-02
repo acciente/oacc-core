@@ -3064,9 +3064,9 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
 
          resourceClassName = resourceClassName.trim();
          Set<ResourcePermission> anyRequiredResourcePermissions = new HashSet<>(3);
-         anyRequiredResourcePermissions.add(ResourcePermissions.getInstance(ResourcePermissions.IMPERSONATE));
-         anyRequiredResourcePermissions.add(ResourcePermissions.getInstance(ResourcePermissions.INHERIT));
-         anyRequiredResourcePermissions.add(ResourcePermissions.getInstance(ResourcePermissions.RESET_CREDENTIALS));
+         anyRequiredResourcePermissions.add(ResourcePermission_IMPERSONATE);
+         anyRequiredResourcePermissions.add(ResourcePermission_INHERIT);
+         anyRequiredResourcePermissions.add(ResourcePermission_RESET_CREDENTIALS);
 
          if ( sessionResource.equals(accessorResource)
                || __hasAnyPermissions(connection,
