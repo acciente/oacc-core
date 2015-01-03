@@ -2945,7 +2945,23 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
 
          resourceClassName = resourceClassName.trim();
 
-         return __getResourcesByPermission(connection, accessorResource, resourceClassName, resourcePermission);
+         Set<ResourcePermission> anyRequiredResourcePermissions = new HashSet<>(3);
+         anyRequiredResourcePermissions.add(ResourcePermission_IMPERSONATE);
+         anyRequiredResourcePermissions.add(ResourcePermission_INHERIT);
+         anyRequiredResourcePermissions.add(ResourcePermission_RESET_CREDENTIALS);
+
+         if ( sessionResource.equals(accessorResource)
+               || __hasAnyPermissions(connection,
+                                      sessionResource,
+                                      accessorResource,
+                                      anyRequiredResourcePermissions)) {
+            return __getResourcesByPermission(connection, accessorResource, resourceClassName, resourcePermission);
+         }
+         else {
+            throw new AccessControlException("Current resource must have IMPERSONATE, RESET_CREDENTIALS or INHERIT permission to: "
+                                                   + accessorResource,
+                                             true);
+         }
       }
       catch (SQLException e) {
          throw new AccessControlException(e);

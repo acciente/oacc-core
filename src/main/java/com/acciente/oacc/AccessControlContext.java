@@ -290,6 +290,11 @@ public interface AccessControlContext {
     * <p/>
     * The method takes into account direct, inherited and global permissions, as well as
     * resources that are reachable as a result of SUPER-USER permissions.
+    * <p/>
+    * Note that the current session resource must either be the specified accessor resource, or
+    * the current session resource must have IMPERSONATE, INHERIT or RESET-CREDENTIALS permissions to
+    * the specified accessor resource, or must have SUPER-USER permission to the (parent-) domain
+    * of the specified accessor resource, otherwise an exception is thrown.
     *
     * @param accessorResource   the resource relative to which the set of accessible resources is computed
     * @param resourceClassName  a string resource class name

@@ -180,13 +180,18 @@ public class TestAccessControl_getResourcesByResourcePermission extends TestAcce
                                                                     queriedDomain);
       assertThat(resourcesByPermissionAndDomain, is(expectedResources_queriedDomain));
 
+      Set<Resource> resourcesByAuthenticatedAccessorAndPermission
+            = accessControlContext.getResourcesByResourcePermission(accessorResource,
+                                                                    queriedResourceClass,
+                                                                    ResourcePermissions.getInstance(queriedPermission));
+      assertThat(resourcesByAuthenticatedAccessorAndPermission, is(expectedResources_anyDomain));
+
       Set<Resource> resourcesByAuthenticatedAccessorAndPermissionAndDomain
             = accessControlContext.getResourcesByResourcePermission(accessorResource,
                                                                     queriedResourceClass,
                                                                     ResourcePermissions.getInstance(queriedPermission),
                                                                     queriedDomain);
       assertThat(resourcesByAuthenticatedAccessorAndPermissionAndDomain, is(expectedResources_queriedDomain));
-
    }
 
    @Test
@@ -236,6 +241,7 @@ public class TestAccessControl_getResourcesByResourcePermission extends TestAcce
          accessControlContext.getResourcesByResourcePermission(accessorResource,
                                                                queriedResourceClass,
                                                                ResourcePermissions.getInstance(queriedPermission));
+         fail("getting resources by resource permission without authorization should have failed");
       }
       catch (AccessControlException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("resource must have impersonate, reset_credentials or inherit permission"));
@@ -246,6 +252,7 @@ public class TestAccessControl_getResourcesByResourcePermission extends TestAcce
                                                                queriedResourceClass,
                                                                ResourcePermissions.getInstance(queriedPermission),
                                                                queriedDomain);
+         fail("getting resources by resource permission without authorization should have failed");
       }
       catch (AccessControlException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("resource must have impersonate, reset_credentials or inherit permission"));
@@ -1001,6 +1008,14 @@ public class TestAccessControl_getResourcesByResourcePermission extends TestAcce
       final ResourcePermission nonExistentPermission = ResourcePermissions.getInstance("does_not_exist");
 
       try {
+         accessControlContext.getResourcesByResourcePermission(nonExistentResource, resourceClass, resourcePermission);
+         fail("getting resources by resource permission with non-existent accessor resource should have failed");
+      }
+      catch (AccessControlException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("could not determine resource domain for resource"));
+      }
+
+      try {
          accessControlContext.getResourcesByResourcePermission(nonExistentResource, resourceClass, resourcePermission, domain);
          fail("getting resources by resource permission with non-existent accessor resource should have failed");
       }
@@ -1090,19 +1105,5 @@ public class TestAccessControl_getResourcesByResourcePermission extends TestAcce
       catch (AccessControlException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("could not find domain"));
       }
-   }
-
-   @Test
-   public void getResourcesByResourcePermission_nonExistentReferences_shouldSucceed() throws AccessControlException {
-      authenticateSystemResource();
-
-      final Resource nonExistentResource = Resources.getInstance(-999L);
-      final String resourceClass = generateResourceClass(false, false);
-      final ResourcePermission resourcePermission
-            = ResourcePermissions.getInstance(generateResourceClassPermission(resourceClass));
-
-      final Set<Resource> nonExistentAccessorResources
-            = accessControlContext.getResourcesByResourcePermission(nonExistentResource, resourceClass, resourcePermission);
-      assertThat(nonExistentAccessorResources.isEmpty(), is(true));
    }
 }
