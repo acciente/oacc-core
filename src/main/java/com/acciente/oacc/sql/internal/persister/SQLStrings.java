@@ -60,6 +60,7 @@ public class SQLStrings implements Serializable {
    public final String SQL_findInGrantDomainPermissionSys_SysPermissionID_IsWithGrant_InheritLevel_DomainLevel_BY_AccessorID_DomainID;
    public final String SQL_findInGrantDomainPermissionSys_withoutInheritance_SysPermissionID_IsWithGrant_BY_AccessorID_DomainID;
    public final String SQL_findInGrantDomainPermissionSys_ResourceDomainName_SysPermissionID_IsWithGrant_InheritLevel_DomainLevel_BY_AccessorID;
+   public final String SQL_findInGrantDomainPermissionSys_withoutInheritance_ResourceDomainName_SysPermissionID_IsWithGrant_BY_AccessorID;
    public final String SQL_createInGrantDomainPermissionSys_WITH_AccessorID_GrantorID_AccessedDomainID_IsWithGrant_SysPermissionID;
    public final String SQL_removeInGrantDomainPermissionSys_BY_AccessorID_AccessedDomainID;
 
@@ -359,6 +360,14 @@ public class SQLStrings implements Serializable {
             + "SELECT B.DomainName, P.SysPermissionId, P.IsWithGrant, P.InheritLevel, P.DomainLevel FROM P JOIN "
             + schemaNameAndTablePrefix
             + "Domain B ON B.DomainId = P.AccessedDomainId";
+
+      SQL_findInGrantDomainPermissionSys_withoutInheritance_ResourceDomainName_SysPermissionID_IsWithGrant_BY_AccessorID
+            = "SELECT B.DomainName, A.SysPermissionId, A.IsWithGrant FROM "
+            + schemaNameAndTablePrefix
+            + "Grant_DomPerm_Sys A JOIN "
+            + schemaNameAndTablePrefix
+            + "Domain B ON B.DomainId = A.AccessedDomainId "
+            + "WHERE A.AccessorResourceId = ?";
 
       SQL_createInGrantDomainPermissionSys_WITH_AccessorID_GrantorID_AccessedDomainID_IsWithGrant_SysPermissionID
             = "INSERT INTO "

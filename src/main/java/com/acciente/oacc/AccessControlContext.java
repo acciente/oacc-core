@@ -558,6 +558,37 @@ public interface AccessControlContext {
          throws AccessControlException;
 
    /**
+    * Gets all domain permissions the accessor resource has directly to the specified domain.
+    * <p/>
+    * This method only takes into account direct domain permissions, but not any inherited
+    * domain permissions and not any domain permissions the accessor may have to ancestors of
+    * the specified domain.
+    *
+    * @param accessorResource the accessor resource relative which permissions should be returned
+    * @param domainName       a string domain name
+    * @return the set of all direct domain permission the accessor resource has to the domain
+    * @throws AccessControlException if an error occurs
+    */
+   public Set<DomainPermission> getDomainPermissions(Resource accessorResource,
+                                                     String domainName)
+         throws AccessControlException;
+
+   /**
+    * Gets all domain permissions the accessor resource has directly to any domain, mapped by domain name.
+    * <p/>
+    * This method only takes into account direct domain permissions, but not any inherited domain
+    * permissions and not any domain permissions the accessor may have to ancestors of each domain.
+    * The result is returned as a map keyed by the domain name, where each value is the
+    * set of direct permissions for the domain name of the key.
+    *
+    * @param accessorResource the accessor resource relative which permissions should be returned
+    * @return the sets of direct domain permission the accessor resource has to any domain, mapped by domain name
+    * @throws AccessControlException if an error occurs
+    */
+   public Map<String, Set<DomainPermission>> getDomainPermissionsMap(Resource accessorResource)
+         throws AccessControlException;
+
+   /**
     * Gets all effective domain permissions the accessor resource has to the specified domain.
     * <p/>
     * This method takes into account direct domain permissions, inherited domain permissions

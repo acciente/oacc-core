@@ -210,6 +210,46 @@ public class GrantDomainPermissionSysPersister extends Persister {
          closeStatement(statement);
       }
    }
+   public Map<String, Set<DomainPermission>> getDomainSysPermissions(SQLConnection connection,
+                                                                     Resource accessorResource) throws AccessControlException {
+      SQLStatement statement = null;
+
+      try {
+         // collect the create permissions that this resource has to each resource domains
+         statement = connection.prepareStatement(sqlStrings.SQL_findInGrantDomainPermissionSys_withoutInheritance_ResourceDomainName_SysPermissionID_IsWithGrant_BY_AccessorID);
+         statement.setResourceId(1, accessorResource);
+         SQLResult resultSet = statement.executeQuery();
+
+         final Map<String, Set<DomainPermission>> domainPermissionsMap = new HashMap<>();
+
+         while (resultSet.next()) {
+            final String resourceDomainName = resultSet.getString("DomainName");
+
+            Set<DomainPermission> domainPermissions = domainPermissionsMap.get(resourceDomainName);
+
+            if (domainPermissions == null) {
+               domainPermissionsMap.put(resourceDomainName,
+                                        domainPermissions = new HashSet<>());
+            }
+
+            // on the resource domains only pre-defined system permissions are expected
+            domainPermissions
+                  .add(DomainPermissions.getInstance(resultSet.getDomainSysPermissionName("SysPermissionId"),
+                                                     resultSet.getBoolean("IsWithGrant"),
+                                                     0,
+                                                     0));
+         }
+         resultSet.close();
+
+         return domainPermissionsMap;
+      }
+      catch (SQLException e) {
+         throw new AccessControlException(e);
+      }
+      finally {
+         closeStatement(statement);
+      }
+   }
 
    public void addDomainSysPermissions(SQLConnection connection,
                                        Resource accessorResource,

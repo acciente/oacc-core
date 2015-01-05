@@ -911,6 +911,56 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       }
    }
 
+   @Override
+   public Set<DomainPermission> getDomainPermissions(Resource accessorResource,
+                                                     String domainName) throws AccessControlException {
+      SQLConnection connection = null;
+
+      assertAuth();
+      assertResourceSpecified(accessorResource);
+      assertDomainSpecified(domainName);
+
+      try {
+         connection = getConnection();
+
+         Id<DomainId> domainId = domainPersister.getResourceDomainId(connection, domainName);
+
+         if (domainId == null) {
+            throw new AccessControlException("Could not find domain: " + domainName);
+         }
+
+         return __getDirectDomainPermissions(connection, accessorResource, domainId);
+      }
+      catch (SQLException e) {
+         throw new AccessControlException(e);
+      }
+      finally {
+         closeConnection(connection);
+      }
+   }
+
+   @Override
+   public Map<String, Set<DomainPermission>> getDomainPermissionsMap(Resource accessorResource) throws AccessControlException {
+      SQLConnection connection = null;
+
+      assertAuth();
+      assertResourceSpecified(accessorResource);
+
+      try {
+         connection = getConnection();
+
+         return collapseDomainPermissions(grantDomainPermissionSysPersister.getDomainSysPermissions(connection,
+                                                                                                    accessorResource));
+      }
+      catch (SQLException e) {
+         throw new AccessControlException(e);
+      }
+      finally {
+         closeConnection(connection);
+      }
+
+   }
+
    private void __setDomainPermissions(SQLConnection connection,
                                        Resource accessorResource,
                                        String domainName,

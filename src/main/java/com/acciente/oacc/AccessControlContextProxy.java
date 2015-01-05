@@ -234,6 +234,17 @@ public class AccessControlContextProxy implements AccessControlContext {
    }
 
    @Override
+   public Set<DomainPermission> getDomainPermissions(Resource accessorResource,
+                                                     String domainName) throws AccessControlException {
+      return accessControlContext.getDomainPermissions(accessorResource, domainName);
+   }
+
+   @Override
+   public Map<String, Set<DomainPermission>> getDomainPermissionsMap(Resource accessorResource) throws AccessControlException {
+      return accessControlContext.getDomainPermissionsMap(accessorResource);
+   }
+
+   @Override
    public Set<DomainPermission> getEffectiveDomainPermissions(Resource accessorResource,
                                                               String domainName) throws AccessControlException {
       return accessControlContext.getEffectiveDomainPermissions(accessorResource, domainName);
