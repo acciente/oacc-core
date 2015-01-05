@@ -515,6 +515,19 @@ public interface AccessControlContext {
          throws AccessControlException;
 
    /**
+    * Gets all direct domain create permissions the specified accessor resource has.
+    * <p/>
+    * This method only takes into account direct domain create permissions and does not return the
+    * domain create permissions the specified accessor resource inherits from another resource.
+    *
+    * @param accessorResource the accessor resource relative which permissions should be returned
+    * @return a set of direct domain create permission the accessor resource has
+    * @throws AccessControlException if an error occurs
+    */
+   public Set<DomainCreatePermission> getDomainCreatePermissions(Resource accessorResource)
+         throws AccessControlException;
+
+   /**
     * Gets all effective domain create permissions the specified accessor resource has, both directly
     * and inherited (from other resources).
     *

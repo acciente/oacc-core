@@ -217,6 +217,11 @@ public class AccessControlContextProxy implements AccessControlContext {
    }
 
    @Override
+   public Set<DomainCreatePermission> getDomainCreatePermissions(Resource accessorResource) throws AccessControlException {
+      return accessControlContext.getDomainCreatePermissions(accessorResource);
+   }
+
+   @Override
    public Set<DomainCreatePermission> getEffectiveDomainCreatePermissions(Resource accessorResource) throws AccessControlException {
       return accessControlContext.getEffectiveDomainCreatePermissions(accessorResource);
    }

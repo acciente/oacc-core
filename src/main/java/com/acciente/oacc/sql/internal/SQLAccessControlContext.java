@@ -1233,6 +1233,26 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
    }
 
    @Override
+   public Set<DomainCreatePermission> getDomainCreatePermissions(Resource accessorResource) throws AccessControlException {
+      SQLConnection connection = null;
+
+      assertAuth();
+      assertResourceSpecified(accessorResource);
+
+      try {
+         connection = getConnection();
+
+         return __getDirectDomainCreatePermissions(connection, accessorResource);
+      }
+      catch (SQLException e) {
+         throw new AccessControlException(e);
+      }
+      finally {
+         closeConnection(connection);
+      }
+   }
+
+   @Override
    public Set<DomainCreatePermission> getEffectiveDomainCreatePermissions(Resource accessorResource) throws AccessControlException {
       SQLConnection connection = null;
 
