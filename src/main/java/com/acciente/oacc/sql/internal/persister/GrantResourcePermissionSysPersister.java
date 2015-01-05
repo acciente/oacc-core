@@ -36,7 +36,7 @@ public class GrantResourcePermissionSysPersister extends Persister {
       this.sqlStrings = sqlStrings;
    }
 
-   public Set<Resource> getResourcesBySysResourcePermission(SQLConnection connection,
+   public Set<Resource> getResourcesByResourceSysPermission(SQLConnection connection,
                                                             Resource accessorResource,
                                                             Id<ResourceClassId> resourceClassId,
                                                             ResourcePermission resourcePermission) throws AccessControlException {
@@ -73,7 +73,7 @@ public class GrantResourcePermissionSysPersister extends Persister {
       }
    }
 
-   public Set<Resource> getResourcesBySysResourcePermission(SQLConnection connection,
+   public Set<Resource> getResourcesByResourceSysPermission(SQLConnection connection,
                                                             Resource accessorResource,
                                                             Id<ResourceClassId> resourceClassId,
                                                             Id<DomainId> resourceDomainId,
@@ -111,7 +111,7 @@ public class GrantResourcePermissionSysPersister extends Persister {
       }
    }
 
-   public Set<Resource> getAccessorResourcesBySysResourcePermission(SQLConnection connection,
+   public Set<Resource> getAccessorResourcesByResourceSysPermission(SQLConnection connection,
                                                                     Resource accessedResource,
                                                                     Id<ResourceClassId> resourceClassId,
                                                                     ResourcePermission resourcePermission) throws AccessControlException {
@@ -148,7 +148,7 @@ public class GrantResourcePermissionSysPersister extends Persister {
       }
    }
 
-   public Set<ResourcePermission> getSysResourcePermissionsIncludeInherited(SQLConnection connection,
+   public Set<ResourcePermission> getResourceSysPermissionsIncludeInherited(SQLConnection connection,
                                                                             Resource accessorResource,
                                                                             Resource accessedResource)
          throws AccessControlException {
@@ -183,7 +183,7 @@ public class GrantResourcePermissionSysPersister extends Persister {
       }
    }
 
-   public Set<ResourcePermission> getSysResourcePermissions(SQLConnection connection,
+   public Set<ResourcePermission> getResourceSysPermissions(SQLConnection connection,
                                                             Resource accessorResource,
                                                             Resource accessedResource)
          throws AccessControlException {
@@ -219,7 +219,7 @@ public class GrantResourcePermissionSysPersister extends Persister {
       }
    }
 
-   public void addSysResourcePermissions(SQLConnection connection,
+   public void addResourceSysPermissions(SQLConnection connection,
                                          Resource accessorResource,
                                          Resource accessedResource,
                                          Id<ResourceClassId> accessedResourceClassId,
@@ -251,7 +251,7 @@ public class GrantResourcePermissionSysPersister extends Persister {
       }
    }
 
-   public void removeSysResourcePermissions(SQLConnection connection,
+   public void removeResourceSysPermissions(SQLConnection connection,
                                             Resource accessorResource,
                                             Resource accessedResource) throws AccessControlException {
 

@@ -1898,7 +1898,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
          }
 
          // revoke any existing direct system permissions between the accessor and the accessed resource
-         grantResourcePermissionSysPersister.removeSysResourcePermissions(connection,
+         grantResourcePermissionSysPersister.removeResourceSysPermissions(connection,
                                                                           accessorResource,
                                                                           accessedResource);
 
@@ -1907,7 +1907,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       }
 
       // add the new direct system permissions
-      grantResourcePermissionSysPersister.addSysResourcePermissions(connection,
+      grantResourcePermissionSysPersister.addResourceSysPermissions(connection,
                                                                     accessorResource,
                                                                     accessedResource,
                                                                     Id.<ResourceClassId>from(
@@ -2005,7 +2005,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
 
       // collect the system permissions that the accessor resource has to the accessed resource
       resourcePermissions.addAll(grantResourcePermissionSysPersister
-                                       .getSysResourcePermissionsIncludeInherited(connection,
+                                       .getResourceSysPermissionsIncludeInherited(connection,
                                                                                   accessorResource,
                                                                                   accessedResource));
 
@@ -2043,7 +2043,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       Set<ResourcePermission> resourcePermissions = new HashSet<>();
 
       // collect the system permissions that the accessor resource has to the accessed resource
-      resourcePermissions.addAll(grantResourcePermissionSysPersister.getSysResourcePermissions(connection,
+      resourcePermissions.addAll(grantResourcePermissionSysPersister.getResourceSysPermissions(connection,
                                                                                                accessorResource,
                                                                                                accessedResource));
 
@@ -2989,7 +2989,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
 
       if (resourcePermission.isSystemPermission()) {
          // get the list of objects of the specified type that the session has access to via direct permissions
-         resources.addAll(grantResourcePermissionSysPersister.getResourcesBySysResourcePermission(connection,
+         resources.addAll(grantResourcePermissionSysPersister.getResourcesByResourceSysPermission(connection,
                                                                                                   accessorResource,
                                                                                                   resourceClassId,
                                                                                                   resourcePermission));
@@ -3137,7 +3137,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
 
       if (resourcePermission.isSystemPermission()) {
          // get the list of objects of the specified type that the session has access to via direct permissions
-         resources.addAll(grantResourcePermissionSysPersister.getResourcesBySysResourcePermission(connection,
+         resources.addAll(grantResourcePermissionSysPersister.getResourcesByResourceSysPermission(connection,
                                                                                                   accessorResource,
                                                                                                   resourceClassId,
                                                                                                   domainId,
@@ -3229,7 +3229,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
 
       if (resourcePermission.isSystemPermission()) {
          // get the list of objects of the specified type that the session has access to via direct permissions
-         resources.addAll(grantResourcePermissionSysPersister.getAccessorResourcesBySysResourcePermission(connection,
+         resources.addAll(grantResourcePermissionSysPersister.getAccessorResourcesByResourceSysPermission(connection,
                                                                                                           accessedResource,
                                                                                                           resourceClassId,
                                                                                                           resourcePermission));
