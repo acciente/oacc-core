@@ -130,7 +130,7 @@ public class GrantGlobalResourcePermissionSysPersister extends Persister {
 
          while (resultSet.next()) {
             resourcePermissions.add(ResourcePermissions.getInstance(resultSet.getResourceSysPermissionName(
-                  "SysPermissionId"),
+                                                                          "SysPermissionId"),
                                                                     resultSet.getBoolean("IsWithGrant"),
                                                                     resultSet.getInteger("InheritLevel"),
                                                                     resultSet.getInteger("DomainLevel")));
@@ -219,6 +219,56 @@ public class GrantGlobalResourcePermissionSysPersister extends Persister {
                                                                                     resultSet.getBoolean("IsWithGrant"),
                                                                                     resultSet.getInteger("InheritLevel"),
                                                                                     resultSet.getInteger("DomainLevel")));
+         }
+         resultSet.close();
+
+         return globalSysPermissionsMap;
+      }
+      catch (SQLException e) {
+         throw new AccessControlException(e);
+      }
+      finally {
+         closeStatement(statement);
+      }
+   }
+
+   public Map<String, Map<String, Set<ResourcePermission>>> getGlobalSysPermissions(SQLConnection connection,
+                                                                                    Resource accessorResource)
+         throws AccessControlException {
+      SQLStatement statement = null;
+      try {
+         // collect the system permissions that the accessor has
+         SQLResult resultSet;
+         Map<String, Map<String, Set<ResourcePermission>>> globalSysPermissionsMap = new HashMap<>();
+
+         statement = connection.prepareStatement(sqlStrings.SQL_findInGrantGlobalResourcePermissionSys_withoutInheritance_ResourceDomainName_ResourceClassName_SysPermissionID_IsWithGrant_BY_AccessorID);
+         statement.setResourceId(1, accessorResource);
+         resultSet = statement.executeQuery();
+
+         while (resultSet.next()) {
+            final String resourceDomainName;
+            final String resourceClassName;
+            Map<String, Set<ResourcePermission>> permissionsForResourceDomain;
+            Set<ResourcePermission> resourcePermissionsForResourceClass;
+
+            resourceDomainName = resultSet.getString("DomainName");
+            resourceClassName = resultSet.getString("ResourceClassName");
+
+            if ((permissionsForResourceDomain = globalSysPermissionsMap.get(resourceDomainName)) == null) {
+               globalSysPermissionsMap.put(resourceDomainName,
+                                           permissionsForResourceDomain = new HashMap<>());
+            }
+
+            if ((resourcePermissionsForResourceClass = permissionsForResourceDomain.get(resourceClassName)) == null) {
+               permissionsForResourceDomain.put(resourceClassName,
+                                                resourcePermissionsForResourceClass = new HashSet<>());
+            }
+
+            resourcePermissionsForResourceClass
+                  .add(ResourcePermissions.getInstance(resultSet.getResourceSysPermissionName("SysPermissionId"),
+                                                       resultSet.getBoolean("IsWithGrant"),
+                                                       0,
+                                                       0));
          }
          resultSet.close();
 

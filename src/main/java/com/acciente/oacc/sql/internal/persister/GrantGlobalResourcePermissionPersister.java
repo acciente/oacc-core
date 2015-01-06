@@ -237,6 +237,56 @@ public class GrantGlobalResourcePermissionPersister extends Persister {
       }
    }
 
+   public Map<String, Map<String, Set<ResourcePermission>>> getGlobalResourcePermissions(SQLConnection connection,
+                                                                                         Resource accessorResource)
+         throws AccessControlException {
+      SQLStatement statement = null;
+      try {
+         // collect the non-system permissions that the accessor has
+         SQLResult resultSet;
+         final Map<String, Map<String, Set<ResourcePermission>>> globalPermissionsMap = new HashMap<>();
+
+         statement = connection.prepareStatement(sqlStrings.SQL_findInGrantGlobalResourcePermission_withoutInheritance_ResourceDomainName_ResourceClassName_PermissionName_IsWithGrant_BY_AccessorID);
+         statement.setResourceId(1, accessorResource);
+         resultSet = statement.executeQuery();
+
+         while (resultSet.next()) {
+            final String resourceDomainName;
+            final String resourceClassName;
+            Map<String, Set<ResourcePermission>> permissionsForResourceDomain;
+            Set<ResourcePermission> resourcePermissionsForResourceClass;
+
+            resourceDomainName = resultSet.getString("DomainName");
+            resourceClassName = resultSet.getString("ResourceClassName");
+
+            if ((permissionsForResourceDomain = globalPermissionsMap.get(resourceDomainName)) == null) {
+               globalPermissionsMap.put(resourceDomainName,
+                                        permissionsForResourceDomain = new HashMap<>());
+            }
+
+            if ((resourcePermissionsForResourceClass = permissionsForResourceDomain.get(resourceClassName)) == null) {
+               permissionsForResourceDomain.put(resourceClassName,
+                                                resourcePermissionsForResourceClass = new HashSet<>());
+            }
+
+            resourcePermissionsForResourceClass.add(ResourcePermissions.getInstance(
+                  resultSet.getString("PermissionName"),
+                  resultSet.getBoolean("IsWithGrant"),
+                  0,
+                  0));
+         }
+         resultSet.close();
+
+         return globalPermissionsMap;
+      }
+      catch (SQLException e) {
+         throw new AccessControlException(e);
+      }
+      finally {
+         closeStatement(statement);
+      }
+   }
+
    public void addGlobalResourcePermissions(SQLConnection connection,
                                             Resource accessorResource,
                                             Id<ResourceClassId> accessedResourceClassId,

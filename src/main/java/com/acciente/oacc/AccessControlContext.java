@@ -884,6 +884,26 @@ public interface AccessControlContext {
          throws AccessControlException;
 
    /**
+    * Gets the global resource permissions the specified accessor resource has directly to the resources of
+    * the specified resource class in the specified domain.
+    * <p/>
+    * This method only takes into account direct global resource permissions, but not inherited
+    * global resource permissions and not any global resource permissions the accessor may have to
+    * ancestors of the specified domain.
+    *
+    * @param accessorResource  the resource relative to which the permissions should be returned
+    * @param resourceClassName a string resource class name
+    * @param domainName        a string domain name
+    * @return a set of direct global resource permissions the accessor resource has to resources in the
+    *         specified resource class and domain
+    * @throws AccessControlException if an error occurs
+    */
+   public Set<ResourcePermission> getGlobalResourcePermissions(Resource accessorResource,
+                                                               String resourceClassName,
+                                                               String domainName)
+         throws AccessControlException;
+
+   /**
     * Gets the effective global resource permissions the specified accessor resource has to the resources of
     * the specified resource class in the specified domain.
     * <p/>
@@ -933,6 +953,24 @@ public interface AccessControlContext {
          throws AccessControlException;
 
    /**
+    * Gets the global resource permissions the specified accessor resource has directly to the resources of
+    * the specified resource class in the current session resource's domain.
+    * <p/>
+    * This method only takes into account direct global resource permissions, but not inherited
+    * global resource permissions and not any global resource permissions the accessor may have to
+    * ancestors of the current session resource's domain.
+    *
+    * @param accessorResource  the resource relative to which the permissions should be returned
+    * @param resourceClassName a string resource class name
+    * @return the set of direct global resource permissions the accessor resource has to resources of
+    *         the specified resource class in the current session resource's domain
+    * @throws AccessControlException if an error occurs
+    */
+   public Set<ResourcePermission> getGlobalResourcePermissions(Resource accessorResource,
+                                                               String resourceClassName)
+         throws AccessControlException;
+
+   /**
     * Gets the effective global resource permissions the specified accessor resource has to the resources of
     * the specified resource class in the current session resource's domain.
     * <p/>
@@ -948,6 +986,26 @@ public interface AccessControlContext {
     */
    public Set<ResourcePermission> getEffectiveGlobalResourcePermissions(Resource accessorResource,
                                                                         String resourceClassName)
+         throws AccessControlException;
+
+   /**
+    * Gets all global resource permissions the specified accessor resource has directly to any resources
+    * of any resource class in any domain, mapped by domain name and resource class name.
+    * <p/>
+    * This method only takes into account direct global resource permissions, but not inherited
+    * global resource permissions and not any global resource permissions the accessor may have to
+    * ancestors of each domain.
+    * <p/>
+    * The result is returned as a map keyed by the domain name, where each value is another
+    * map keyed by resource class name, in which each value is the set of global resource permissions
+    * for the resource class and domain name of the respective keys.
+    *
+    * @param accessorResource the resource relative to which the permissions should be returned
+    * @return a map of maps of all direct global resource permissions the accessor resource has, keyed
+    *         by domain name and resource class name
+    * @throws AccessControlException if an error occurs
+    */
+   public Map<String, Map<String, Set<ResourcePermission>>> getGlobalResourcePermissionsMap(Resource accessorResource)
          throws AccessControlException;
 
    /**

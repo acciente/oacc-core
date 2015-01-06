@@ -334,6 +334,13 @@ public class AccessControlContextProxy implements AccessControlContext {
    }
 
    @Override
+   public Set<ResourcePermission> getGlobalResourcePermissions(Resource accessorResource,
+                                                               String resourceClassName,
+                                                               String domainName) throws AccessControlException {
+      return accessControlContext.getGlobalResourcePermissions(accessorResource, resourceClassName, domainName);
+   }
+
+   @Override
    public Set<ResourcePermission> getEffectiveGlobalResourcePermissions(Resource accessorResource,
                                                                         String resourceClassName,
                                                                         String domainName) throws AccessControlException {
@@ -348,9 +355,20 @@ public class AccessControlContextProxy implements AccessControlContext {
    }
 
    @Override
+   public Set<ResourcePermission> getGlobalResourcePermissions(Resource accessorResource,
+                                                               String resourceClassName) throws AccessControlException {
+      return accessControlContext.getGlobalResourcePermissions(accessorResource, resourceClassName);
+   }
+
+   @Override
    public Set<ResourcePermission> getEffectiveGlobalResourcePermissions(Resource accessorResource,
                                                                         String resourceClassName) throws AccessControlException {
       return accessControlContext.getEffectiveGlobalResourcePermissions(accessorResource, resourceClassName);
+   }
+
+   @Override
+   public Map<String, Map<String, Set<ResourcePermission>>> getGlobalResourcePermissionsMap(Resource accessorResource) throws AccessControlException {
+      return accessControlContext.getGlobalResourcePermissionsMap(accessorResource);
    }
 
    @Override

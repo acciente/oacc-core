@@ -133,12 +133,14 @@ public class SQLStrings implements Serializable {
    public final String SQL_findInGrantGlobalResourcePermissionSys_SysPermissionID_IsWithGrant_InheritLevel_DomainLevel_BY_AccessorID_AccessedDomainID_ResourceClassID;
    public final String SQL_findInGrantGlobalResourcePermissionSys_withoutInheritance_SysPermissionID_IsWithGrant_BY_AccessorID_AccessedDomainID_ResourceClassID;
    public final String SQL_findInGrantGlobalResourcePermissionSys_ResourceDomainName_ResourceClassName_SysPermissionID_IsWithGrant_InheritLevel_DomainLevel_BY_AccessorID;
+   public final String SQL_findInGrantGlobalResourcePermissionSys_withoutInheritance_ResourceDomainName_ResourceClassName_SysPermissionID_IsWithGrant_BY_AccessorID;
    public final String SQL_createInGrantGlobalResourcePermissionSys_WITH_AccessorID_GrantorID_AccessedDomainID_IsWithGrant_ResourceClassID_SysPermissionID;
    public final String SQL_removeInGrantGlobalResourcePermissionSys_BY_AccessorID_AccessedDomainID_ResourceClassID;
    // GrantGlobalResourcePermission
    public final String SQL_findInGrantGlobalResourcePermission_PermissionName_IsWithGrant_InheritLevel_DomainLevel_BY_AccessorID_AccessedDomainID_ResourceClassID;
    public final String SQL_findInGrantGlobalResourcePermission_withoutInheritance_PermissionName_IsWithGrant_BY_AccessorID_AccessedDomainID_ResourceClassID;
    public final String SQL_findInGrantGlobalResourcePermission_ResourceDomainName_ResourceClassName_PermissionName_IsWithGrant_InheritLevel_DomainLevel_BY_AccessorID;
+   public final String SQL_findInGrantGlobalResourcePermission_withoutInheritance_ResourceDomainName_ResourceClassName_PermissionName_IsWithGrant_BY_AccessorID;
    public final String SQL_createInGrantGlobalResourcePermission_WITH_AccessorID_GrantorID_AccessedDomainID_IsWithGrant_ResourceClassID_PermissionName;
    public final String SQL_removeInGrantGlobalResourcePermission_BY_AccessorID_AccessedDomainID_ResourceClassID;
 
@@ -854,6 +856,16 @@ public class SQLStrings implements Serializable {
             + schemaNameAndTablePrefix
             + "Domain C ON C.DomainId = P.AccessedDomainId";
 
+      SQL_findInGrantGlobalResourcePermissionSys_withoutInheritance_ResourceDomainName_ResourceClassName_SysPermissionID_IsWithGrant_BY_AccessorID
+            = "SELECT C.DomainName, B.ResourceClassName, A.SysPermissionId, A.IsWithGrant FROM "
+            + schemaNameAndTablePrefix
+            + "Grant_Global_ResPerm_Sys A JOIN "
+            + schemaNameAndTablePrefix
+            + "ResourceClass B ON B.ResourceClassId = A.ResourceClassId JOIN "
+            + schemaNameAndTablePrefix
+            + "Domain C ON C.DomainId = A.AccessedDomainId "
+            + "WHERE A.AccessorResourceId = ?";
+
       SQL_createInGrantGlobalResourcePermissionSys_WITH_AccessorID_GrantorID_AccessedDomainID_IsWithGrant_ResourceClassID_SysPermissionID
             = "INSERT INTO "
             + schemaNameAndTablePrefix
@@ -905,6 +917,18 @@ public class SQLStrings implements Serializable {
             + "ResourceClass C ON C.ResourceClassId = P.ResourceClassId JOIN "
             + schemaNameAndTablePrefix
             + "Domain D ON D.DomainId = P.AccessedDomainId";
+
+      SQL_findInGrantGlobalResourcePermission_withoutInheritance_ResourceDomainName_ResourceClassName_PermissionName_IsWithGrant_BY_AccessorID
+            = "SELECT D.DomainName, C.ResourceClassName, B.PermissionName, A.IsWithGrant FROM "
+            + schemaNameAndTablePrefix
+            + "Grant_Global_ResPerm A JOIN "
+            + schemaNameAndTablePrefix
+            + "ResourceClassPermission B ON B.ResourceClassId = A.ResourceClassId AND B.PermissionId = A.PermissionId JOIN "
+            + schemaNameAndTablePrefix
+            + "ResourceClass C ON C.ResourceClassId = A.ResourceClassId JOIN "
+            + schemaNameAndTablePrefix
+            + "Domain D ON D.DomainId = A.AccessedDomainId "
+            + "WHERE A.AccessorResourceId = ?";
 
       SQL_createInGrantGlobalResourcePermission_WITH_AccessorID_GrantorID_AccessedDomainID_IsWithGrant_ResourceClassID_PermissionName
             = "INSERT INTO "

@@ -911,56 +911,6 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       }
    }
 
-   @Override
-   public Set<DomainPermission> getDomainPermissions(Resource accessorResource,
-                                                     String domainName) throws AccessControlException {
-      SQLConnection connection = null;
-
-      assertAuth();
-      assertResourceSpecified(accessorResource);
-      assertDomainSpecified(domainName);
-
-      try {
-         connection = getConnection();
-
-         Id<DomainId> domainId = domainPersister.getResourceDomainId(connection, domainName);
-
-         if (domainId == null) {
-            throw new AccessControlException("Could not find domain: " + domainName);
-         }
-
-         return __getDirectDomainPermissions(connection, accessorResource, domainId);
-      }
-      catch (SQLException e) {
-         throw new AccessControlException(e);
-      }
-      finally {
-         closeConnection(connection);
-      }
-   }
-
-   @Override
-   public Map<String, Set<DomainPermission>> getDomainPermissionsMap(Resource accessorResource) throws AccessControlException {
-      SQLConnection connection = null;
-
-      assertAuth();
-      assertResourceSpecified(accessorResource);
-
-      try {
-         connection = getConnection();
-
-         return collapseDomainPermissions(grantDomainPermissionSysPersister.getDomainSysPermissions(connection,
-                                                                                                    accessorResource));
-      }
-      catch (SQLException e) {
-         throw new AccessControlException(e);
-      }
-      finally {
-         closeConnection(connection);
-      }
-
-   }
-
    private void __setDomainPermissions(SQLConnection connection,
                                        Resource accessorResource,
                                        String domainName,
@@ -1063,6 +1013,56 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
    }
 
    @Override
+   public Set<DomainPermission> getDomainPermissions(Resource accessorResource,
+                                                     String domainName) throws AccessControlException {
+      SQLConnection connection = null;
+
+      assertAuth();
+      assertResourceSpecified(accessorResource);
+      assertDomainSpecified(domainName);
+
+      try {
+         connection = getConnection();
+
+         Id<DomainId> domainId = domainPersister.getResourceDomainId(connection, domainName);
+
+         if (domainId == null) {
+            throw new AccessControlException("Could not find domain: " + domainName);
+         }
+
+         return __getDirectDomainPermissions(connection, accessorResource, domainId);
+      }
+      catch (SQLException e) {
+         throw new AccessControlException(e);
+      }
+      finally {
+         closeConnection(connection);
+      }
+   }
+
+   @Override
+   public Map<String, Set<DomainPermission>> getDomainPermissionsMap(Resource accessorResource) throws AccessControlException {
+      SQLConnection connection = null;
+
+      assertAuth();
+      assertResourceSpecified(accessorResource);
+
+      try {
+         connection = getConnection();
+
+         return collapseDomainPermissions(grantDomainPermissionSysPersister.getDomainSysPermissions(connection,
+                                                                                                    accessorResource));
+      }
+      catch (SQLException e) {
+         throw new AccessControlException(e);
+      }
+      finally {
+         closeConnection(connection);
+      }
+
+   }
+
+   @Override
    public Set<DomainPermission> getEffectiveDomainPermissions(Resource accessorResource,
                                                               String domainName) throws AccessControlException {
       SQLConnection connection = null;
@@ -1125,9 +1125,8 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       try {
          connection = getConnection();
 
-         return collapseDomainPermissions(grantDomainPermissionSysPersister.getDomainSysPermissionsIncludeInherited(
-               connection,
-               accessorResource));
+         return collapseDomainPermissions(grantDomainPermissionSysPersister
+                                                .getDomainSysPermissionsIncludeInherited(connection, accessorResource));
       }
       catch (SQLException e) {
          throw new AccessControlException(e);
@@ -1749,11 +1748,11 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
    private Map<String, Map<String, Set<ResourceCreatePermission>>> __getDirectResourceCreatePermissionsMap(SQLConnection connection,
                                                                                                            Resource accessorResource) throws AccessControlException {
       // collect all the create permissions that the accessor has
-      Map<String, Map<String, Set<ResourceCreatePermission>>> allResourceCreatePermissionsMap;
+      Map<String, Map<String, Set<ResourceCreatePermission>>> allResourceCreatePermissionsMap = new HashMap<>();
 
       // read the *CREATE system permissions and add to allResourceCreatePermissionsMap
       allResourceCreatePermissionsMap
-            = grantResourceCreatePermissionSysPersister.getResourceCreateSysPermissions(connection, accessorResource);
+            .putAll(grantResourceCreatePermissionSysPersister.getResourceCreateSysPermissions(connection, accessorResource));
 
       // read the post create system permissions and add to allResourceCreatePermissionsMap
       mergeSourceCreatePermissionsMapIntoTargetCreatePermissionsMap(
@@ -1854,20 +1853,20 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
                                                                                                       domainId));
 
       // next read the post create system permissions the accessor has to the specified resource class
-      resourceCreatePermissions.addAll(
-            grantResourceCreatePermissionPostCreateSysPersister.getResourceCreatePostCreateSysPermissionsIncludeInherited(
-                  connection,
-                  accessorResource,
-                  resourceClassId,
-                  domainId));
+      resourceCreatePermissions
+            .addAll(grantResourceCreatePermissionPostCreateSysPersister
+                          .getResourceCreatePostCreateSysPermissionsIncludeInherited(connection,
+                                                                                     accessorResource,
+                                                                                     resourceClassId,
+                                                                                     domainId));
 
       // next read the post create non-system permissions the accessor has to the specified resource class
-      resourceCreatePermissions.addAll(
-            grantResourceCreatePermissionPostCreatePersister.getResourceCreatePostCreatePermissionsIncludeInherited(
-                  connection,
-                  accessorResource,
-                  resourceClassId,
-                  domainId));
+      resourceCreatePermissions
+            .addAll(grantResourceCreatePermissionPostCreatePersister
+                          .getResourceCreatePostCreatePermissionsIncludeInherited(connection,
+                                                                                  accessorResource,
+                                                                                  resourceClassId,
+                                                                                  domainId));
       return collapseResourceCreatePermissions(resourceCreatePermissions);
    }
 
@@ -1913,12 +1912,12 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
          Resource accessorResource)
          throws AccessControlException {
       // collect all the create permissions that the accessor has
-      Map<String, Map<String, Set<ResourceCreatePermission>>> allResourceCreatePermissionsMap;
+      Map<String, Map<String, Set<ResourceCreatePermission>>> allResourceCreatePermissionsMap = new HashMap<>();
 
       // read the *CREATE system permissions and add to allResourceCreatePermissionsMap
       allResourceCreatePermissionsMap
-            = grantResourceCreatePermissionSysPersister.getResourceCreateSysPermissionsIncludeInherited(connection,
-                                                                                                        accessorResource);
+            .putAll(grantResourceCreatePermissionSysPersister
+                          .getResourceCreateSysPermissionsIncludeInherited(connection, accessorResource));
 
       // read the post create system permissions and add to allResourceCreatePermissionsMap
       mergeSourceCreatePermissionsMapIntoTargetCreatePermissionsMap(
@@ -2189,6 +2188,25 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       }
    }
 
+   private Set<ResourcePermission> __getDirectResourcePermissions(SQLConnection connection,
+                                                                  Resource accessorResource,
+                                                                  Resource accessedResource)
+         throws AccessControlException {
+      Set<ResourcePermission> resourcePermissions = new HashSet<>();
+
+      // collect the system permissions that the accessor resource has to the accessed resource
+      resourcePermissions.addAll(grantResourcePermissionSysPersister.getResourceSysPermissions(connection,
+                                                                                               accessorResource,
+                                                                                               accessedResource));
+
+      // collect the non-system permissions that the accessor has to the accessed resource
+      resourcePermissions.addAll(grantResourcePermissionPersister.getResourcePermissions(connection,
+                                                                                         accessorResource,
+                                                                                         accessedResource));
+
+      return resourcePermissions;
+   }
+
    @Override
    public Set<ResourcePermission> getEffectiveResourcePermissions(Resource accessorResource, Resource accessedResource)
          throws AccessControlException {
@@ -2235,38 +2253,19 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
                             .getResourceClassId());
 
       // collect the global system permissions that the accessor has to the accessed resource's domain
-      resourcePermissions.addAll(grantGlobalResourcePermissionSysPersister.getGlobalSysPermissionsIncludeInherited(
-            connection,
-            accessorResource,
-            accessedResourceClassId,
-            accessedDomainId));
+      resourcePermissions
+            .addAll(grantGlobalResourcePermissionSysPersister.getGlobalSysPermissionsIncludeInherited(connection,
+                                                                                                      accessorResource,
+                                                                                                      accessedResourceClassId,
+                                                                                                      accessedDomainId));
 
       // first collect the global non-system permissions that the accessor this resource has to the accessed resource's domain
-      resourcePermissions.addAll(grantGlobalResourcePermissionPersister.getGlobalResourcePermissionsIncludeInherited(
-            connection,
-            accessorResource,
-            accessedResourceClassId,
-            accessedDomainId));
+      resourcePermissions
+            .addAll(grantGlobalResourcePermissionPersister.getGlobalResourcePermissionsIncludeInherited(connection,
+                                                                                                        accessorResource,
+                                                                                                        accessedResourceClassId,
+                                                                                                        accessedDomainId));
       return collapseResourcePermissions(resourcePermissions);
-   }
-
-   private Set<ResourcePermission> __getDirectResourcePermissions(SQLConnection connection,
-                                                                  Resource accessorResource,
-                                                                  Resource accessedResource)
-         throws AccessControlException {
-      Set<ResourcePermission> resourcePermissions = new HashSet<>();
-
-      // collect the system permissions that the accessor resource has to the accessed resource
-      resourcePermissions.addAll(grantResourcePermissionSysPersister.getResourceSysPermissions(connection,
-                                                                                               accessorResource,
-                                                                                               accessedResource));
-
-      // collect the non-system permissions that the accessor has to the accessed resource
-      resourcePermissions.addAll(grantResourcePermissionPersister.getResourcePermissions(connection,
-                                                                                         accessorResource,
-                                                                                         accessedResource));
-
-      return resourcePermissions;
    }
 
    @Override
@@ -2494,6 +2493,85 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
    }
 
    @Override
+   public Set<ResourcePermission> getGlobalResourcePermissions(Resource accessorResource,
+                                                               String resourceClassName,
+                                                               String domainName) throws AccessControlException {
+      SQLConnection connection = null;
+
+      assertAuth();
+      assertResourceSpecified(accessorResource);
+      assertResourceClassSpecified(resourceClassName);
+      assertDomainSpecified(domainName);
+
+      try {
+         connection = getConnection();
+         resourceClassName = resourceClassName.trim();
+         domainName = domainName.trim();
+
+         return __getDirectGlobalResourcePermissions(connection,
+                                                     accessorResource,
+                                                     resourceClassName,
+                                                     domainName);
+      }
+      catch (SQLException e) {
+         throw new AccessControlException(e);
+      }
+      finally {
+         closeConnection(connection);
+      }
+   }
+
+   private Set<ResourcePermission> __getDirectGlobalResourcePermissions(SQLConnection connection,
+                                                                        Resource accessorResource,
+                                                                        String resourceClassName,
+                                                                        String domainName) throws AccessControlException {
+      // verify that resource class is defined
+      final Id<ResourceClassId> resourceClassId = resourceClassPersister.getResourceClassId(connection, resourceClassName);
+
+      if (resourceClassId == null) {
+         throw new AccessControlException("Could not find resource class: " + resourceClassName);
+      }
+
+      // verify the domain
+      final Id<DomainId> domainId = domainPersister.getResourceDomainId(connection, domainName);
+
+      if (domainId == null) {
+         throw new AccessControlException("Could not find domain: " + domainName);
+      }
+
+      return __getDirectGlobalResourcePermissions(connection,
+                                                  accessorResource,
+                                                  resourceClassId,
+                                                  domainId);
+   }
+
+   @Override
+   public Set<ResourcePermission> getGlobalResourcePermissions(Resource accessorResource,
+                                                               String resourceClassName) throws AccessControlException {
+      SQLConnection connection = null;
+
+      assertAuth();
+      assertResourceSpecified(accessorResource);
+      assertResourceClassSpecified(resourceClassName);
+
+      try {
+         connection = getConnection();
+         resourceClassName = resourceClassName.trim();
+
+         return __getDirectGlobalResourcePermissions(connection,
+                                                     accessorResource,
+                                                     resourceClassName,
+                                                     sessionResourceDomainName);
+      }
+      catch (SQLException e) {
+         throw new AccessControlException(e);
+      }
+      finally {
+         closeConnection(connection);
+      }
+   }
+
+   @Override
    public Set<ResourcePermission> getEffectiveGlobalResourcePermissions(Resource accessorResource,
                                                                         String resourceClassName,
                                                                         String domainName)
@@ -2603,6 +2681,43 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
    }
 
    @Override
+   public Map<String, Map<String, Set<ResourcePermission>>> getGlobalResourcePermissionsMap(Resource accessorResource) throws AccessControlException {
+      SQLConnection connection = null;
+
+      assertAuth();
+      assertResourceSpecified(accessorResource);
+
+      try {
+         connection = getConnection();
+
+         return __getDirectGlobalPermissions(connection, accessorResource);
+      }
+      catch (SQLException e) {
+         throw new AccessControlException(e);
+      }
+      finally {
+         closeConnection(connection);
+      }
+   }
+
+   private Map<String, Map<String, Set<ResourcePermission>>> __getDirectGlobalPermissions(SQLConnection connection,
+                                                                                          Resource accessorResource)
+         throws AccessControlException {
+      final Map<String, Map<String, Set<ResourcePermission>>> globalALLPermissionsMap = new HashMap<>();
+
+      // collect the system permissions that the accessor has and add it into the globalALLPermissionsMap
+      globalALLPermissionsMap
+            .putAll(grantGlobalResourcePermissionSysPersister.getGlobalSysPermissions(connection, accessorResource));
+
+      // next collect the non-system permissions that the accessor has and add it into the globalALLPermissionsMap
+      mergeSourcePermissionsMapIntoTargetPermissionsMap(grantGlobalResourcePermissionPersister
+                                                              .getGlobalResourcePermissions(connection, accessorResource),
+                                                        globalALLPermissionsMap);
+
+      return collapseResourcePermissions(globalALLPermissionsMap);
+   }
+
+   @Override
    public Map<String, Map<String, Set<ResourcePermission>>> getEffectiveGlobalResourcePermissionsMap(Resource accessorResource)
          throws AccessControlException {
       SQLConnection connection = null;
@@ -2629,10 +2744,9 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       final Map<String, Map<String, Set<ResourcePermission>>> globalALLPermissionsMap = new HashMap<>();
 
       // collect the system permissions that the accessor has and add it into the globalALLPermissionsMap
-      mergeSourcePermissionsMapIntoTargetPermissionsMap(
-            grantGlobalResourcePermissionSysPersister.getGlobalSysPermissionsIncludeInherited(connection,
-                                                                                              accessorResource),
-            globalALLPermissionsMap);
+      globalALLPermissionsMap
+            .putAll(grantGlobalResourcePermissionSysPersister
+                          .getGlobalSysPermissionsIncludeInherited(connection, accessorResource));
 
       // next collect the non-system permissions that the accessor has and add it into the globalALLPermissionsMap
       mergeSourcePermissionsMapIntoTargetPermissionsMap(
