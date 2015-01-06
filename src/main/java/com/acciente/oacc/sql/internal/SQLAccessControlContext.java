@@ -397,10 +397,10 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
          final String
                domainName = domainPersister.getResourceDomainNameByResourceId(connection, resource);
          final Set<ResourcePermission>
-               globalResourcePermissions = __getEffectiveGlobalPermissions(connection,
-                                                                           authenticatedResource,
-                                                                           resourceClassInternalInfo.getResourceClassName(),
-                                                                           domainName);
+               globalResourcePermissions = __getEffectiveGlobalResourcePermissions(connection,
+                                                                                   authenticatedResource,
+                                                                                   resourceClassInternalInfo.getResourceClassName(),
+                                                                                   domainName);
 
          if (globalResourcePermissions.contains(ResourcePermission_IMPERSONATE)
                || globalResourcePermissions.contains(ResourcePermission_IMPERSONATE_GRANT)) {
@@ -477,10 +477,10 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
             final String
                   domainName = domainPersister.getResourceDomainNameByResourceId(connection, resource);
             final Set<ResourcePermission>
-                  globalResourcePermissions = __getEffectiveGlobalPermissions(connection,
-                                                                              authenticatedResource,
-                                                                              resourceClassInfo.getResourceClassName(),
-                                                                              domainName);
+                  globalResourcePermissions = __getEffectiveGlobalResourcePermissions(connection,
+                                                                                      authenticatedResource,
+                                                                                      resourceClassInfo.getResourceClassName(),
+                                                                                      domainName);
 
             if (globalResourcePermissions.contains(ResourcePermission_RESET_CREDENTIALS)
                   || globalResourcePermissions.contains(ResourcePermission_RESET_CREDENTIALS_GRANT)) {
@@ -2361,10 +2361,10 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
          // check if the grantor (=session resource) is authorized to grant the requested permissions
          final Set<ResourcePermission>
                grantorPermissions
-               = __getEffectiveGlobalPermissions(connection,
-                                                 sessionResource,
-                                                 resourceClassName,
-                                                 domainName);
+               = __getEffectiveGlobalResourcePermissions(connection,
+                                                         sessionResource,
+                                                         resourceClassName,
+                                                         domainName);
          final Set<ResourcePermission>
                directAccessorPermissions
                = __getDirectGlobalResourcePermissions(connection,
@@ -2588,10 +2588,10 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
          resourceClassName = resourceClassName.trim();
          domainName = domainName.trim();
 
-         return __getEffectiveGlobalPermissions(connection,
-                                                accessorResource,
-                                                resourceClassName,
-                                                domainName);
+         return __getEffectiveGlobalResourcePermissions(connection,
+                                                        accessorResource,
+                                                        resourceClassName,
+                                                        domainName);
       }
       catch (SQLException e) {
          throw new AccessControlException(e);
@@ -2615,10 +2615,10 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
          connection = getConnection();
          resourceClassName = resourceClassName.trim();
 
-         return __getEffectiveGlobalPermissions(connection,
-                                                accessorResource,
-                                                resourceClassName,
-                                                sessionResourceDomainName);
+         return __getEffectiveGlobalResourcePermissions(connection,
+                                                        accessorResource,
+                                                        resourceClassName,
+                                                        sessionResourceDomainName);
       }
       catch (SQLException e) {
          throw new AccessControlException(e);
@@ -2628,10 +2628,10 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       }
    }
 
-   private Set<ResourcePermission> __getEffectiveGlobalPermissions(SQLConnection connection,
-                                                                   Resource accessorResource,
-                                                                   String resourceClassName,
-                                                                   String domainName)
+   private Set<ResourcePermission> __getEffectiveGlobalResourcePermissions(SQLConnection connection,
+                                                                           Resource accessorResource,
+                                                                           String resourceClassName,
+                                                                           String domainName)
          throws AccessControlException {
       // verify that resource class is defined
       final Id<ResourceClassId> resourceClassId = resourceClassPersister.getResourceClassId(connection, resourceClassName);
@@ -2690,7 +2690,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       try {
          connection = getConnection();
 
-         return __getDirectGlobalPermissions(connection, accessorResource);
+         return __getDirectGlobalResourcePermissionsMap(connection, accessorResource);
       }
       catch (SQLException e) {
          throw new AccessControlException(e);
@@ -2700,8 +2700,8 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       }
    }
 
-   private Map<String, Map<String, Set<ResourcePermission>>> __getDirectGlobalPermissions(SQLConnection connection,
-                                                                                          Resource accessorResource)
+   private Map<String, Map<String, Set<ResourcePermission>>> __getDirectGlobalResourcePermissionsMap(SQLConnection connection,
+                                                                                                     Resource accessorResource)
          throws AccessControlException {
       final Map<String, Map<String, Set<ResourcePermission>>> globalALLPermissionsMap = new HashMap<>();
 
@@ -2728,7 +2728,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       try {
          connection = getConnection();
 
-         return __getEffectiveGlobalPermissions(connection, accessorResource);
+         return __getEffectiveGlobalResourcePermissionsMap(connection, accessorResource);
       }
       catch (SQLException e) {
          throw new AccessControlException(e);
@@ -2738,8 +2738,8 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       }
    }
 
-   private Map<String, Map<String, Set<ResourcePermission>>> __getEffectiveGlobalPermissions(SQLConnection connection,
-                                                                                             Resource accessorResource)
+   private Map<String, Map<String, Set<ResourcePermission>>> __getEffectiveGlobalResourcePermissionsMap(SQLConnection connection,
+                                                                                                        Resource accessorResource)
          throws AccessControlException {
       final Map<String, Map<String, Set<ResourcePermission>>> globalALLPermissionsMap = new HashMap<>();
 
@@ -2994,10 +2994,10 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
 
          // check if the requested permission is permissible from the set of effective global permissions
          final Set<ResourcePermission> globalResourcePermissions
-               = __getEffectiveGlobalPermissions(connection,
-                                                 sessionResource,
-                                                 resourceClassName,
-                                                 domainName);
+               = __getEffectiveGlobalResourcePermissions(connection,
+                                                         sessionResource,
+                                                         resourceClassName,
+                                                         domainName);
 
          if (isPermissible(requestedResourcePermission, globalResourcePermissions)) {
             return;
@@ -3042,7 +3042,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
          connection = getConnection();
          resourceClassName = resourceClassName.trim();
 
-         __assertGlobalPermission(connection, resourceClassName, requestedResourcePermission, sessionResourceDomainName);
+         __assertGlobalResourcePermission(connection, resourceClassName, requestedResourcePermission, sessionResourceDomainName);
       }
       catch (SQLException e) {
          throw new AccessControlException(e);
@@ -3068,7 +3068,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
          resourceClassName = resourceClassName.trim();
          domainName = domainName.trim();
 
-         __assertGlobalPermission(connection, resourceClassName, requestedResourcePermission, domainName);
+         __assertGlobalResourcePermission(connection, resourceClassName, requestedResourcePermission, domainName);
       }
       catch (SQLException e) {
          throw new AccessControlException(e);
@@ -3078,17 +3078,17 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       }
    }
 
-   private void __assertGlobalPermission(SQLConnection connection,
-                                         String resourceClassName,
-                                         ResourcePermission requestedResourcePermission, String domainName)
+   private void __assertGlobalResourcePermission(SQLConnection connection,
+                                                 String resourceClassName,
+                                                 ResourcePermission requestedResourcePermission, String domainName)
          throws AccessControlException {
       assertPermissionValid(connection, resourceClassName, requestedResourcePermission);
 
       final Set<ResourcePermission>
-            globalResourcePermissions = __getEffectiveGlobalPermissions(connection,
-                                                                        sessionResource,
-                                                                        resourceClassName,
-                                                                        domainName);
+            globalResourcePermissions = __getEffectiveGlobalResourcePermissions(connection,
+                                                                                sessionResource,
+                                                                                resourceClassName,
+                                                                                domainName);
 
       if (isPermissible(requestedResourcePermission, globalResourcePermissions)) {
          return;
@@ -3100,7 +3100,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
 
       // if none of the above then complain...
       throw new AccessControlException("No global permission: " + requestedResourcePermission,
-                                 true);
+                                       true);
    }
 
    @Override
@@ -3185,7 +3185,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
             = domainPersister.getResourceDomainNameByResourceId(connection, accessedResource);
 
       if (isPermissible(requestedResourcePermission,
-                        __getEffectiveGlobalPermissions(connection, accessorResource, resourceClassName, domainName))) {
+                        __getEffectiveGlobalResourcePermissions(connection, accessorResource, resourceClassName, domainName))) {
          return true;
       }
 
@@ -3217,7 +3217,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       final String domainName
             = domainPersister.getResourceDomainNameByResourceId(connection, accessedResource);
       final Set<ResourcePermission> effectiveGlobalPermissions
-            = __getEffectiveGlobalPermissions(connection, accessorResource, resourceClassName, domainName);
+            = __getEffectiveGlobalResourcePermissions(connection, accessorResource, resourceClassName, domainName);
 
       for (ResourcePermission requestedResourcePermission : requestedResourcePermissions) {
          if (isPermissible(requestedResourcePermission, effectiveGlobalPermissions)) {
@@ -3426,8 +3426,8 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
          }
          else {
             throw new AccessControlException("Current resource must have IMPERSONATE, RESET_CREDENTIALS or INHERIT permission to: "
-                                             + accessorResource,
-                                       true);
+                                                   + accessorResource,
+                                             true);
          }
       }
       catch (SQLException e) {
@@ -3529,7 +3529,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
          connection = getConnection();
          resourceClassName = resourceClassName.trim();
 
-         return __getAccessorResourcesByPermission(connection, accessedResource, resourceClassName, resourcePermission);
+         return __getAccessorResourcesByResourcePermission(connection, accessedResource, resourceClassName, resourcePermission);
       }
       catch (SQLException e) {
          throw new AccessControlException(e);
@@ -3539,10 +3539,10 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       }
    }
 
-   private Set<Resource> __getAccessorResourcesByPermission(SQLConnection connection,
-                                                            Resource accessedResource,
-                                                            String resourceClassName,
-                                                            ResourcePermission resourcePermission) throws AccessControlException {
+   private Set<Resource> __getAccessorResourcesByResourcePermission(SQLConnection connection,
+                                                                    Resource accessedResource,
+                                                                    String resourceClassName,
+                                                                    ResourcePermission resourcePermission) throws AccessControlException {
       // first verify that resource class is defined
       Id<ResourceClassId> resourceClassId;
       Id<ResourcePermissionId> permissionId;
