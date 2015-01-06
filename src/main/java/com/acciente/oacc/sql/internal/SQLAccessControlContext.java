@@ -2168,6 +2168,28 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
    }
 
    @Override
+   public Set<ResourcePermission> getResourcePermissions(Resource accessorResource,
+                                                         Resource accessedResource) throws AccessControlException {
+      SQLConnection connection = null;
+
+      assertAuth();
+      assertResourceSpecified(accessorResource);
+      assertResourceSpecified(accessedResource);
+
+      try {
+         connection = getConnection();
+
+         return __getDirectResourcePermissions(connection, accessorResource, accessedResource);
+      }
+      catch (SQLException e) {
+         throw new AccessControlException(e);
+      }
+      finally {
+         closeConnection(connection);
+      }
+   }
+
+   @Override
    public Set<ResourcePermission> getEffectiveResourcePermissions(Resource accessorResource, Resource accessedResource)
          throws AccessControlException {
       SQLConnection connection = null;

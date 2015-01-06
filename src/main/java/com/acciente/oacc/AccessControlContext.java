@@ -822,12 +822,29 @@ public interface AccessControlContext {
          throws AccessControlException;
 
    /**
-    * Gets the effective resource permissions that the specified accessor resource has to the
+    * Gets the resource permissions that the specified accessor resource has directly to the
     * specified accessed resource.
-    * This method takes into account direct, inherited and global permissions of the session resource.
+    * <p/>
+    * This method only takes into account direct permissions, but not inherited and not global permissions
+    * of the specified accessor resource.
     *
     * @param accessorResource the resource relative to which the permissions should be returned
-    * @param accessedResource the resource on which the privilege is granted
+    * @param accessedResource the resource on which the privileges were granted
+    * @return a set of direct resource permissions
+    * @throws AccessControlException if an error occurs
+    */
+   public Set<ResourcePermission> getResourcePermissions(Resource accessorResource,
+                                                         Resource accessedResource)
+         throws AccessControlException;
+
+   /**
+    * Gets the effective resource permissions that the specified accessor resource has to the
+    * specified accessed resource.
+    * <p/>
+    * This method takes into account direct, inherited and global permissions of the specified accessor resource.
+    *
+    * @param accessorResource the resource relative to which the permissions should be returned
+    * @param accessedResource the resource on which the privileges were granted
     * @return a set of effective resource permissions
     * @throws AccessControlException if an error occurs
     */
