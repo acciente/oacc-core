@@ -1648,6 +1648,129 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
    }
 
    @Override
+   public Set<ResourceCreatePermission> getResourceCreatePermissions(Resource accessorResource,
+                                                                     String resourceClassName,
+                                                                     String domainName) throws AccessControlException {
+      SQLConnection connection = null;
+
+      assertAuth();
+      assertResourceSpecified(accessorResource);
+      assertResourceClassSpecified(resourceClassName);
+      assertDomainSpecified(domainName);
+
+      try {
+         connection = getConnection();
+         resourceClassName = resourceClassName.trim();
+         domainName = domainName.trim();
+
+         return __getDirectResourceCreatePermissions(connection,
+                                                     accessorResource,
+                                                     resourceClassName,
+                                                     domainName);
+      }
+      catch (SQLException e) {
+         throw new AccessControlException(e);
+      }
+      finally {
+         closeConnection(connection);
+      }
+   }
+
+   private Set<ResourceCreatePermission> __getDirectResourceCreatePermissions(SQLConnection connection,
+                                                                              Resource accessorResource,
+                                                                              String resourceClassName,
+                                                                              String domainName) throws AccessControlException {
+      // verify that resource class is defined
+      Id<ResourceClassId> resourceClassId = resourceClassPersister.getResourceClassId(connection, resourceClassName);
+
+      if (resourceClassId == null) {
+         throw new AccessControlException("Could not find resource class: " + resourceClassName);
+      }
+
+      // verify that domain is defined
+      final Id<DomainId> domainId = domainPersister.getResourceDomainId(connection, domainName);
+
+      if (domainId == null) {
+         throw new AccessControlException("Could not find domain: " + domainName);
+      }
+
+      return __getDirectResourceCreatePermissions(connection,
+                                                  accessorResource,
+                                                  resourceClassId,
+                                                  domainId);
+   }
+
+   @Override
+   public Set<ResourceCreatePermission> getResourceCreatePermissions(Resource accessorResource,
+                                                                     String resourceClassName) throws AccessControlException {
+      SQLConnection connection = null;
+
+      assertAuth();
+      assertResourceSpecified(accessorResource);
+      assertResourceClassSpecified(resourceClassName);
+
+      try {
+         connection = getConnection();
+         resourceClassName = resourceClassName.trim();
+
+         return __getDirectResourceCreatePermissions(connection,
+                                                     accessorResource,
+                                                     resourceClassName,
+                                                     sessionResourceDomainName);
+      }
+      catch (SQLException e) {
+         throw new AccessControlException(e);
+      }
+      finally {
+         closeConnection(connection);
+      }
+   }
+
+   @Override
+   public Map<String, Map<String, Set<ResourceCreatePermission>>> getResourceCreatePermissionsMap(Resource accessorResource) throws AccessControlException {
+      SQLConnection connection = null;
+
+      assertAuth();
+      assertResourceSpecified(accessorResource);
+
+      try {
+         connection = getConnection();
+
+         return __getDirectResourceCreatePermissionsMap(connection, accessorResource);
+      }
+      catch (SQLException e) {
+         throw new AccessControlException(e);
+      }
+      finally {
+         closeConnection(connection);
+      }
+   }
+
+   private Map<String, Map<String, Set<ResourceCreatePermission>>> __getDirectResourceCreatePermissionsMap(SQLConnection connection,
+                                                                                                           Resource accessorResource) throws AccessControlException {
+      // collect all the create permissions that the accessor has
+      Map<String, Map<String, Set<ResourceCreatePermission>>> allResourceCreatePermissionsMap;
+
+      // read the *CREATE system permissions and add to allResourceCreatePermissionsMap
+      allResourceCreatePermissionsMap
+            = grantResourceCreatePermissionSysPersister.getResourceCreateSysPermissions(connection, accessorResource);
+
+      // read the post create system permissions and add to allResourceCreatePermissionsMap
+      mergeSourceCreatePermissionsMapIntoTargetCreatePermissionsMap(
+            grantResourceCreatePermissionPostCreateSysPersister
+                  .getResourceCreatePostCreateSysPermissions(connection, accessorResource),
+            allResourceCreatePermissionsMap);
+
+      // read the post create non-system permissions and add to allResourceCreatePermissionsMap
+      mergeSourceCreatePermissionsMapIntoTargetCreatePermissionsMap(
+            grantResourceCreatePermissionPostCreatePersister
+                  .getResourceCreatePostCreatePermissions(connection, accessorResource),
+            allResourceCreatePermissionsMap);
+
+      return collapseResourceCreatePermissions(allResourceCreatePermissionsMap);
+   }
+
+   @Override
    public Set<ResourceCreatePermission> getEffectiveResourceCreatePermissions(Resource accessorResource,
                                                                               String resourceClassName,
                                                                               String domainName) throws AccessControlException {
@@ -1790,21 +1913,20 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
          Resource accessorResource)
          throws AccessControlException {
       // collect all the create permissions that the accessor has
-      Map<String, Map<String, Set<ResourceCreatePermission>>> allResourceCreatePermissionsMap = new HashMap<>();
+      Map<String, Map<String, Set<ResourceCreatePermission>>> allResourceCreatePermissionsMap;
 
-      // read the *CREATE system permissions and add to createALLPermissionsMap
-      mergeSourceCreatePermissionsMapIntoTargetCreatePermissionsMap(
-            grantResourceCreatePermissionSysPersister.getResourceCreateSysPermissionsIncludeInherited(connection,
-                                                                                                      accessorResource),
-            allResourceCreatePermissionsMap);
+      // read the *CREATE system permissions and add to allResourceCreatePermissionsMap
+      allResourceCreatePermissionsMap
+            = grantResourceCreatePermissionSysPersister.getResourceCreateSysPermissionsIncludeInherited(connection,
+                                                                                                        accessorResource);
 
-      // read the post create system permissions and add to createALLPermissionsMap
+      // read the post create system permissions and add to allResourceCreatePermissionsMap
       mergeSourceCreatePermissionsMapIntoTargetCreatePermissionsMap(
             grantResourceCreatePermissionPostCreateSysPersister
                   .getResourceCreatePostCreateSysPermissionsIncludeInherited(connection, accessorResource),
             allResourceCreatePermissionsMap);
 
-      // read the post create non-system permissions and add to createALLPermissionsMap
+      // read the post create non-system permissions and add to allResourceCreatePermissionsMap
       mergeSourceCreatePermissionsMapIntoTargetCreatePermissionsMap(
             grantResourceCreatePermissionPostCreatePersister
                   .getResourceCreatePostCreatePermissionsIncludeInherited(connection, accessorResource),

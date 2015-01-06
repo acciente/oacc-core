@@ -100,18 +100,21 @@ public class SQLStrings implements Serializable {
    public final String SQL_findInGrantResourceCreatePermissionSys_SysPermissionId_IsWithGrant_InheritLevel_DomainLevel_BY_AccessorID_AccessedDomainID_ResourceClassID;
    public final String SQL_findInGrantResourceCreatePermissionSys_withoutInheritance_SysPermissionId_IsWithGrant_BY_AccessorID_AccessedDomainID_ResourceClassID;
    public final String SQL_findInGrantResourceCreatePermissionSys_ResourceDomainName_ResourceClassName_SysPermissionId_IsWithGrant_InheritLevel_DomainLevel_BY_AccessorID;
+   public final String SQL_findInGrantResourceCreatePermissionSys_withoutInheritance_ResourceDomainName_ResourceClassName_SysPermissionId_IsWithGrant_BY_AccessorID;
    public final String SQL_createInGrantResourceCreatePermissionSys_WITH_AccessorID_GrantorID_AccessedDomainID_IsWithGrant_ResourceClassID_SysPermissionId;
    public final String SQL_removeInGrantResourceCreatePermissionSys_BY_AccessorID_AccessedDomainID_ResourceClassID;
    // GrantResourceCreatePermissionPostCreateSys
    public final String SQL_findInGrantResourceCreatePermissionPostCreateSys_PostCreateSysPermissionID_PostCreateIsWithGrant_IsWithGrant_InheritLevel_DomainLevel_BY_AccessorID_AccessedDomainID_ResourceClassID;
    public final String SQL_findInGrantResourceCreatePermissionPostCreateSys_withoutInheritance_PostCreateSysPermissionID_PostCreateIsWithGrant_IsWithGrant_BY_AccessorID_AccessedDomainID_ResourceClassID;
    public final String SQL_findInGrantResourceCreatePermissionPostCreateSys_ResourceDomainName_ResourceClassName_PostCreateSysPermissionID_PostCreateIsWithGrant_IsWithGrant_InheritLevel_DomainLevel_BY_AccessorID;
+   public final String SQL_findInGrantResourceCreatePermissionPostCreateSys_withoutInheritance_ResourceDomainName_ResourceClassName_PostCreateSysPermissionID_PostCreateIsWithGrant_IsWithGrant_BY_AccessorID;
    public final String SQL_createInGrantResourceCreatePermissionPostCreateSys_WITH_AccessorID_GrantorID_AccessedDomainID_IsWithGrant_PostCreateIsWithGrant_ResourceClassID_PostCreateSysPermissionID;
    public final String SQL_removeInGrantResourceCreatePermissionPostCreateSys_BY_AccessorID_AccessedDomainID_ResourceClassID;
    // GrantResourceCreatePermissionPostCreate
    public final String SQL_findInGrantResourceCreatePermissionPostCreate_ResourceClassName_PostCreatePermissionName_PostCreateIsWithGrant_IsWithGrant_InheritLevel_DomainLevel_BY_AccessorID_AccessedDomainID_ResourceClassID;
    public final String SQL_findInGrantResourceCreatePermissionPostCreate_withoutInheritance_PostCreatePermissionName_PostCreateIsWithGrant_IsWithGrant_BY_AccessorID_AccessedDomainID_ResourceClassID;
    public final String SQL_findInGrantResourceCreatePermissionPostCreate_ResourceDomainName_ResourceClassName_PostCreatePermissionName_PostCreateIsWithGrant_IsWithGrant_InheritLevel_DomainLevel_BY_AccessorID;
+   public final String SQL_findInGrantResourceCreatePermissionPostCreate_withoutInheritance_ResourceDomainName_ResourceClassName_PostCreatePermissionName_PostCreateIsWithGrant_IsWithGrant_BY_AccessorID;
    public final String SQL_createInGrantResourceCreatePermissionPostCreate_WITH_AccessorID_GrantorID_AccessedDomainID_IsWithGrant_PostCreateIsWithGrant_ResourceClassID_PostCreatePermissionName;
    public final String SQL_removeInGrantResourceCreatePermissionPostCreate_BY_AccessorID_AccessedDomainID_ResourceClassID;
 
@@ -605,6 +608,16 @@ public class SQLStrings implements Serializable {
             + schemaNameAndTablePrefix
             + "Domain C ON C.DomainId = P.AccessedDomainId";
 
+      SQL_findInGrantResourceCreatePermissionSys_withoutInheritance_ResourceDomainName_ResourceClassName_SysPermissionId_IsWithGrant_BY_AccessorID
+            = "SELECT C.DomainName, B.ResourceClassName, A.SysPermissionId, A.IsWithGrant FROM "
+            + schemaNameAndTablePrefix
+            + "Grant_ResCrPerm_Sys A JOIN "
+            + schemaNameAndTablePrefix
+            + "ResourceClass B ON B.ResourceClassId = A.ResourceClassId JOIN "
+            + schemaNameAndTablePrefix
+            + "Domain C ON C.DomainId = A.AccessedDomainId "
+            + "WHERE A.AccessorResourceId = ?";
+
       SQL_createInGrantResourceCreatePermissionSys_WITH_AccessorID_GrantorID_AccessedDomainID_IsWithGrant_ResourceClassID_SysPermissionId
             = "INSERT INTO "
             + schemaNameAndTablePrefix
@@ -650,6 +663,16 @@ public class SQLStrings implements Serializable {
             + "ResourceClass B ON B.ResourceClassId = P.ResourceClassId JOIN "
             + schemaNameAndTablePrefix
             + "Domain C ON C.DomainId = P.AccessedDomainId";
+
+      SQL_findInGrantResourceCreatePermissionPostCreateSys_withoutInheritance_ResourceDomainName_ResourceClassName_PostCreateSysPermissionID_PostCreateIsWithGrant_IsWithGrant_BY_AccessorID
+            = "SELECT C.DomainName, B.ResourceClassName, A.PostCreateSysPermissionId, A.PostCreateIsWithGrant, A.IsWithGrant FROM "
+            + schemaNameAndTablePrefix
+            + "Grant_ResCrPerm_PostCr_Sys A JOIN "
+            + schemaNameAndTablePrefix
+            + "ResourceClass B ON B.ResourceClassId = A.ResourceClassId JOIN "
+            + schemaNameAndTablePrefix
+            + "Domain C ON C.DomainId = A.AccessedDomainId "
+            + "WHERE A.AccessorResourceId = ?";
 
       SQL_createInGrantResourceCreatePermissionPostCreateSys_WITH_AccessorID_GrantorID_AccessedDomainID_IsWithGrant_PostCreateIsWithGrant_ResourceClassID_PostCreateSysPermissionID
             = "INSERT INTO "
@@ -704,6 +727,18 @@ public class SQLStrings implements Serializable {
             + "ResourceClass C ON C.ResourceClassId = P.ResourceClassId JOIN "
             + schemaNameAndTablePrefix
             + "Domain D ON D.DomainId = P.AccessedDomainId";
+
+      SQL_findInGrantResourceCreatePermissionPostCreate_withoutInheritance_ResourceDomainName_ResourceClassName_PostCreatePermissionName_PostCreateIsWithGrant_IsWithGrant_BY_AccessorID
+            = "SELECT D.DomainName, C.ResourceClassName, B.PermissionName PostCreatePermissionName, A.PostCreateIsWithGrant, A.IsWithGrant FROM "
+            + schemaNameAndTablePrefix
+            + "Grant_ResCrPerm_PostCr A JOIN "
+            + schemaNameAndTablePrefix
+            + "ResourceClassPermission B ON B.ResourceClassId = A.ResourceClassId AND B.PermissionId = A.PostCreatePermissionId JOIN "
+            + schemaNameAndTablePrefix
+            + "ResourceClass C ON C.ResourceClassId = A.ResourceClassId JOIN "
+            + schemaNameAndTablePrefix
+            + "Domain D ON D.DomainId = A.AccessedDomainId "
+            + "WHERE A.AccessorResourceId = ?";
 
       SQL_createInGrantResourceCreatePermissionPostCreate_WITH_AccessorID_GrantorID_AccessedDomainID_IsWithGrant_PostCreateIsWithGrant_ResourceClassID_PostCreatePermissionName
             = "INSERT INTO "

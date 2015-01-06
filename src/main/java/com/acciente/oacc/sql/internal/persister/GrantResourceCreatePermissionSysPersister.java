@@ -125,6 +125,56 @@ public class GrantResourceCreatePermissionSysPersister extends Persister {
       }
    }
 
+   public Map<String, Map<String, Set<ResourceCreatePermission>>> getResourceCreateSysPermissions(SQLConnection connection,
+                                                                                                  Resource accessorResource) throws AccessControlException {
+      SQLStatement statement = null;
+
+      try {
+         Map<String, Map<String, Set<ResourceCreatePermission>>> createSysPermissionsMap = new HashMap<>();
+         SQLResult resultSet;
+
+         // collect the system permissions that the accessor has and add it to createALLPermissionsMap
+         statement = connection.prepareStatement(sqlStrings.SQL_findInGrantResourceCreatePermissionSys_withoutInheritance_ResourceDomainName_ResourceClassName_SysPermissionId_IsWithGrant_BY_AccessorID);
+         statement.setResourceId(1, accessorResource);
+         resultSet = statement.executeQuery();
+
+         while (resultSet.next()) {
+            final String resourceDomainName;
+            final String resourceClassName;
+            Map<String, Set<ResourceCreatePermission>> permissionsForResourceDomain;
+            Set<ResourceCreatePermission> permissionsForResourceClass;
+
+            resourceDomainName = resultSet.getString("DomainName");
+            resourceClassName = resultSet.getString("ResourceClassName");
+
+            if ((permissionsForResourceDomain = createSysPermissionsMap.get(resourceDomainName)) == null) {
+               createSysPermissionsMap.put(resourceDomainName,
+                                           permissionsForResourceDomain = new HashMap<>());
+            }
+
+            if ((permissionsForResourceClass = permissionsForResourceDomain.get(resourceClassName)) == null) {
+               permissionsForResourceDomain.put(resourceClassName,
+                                                permissionsForResourceClass = new HashSet<>());
+            }
+
+            permissionsForResourceClass.add(
+                  ResourceCreatePermissions.getInstance(resultSet.getResourceCreateSysPermissionName("SysPermissionId"),
+                                                        resultSet.getBoolean("IsWithGrant"),
+                                                        0,
+                                                        0));
+         }
+         resultSet.close();
+
+         return createSysPermissionsMap;
+      }
+      catch (SQLException e) {
+         throw new AccessControlException(e);
+      }
+      finally {
+         closeStatement(statement);
+      }
+   }
+
    public Set<ResourceCreatePermission> getResourceCreateSysPermissions(SQLConnection connection,
                                                                         Resource accessorResource,
                                                                         Id<ResourceClassId> resourceClassId,

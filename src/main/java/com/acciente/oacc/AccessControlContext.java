@@ -652,6 +652,27 @@ public interface AccessControlContext {
          throws AccessControlException;
 
    /**
+    * Gets all direct resource create permissions the accessor resource has to the specified
+    * resource class in the specified domain (which define a subset of the resource permissions
+    * the accessor resource would receive directly, if it created a resource of the specified
+    * resource class in the specified domain).
+    * <p/>
+    * This method only takes into account direct resource create permissions, but not inherited
+    * resource create permissions and not any resource create permissions the accessor may have to
+    * ancestors of the specified domain.
+    *
+    * @param accessorResource  the accessor resource relative which permissions should be returned
+    * @param resourceClassName a string resource class name
+    * @param domainName        a string representing a valid domain name
+    * @return a set of direct resource create permissions
+    * @throws AccessControlException if an error occurs
+    */
+   public Set<ResourceCreatePermission> getResourceCreatePermissions(Resource accessorResource,
+                                                                     String resourceClassName,
+                                                                     String domainName)
+         throws AccessControlException;
+
+   /**
     * Gets all effective resource create permissions the accessor resource has to the specified
     * resource class in the specified domain (which effectively define the resource permissions
     * the accessor resource will receive directly, if it created a resource of the specified
@@ -701,6 +722,25 @@ public interface AccessControlContext {
          throws AccessControlException;
 
    /**
+    * Gets all direct resource create permissions the accessor resource has to the specified
+    * resource class in the the current session resource's domain (which define a subset of
+    * the resource permissions the accessor resource would receive directly, if it created a
+    * resource of the specified resource class in the current session resource's domain).
+    * <p/>
+    * This method only takes into account direct resource create permissions, but not inherited
+    * resource create permissions and not any resource create permissions the accessor may have to
+    * ancestors of the current session resource's domain.
+    *
+    * @param accessorResource  the accessor resource relative which permissions should be returned
+    * @param resourceClassName a string resource class name
+    * @return a set of direct resource create permissions
+    * @throws AccessControlException if an error occurs
+    */
+   public Set<ResourceCreatePermission> getResourceCreatePermissions(Resource accessorResource,
+                                                                     String resourceClassName)
+         throws AccessControlException;
+
+   /**
     * Gets all effective resource create permissions the accessor resource has to the specified
     * resource class in the the current session resource's domain (which effectively define
     * the resource permissions the accessor resource will receive directly, if it created
@@ -717,6 +757,28 @@ public interface AccessControlContext {
     */
    public Set<ResourceCreatePermission> getEffectiveResourceCreatePermissions(Resource accessorResource,
                                                                               String resourceClassName)
+         throws AccessControlException;
+
+   /**
+    * Gets all direct resource create permissions the accessor resource has to any resource class in
+    * any domain, mapped by domain name and resource class name.
+    * <p/>
+    * Direct resource create permissions make up a subset of the resource permissions the accessor resource
+    * will receive directly, if it created a resource of a resource class in a domain.
+    * <p/>
+    * This method only takes into account direct resource create permissions, but not inherited
+    * resource create permissions and not any resource create permissions the accessor may have to
+    * ancestors of each domain.
+    * <p/>
+    * The result is returned as a map keyed by the domain name, where each value is another
+    * map keyed by resource class name, in which each value is the set of direct resource create permissions
+    * for the resource class and domain name of the respective keys.
+    *
+    * @param accessorResource the accessor resource relative which permissions should be returned
+    * @return a map of maps of direct resource create permissions, keyed by domain name and resource class name
+    * @throws AccessControlException if an error occurs
+    */
+   public Map<String, Map<String, Set<ResourceCreatePermission>>> getResourceCreatePermissionsMap(Resource accessorResource)
          throws AccessControlException;
 
    /**

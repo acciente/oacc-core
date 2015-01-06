@@ -139,6 +139,61 @@ public class GrantResourceCreatePermissionPostCreatePersister extends Persister 
       }
    }
 
+   public Map<String, Map<String, Set<ResourceCreatePermission>>> getResourceCreatePostCreatePermissions(SQLConnection connection,
+                                                                                                         Resource accessorResource) throws AccessControlException {
+      SQLStatement statement = null;
+
+      try {
+         Map<String, Map<String, Set<ResourceCreatePermission>>> createPermissionsMap = new HashMap<>();
+         SQLResult resultSet;
+
+         // collect the non-system permissions that the accessor has and add it to createALLPermissionsMap
+         statement = connection.prepareStatement(sqlStrings.SQL_findInGrantResourceCreatePermissionPostCreate_withoutInheritance_ResourceDomainName_ResourceClassName_PostCreatePermissionName_PostCreateIsWithGrant_IsWithGrant_BY_AccessorID);
+         statement.setResourceId(1, accessorResource);
+         resultSet = statement.executeQuery();
+
+         while (resultSet.next()) {
+            final String resourceDomainName;
+            final String resourceClassName;
+            Map<String, Set<ResourceCreatePermission>> permissionsForResourceDomain;
+            Set<ResourceCreatePermission> permissionsForResourceClass;
+
+            resourceDomainName = resultSet.getString("DomainName");
+            resourceClassName = resultSet.getString("ResourceClassName");
+
+            if ((permissionsForResourceDomain = createPermissionsMap.get(resourceDomainName)) == null) {
+               createPermissionsMap.put(resourceDomainName,
+                                        permissionsForResourceDomain = new HashMap<>());
+            }
+
+            if ((permissionsForResourceClass = permissionsForResourceDomain.get(resourceClassName)) == null) {
+               permissionsForResourceDomain.put(resourceClassName,
+                                                permissionsForResourceClass = new HashSet<>());
+            }
+
+            ResourcePermission
+                  resourcePermission
+                  = ResourcePermissions.getInstance(resultSet.getString("PostCreatePermissionName"),
+                                                    resultSet.getBoolean("PostCreateIsWithGrant"));
+
+            permissionsForResourceClass
+                  .add(ResourceCreatePermissions.getInstance(resourcePermission,
+                                                             resultSet.getBoolean("IsWithGrant"),
+                                                             0,
+                                                             0));
+         }
+         resultSet.close();
+
+         return createPermissionsMap;
+      }
+      catch (SQLException e) {
+         throw new AccessControlException(e);
+      }
+      finally {
+         closeStatement(statement);
+      }
+   }
+
    public Set<ResourceCreatePermission> getResourceCreatePostCreatePermissions(SQLConnection connection,
                                                                                Resource accessorResource,
                                                                                Id<ResourceClassId> resourceClassId,
