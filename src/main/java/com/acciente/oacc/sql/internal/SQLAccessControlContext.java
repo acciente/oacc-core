@@ -347,7 +347,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
    public void impersonate(Resource resource) throws AccessControlException {
       SQLConnection connection = null;
 
-      __assertAuth();
+      __assertAuthenticated();
       __assertResourceSpecified(resource);
 
       try {
@@ -417,7 +417,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
 
       if (!impersonatePermissionOK) {
          throw new AccessControlException("Not authorized to impersonate: " + resource,
-                                    true);
+                                          true);
       }
    }
 
@@ -430,7 +430,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
 
    @Override
    public void setCredentials(Resource resource, Credentials newCredentials) throws AccessControlException {
-      __assertAuth();
+      __assertAuthenticated();
       __assertResourceSpecified(resource);
 
       if (!authenticatedResource.equals(sessionResource)) {
@@ -513,8 +513,8 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
                                    boolean unuthenticatedCreateAllowed) throws AccessControlException {
       SQLConnection connection = null;
 
-      __assertAuth();
-      __assertSysAuth();  // check if the auth resource is permitted to create resource classes
+      __assertAuthenticated();
+      __assertAuthenticatedAsSystemResource();  // check if the auth resource is permitted to create resource classes
       __assertResourceClassNameValid(resourceClassName);
 
       try {
@@ -541,8 +541,8 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
    public void createResourcePermission(String resourceClassName, String permissionName) throws AccessControlException {
       SQLConnection connection = null;
 
-      __assertAuth();
-      __assertSysAuth();  // check if the auth resource is permitted to create resource classes
+      __assertAuthenticated();
+      __assertAuthenticatedAsSystemResource();  // check if the auth resource is permitted to create resource classes
       __assertResourceClassSpecified(resourceClassName);
       __assertPermissionNameValid(permissionName);
 
@@ -581,7 +581,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
    public void createDomain(String domainName) throws AccessControlException {
       SQLConnection connection = null;
 
-      __assertAuth();
+      __assertAuthenticated();
       __assertDomainSpecified(domainName);
 
       try {
@@ -603,7 +603,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
                             String parentDomainName) throws AccessControlException {
       SQLConnection connection = null;
 
-      __assertAuth();
+      __assertAuthenticated();
       __assertDomainSpecified(domainName);
       __assertParentDomainSpecified(parentDomainName);
 
@@ -669,8 +669,8 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
                && !parentDomainPermissions.contains(DomainPermission_SUPER_USER)
                && !parentDomainPermissions.contains(DomainPermission_SUPER_USER_GRANT)) {
             throw new AccessControlException("Not authorized to create child domains in domain: "
-                                             + parentDomainName,
-                                       true);
+                                                   + parentDomainName,
+                                             true);
          }
 
          // create the new child domain
@@ -779,7 +779,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       }
 
       if (!resourceClassInternalInfo.isUnauthenticatedCreateAllowed()) {
-         __assertAuth();
+         __assertAuthenticated();
       }
 
       if (resourceClassInternalInfo.isAuthenticatable()) {
@@ -893,7 +893,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
                                     Set<DomainPermission> permissions) throws AccessControlException {
       SQLConnection connection = null;
 
-      __assertAuth();
+      __assertAuthenticated();
       __assertResourceSpecified(accessorResource);
       __assertDomainSpecified(domainName);
       __assertPermissionsSpecified(permissions);
@@ -1017,7 +1017,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
                                                      String domainName) throws AccessControlException {
       SQLConnection connection = null;
 
-      __assertAuth();
+      __assertAuthenticated();
       __assertResourceSpecified(accessorResource);
       __assertDomainSpecified(domainName);
 
@@ -1044,7 +1044,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
    public Map<String, Set<DomainPermission>> getDomainPermissionsMap(Resource accessorResource) throws AccessControlException {
       SQLConnection connection = null;
 
-      __assertAuth();
+      __assertAuthenticated();
       __assertResourceSpecified(accessorResource);
 
       try {
@@ -1067,7 +1067,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
                                                               String domainName) throws AccessControlException {
       SQLConnection connection = null;
 
-      __assertAuth();
+      __assertAuthenticated();
       __assertResourceSpecified(accessorResource);
       __assertDomainSpecified(domainName);
 
@@ -1119,7 +1119,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
    public Map<String, Set<DomainPermission>> getEffectiveDomainPermissionsMap(Resource accessorResource) throws AccessControlException {
       SQLConnection connection = null;
 
-      __assertAuth();
+      __assertAuthenticated();
       __assertResourceSpecified(accessorResource);
 
       try {
@@ -1151,7 +1151,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
                                           Set<DomainCreatePermission> domainCreatePermissions) throws AccessControlException {
       SQLConnection connection = null;
 
-      __assertAuth();
+      __assertAuthenticated();
       __assertResourceSpecified(accessorResource);
       __assertPermissionsSpecified(domainCreatePermissions);
 
@@ -1285,7 +1285,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
    public Set<DomainCreatePermission> getDomainCreatePermissions(Resource accessorResource) throws AccessControlException {
       SQLConnection connection = null;
 
-      __assertAuth();
+      __assertAuthenticated();
       __assertResourceSpecified(accessorResource);
 
       try {
@@ -1305,7 +1305,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
    public Set<DomainCreatePermission> getEffectiveDomainCreatePermissions(Resource accessorResource) throws AccessControlException {
       SQLConnection connection = null;
 
-      __assertAuth();
+      __assertAuthenticated();
       __assertResourceSpecified(accessorResource);
 
       try {
@@ -1356,7 +1356,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
                                             String domainName) throws AccessControlException {
       SQLConnection connection = null;
 
-      __assertAuth();
+      __assertAuthenticated();
       __assertResourceSpecified(accessorResource);
       __assertResourceClassSpecified(resourceClassName);
       __assertPermissionsSpecified(resourceCreatePermissions);
@@ -1386,7 +1386,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
                                             Set<ResourceCreatePermission> resourceCreatePermissions) throws AccessControlException {
       SQLConnection connection = null;
 
-      __assertAuth();
+      __assertAuthenticated();
       __assertResourceSpecified(accessorResource);
       __assertResourceClassSpecified(resourceClassName);
       __assertPermissionsSpecified(resourceCreatePermissions);
@@ -1652,7 +1652,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
                                                                      String domainName) throws AccessControlException {
       SQLConnection connection = null;
 
-      __assertAuth();
+      __assertAuthenticated();
       __assertResourceSpecified(accessorResource);
       __assertResourceClassSpecified(resourceClassName);
       __assertDomainSpecified(domainName);
@@ -1704,7 +1704,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
                                                                      String resourceClassName) throws AccessControlException {
       SQLConnection connection = null;
 
-      __assertAuth();
+      __assertAuthenticated();
       __assertResourceSpecified(accessorResource);
       __assertResourceClassSpecified(resourceClassName);
 
@@ -1729,7 +1729,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
    public Map<String, Map<String, Set<ResourceCreatePermission>>> getResourceCreatePermissionsMap(Resource accessorResource) throws AccessControlException {
       SQLConnection connection = null;
 
-      __assertAuth();
+      __assertAuthenticated();
       __assertResourceSpecified(accessorResource);
 
       try {
@@ -1775,7 +1775,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
                                                                               String domainName) throws AccessControlException {
       SQLConnection connection = null;
 
-      __assertAuth();
+      __assertAuthenticated();
       __assertResourceSpecified(accessorResource);
       __assertResourceClassSpecified(resourceClassName);
       __assertDomainSpecified(domainName);
@@ -1803,7 +1803,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
                                                                               String resourceClassName) throws AccessControlException {
       SQLConnection connection = null;
 
-      __assertAuth();
+      __assertAuthenticated();
       __assertResourceSpecified(accessorResource);
       __assertResourceClassSpecified(resourceClassName);
 
@@ -1890,7 +1890,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
          throws AccessControlException {
       SQLConnection connection = null;
 
-      __assertAuth();
+      __assertAuthenticated();
       __assertResourceSpecified(accessorResource);
 
       try {
@@ -1982,7 +1982,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
                                       Set<ResourcePermission> resourcePermissions) throws AccessControlException {
       SQLConnection connection = null;
 
-      __assertAuth();
+      __assertAuthenticated();
       __assertResourceSpecified(accessorResource);
       __assertResourceSpecified(accessedResource);
       __assertPermissionsSpecified(resourcePermissions);
@@ -2171,7 +2171,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
                                                          Resource accessedResource) throws AccessControlException {
       SQLConnection connection = null;
 
-      __assertAuth();
+      __assertAuthenticated();
       __assertResourceSpecified(accessorResource);
       __assertResourceSpecified(accessedResource);
 
@@ -2212,7 +2212,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
          throws AccessControlException {
       SQLConnection connection = null;
 
-      __assertAuth();
+      __assertAuthenticated();
       __assertResourceSpecified(accessorResource);
       __assertResourceSpecified(accessedResource);
 
@@ -2276,7 +2276,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
          throws AccessControlException {
       SQLConnection connection = null;
 
-      __assertAuth();
+      __assertAuthenticated();
       __assertResourceSpecified(accessorResource);
       __assertResourceClassSpecified(resourceClassName);
       __assertPermissionsSpecified(resourcePermissions);
@@ -2308,7 +2308,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
                                             Set<ResourcePermission> resourcePermissions) throws AccessControlException {
       SQLConnection connection = null;
 
-      __assertAuth();
+      __assertAuthenticated();
       __assertResourceSpecified(accessorResource);
       __assertResourceClassSpecified(resourceClassName);
       __assertPermissionsSpecified(resourcePermissions);
@@ -2498,7 +2498,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
                                                                String domainName) throws AccessControlException {
       SQLConnection connection = null;
 
-      __assertAuth();
+      __assertAuthenticated();
       __assertResourceSpecified(accessorResource);
       __assertResourceClassSpecified(resourceClassName);
       __assertDomainSpecified(domainName);
@@ -2550,7 +2550,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
                                                                String resourceClassName) throws AccessControlException {
       SQLConnection connection = null;
 
-      __assertAuth();
+      __assertAuthenticated();
       __assertResourceSpecified(accessorResource);
       __assertResourceClassSpecified(resourceClassName);
 
@@ -2578,7 +2578,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
          throws AccessControlException {
       SQLConnection connection = null;
 
-      __assertAuth();
+      __assertAuthenticated();
       __assertResourceSpecified(accessorResource);
       __assertResourceClassSpecified(resourceClassName);
       __assertDomainSpecified(domainName);
@@ -2607,7 +2607,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
          throws AccessControlException {
       SQLConnection connection = null;
 
-      __assertAuth();
+      __assertAuthenticated();
       __assertResourceSpecified(accessorResource);
       __assertResourceClassSpecified(resourceClassName);
 
@@ -2684,7 +2684,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
    public Map<String, Map<String, Set<ResourcePermission>>> getGlobalResourcePermissionsMap(Resource accessorResource) throws AccessControlException {
       SQLConnection connection = null;
 
-      __assertAuth();
+      __assertAuthenticated();
       __assertResourceSpecified(accessorResource);
 
       try {
@@ -2722,7 +2722,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
          throws AccessControlException {
       SQLConnection connection = null;
 
-      __assertAuth();
+      __assertAuthenticated();
       __assertResourceSpecified(accessorResource);
 
       try {
@@ -2802,7 +2802,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
    public String getDomainNameByResource(Resource resource) throws AccessControlException {
       SQLConnection connection = null;
 
-      __assertAuth();
+      __assertAuthenticated();
       __assertResourceSpecified(resource);
 
       try {
@@ -2822,7 +2822,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
    public Set<String> getDomainDescendants(String domainName) throws AccessControlException {
       SQLConnection connection = null;
 
-      __assertAuth();
+      __assertAuthenticated();
       __assertDomainSpecified(domainName);
 
       try {
@@ -2843,7 +2843,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
    public ResourceClassInfo getResourceClassInfo(String resourceClassName) throws AccessControlException {
       SQLConnection connection = null;
 
-      __assertAuth();
+      __assertAuthenticated();
       __assertResourceClassSpecified(resourceClassName);
 
       try {
@@ -2872,7 +2872,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
    public ResourceClassInfo getResourceClassInfoByResource(Resource resource) throws AccessControlException {
       SQLConnection connection = null;
 
-      __assertAuth();
+      __assertAuthenticated();
       __assertResourceSpecified(resource);
 
       try {
@@ -2894,14 +2894,14 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
 
    @Override
    public Resource getAuthenticatedResource() throws AccessControlException {
-      __assertAuth();
+      __assertAuthenticated();
 
       return authenticatedResource;
    }
 
    @Override
    public Resource getSessionResource() throws AccessControlException {
-      __assertAuth();
+      __assertAuthenticated();
 
       return sessionResource;
    }
@@ -2914,7 +2914,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
          throws AccessControlException {
       SQLConnection connection = null;
 
-      __assertAuth();
+      __assertAuthenticated();
       __assertResourceClassSpecified(resourceClassName);
       __assertPermissionSpecified(requestedResourcePermission);
 
@@ -2941,7 +2941,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
                                                   String domainName) throws AccessControlException {
       SQLConnection connection = null;
 
-      __assertAuth();
+      __assertAuthenticated();
       __assertResourceClassSpecified(resourceClassName);
       __assertPermissionSpecified(requestedResourcePermission);
       __assertDomainSpecified(domainName);
@@ -3034,7 +3034,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
          throws AccessControlException {
       SQLConnection connection = null;
 
-      __assertAuth();
+      __assertAuthenticated();
       __assertResourceClassSpecified(resourceClassName);
       __assertPermissionSpecified(requestedResourcePermission);
 
@@ -3058,7 +3058,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
                                               String domainName) throws AccessControlException {
       SQLConnection connection = null;
 
-      __assertAuth();
+      __assertAuthenticated();
       __assertResourceClassSpecified(resourceClassName);
       __assertPermissionSpecified(requestedResourcePermission);
       __assertDomainSpecified(domainName);
@@ -3108,7 +3108,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
          throws AccessControlException {
       SQLConnection connection = null;
 
-      __assertAuth();
+      __assertAuthenticated();
       __assertResourceSpecified(accessedResource);
       __assertPermissionSpecified(requestedResourcePermission);
 
@@ -3137,7 +3137,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
          throws AccessControlException {
       SQLConnection connection = null;
 
-      __assertAuth();
+      __assertAuthenticated();
       __assertResourceSpecified(accessorResource);
       __assertResourceSpecified(accessedResource);
       __assertPermissionSpecified(requestedResourcePermission);
@@ -3149,13 +3149,13 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
             // if none of the above then complain...
             if (sessionResource.equals(accessorResource)) {
                throw new AccessControlException("Current resource " + sessionResource + " does not have requested permission: "
-                                                + requestedResourcePermission,
-                                          true);
+                                                      + requestedResourcePermission,
+                                                true);
             }
             else {
                throw new AccessControlException("Resource " + accessorResource + " does not have requested permission: "
-                                                + requestedResourcePermission,
-                                          true);
+                                                      + requestedResourcePermission,
+                                                true);
             }
          }
       }
@@ -3238,7 +3238,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
          throws AccessControlException {
       SQLConnection connection = null;
 
-      __assertAuth();
+      __assertAuthenticated();
       __assertResourceClassSpecified(resourceClassName);
       __assertPermissionSpecified(resourcePermission);
 
@@ -3263,7 +3263,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
                                                          ResourcePermission resourcePermission) throws AccessControlException {
       SQLConnection connection = null;
 
-      __assertAuth();
+      __assertAuthenticated();
       __assertResourceSpecified(accessorResource);
       __assertResourceClassSpecified(resourceClassName);
       __assertPermissionSpecified(resourcePermission);
@@ -3366,7 +3366,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
          throws AccessControlException {
       SQLConnection connection = null;
 
-      __assertAuth();
+      __assertAuthenticated();
       __assertResourceClassSpecified(resourceClassName);
       __assertPermissionSpecified(resourcePermission);
       __assertDomainSpecified(domainName);
@@ -3397,7 +3397,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
                                                          String domainName) throws AccessControlException {
       SQLConnection connection = null;
 
-      __assertAuth();
+      __assertAuthenticated();
       __assertResourceSpecified(accessorResource);
       __assertResourceClassSpecified(resourceClassName);
       __assertPermissionSpecified(resourcePermission);
@@ -3520,7 +3520,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
                                                                  ResourcePermission resourcePermission) throws AccessControlException {
       SQLConnection connection = null;
 
-      __assertAuth();
+      __assertAuthenticated();
       __assertResourceSpecified(accessedResource);
       __assertResourceClassSpecified(resourceClassName);
       __assertPermissionSpecified(resourcePermission);
@@ -3585,7 +3585,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
    public List<String> getResourceClassNames() throws AccessControlException {
       SQLConnection connection = null;
 
-      __assertAuth();
+      __assertAuthenticated();
 
       try {
          connection = __getConnection();
@@ -3604,7 +3604,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
    public List<String> getResourcePermissionNames(String resourceClassName) throws AccessControlException {
       SQLConnection connection = null;
 
-      __assertAuth();
+      __assertAuthenticated();
       __assertResourceClassSpecified(resourceClassName);
 
       try {
@@ -3698,15 +3698,15 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       }
    }
 
-   private void __assertSysAuth()
+   private void __assertAuthenticatedAsSystemResource()
          throws AccessControlException {
-      if (sessionResource.getId() != SYSTEM_RESOURCE_ID) {
+      if (sessionResource == null || sessionResource.getId() != SYSTEM_RESOURCE_ID) {
          throw new AccessControlException("Operation requires this session be authenticated by the SYSTEM resource",
                                           true);
       }
    }
 
-   private void __assertAuth() throws AccessControlException {
+   private void __assertAuthenticated() throws AccessControlException {
       if (sessionResource == null) {
          throw new AccessControlException("Session not authenticated",
                                           true);
