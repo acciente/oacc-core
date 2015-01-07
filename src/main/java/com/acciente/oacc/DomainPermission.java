@@ -18,33 +18,36 @@
 package com.acciente.oacc;
 
 /**
+ * The interface for the type of permission that governs domain management.
+ * <p/>
  * A DomainPermission is the type of permission used to grant an accessor permission to manage
- * a domain. A DomainPermission is always a system permission; the system permission values
- * supported are *SUPER-USER and *CREATE-CHILD-DOMAIN.
+ * a domain. A DomainPermission is never application-defined, bu is always a system permission;
+ * the supported system permissions values are *SUPER-USER and *CREATE-CHILD-DOMAIN.
  * <p/>
  * To create an instance of this class use {@link DomainPermissions#getInstance(String)} or one
  * of its variants.
  */
 public interface DomainPermission {
    /**
-    * Property to determine if this is system permission.
+    * Determine if this is system permission.
     *
     * @return true if this is a system permission, false otherwise.
     */
    boolean isSystemPermission();
 
    /**
-    * Property to retrieve the system permission name, if this is not a system permission an
-    * exception is thrown.
+    * Retrieves the permission name.
     *
-    * @return the name of the system permission.
-    * @throws IllegalStateException if this method is called on a non-system permission.
+    * @return the name of the permission.
     */
    String getPermissionName();
 
    /**
-    * Property to retrieve the system permission id, if this is not a system permission an
-    * exception is thrown.
+    * Retrieve the id of a system permission.
+    * <p/>
+    * Applications should not use this id, but refer to the system permission by name instead.
+    * <p/>
+    * Note that if this is not a system permission an exception is thrown.
     *
     * @return the internal id of the system permission. Applications should not use this id.
     * @throws IllegalStateException if this method is called on a non-system permission.
@@ -52,27 +55,26 @@ public interface DomainPermission {
    long getSystemPermissionId();
 
    /**
-    * Property to retrieve the "with grant" option.
+    * Retrieves the "with grant" option.
     *
-    * @return true if this permission includes the privilege to grant, false otherwise.
+    * @return true if this permission includes the privilege to be granted to others, false otherwise.
     */
    boolean isWithGrant();
 
    /**
-    * Used to determine if this permission can be granted by an grantor holding the specified
-    * permission.
+    * Determines if this permission can be granted by a grantor holding the specified other permission.
     *
     * @param other another permission to compare with
-    * @return true if this permission can be granted by a holder of the passed in permission,
+    * @return true if this permission can be granted by a holder of the specified other permission,
     *         false otherwise.
     */
    boolean isGrantableFrom(DomainPermission other);
 
    /**
-    * Compare this permission with the specified permission ignoring the grant option.
+    * Compare this permission with the specified other permission for equality, but ignoring the grant option.
     *
     * @param other another permission to compare with
-    * @return true if the passed in permission is equal to this permission ignoring the
+    * @return true if the specified other permission is equal to this permission ignoring the
     *         value of the {@link #isWithGrant()} property.
     */
    boolean equalsIgnoreGrant(Object other);

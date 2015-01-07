@@ -24,7 +24,6 @@ import java.util.List;
 public class ResourcePermissions {
    // constants for the important system permissions with pre-defined semantics
    private static final SysPermission SYSPERMISSION_INHERIT           = new SysPermission(-101, "*INHERIT");
-   // constants for the important system permissions with pre-defined semantics
    public static final  String        INHERIT                         = SYSPERMISSION_INHERIT.getPermissionName();
    private static final SysPermission SYSPERMISSION_IMPERSONATE       = new SysPermission(-102, "*IMPERSONATE");
    public static final  String        IMPERSONATE                     = SYSPERMISSION_IMPERSONATE.getPermissionName();

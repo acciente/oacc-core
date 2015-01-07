@@ -18,18 +18,21 @@
 package com.acciente.oacc;
 
 /**
- * A DomainCreatePermission is the type of permission used to grant an accessor permission to
- * create domains. This permission type is also used to grant an accessor the domain permissions
- * the accessor is granted on the newly created domain (these are called post-create permissions).
+ * The interface for a permission that governs creation of a domain and defines which permissions
+ * the creator will receive on the new domain.
+ * <p/>
+ * A DomainCreatePermission is the type of permission used to grant a resource permission to
+ * create domains. This permission type is also used to grant the creator resource the domain permissions
+ * the creator will receive on the newly created domain (these are called post-create permissions).
  * The use of post-create permissions is optional. Post-create permissions should only be used
  * when other more manageable means, such as the global permissions mechanism, are not adequate
- * to grant the accessor permissions on newly created domains.
+ * to grant the creator permissions on newly created domains.
  * <p/>
- * A non-post-create DomainCreatePermission is a system permission. The only system permission
- * supported by a DomainCreatePermission is the *CREATE system permission. The *CREATE permission
- * allows the accessor to create domains. As mentioned previosuly, an accessor with the *CREATE
- * permission may also be granted post-create permissions to specify what permissions are granted
- * to the accessor on a domain the accessor creates. Having the *CREATE permission is a pre-requisite
+ * A DomainCreatePermission without post-create permission has to be a system permission. The only
+ * system permission available for DomainCreatePermissions is the *CREATE system permission.
+ * The *CREATE permission allows the accessor to create domains. As mentioned previously, a resource
+ * with the *CREATE permission may also be granted post-create permissions to specify what permissions
+ * it will receive on a domain it creates. Having the *CREATE permission is a pre-requisite
  * for having post-create permissions.
  * <p/>
  * To create an instance of this class use {@link DomainCreatePermissions#getInstance(String)}
@@ -37,24 +40,25 @@ package com.acciente.oacc;
  */
 public interface DomainCreatePermission {
    /**
-    * Property to determine if this is system permission.
+    * Determines if this is system permission.
     *
     * @return true if this is a system permission, false otherwise.
     */
    boolean isSystemPermission();
 
    /**
-    * Property to retrieve the system permission name, if this is not a system permission an
-    * exception is thrown.
+    * Retrieves the permission name.
     *
     * @return the name of the system permission.
-    * @throws IllegalStateException if this method is called on a non-system permission.
     */
    String getPermissionName();
 
    /**
-    * Property to retrieve the system permission id, if this is not a system permission an
-    * exception is thrown.
+    * Retrieve the id of a system permission.
+    * <p/>
+    * Applications should not use this id, but refer to the system permission by name instead.
+    * <p/>
+    * Note that if this is not a system permission an exception is thrown.
     *
     * @return the internal id of the system permission. Applications should not use this id.
     * @throws IllegalStateException if this method is called on a non-system permission.
@@ -62,36 +66,36 @@ public interface DomainCreatePermission {
    long getSystemPermissionId();
 
    /**
-    * Property to retrieve the post-create permission, if this is a system permission an
-    * exception is thrown.
+    * Retrieves the post-create permission for non-system permissions.
+    * <p/>
+    * Note that if this is a system permission an exception is thrown.
     *
-    * @return the post create domain permission associated with this permission, if any.
+    * @return the post create resource permission associated with this permission.
     * @throws IllegalStateException if this method is called on a system permission.
     */
    DomainPermission getPostCreateDomainPermission();
 
    /**
-    * Property to retrieve the "with grant" option.
+    * Retrieves the "with grant" option.
     *
-    * @return true if this permission includes the privilege to grant, false otherwise.
+    * @return true if this permission includes the privilege to be granted to others, false otherwise.
     */
    boolean isWithGrant();
 
    /**
-    * Used to determine if this permission can be granted by an grantor holding the specified
-    * permission.
+    * Determines if this permission can be granted by a grantor holding the specified other permission.
     *
     * @param other another permission to compare with
-    * @return true if this permission can be granted by a holder of the passed in permission,
+    * @return true if this permission can be granted by a holder of the specified other permission,
     *         false otherwise.
     */
    boolean isGrantableFrom(DomainCreatePermission other);
 
    /**
-    * Compare this permission with the specified permission ignoring the grant option.
+    * Compare this permission with the specified other permission for equality, but ignoring the grant option.
     *
     * @param other another permission to compare with
-    * @return true if the passed in permission is equal to this permission ignoring the
+    * @return true if the specified other permission is equal to this permission ignoring the
     *         value of the {@link #isWithGrant()} property.
     */
    boolean equalsIgnoreGrant(Object other);
