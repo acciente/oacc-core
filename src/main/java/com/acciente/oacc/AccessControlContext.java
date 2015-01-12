@@ -447,7 +447,7 @@ public interface AccessControlContext {
          throws AccessControlException;
 
    /**
-    * Creates a new resource class in the same domain as this session resource.
+    * Creates a new resource in the same domain as this session resource.
     *
     * @param resourceClassName a string resource class name
     * @return the integer resourceId of the newly created resource
@@ -457,10 +457,7 @@ public interface AccessControlContext {
          throws AccessControlException;
 
    /**
-    * Creates a new resource class within the specified domain.
-    * <p/>
-    * Note that the session resource must be member of the specified domain or
-    * have SUPER-USER privileges to the specified domain.
+    * Creates a new resource within the specified domain.
     *
     * @param resourceClassName a string resource class name
     * @param domainName        a string domain name
@@ -483,9 +480,6 @@ public interface AccessControlContext {
 
    /**
     * Creates a new authenticatable resource within the specified domain.
-    * <p/>
-    * Note that the session resource must be member of the specified domain or
-    * have SUPER-USER privileges to the specified domain.
     *
     * @param resourceClassName a string resource class name
     * @param domainName        a string domain name
