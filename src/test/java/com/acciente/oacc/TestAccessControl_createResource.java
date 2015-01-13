@@ -279,27 +279,27 @@ public class TestAccessControl_createResource extends TestAccessControlBase {
    }
 
    @Test
-   public void createResource_authenticatableResourceClass_shouldFail() throws AccessControlException {
+   public void createResource_authenticatableResourceClass_withoutCredentials_shouldFail() throws AccessControlException {
       authenticateSystemResource();
 
       final String domainName = generateDomain();
       final String resourceClassName = generateResourceClass(true, false);
 
-      // attempt to create resource for unauthenticatable resource class
+      // attempt to create resource for authenticatable resource class
       try {
-         final Resource resource = accessControlContext.createResource(resourceClassName, domainName);
-         assertThat(resource, notNullValue());
+         accessControlContext.createResource(resourceClassName, domainName);
+         fail("creating resource without credentials for authenticatable resource class should have failed");
       }
       catch (AccessControlException e) {
-         fail("creating resource without credentials for authenticatable resource class should have passed, error: " + e.getMessage());
+         assertThat(e.getMessage().toLowerCase(), containsString("credentials required"));
       }
 
       try {
-         final Resource resource = accessControlContext.createResource(resourceClassName);
-         assertThat(resource, notNullValue());
+         accessControlContext.createResource(resourceClassName);
+         fail("creating resource without credentials for authenticatable resource class should have failed");
       }
       catch (AccessControlException e) {
-         fail("creating resource without credentials for authenticatable resource class should have passed, error: " + e.getMessage());
+         assertThat(e.getMessage().toLowerCase(), containsString("credentials required"));
       }
    }
 

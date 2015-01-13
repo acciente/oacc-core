@@ -33,7 +33,8 @@ public class TestAccessControl_getResourceClassInfoByResource extends TestAccess
 
       generateUnauthenticatableResource();
       final String resourceClassName = generateResourceClass(true, false);
-      final Resource queriedResource = accessControlContext.createResource(resourceClassName);
+      final Resource queriedResource = accessControlContext.createResource(resourceClassName,
+                                                                           PasswordCredentials.newInstance(generateUniquePassword()));
 
       // verify
       final ResourceClassInfo resourceClassInfo = accessControlContext.getResourceClassInfoByResource(queriedResource);

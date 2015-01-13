@@ -70,6 +70,7 @@ public class SQLPasswordAuthenticationProvider implements AuthenticationProvider
 
    @Override
    public void authenticate(Resource resource, Credentials credentials) throws AccessControlException {
+      assertCredentialSpecified(credentials);
       assertSupportedCredentials(credentials);
 
       final PasswordCredentials passwordCredentials = ((PasswordCredentials) credentials);
@@ -116,7 +117,8 @@ public class SQLPasswordAuthenticationProvider implements AuthenticationProvider
    }
 
    @Override
-   public void validateCredentials(Credentials credentials) throws AccessControlException {
+   public void validateCredentials(String resourceClassName, String domainName, Credentials credentials) throws AccessControlException {
+      assertCredentialSpecified(credentials);
       assertSupportedCredentials(credentials);
 
       final char[] password = ((PasswordCredentials) credentials).getPassword();
@@ -136,6 +138,7 @@ public class SQLPasswordAuthenticationProvider implements AuthenticationProvider
 
    @Override
    public void setCredentials(Resource resource, Credentials credentials) throws AccessControlException {
+      assertCredentialSpecified(credentials);
       assertSupportedCredentials(credentials);
 
       final PasswordCredentials passwordCredentials = ((PasswordCredentials) credentials);
@@ -168,6 +171,12 @@ public class SQLPasswordAuthenticationProvider implements AuthenticationProvider
       }
       finally {
          PasswordUtils.cleanPassword(newBoundPassword);
+      }
+   }
+
+   private void assertCredentialSpecified(Credentials credentials) throws AccessControlException {
+      if (credentials == null) {
+         throw new AccessControlException("Credentials required, none specified");
       }
    }
 

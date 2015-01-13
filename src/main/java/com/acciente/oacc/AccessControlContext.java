@@ -39,7 +39,8 @@ import java.util.Set;
  * <dd> The resource whose security credentials are associated with this session.
  * This is the same as the authenticated resource, unless another resource is being {@link #impersonate impersonated}.
  * </dl>
- * Unless a session is authenticated, all attempts to call any methods other than <code>authenticate</code> will fail.
+ * Unless a session is authenticated, all attempts to call any methods other than <code>authenticate</code>,
+ * <code>unauthenticate</code> or <code>unimpersonate</code> will fail.
  */
 public interface AccessControlContext {
    String SYSTEM_DOMAIN         = "SYSDOMAIN";
@@ -448,6 +449,9 @@ public interface AccessControlContext {
 
    /**
     * Creates a new resource in the same domain as this session resource.
+    * <p/>
+    * Note that a custom {@link AuthenticationProvider} implementation is required to support
+    * creation of an authenticatable resource without providing explicit credentials
     *
     * @param resourceClassName a string resource class name
     * @return the integer resourceId of the newly created resource
@@ -458,6 +462,9 @@ public interface AccessControlContext {
 
    /**
     * Creates a new resource within the specified domain.
+    * <p/>
+    * Note that a custom {@link AuthenticationProvider} implementation is required to support
+    * creation of an authenticatable resource without providing explicit credentials
     *
     * @param resourceClassName a string resource class name
     * @param domainName        a string domain name

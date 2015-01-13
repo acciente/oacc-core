@@ -47,13 +47,16 @@ public interface AuthenticationProvider {
    void authenticate(Resource resource) throws AccessControlException;
 
    /**
-    * Checks if the the authentication credentials are valid, for example this method may check if the credentials
-    * satisfy the minimum strength requirements.
+    * Checks if the the authentication credentials are valid for the specified resource class and domain.
+    * <p/>
+    * This method may check if the credentials satisfy the minimum strength requirements, for example.
     *
+    * @param resourceClassName the resource class for which to validate the specified credentials
+    * @param domainName the domain for which to validate the specified credentials
     * @param credentials the authentication credentials to validate
     * @throws AccessControlException if the credentials are invalid.
     */
-   void validateCredentials(Credentials credentials) throws AccessControlException;
+   void validateCredentials(String resourceClassName, String domainName, Credentials credentials) throws AccessControlException;
 
    /**
     * Sets (or resets) the authentication credentials of the specified resource.

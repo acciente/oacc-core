@@ -430,6 +430,8 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
 
    @Override
    public void setCredentials(Resource resource, Credentials newCredentials) throws AccessControlException {
+      SQLConnection connection = null;
+
       __assertAuthenticated();
       __assertResourceSpecified(resource);
 
@@ -438,65 +440,26 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       }
 
       __assertCredentialsSpecified(newCredentials);
-      authenticationProvider.validateCredentials(newCredentials);
 
-      // skip permission checks if the authenticated resource is trying to set its own credentials
-      if (!authenticatedResource.equals(resource)) {
-         __assertResetCredentialsResourcePermission(resource);
-      }
-
-      authenticationProvider.setCredentials(resource, newCredentials);
-   }
-
-   private void __assertResetCredentialsResourcePermission(Resource resource) throws AccessControlException {
-      SQLConnection connection = null;
-
+      final ResourceClassInternalInfo resourceClassInfo;
+      final String domainName;
       try {
          connection = __getConnection();
 
-         boolean hasResetCredentialsPermission = false;
-
-         // first check direct permissions
-         final ResourceClassInternalInfo
-               resourceClassInfo = resourceClassPersister.getResourceClassInfoByResourceId(connection, resource);
+         resourceClassInfo = resourceClassPersister.getResourceClassInfoByResourceId(connection, resource);
 
          if (!resourceClassInfo.isAuthenticatable()) {
             throw new AccessControlException("Calling setCredentials for an unauthenticatable resource is not valid");
          }
 
-         final Set<ResourcePermission>
-               resourcePermissions = __getEffectiveResourcePermissions(connection, authenticatedResource, resource);
+         domainName = domainPersister.getResourceDomainNameByResourceId(connection, resource);
 
-         if (resourcePermissions.contains(ResourcePermission_RESET_CREDENTIALS)
-               || resourcePermissions.contains(ResourcePermission_RESET_CREDENTIALS_GRANT)) {
-            hasResetCredentialsPermission = true;
-         }
-
-         if (!hasResetCredentialsPermission) {
-            // next check global direct permissions
-            final String
-                  domainName = domainPersister.getResourceDomainNameByResourceId(connection, resource);
-            final Set<ResourcePermission>
-                  globalResourcePermissions = __getEffectiveGlobalResourcePermissions(connection,
-                                                                                      authenticatedResource,
-                                                                                      resourceClassInfo.getResourceClassName(),
-                                                                                      domainName);
-
-            if (globalResourcePermissions.contains(ResourcePermission_RESET_CREDENTIALS)
-                  || globalResourcePermissions.contains(ResourcePermission_RESET_CREDENTIALS_GRANT)) {
-               hasResetCredentialsPermission = true;
-            }
-         }
-
-         if (!hasResetCredentialsPermission) {
-            // finally check for super user permissions
-            if (__isSuperUserOfResource(connection, authenticatedResource, resource)) {
-               hasResetCredentialsPermission = true;
-            }
-         }
-
-         if (!hasResetCredentialsPermission) {
-            throw new AccessControlException("Not authorized to reset credentials for: " + resource, true);
+         // skip permission checks if the authenticated resource is trying to set its own credentials
+         if (!authenticatedResource.equals(resource)) {
+            __assertResetCredentialsResourcePermission(connection,
+                                                       resource,
+                                                       resourceClassInfo.getResourceClassName(),
+                                                       domainName);
          }
       }
       catch (SQLException e) {
@@ -504,6 +467,53 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       }
       finally {
          __closeConnection(connection);
+      }
+
+      authenticationProvider.validateCredentials(resourceClassInfo.getResourceClassName(),
+                                                 domainName,
+                                                 newCredentials);
+
+      authenticationProvider.setCredentials(resource, newCredentials);
+   }
+
+   private void __assertResetCredentialsResourcePermission(SQLConnection connection,
+                                                           Resource resource,
+                                                           String resourceClassName,
+                                                           String domainName) throws AccessControlException {
+      // first check direct permissions
+      boolean hasResetCredentialsPermission = false;
+
+      final Set<ResourcePermission>
+            resourcePermissions = __getEffectiveResourcePermissions(connection, authenticatedResource, resource);
+
+      if (resourcePermissions.contains(ResourcePermission_RESET_CREDENTIALS)
+            || resourcePermissions.contains(ResourcePermission_RESET_CREDENTIALS_GRANT)) {
+         hasResetCredentialsPermission = true;
+      }
+
+      if (!hasResetCredentialsPermission) {
+         // next check global direct permissions
+         final Set<ResourcePermission>
+               globalResourcePermissions = __getEffectiveGlobalResourcePermissions(connection,
+                                                                                   authenticatedResource,
+                                                                                   resourceClassName,
+                                                                                   domainName);
+
+         if (globalResourcePermissions.contains(ResourcePermission_RESET_CREDENTIALS)
+               || globalResourcePermissions.contains(ResourcePermission_RESET_CREDENTIALS_GRANT)) {
+            hasResetCredentialsPermission = true;
+         }
+      }
+
+      if (!hasResetCredentialsPermission) {
+         // finally check for super user permissions
+         if (__isSuperUserOfResource(connection, authenticatedResource, resource)) {
+            hasResetCredentialsPermission = true;
+         }
+      }
+
+      if (!hasResetCredentialsPermission) {
+         throw new AccessControlException("Not authorized to reset credentials for: " + resource, true);
       }
    }
 
@@ -783,10 +793,8 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       }
 
       if (resourceClassInternalInfo.isAuthenticatable()) {
-         // if this resource class is authenticatable, then validate the credentials if present
-         if (credentials != null) {
-            authenticationProvider.validateCredentials(credentials);
-         }
+         // if this resource class is authenticatable, then validate the credentials
+         authenticationProvider.validateCredentials(resourceClassName, domainName, credentials);
       }
       else {
          // if this resource class is NOT authenticatable, then specifying credentials is invalid

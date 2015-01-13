@@ -60,7 +60,7 @@ public class TestAccessControlSuite  {
       suite.addTest(new JUnit4TestAdapter(TestAccessControl_getDomainNameByResource.class));
       suite.addTest(new JUnit4TestAdapter(TestAccessControl_impersonate.class));
       suite.addTest(new JUnit4TestAdapter(TestAccessControl_unimpersonate.class));
-      suite.addTest(new JUnit4TestAdapter(TestAccessControl_authenticateWithCustomAuthenticationProvider.class));
+      suite.addTest(new JUnit4TestAdapter(TestAccessControl_customAuthenticationProvider.class));
       suite.addTest(new JUnit4TestAdapter(TestAccessControl_getDomainCreatePermissions.class));
       suite.addTest(new JUnit4TestAdapter(TestAccessControl_getDomainPermissions.class));
       suite.addTest(new JUnit4TestAdapter(TestAccessControl_getResourceCreatePermissions.class));

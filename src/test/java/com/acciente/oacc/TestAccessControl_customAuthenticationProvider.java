@@ -32,18 +32,36 @@ import java.sql.SQLException;
 
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.not;
+import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 
-public class TestAccessControl_authenticateWithCustomAuthenticationProvider extends TestAccessControlBase {
+public class TestAccessControl_customAuthenticationProvider extends TestAccessControlBase {
 
    public static final char[] GUEST_PASSWORD = "9UE5T".toCharArray();
+   public static final char[] ADMIN_PASSWORD = "... . -.-. .-. . -".toCharArray();
    private static AccessControlContext customAccessControlContext;
    private static Resource             guestResource;
+   private static Resource             adminResource;
+   private static String               adminDomain;
+   private static String               strictDomain;
+   private static String               strictResourceClass;
+   private static int                  strictMinPasswordLength = 16;
 
    @Before
    public void setUpTest() throws Exception {
       guestResource = generateAuthenticatableResource(GUEST_PASSWORD, generateDomain());
+      adminDomain = generateDomain();
+      adminResource = generateAuthenticatableResource(ADMIN_PASSWORD, adminDomain);
+      strictDomain = generateChildDomain(adminDomain);
+      strictResourceClass = generateResourceClass(true, false);
+
+      authenticateSystemAccessControlContext();
+      systemAccessControlContext.setDomainPermissions(adminResource,
+                                                      adminDomain,
+                                                      setOf(DomainPermissions.getInstance(DomainPermissions.SUPER_USER)));
+      systemAccessControlContext.unauthenticate();
 
       SQLDialect sqlDialect = TestDataSourceFactory.getSQLDialect();
       DataSource dataSource = TestDataSourceFactory.getDataSource();
@@ -86,6 +104,74 @@ public class TestAccessControl_authenticateWithCustomAuthenticationProvider exte
       customAccessControlContext.authenticate(guestResource);
    }
 
+   @Test
+   public void createResource_withoutCredentials_shouldFail() throws AccessControlException {
+      customAccessControlContext.authenticate(adminResource, PasswordCredentials.newInstance(ADMIN_PASSWORD));
+
+      final Resource resource = customAccessControlContext.createResource(generateResourceClass(true, true));
+      assertThat(resource, is(not(nullValue())));
+   }
+
+   @Test
+   public void createResource_validCredentialCriteria_shouldSucceed() throws AccessControlException {
+      customAccessControlContext.authenticate(adminResource, PasswordCredentials.newInstance(ADMIN_PASSWORD));
+
+      final Resource strictAuthenticatableResource
+            = customAccessControlContext.createResource(strictResourceClass,
+                                                        strictDomain,
+                                                        PasswordCredentials.newInstance("opensesameplease".toCharArray()));
+      assertThat(strictAuthenticatableResource, is(not(nullValue())));
+   }
+
+   @Test
+   public void createResource_invalidCredentialCriteria_shouldFail() throws AccessControlException {
+      customAccessControlContext.authenticate(adminResource, PasswordCredentials.newInstance(ADMIN_PASSWORD));
+
+      try {
+         customAccessControlContext.createResource(strictResourceClass,
+                                                   strictDomain,
+                                                   PasswordCredentials.newInstance("tooshort".toCharArray()));
+         fail("creating resource with invalid credentials should have failed");
+      }
+      catch (AccessControlException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("does not meet minimum length"));
+      }
+   }
+
+   @Test
+   public void setCredentials_validCredentialCriteria_shouldSucceed() throws AccessControlException {
+      customAccessControlContext.authenticate(adminResource, PasswordCredentials.newInstance(ADMIN_PASSWORD));
+
+      final Resource strictAuthenticatableResource
+            = customAccessControlContext.createResource(strictResourceClass,
+                                                        strictDomain,
+                                                        PasswordCredentials.newInstance("opensesameplease".toCharArray()));
+
+      final PasswordCredentials newCredentials = PasswordCredentials.newInstance("pleaseopensesame".toCharArray());
+      customAccessControlContext.setCredentials(strictAuthenticatableResource, newCredentials);
+
+      customAccessControlContext.authenticate(strictAuthenticatableResource, newCredentials);
+   }
+
+   @Test
+   public void setCredentials_invalidCredentialCriteria_shouldFail() throws AccessControlException {
+      customAccessControlContext.authenticate(adminResource, PasswordCredentials.newInstance(ADMIN_PASSWORD));
+
+      final Resource strictAuthenticatableResource
+            = customAccessControlContext.createResource(strictResourceClass,
+                                                        strictDomain,
+                                                        PasswordCredentials.newInstance("opensesameplease".toCharArray()));
+
+      try {
+         customAccessControlContext.setCredentials(strictAuthenticatableResource,
+                                                   PasswordCredentials.newInstance("tooshort".toCharArray()));
+         fail("setting credentials with invalid credentials should have failed");
+      }
+      catch (AccessControlException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("does not meet minimum length"));
+      }
+   }
+
    private static class CustomAuthenticationProvider extends SQLPasswordAuthenticationProvider {
       protected CustomAuthenticationProvider(Connection connection,
                                              String schemaName,
@@ -122,8 +208,18 @@ public class TestAccessControl_authenticateWithCustomAuthenticationProvider exte
       }
 
       @Override
-      public void validateCredentials(Credentials credentials) throws AccessControlException {
-         super.validateCredentials(credentials);
+      public void validateCredentials(String resourceClassName, String domainName, Credentials credentials) throws AccessControlException {
+         // unlike super.validateCredentials(), our custom validator passes if credentials are null
+         if (credentials != null) {
+            if (credentials instanceof PasswordCredentials
+                  && strictResourceClass.equalsIgnoreCase(resourceClassName)
+                  && strictDomain.equalsIgnoreCase(domainName)
+                  && ((PasswordCredentials) credentials).getPassword().length < strictMinPasswordLength) {
+               throw new AccessControlException("password does not meet minimum length criteria (" + strictMinPasswordLength + ")");
+            }
+
+            super.validateCredentials(resourceClassName, domainName, credentials);
+         }
       }
 
       @Override

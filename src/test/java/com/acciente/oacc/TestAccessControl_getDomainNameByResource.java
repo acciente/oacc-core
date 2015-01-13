@@ -32,7 +32,7 @@ public class TestAccessControl_getDomainNameByResource extends TestAccessControl
       authenticateSystemResource();
 
       generateUnauthenticatableResource();
-      final String resourceClassName = generateResourceClass(true, false);
+      final String resourceClassName = generateResourceClass(false, true);
       final Resource queriedResource = accessControlContext.createResource(resourceClassName);
 
       // verify

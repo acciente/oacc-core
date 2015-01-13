@@ -30,16 +30,15 @@ import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 public class TestAccessControlBase {
    public static final Resource SYS_RESOURCE = Resources.getInstance(0);
 
-   private static SQLDialect           sqlDialect;
-   private static DataSource           dataSource;
-   private static AccessControlContext systemAccessControlContext;
-   private static boolean              isDBCaseSensitive;
+   private static   SQLDialect           sqlDialect;
+   private static   DataSource           dataSource;
+   protected static AccessControlContext systemAccessControlContext;
+   private static   boolean              isDBCaseSensitive;
 
    static {
       sqlDialect = TestDataSourceFactory.getSQLDialect();
@@ -117,7 +116,7 @@ public class TestAccessControlBase {
       return permissionName;
    }
 
-   private static void authenticateSystemAccessControlContext() throws AccessControlException {
+   protected static void authenticateSystemAccessControlContext() throws AccessControlException {
       systemAccessControlContext.authenticate(SYS_RESOURCE,
                                               PasswordCredentials.newInstance(Constants.OACC_ROOT_PWD));
    }
