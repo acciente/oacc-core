@@ -3180,22 +3180,15 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
                                    Resource accessedResource,
                                    ResourcePermission requestedResourcePermission)
          throws AccessControlException, SQLException {
-      // first check for direct resource permissions
+      // first check for effective permissions
       if (__isPermissible(requestedResourcePermission,
                           __getEffectiveResourcePermissions(connection, accessorResource, accessedResource))) {
          return true;
       }
 
-      // next check for global permissions to the domain of the accessed resource
-      final String resourceClassName
-            = resourceClassPersister.getResourceClassInfoByResourceId(connection, accessedResource).getResourceClassName();
+      // next check super-user permissions to the domain of the accessed resource
       final String domainName
             = domainPersister.getResourceDomainNameByResourceId(connection, accessedResource);
-
-      if (__isPermissible(requestedResourcePermission,
-                          __getEffectiveGlobalResourcePermissions(connection, accessorResource, resourceClassName, domainName))) {
-         return true;
-      }
 
       if (__isSuperUserOfDomain(connection, accessorResource, domainName)) {
          return true;
@@ -3209,7 +3202,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
                                        Resource accessedResource,
                                        Set<ResourcePermission> requestedResourcePermissions)
          throws AccessControlException, SQLException {
-      // first check for direct resource permissions
+      // first check for effective permissions
       final Set<ResourcePermission> effectiveResourcePermissions
             = __getEffectiveResourcePermissions(connection, accessorResource, accessedResource);
 
@@ -3219,19 +3212,9 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
          }
       }
 
-      // next check for global permissions to the domain of the accessed resource
-      final String resourceClassName
-            = resourceClassPersister.getResourceClassInfoByResourceId(connection, accessedResource).getResourceClassName();
+      // next check for super-user permissions to the domain of the accessed resource
       final String domainName
             = domainPersister.getResourceDomainNameByResourceId(connection, accessedResource);
-      final Set<ResourcePermission> effectiveGlobalPermissions
-            = __getEffectiveGlobalResourcePermissions(connection, accessorResource, resourceClassName, domainName);
-
-      for (ResourcePermission requestedResourcePermission : requestedResourcePermissions) {
-         if (__isPermissible(requestedResourcePermission, effectiveGlobalPermissions)) {
-            return true;
-         }
-      }
 
       if (__isSuperUserOfDomain(connection, accessorResource, domainName)) {
          return true;
