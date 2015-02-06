@@ -137,46 +137,71 @@ public interface AccessControlContext {
          throws AccessControlException;
 
    /**
-    * Checks if the current session resource has the specified global resource permission on
-    * the specified resource class in the session resource's domain.
-    * This method takes into account any global permissions that the session resource may have.
+    * Checks if the specified accessor resource has the specified domain permission on
+    * the specified domain.
+    * This method takes into account any direct domain permissions, inherited domain permissions
+    * and any domain permissions the accessor may have to ancestors of the specified domain, as well
+    * as any super-user privileges.
     *
-    * @param resourceClassName  a string resource class name
-    * @param resourcePermission the permission to be checked
-    * @throws AccessControlException if the session resource <strong>does not</strong> have the
-    *                                specified global permission, or if an error occurs
+    * @param accessorResource the resource on which access is being checked
+    * @param domainPermission the permission to be checked
+    * @param domainName       the domain for which the permission should be checked
+    * @throws AccessControlException if the accessor resource <strong>does not</strong> have the
+    *                                specified domain permission, or if an error occurs
     */
-   public void assertGlobalResourcePermission(String resourceClassName, ResourcePermission resourcePermission)
+   public void assertDomainPermission(Resource accessorResource,
+                                      DomainPermission domainPermission,
+                                      String domainName)
          throws AccessControlException;
 
    /**
-    * Checks if the current session resource has the specified global resource permission on
-    * the specified resource class in the specified domain.
-    * This method takes into account any global permissions that the session resource may have.
+    * Checks if the specified accessor resource would receive the specified domain permission, if the accessor
+    * were to create a domain.
+    * The method takes into account any direct and inherited domain create permissions the accessor might have.
     *
+    * @param accessorResource the resource requesting the access
+    * @param domainPermission the permission to be checked
+    * @throws AccessControlException if the accessor resource would <strong>not</strong> receive the
+    *                                specified permission after creating a domain, or if an error occurs
+    */
+   public void assertPostCreateDomainPermission(Resource accessorResource,
+                                                DomainPermission domainPermission)
+         throws AccessControlException;
+
+   /**
+    * Checks if the specified accessor resource has the specified global resource permission on
+    * the specified resource class in the session resource's domain.
+    * This method takes into account any global permissions that the accessor resource may have.
+    *
+    * @param accessorResource   the resource on which access is being checked
+    * @param resourceClassName  a string resource class name
+    * @param resourcePermission the permission to be checked
+    * @throws AccessControlException if the accessor resource <strong>does not</strong> have the
+    *                                specified global permission, or if an error occurs
+    */
+   public void assertGlobalResourcePermission(Resource accessorResource,
+                                              String resourceClassName,
+                                              ResourcePermission resourcePermission)
+         throws AccessControlException;
+
+   /**
+    * Checks if the specified accessor resource has the specified global resource permission on
+    * the specified resource class in the specified domain.
+    * This method takes into account any global permissions that the accessor resource may have.
+    *
+    * @param accessorResource   the resource on which access is being checked
     * @param resourceClassName  a string resource class name
     * @param resourcePermission the permission to be checked
     * @param domainName         the domain in which the permission should be checked
-    * @throws AccessControlException if the session resource <strong>does not</strong> have the
+    * @throws AccessControlException if the accessor resource <strong>does not</strong> have the
     *                                specified global permission, or if an error occurs
     */
-   public void assertGlobalResourcePermission(String resourceClassName,
+   public void assertGlobalResourcePermission(Resource accessorResource,
+                                              String resourceClassName,
                                               ResourcePermission resourcePermission,
                                               String domainName)
          throws AccessControlException;
 
-   /**
-    * Checks if the current session resource has the specified resource permission to
-    * the specified accessed resource.
-    * This method takes into account direct, inherited and global permissions of the session resource.
-    *
-    * @param accessedResource   the resource on which access is being checked
-    * @param resourcePermission the permission to be checked
-    * @throws AccessControlException if the session resource <strong>does not</strong> have the
-    *                                specified permission, or if an error occurs
-    */
-   public void assertResourcePermission(Resource accessedResource, ResourcePermission resourcePermission)
-         throws AccessControlException;
 
    /**
     * Checks if the specified accessor resource has the specified resource permission
@@ -195,34 +220,39 @@ public interface AccessControlContext {
          throws AccessControlException;
 
    /**
-    * Checks if the current session resource would receive the specified permission on an object of
-    * the specified class in the session resource's domain, if were to create such an object.
+    * Checks if the specified accessor resource would receive the specified permission on an object of
+    * the specified class in the session resource's domain, if it were to create such an object.
     * The method takes into account any resource create permissions and global resource permissions
-    * of the session resource.
+    * of the specified accessor resource.
     *
+    * @param accessorResource   the resource requesting the access
     * @param resourceClassName  a string resource class name
     * @param resourcePermission the permission to be checked
-    * @throws AccessControlException if the session resource would <strong>not</strong> receive the
-    *                                specified permission after creating a resource of the specified class in the current session domain,
-    *                                or if an error occurs
+    * @throws AccessControlException if the accessor resource would <strong>not</strong> receive the
+    *                                specified permission after creating a resource of the specified class
+    *                                in the current session domain, or if an error occurs
     */
-   public void assertPostCreateResourcePermission(String resourceClassName, ResourcePermission resourcePermission)
+   public void assertPostCreateResourcePermission(Resource accessorResource,
+                                                  String resourceClassName,
+                                                  ResourcePermission resourcePermission)
          throws AccessControlException;
 
    /**
-    * Checks if the current session resource would receive the specified permission on an object of
-    * the specified class in the specified domain, if were to create such an object.
+    * Checks if the specified accessor resource would receive the specified permission on an object of
+    * the specified class in the specified domain, if it were to create such an object.
     * The method takes into account any resource create permissions and global resource permissions
-    * of the session resource.
+    * of the specified accessor resource.
     *
+    * @param accessorResource   the resource requesting the access
     * @param resourceClassName  a string resource class name
     * @param resourcePermission the permission to be checked
     * @param domainName         the domain in which the permission should be checked
-    * @throws AccessControlException if the session resource would <strong>not</strong> receive the
-    *                                specified permission after creating a resource of the specified class in the specified domain,
-    *                                or if an error occurs
+    * @throws AccessControlException if the accessor resource would <strong>not</strong> receive the
+    *                                specified permission after creating a resource of the specified class
+    *                                in the specified domain, or if an error occurs
     */
-   public void assertPostCreateResourcePermission(String resourceClassName,
+   public void assertPostCreateResourcePermission(Resource accessorResource,
+                                                  String resourceClassName,
                                                   ResourcePermission resourcePermission,
                                                   String domainName)
          throws AccessControlException;

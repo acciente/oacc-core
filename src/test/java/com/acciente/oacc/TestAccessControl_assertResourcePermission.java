@@ -43,9 +43,6 @@ public class TestAccessControl_assertResourcePermission extends TestAccessContro
       assertThat(allResourcePermissions.isEmpty(), is(true));
 
       // verify
-      accessControlContext.assertResourcePermission(accessedResource,
-                                                    ResourcePermissions.getInstance(customPermissionName));
-
       accessControlContext.assertResourcePermission(SYS_RESOURCE,
                                                     accessedResource,
                                                     ResourcePermissions.getInstance(customPermissionName));
@@ -72,16 +69,6 @@ public class TestAccessControl_assertResourcePermission extends TestAccessContro
       accessControlContext.authenticate(accessorResource, PasswordCredentials.newInstance(password));
 
       // verify
-      try {
-         accessControlContext.assertResourcePermission(accessedResource,
-                                                       ResourcePermissions.getInstance(customPermissionName));
-         fail("asserting resource permission when none has been granted should not have succeeded for authenticated resource");
-      }
-      catch (AccessControlException e) {
-         assertThat(e.isNotAuthorizedError(), is(true));
-         assertThat(e.getMessage().toLowerCase(), containsString("does not have requested permission"));
-      }
-
       try {
          accessControlContext.assertResourcePermission(accessorResource,
                                                        accessedResource,
@@ -115,7 +102,6 @@ public class TestAccessControl_assertResourcePermission extends TestAccessContro
       accessControlContext.authenticate(accessorResource, PasswordCredentials.newInstance(password));
 
       // verify
-      accessControlContext.assertResourcePermission(accessedResource, customPermission);
       accessControlContext.assertResourcePermission(accessorResource, accessedResource, customPermission);
    }
 
@@ -150,22 +136,10 @@ public class TestAccessControl_assertResourcePermission extends TestAccessContro
       accessControlContext.authenticate(accessorResource, PasswordCredentials.newInstance(password));
 
       // verify
-      accessControlContext.assertResourcePermission(accessedResource, customPermission1_withoutGrant);
       accessControlContext.assertResourcePermission(accessorResource, accessedResource, customPermission1_withoutGrant);
-      accessControlContext.assertResourcePermission(accessedResource, customPermission1_withGrant);
       accessControlContext.assertResourcePermission(accessorResource, accessedResource, customPermission1_withGrant);
-
-      accessControlContext.assertResourcePermission(accessedResource, customPermission2_withoutGrant);
       accessControlContext.assertResourcePermission(accessorResource, accessedResource, customPermission2_withoutGrant);
 
-      try {
-         accessControlContext.assertResourcePermission(accessedResource, customPermission2_withGrant);
-         fail("asserting resource permission with grant when the one granted does not have grant should not have succeeded for authenticated resource");
-      }
-      catch (AccessControlException e) {
-         assertThat(e.isNotAuthorizedError(), is(true));
-         assertThat(e.getMessage().toLowerCase(), containsString("does not have requested permission"));
-      }
       try {
          accessControlContext.assertResourcePermission(accessorResource, accessedResource, customPermission2_withGrant);
          fail("asserting resource permission with grant when the one granted does not have grant should not have succeeded for authenticated resource");
@@ -203,7 +177,6 @@ public class TestAccessControl_assertResourcePermission extends TestAccessContro
       accessControlContext.authenticate(accessorResource, PasswordCredentials.newInstance(password));
 
       // verify
-      accessControlContext.assertResourcePermission(accessedResource, customPermission);
       accessControlContext.assertResourcePermission(accessorResource, accessedResource, customPermission);
    }
 
@@ -235,7 +208,6 @@ public class TestAccessControl_assertResourcePermission extends TestAccessContro
       accessControlContext.authenticate(accessorResource, PasswordCredentials.newInstance(password));
 
       // verify
-      accessControlContext.assertResourcePermission(accessedResource, customPermission);
       accessControlContext.assertResourcePermission(accessorResource, accessedResource, customPermission);
    }
 
@@ -273,7 +245,6 @@ public class TestAccessControl_assertResourcePermission extends TestAccessContro
       accessControlContext.authenticate(accessorResource, PasswordCredentials.newInstance(password));
 
       // verify
-      accessControlContext.assertResourcePermission(accessedResource, customPermission);
       accessControlContext.assertResourcePermission(accessorResource, accessedResource, customPermission);
    }
 
@@ -305,7 +276,6 @@ public class TestAccessControl_assertResourcePermission extends TestAccessContro
       final String customPermissionName = generateResourceClassPermission(accessedResourceClassName);
       final ResourcePermission customPermission = ResourcePermissions.getInstance(customPermissionName);
 
-      accessControlContext.assertResourcePermission(accessedResource, customPermission);
       accessControlContext.assertResourcePermission(accessorResource, accessedResource, customPermission);
    }
 
@@ -343,7 +313,6 @@ public class TestAccessControl_assertResourcePermission extends TestAccessContro
       final String customPermissionName = generateResourceClassPermission(accessedResourceClassName);
       final ResourcePermission customPermission = ResourcePermissions.getInstance(customPermissionName);
 
-      accessControlContext.assertResourcePermission(accessedResource, customPermission);
       accessControlContext.assertResourcePermission(accessorResource, accessedResource, customPermission);
    }
 
@@ -368,20 +337,6 @@ public class TestAccessControl_assertResourcePermission extends TestAccessContro
       accessControlContext.authenticate(accessorResource, PasswordCredentials.newInstance(password));
 
       // verify
-      try {
-         accessControlContext.assertResourcePermission(null, customPermission);
-      }
-      catch (AccessControlException e) {
-         assertThat(e.isNotAuthorizedError(), is(false));
-         assertThat(e.getMessage().toLowerCase(), containsString("resource required"));
-      }
-      try {
-         accessControlContext.assertResourcePermission(accessedResource, null);
-      }
-      catch (AccessControlException e) {
-         assertThat(e.isNotAuthorizedError(), is(false));
-         assertThat(e.getMessage().toLowerCase(), containsString("resource permission required"));
-      }
       try {
          accessControlContext.assertResourcePermission(null, accessedResource, customPermission);
       }
@@ -429,20 +384,6 @@ public class TestAccessControl_assertResourcePermission extends TestAccessContro
       final Resource invalidResource = Resources.getInstance(-999L);
       final ResourcePermission invalidPermission = ResourcePermissions.getInstance("invalid_permission");
 
-      try {
-         accessControlContext.assertResourcePermission(invalidResource, customPermission);
-      }
-      catch (AccessControlException e) {
-         assertThat(e.isNotAuthorizedError(), is(false));
-         assertThat(e.getMessage().toLowerCase(), containsString("could not determine resource domain for resource"));
-      }
-      try {
-         accessControlContext.assertResourcePermission(accessedResource, invalidPermission);
-      }
-      catch (AccessControlException e) {
-//         assertThat(e.isNotAuthorizedError(), is(false));
-         assertThat(e.getMessage().toLowerCase(), containsString("does not have requested permission"));
-      }
       try {
          accessControlContext.assertResourcePermission(invalidResource, accessedResource, customPermission);
       }
