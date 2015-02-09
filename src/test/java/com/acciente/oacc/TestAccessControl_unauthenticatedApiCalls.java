@@ -71,6 +71,18 @@ public class TestAccessControl_unauthenticatedApiCalls extends TestAccessControl
       catch (AccessControlException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("not authenticated"));
       }
+      try {
+         accessControlContext.createResource("any_resource_class_name");
+      }
+      catch (AccessControlException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("not authenticated"));
+      }
+      try {
+         accessControlContext.createResource("any_resource_class_name", PasswordCredentials.newInstance(generateUniquePassword()));
+      }
+      catch (AccessControlException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("not authenticated"));
+      }
 
       // verify getters
       try {
@@ -234,16 +246,6 @@ public class TestAccessControl_unauthenticatedApiCalls extends TestAccessControl
       catch (AccessControlException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("not authenticated"));
       }
-
-      // the following requires implicit domain from authenticated resource (or from session resource)
-      // i.e. can't use this method to create nonAuthCreateAllowed-resources when not authenticated
-      // hence the error message is different
-      try {
-         accessControlContext.createResource("any_resource_class_name");
-      }
-      catch (AccessControlException e) {
-         assertThat(e.getMessage().toLowerCase(), containsString("domain required"));
-      }
    }
 
    @Test
@@ -266,7 +268,6 @@ public class TestAccessControl_unauthenticatedApiCalls extends TestAccessControl
       final String resourceClassName = generateResourceClass(false, false);
       final String authenticatableResourceClassName = generateResourceClass(true, false);
       final String domainName = generateDomain();
-      final String singletonResourceClassName = generateResourceClassSingleton(domainName);
 
       // need valid resourceClass and domains to test the
       // following method calls from an unauthenticated context
@@ -285,6 +286,5 @@ public class TestAccessControl_unauthenticatedApiCalls extends TestAccessControl
       catch (AccessControlException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("not authenticated"));
       }
-
    }
 }

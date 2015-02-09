@@ -701,6 +701,8 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
    public Resource createResource(String resourceClassName) throws AccessControlException {
       SQLConnection connection = null;
 
+      __assertAuthenticated();
+
       try {
          connection = __getConnection();
 
@@ -735,6 +737,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
    public Resource createResource(String resourceClassName, Credentials credentials) throws AccessControlException {
       SQLConnection connection = null;
 
+      __assertAuthenticated();
       __assertCredentialsSpecified(credentials);
 
       try {

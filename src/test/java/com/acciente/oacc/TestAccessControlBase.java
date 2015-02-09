@@ -174,13 +174,6 @@ public class TestAccessControlBase {
       return systemAccessControlContext.createResource(generateResourceClass(false, true), generateDomain());
    }
 
-   protected static String generateResourceClassSingleton(String domainName) throws AccessControlException {
-      authenticateSystemAccessControlContext();
-      final String resourceClassName = generateResourceClass(false, true);
-      systemAccessControlContext.createResource(resourceClassName, domainName);
-      return resourceClassName;
-   }
-
    protected static void grantDomainCreatePermission(Resource accessorResource) throws AccessControlException {
       authenticateSystemAccessControlContext();
       Set<DomainCreatePermission> domainCreatePermissions = new HashSet<>();
