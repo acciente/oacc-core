@@ -485,7 +485,7 @@ public class TestAccessControl_setDomainPermissions extends TestAccessControlBas
          accessControlContext.setDomainPermissions(null, domainName, domainPermissions);
          fail("setting domain create permissions with null accessor resource should have failed");
       }
-      catch (AccessControlException e) {
+      catch (NullPointerException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("resource required"));
       }
 
@@ -493,7 +493,7 @@ public class TestAccessControl_setDomainPermissions extends TestAccessControlBas
          accessControlContext.setDomainPermissions(accessorResource, null, domainPermissions);
          fail("setting domain create permissions with null domain name should have failed");
       }
-      catch (AccessControlException e) {
+      catch (NullPointerException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("domain required"));
       }
 
@@ -501,7 +501,7 @@ public class TestAccessControl_setDomainPermissions extends TestAccessControlBas
          accessControlContext.setDomainPermissions(accessorResource, domainName, null);
          fail("setting domain create permissions with null domain permission set should have failed");
       }
-      catch (AccessControlException e) {
+      catch (NullPointerException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("permissions required"));
       }
 
@@ -509,7 +509,7 @@ public class TestAccessControl_setDomainPermissions extends TestAccessControlBas
          accessControlContext.setDomainPermissions(accessorResource, domainName, domainPermission_nullElement);
          fail("setting domain create permissions with null element in domain permission set should have failed");
       }
-      catch (AccessControlException e) {
+      catch (NullPointerException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("contains null element"));
       }
    }

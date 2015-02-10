@@ -446,7 +446,7 @@ public class TestAccessControl_createAuthenticatableResource extends TestAccessC
          accessControlContext.createResource(null, PasswordCredentials.newInstance(password));
          fail("creating authenticatable resource with null resource class name should have failed");
       }
-      catch (AccessControlException e) {
+      catch (NullPointerException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("resource class required"));
       }
 
@@ -454,7 +454,7 @@ public class TestAccessControl_createAuthenticatableResource extends TestAccessC
          accessControlContext.createResource(resourceClassName, (Credentials) null);
          fail("creating authenticatable resource with null credentials should have failed");
       }
-      catch (AccessControlException e) {
+      catch (NullPointerException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("credentials required, none specified"));
       }
 
@@ -470,7 +470,7 @@ public class TestAccessControl_createAuthenticatableResource extends TestAccessC
          accessControlContext.createResource(null, domainName, PasswordCredentials.newInstance(password));
          fail("creating authenticatable resource with null resource class name should have failed");
       }
-      catch (AccessControlException e) {
+      catch (NullPointerException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("resource class required"));
       }
 
@@ -478,7 +478,7 @@ public class TestAccessControl_createAuthenticatableResource extends TestAccessC
          accessControlContext.createResource(resourceClassName, null, PasswordCredentials.newInstance(password));
          fail("creating authenticatable resource with null domain name should have failed");
       }
-      catch (AccessControlException e) {
+      catch (NullPointerException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("domain required"));
       }
 
@@ -486,7 +486,7 @@ public class TestAccessControl_createAuthenticatableResource extends TestAccessC
          accessControlContext.createResource(resourceClassName, domainName, null);
          fail("creating authenticatable resource with null credentials should have failed");
       }
-      catch (AccessControlException e) {
+      catch (NullPointerException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("credentials required, none specified"));
       }
 
@@ -511,7 +511,7 @@ public class TestAccessControl_createAuthenticatableResource extends TestAccessC
          accessControlContext.createResource(resourceClassName, domainName, null);
          fail("creating authenticatable resource with null credentials should have failed");
       }
-      catch (AccessControlException e) {
+      catch (NullPointerException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("credentials required"));
       }
 
@@ -539,14 +539,14 @@ public class TestAccessControl_createAuthenticatableResource extends TestAccessC
          accessControlContext.createResource("", PasswordCredentials.newInstance(password));
          fail("creating authenticatable resource with empty resource class name should have failed");
       }
-      catch (AccessControlException e) {
+      catch (IllegalArgumentException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("resource class required"));
       }
       try {
          accessControlContext.createResource(" \t", PasswordCredentials.newInstance(password));
          fail("creating authenticatable resource with empty resource class name should have failed");
       }
-      catch (AccessControlException e) {
+      catch (IllegalArgumentException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("resource class required"));
       }
 
@@ -569,14 +569,14 @@ public class TestAccessControl_createAuthenticatableResource extends TestAccessC
          accessControlContext.createResource("", domainName, PasswordCredentials.newInstance(password));
          fail("creating authenticatable resource with empty resource class name should have failed");
       }
-      catch (AccessControlException e) {
+      catch (IllegalArgumentException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("resource class required"));
       }
       try {
          accessControlContext.createResource(" \t", domainName, PasswordCredentials.newInstance(password));
          fail("creating authenticatable resource with empty resource class name should have failed");
       }
-      catch (AccessControlException e) {
+      catch (IllegalArgumentException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("resource class required"));
       }
 
@@ -584,14 +584,14 @@ public class TestAccessControl_createAuthenticatableResource extends TestAccessC
          accessControlContext.createResource(resourceClassName, "", PasswordCredentials.newInstance(password));
          fail("creating authenticatable resource with empty domain name should have failed");
       }
-      catch (AccessControlException e) {
+      catch (IllegalArgumentException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("domain required"));
       }
       try {
          accessControlContext.createResource(resourceClassName, " \t", PasswordCredentials.newInstance(password));
          fail("creating authenticatable resource with empty domain name should have failed");
       }
-      catch (AccessControlException e) {
+      catch (IllegalArgumentException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("domain required"));
       }
 

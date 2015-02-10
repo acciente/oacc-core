@@ -100,7 +100,7 @@ public class TestAccessControl_getResourceClassInfoByResource extends TestAccess
          accessControlContext.getResourceClassInfoByResource(null);
          fail("getting resource class info by resource for null resource should have failed");
       }
-      catch (AccessControlException e) {
+      catch (NullPointerException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("resource required"));
       }
    }

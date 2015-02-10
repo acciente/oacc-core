@@ -395,7 +395,7 @@ public class TestAccessControl_getEffectiveGlobalResourcePermissions extends Tes
          accessControlContext.getEffectiveGlobalResourcePermissionsMap(null);
          fail("getting effective global resource permissions with null accessor resource should have failed");
       }
-      catch (AccessControlException e) {
+      catch (NullPointerException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("resource required"));
       }
 
@@ -406,14 +406,14 @@ public class TestAccessControl_getEffectiveGlobalResourcePermissions extends Tes
          accessControlContext.getEffectiveGlobalResourcePermissions(null, resourceClassName);
          fail("getting effective global resource permissions with null resource should have failed");
       }
-      catch (AccessControlException e) {
+      catch (NullPointerException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("resource required"));
       }
       try {
          accessControlContext.getEffectiveGlobalResourcePermissions(null, resourceClassName, domainName);
          fail("getting effective global resource permissions with null resource should have failed");
       }
-      catch (AccessControlException e) {
+      catch (NullPointerException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("resource required"));
       }
 
@@ -421,14 +421,14 @@ public class TestAccessControl_getEffectiveGlobalResourcePermissions extends Tes
          accessControlContext.getEffectiveGlobalResourcePermissions(accessorResource, null);
          fail("getting effective global resource permissions with null resource class name should have failed");
       }
-      catch (AccessControlException e) {
+      catch (NullPointerException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("resource class required"));
       }
       try {
          accessControlContext.getEffectiveGlobalResourcePermissions(accessorResource, null, domainName);
          fail("getting effective global resource permissions with null resource class name should have failed");
       }
-      catch (AccessControlException e) {
+      catch (NullPointerException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("resource class required"));
       }
 
@@ -436,7 +436,7 @@ public class TestAccessControl_getEffectiveGlobalResourcePermissions extends Tes
          accessControlContext.getEffectiveGlobalResourcePermissions(accessorResource, resourceClassName, null);
          fail("getting effective global resource permissions with null domain name should have failed");
       }
-      catch (AccessControlException e) {
+      catch (NullPointerException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("domain required"));
       }
    }

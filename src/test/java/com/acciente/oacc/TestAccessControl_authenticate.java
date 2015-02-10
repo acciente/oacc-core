@@ -132,14 +132,14 @@ public class TestAccessControl_authenticate extends TestAccessControlBase {
          accessControlContext.authenticate(null, PasswordCredentials.newInstance(null));
          fail("authentication of null-resource should not have succeeded");
       }
-      catch (AccessControlException e) {
+      catch (NullPointerException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("resource required, none specified"));
       }
       try {
          accessControlContext.authenticate(getSystemResource(), null);
          fail("authentication of system resource with null password credentials should not have succeeded");
       }
-      catch (AccessControlException e) {
+      catch (NullPointerException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("credentials required, none specified"));
       }
       try {

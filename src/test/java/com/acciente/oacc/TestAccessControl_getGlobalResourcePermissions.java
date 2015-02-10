@@ -308,7 +308,7 @@ public class TestAccessControl_getGlobalResourcePermissions extends TestAccessCo
          accessControlContext.getGlobalResourcePermissionsMap(null);
          fail("getting direct global resource permissions with null accessor resource should have failed");
       }
-      catch (AccessControlException e) {
+      catch (NullPointerException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("resource required"));
       }
 
@@ -319,14 +319,14 @@ public class TestAccessControl_getGlobalResourcePermissions extends TestAccessCo
          accessControlContext.getGlobalResourcePermissions(null, resourceClassName);
          fail("getting direct global resource permissions with null resource should have failed");
       }
-      catch (AccessControlException e) {
+      catch (NullPointerException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("resource required"));
       }
       try {
          accessControlContext.getGlobalResourcePermissions(null, resourceClassName, domainName);
          fail("getting direct global resource permissions with null resource should have failed");
       }
-      catch (AccessControlException e) {
+      catch (NullPointerException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("resource required"));
       }
 
@@ -334,14 +334,14 @@ public class TestAccessControl_getGlobalResourcePermissions extends TestAccessCo
          accessControlContext.getGlobalResourcePermissions(accessorResource, null);
          fail("getting direct global resource permissions with null resource class name should have failed");
       }
-      catch (AccessControlException e) {
+      catch (NullPointerException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("resource class required"));
       }
       try {
          accessControlContext.getGlobalResourcePermissions(accessorResource, null, domainName);
          fail("getting direct global resource permissions with null resource class name should have failed");
       }
-      catch (AccessControlException e) {
+      catch (NullPointerException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("resource class required"));
       }
 
@@ -349,7 +349,7 @@ public class TestAccessControl_getGlobalResourcePermissions extends TestAccessCo
          accessControlContext.getGlobalResourcePermissions(accessorResource, resourceClassName, null);
          fail("getting direct global resource permissions with null domain name should have failed");
       }
-      catch (AccessControlException e) {
+      catch (NullPointerException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("domain required"));
       }
    }

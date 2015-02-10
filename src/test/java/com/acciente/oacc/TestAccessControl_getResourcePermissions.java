@@ -263,7 +263,7 @@ public class TestAccessControl_getResourcePermissions extends TestAccessControlB
          accessControlContext.getResourcePermissions(null, accessedResource);
          fail("getting permissions with null accessor resource should have failed");
       }
-      catch (AccessControlException e) {
+      catch (NullPointerException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("resource required"));
       }
 
@@ -272,7 +272,7 @@ public class TestAccessControl_getResourcePermissions extends TestAccessControlB
          accessControlContext.getResourcePermissions(accessorResource, null);
          fail("getting permissions with null accessed resource should have failed");
       }
-      catch (AccessControlException e) {
+      catch (NullPointerException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("resource required"));
       }
    }

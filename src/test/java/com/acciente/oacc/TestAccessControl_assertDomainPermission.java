@@ -331,7 +331,7 @@ public class TestAccessControl_assertDomainPermission extends TestAccessControlB
          accessControlContext.assertDomainPermission(null, domPerm_superUser, domainName);
          fail("asserting domain permissions with null accessor resource reference should have failed");
       }
-      catch (AccessControlException e) {
+      catch (NullPointerException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("resource required"));
       }
 
@@ -339,7 +339,7 @@ public class TestAccessControl_assertDomainPermission extends TestAccessControlB
          accessControlContext.assertDomainPermission(accessorResource, null, domainName);
          fail("asserting domain permissions with null domain permission reference should have failed");
       }
-      catch (AccessControlException e) {
+      catch (NullPointerException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("permission required"));
       }
 
@@ -347,7 +347,7 @@ public class TestAccessControl_assertDomainPermission extends TestAccessControlB
          accessControlContext.assertDomainPermission(accessorResource, domPerm_superUser, null);
          fail("asserting domain permissions with null domain name should have failed");
       }
-      catch (AccessControlException e) {
+      catch (NullPointerException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("domain required"));
       }
    }

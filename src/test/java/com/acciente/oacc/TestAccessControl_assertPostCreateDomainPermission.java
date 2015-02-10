@@ -379,14 +379,14 @@ public class TestAccessControl_assertPostCreateDomainPermission extends TestAcce
          accessControlContext.assertPostCreateDomainPermission(null, domainPermission);
          fail("asserting post-create domain permission with null accessor resource should have failed");
       }
-      catch (AccessControlException e) {
+      catch (NullPointerException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("resource required"));
       }
       try {
          accessControlContext.assertPostCreateDomainPermission(accessorResource, null);
          fail("asserting post-create domain permission with null permission should have failed");
       }
-      catch (AccessControlException e) {
+      catch (NullPointerException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("permission required"));
       }
    }

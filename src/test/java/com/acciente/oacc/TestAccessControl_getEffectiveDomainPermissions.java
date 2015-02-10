@@ -345,7 +345,7 @@ public class TestAccessControl_getEffectiveDomainPermissions extends TestAccessC
          accessControlContext.getEffectiveDomainPermissionsMap(null);
          fail("getting effective domain permissions map with null accessor resource reference should have failed");
       }
-      catch (AccessControlException e) {
+      catch (NullPointerException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("resource required"));
       }
 
@@ -353,7 +353,7 @@ public class TestAccessControl_getEffectiveDomainPermissions extends TestAccessC
          accessControlContext.getEffectiveDomainPermissions(null, generateDomain());
          fail("getting effective domain permissions with null accessor resource reference should have failed");
       }
-      catch (AccessControlException e) {
+      catch (NullPointerException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("resource required"));
       }
 
@@ -361,7 +361,7 @@ public class TestAccessControl_getEffectiveDomainPermissions extends TestAccessC
          accessControlContext.getEffectiveDomainPermissions(generateUnauthenticatableResource(), null);
          fail("getting effective domain permissions with null domain name should have failed");
       }
-      catch (AccessControlException e) {
+      catch (NullPointerException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("domain required"));
       }
    }

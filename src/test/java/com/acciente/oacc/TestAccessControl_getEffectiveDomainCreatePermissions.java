@@ -348,7 +348,7 @@ public class TestAccessControl_getEffectiveDomainCreatePermissions extends TestA
       try {
          accessControlContext.getEffectiveDomainCreatePermissions(null);
       }
-      catch (AccessControlException e) {
+      catch (NullPointerException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("resource required"));
       }
    }

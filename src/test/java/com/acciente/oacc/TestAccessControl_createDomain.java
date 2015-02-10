@@ -249,7 +249,7 @@ public class TestAccessControl_createDomain extends TestAccessControlBase {
          accessControlContext.createDomain(null);
          fail("creating a null domain should fail");
       }
-      catch (AccessControlException e) {
+      catch (NullPointerException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("none specified"));
       }
    }
@@ -263,7 +263,7 @@ public class TestAccessControl_createDomain extends TestAccessControlBase {
          accessControlContext.createDomain("");
          fail("creating a domain with empty name should fail");
       }
-      catch (AccessControlException e) {
+      catch (IllegalArgumentException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("none specified"));
       }
 
@@ -271,7 +271,7 @@ public class TestAccessControl_createDomain extends TestAccessControlBase {
          accessControlContext.createDomain(" \t");
          fail("creating a domain with empty name should fail");
       }
-      catch (AccessControlException e) {
+      catch (IllegalArgumentException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("none specified"));
       }
    }

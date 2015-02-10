@@ -167,15 +167,15 @@ public class TestAccessControl_createResourcePermission extends TestAccessContro
          accessControlContext.createResourcePermission(null, permissionName);
          fail("creating resource permission with NULL resource class name should fail");
       }
-      catch (AccessControlException e) {
+      catch (NullPointerException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("resource class required"));
       }
       try {
          accessControlContext.createResourcePermission(resourceClassName, null);
          fail("creating resource permission with NULL permission name should fail");
       }
-      catch (AccessControlException e) {
-         assertThat(e.getMessage().toLowerCase(), containsString("permission name may not be null or blank"));
+      catch (NullPointerException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("permission name may not be null"));
       }
    }
 
@@ -205,7 +205,7 @@ public class TestAccessControl_createResourcePermission extends TestAccessContro
          accessControlContext.createResourcePermission(resourceClassName, permissionName);
          fail("creating resource permission with asterisk-prefixed permission name should fail");
       }
-      catch (AccessControlException e) {
+      catch (IllegalArgumentException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("asterisk"));
       }
    }
@@ -220,8 +220,8 @@ public class TestAccessControl_createResourcePermission extends TestAccessContro
          accessControlContext.createResourcePermission(resourceClassName, "");
          fail("creating resource permission with empty permission name should fail");
       }
-      catch (AccessControlException e) {
-         assertThat(e.getMessage().toLowerCase(), containsString("permission name may not be null or blank"));
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("permission name may not be blank"));
       }
    }
 

@@ -834,8 +834,7 @@ public class TestAccessControl_assertPostCreateResourcePermission extends TestAc
                                                                  ResourcePermissions.getInstance(customPermissionName));
          fail("asserting post-create resource permission for null accessor resource reference should have failed for system resource");
       }
-      catch (AccessControlException e) {
-         assertThat(e.isNotAuthorizedError(), is(false));
+      catch (NullPointerException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("resource required"));
       }
       try {
@@ -844,8 +843,7 @@ public class TestAccessControl_assertPostCreateResourcePermission extends TestAc
                                                                  ResourcePermissions.getInstance(customPermissionName));
          fail("asserting post-create resource permission for null resource class reference should have failed for system resource");
       }
-      catch (AccessControlException e) {
-         assertThat(e.isNotAuthorizedError(), is(false));
+      catch (NullPointerException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("resource class required"));
       }
       try {
@@ -854,8 +852,7 @@ public class TestAccessControl_assertPostCreateResourcePermission extends TestAc
                                                                  null);
          fail("asserting post-create resource permission for null resource permission reference should have failed for system resource");
       }
-      catch (AccessControlException e) {
-         assertThat(e.isNotAuthorizedError(), is(false));
+      catch (NullPointerException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("resource permission required"));
       }
 
@@ -867,8 +864,7 @@ public class TestAccessControl_assertPostCreateResourcePermission extends TestAc
                                                                  domainName);
          fail("asserting post-create resource permission (by domain) for null accessor resource reference should have failed for system resource");
       }
-      catch (AccessControlException e) {
-         assertThat(e.isNotAuthorizedError(), is(false));
+      catch (NullPointerException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("resource required"));
       }
       try {
@@ -878,8 +874,7 @@ public class TestAccessControl_assertPostCreateResourcePermission extends TestAc
                                                                  domainName);
          fail("asserting post-create resource permission (by domain) for null resource class reference should have failed for system resource");
       }
-      catch (AccessControlException e) {
-         assertThat(e.isNotAuthorizedError(), is(false));
+      catch (NullPointerException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("resource class required"));
       }
       try {
@@ -889,8 +884,7 @@ public class TestAccessControl_assertPostCreateResourcePermission extends TestAc
                                                                  domainName);
          fail("asserting post-create resource permission (by domain) for null resource permission reference should have failed for system resource");
       }
-      catch (AccessControlException e) {
-         assertThat(e.isNotAuthorizedError(), is(false));
+      catch (NullPointerException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("resource permission required"));
       }
       try {
@@ -900,8 +894,7 @@ public class TestAccessControl_assertPostCreateResourcePermission extends TestAc
                                                                  null);
          fail("asserting post-create resource permission (by domain) for null domain reference should have failed for system resource");
       }
-      catch (AccessControlException e) {
-         assertThat(e.isNotAuthorizedError(), is(false));
+      catch (NullPointerException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("domain required"));
       }
    }
@@ -929,8 +922,7 @@ public class TestAccessControl_assertPostCreateResourcePermission extends TestAc
                                                                  ResourcePermissions.getInstance(customPermissionName));
          fail("asserting post-create resource permission for invalid resource class reference should have failed for system resource");
       }
-      catch (AccessControlException e) {
-         assertThat(e.isNotAuthorizedError(), is(false));
+      catch (IllegalArgumentException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("not defined for resource class"));
       }
       try {
@@ -939,8 +931,7 @@ public class TestAccessControl_assertPostCreateResourcePermission extends TestAc
                                                                  ResourcePermissions.getInstance("invalid_permission"));
          fail("asserting post-create resource permission for invalid resource permission reference should have failed for system resource");
       }
-      catch (AccessControlException e) {
-         assertThat(e.isNotAuthorizedError(), is(false));
+      catch (IllegalArgumentException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("not defined for resource class"));
       }
 
@@ -963,8 +954,7 @@ public class TestAccessControl_assertPostCreateResourcePermission extends TestAc
                                                                  domainName);
          fail("asserting post-create resource permission (by domain) for invalid resource class reference should have failed for system resource");
       }
-      catch (AccessControlException e) {
-         assertThat(e.isNotAuthorizedError(), is(false));
+      catch (IllegalArgumentException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("not defined for resource class"));
       }
       try {
@@ -974,8 +964,7 @@ public class TestAccessControl_assertPostCreateResourcePermission extends TestAc
                                                                  domainName);
          fail("asserting post-create resource permission (by domain) for invalid resource permission reference should have failed for system resource");
       }
-      catch (AccessControlException e) {
-         assertThat(e.isNotAuthorizedError(), is(false));
+      catch (IllegalArgumentException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("not defined for resource class"));
       }
       try {

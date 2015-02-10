@@ -438,7 +438,7 @@ public class TestAccessControl_getResourceCreatePermissions extends TestAccessCo
          accessControlContext.getResourceCreatePermissionsMap(null);
          fail("getting create permissions with null accessor resource should have failed");
       }
-      catch (AccessControlException e) {
+      catch (NullPointerException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("resource required"));
       }
 
@@ -449,14 +449,14 @@ public class TestAccessControl_getResourceCreatePermissions extends TestAccessCo
          accessControlContext.getResourceCreatePermissions(null, resourceClassName);
          fail("getting create permissions with null resource class name should have failed");
       }
-      catch (AccessControlException e) {
+      catch (NullPointerException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("resource required"));
       }
       try {
          accessControlContext.getResourceCreatePermissions(null, resourceClassName, domainName);
          fail("getting create permissions with null resource class name should have failed");
       }
-      catch (AccessControlException e) {
+      catch (NullPointerException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("resource required"));
       }
 
@@ -464,14 +464,14 @@ public class TestAccessControl_getResourceCreatePermissions extends TestAccessCo
          accessControlContext.getResourceCreatePermissions(accessorResource, null);
          fail("getting create permissions with null resource class name should have failed");
       }
-      catch (AccessControlException e) {
+      catch (NullPointerException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("resource class required"));
       }
       try {
          accessControlContext.getResourceCreatePermissions(accessorResource, null, domainName);
          fail("getting create permissions with null resource class name should have failed");
       }
-      catch (AccessControlException e) {
+      catch (NullPointerException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("resource class required"));
       }
 
@@ -479,7 +479,7 @@ public class TestAccessControl_getResourceCreatePermissions extends TestAccessCo
          accessControlContext.getResourceCreatePermissions(accessorResource, resourceClassName, null);
          fail("getting create permissions with null domain name should have failed");
       }
-      catch (AccessControlException e) {
+      catch (NullPointerException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("domain required"));
       }
    }

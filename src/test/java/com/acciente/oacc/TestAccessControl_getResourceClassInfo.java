@@ -101,7 +101,7 @@ public class TestAccessControl_getResourceClassInfo extends TestAccessControlBas
          accessControlContext.getResourceClassInfo("");
          fail("getting resource class info for blank resource class reference should have failed");
       }
-      catch (AccessControlException e) {
+      catch (IllegalArgumentException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("resource class required"));
       }
    }
@@ -120,7 +120,7 @@ public class TestAccessControl_getResourceClassInfo extends TestAccessControlBas
          accessControlContext.getResourceClassInfo(null);
          fail("getting resource class info for null resource class reference should have failed");
       }
-      catch (AccessControlException e) {
+      catch (NullPointerException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("resource class required"));
       }
    }

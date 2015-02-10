@@ -200,21 +200,21 @@ public class TestAccessControl_getDomainPermissions extends TestAccessControlBas
       try {
          accessControlContext.getDomainPermissionsMap(null);
       }
-      catch (AccessControlException e) {
+      catch (NullPointerException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("resource required"));
       }
 
       try {
          accessControlContext.getDomainPermissions(null, generateDomain());
       }
-      catch (AccessControlException e) {
+      catch (NullPointerException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("resource required"));
       }
 
       try {
          accessControlContext.getDomainPermissions(generateUnauthenticatableResource(), null);
       }
-      catch (AccessControlException e) {
+      catch (NullPointerException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("domain required"));
       }
    }

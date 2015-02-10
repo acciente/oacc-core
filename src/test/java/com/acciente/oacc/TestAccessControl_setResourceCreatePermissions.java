@@ -999,7 +999,7 @@ public class TestAccessControl_setResourceCreatePermissions extends TestAccessCo
                                                            resourceCreatePermissions_pre);
          fail("setting create-permissions with null accessor resource should have failed");
       }
-      catch (AccessControlException e) {
+      catch (NullPointerException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("resource required"));
       }
       try {
@@ -1009,7 +1009,7 @@ public class TestAccessControl_setResourceCreatePermissions extends TestAccessCo
                                                            domainName);
          fail("setting create-permissions with null accessor resource should have failed");
       }
-      catch (AccessControlException e) {
+      catch (NullPointerException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("resource required"));
       }
 
@@ -1019,7 +1019,7 @@ public class TestAccessControl_setResourceCreatePermissions extends TestAccessCo
                                                            resourceCreatePermissions_pre);
          fail("setting create-permissions with null resource class name should have failed");
       }
-      catch (AccessControlException e) {
+      catch (NullPointerException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("resource class required"));
       }
       try {
@@ -1029,7 +1029,7 @@ public class TestAccessControl_setResourceCreatePermissions extends TestAccessCo
                                                            domainName);
          fail("setting create-permissions with null resource class name should have failed");
       }
-      catch (AccessControlException e) {
+      catch (NullPointerException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("resource class required"));
       }
 
@@ -1039,7 +1039,7 @@ public class TestAccessControl_setResourceCreatePermissions extends TestAccessCo
                                                            null);
          fail("setting create-permissions with null permission set should have failed");
       }
-      catch (AccessControlException e) {
+      catch (NullPointerException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("permissions required"));
       }
       try {
@@ -1049,7 +1049,7 @@ public class TestAccessControl_setResourceCreatePermissions extends TestAccessCo
                                                            domainName);
          fail("setting create-permissions with null permission set should have failed");
       }
-      catch (AccessControlException e) {
+      catch (NullPointerException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("permissions required"));
       }
 
@@ -1059,7 +1059,7 @@ public class TestAccessControl_setResourceCreatePermissions extends TestAccessCo
                                                            resourceCreatePermissions_nullElement);
          fail("setting create-permissions with null element in permission set should have failed");
       }
-      catch (AccessControlException e) {
+      catch (NullPointerException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("set of permissions contains null element"));
       }
       try {
@@ -1069,7 +1069,7 @@ public class TestAccessControl_setResourceCreatePermissions extends TestAccessCo
                                                            domainName);
          fail("setting create-permissions with null element in permission set should have failed");
       }
-      catch (AccessControlException e) {
+      catch (NullPointerException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("set of permissions contains null element"));
       }
 
@@ -1081,7 +1081,7 @@ public class TestAccessControl_setResourceCreatePermissions extends TestAccessCo
          );
          fail("setting create-permissions with null domain name should have failed");
       }
-      catch (AccessControlException e) {
+      catch (NullPointerException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("domain required"));
       }
    }

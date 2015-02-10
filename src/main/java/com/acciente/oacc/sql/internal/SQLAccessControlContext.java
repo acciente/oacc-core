@@ -641,7 +641,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
             = grantDomainCreatePermissionSysPersister.getDomainCreateSysPermissionsIncludeInherited(connection,
                                                                                                     sessionResource);
 
-      // if there is at least one permission, then it implies that this resource is allow to create domains
+      // if there is at least one permission, then it implies that this resource is allowed to create domains
       if (domainCreatePermissions.isEmpty()) {
          throw new AccessControlException("Not authorized to create domains, domain: " + domainName,
                                           true);
@@ -3779,17 +3779,15 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
 
    // helper methods
 
-   private void __assertResourceSpecified(Resource resource)
-         throws AccessControlException {
+   private void __assertResourceSpecified(Resource resource) {
       if (resource == null) {
-         throw new AccessControlException("Resource required, none specified");
+         throw new NullPointerException("Resource required, none specified");
       }
    }
 
-   private void __assertCredentialsSpecified(Credentials credentials)
-         throws AccessControlException {
+   private void __assertCredentialsSpecified(Credentials credentials) {
       if (credentials == null) {
-         throw new AccessControlException("Credentials required, none specified");
+         throw new NullPointerException("Credentials required, none specified");
       }
    }
 
@@ -3800,17 +3798,21 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       }
    }
 
-   private void __assertDomainSpecified(String domainName)
-         throws AccessControlException {
-      if (domainName == null || domainName.trim().isEmpty()) {
-         throw new AccessControlException("Domain required, none specified");
+   private void __assertDomainSpecified(String domainName) {
+      if (domainName == null) {
+         throw new NullPointerException("Domain required, none specified");
+      }
+      else if (domainName.trim().isEmpty()) {
+         throw new IllegalArgumentException("Domain required, none specified");
       }
    }
 
-   private void __assertParentDomainSpecified(String domainName)
-         throws AccessControlException {
-      if (domainName == null || domainName.trim().isEmpty()) {
-         throw new AccessControlException("Parent domain required, none specified");
+   private void __assertParentDomainSpecified(String domainName) {
+      if (domainName == null) {
+         throw new NullPointerException("Parent domain required, none specified");
+      }
+      else if (domainName.trim().isEmpty()) {
+         throw new IllegalArgumentException("Parent domain required, none specified");
       }
    }
 
@@ -3836,47 +3838,56 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       }
    }
 
-   private void __assertResourceClassSpecified(String resourceClassName) throws AccessControlException {
-      if (resourceClassName == null || resourceClassName.trim().isEmpty()) {
-         throw new AccessControlException("Resource class required, none specified");
+   private void __assertResourceClassSpecified(String resourceClassName) {
+      if (resourceClassName == null) {
+         throw new NullPointerException("Resource class required, none specified");
+      }
+      else if (resourceClassName.trim().isEmpty()) {
+         throw new IllegalArgumentException("Resource class required, none specified");
       }
    }
 
-   private void __assertPermissionSpecified(ResourcePermission resourcePermission) throws AccessControlException {
+   private void __assertPermissionSpecified(ResourcePermission resourcePermission) {
       if (resourcePermission == null) {
-         throw new AccessControlException("Resource permission required, none specified");
+         throw new NullPointerException("Resource permission required, none specified");
       }
    }
 
-   private void __assertPermissionSpecified(DomainPermission domainPermission) throws AccessControlException {
+   private void __assertPermissionSpecified(DomainPermission domainPermission) {
       if (domainPermission == null) {
-         throw new AccessControlException("Domain permission required, none specified");
+         throw new NullPointerException("Domain permission required, none specified");
       }
    }
 
-   private void __assertPermissionsSpecified(Set permissionSet) throws AccessControlException {
+   private void __assertPermissionsSpecified(Set permissionSet) {
       if (permissionSet == null) {
-         throw new AccessControlException("Set of permissions required, none specified");
+         throw new NullPointerException("Set of permissions required, none specified");
       }
 
       if (permissionSet.contains(null)) {
-         throw new AccessControlException("Set of permissions contains null element");
+         throw new NullPointerException("Set of permissions contains null element");
       }
    }
 
-   private void __assertPermissionNameValid(String permissionName) throws AccessControlException {
-      if (permissionName == null || permissionName.trim().isEmpty()) {
-         throw new AccessControlException("Permission name may not be null or blank");
+   private void __assertPermissionNameValid(String permissionName) {
+      if (permissionName == null) {
+         throw new NullPointerException("Permission name may not be null");
+      }
+      else if (permissionName.trim().isEmpty()) {
+         throw new IllegalArgumentException("Permission name may not be blank");
       }
 
       if (permissionName.trim().startsWith("*")) {
-         throw new AccessControlException("Permission name may not start with asterisk '*'");
+         throw new IllegalArgumentException("Permission name may not start with asterisk '*'");
       }
    }
 
-   private void __assertResourceClassNameValid(String resourceClassName) throws AccessControlException {
-      if (resourceClassName == null || resourceClassName.trim().isEmpty()) {
-         throw new AccessControlException("Resource class name may not be null or blank");
+   private void __assertResourceClassNameValid(String resourceClassName) {
+      if (resourceClassName == null) {
+         throw new NullPointerException("Resource class name may not be null");
+      }
+      else if (resourceClassName.trim().isEmpty()) {
+         throw new IllegalArgumentException("Resource class name may not be blank");
       }
    }
 
@@ -3887,7 +3898,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
          final List<String> permissionNames
                = resourceClassPermissionPersister.getPermissionNames(connection, resourceClassName);
          if (!permissionNames.contains(resourcePermission.getPermissionName())) {
-            throw new AccessControlException("Permission: " + resourcePermission + " is not defined for resource class: " + resourceClassName);
+            throw new IllegalArgumentException("Permission: " + resourcePermission + " is not defined for resource class: " + resourceClassName);
          }
       }
    }

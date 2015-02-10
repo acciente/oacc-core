@@ -151,8 +151,8 @@ public class TestAccessControl_createResourceClass extends TestAccessControlBase
          accessControlContext.createResourceClass(null, false, false);
          fail("creating resource class with null name should have failed");
       }
-      catch (AccessControlException e) {
-         assertThat(e.getMessage().toLowerCase(), containsString("may not be null or blank"));
+      catch (NullPointerException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("may not be null"));
       }
 
       assertThat(accessControlContext.getResourceClassNames().isEmpty(), is(true));
@@ -170,8 +170,8 @@ public class TestAccessControl_createResourceClass extends TestAccessControlBase
          accessControlContext.createResourceClass(empty_ResClassName, true, true);
          fail("creating resource class with empty name should have failed");
       }
-      catch (AccessControlException e) {
-         assertThat(e.getMessage().toLowerCase(), containsString("may not be null or blank"));
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("may not be blank"));
       }
 
       // attempt to create resource class with empty name
@@ -180,8 +180,8 @@ public class TestAccessControl_createResourceClass extends TestAccessControlBase
          accessControlContext.createResourceClass(empty_ResClassName, true, true);
          fail("creating resource class with blank name should have failed");
       }
-      catch (AccessControlException e) {
-         assertThat(e.getMessage().toLowerCase(), containsString("may not be null or blank"));
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("may not be blank"));
       }
 
       assertThat(accessControlContext.getResourceClassNames().isEmpty(), is(true));

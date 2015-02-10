@@ -22,6 +22,7 @@ import org.junit.Test;
 import java.util.HashSet;
 import java.util.Set;
 
+import static junit.framework.TestCase.fail;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
@@ -159,8 +160,9 @@ public class TestAccessControl_getDomainCreatePermissions extends TestAccessCont
 
       try {
          accessControlContext.getDomainCreatePermissions(null);
+         fail("getting domain create permissions for null accessor resource should have failed");
       }
-      catch (AccessControlException e) {
+      catch (NullPointerException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("resource required"));
       }
    }

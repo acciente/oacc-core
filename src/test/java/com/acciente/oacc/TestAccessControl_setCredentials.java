@@ -389,7 +389,7 @@ public class TestAccessControl_setCredentials extends TestAccessControlBase {
          accessControlContext.setCredentials(null, PasswordCredentials.newInstance(newPwd));
          fail("setting credentials with null resource should have failed");
       }
-      catch (AccessControlException e) {
+      catch (NullPointerException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("resource required"));
       }
 
@@ -397,7 +397,7 @@ public class TestAccessControl_setCredentials extends TestAccessControlBase {
          accessControlContext.setCredentials(getSystemResource(), null);
          fail("setting credentials with null credentials should have failed");
       }
-      catch (AccessControlException e) {
+      catch (NullPointerException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("credentials required"));
       }
    }

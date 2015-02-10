@@ -295,7 +295,7 @@ public class TestAccessControl_impersonate extends TestAccessControlBase {
          accessControlContext.impersonate(null);
          fail("calling impersonate with a null resource reference should have failed");
       }
-      catch (AccessControlException e) {
+      catch (NullPointerException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("resource required"));
       }
    }

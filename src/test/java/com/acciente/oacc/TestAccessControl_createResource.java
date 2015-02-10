@@ -24,7 +24,6 @@ import java.util.Set;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
-import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
@@ -315,7 +314,7 @@ public class TestAccessControl_createResource extends TestAccessControlBase {
          accessControlContext.createResource(null);
          fail("creating resource with null resource class name should have failed");
       }
-      catch (AccessControlException e) {
+      catch (NullPointerException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("resource class required"));
       }
 
@@ -323,7 +322,7 @@ public class TestAccessControl_createResource extends TestAccessControlBase {
          accessControlContext.createResource(null, domainName);
          fail("creating resource with null resource class name should have failed");
       }
-      catch (AccessControlException e) {
+      catch (NullPointerException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("resource class required"));
       }
 
@@ -331,7 +330,7 @@ public class TestAccessControl_createResource extends TestAccessControlBase {
          accessControlContext.createResource(resourceClassName, (String) null);
          fail("creating resource with null domain name should have failed");
       }
-      catch (AccessControlException e) {
+      catch (NullPointerException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("domain required"));
       }
    }
@@ -348,7 +347,7 @@ public class TestAccessControl_createResource extends TestAccessControlBase {
          accessControlContext.createResource("");
          fail("creating resource with empty resource class name should have failed");
       }
-      catch (AccessControlException e) {
+      catch (IllegalArgumentException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("resource class required"));
       }
 
@@ -356,7 +355,7 @@ public class TestAccessControl_createResource extends TestAccessControlBase {
          accessControlContext.createResource(" \t");
          fail("creating resource with empty resource class name should have failed");
       }
-      catch (AccessControlException e) {
+      catch (IllegalArgumentException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("resource class required"));
       }
 
@@ -364,7 +363,7 @@ public class TestAccessControl_createResource extends TestAccessControlBase {
          accessControlContext.createResource("", domainName);
          fail("creating resource with empty resource class name should have failed");
       }
-      catch (AccessControlException e) {
+      catch (IllegalArgumentException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("resource class required"));
       }
 
@@ -372,7 +371,7 @@ public class TestAccessControl_createResource extends TestAccessControlBase {
          accessControlContext.createResource(" \t", domainName);
          fail("creating resource with empty resource class name should have failed");
       }
-      catch (AccessControlException e) {
+      catch (IllegalArgumentException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("resource class required"));
       }
 
@@ -380,7 +379,7 @@ public class TestAccessControl_createResource extends TestAccessControlBase {
          accessControlContext.createResource(resourceClassName, "");
          fail("creating resource with empty domain name should have failed");
       }
-      catch (AccessControlException e) {
+      catch (IllegalArgumentException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("domain required"));
       }
 
@@ -388,7 +387,7 @@ public class TestAccessControl_createResource extends TestAccessControlBase {
          accessControlContext.createResource(resourceClassName, " \t");
          fail("creating resource with empty domain name should have failed");
       }
-      catch (AccessControlException e) {
+      catch (IllegalArgumentException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("domain required"));
       }
    }

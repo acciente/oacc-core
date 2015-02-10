@@ -23,7 +23,6 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
-import static org.hamcrest.CoreMatchers.anyOf;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
@@ -521,7 +520,7 @@ public class TestAccessControl_setDomainCreatePermissions extends TestAccessCont
          accessControlContext.setDomainCreatePermissions(null, domainCreatePermissions);
          fail("setting domain create permissions with null accessor resource should have failed");
       }
-      catch (AccessControlException e) {
+      catch (NullPointerException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("resource required"));
       }
 
@@ -529,7 +528,7 @@ public class TestAccessControl_setDomainCreatePermissions extends TestAccessCont
          accessControlContext.setDomainCreatePermissions(accessorResource, null);
          fail("setting domain create permissions with null domain permission set should have failed");
       }
-      catch (AccessControlException e) {
+      catch (NullPointerException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("permissions required"));
       }
 
@@ -537,7 +536,7 @@ public class TestAccessControl_setDomainCreatePermissions extends TestAccessCont
          accessControlContext.setDomainCreatePermissions(accessorResource, domainCreatePermission_nullElement);
          fail("setting domain create permissions with null element in domain permission set should have failed");
       }
-      catch (AccessControlException e) {
+      catch (NullPointerException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("contains null element"));
       }
    }

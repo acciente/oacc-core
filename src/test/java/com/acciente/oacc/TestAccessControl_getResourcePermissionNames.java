@@ -76,7 +76,7 @@ public class TestAccessControl_getResourcePermissionNames extends TestAccessCont
          accessControlContext.getResourcePermissionNames(null);
          fail("getting resource permission names with null resource class name should have failed");
       }
-      catch (AccessControlException e) {
+      catch (NullPointerException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("resource class required"));
       }
    }

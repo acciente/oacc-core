@@ -115,7 +115,7 @@ public class TestAccessControl_getDomainDescendants extends TestAccessControlBas
          accessControlContext.getDomainDescendants(null);
          fail("getting domain descendents' names with null domain name should have failed");
       }
-      catch (AccessControlException e) {
+      catch (NullPointerException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("domain required"));
       }
    }
