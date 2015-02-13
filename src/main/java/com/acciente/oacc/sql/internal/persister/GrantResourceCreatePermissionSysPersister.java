@@ -245,7 +245,7 @@ public class GrantResourceCreatePermissionSysPersister extends Persister {
                                                   Id<DomainId> accessedResourceDomainId) throws AccessControlException {
       SQLStatement statement = null;
       try {
-         // revoke any existing create system permissions this accessor has to this resource domain + resource class
+         // revoke any existing create system permissions this accessor has to this domain + resource class
          statement = connection.prepareStatement(sqlStrings.SQL_removeInGrantResourceCreatePermissionSys_BY_AccessorID_AccessedDomainID_ResourceClassID);
          statement.setResourceId(1, accessorResource);
          statement.setResourceDomainId(2, accessedResourceDomainId);

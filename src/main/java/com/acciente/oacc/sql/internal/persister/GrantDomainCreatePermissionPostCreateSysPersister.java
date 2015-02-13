@@ -43,7 +43,7 @@ public class GrantDomainCreatePermissionPostCreateSysPersister extends Persister
          statement.setResourceId(1, accessorResource);
          SQLResult resultSet = statement.executeQuery();
 
-         // first collect the create permissions that this resource has to resource domains
+         // first collect the create permissions that this resource has to domains
          Set<DomainCreatePermission> domainCreatePermissions = new HashSet<>();
          while (resultSet.next()) {
             domainCreatePermissions
@@ -75,7 +75,7 @@ public class GrantDomainCreatePermissionPostCreateSysPersister extends Persister
          statement.setResourceId(1, accessorResource);
          SQLResult resultSet = statement.executeQuery();
 
-         // collect the create permissions that this resource has to resource domains directly
+         // collect the create permissions that this resource has to domains directly
          Set<DomainCreatePermission> domainCreatePermissions = new HashSet<>();
          while (resultSet.next()) {
             domainCreatePermissions

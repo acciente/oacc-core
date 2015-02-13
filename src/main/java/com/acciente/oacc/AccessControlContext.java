@@ -1004,7 +1004,7 @@ public interface AccessControlContext {
     * resource class in the specified domain.
     * <p/>
     * Global resource permissions are resource permissions that are defined on a resource class for
-    * a given resource domain and thus apply to any and all resources of that resource class and domain.
+    * a given domain and thus apply to any and all resources of that resource class and domain.
     * They are <strong>not</strong> associated directly with <em>every</em> individual resource of
     * that resource class and domain!
     * <p/>
@@ -1089,7 +1089,7 @@ public interface AccessControlContext {
     * resource class in the current session resource's domain.
     * <p/>
     * Global resource permissions are resource permissions that are defined on a resource class for
-    * a given resource domain and thus apply to any and all resources of that resource class and domain.
+    * a given domain and thus apply to any and all resources of that resource class and domain.
     * They are <strong>not</strong> associated directly with <em>every</em> individual resource of
     * that resource class and domain!
     * <p/>

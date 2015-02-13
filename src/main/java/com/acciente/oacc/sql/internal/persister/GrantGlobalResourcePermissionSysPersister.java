@@ -320,7 +320,7 @@ public class GrantGlobalResourcePermissionSysPersister extends Persister {
 
       SQLStatement statement = null;
       try {
-         // revoke any existing system permissions this accessor has to this resource domain + resource class
+         // revoke any existing system permissions this accessor has to this domain + resource class
          statement = connection.prepareStatement(sqlStrings.SQL_removeInGrantGlobalResourcePermissionSys_BY_AccessorID_AccessedDomainID_ResourceClassID);
          statement.setResourceId(1, accessorResource);
          statement.setResourceDomainId(2, accessedResourceDomainId);

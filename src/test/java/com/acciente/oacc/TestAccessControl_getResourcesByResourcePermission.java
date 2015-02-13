@@ -1012,7 +1012,7 @@ public class TestAccessControl_getResourcesByResourcePermission extends TestAcce
          fail("getting resources by resource permission with non-existent accessor resource should have failed");
       }
       catch (IllegalArgumentException e) {
-         assertThat(e.getMessage().toLowerCase(), containsString("could not determine resource domain for resource"));
+         assertThat(e.getMessage().toLowerCase(), containsString("could not determine domain for resource"));
       }
 
       try {
@@ -1020,7 +1020,7 @@ public class TestAccessControl_getResourcesByResourcePermission extends TestAcce
          fail("getting resources by resource permission with non-existent accessor resource should have failed");
       }
       catch (IllegalArgumentException e) {
-         assertThat(e.getMessage().toLowerCase(), containsString("could not determine resource domain for resource"));
+         assertThat(e.getMessage().toLowerCase(), containsString("could not determine domain for resource"));
       }
 
       try {

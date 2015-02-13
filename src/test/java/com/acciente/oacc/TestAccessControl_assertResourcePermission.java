@@ -392,7 +392,7 @@ public class TestAccessControl_assertResourcePermission extends TestAccessContro
          accessControlContext.assertResourcePermission(accessorResource, invalidResource, customPermission);
       }
       catch (IllegalArgumentException e) {
-         assertThat(e.getMessage().toLowerCase(), containsString("could not determine resource domain for resource"));
+         assertThat(e.getMessage().toLowerCase(), containsString("could not determine domain for resource"));
       }
       try {
          accessControlContext.assertResourcePermission(accessorResource, accessedResource, invalidPermission);

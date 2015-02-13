@@ -115,10 +115,10 @@ public class GrantDomainPermissionSysPersister extends Persister {
          statement.setResourceDomainId(2, resourceDomainId);
          SQLResult resultSet = statement.executeQuery();
 
-         // first collect the create permissions that this resource has to resource domains
+         // first collect the create permissions that this resource has to domains
          Set<DomainPermission> domainPermissions = new HashSet<>();
          while (resultSet.next()) {
-            // on the resource domains only pre-defined system permissions are expected
+            // on the domains only pre-defined system permissions are expected
             domainPermissions
                   .add(DomainPermissions.getInstance(resultSet.getDomainSysPermissionName("SysPermissionId"),
                                                      resultSet.getBoolean("IsWithGrant"),
@@ -148,10 +148,10 @@ public class GrantDomainPermissionSysPersister extends Persister {
          statement.setResourceDomainId(2, resourceDomainId);
          SQLResult resultSet = statement.executeQuery();
 
-         // collect the create permissions that this resource has to the resource domain directly
+         // collect the create permissions that this resource has to the domain directly
          Set<DomainPermission> domainPermissions = new HashSet<>();
          while (resultSet.next()) {
-            // on the resource domains only pre-defined system permissions are expected
+            // on the domains only pre-defined system permissions are expected
             domainPermissions
                   .add(DomainPermissions.getInstance(resultSet.getDomainSysPermissionName("SysPermissionId"),
                                                      resultSet.getBoolean("IsWithGrant"),
@@ -175,7 +175,7 @@ public class GrantDomainPermissionSysPersister extends Persister {
       SQLStatement statement = null;
 
       try {
-         // collect the create permissions that this resource has to each resource domains
+         // collect the create permissions that this resource has to each domain
          statement = connection.prepareStatement(sqlStrings.SQL_findInGrantDomainPermissionSys_ResourceDomainName_SysPermissionID_IsWithGrant_InheritLevel_DomainLevel_BY_AccessorID);
          statement.setResourceId(1, accessorResource);
          SQLResult resultSet = statement.executeQuery();
@@ -192,7 +192,7 @@ public class GrantDomainPermissionSysPersister extends Persister {
                                         domainPermissions = new HashSet<>());
             }
 
-            // on the resource domains only pre-defined system permissions are expected
+            // on the domains only pre-defined system permissions are expected
             domainPermissions
                   .add(DomainPermissions.getInstance(resultSet.getDomainSysPermissionName("SysPermissionId"),
                                                      resultSet.getBoolean("IsWithGrant"),
@@ -215,7 +215,7 @@ public class GrantDomainPermissionSysPersister extends Persister {
       SQLStatement statement = null;
 
       try {
-         // collect the create permissions that this resource has to each resource domains
+         // collect the create permissions that this resource has to each domain
          statement = connection.prepareStatement(sqlStrings.SQL_findInGrantDomainPermissionSys_withoutInheritance_ResourceDomainName_SysPermissionID_IsWithGrant_BY_AccessorID);
          statement.setResourceId(1, accessorResource);
          SQLResult resultSet = statement.executeQuery();
@@ -232,7 +232,7 @@ public class GrantDomainPermissionSysPersister extends Persister {
                                         domainPermissions = new HashSet<>());
             }
 
-            // on the resource domains only pre-defined system permissions are expected
+            // on the domains only pre-defined system permissions are expected
             domainPermissions
                   .add(DomainPermissions.getInstance(resultSet.getDomainSysPermissionName("SysPermissionId"),
                                                      resultSet.getBoolean("IsWithGrant"),
