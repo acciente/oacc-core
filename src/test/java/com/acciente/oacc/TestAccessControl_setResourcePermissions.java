@@ -64,7 +64,7 @@ public class TestAccessControl_setResourcePermissions extends TestAccessControlB
          accessControlContext.setResourcePermissions(accessorResource, accessedResource, permissions_pre);
          fail("granting *RESET_CREDENTIALS system permission to an unauthenticatable resource should have failed");
       }
-      catch (AccessControlException e) {
+      catch (IllegalArgumentException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("not valid for unauthenticatable resource"));
       }
    }
@@ -84,7 +84,7 @@ public class TestAccessControl_setResourcePermissions extends TestAccessControlB
          accessControlContext.setResourcePermissions(accessorResource, accessedResource, permissions_pre);
          fail("granting *IMPERSONATE system permission on an unauthenticatable resource should have failed");
       }
-      catch (AccessControlException e) {
+      catch (IllegalArgumentException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("not valid for unauthenticatable resource"));
       }
    }
@@ -804,7 +804,7 @@ public class TestAccessControl_setResourcePermissions extends TestAccessControlB
          accessControlContext.setResourcePermissions(accessorResource, accessedResource, permissions_pre);
          fail("setting permissions that include the same permission - by name - but with different grant-options, should have failed");
       }
-      catch (AccessControlException e) {
+      catch (IllegalArgumentException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("duplicate permission"));
       }
    }
@@ -860,6 +860,7 @@ public class TestAccessControl_setResourcePermissions extends TestAccessControlB
    public void setResourcePermission_nonExistentReferences_shouldFail() throws AccessControlException {
       authenticateSystemResource();
       final String resourceClassName = generateResourceClass(false, false);
+      final String customPermissionName = generateResourceClassPermission(resourceClassName);
       final Resource accessorResource = generateUnauthenticatableResource();
       final Resource accessedResource = accessControlContext.createResource(resourceClassName, generateDomain());
       assertThat(accessControlContext.getEffectiveResourcePermissions(accessorResource, accessedResource).isEmpty(), is(true));
@@ -871,14 +872,46 @@ public class TestAccessControl_setResourcePermissions extends TestAccessControlB
       resourcePermissions_mismatchedResourceClass.add(ResourcePermissions.getInstance(generateResourceClassPermission(
             generateResourceClass(false, false))));
 
+      Set<ResourcePermission> grantorPermissions
+            = setOf(ResourcePermissions.getInstance(ResourcePermissions.INHERIT, true),
+                    ResourcePermissions.getInstance(customPermissionName, true));
+
+      // setup grantor permissions
+      accessControlContext.setResourcePermissions(accessorResource, accessedResource, grantorPermissions);
+      assertThat(accessControlContext.getEffectiveResourcePermissions(accessorResource, accessedResource), is(grantorPermissions));
+
+      Set<ResourcePermission> permissions_valid
+            = setOf(ResourcePermissions.getInstance(ResourcePermissions.INHERIT),
+                    ResourcePermissions.getInstance(customPermissionName));
+
       // attempt to set permissions with non-existent references
+      try {
+         accessControlContext.setResourcePermissions(Resources.getInstance(-999L),
+                                                     accessedResource,
+                                                     permissions_valid);
+         fail("setting permissions with non-existent accessor resource reference should have failed");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("could not determine resource domain for resource"));
+      }
+
+      try {
+         accessControlContext.setResourcePermissions(accessorResource,
+                                                     Resources.getInstance(-999L),
+                                                     permissions_valid);
+         fail("setting permissions with non-existent accessed resource reference should have failed");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("could not determine resource class for resource"));
+      }
+
       try {
          accessControlContext.setResourcePermissions(accessorResource,
                                                      accessedResource,
                                                      resourcePermissions_mismatchedResourceClass);
          fail("setting permissions with mismatched resource class should have failed");
       }
-      catch (AccessControlException e) {
+      catch (IllegalArgumentException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("does not exist for the specified resource class"));
       }
 
@@ -886,7 +919,7 @@ public class TestAccessControl_setResourcePermissions extends TestAccessControlB
          accessControlContext.setResourcePermissions(accessorResource, accessedResource, permissions_invalidName);
          fail("setting permissions with non-existent permission name should have failed");
       }
-      catch (AccessControlException e) {
+      catch (IllegalArgumentException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("does not exist for the specified resource class"));
       }
    }

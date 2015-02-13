@@ -180,8 +180,8 @@ public class AccessControlContextProxy implements AccessControlContext {
    @Override
    public void createResourceClass(String resourceClassName,
                                    boolean authenticatable,
-                                   boolean unuthenticatedCreateAllowed) throws AccessControlException {
-      accessControlContext.createResourceClass(resourceClassName, authenticatable, unuthenticatedCreateAllowed);
+                                   boolean unauthenticatedCreateAllowed) throws AccessControlException {
+      accessControlContext.createResourceClass(resourceClassName, authenticatable, unauthenticatedCreateAllowed);
    }
 
    @Override

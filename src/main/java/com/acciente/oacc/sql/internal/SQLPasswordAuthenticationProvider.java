@@ -99,7 +99,7 @@ public class SQLPasswordAuthenticationProvider implements AuthenticationProvider
    }
 
    private void __authenticate(SQLConnection connection, Resource resource, char[] password)
-         throws AccessControlException, SQLException {
+         throws AccessControlException {
       // first locate the resource
       final String encryptedBoundPassword = resourcePasswordPersister.getEncryptedBoundPasswordByResourceId(connection, resource);
 
@@ -159,8 +159,7 @@ public class SQLPasswordAuthenticationProvider implements AuthenticationProvider
       }
    }
 
-   private void __setResourcePassword(SQLConnection connection, Resource resource, char[] newPassword)
-         throws AccessControlException, SQLException {
+   private void __setResourcePassword(SQLConnection connection, Resource resource, char[] newPassword) throws AccessControlException {
       char[] newBoundPassword = null;
       try {
          newBoundPassword = PasswordUtils.computeBoundPassword(resource, newPassword);

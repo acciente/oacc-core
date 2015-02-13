@@ -385,21 +385,20 @@ public class TestAccessControl_assertResourcePermission extends TestAccessContro
          accessControlContext.assertResourcePermission(invalidResource, accessedResource, customPermission);
       }
       catch (AccessControlException e) {
-//         assertThat(e.isNotAuthorizedError(), is(false));
+         assertThat(e.isNotAuthorizedError(), is(true));
          assertThat(e.getMessage().toLowerCase(), containsString("does not have requested permission"));
       }
       try {
          accessControlContext.assertResourcePermission(accessorResource, invalidResource, customPermission);
       }
-      catch (AccessControlException e) {
-         assertThat(e.isNotAuthorizedError(), is(false));
+      catch (IllegalArgumentException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("could not determine resource domain for resource"));
       }
       try {
          accessControlContext.assertResourcePermission(accessorResource, accessedResource, invalidPermission);
       }
       catch (AccessControlException e) {
-//         assertThat(e.isNotAuthorizedError(), is(false));
+         assertThat(e.isNotAuthorizedError(), is(true));
          assertThat(e.getMessage().toLowerCase(), containsString("does not have requested permission"));
       }
    }

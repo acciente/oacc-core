@@ -784,8 +784,7 @@ public class TestAccessControl_assertGlobalResourcePermission extends TestAccess
                                                              "invalid_domain");
          fail("asserting global resource permission (by domain) for invalid domain reference should have failed for system resource");
       }
-      catch (AccessControlException e) {
-         assertThat(e.isNotAuthorizedError(), is(false));
+      catch (IllegalArgumentException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("could not find domain"));
       }
    }

@@ -152,6 +152,18 @@ public class TestAccessControl_authenticate extends TestAccessControlBase {
    }
 
    @Test
+   public void authenticate_nonExistentResource_shouldFail() throws InterruptedException, AccessControlException, SQLException {
+      try {
+         accessControlContext.authenticate(Resources.getInstance(-999L),
+                                           PasswordCredentials.newInstance("any_password".toCharArray()));
+         fail("authentication of non-existent resource reference should not have succeeded");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("could not determine resource class for resource"));
+      }
+   }
+
+   @Test
    public void authenticate_unauthenticatableResource_shouldFail() throws InterruptedException, AccessControlException, SQLException {
       Resource unauthenticatableResource = generateUnauthenticatableResource();
       try {
@@ -159,9 +171,8 @@ public class TestAccessControl_authenticate extends TestAccessControlBase {
                                            PasswordCredentials.newInstance("any_password".toCharArray()));
          fail("authentication of unauthenticatable resource should not have succeeded");
       }
-      catch (AccessControlException e) {
-         assertThat(e.getMessage().toLowerCase(), containsString("is not of an authenticatable type"));
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("is not of an authenticatable resource class"));
       }
    }
-
 }

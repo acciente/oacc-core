@@ -373,8 +373,12 @@ public class TestAccessControl_getEffectiveDomainPermissions extends TestAccessC
       final String domainName = generateDomain();
       final Resource invalidResource = Resources.getInstance(-999L);
 
-      final Set<DomainPermission> domainPermissions1 = accessControlContext.getEffectiveDomainPermissions(invalidResource, domainName);
-      assertThat(domainPermissions1.isEmpty(), is(true));
+      final Set<DomainPermission> domainPermissions = accessControlContext.getEffectiveDomainPermissions(invalidResource, domainName);
+      assertThat(domainPermissions.isEmpty(), is(true));
+
+      final Map<String, Set<DomainPermission>> domainPermissionsMap
+            = accessControlContext.getEffectiveDomainPermissionsMap(invalidResource);
+      assertThat(domainPermissionsMap.isEmpty(), is(true));
    }
 
    @Test
@@ -387,7 +391,7 @@ public class TestAccessControl_getEffectiveDomainPermissions extends TestAccessC
          accessControlContext.getEffectiveDomainPermissions(accessorResource, "invalid_domain");
          fail("getting effective domain permissions with invalid domain name should have failed");
       }
-      catch (AccessControlException e) {
+      catch (IllegalArgumentException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("could not find domain"));
       }
    }

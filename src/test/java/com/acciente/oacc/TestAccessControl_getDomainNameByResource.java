@@ -76,8 +76,8 @@ public class TestAccessControl_getDomainNameByResource extends TestAccessControl
          accessControlContext.getDomainNameByResource(Resources.getInstance(-999L));
          fail("getting domain name by resource for non-existent resource should have failed");
       }
-      catch (AccessControlException e) {
-         assertThat(e.getMessage().toLowerCase(), containsString("could not determine resource domain for resource"));
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("could not determine domain for resource"));
       }
    }
 

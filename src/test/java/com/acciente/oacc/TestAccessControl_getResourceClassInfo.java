@@ -93,7 +93,7 @@ public class TestAccessControl_getResourceClassInfo extends TestAccessControlBas
          accessControlContext.getResourceClassInfo("does_not_exist");
          fail("getting resource class info for non-existent resource class reference should have failed");
       }
-      catch (AccessControlException e) {
+      catch (IllegalArgumentException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("could not find resource class"));
       }
 

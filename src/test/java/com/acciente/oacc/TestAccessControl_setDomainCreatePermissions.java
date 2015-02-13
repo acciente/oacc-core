@@ -19,6 +19,7 @@ package com.acciente.oacc;
 
 import org.junit.Test;
 
+import java.sql.SQLException;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
@@ -466,7 +467,7 @@ public class TestAccessControl_setDomainCreatePermissions extends TestAccessCont
          accessControlContext.setDomainCreatePermissions(accessorResource, domainCreatePermissions_pre);
          fail("setting domain create permissions without passing the *CREATE system permission should have failed");
       }
-      catch (AccessControlException e) {
+      catch (IllegalArgumentException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("create must be specified"));
       }
    }
@@ -538,6 +539,35 @@ public class TestAccessControl_setDomainCreatePermissions extends TestAccessCont
       }
       catch (NullPointerException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("contains null element"));
+      }
+   }
+
+   @Test
+   public void setDomainCreatePermissions_nonExistentReferences_shouldFail() throws AccessControlException {
+      authenticateSystemResource();
+      final DomainCreatePermission domCreatePerm_create_withGrant
+            = DomainCreatePermissions.getInstance(DomainCreatePermissions.CREATE, true);
+
+      Set<DomainCreatePermission> domainCreatePermissions = new HashSet<>();
+      domainCreatePermissions.add(domCreatePerm_create_withGrant);
+
+      Set<DomainCreatePermission> domainCreatePermission_nullElement = new HashSet<>();
+      domainCreatePermission_nullElement.add(null);
+
+      Resource accessorResource = generateUnauthenticatableResource();
+
+      // attempt to set domain create permissions with non-existent references
+      try {
+         accessControlContext.setDomainCreatePermissions(Resources.getInstance(-999L), domainCreatePermissions);
+         fail("setting domain create permissions with non-existent accessor resource reference should have failed");
+      }
+//      catch (IllegalArgumentException e) {
+//         assertThat(e.getMessage().toLowerCase(), containsString("could not find resource"));
+//      }
+      catch (AccessControlException e) {
+         // this is a real ugly check because we don't currently validate the accessor resource and thus expect the
+         // database to complain with some sort of foreign key constraint violation upon adding the domain create permissions
+         assertThat(e.getCause() instanceof SQLException, is(true));
       }
    }
 

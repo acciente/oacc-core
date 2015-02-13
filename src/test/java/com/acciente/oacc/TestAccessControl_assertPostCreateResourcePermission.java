@@ -974,8 +974,7 @@ public class TestAccessControl_assertPostCreateResourcePermission extends TestAc
                                                                  "invalid_domain");
          fail("asserting post-create resource permission (by domain) for invalid domain reference should have failed for system resource");
       }
-      catch (AccessControlException e) {
-         assertThat(e.isNotAuthorizedError(), is(false));
+      catch (IllegalArgumentException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("could not find domain"));
       }
    }

@@ -512,7 +512,7 @@ public class TestAccessControl_getResourceCreatePermissions extends TestAccessCo
          accessControlContext.getResourceCreatePermissions(accessorResource, "invalid_resource_class");
          fail("getting create-permissions with reference to non-existent resource class name should have failed");
       }
-      catch (AccessControlException e) {
+      catch (IllegalArgumentException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("could not find resource class"));
       }
 
@@ -520,7 +520,7 @@ public class TestAccessControl_getResourceCreatePermissions extends TestAccessCo
          accessControlContext.getResourceCreatePermissions(accessorResource, "invalid_resource_class", domainName);
          fail("getting create-permissions with reference to non-existent resource class name should have failed");
       }
-      catch (AccessControlException e) {
+      catch (IllegalArgumentException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("could not find resource class"));
       }
 
@@ -529,7 +529,7 @@ public class TestAccessControl_getResourceCreatePermissions extends TestAccessCo
          accessControlContext.getResourceCreatePermissions(accessorResource, resourceClassName, "invalid_resource_domain");
          fail("getting create-permissions with reference to non-existent domain name should have failed");
       }
-      catch (AccessControlException e) {
+      catch (IllegalArgumentException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("could not find domain"));
       }
    }

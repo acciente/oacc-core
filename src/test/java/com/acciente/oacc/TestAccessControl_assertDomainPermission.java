@@ -384,7 +384,7 @@ public class TestAccessControl_assertDomainPermission extends TestAccessControlB
          accessControlContext.assertDomainPermission(accessorResource, domPerm_superUser, "invalid_domain");
          fail("asserting domain permissions with invalid domain name should have failed");
       }
-      catch (AccessControlException e) {
+      catch (IllegalArgumentException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("could not find domain"));
       }
    }

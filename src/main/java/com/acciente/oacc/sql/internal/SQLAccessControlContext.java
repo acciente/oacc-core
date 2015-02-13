@@ -308,9 +308,9 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
 
          // complain if the resource is not marked as supporting authentication
          if (!resourceClassInternalInfo.isAuthenticatable()) {
-            throw new AccessControlException(resource
-                                                   + " is not of an authenticatable type, type: "
-                                                   + resourceClassInternalInfo.getResourceClassName());
+            throw new IllegalArgumentException("Resource " + resource
+                                                     + " is not of an authenticatable resource class: "
+                                                     + resourceClassInternalInfo.getResourceClassName());
          }
          resourceDomainForResource = domainPersister.getResourceDomainNameByResourceId(connection, resource);
       }
@@ -376,9 +376,9 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
 
       // complain if the resource is not of an authenticatable resource-class
       if (!resourceClassInternalInfo.isAuthenticatable()) {
-         throw new AccessControlException(resource
-                                                + " is not of an authenticatable type, type: "
-                                                + resourceClassInternalInfo.getResourceClassName());
+         throw new IllegalArgumentException("Resource " + resource
+                                                  + " is not of an authenticatable resource class: "
+                                                  + resourceClassInternalInfo.getResourceClassName());
       }
 
       boolean impersonatePermissionOK = false;
@@ -436,7 +436,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       __assertResourceSpecified(resource);
 
       if (!authenticatedResource.equals(sessionResource)) {
-         throw new AccessControlException("Calling setCredentials while impersonating another resource is not valid");
+         throw new IllegalStateException("Calling setCredentials while impersonating another resource is not valid");
       }
 
       __assertCredentialsSpecified(newCredentials);
@@ -449,7 +449,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
          resourceClassInfo = resourceClassPersister.getResourceClassInfoByResourceId(connection, resource);
 
          if (!resourceClassInfo.isAuthenticatable()) {
-            throw new AccessControlException("Calling setCredentials for an unauthenticatable resource is not valid");
+            throw new IllegalArgumentException("Calling setCredentials for an unauthenticatable resource is not valid");
          }
 
          domainName = domainPersister.getResourceDomainNameByResourceId(connection, resource);
@@ -520,7 +520,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
    @Override
    public void createResourceClass(String resourceClassName,
                                    boolean authenticatable,
-                                   boolean unuthenticatedCreateAllowed) throws AccessControlException {
+                                   boolean unauthenticatedCreateAllowed) throws AccessControlException {
       SQLConnection connection = null;
 
       __assertAuthenticated();
@@ -534,10 +534,10 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
 
          // check if this resource class already exists
          if (resourceClassPersister.getResourceClassId(connection, resourceClassName) != null) {
-            throw new AccessControlException("Duplicate resource class: " + resourceClassName);
+            throw new IllegalArgumentException("Duplicate resource class: " + resourceClassName);
          }
 
-         resourceClassPersister.addResourceClass(connection, resourceClassName, authenticatable, unuthenticatedCreateAllowed);
+         resourceClassPersister.addResourceClass(connection, resourceClassName, authenticatable, unauthenticatedCreateAllowed);
       }
       catch (SQLException e) {
          throw new AccessControlException(e);
@@ -566,7 +566,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
          Id<ResourceClassId> resourceClassId = resourceClassPersister.getResourceClassId(connection, resourceClassName);
 
          if (resourceClassId == null) {
-            throw new AccessControlException("Could not find resource class: " + resourceClassName);
+            throw new IllegalArgumentException("Could not find resource class: " + resourceClassName);
          }
 
          // check if the permission name is already defined!
@@ -574,7 +574,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
                = resourceClassPermissionPersister.getResourceClassPermissionId(connection, resourceClassId, permissionName);
 
          if (permissionId != null) {
-            throw new AccessControlException("Duplicate permission: " + permissionName + " for resource class: " + resourceClassName);
+            throw new IllegalArgumentException("Duplicate permission: " + permissionName + " for resource class: " + resourceClassName);
          }
 
          resourceClassPermissionPersister.addResourceClassPermission(connection, resourceClassId, permissionName);
@@ -654,7 +654,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
                                                                                                               sessionResource));
       // check to ensure that the requested domain name does not already exist
       if (domainPersister.getResourceDomainId(connection, domainName) != null) {
-         throw new AccessControlException("Duplicate domain: " + domainName);
+         throw new IllegalArgumentException("Duplicate domain: " + domainName);
       }
 
       if (parentDomainName == null) {
@@ -666,7 +666,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
          Id<DomainId> parentDomainId = domainPersister.getResourceDomainId(connection, parentDomainName);
 
          if (parentDomainId == null) {
-            throw new AccessControlException("Parent domain: " + domainName + " not found!");
+            throw new IllegalArgumentException("Parent domain: " + parentDomainName + " not found!");
          }
 
          // we need to check if the currently authenticated resource is allowed to create child domains in the parent
@@ -788,7 +788,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
 
       // check if the resource class is valid
       if (resourceClassInternalInfo == null) {
-         throw new AccessControlException("Could not find resource class: " + resourceClassName);
+         throw new IllegalArgumentException("Could not find resource class: " + resourceClassName);
       }
 
       if (!resourceClassInternalInfo.isUnauthenticatedCreateAllowed()) {
@@ -808,7 +808,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       final Id<DomainId> domainId = domainPersister.getResourceDomainId(connection, domainName);
 
       if (domainId == null) {
-         throw new AccessControlException("Could not find domain: " + domainName);
+         throw new IllegalArgumentException("Could not find domain: " + domainName);
       }
 
       // we first check the create permissions
@@ -931,12 +931,12 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       Id<DomainId> domainId = domainPersister.getResourceDomainId(connection, domainName);
 
       if (domainId == null) {
-         throw new AccessControlException("Could not find domain: " + domainName);
+         throw new IllegalArgumentException("Could not find domain: " + domainName);
       }
 
-      // check if requested set contains *CREATE permission, which is nonsensical as an applied (i.e. non-create) permission
+      // validate requested set is not null; empty set is valid and would remove any direct domain permissions
       if (requestedDomainPermissions == null) {
-         throw new AccessControlException("Set of requested domain permissions may not be null");
+         throw new IllegalArgumentException("Set of requested domain permissions may not be null");
       }
 
       if (!newDomainMode) {
@@ -1038,7 +1038,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
          Id<DomainId> domainId = domainPersister.getResourceDomainId(connection, domainName);
 
          if (domainId == null) {
-            throw new AccessControlException("Could not find domain: " + domainName);
+            throw new IllegalArgumentException("Could not find domain: " + domainName);
          }
 
          return __getDirectDomainPermissions(connection, accessorResource, domainId);
@@ -1101,7 +1101,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       Id<DomainId> domainId = domainPersister.getResourceDomainId(connection, domainName);
 
       if (domainId == null) {
-         throw new AccessControlException("Could not find domain: " + domainName);
+         throw new IllegalArgumentException("Could not find domain: " + domainName);
       }
 
       // only system permissions are possible on a domain
@@ -1246,7 +1246,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
                                                      requestedDomainCreatePermissions);
    }
 
-   private void __assertSetContainsDomainCreateSystemPermission(Set<DomainCreatePermission> domainCreatePermissions) throws AccessControlException {
+   private void __assertSetContainsDomainCreateSystemPermission(Set<DomainCreatePermission> domainCreatePermissions) {
       if (!domainCreatePermissions.isEmpty()) {
          boolean createSysPermissionFound = false;
          for (final DomainCreatePermission domainCreatePermission : domainCreatePermissions) {
@@ -1258,7 +1258,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
          }
          // if at least one permission is specified, then there must be a *CREATE permission in the set
          if (!createSysPermissionFound) {
-            throw new AccessControlException("Domain create permission *CREATE must be specified");
+            throw new IllegalArgumentException("Domain create permission *CREATE must be specified");
          }
       }
    }
@@ -1430,7 +1430,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
             = resourceClassPersister.getResourceClassInfo(connection, resourceClassName);
 
       if (resourceClassInfo == null) {
-         throw new AccessControlException("Could not find resource class: " + resourceClassName);
+         throw new IllegalArgumentException("Could not find resource class: " + resourceClassName);
       }
 
       final Id<ResourceClassId> resourceClassId = Id.from(resourceClassInfo.getResourceClassId());
@@ -1439,7 +1439,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       final Id<DomainId> domainId = domainPersister.getResourceDomainId(connection, domainName);
 
       if (domainId == null) {
-         throw new AccessControlException("Could not find domain: " + domainName);
+         throw new IllegalArgumentException("Could not find domain: " + domainName);
       }
 
       // ensure that the *CREATE system permissions was specified
@@ -1541,7 +1541,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
                                                                                               sessionResource);
    }
 
-   private void __assertSetContainsResourceCreateSystemPermission(Set<ResourceCreatePermission> resourceCreatePermissions) throws AccessControlException {
+   private void __assertSetContainsResourceCreateSystemPermission(Set<ResourceCreatePermission> resourceCreatePermissions) {
       if (!resourceCreatePermissions.isEmpty()) {
          boolean createSysPermissionFound = false;
          for (final ResourceCreatePermission resourceCreatePermission : resourceCreatePermissions) {
@@ -1553,7 +1553,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
          }
          // if at least one permission is specified, then there must be a *CREATE permission in the set
          if (!createSysPermissionFound) {
-            throw new AccessControlException("Permission: *CREATE must be specified");
+            throw new IllegalArgumentException("Permission: *CREATE must be specified");
          }
       }
    }
@@ -1578,20 +1578,20 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
             if (!resourceClassInternalInfo.isAuthenticatable()
                   && (ResourcePermissions.IMPERSONATE.equals(postCreateResourcePermission.getPermissionName())
                   || ResourcePermissions.RESET_CREDENTIALS.equals(postCreateResourcePermission.getPermissionName()))) {
-               throw new AccessControlException("Permission: " + postCreateResourcePermission
+               throw new IllegalArgumentException("Permission: " + postCreateResourcePermission
                                                       + ", not valid for unauthenticatable resource");
             }
          }
          else {
             // every non-system permission must be defined for the resource class specified
             if (!validPermissionNames.contains(postCreateResourcePermission.getPermissionName())) {
-               throw new AccessControlException("Permission: " + postCreateResourcePermission.getPermissionName()
+               throw new IllegalArgumentException("Permission: " + postCreateResourcePermission.getPermissionName()
                                                       + " does not exist for the specified resource class: "
                                                       + resourceClassInternalInfo.getResourceClassName());
             }
          }
          if (uniquePermissionNames.contains(postCreateResourcePermission.getPermissionName())) {
-            throw new AccessControlException("Duplicate permission: " + postCreateResourcePermission.getPermissionName()
+            throw new IllegalArgumentException("Duplicate permission: " + postCreateResourcePermission.getPermissionName()
                                                    + " that only differs in 'withGrant' option");
          }
          else {
@@ -1694,14 +1694,14 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       Id<ResourceClassId> resourceClassId = resourceClassPersister.getResourceClassId(connection, resourceClassName);
 
       if (resourceClassId == null) {
-         throw new AccessControlException("Could not find resource class: " + resourceClassName);
+         throw new IllegalArgumentException("Could not find resource class: " + resourceClassName);
       }
 
       // verify that domain is defined
       final Id<DomainId> domainId = domainPersister.getResourceDomainId(connection, domainName);
 
       if (domainId == null) {
-         throw new AccessControlException("Could not find domain: " + domainName);
+         throw new IllegalArgumentException("Could not find domain: " + domainName);
       }
 
       return __getDirectResourceCreatePermissions(connection,
@@ -1843,14 +1843,14 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       Id<ResourceClassId> resourceClassId = resourceClassPersister.getResourceClassId(connection, resourceClassName);
 
       if (resourceClassId == null) {
-         throw new AccessControlException("Could not find resource class: " + resourceClassName);
+         throw new IllegalArgumentException("Could not find resource class: " + resourceClassName);
       }
 
       // verify that domain is defined
       final Id<DomainId> domainId = domainPersister.getResourceDomainId(connection, domainName);
 
       if (domainId == null) {
-         throw new AccessControlException("Could not find domain: " + domainName);
+         throw new IllegalArgumentException("Could not find domain: " + domainName);
       }
 
       // collect the create permissions that this resource has to this resource class
@@ -2139,20 +2139,20 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
             if (!resourceClassInternalInfo.isAuthenticatable()
                   && (ResourcePermissions.IMPERSONATE.equals(resourcePermission.getPermissionName())
                   || ResourcePermissions.RESET_CREDENTIALS.equals(resourcePermission.getPermissionName()))) {
-               throw new AccessControlException("Permission: " + resourcePermission
+               throw new IllegalArgumentException("Permission: " + resourcePermission
                                                       + ", not valid for unauthenticatable resource");
             }
          }
          else {
             // every non-system permission must be defined for the resource class specified
             if (!validPermissionNames.contains(resourcePermission.getPermissionName())) {
-               throw new AccessControlException("Permission: " + resourcePermission.getPermissionName()
+               throw new IllegalArgumentException("Permission: " + resourcePermission.getPermissionName()
                                                       + " does not exist for the specified resource class: "
                                                       + resourceClassInternalInfo.getResourceClassName());
             }
          }
          if (uniquePermissionNames.contains(resourcePermission.getPermissionName())) {
-            throw new AccessControlException("Duplicate permission: " + resourcePermission.getPermissionName()
+            throw new IllegalArgumentException("Duplicate permission: " + resourcePermission.getPermissionName()
                                                    + " that only differs in 'withGrant' option");
          }
          else {
@@ -2353,7 +2353,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       final Id<ResourceClassId> resourceClassId = resourceClassPersister.getResourceClassId(connection, resourceClassName);
 
       if (resourceClassId == null) {
-         throw new AccessControlException("Could not find resource class: " + resourceClassName);
+         throw new IllegalArgumentException("Could not find resource class: " + resourceClassName);
       }
 
       final ResourceClassInternalInfo resourceClassInternalInfo = resourceClassPersister.getResourceClassInfo(connection, resourceClassName);
@@ -2362,7 +2362,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       final Id<DomainId> domainId = domainPersister.getResourceDomainId(connection, domainName);
 
       if (domainId == null) {
-         throw new AccessControlException("Could not find domain: " + domainName);
+         throw new IllegalArgumentException("Could not find domain: " + domainName);
       }
 
       // next ensure that the requested permissions are all in the correct resource class
@@ -2477,24 +2477,24 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
          // we prohibit granting the system INHERIT permission, since cycle checking may be prohibitively compute intensive
          if (resourcePermission.isSystemPermission()) {
             if (ResourcePermission_INHERIT.equals(resourcePermission)) {
-               throw new AccessControlException("Permission: " + resourcePermission + ", not valid in this context");
+               throw new IllegalArgumentException("Permission: " + resourcePermission + ", not valid in this context");
             }
             if (!resourceClassInternalInfo.isAuthenticatable()
                   && (ResourcePermissions.IMPERSONATE.equals(resourcePermission.getPermissionName())
                   || ResourcePermissions.RESET_CREDENTIALS.equals(resourcePermission.getPermissionName()))) {
-               throw new AccessControlException("Permission: " + resourcePermission + ", not valid for unauthenticatable resource");
+               throw new IllegalArgumentException("Permission: " + resourcePermission + ", not valid for unauthenticatable resource");
             }
          }
          else {
             // every non-system permission must be defined for the resource class specified
             if (!validPermissionNames.contains(resourcePermission.getPermissionName())) {
-               throw new AccessControlException("Permission: " + resourcePermission.getPermissionName()
+               throw new IllegalArgumentException("Permission: " + resourcePermission.getPermissionName()
                                                 + " does not exist for the specified resource class: "
                                                 + resourceClassInternalInfo.getResourceClassName());
             }
          }
          if (uniquePermissionNames.contains(resourcePermission.getPermissionName())) {
-            throw new AccessControlException("Duplicate permission: "
+            throw new IllegalArgumentException("Duplicate permission: "
                                              + resourcePermission.getPermissionName() + " that only differs in 'withGrant' option");
          }
          else {
@@ -2540,14 +2540,14 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       final Id<ResourceClassId> resourceClassId = resourceClassPersister.getResourceClassId(connection, resourceClassName);
 
       if (resourceClassId == null) {
-         throw new AccessControlException("Could not find resource class: " + resourceClassName);
+         throw new IllegalArgumentException("Could not find resource class: " + resourceClassName);
       }
 
       // verify the domain
       final Id<DomainId> domainId = domainPersister.getResourceDomainId(connection, domainName);
 
       if (domainId == null) {
-         throw new AccessControlException("Could not find domain: " + domainName);
+         throw new IllegalArgumentException("Could not find domain: " + domainName);
       }
 
       return __getDirectGlobalResourcePermissions(connection,
@@ -2648,14 +2648,14 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       final Id<ResourceClassId> resourceClassId = resourceClassPersister.getResourceClassId(connection, resourceClassName);
 
       if (resourceClassId == null) {
-         throw new AccessControlException("Could not find resource class: " + resourceClassName);
+         throw new IllegalArgumentException("Could not find resource class: " + resourceClassName);
       }
 
       // verify the domain
       final Id<DomainId> domainId = domainPersister.getResourceDomainId(connection, domainName);
 
       if (domainId == null) {
-         throw new AccessControlException("Could not find domain: " + domainName);
+         throw new IllegalArgumentException("Could not find domain: " + domainName);
       }
 
       Set<ResourcePermission> resourcePermissions = new HashSet<>();
@@ -2864,7 +2864,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
                = resourceClassPersister.getResourceClassInfo(connection, resourceClassName);
 
          if (resourceClassInternalInfo == null) {
-            throw new AccessControlException("Could not find resource class: " + resourceClassName);
+            throw new IllegalArgumentException("Could not find resource class: " + resourceClassName);
          }
 
          return new ResourceClassInfo(resourceClassInternalInfo.getResourceClassName(),
@@ -3025,8 +3025,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
    private boolean __hasPermission(SQLConnection connection,
                                    Resource accessorResource,
                                    DomainPermission requestedDomainPermission,
-                                   String domainName)
-         throws AccessControlException, SQLException {
+                                   String domainName) throws AccessControlException  {
       // first check for effective permissions
       if (__isPermissible(requestedDomainPermission,
                           __getEffectiveDomainPermissions(connection, accessorResource, domainName))) {
@@ -3301,8 +3300,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
    private boolean __hasPermission(SQLConnection connection,
                                    Resource accessorResource,
                                    Resource accessedResource,
-                                   ResourcePermission requestedResourcePermission)
-         throws AccessControlException, SQLException {
+                                   ResourcePermission requestedResourcePermission) throws AccessControlException {
       // first check for effective permissions
       if (__isPermissible(requestedResourcePermission,
                           __getEffectiveResourcePermissions(connection, accessorResource, accessedResource))) {
@@ -3324,7 +3322,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
                                        Resource accessorResource,
                                        Resource accessedResource,
                                        Set<ResourcePermission> requestedResourcePermissions)
-         throws AccessControlException, SQLException {
+         throws AccessControlException {
       // first check for effective permissions
       final Set<ResourcePermission> effectiveResourcePermissions
             = __getEffectiveResourcePermissions(connection, accessorResource, accessedResource);
@@ -3424,7 +3422,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       resourceClassId = resourceClassPersister.getResourceClassId(connection, resourceClassName);
 
       if (resourceClassId == null) {
-         throw new AccessControlException("Could not find resource class: " + resourceClassName);
+         throw new IllegalArgumentException("Could not find resource class: " + resourceClassName);
       }
 
       Set<Resource> resources = new HashSet<>();
@@ -3447,7 +3445,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
          permissionId = resourceClassPermissionPersister.getResourceClassPermissionId(connection, resourceClassId, resourcePermission.getPermissionName());
 
          if (permissionId == null) {
-            throw new AccessControlException("Permission: " + resourcePermission + " is not defined for resource class: " + resourceClassName);
+            throw new IllegalArgumentException("Permission: " + resourcePermission + " is not defined for resource class: " + resourceClassName);
          }
 
          // get the list of objects of the specified type that the session has access to via direct permissions
@@ -3565,13 +3563,13 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       resourceClassId = resourceClassPersister.getResourceClassId(connection, resourceClassName);
 
       if (resourceClassId == null) {
-         throw new AccessControlException("Could not find resource class: " + resourceClassName);
+         throw new IllegalArgumentException("Could not find resource class: " + resourceClassName);
       }
 
       domainId = domainPersister.getResourceDomainId(connection, domainName);
 
       if (domainId == null) {
-         throw new AccessControlException("Could not find domain: " + domainName);
+         throw new IllegalArgumentException("Could not find domain: " + domainName);
       }
 
 
@@ -3599,7 +3597,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
                                                                                       resourcePermission.getPermissionName());
 
          if (permissionId == null) {
-            throw new AccessControlException("Permission: " + resourcePermission + " is not defined for resource class: " + resourceClassName);
+            throw new IllegalArgumentException("Permission: " + resourcePermission + " is not defined for resource class: " + resourceClassName);
          }
 
          // get the list of objects of the specified type that the session has access to via direct permissions
@@ -3664,7 +3662,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       resourceClassId = resourceClassPersister.getResourceClassId(connection, resourceClassName);
 
       if (resourceClassId == null) {
-         throw new AccessControlException("Could not find resource class: " + resourceClassName);
+         throw new IllegalArgumentException("Could not find resource class: " + resourceClassName);
       }
 
       Set<Resource> resources = new HashSet<>();
@@ -3681,7 +3679,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
          permissionId = resourceClassPermissionPersister.getResourceClassPermissionId(connection, resourceClassId, resourcePermission.getPermissionName());
 
          if (permissionId == null) {
-            throw new AccessControlException("Permission: " + resourcePermission + " is not defined for resource class: " + resourceClassName);
+            throw new IllegalArgumentException("Permission: " + resourcePermission + " is not defined for resource class: " + resourceClassName);
          }
 
          // get the list of objects of the specified type that the session has access to via direct permissions
@@ -3791,10 +3789,9 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       }
    }
 
-   private void __assertCredentialsNotSpecified(Credentials credentials)
-         throws AccessControlException {
+   private void __assertCredentialsNotSpecified(Credentials credentials) {
       if (credentials != null) {
-         throw new AccessControlException("Credentials not supported, but specified");
+         throw new IllegalArgumentException("Credentials not supported, but specified");
       }
    }
 

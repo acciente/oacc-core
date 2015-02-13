@@ -19,6 +19,7 @@ package com.acciente.oacc;
 
 import org.junit.Test;
 
+import java.sql.SQLException;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
@@ -83,7 +84,16 @@ public class TestAccessControl_setResourceCreatePermissions extends TestAccessCo
          accessControlContext.setResourceCreatePermissions(accessorResource, resourceClassName, permissions_pre);
          fail("granting *RESET_CREDENTIALS system permission as a create permission on an unauthenticatable resource class should have failed");
       }
-      catch (AccessControlException e) {
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("not valid for unauthenticatable resource"));
+      }
+
+      final String domainName = generateDomain();
+      try {
+         accessControlContext.setResourceCreatePermissions(accessorResource, resourceClassName, permissions_pre, domainName);
+         fail("granting *RESET_CREDENTIALS system permission as a create permission on an unauthenticatable resource class should have failed");
+      }
+      catch (IllegalArgumentException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("not valid for unauthenticatable resource"));
       }
    }
@@ -105,7 +115,16 @@ public class TestAccessControl_setResourceCreatePermissions extends TestAccessCo
          accessControlContext.setResourceCreatePermissions(accessorResource, resourceClassName, permissions_pre);
          fail("granting *IMPERSONATE system permission as a create permission on an unauthenticatable resource class should have failed");
       }
-      catch (AccessControlException e) {
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("not valid for unauthenticatable resource"));
+      }
+
+      final String domainName = generateDomain();
+      try {
+         accessControlContext.setResourceCreatePermissions(accessorResource, resourceClassName, permissions_pre, domainName);
+         fail("granting *IMPERSONATE system permission as a create permission on an unauthenticatable resource class should have failed");
+      }
+      catch (IllegalArgumentException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("not valid for unauthenticatable resource"));
       }
    }
@@ -346,7 +365,8 @@ public class TestAccessControl_setResourceCreatePermissions extends TestAccessCo
          // set create permissions and verify
          accessControlContext.setResourceCreatePermissions(accessorResource,
                                                            resourceClassName,
-                                                           resourceCreatePermissions_pre, domainName
+                                                           resourceCreatePermissions_pre,
+                                                           domainName
          );
 
          final Set<ResourceCreatePermission> resourceCreatePermissions_post
@@ -367,7 +387,8 @@ public class TestAccessControl_setResourceCreatePermissions extends TestAccessCo
          try {
             accessControlContext.setResourceCreatePermissions(accessorResource,
                                                               resourceClassName,
-                                                              resourceCreatePermissions_pre, domainName
+                                                              resourceCreatePermissions_pre,
+                                                              domainName
             );
             fail("setting resource create permission with the name of an existing permission that differs in case only should have failed for case-insensitive databases");
          }
@@ -933,11 +954,12 @@ public class TestAccessControl_setResourceCreatePermissions extends TestAccessCo
       try {
          accessControlContext.setResourceCreatePermissions(accessorResource,
                                                            resourceClassName,
-                                                           resourceCreatePermissions_pre, domainName
+                                                           resourceCreatePermissions_pre,
+                                                           domainName
          );
          fail("setting create-permissions that include the same permission, but with different grant-options, should have failed");
       }
-      catch (AccessControlException e) {
+      catch (IllegalArgumentException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("duplicate permission"));
       }
    }
@@ -961,11 +983,12 @@ public class TestAccessControl_setResourceCreatePermissions extends TestAccessCo
       try {
          accessControlContext.setResourceCreatePermissions(accessorResource,
                                                            resourceClassName,
-                                                           resourceCreatePermissions_pre, domainName
+                                                           resourceCreatePermissions_pre,
+                                                           domainName
          );
          fail("setting create-permissions without *CREATE system permission should have failed");
       }
-      catch (AccessControlException e) {
+      catch (IllegalArgumentException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("*create must be specified"));
       }
    }
@@ -1110,13 +1133,30 @@ public class TestAccessControl_setResourceCreatePermissions extends TestAccessCo
 
       // attempt to set create permissions with invalid references
       try {
+         accessControlContext.setResourceCreatePermissions(Resources.getInstance(-999L),
+                                                           resourceClassName,
+                                                           resourceCreatePermissions_valid,
+                                                           domainName
+         );
+         fail("setting create-permissions with reference to non-existent accessor resource should have failed");
+      }
+//      catch (IllegalArgumentException e) {
+//         assertThat(e.getMessage().toLowerCase(), containsString("could not find resource"));
+//      }
+      catch (AccessControlException e) {
+         // this is a real ugly check because we don't currently validate the accessor resource and thus expect the
+         // database to complain with some sort of foreign key constraint violation upon adding the domain create permissions
+         assertThat(e.getCause() instanceof SQLException, is(true));
+      }
+      try {
          accessControlContext.setResourceCreatePermissions(accessorResource,
                                                            "invalid_resource_class",
-                                                           resourceCreatePermissions_valid, domainName
+                                                           resourceCreatePermissions_valid,
+                                                           domainName
          );
          fail("setting create-permissions with reference to non-existent resource class name should have failed");
       }
-      catch (AccessControlException e) {
+      catch (IllegalArgumentException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("could not find resource class"));
       }
       try {
@@ -1127,17 +1167,18 @@ public class TestAccessControl_setResourceCreatePermissions extends TestAccessCo
          );
          fail("setting create-permissions with reference to non-existent domain name should have failed");
       }
-      catch (AccessControlException e) {
+      catch (IllegalArgumentException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("could not find domain"));
       }
       try {
          accessControlContext.setResourceCreatePermissions(accessorResource,
                                                            resourceClassName,
-                                                           resourceCreatePermissions_invalid, domainName
+                                                           resourceCreatePermissions_invalid,
+                                                           domainName
          );
          fail("setting create-permissions with reference to non-existent permission name should have failed");
       }
-      catch (AccessControlException e) {
+      catch (IllegalArgumentException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("does not exist for the specified resource class"));
       }
    }
@@ -1166,7 +1207,8 @@ public class TestAccessControl_setResourceCreatePermissions extends TestAccessCo
 
       accessControlContext.setResourceCreatePermissions(grantorResource,
                                                         resourceClassName,
-                                                        grantorPermissions, domainName
+                                                        grantorPermissions,
+                                                        domainName
       );
       assertThat(accessControlContext.getEffectiveResourceCreatePermissions(grantorResource, resourceClassName, domainName),
                  is(grantorPermissions));
@@ -1186,7 +1228,8 @@ public class TestAccessControl_setResourceCreatePermissions extends TestAccessCo
       try {
          accessControlContext.setResourceCreatePermissions(accessorResource,
                                                            resourceClassName,
-                                                           resourceCreatePermissions_pre, domainName
+                                                           resourceCreatePermissions_pre,
+                                                           domainName
          );
          fail("setting create permissions without having rights to grant should have failed");
       }

@@ -132,7 +132,7 @@ public class ResourcePersister extends Persister {
          }
 
          if (domainId == null) {
-            throw new AccessControlException("Could not determine resource domain for resource: " + resource);
+            throw new IllegalArgumentException("Could not determine resource domain for resource: " + resource);
          }
 
          return domainId;

@@ -81,7 +81,7 @@ public class TestAccessControl_getResourceClassInfoByResource extends TestAccess
          accessControlContext.getResourceClassInfoByResource(Resources.getInstance(-999L));
          fail("getting resource class info by resource for non-existent resource should have failed");
       }
-      catch (AccessControlException e) {
+      catch (IllegalArgumentException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("could not determine resource class for resource"));
       }
    }

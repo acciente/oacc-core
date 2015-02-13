@@ -107,7 +107,7 @@ public class TestAccessControl_createResourceClass extends TestAccessControlBase
             accessControlContext.createResourceClass(resClassName_UPPER, true, false);
             fail("creating a resource class with the name of an existing class that differs in case only should have failed for case-insensitive databases");
          }
-         catch (AccessControlException e) {
+         catch (IllegalArgumentException e) {
             assertThat(e.getMessage().toLowerCase(), containsString("duplicate resource class"));
          }
       }
@@ -131,7 +131,7 @@ public class TestAccessControl_createResourceClass extends TestAccessControlBase
          accessControlContext.createResourceClass(duplicate_resClassName, false, true);
          fail("creating resource class with duplicate name should have failed");
       }
-      catch (AccessControlException e) {
+      catch (IllegalArgumentException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("duplicate resource class"));
       }
 

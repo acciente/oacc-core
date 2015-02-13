@@ -154,9 +154,8 @@ public class TestAccessControl_impersonate extends TestAccessControlBase {
          accessControlContext.impersonate(unauthenticatableResource);
          fail("attempting to impersonate an unauthenticatable resource should have failed");
       }
-      catch (AccessControlException e) {
-         assertThat(e.isNotAuthorizedError(), is(false));
-         assertThat(e.getMessage().toLowerCase(), containsString("not of an authenticatable type"));
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("not of an authenticatable resource class"));
       }
    }
 
@@ -176,9 +175,8 @@ public class TestAccessControl_impersonate extends TestAccessControlBase {
          accessControlContext.impersonate(unauthenticatableResource);
          fail("attempting to impersonate an unauthenticatable resource should have failed");
       }
-      catch (AccessControlException e) {
-         assertThat(e.isNotAuthorizedError(), is(false));
-         assertThat(e.getMessage().toLowerCase(), containsString("not of an authenticatable type"));
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("not of an authenticatable resource class"));
       }
    }
 

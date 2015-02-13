@@ -393,34 +393,34 @@ public class TestAccessControl_createResource extends TestAccessControlBase {
    }
 
    @Test
-   public void createResource_nonExistantReferences_shouldFail() throws AccessControlException {
+   public void createResource_nonExistentReferences_shouldFail() throws AccessControlException {
       authenticateSystemResource();
 
       final String domainName = generateDomain();
       final String resourceClassName = generateResourceClass(false, false);
 
-      // attempt to create resources with non-existant references to class or domain names
+      // attempt to create resources with non-existent references to class or domain names
       try {
          accessControlContext.createResource("does_not_exist");
-         fail("creating resource with non-existant resource class name should fail");
+         fail("creating resource with non-existent resource class name should fail");
       }
-      catch (AccessControlException e) {
+      catch (IllegalArgumentException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("could not find resource class"));
       }
 
       try {
          accessControlContext.createResource("does_not_exist", domainName);
-         fail("creating resource with non-existant resource class name should fail");
+         fail("creating resource with non-existent resource class name should fail");
       }
-      catch (AccessControlException e) {
+      catch (IllegalArgumentException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("could not find resource class"));
       }
 
       try {
          accessControlContext.createResource(resourceClassName, "does_not_exist");
-         fail("creating resource with non-existant domain name should have failed");
+         fail("creating resource with non-existent domain name should have failed");
       }
-      catch (AccessControlException e) {
+      catch (IllegalArgumentException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("could not find domain"));
       }
    }

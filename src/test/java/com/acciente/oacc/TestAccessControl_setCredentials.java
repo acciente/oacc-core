@@ -140,7 +140,7 @@ public class TestAccessControl_setCredentials extends TestAccessControlBase {
                                              PasswordCredentials.newInstance(newPassword));
          fail("setting credentials on an unauthenticatable resource should have failed");
       }
-      catch (AccessControlException e) {
+      catch (IllegalArgumentException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("unauthenticatable resource is not valid"));
       }
    }
@@ -374,7 +374,7 @@ public class TestAccessControl_setCredentials extends TestAccessControlBase {
                                              PasswordCredentials.newInstance(newPassword));
          fail("setting credentials while impersonating another resource should have failed");
       }
-      catch (AccessControlException e) {
+      catch (IllegalStateException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("while impersonating another resource"));
       }
    }
@@ -402,5 +402,18 @@ public class TestAccessControl_setCredentials extends TestAccessControlBase {
       }
    }
 
-   // todo: set with impersonate
+   @Test
+   public void setCredentials_nonExistentReferences_shouldFail() throws Exception {
+      authenticateSystemResource();
+
+      // attempt to update credentials
+      final char[] newPwd = "new_password".toCharArray();
+      try {
+         accessControlContext.setCredentials(Resources.getInstance(-999L), PasswordCredentials.newInstance(newPwd));
+         fail("setting credentials with non-existent resource reference should have failed");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("could not determine resource class for resource"));
+      }
+   }
 }

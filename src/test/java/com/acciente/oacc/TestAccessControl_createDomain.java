@@ -216,6 +216,7 @@ public class TestAccessControl_createDomain extends TestAccessControlBase {
       authenticateSystemResource();
 
       final String domainName = generateUniqueDomainName();
+      final String otherDomainName = generateDomain();
       assertThat(accessControlContext.getDomainDescendants(domainName).isEmpty(), is(true));
       accessControlContext.createDomain(domainName);
 
@@ -224,7 +225,7 @@ public class TestAccessControl_createDomain extends TestAccessControlBase {
          accessControlContext.createDomain(domainName);
          fail("creating a duplicate domain should fail");
       }
-      catch (AccessControlException e) {
+      catch (IllegalArgumentException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("duplicate"));
       }
 
@@ -232,12 +233,22 @@ public class TestAccessControl_createDomain extends TestAccessControlBase {
          accessControlContext.createDomain(domainName, domainName);
          fail("creating a duplicate child domain should fail");
       }
-      catch (AccessControlException e) {
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("duplicate"));
+      }
+
+      try {
+         accessControlContext.createDomain(otherDomainName, domainName);
+         fail("creating a duplicate nested (but unrelated) domain should fail");
+      }
+      catch (IllegalArgumentException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("duplicate"));
       }
 
       assertThat(accessControlContext.getDomainDescendants(domainName).size(), is(1));
       assertThat(accessControlContext.getDomainDescendants(domainName), hasItem(domainName));
+      assertThat(accessControlContext.getDomainDescendants(otherDomainName).size(), is(1));
+      assertThat(accessControlContext.getDomainDescendants(otherDomainName), hasItem(otherDomainName));
    }
 
    @Test
@@ -274,6 +285,25 @@ public class TestAccessControl_createDomain extends TestAccessControlBase {
       catch (IllegalArgumentException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("none specified"));
       }
+   }
+
+   @Test
+   public void createDomain_nonExistentReferences_shouldFail() throws Exception {
+      authenticateSystemResource();
+
+      final String domainName = generateUniqueDomainName();
+      assertThat(accessControlContext.getDomainDescendants(domainName).isEmpty(), is(true));
+
+      try {
+         accessControlContext.createDomain(domainName, "invalid_domain_name");
+         fail("creating a child domain with non-existent parent domain reference should fail");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("parent domain"));
+         assertThat(e.getMessage().toLowerCase(), containsString("not found"));
+      }
+
+      assertThat(accessControlContext.getDomainDescendants(domainName).isEmpty(), is(true));
    }
 
    @Test

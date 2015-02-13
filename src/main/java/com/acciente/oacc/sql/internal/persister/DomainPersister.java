@@ -38,7 +38,7 @@ public class DomainPersister extends Persister {
       SQLStatement statement = null;
 
       if (resourceDomainName == null) {
-         throw new AccessControlException("Domain name must not be null");
+         throw new IllegalArgumentException("Domain name must not be null");
       }
 
       try {
@@ -78,7 +78,7 @@ public class DomainPersister extends Persister {
          }
 
          if (resourceDomainName == null) {
-            throw new AccessControlException("Could not determine resource domain for resource: " + resource);
+            throw new IllegalArgumentException("Could not determine domain for resource: " + resource);
          }
 
          return resourceDomainName;

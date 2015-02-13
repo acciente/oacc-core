@@ -19,6 +19,7 @@ package com.acciente.oacc;
 
 import org.junit.Test;
 
+import java.sql.SQLException;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Map;
@@ -89,7 +90,7 @@ public class TestAccessControl_setGlobalResourcePermissions extends TestAccessCo
                                                            domainName);
          fail("setting *INHERIT system permission as a global permission should have failed");
       }
-      catch (AccessControlException e) {
+      catch (IllegalArgumentException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("not valid in this context"));
       }
    }
@@ -113,7 +114,7 @@ public class TestAccessControl_setGlobalResourcePermissions extends TestAccessCo
                                                            domainName);
          fail("granting *RESET_CREDENTIALS system permission globally to an unauthenticatable resource class should have failed");
       }
-      catch (AccessControlException e) {
+      catch (IllegalArgumentException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("not valid for unauthenticatable resource"));
       }
    }
@@ -137,7 +138,7 @@ public class TestAccessControl_setGlobalResourcePermissions extends TestAccessCo
                                                            domainName);
          fail("granting *IMPERSONATE system permission globally to an unauthenticatable resource class should have failed");
       }
-      catch (AccessControlException e) {
+      catch (IllegalArgumentException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("not valid for unauthenticatable resource"));
       }
    }
@@ -559,7 +560,7 @@ public class TestAccessControl_setGlobalResourcePermissions extends TestAccessCo
                                                            domainName);
          fail("setting global permissions that include the same permission - by name - but with different grant-options, should have failed");
       }
-      catch (AccessControlException e) {
+      catch (IllegalArgumentException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("duplicate permission"));
       }
    }
@@ -713,7 +714,7 @@ public class TestAccessControl_setGlobalResourcePermissions extends TestAccessCo
                                                            domainName);
          fail("setting global permissions with mismatched resource class and permission should have failed");
       }
-      catch (AccessControlException e) {
+      catch (IllegalArgumentException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("does not exist for the specified resource class"));
       }
    }
@@ -735,13 +736,29 @@ public class TestAccessControl_setGlobalResourcePermissions extends TestAccessCo
 
       // attempt to set permissions with non-existent references
       try {
+         accessControlContext.setGlobalResourcePermissions(Resources.getInstance(-999L),
+                                                           resourceClassName,
+                                                           resourcePermissions_invalidResourceClass,
+                                                           domainName);
+         fail("setting permissions with non-existent accessor resource reference should have failed");
+      }
+//      catch (IllegalArgumentException e) {
+//         assertThat(e.getMessage().toLowerCase(), containsString("could not find resource"));
+//      }
+      catch (AccessControlException e) {
+         // this is a real ugly check because we don't currently validate the accessor resource and thus expect the
+         // database to complain with some sort of foreign key constraint violation upon adding the domain create permissions
+         assertThat(e.getCause() instanceof SQLException, is(true));
+      }
+
+      try {
          accessControlContext.setGlobalResourcePermissions(accessorResource,
                                                            "invalid_resourceClass",
                                                            resourcePermissions_invalidResourceClass,
                                                            domainName);
          fail("setting permissions with non-existent resource class should have failed");
       }
-      catch (AccessControlException e) {
+      catch (IllegalArgumentException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("could not find resource class"));
       }
 
@@ -752,7 +769,7 @@ public class TestAccessControl_setGlobalResourcePermissions extends TestAccessCo
                                                            "invalid_domain");
          fail("setting permissions with non-existent domain should have failed");
       }
-      catch (AccessControlException e) {
+      catch (IllegalArgumentException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("could not find domain"));
       }
 
@@ -763,7 +780,7 @@ public class TestAccessControl_setGlobalResourcePermissions extends TestAccessCo
                                                            domainName);
          fail("setting permissions with non-existent permission name should have failed");
       }
-      catch (AccessControlException e) {
+      catch (IllegalArgumentException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("does not exist for the specified resource class"));
       }
    }

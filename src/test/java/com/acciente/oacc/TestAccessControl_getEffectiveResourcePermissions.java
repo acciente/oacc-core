@@ -420,7 +420,7 @@ public class TestAccessControl_getEffectiveResourcePermissions extends TestAcces
          accessControlContext.getEffectiveResourcePermissions(validResource, invalidResource);
          fail("getting effective resource permissions with invalid accessed resource reference should have failed");
       }
-      catch (AccessControlException e) {
+      catch (IllegalArgumentException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("could not determine resource domain"));
       }
    }

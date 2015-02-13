@@ -19,6 +19,7 @@ package com.acciente.oacc;
 
 import org.junit.Test;
 
+import java.sql.SQLException;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
@@ -483,7 +484,7 @@ public class TestAccessControl_setDomainPermissions extends TestAccessControlBas
       // attempt to set domain permissions with nulls
       try {
          accessControlContext.setDomainPermissions(null, domainName, domainPermissions);
-         fail("setting domain create permissions with null accessor resource should have failed");
+         fail("setting domain permissions with null accessor resource should have failed");
       }
       catch (NullPointerException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("resource required"));
@@ -491,7 +492,7 @@ public class TestAccessControl_setDomainPermissions extends TestAccessControlBas
 
       try {
          accessControlContext.setDomainPermissions(accessorResource, null, domainPermissions);
-         fail("setting domain create permissions with null domain name should have failed");
+         fail("setting domain permissions with null domain name should have failed");
       }
       catch (NullPointerException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("domain required"));
@@ -499,7 +500,7 @@ public class TestAccessControl_setDomainPermissions extends TestAccessControlBas
 
       try {
          accessControlContext.setDomainPermissions(accessorResource, domainName, null);
-         fail("setting domain create permissions with null domain permission set should have failed");
+         fail("setting domain permissions with null domain permission set should have failed");
       }
       catch (NullPointerException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("permissions required"));
@@ -507,10 +508,44 @@ public class TestAccessControl_setDomainPermissions extends TestAccessControlBas
 
       try {
          accessControlContext.setDomainPermissions(accessorResource, domainName, domainPermission_nullElement);
-         fail("setting domain create permissions with null element in domain permission set should have failed");
+         fail("setting domain permissions with null element in domain permission set should have failed");
       }
       catch (NullPointerException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("contains null element"));
+      }
+   }
+
+   @Test
+   public void setDomainPermissions_nonExistentReferences_shouldFail() throws AccessControlException {
+      authenticateSystemResource();
+      final DomainPermission domCreatePerm_child_withGrant
+            = DomainPermissions.getInstance(DomainPermissions.CREATE_CHILD_DOMAIN, true);
+
+      Set<DomainPermission> domainPermissions = new HashSet<>();
+      domainPermissions.add(domCreatePerm_child_withGrant);
+
+      final String domainName = generateDomain();
+      Resource accessorResource = generateUnauthenticatableResource();
+
+      try {
+         accessControlContext.setDomainPermissions(Resources.getInstance(-999L), domainName, domainPermissions);
+         fail("setting domain permissions with non-existent accessor resource reference should have failed");
+      }
+//      catch (IllegalArgumentException e) {
+//         assertThat(e.getMessage().toLowerCase(), containsString("could not find resource"));
+//      }
+      catch (AccessControlException e) {
+         // this is a real ugly check because we don't currently validate the accessor resource and thus expect the
+         // database to complain with some sort of foreign key constraint violation upon adding the domain permissions
+         assertThat(e.getCause() instanceof SQLException, is(true));
+      }
+
+      try {
+         accessControlContext.setDomainPermissions(accessorResource, "invalid_domain", domainPermissions);
+         fail("setting domain permissions with non-existent accessor resource reference should have failed");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("could not find domain"));
       }
    }
 
@@ -551,7 +586,7 @@ public class TestAccessControl_setDomainPermissions extends TestAccessControlBas
 
       try {
          accessControlContext.setDomainPermissions(accessorResource, dmainName, domainPermissions_pre);
-         fail("setting domain create permissions without having rights to grant should have failed");
+         fail("setting domain permissions without having rights to grant should have failed");
       }
       catch (AccessControlException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("not authorized"));
@@ -566,7 +601,7 @@ public class TestAccessControl_setDomainPermissions extends TestAccessControlBas
 
       try {
          accessControlContext.setDomainPermissions(accessorResource, dmainName, domainPermissions_pre);
-         fail("setting domain create permissions without having rights to grant should have failed");
+         fail("setting domain permissions without having rights to grant should have failed");
       }
       catch (AccessControlException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("not authorized"));

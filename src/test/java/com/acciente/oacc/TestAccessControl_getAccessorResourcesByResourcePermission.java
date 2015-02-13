@@ -349,7 +349,7 @@ public class TestAccessControl_getAccessorResourcesByResourcePermission extends 
                                                                              .getInstance(queriedPermissionName));
          fail("getting accessor resources by resource permission with non-existent resource class name should have failed");
       }
-      catch (AccessControlException e) {
+      catch (IllegalArgumentException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("could not find resource class"));
       }
 
@@ -360,7 +360,7 @@ public class TestAccessControl_getAccessorResourcesByResourcePermission extends 
                                                                              .getInstance("does_not_exist"));
          fail("getting accessor resources by resource permission with non-existent permission should have failed");
       }
-      catch (AccessControlException e) {
+      catch (IllegalArgumentException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("is not defined for resource class"));
       }
    }

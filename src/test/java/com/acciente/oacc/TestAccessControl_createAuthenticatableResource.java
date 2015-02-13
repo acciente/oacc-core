@@ -420,7 +420,7 @@ public class TestAccessControl_createAuthenticatableResource extends TestAccessC
          accessControlContext.createResource(resourceClassName, domainName, PasswordCredentials.newInstance(password));
          fail("creating authenticatable resource for unauthenticatable resource class name should have failed");
       }
-      catch (AccessControlException e) {
+      catch (IllegalArgumentException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("credentials not supported, but specified"));
       }
 
@@ -428,7 +428,7 @@ public class TestAccessControl_createAuthenticatableResource extends TestAccessC
          accessControlContext.createResource(resourceClassName, PasswordCredentials.newInstance(password));
          fail("creating authenticatable resource for unauthenticatable resource class name should have failed");
       }
-      catch (AccessControlException e) {
+      catch (IllegalArgumentException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("credentials not supported, but specified"));
       }
    }
@@ -616,27 +616,27 @@ public class TestAccessControl_createAuthenticatableResource extends TestAccessC
    }
 
    @Test
-   public void createAuthenticatableResource_nonExistantReferences_shouldFail() throws AccessControlException {
+   public void createAuthenticatableResource_nonExistentReferences_shouldFail() throws AccessControlException {
       authenticateSystemResource();
 
       final String domainName = generateDomain();
       final String resourceClassName = generateResourceClass(true, false);
       final char[] password = generateUniquePassword();
 
-      // attempt to create authenticatable resources with non-existant references to class or domain names
+      // attempt to create authenticatable resources with non-existent references to class or domain names
       try {
          accessControlContext.createResource("does_not_exist", PasswordCredentials.newInstance(password));
-         fail("creating authenticatable resource with non-existant resource class name should fail");
+         fail("creating authenticatable resource with non-existent resource class name should fail");
       }
-      catch (AccessControlException e) {
+      catch (IllegalArgumentException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("could not find resource class"));
       }
 
       try {
          accessControlContext.createResource("does_not_exist", domainName, PasswordCredentials.newInstance(password));
-         fail("creating authenticatable resource with non-existant resource class name should fail");
+         fail("creating authenticatable resource with non-existent resource class name should fail");
       }
-      catch (AccessControlException e) {
+      catch (IllegalArgumentException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("could not find resource class"));
       }
 
@@ -644,9 +644,9 @@ public class TestAccessControl_createAuthenticatableResource extends TestAccessC
          accessControlContext.createResource(resourceClassName,
                                              "does_not_exist",
                                              PasswordCredentials.newInstance(password));
-         fail("creating authenticatable resource with non-existant domain name should have failed");
+         fail("creating authenticatable resource with non-existent domain name should have failed");
       }
-      catch (AccessControlException e) {
+      catch (IllegalArgumentException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("could not find domain"));
       }
    }

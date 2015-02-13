@@ -110,7 +110,7 @@ public class ResourceClassPersister extends Persister {
          }
 
          if (resourceClassInternalInfo == null) {
-            throw new AccessControlException("Could not determine resource class for resource: " + resource);
+            throw new IllegalArgumentException("Could not determine resource class for resource: " + resource);
          }
 
          return resourceClassInternalInfo;

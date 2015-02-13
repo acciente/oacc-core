@@ -18,7 +18,6 @@
 package com.acciente.oacc.sql.internal.persister;
 
 import com.acciente.oacc.AccessControlException;
-import com.acciente.oacc.sql.SQLDialect;
 
 import java.io.Serializable;
 

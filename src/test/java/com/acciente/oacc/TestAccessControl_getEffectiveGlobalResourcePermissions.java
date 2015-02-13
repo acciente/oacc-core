@@ -470,21 +470,21 @@ public class TestAccessControl_getEffectiveGlobalResourcePermissions extends Tes
          accessControlContext.getEffectiveGlobalResourcePermissions(validResource, "invalid_resourceClassName");
          fail("getting effective global resource permissions with invalid accessed resource class reference should have failed");
       }
-      catch (AccessControlException e) {
+      catch (IllegalArgumentException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("could not find resource class"));
       }
       try {
          accessControlContext.getEffectiveGlobalResourcePermissions(validResource, "invalid_resourceClassName", domainName);
          fail("getting effective global resource permissions with invalid accessed resource class reference should have failed");
       }
-      catch (AccessControlException e) {
+      catch (IllegalArgumentException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("could not find resource class"));
       }
       try {
          accessControlContext.getEffectiveGlobalResourcePermissions(validResource, resourceClassName, "invalid_domainName");
          fail("getting effective global resource permissions with invalid domain reference should have failed");
       }
-      catch (AccessControlException e) {
+      catch (IllegalArgumentException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("could not find domain"));
       }
    }

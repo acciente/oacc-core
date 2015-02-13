@@ -180,16 +180,16 @@ public class TestAccessControl_createResourcePermission extends TestAccessContro
    }
 
    @Test
-   public void createResourcePermission_nonExistantResourceClass_shouldFail() throws AccessControlException {
+   public void createResourcePermission_nonExistentResourceClass_shouldFail() throws AccessControlException {
       authenticateSystemResource();
 
       final String permissionName = generateUniquePermissionName();
 
       try {
          accessControlContext.createResourcePermission("does_not_exist", permissionName);
-         fail("creating resource permission with non-existant resource class name should fail");
+         fail("creating resource permission with non-existent resource class name should fail");
       }
-      catch (AccessControlException e) {
+      catch (IllegalArgumentException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("could not find resource class"));
       }
    }
@@ -238,7 +238,7 @@ public class TestAccessControl_createResourcePermission extends TestAccessContro
          accessControlContext.createResourcePermission(resourceClassName, permissionName);
          fail("creating resource permission with duplicate permission name should fail");
       }
-      catch (AccessControlException e) {
+      catch (IllegalArgumentException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("duplicate"));
          List<String> permissionNames = accessControlContext.getResourcePermissionNames(resourceClassName);
          assertThat(permissionNames.size(), is(1));
@@ -249,7 +249,7 @@ public class TestAccessControl_createResourcePermission extends TestAccessContro
          accessControlContext.createResourcePermission(resourceClassName, " " + permissionName + "\t");
          fail("creating resource permission with duplicate permission name should fail");
       }
-      catch (AccessControlException e) {
+      catch (IllegalArgumentException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("duplicate"));
          List<String> permissionNames = accessControlContext.getResourcePermissionNames(resourceClassName);
          assertThat(permissionNames.size(), is(1));

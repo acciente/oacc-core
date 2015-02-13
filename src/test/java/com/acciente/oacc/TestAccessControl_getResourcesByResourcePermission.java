@@ -1011,7 +1011,7 @@ public class TestAccessControl_getResourcesByResourcePermission extends TestAcce
          accessControlContext.getResourcesByResourcePermission(nonExistentResource, resourceClass, resourcePermission);
          fail("getting resources by resource permission with non-existent accessor resource should have failed");
       }
-      catch (AccessControlException e) {
+      catch (IllegalArgumentException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("could not determine resource domain for resource"));
       }
 
@@ -1019,7 +1019,7 @@ public class TestAccessControl_getResourcesByResourcePermission extends TestAcce
          accessControlContext.getResourcesByResourcePermission(nonExistentResource, resourceClass, resourcePermission, domain);
          fail("getting resources by resource permission with non-existent accessor resource should have failed");
       }
-      catch (AccessControlException e) {
+      catch (IllegalArgumentException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("could not determine resource domain for resource"));
       }
 
@@ -1027,7 +1027,7 @@ public class TestAccessControl_getResourcesByResourcePermission extends TestAcce
          accessControlContext.getResourcesByResourcePermission(accessorResource, "does_not_exit", resourcePermission);
          fail("getting resources by resource permission with non-existent resource class name should have failed");
       }
-      catch (AccessControlException e) {
+      catch (IllegalArgumentException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("could not find resource class"));
       }
 
@@ -1035,7 +1035,7 @@ public class TestAccessControl_getResourcesByResourcePermission extends TestAcce
          accessControlContext.getResourcesByResourcePermission(accessorResource, "does_not_exit", resourcePermission, domain);
          fail("getting resources by resource permission with non-existent resource class name should have failed");
       }
-      catch (AccessControlException e) {
+      catch (IllegalArgumentException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("could not find resource class"));
       }
 
@@ -1043,7 +1043,7 @@ public class TestAccessControl_getResourcesByResourcePermission extends TestAcce
          accessControlContext.getResourcesByResourcePermission(accessorResource, resourceClass, nonExistentPermission);
          fail("getting resources by resource permission with non-existent resource permission should have failed");
       }
-      catch (AccessControlException e) {
+      catch (IllegalArgumentException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("is not defined for resource class"));
       }
 
@@ -1051,7 +1051,7 @@ public class TestAccessControl_getResourcesByResourcePermission extends TestAcce
          accessControlContext.getResourcesByResourcePermission(accessorResource, resourceClass, nonExistentPermission, domain);
          fail("getting resources by resource permission with non-existent resource permission should have failed");
       }
-      catch (AccessControlException e) {
+      catch (IllegalArgumentException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("is not defined for resource class"));
       }
 
@@ -1059,7 +1059,7 @@ public class TestAccessControl_getResourcesByResourcePermission extends TestAcce
          accessControlContext.getResourcesByResourcePermission(accessorResource, resourceClass, resourcePermission, "does_not_exist");
          fail("getting resources by resource permission with non-existent domain should have failed");
       }
-      catch (AccessControlException e) {
+      catch (IllegalArgumentException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("could not find domain"));
       }
 
@@ -1070,7 +1070,7 @@ public class TestAccessControl_getResourcesByResourcePermission extends TestAcce
          accessControlContext.getResourcesByResourcePermission("does_not_exit", resourcePermission);
          fail("getting resources by resource permission with non-existent resource class name should have failed");
       }
-      catch (AccessControlException e) {
+      catch (IllegalArgumentException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("could not find resource class"));
       }
 
@@ -1078,7 +1078,7 @@ public class TestAccessControl_getResourcesByResourcePermission extends TestAcce
          accessControlContext.getResourcesByResourcePermission("does_not_exit", resourcePermission, domain);
          fail("getting resources by resource permission with non-existent resource class name should have failed");
       }
-      catch (AccessControlException e) {
+      catch (IllegalArgumentException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("could not find resource class"));
       }
 
@@ -1086,7 +1086,7 @@ public class TestAccessControl_getResourcesByResourcePermission extends TestAcce
          accessControlContext.getResourcesByResourcePermission(resourceClass, nonExistentPermission);
          fail("getting resources by resource permission with non-existent resource permission should have failed");
       }
-      catch (AccessControlException e) {
+      catch (IllegalArgumentException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("is not defined for resource class"));
       }
 
@@ -1094,7 +1094,7 @@ public class TestAccessControl_getResourcesByResourcePermission extends TestAcce
          accessControlContext.getResourcesByResourcePermission(resourceClass, nonExistentPermission, domain);
          fail("getting resources by resource permission with non-existent resource permission should have failed");
       }
-      catch (AccessControlException e) {
+      catch (IllegalArgumentException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("is not defined for resource class"));
       }
 
@@ -1102,7 +1102,7 @@ public class TestAccessControl_getResourcesByResourcePermission extends TestAcce
          accessControlContext.getResourcesByResourcePermission(resourceClass, resourcePermission, "does_not_exist");
          fail("getting resources by resource permission with non-existent domain should have failed");
       }
-      catch (AccessControlException e) {
+      catch (IllegalArgumentException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("could not find domain"));
       }
    }
