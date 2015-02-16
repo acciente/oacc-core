@@ -314,9 +314,6 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
          }
          resourceDomainForResource = domainPersister.getResourceDomainNameByResourceId(connection, resource);
       }
-      catch (SQLException e) {
-         throw new AccessControlException(e);
-      }
       finally {
          __closeConnection(connection);
       }
@@ -358,9 +355,6 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
          // switch the session credentials to the new resource
          sessionResource = resource;
          sessionResourceDomainName = domainPersister.getResourceDomainNameByResourceId(connection, resource);
-      }
-      catch (SQLException e) {
-         throw new AccessControlException(e);
       }
       finally {
          __closeConnection(connection);
@@ -462,9 +456,6 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
                                                        domainName);
          }
       }
-      catch (SQLException e) {
-         throw new AccessControlException(e);
-      }
       finally {
          __closeConnection(connection);
       }
@@ -539,9 +530,6 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
 
          resourceClassPersister.addResourceClass(connection, resourceClassName, authenticatable, unauthenticatedCreateAllowed);
       }
-      catch (SQLException e) {
-         throw new AccessControlException(e);
-      }
       finally {
          __closeConnection(connection);
       }
@@ -579,9 +567,6 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
 
          resourceClassPermissionPersister.addResourceClassPermission(connection, resourceClassId, permissionName);
       }
-      catch (SQLException e) {
-         throw new AccessControlException(e);
-      }
       finally {
          __closeConnection(connection);
       }
@@ -599,9 +584,6 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
          domainName = domainName.trim();
 
          __createDomain(connection, domainName, null);
-      }
-      catch (SQLException e) {
-         throw new AccessControlException(e);
       }
       finally {
          __closeConnection(connection);
@@ -624,9 +606,6 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
          parentDomainName = parentDomainName.trim();
 
          __createDomain(connection, domainName, parentDomainName);
-      }
-      catch (SQLException e) {
-         throw new AccessControlException(e);
       }
       finally {
          __closeConnection(connection);
@@ -708,9 +687,6 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
 
          return __createResource(connection, resourceClassName, sessionResourceDomainName, null);
       }
-      catch (SQLException e) {
-         throw new AccessControlException(e);
-      }
       finally {
          __closeConnection(connection);
       }
@@ -724,9 +700,6 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
          connection = __getConnection();
 
          return __createResource(connection, resourceClassName, domainName, null);
-      }
-      catch (SQLException e) {
-         throw new AccessControlException(e);
       }
       finally {
          __closeConnection(connection);
@@ -745,9 +718,6 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
 
          return __createResource(connection, resourceClassName, sessionResourceDomainName, credentials);
       }
-      catch (SQLException e) {
-         throw new AccessControlException(e);
-      }
       finally {
          __closeConnection(connection);
       }
@@ -765,9 +735,6 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
          connection = __getConnection();
 
          return __createResource(connection, resourceClassName, domainName, credentials);
-      }
-      catch (SQLException e) {
-         throw new AccessControlException(e);
       }
       finally {
          __closeConnection(connection);
@@ -914,9 +881,6 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
 
          __setDirectDomainPermissions(connection, accessorResource, domainName, permissions, false);
       }
-      catch (SQLException e) {
-         throw new AccessControlException(e);
-      }
       finally {
          __closeConnection(connection);
       }
@@ -1043,9 +1007,6 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
 
          return __getDirectDomainPermissions(connection, accessorResource, domainId);
       }
-      catch (SQLException e) {
-         throw new AccessControlException(e);
-      }
       finally {
          __closeConnection(connection);
       }
@@ -1063,9 +1024,6 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
 
          return __collapseDomainPermissions(grantDomainPermissionSysPersister.getDomainSysPermissions(connection,
                                                                                                       accessorResource));
-      }
-      catch (SQLException e) {
-         throw new AccessControlException(e);
       }
       finally {
          __closeConnection(connection);
@@ -1086,9 +1044,6 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
          connection = __getConnection();
 
          return __getEffectiveDomainPermissions(connection, accessorResource, domainName);
-      }
-      catch (SQLException e) {
-         throw new AccessControlException(e);
       }
       finally {
          __closeConnection(connection);
@@ -1139,9 +1094,6 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
          return __collapseDomainPermissions(grantDomainPermissionSysPersister
                                                   .getDomainSysPermissionsIncludeInherited(connection, accessorResource));
       }
-      catch (SQLException e) {
-         throw new AccessControlException(e);
-      }
       finally {
          __closeConnection(connection);
       }
@@ -1170,9 +1122,6 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
          connection = __getConnection();
 
          __setDirectDomainCreatePermissions(connection, accessorResource, domainCreatePermissions);
-      }
-      catch (SQLException e) {
-         throw new AccessControlException(e);
       }
       finally {
          __closeConnection(connection);
@@ -1304,9 +1253,6 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
 
          return __getDirectDomainCreatePermissions(connection, accessorResource);
       }
-      catch (SQLException e) {
-         throw new AccessControlException(e);
-      }
       finally {
          __closeConnection(connection);
       }
@@ -1323,9 +1269,6 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
          connection = __getConnection();
 
          return __getEffectiveDomainCreatePermissions(connection, accessorResource);
-      }
-      catch (SQLException e) {
-         throw new AccessControlException(e);
       }
       finally {
          __closeConnection(connection);
@@ -1383,9 +1326,6 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
                                               domainName
          );
       }
-      catch (SQLException e) {
-         throw new AccessControlException(e);
-      }
       finally {
          __closeConnection(connection);
       }
@@ -1411,9 +1351,6 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
                                               resourceCreatePermissions,
                                               sessionResourceDomainName
          );
-      }
-      catch (SQLException e) {
-         throw new AccessControlException(e);
       }
       finally {
          __closeConnection(connection);
@@ -1677,9 +1614,6 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
                                                      resourceClassName,
                                                      domainName);
       }
-      catch (SQLException e) {
-         throw new AccessControlException(e);
-      }
       finally {
          __closeConnection(connection);
       }
@@ -1727,9 +1661,6 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
                                                      resourceClassName,
                                                      sessionResourceDomainName);
       }
-      catch (SQLException e) {
-         throw new AccessControlException(e);
-      }
       finally {
          __closeConnection(connection);
       }
@@ -1746,9 +1677,6 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
          connection = __getConnection();
 
          return __getDirectResourceCreatePermissionsMap(connection, accessorResource);
-      }
-      catch (SQLException e) {
-         throw new AccessControlException(e);
       }
       finally {
          __closeConnection(connection);
@@ -1800,9 +1728,6 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
                                                         resourceClassName,
                                                         domainName);
       }
-      catch (SQLException e) {
-         throw new AccessControlException(e);
-      }
       finally {
          __closeConnection(connection);
       }
@@ -1825,9 +1750,6 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
                                                         accessorResource,
                                                         resourceClassName,
                                                         sessionResourceDomainName);
-      }
-      catch (SQLException e) {
-         throw new AccessControlException(e);
       }
       finally {
          __closeConnection(connection);
@@ -1908,9 +1830,6 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
 
          return __getEffectiveResourceCreatePermissionsMap(connection,
                                                            accessorResource);
-      }
-      catch (SQLException e) {
-         throw new AccessControlException(e);
       }
       finally {
          __closeConnection(connection);
@@ -2005,9 +1924,6 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
                                         resourcePermissions,
                                         sessionResource,
                                         false);
-      }
-      catch (SQLException e) {
-         throw new AccessControlException(e);
       }
       finally {
          __closeConnection(connection);
@@ -2189,9 +2105,6 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
 
          return __getDirectResourcePermissions(connection, accessorResource, accessedResource);
       }
-      catch (SQLException e) {
-         throw new AccessControlException(e);
-      }
       finally {
          __closeConnection(connection);
       }
@@ -2228,9 +2141,6 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
          connection = __getConnection();
 
          return __getEffectiveResourcePermissions(connection, accessorResource, accessedResource);
-      }
-      catch (SQLException e) {
-         throw new AccessControlException(e);
       }
       finally {
          __closeConnection(connection);
@@ -2301,9 +2211,6 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
                                       domainName
          );
       }
-      catch (SQLException e) {
-         throw new AccessControlException(e);
-      }
       finally {
          __closeConnection(connection);
       }
@@ -2330,9 +2237,6 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
                                       resourcePermissions,
                                       sessionResourceDomainName
          );
-      }
-      catch (SQLException e) {
-         throw new AccessControlException(e);
       }
       finally {
          __closeConnection(connection);
@@ -2520,9 +2424,6 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
                                                      resourceClassName,
                                                      domainName);
       }
-      catch (SQLException e) {
-         throw new AccessControlException(e);
-      }
       finally {
          __closeConnection(connection);
       }
@@ -2570,9 +2471,6 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
                                                      resourceClassName,
                                                      sessionResourceDomainName);
       }
-      catch (SQLException e) {
-         throw new AccessControlException(e);
-      }
       finally {
          __closeConnection(connection);
       }
@@ -2600,9 +2498,6 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
                                                         resourceClassName,
                                                         domainName);
       }
-      catch (SQLException e) {
-         throw new AccessControlException(e);
-      }
       finally {
          __closeConnection(connection);
       }
@@ -2626,9 +2521,6 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
                                                         accessorResource,
                                                         resourceClassName,
                                                         sessionResourceDomainName);
-      }
-      catch (SQLException e) {
-         throw new AccessControlException(e);
       }
       finally {
          __closeConnection(connection);
@@ -2698,9 +2590,6 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
 
          return __getDirectGlobalResourcePermissionsMap(connection, accessorResource);
       }
-      catch (SQLException e) {
-         throw new AccessControlException(e);
-      }
       finally {
          __closeConnection(connection);
       }
@@ -2734,9 +2623,6 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
          connection = __getConnection();
 
          return __getEffectiveGlobalResourcePermissionsMap(connection, accessorResource);
-      }
-      catch (SQLException e) {
-         throw new AccessControlException(e);
       }
       finally {
          __closeConnection(connection);
@@ -2814,9 +2700,6 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
 
          return domainPersister.getResourceDomainNameByResourceId(connection, resource);
       }
-      catch (SQLException e) {
-         throw new AccessControlException(e);
-      }
       finally {
          __closeConnection(connection);
       }
@@ -2834,9 +2717,6 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
          domainName = domainName.trim();
 
          return domainPersister.getResourceDomainNameDescendants(connection, domainName);
-      }
-      catch (SQLException e) {
-         throw new AccessControlException(e);
       }
       finally {
          __closeConnection(connection);
@@ -2864,9 +2744,6 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
                                       resourceClassInternalInfo.isAuthenticatable(),
                                       resourceClassInternalInfo.isUnauthenticatedCreateAllowed());
       }
-      catch (SQLException e) {
-         throw new AccessControlException(e);
-      }
       finally {
          __closeConnection(connection);
       }
@@ -2887,9 +2764,6 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
          return new ResourceClassInfo(resourceClassInternalInfo.getResourceClassName(),
                                       resourceClassInternalInfo.isAuthenticatable(),
                                       resourceClassInternalInfo.isUnauthenticatedCreateAllowed());
-      }
-      catch (SQLException e) {
-         throw new AccessControlException(e);
       }
       finally {
          __closeConnection(connection);
@@ -2925,9 +2799,6 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
          __assertPostCreateDomainPermission(connection,
                                             accessorResource,
                                             domainPermission);
-      }
-      catch (SQLException e) {
-         throw new AccessControlException(e);
       }
       finally {
          __closeConnection(connection);
@@ -3007,9 +2878,6 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
                                              true);
          }
       }
-      catch (SQLException e) {
-         throw new AccessControlException(e);
-      }
       finally {
          __closeConnection(connection);
       }
@@ -3055,9 +2923,6 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
                                               requestedResourcePermission,
                                               sessionResourceDomainName);
       }
-      catch (SQLException e) {
-         throw new AccessControlException(e);
-      }
       finally {
          __closeConnection(connection);
       }
@@ -3086,9 +2951,6 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
                                               resourceClassName,
                                               resourcePermission,
                                               domainName);
-      }
-      catch (SQLException e) {
-         throw new AccessControlException(e);
       }
       finally {
          __closeConnection(connection);
@@ -3186,9 +3048,6 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
                                           requestedResourcePermission,
                                           sessionResourceDomainName);
       }
-      catch (SQLException e) {
-         throw new AccessControlException(e);
-      }
       finally {
          __closeConnection(connection);
       }
@@ -3217,9 +3076,6 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
                                           resourceClassName,
                                           requestedResourcePermission,
                                           domainName);
-      }
-      catch (SQLException e) {
-         throw new AccessControlException(e);
       }
       finally {
          __closeConnection(connection);
@@ -3281,9 +3137,6 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
                                                 true);
             }
          }
-      }
-      catch (SQLException e) {
-         throw new AccessControlException(e);
       }
       finally {
          __closeConnection(connection);
@@ -3353,9 +3206,6 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
 
          return __getResourcesByPermission(connection, sessionResource, resourceClassName, resourcePermission);
       }
-      catch (SQLException e) {
-         throw new AccessControlException(e);
-      }
       finally {
          __closeConnection(connection);
       }
@@ -3394,9 +3244,6 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
                                                    + accessorResource,
                                              true);
          }
-      }
-      catch (SQLException e) {
-         throw new AccessControlException(e);
       }
       finally {
          __closeConnection(connection);
@@ -3486,9 +3333,6 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
                                            resourcePermission,
                                            domainName);
       }
-      catch (SQLException e) {
-         throw new AccessControlException(e);
-      }
       finally {
          __closeConnection(connection);
       }
@@ -3533,9 +3377,6 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
                                                    + accessorResource,
                                              true);
          }
-      }
-      catch (SQLException e) {
-         throw new AccessControlException(e);
       }
       finally {
          __closeConnection(connection);
@@ -3635,9 +3476,6 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
 
          return __getAccessorResourcesByResourcePermission(connection, accessedResource, resourceClassName, resourcePermission);
       }
-      catch (SQLException e) {
-         throw new AccessControlException(e);
-      }
       finally {
          __closeConnection(connection);
       }
@@ -3696,9 +3534,6 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
 
          return resourceClassPersister.getResourceClassNames(connection);
       }
-      catch (SQLException e) {
-         throw new AccessControlException(e);
-      }
       finally {
          __closeConnection(connection);
       }
@@ -3716,9 +3551,6 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
          resourceClassName = resourceClassName.trim();
 
          return resourceClassPermissionPersister.getPermissionNames(connection, resourceClassName);
-      }
-      catch (SQLException e) {
-         throw new AccessControlException(e);
       }
       finally {
          __closeConnection(connection);
@@ -3894,19 +3726,24 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
 
    // private connection management helper methods
 
-   private SQLConnection __getConnection() throws SQLException, AccessControlException {
+   private SQLConnection __getConnection() {
       if (dataSource != null) {
-         return new SQLConnection(dataSource.getConnection());
+         try {
+            return new SQLConnection(dataSource.getConnection());
+         }
+         catch (SQLException e) {
+            throw new RuntimeException(e);
+         }
       }
       else if (connection != null) {
          return new SQLConnection(connection);
       }
       else {
-         throw new AccessControlException("Not initialized! No data source or connection, perhaps missing call to postDeserialize()?");
+         throw new IllegalStateException("Not initialized! No data source or connection, perhaps missing call to postDeserialize()?");
       }
    }
 
-   private void __closeConnection(SQLConnection connection) throws AccessControlException {
+   private void __closeConnection(SQLConnection connection) {
       // only close the connection if we got it from a pool, otherwise just leave the connection open
       if (dataSource != null) {
          if (connection != null) {
@@ -3914,7 +3751,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
                connection.close();
             }
             catch (SQLException e) {
-               throw new AccessControlException(e);
+               throw new RuntimeException(e);
             }
          }
       }
