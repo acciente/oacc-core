@@ -17,7 +17,6 @@
  */
 package com.acciente.oacc.sql.internal.persister;
 
-import com.acciente.oacc.AccessControlException;
 import com.acciente.oacc.sql.SQLDialect;
 
 class DialectSpecificSQLGenerator {
@@ -33,7 +32,7 @@ class DialectSpecificSQLGenerator {
    private static final DialectSpecificSQLGenerator PostgreSQL_9_3 = new DialectSpecificSQLGenerator("WITH RECURSIVE", "UNION ALL", "SELECT nextval('", "')", "nextval('", "')");
    private static final DialectSpecificSQLGenerator SQLServer_12_0 = new DialectSpecificSQLGenerator("WITH", "UNION ALL", "SELECT NEXT VALUE FOR ", "", "NEXT VALUE FOR ", "");
 
-   static DialectSpecificSQLGenerator getInstance(SQLDialect sqlDialect) throws AccessControlException {
+   static DialectSpecificSQLGenerator getInstance(SQLDialect sqlDialect) {
       switch (sqlDialect) {
          case DB2_10_5:
             return DB2_10_5;
@@ -44,7 +43,7 @@ class DialectSpecificSQLGenerator {
          case SQLServer_12_0:
             return SQLServer_12_0;
          default:
-            throw new AccessControlException("Unsupported SQL dialect: " + sqlDialect);
+            throw new IllegalArgumentException("Unsupported SQL dialect: " + sqlDialect);
       }
    }
 

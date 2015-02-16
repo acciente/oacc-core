@@ -27,20 +27,19 @@ public class SQLPasswordAuthenticationProvider implements AuthenticationProvider
    // protected constructors/methods
    protected SQLPasswordAuthenticationProvider(Connection connection,
                                                String schemaName,
-                                               SQLDialect sqlDialect) throws AccessControlException {
+                                               SQLDialect sqlDialect) {
       this(schemaName, sqlDialect);
       this.connection = connection;
    }
 
    protected SQLPasswordAuthenticationProvider(DataSource dataSource,
                                                String schemaName,
-                                               SQLDialect sqlDialect) throws AccessControlException {
+                                               SQLDialect sqlDialect) {
       this(schemaName, sqlDialect);
       this.dataSource = dataSource;
    }
 
-   private SQLPasswordAuthenticationProvider(String schemaName, SQLDialect sqlDialect)
-         throws AccessControlException {
+   private SQLPasswordAuthenticationProvider(String schemaName, SQLDialect sqlDialect) {
       this.passwordEncryptor = new StrongCleanablePasswordEncryptor();
 
       // generate all the SQLs the persisters need based on the database dialect
@@ -159,7 +158,7 @@ public class SQLPasswordAuthenticationProvider implements AuthenticationProvider
       }
    }
 
-   private void __setResourcePassword(SQLConnection connection, Resource resource, char[] newPassword) throws AccessControlException {
+   private void __setResourcePassword(SQLConnection connection, Resource resource, char[] newPassword) {
       char[] newBoundPassword = null;
       try {
          newBoundPassword = PasswordUtils.computeBoundPassword(resource, newPassword);

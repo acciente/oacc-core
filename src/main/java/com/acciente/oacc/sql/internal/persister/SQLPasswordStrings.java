@@ -17,8 +17,6 @@
  */
 package com.acciente.oacc.sql.internal.persister;
 
-import com.acciente.oacc.AccessControlException;
-
 import java.io.Serializable;
 
 public class SQLPasswordStrings implements Serializable {
@@ -29,7 +27,7 @@ public class SQLPasswordStrings implements Serializable {
    public final String SQL_createInResourcePassword_WITH_ResourceID_ResourceClassID_DomainID_Password;
    public final String SQL_updateInResourcePassword_Password_BY_ResourceID;
 
-   public static SQLPasswordStrings getSQLPasswordStrings(String schemaName) throws AccessControlException {
+   public static SQLPasswordStrings getSQLPasswordStrings(String schemaName) {
       return new SQLPasswordStrings(schemaName);
    }
 

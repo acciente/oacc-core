@@ -17,7 +17,6 @@
  */
 package com.acciente.oacc.sql.internal.persister;
 
-import com.acciente.oacc.AccessControlException;
 import com.acciente.oacc.DomainCreatePermission;
 import com.acciente.oacc.DomainCreatePermissions;
 import com.acciente.oacc.DomainPermissions;
@@ -35,7 +34,7 @@ public class GrantDomainCreatePermissionPostCreateSysPersister extends Persister
    }
 
    public Set<DomainCreatePermission> getDomainCreatePostCreateSysPermissionsIncludeInherited(SQLConnection connection,
-                                                                                              Resource accessorResource) throws AccessControlException {
+                                                                                              Resource accessorResource) {
       SQLStatement statement = null;
 
       try {
@@ -47,19 +46,19 @@ public class GrantDomainCreatePermissionPostCreateSysPersister extends Persister
          Set<DomainCreatePermission> domainCreatePermissions = new HashSet<>();
          while (resultSet.next()) {
             domainCreatePermissions
-                  .add(DomainCreatePermissions.getInstance(DomainPermissions.getInstance(resultSet.getDomainSysPermissionName(
-                        "PostCreateSysPermissionId"),
-                                                                                         resultSet.getBoolean(
-                                                                                               "PostCreateIsWithGrant")),
-                                                           resultSet.getBoolean("IsWithGrant"),
-                                                           resultSet.getInteger("InheritLevel")));
+                  .add(DomainCreatePermissions
+                             .getInstance(DomainPermissions
+                                                .getInstance(resultSet.getDomainSysPermissionName("PostCreateSysPermissionId"),
+                                                             resultSet.getBoolean("PostCreateIsWithGrant")),
+                                          resultSet.getBoolean("IsWithGrant"),
+                                          resultSet.getInteger("InheritLevel")));
          }
          resultSet.close();
 
          return domainCreatePermissions;
       }
       catch (SQLException e) {
-         throw new AccessControlException(e);
+         throw new RuntimeException(e);
       }
       finally {
          closeStatement(statement);
@@ -67,7 +66,7 @@ public class GrantDomainCreatePermissionPostCreateSysPersister extends Persister
    }
 
    public Set<DomainCreatePermission> getDomainCreatePostCreateSysPermissions(SQLConnection connection,
-                                                                              Resource accessorResource) throws AccessControlException {
+                                                                              Resource accessorResource) {
       SQLStatement statement = null;
 
       try {
@@ -79,19 +78,19 @@ public class GrantDomainCreatePermissionPostCreateSysPersister extends Persister
          Set<DomainCreatePermission> domainCreatePermissions = new HashSet<>();
          while (resultSet.next()) {
             domainCreatePermissions
-                  .add(DomainCreatePermissions.getInstance(DomainPermissions.getInstance(resultSet.getDomainSysPermissionName(
-                        "PostCreateSysPermissionId"),
-                                                                                         resultSet.getBoolean(
-                                                                                               "PostCreateIsWithGrant")),
-                                                           resultSet.getBoolean("IsWithGrant"),
-                                                           0));
+                  .add(DomainCreatePermissions
+                             .getInstance(DomainPermissions
+                                                .getInstance(resultSet.getDomainSysPermissionName("PostCreateSysPermissionId"),
+                                                             resultSet.getBoolean("PostCreateIsWithGrant")),
+                                          resultSet.getBoolean("IsWithGrant"),
+                                          0));
          }
          resultSet.close();
 
          return domainCreatePermissions;
       }
       catch (SQLException e) {
-         throw new AccessControlException(e);
+         throw new RuntimeException(e);
       }
       finally {
          closeStatement(statement);
@@ -99,7 +98,7 @@ public class GrantDomainCreatePermissionPostCreateSysPersister extends Persister
    }
 
    public void removeDomainCreatePostCreateSysPermissions(SQLConnection connection,
-                                                          Resource accessorResource) throws AccessControlException {
+                                                          Resource accessorResource) {
       SQLStatement statement = null;
 
       try {
@@ -108,7 +107,7 @@ public class GrantDomainCreatePermissionPostCreateSysPersister extends Persister
          statement.executeUpdate();
       }
       catch (SQLException e) {
-         throw new AccessControlException(e);
+         throw new RuntimeException(e);
       }
       finally {
          closeStatement(statement);
@@ -118,7 +117,7 @@ public class GrantDomainCreatePermissionPostCreateSysPersister extends Persister
    public void addDomainCreatePostCreateSysPermissions(SQLConnection connection,
                                                        Resource accessorResource,
                                                        Resource grantorResource,
-                                                       Set<DomainCreatePermission> domainCreatePermissions) throws AccessControlException {
+                                                       Set<DomainCreatePermission> domainCreatePermissions) {
       SQLStatement statement = null;
 
       try {
@@ -137,7 +136,7 @@ public class GrantDomainCreatePermissionPostCreateSysPersister extends Persister
          }
       }
       catch (SQLException e) {
-         throw new AccessControlException(e);
+         throw new RuntimeException(e);
       }
       finally {
          closeStatement(statement);

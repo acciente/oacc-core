@@ -17,8 +17,6 @@
  */
 package com.acciente.oacc.sql.internal.persister;
 
-import com.acciente.oacc.AccessControlException;
-
 import java.io.Serializable;
 import java.sql.SQLException;
 
@@ -26,29 +24,28 @@ import java.sql.SQLException;
  * Base class for persisters
  */
 public abstract class Persister implements Serializable {
-   protected static void closeStatement(SQLStatement statement)
-         throws AccessControlException {
+   protected static void closeStatement(SQLStatement statement) {
       try {
          if (statement != null) {
             statement.close();
          }
       }
       catch (SQLException e) {
-         throw new AccessControlException(e);
+         throw new RuntimeException(e);
       }
    }
 
    // data verification helpers
 
-   protected void assertOneRowInserted(int rowCount) throws AccessControlException {
+   protected void assertOneRowInserted(int rowCount) {
       if (rowCount != 1) {
-         throw new AccessControlException("Security table data insert, 1 row expected, got: " + rowCount);
+         throw new IllegalStateException("Security table data insert, 1 row expected, got: " + rowCount);
       }
    }
 
-   protected void assertOneRowUpdated(int rowCount) throws AccessControlException {
+   protected void assertOneRowUpdated(int rowCount) {
       if (rowCount != 1) {
-         throw new AccessControlException("Security table data update, 1 row expected, got: " + rowCount);
+         throw new IllegalStateException("Security table data update, 1 row expected, got: " + rowCount);
       }
    }
 }

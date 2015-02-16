@@ -313,7 +313,7 @@ public class TestAccessControl_impersonate extends TestAccessControlBase {
          accessControlContext.impersonate(Resources.getInstance(-999L));
          fail("calling impersonate with a non-existent resource reference should have failed");
       }
-      catch (AccessControlException e) {
+      catch (IllegalArgumentException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("not found"));
       }
    }

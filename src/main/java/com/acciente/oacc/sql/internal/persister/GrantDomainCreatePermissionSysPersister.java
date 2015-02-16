@@ -17,7 +17,6 @@
  */
 package com.acciente.oacc.sql.internal.persister;
 
-import com.acciente.oacc.AccessControlException;
 import com.acciente.oacc.DomainCreatePermission;
 import com.acciente.oacc.DomainCreatePermissions;
 import com.acciente.oacc.Resource;
@@ -34,7 +33,7 @@ public class GrantDomainCreatePermissionSysPersister extends Persister {
    }
 
    public Set<DomainCreatePermission> getDomainCreateSysPermissionsIncludeInherited(SQLConnection connection,
-                                                                                    Resource accessorResource) throws AccessControlException {
+                                                                                    Resource accessorResource) {
       SQLStatement statement = null;
 
       try {
@@ -55,7 +54,7 @@ public class GrantDomainCreatePermissionSysPersister extends Persister {
          return domainCreatePermissions;
       }
       catch (SQLException e) {
-         throw new AccessControlException(e);
+         throw new RuntimeException(e);
       }
       finally {
          closeStatement(statement);
@@ -63,7 +62,7 @@ public class GrantDomainCreatePermissionSysPersister extends Persister {
    }
 
    public Set<DomainCreatePermission> getDomainCreateSysPermissions(SQLConnection connection,
-                                                                    Resource accessorResource) throws AccessControlException {
+                                                                    Resource accessorResource) {
       SQLStatement statement = null;
 
       try {
@@ -84,7 +83,7 @@ public class GrantDomainCreatePermissionSysPersister extends Persister {
          return domainCreatePermissions;
       }
       catch (SQLException e) {
-         throw new AccessControlException(e);
+         throw new RuntimeException(e);
       }
       finally {
          closeStatement(statement);
@@ -94,7 +93,7 @@ public class GrantDomainCreatePermissionSysPersister extends Persister {
    public void addDomainCreateSysPermissions(SQLConnection connection,
                                              Resource accessorResource,
                                              Resource grantorResource,
-                                             Set<DomainCreatePermission> domainCreatePermissions) throws AccessControlException {
+                                             Set<DomainCreatePermission> domainCreatePermissions) {
       SQLStatement statement = null;
 
       try {
@@ -111,7 +110,7 @@ public class GrantDomainCreatePermissionSysPersister extends Persister {
          }
       }
       catch (SQLException e) {
-         throw new AccessControlException(e);
+         throw new RuntimeException(e);
       }
       finally {
          closeStatement(statement);
@@ -119,7 +118,7 @@ public class GrantDomainCreatePermissionSysPersister extends Persister {
    }
 
    public void removeDomainCreateSysPermissions(SQLConnection connection,
-                                                Resource accessorResource) throws AccessControlException {
+                                                Resource accessorResource) {
       SQLStatement statement = null;
 
       try {
@@ -128,7 +127,7 @@ public class GrantDomainCreatePermissionSysPersister extends Persister {
          statement.executeUpdate();
       }
       catch (SQLException e) {
-         throw new AccessControlException(e);
+         throw new RuntimeException(e);
       }
       finally {
          closeStatement(statement);

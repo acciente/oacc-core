@@ -19,7 +19,6 @@ package com.acciente.oacc.sql.internal.persister;
 
 import com.acciente.oacc.Resource;
 import com.acciente.oacc.ResourcePermission;
-import com.acciente.oacc.AccessControlException;
 import com.acciente.oacc.ResourcePermissions;
 import com.acciente.oacc.sql.internal.persister.id.DomainId;
 import com.acciente.oacc.sql.internal.persister.id.Id;
@@ -41,9 +40,9 @@ public class GrantResourcePermissionPersister extends Persister {
                                                          Resource accessorResource,
                                                          Id<ResourceClassId> resourceClassId,
                                                          ResourcePermission resourcePermission,
-                                                         Id<ResourcePermissionId> resourcePermissionId) throws AccessControlException {
+                                                         Id<ResourcePermissionId> resourcePermissionId) {
       if (resourcePermission.isSystemPermission()) {
-         throw new AccessControlException("Permission: " + resourcePermission + " is not a non-system permission");
+         throw new IllegalArgumentException("Permission: " + resourcePermission + " is not a non-system permission");
       }
 
       SQLStatement statement = null;
@@ -68,7 +67,7 @@ public class GrantResourcePermissionPersister extends Persister {
 
       }
       catch (SQLException e) {
-         throw new AccessControlException(e);
+         throw new RuntimeException(e);
       }
       finally {
          closeStatement(statement);
@@ -80,9 +79,9 @@ public class GrantResourcePermissionPersister extends Persister {
                                                          Id<ResourceClassId> resourceClassId,
                                                          Id<DomainId> resourceDomainId,
                                                          ResourcePermission resourcePermission,
-                                                         Id<ResourcePermissionId> resourcePermissionId) throws AccessControlException {
+                                                         Id<ResourcePermissionId> resourcePermissionId) {
       if (resourcePermission.isSystemPermission()) {
-         throw new AccessControlException("Permission: " + resourcePermission + " is not a non-system permission");
+         throw new IllegalArgumentException("Permission: " + resourcePermission + " is not a non-system permission");
       }
 
       SQLStatement statement = null;
@@ -107,7 +106,7 @@ public class GrantResourcePermissionPersister extends Persister {
          return resources;
       }
       catch (SQLException e) {
-         throw new AccessControlException(e);
+         throw new RuntimeException(e);
       }
       finally {
          closeStatement(statement);
@@ -118,9 +117,9 @@ public class GrantResourcePermissionPersister extends Persister {
                                                                  Resource accessedResource,
                                                                  Id<ResourceClassId> resourceClassId,
                                                                  ResourcePermission resourcePermission,
-                                                                 Id<ResourcePermissionId> resourcePermissionId) throws AccessControlException {
+                                                                 Id<ResourcePermissionId> resourcePermissionId) {
       if (resourcePermission.isSystemPermission()) {
-         throw new AccessControlException("Permission: " + resourcePermission + " is not a non-system permission");
+         throw new IllegalArgumentException("Permission: " + resourcePermission + " is not a non-system permission");
       }
 
       SQLStatement statement = null;
@@ -144,7 +143,7 @@ public class GrantResourcePermissionPersister extends Persister {
          return resources;
       }
       catch (SQLException e) {
-         throw new AccessControlException(e);
+         throw new RuntimeException(e);
       }
       finally {
          closeStatement(statement);
@@ -153,9 +152,7 @@ public class GrantResourcePermissionPersister extends Persister {
 
    public Set<ResourcePermission> getResourcePermissionsIncludeInherited(SQLConnection connection,
                                                                          Resource accessorResource,
-                                                                         Resource accessedResource)
-         throws AccessControlException {
-
+                                                                         Resource accessedResource) {
       SQLStatement statement = null;
       try {
          SQLResult resultSet;
@@ -178,7 +175,7 @@ public class GrantResourcePermissionPersister extends Persister {
          return resourcePermissions;
       }
       catch (SQLException e) {
-         throw new AccessControlException(e);
+         throw new RuntimeException(e);
       }
       finally {
          closeStatement(statement);
@@ -187,9 +184,7 @@ public class GrantResourcePermissionPersister extends Persister {
 
    public Set<ResourcePermission> getResourcePermissions(SQLConnection connection,
                                                          Resource accessorResource,
-                                                         Resource accessedResource)
-         throws AccessControlException {
-
+                                                         Resource accessedResource) {
       SQLStatement statement = null;
       try {
          SQLResult resultSet;
@@ -212,7 +207,7 @@ public class GrantResourcePermissionPersister extends Persister {
          return resourcePermissions;
       }
       catch (SQLException e) {
-         throw new AccessControlException(e);
+         throw new RuntimeException(e);
       }
       finally {
          closeStatement(statement);
@@ -224,8 +219,7 @@ public class GrantResourcePermissionPersister extends Persister {
                                       Resource accessedResource,
                                       Id<ResourceClassId> accessedResourceClassId,
                                       Set<ResourcePermission> requestedResourcePermissions,
-                                      Resource grantorResource) throws AccessControlException {
-
+                                      Resource grantorResource) {
       SQLStatement statement = null;
       try {
          statement = connection.prepareStatement(sqlStrings.SQL_createInGrantResourcePermission_WITH_AccessorID_GrantorID_AccessedID_IsWithGrant_ResourceClassID_PermissionName);
@@ -243,7 +237,7 @@ public class GrantResourcePermissionPersister extends Persister {
          }
       }
       catch (SQLException e) {
-         throw new AccessControlException(e);
+         throw new RuntimeException(e);
       }
       finally {
          closeStatement(statement);
@@ -252,8 +246,7 @@ public class GrantResourcePermissionPersister extends Persister {
 
    public void removeResourcePermissions(SQLConnection connection,
                                          Resource accessorResource,
-                                         Resource accessedResource) throws AccessControlException {
-
+                                         Resource accessedResource) {
       SQLStatement statement = null;
       try {
          statement = connection.prepareStatement(sqlStrings.SQL_removeInGrantResourcePermission_BY_AccessorID_AccessedID);
@@ -262,7 +255,7 @@ public class GrantResourcePermissionPersister extends Persister {
          statement.executeUpdate();
       }
       catch (SQLException e) {
-         throw new AccessControlException(e);
+         throw new RuntimeException(e);
       }
       finally {
          closeStatement(statement);

@@ -17,7 +17,6 @@
  */
 package com.acciente.oacc.sql.internal.persister;
 
-import com.acciente.oacc.AccessControlException;
 import com.acciente.oacc.DomainPermission;
 import com.acciente.oacc.DomainPermissions;
 import com.acciente.oacc.Resource;
@@ -42,7 +41,7 @@ public class GrantDomainPermissionSysPersister extends Persister {
 
    public Set<Resource> getResourcesByDomainSuperUserPermission(SQLConnection connection,
                                                                 Resource accessorResource,
-                                                                Id<ResourceClassId> resourceClassId) throws AccessControlException {
+                                                                Id<ResourceClassId> resourceClassId) {
       SQLStatement statement = null;
       try {
          // get the list of objects of the specified type that the session has access to via domain super user permissions
@@ -64,7 +63,7 @@ public class GrantDomainPermissionSysPersister extends Persister {
          return resources;
       }
       catch (SQLException e) {
-         throw new AccessControlException(e);
+         throw new RuntimeException(e);
       }
       finally {
          closeStatement(statement);
@@ -74,7 +73,7 @@ public class GrantDomainPermissionSysPersister extends Persister {
    public Set<Resource> getResourcesByDomainSuperUserPermission(SQLConnection connection,
                                                                 Resource accessorResource,
                                                                 Id<ResourceClassId> resourceClassId,
-                                                                Id<DomainId> resourceDomainId) throws AccessControlException {
+                                                                Id<DomainId> resourceDomainId) {
       SQLStatement statement = null;
       try {
          // get the list of objects of the specified type that the session has access to via domain super user permissions
@@ -97,7 +96,7 @@ public class GrantDomainPermissionSysPersister extends Persister {
          return resources;
       }
       catch (SQLException e) {
-         throw new AccessControlException(e);
+         throw new RuntimeException(e);
       }
       finally {
          closeStatement(statement);
@@ -106,7 +105,7 @@ public class GrantDomainPermissionSysPersister extends Persister {
 
    public Set<DomainPermission> getDomainSysPermissionsIncludeInherited(SQLConnection connection,
                                                                         Resource accessorResource,
-                                                                        Id<DomainId> resourceDomainId) throws AccessControlException {
+                                                                        Id<DomainId> resourceDomainId) {
       SQLStatement statement = null;
 
       try {
@@ -130,7 +129,7 @@ public class GrantDomainPermissionSysPersister extends Persister {
          return domainPermissions;
       }
       catch (SQLException e) {
-         throw new AccessControlException(e);
+         throw new RuntimeException(e);
       }
       finally {
          closeStatement(statement);
@@ -139,7 +138,7 @@ public class GrantDomainPermissionSysPersister extends Persister {
 
    public Set<DomainPermission> getDomainSysPermissions(SQLConnection connection,
                                                         Resource accessorResource,
-                                                        Id<DomainId> resourceDomainId) throws AccessControlException {
+                                                        Id<DomainId> resourceDomainId) {
       SQLStatement statement = null;
 
       try {
@@ -163,7 +162,7 @@ public class GrantDomainPermissionSysPersister extends Persister {
          return domainPermissions;
       }
       catch (SQLException e) {
-         throw new AccessControlException(e);
+         throw new RuntimeException(e);
       }
       finally {
          closeStatement(statement);
@@ -171,7 +170,7 @@ public class GrantDomainPermissionSysPersister extends Persister {
    }
 
    public Map<String, Set<DomainPermission>> getDomainSysPermissionsIncludeInherited(SQLConnection connection,
-                                                                                     Resource accessorResource) throws AccessControlException {
+                                                                                     Resource accessorResource) {
       SQLStatement statement = null;
 
       try {
@@ -204,14 +203,14 @@ public class GrantDomainPermissionSysPersister extends Persister {
          return domainPermissionsMap;
       }
       catch (SQLException e) {
-         throw new AccessControlException(e);
+         throw new RuntimeException(e);
       }
       finally {
          closeStatement(statement);
       }
    }
    public Map<String, Set<DomainPermission>> getDomainSysPermissions(SQLConnection connection,
-                                                                     Resource accessorResource) throws AccessControlException {
+                                                                     Resource accessorResource) {
       SQLStatement statement = null;
 
       try {
@@ -244,7 +243,7 @@ public class GrantDomainPermissionSysPersister extends Persister {
          return domainPermissionsMap;
       }
       catch (SQLException e) {
-         throw new AccessControlException(e);
+         throw new RuntimeException(e);
       }
       finally {
          closeStatement(statement);
@@ -255,7 +254,7 @@ public class GrantDomainPermissionSysPersister extends Persister {
                                        Resource accessorResource,
                                        Resource grantorResource,
                                        Id<DomainId> resourceDomainId,
-                                       Set<DomainPermission> requestedDomainPermissions) throws AccessControlException {
+                                       Set<DomainPermission> requestedDomainPermissions) {
       SQLStatement statement = null;
 
       try {
@@ -272,7 +271,7 @@ public class GrantDomainPermissionSysPersister extends Persister {
          }
       }
       catch (SQLException e) {
-         throw new AccessControlException(e);
+         throw new RuntimeException(e);
       }
       finally {
          closeStatement(statement);
@@ -281,7 +280,7 @@ public class GrantDomainPermissionSysPersister extends Persister {
 
    public void removeDomainSysPermissions(SQLConnection connection,
                                           Resource accessorResource,
-                                          Id<DomainId> resourceDomainId) throws AccessControlException {
+                                          Id<DomainId> resourceDomainId) {
       SQLStatement statement = null;
 
       try {
@@ -291,7 +290,7 @@ public class GrantDomainPermissionSysPersister extends Persister {
          statement.executeUpdate();
       }
       catch (SQLException e) {
-         throw new AccessControlException(e);
+         throw new RuntimeException(e);
       }
       finally {
          closeStatement(statement);

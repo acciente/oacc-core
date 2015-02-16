@@ -180,7 +180,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
 
    private SQLAccessControlContext(Connection connection,
                                    String schemaName,
-                                   SQLDialect sqlDialect) throws AccessControlException {
+                                   SQLDialect sqlDialect) {
       this(schemaName, sqlDialect);
       this.connection = connection;
       // use the built-in authentication provider when no custom implementation is provided
@@ -192,7 +192,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
    private SQLAccessControlContext(Connection connection,
                                    String schemaName,
                                    SQLDialect sqlDialect,
-                                   AuthenticationProvider authenticationProvider) throws AccessControlException {
+                                   AuthenticationProvider authenticationProvider) {
       this(schemaName, sqlDialect);
       this.connection = connection;
       this.authenticationProvider = authenticationProvider;
@@ -201,7 +201,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
 
    private SQLAccessControlContext(DataSource dataSource,
                                    String schemaName,
-                                   SQLDialect sqlDialect) throws AccessControlException {
+                                   SQLDialect sqlDialect) {
       this(schemaName, sqlDialect);
       this.dataSource = dataSource;
       // use the built-in authentication provider when no custom implementation is provided
@@ -213,7 +213,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
    private SQLAccessControlContext(DataSource dataSource,
                                    String schemaName,
                                    SQLDialect sqlDialect,
-                                   AuthenticationProvider authenticationProvider) throws AccessControlException {
+                                   AuthenticationProvider authenticationProvider) {
       this(schemaName, sqlDialect);
       this.dataSource = dataSource;
       this.authenticationProvider = authenticationProvider;
@@ -221,7 +221,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
    }
 
    private SQLAccessControlContext(String schemaName,
-                                   SQLDialect sqlDialect) throws AccessControlException {
+                                   SQLDialect sqlDialect) {
       // generate all the SQLs the persisters need based on the database dialect
       SQLStrings sqlStrings = SQLStrings.getSQLStrings(schemaName, sqlDialect);
 
@@ -1002,7 +1002,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
 
    private Set<DomainPermission> __getDirectDomainPermissions(SQLConnection connection,
                                                               Resource accessorResource,
-                                                              Id<DomainId> domainId) throws AccessControlException {
+                                                              Id<DomainId> domainId) {
       // only system permissions are possible on a domain
       return grantDomainPermissionSysPersister.getDomainSysPermissions(connection, accessorResource, domainId);
    }
@@ -1097,7 +1097,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
 
    private Set<DomainPermission> __getEffectiveDomainPermissions(SQLConnection connection,
                                                                  Resource accessorResource,
-                                                                 String domainName) throws AccessControlException {
+                                                                 String domainName) {
       Id<DomainId> domainId = domainPersister.getResourceDomainId(connection, domainName);
 
       if (domainId == null) {
@@ -1264,7 +1264,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
    }
 
    private Set<DomainCreatePermission> __getDirectDomainCreatePermissions(SQLConnection connection,
-                                                                          Resource accessorResource) throws AccessControlException {
+                                                                          Resource accessorResource) {
       final Set<DomainCreatePermission> domainCreatePermissions = new HashSet<>();
       domainCreatePermissions
             .addAll(grantDomainCreatePermissionSysPersister.getDomainCreateSysPermissions(connection,
@@ -1333,7 +1333,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
    }
 
    private Set<DomainCreatePermission> __getEffectiveDomainCreatePermissions(SQLConnection connection,
-                                                                             Resource accessorResource) throws AccessControlException {
+                                                                             Resource accessorResource) {
       final Set<DomainCreatePermission> domainCreatePermissions = new HashSet<>();
       domainCreatePermissions
             .addAll(grantDomainCreatePermissionSysPersister.getDomainCreateSysPermissionsIncludeInherited(connection,
@@ -1560,7 +1560,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
 
    private void __assertUniquePostCreatePermissionsNamesForResourceClass(SQLConnection connection,
                                                                          Set<ResourceCreatePermission> resourceCreatePermissions,
-                                                                         ResourceClassInternalInfo resourceClassInternalInfo) throws AccessControlException {
+                                                                         ResourceClassInternalInfo resourceClassInternalInfo) {
       final List<String> validPermissionNames
             = resourceClassPermissionPersister.getPermissionNames(connection, resourceClassInternalInfo.getResourceClassName());
       final Set<String> uniquePermissionNames = new HashSet<>(resourceCreatePermissions.size());
@@ -1627,8 +1627,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
    private Set<ResourceCreatePermission> __getDirectResourceCreatePermissions(SQLConnection connection,
                                                                               Resource accessorResource,
                                                                               Id<ResourceClassId> resourceClassId,
-                                                                              Id<DomainId> domainId)
-         throws AccessControlException {
+                                                                              Id<DomainId> domainId) {
       Set<ResourceCreatePermission> resourceCreatePermissions = new HashSet<>();
 
       // first get the *CREATE system permission the accessor has directly to the specified resource class
@@ -1689,7 +1688,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
    private Set<ResourceCreatePermission> __getDirectResourceCreatePermissions(SQLConnection connection,
                                                                               Resource accessorResource,
                                                                               String resourceClassName,
-                                                                              String domainName) throws AccessControlException {
+                                                                              String domainName) {
       // verify that resource class is defined
       Id<ResourceClassId> resourceClassId = resourceClassPersister.getResourceClassId(connection, resourceClassName);
 
@@ -1757,7 +1756,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
    }
 
    private Map<String, Map<String, Set<ResourceCreatePermission>>> __getDirectResourceCreatePermissionsMap(SQLConnection connection,
-                                                                                                           Resource accessorResource) throws AccessControlException {
+                                                                                                           Resource accessorResource) {
       // collect all the create permissions that the accessor has
       Map<String, Map<String, Set<ResourceCreatePermission>>> allResourceCreatePermissionsMap = new HashMap<>();
 
@@ -1838,7 +1837,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
    private Set<ResourceCreatePermission> __getEffectiveResourceCreatePermissions(SQLConnection connection,
                                                                                  Resource accessorResource,
                                                                                  String resourceClassName,
-                                                                                 String domainName) throws AccessControlException {
+                                                                                 String domainName) {
       // verify that resource class is defined
       Id<ResourceClassId> resourceClassId = resourceClassPersister.getResourceClassId(connection, resourceClassName);
 
@@ -1920,8 +1919,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
 
    private Map<String, Map<String, Set<ResourceCreatePermission>>> __getEffectiveResourceCreatePermissionsMap(
          SQLConnection connection,
-         Resource accessorResource)
-         throws AccessControlException {
+         Resource accessorResource) {
       // collect all the create permissions that the accessor has
       Map<String, Map<String, Set<ResourceCreatePermission>>> allResourceCreatePermissionsMap = new HashMap<>();
 
@@ -2128,7 +2126,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
 
    private void __assertUniqueResourcePermissionsNamesForResourceClass(SQLConnection connection,
                                                                        Set<ResourcePermission> resourcePermissions,
-                                                                       ResourceClassInternalInfo resourceClassInternalInfo) throws AccessControlException {
+                                                                       ResourceClassInternalInfo resourceClassInternalInfo) {
       final List<String> validPermissionNames
             = resourceClassPermissionPersister.getPermissionNames(connection, resourceClassInternalInfo.getResourceClassName());
       final Set<String> uniquePermissionNames = new HashSet<>(resourcePermissions.size());
@@ -2201,8 +2199,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
 
    private Set<ResourcePermission> __getDirectResourcePermissions(SQLConnection connection,
                                                                   Resource accessorResource,
-                                                                  Resource accessedResource)
-         throws AccessControlException {
+                                                                  Resource accessedResource) {
       Set<ResourcePermission> resourcePermissions = new HashSet<>();
 
       // collect the system permissions that the accessor resource has to the accessed resource
@@ -2242,8 +2239,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
 
    private Set<ResourcePermission> __getEffectiveResourcePermissions(SQLConnection connection,
                                                                      Resource accessorResource,
-                                                                     Resource accessedResource)
-         throws AccessControlException {
+                                                                     Resource accessedResource) {
       Set<ResourcePermission> resourcePermissions = new HashSet<>();
 
       // collect the system permissions that the accessor resource has to the accessed resource
@@ -2448,7 +2444,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
    private Set<ResourcePermission> __getDirectGlobalResourcePermissions(SQLConnection connection,
                                                                         Resource accessorResource,
                                                                         Id<ResourceClassId> resourceClassId,
-                                                                        Id<DomainId> domainId) throws AccessControlException {
+                                                                        Id<DomainId> domainId) {
       Set<ResourcePermission> resourcePermissions = new HashSet<>();
 
       // collect the global system permissions that the accessor resource has to the accessed resource class & domain directly
@@ -2468,7 +2464,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
 
    private void __assertUniqueGlobalResourcePermissionNamesForResourceClass(SQLConnection connection,
                                                                             Set<ResourcePermission> requestedResourcePermissions,
-                                                                            ResourceClassInternalInfo resourceClassInternalInfo) throws AccessControlException {
+                                                                            ResourceClassInternalInfo resourceClassInternalInfo) {
       final List<String> validPermissionNames
             = resourceClassPermissionPersister.getPermissionNames(connection, resourceClassInternalInfo.getResourceClassName());
       final HashSet<String> uniquePermissionNames = new HashSet<>(requestedResourcePermissions.size());
@@ -2535,7 +2531,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
    private Set<ResourcePermission> __getDirectGlobalResourcePermissions(SQLConnection connection,
                                                                         Resource accessorResource,
                                                                         String resourceClassName,
-                                                                        String domainName) throws AccessControlException {
+                                                                        String domainName) {
       // verify that resource class is defined
       final Id<ResourceClassId> resourceClassId = resourceClassPersister.getResourceClassId(connection, resourceClassName);
 
@@ -2642,8 +2638,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
    private Set<ResourcePermission> __getEffectiveGlobalResourcePermissions(SQLConnection connection,
                                                                            Resource accessorResource,
                                                                            String resourceClassName,
-                                                                           String domainName)
-         throws AccessControlException {
+                                                                           String domainName) {
       // verify that resource class is defined
       final Id<ResourceClassId> resourceClassId = resourceClassPersister.getResourceClassId(connection, resourceClassName);
 
@@ -2712,8 +2707,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
    }
 
    private Map<String, Map<String, Set<ResourcePermission>>> __getDirectGlobalResourcePermissionsMap(SQLConnection connection,
-                                                                                                     Resource accessorResource)
-         throws AccessControlException {
+                                                                                                     Resource accessorResource) {
       final Map<String, Map<String, Set<ResourcePermission>>> globalALLPermissionsMap = new HashMap<>();
 
       // collect the system permissions that the accessor has and add it into the globalALLPermissionsMap
@@ -2750,8 +2744,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
    }
 
    private Map<String, Map<String, Set<ResourcePermission>>> __getEffectiveGlobalResourcePermissionsMap(SQLConnection connection,
-                                                                                                        Resource accessorResource)
-         throws AccessControlException {
+                                                                                                        Resource accessorResource) {
       final Map<String, Map<String, Set<ResourcePermission>>> globalALLPermissionsMap = new HashMap<>();
 
       // collect the system permissions that the accessor has and add it into the globalALLPermissionsMap
@@ -3025,7 +3018,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
    private boolean __hasPermission(SQLConnection connection,
                                    Resource accessorResource,
                                    DomainPermission requestedDomainPermission,
-                                   String domainName) throws AccessControlException  {
+                                   String domainName) {
       // first check for effective permissions
       if (__isPermissible(requestedDomainPermission,
                           __getEffectiveDomainPermissions(connection, accessorResource, domainName))) {
@@ -3300,7 +3293,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
    private boolean __hasPermission(SQLConnection connection,
                                    Resource accessorResource,
                                    Resource accessedResource,
-                                   ResourcePermission requestedResourcePermission) throws AccessControlException {
+                                   ResourcePermission requestedResourcePermission) {
       // first check for effective permissions
       if (__isPermissible(requestedResourcePermission,
                           __getEffectiveResourcePermissions(connection, accessorResource, accessedResource))) {
@@ -3321,8 +3314,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
    private boolean __hasAnyPermissions(SQLConnection connection,
                                        Resource accessorResource,
                                        Resource accessedResource,
-                                       Set<ResourcePermission> requestedResourcePermissions)
-         throws AccessControlException {
+                                       Set<ResourcePermission> requestedResourcePermissions) {
       // first check for effective permissions
       final Set<ResourcePermission> effectiveResourcePermissions
             = __getEffectiveResourcePermissions(connection, accessorResource, accessedResource);
@@ -3414,7 +3406,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
    private Set<Resource> __getResourcesByPermission(SQLConnection connection,
                                                     Resource accessorResource,
                                                     String resourceClassName,
-                                                    ResourcePermission resourcePermission) throws AccessControlException {
+                                                    ResourcePermission resourcePermission) {
       // first verify that resource class is defined
       Id<ResourceClassId> resourceClassId;
       Id<ResourcePermissionId> permissionId;
@@ -3554,7 +3546,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
                                                     Resource accessorResource,
                                                     String resourceClassName,
                                                     ResourcePermission resourcePermission,
-                                                    String domainName) throws AccessControlException {
+                                                    String domainName) {
       // first verify that resource class and domain is defined
       Id<ResourceClassId> resourceClassId;
       Id<DomainId> domainId;
@@ -3654,7 +3646,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
    private Set<Resource> __getAccessorResourcesByResourcePermission(SQLConnection connection,
                                                                     Resource accessedResource,
                                                                     String resourceClassName,
-                                                                    ResourcePermission resourcePermission) throws AccessControlException {
+                                                                    ResourcePermission resourcePermission) {
       // first verify that resource class is defined
       Id<ResourceClassId> resourceClassId;
       Id<ResourcePermissionId> permissionId;
@@ -3737,7 +3729,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
 
    private boolean __isSuperUserOfResource(SQLConnection connection,
                                            Resource accessorResource,
-                                           Resource accessedResource) throws AccessControlException {
+                                           Resource accessedResource) {
       return __isSuperUserOfDomain(connection,
                                    accessorResource,
                                    domainPersister.getResourceDomainNameByResourceId(connection, accessedResource));
@@ -3746,7 +3738,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
 
    private boolean __isSuperUserOfDomain(SQLConnection connection,
                                          Resource accessorResource,
-                                         String queriedDomain) throws AccessControlException {
+                                         String queriedDomain) {
       Set<DomainPermission> domainPermissions = __getEffectiveDomainPermissions(connection, accessorResource, queriedDomain);
 
       return domainPermissions.contains(DomainPermission_SUPER_USER)
@@ -3890,7 +3882,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
 
    private void __assertPermissionValid(SQLConnection connection,
                                         String resourceClassName,
-                                        ResourcePermission resourcePermission) throws AccessControlException {
+                                        ResourcePermission resourcePermission) {
       if (!resourcePermission.isSystemPermission()) {
          final List<String> permissionNames
                = resourceClassPermissionPersister.getPermissionNames(connection, resourceClassName);

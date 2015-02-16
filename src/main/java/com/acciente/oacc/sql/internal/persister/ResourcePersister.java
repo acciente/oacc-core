@@ -17,7 +17,6 @@
  */
 package com.acciente.oacc.sql.internal.persister;
 
-import com.acciente.oacc.AccessControlException;
 import com.acciente.oacc.Resource;
 import com.acciente.oacc.sql.internal.persister.id.DomainId;
 import com.acciente.oacc.sql.internal.persister.id.Id;
@@ -34,7 +33,7 @@ public class ResourcePersister extends Persister {
    }
 
    public void verifyResourceExists(SQLConnection connection,
-                                    Resource resource) throws AccessControlException {
+                                    Resource resource) {
       SQLStatement statement = null;
 
       try {
@@ -46,48 +45,17 @@ public class ResourcePersister extends Persister {
 
          // complain if we do not find the resource
          if (!resultSet.next()) {
-            throw new AccessControlException(resource + " not found!");
+            throw new IllegalArgumentException(resource + " not found!");
          }
 
          // complain if we found more than one resource!
          // (assuming the PK constraint is being enforced by the DB, currently do not see how this can happen)
          if (resultSet.next()) {
-            throw new AccessControlException(resource + " maps to more than one resource!");
+            throw new IllegalStateException(resource + " maps to more than one resource!");
          }
       }
       catch (SQLException e) {
-         throw new AccessControlException(e);
-      }
-      finally {
-         closeStatement(statement);
-      }
-   }
-
-   public int getResourceCount(SQLConnection connection,
-                               Id<ResourceClassId> resourceClassId,
-                               Id<DomainId> resourceDomainId) throws AccessControlException {
-      SQLStatement statement = null;
-
-      try {
-         SQLResult resultSet;
-
-         statement = connection.prepareStatement(sqlStrings.SQL_findInResource_COUNTResourceID_BY_ResourceClassID_DomainID);
-         statement.setResourceClassId(1, resourceClassId);
-         statement.setResourceDomainId(2, resourceDomainId);
-         resultSet = statement.executeQuery();
-
-         if (!resultSet.next()) {
-            throw new AccessControlException("Could not read count, class: " + resourceClassId + " domain:" + resourceDomainId);
-         }
-
-         final int count = resultSet.getInteger("COUNTResourceID");
-
-         resultSet.close();
-
-         return count;
-      }
-      catch (SQLException e) {
-         throw new AccessControlException(e);
+         throw new RuntimeException(e);
       }
       finally {
          closeStatement(statement);
@@ -97,7 +65,7 @@ public class ResourcePersister extends Persister {
    public void createResource(SQLConnection connection,
                               Id<ResourceId> newResourceId,
                               Id<ResourceClassId> resourceClassId,
-                              Id<DomainId> resourceDomainId) throws AccessControlException {
+                              Id<DomainId> resourceDomainId) {
       SQLStatement statement = null;
 
       try {
@@ -109,7 +77,7 @@ public class ResourcePersister extends Persister {
          assertOneRowInserted(statement.executeUpdate());
       }
       catch (SQLException e) {
-         throw new AccessControlException(e);
+         throw new RuntimeException(e);
       }
       finally {
          closeStatement(statement);
@@ -117,7 +85,7 @@ public class ResourcePersister extends Persister {
    }
 
    public Id<DomainId> getDomainIdByResource(SQLConnection connection,
-                                             Resource resource) throws AccessControlException {
+                                             Resource resource) {
       SQLStatement statement = null;
 
       try {
@@ -138,15 +106,14 @@ public class ResourcePersister extends Persister {
          return domainId;
       }
       catch (SQLException e) {
-         throw new AccessControlException(e);
+         throw new RuntimeException(e);
       }
       finally {
          closeStatement(statement);
       }
    }
 
-   public Id<ResourceId> getNextResourceId(SQLConnection connection)
-         throws AccessControlException {
+   public Id<ResourceId> getNextResourceId(SQLConnection connection) {
       SQLStatement statement = null;
       Id<ResourceId> newResourceId = null;
 
@@ -165,7 +132,7 @@ public class ResourcePersister extends Persister {
          return newResourceId;
       }
       catch (SQLException e) {
-         throw new AccessControlException(e);
+         throw new RuntimeException(e);
       }
       finally {
          closeStatement(statement);

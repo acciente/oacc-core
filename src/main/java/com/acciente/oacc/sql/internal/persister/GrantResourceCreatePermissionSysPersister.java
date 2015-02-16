@@ -17,7 +17,6 @@
  */
 package com.acciente.oacc.sql.internal.persister;
 
-import com.acciente.oacc.AccessControlException;
 import com.acciente.oacc.Resource;
 import com.acciente.oacc.ResourceCreatePermission;
 import com.acciente.oacc.ResourceCreatePermissions;
@@ -41,7 +40,7 @@ public class GrantResourceCreatePermissionSysPersister extends Persister {
    public Set<ResourceCreatePermission> getResourceCreateSysPermissionsIncludeInherited(SQLConnection connection,
                                                                                         Resource accessorResource,
                                                                                         Id<ResourceClassId> resourceClassId,
-                                                                                        Id<DomainId> resourceDomainId) throws AccessControlException {
+                                                                                        Id<DomainId> resourceDomainId) {
       SQLStatement statement = null;
       try {
          SQLResult resultSet;
@@ -66,7 +65,7 @@ public class GrantResourceCreatePermissionSysPersister extends Persister {
          return resourceCreatePermissions;
       }
       catch (SQLException e) {
-         throw new AccessControlException(e);
+         throw new RuntimeException(e);
       }
       finally {
          closeStatement(statement);
@@ -75,8 +74,7 @@ public class GrantResourceCreatePermissionSysPersister extends Persister {
 
    public Map<String, Map<String, Set<ResourceCreatePermission>>> getResourceCreateSysPermissionsIncludeInherited(
          SQLConnection connection,
-         Resource accessorResource)
-         throws AccessControlException {
+         Resource accessorResource) {
       SQLStatement statement = null;
 
       try {
@@ -118,7 +116,7 @@ public class GrantResourceCreatePermissionSysPersister extends Persister {
          return createSysPermissionsMap;
       }
       catch (SQLException e) {
-         throw new AccessControlException(e);
+         throw new RuntimeException(e);
       }
       finally {
          closeStatement(statement);
@@ -126,7 +124,7 @@ public class GrantResourceCreatePermissionSysPersister extends Persister {
    }
 
    public Map<String, Map<String, Set<ResourceCreatePermission>>> getResourceCreateSysPermissions(SQLConnection connection,
-                                                                                                  Resource accessorResource) throws AccessControlException {
+                                                                                                  Resource accessorResource) {
       SQLStatement statement = null;
 
       try {
@@ -168,7 +166,7 @@ public class GrantResourceCreatePermissionSysPersister extends Persister {
          return createSysPermissionsMap;
       }
       catch (SQLException e) {
-         throw new AccessControlException(e);
+         throw new RuntimeException(e);
       }
       finally {
          closeStatement(statement);
@@ -178,7 +176,7 @@ public class GrantResourceCreatePermissionSysPersister extends Persister {
    public Set<ResourceCreatePermission> getResourceCreateSysPermissions(SQLConnection connection,
                                                                         Resource accessorResource,
                                                                         Id<ResourceClassId> resourceClassId,
-                                                                        Id<DomainId> resourceDomainId) throws AccessControlException {
+                                                                        Id<DomainId> resourceDomainId) {
       SQLStatement statement = null;
       try {
          SQLResult resultSet;
@@ -201,7 +199,7 @@ public class GrantResourceCreatePermissionSysPersister extends Persister {
          return resourceCreatePermissions;
       }
       catch (SQLException e) {
-         throw new AccessControlException(e);
+         throw new RuntimeException(e);
       }
       finally {
          closeStatement(statement);
@@ -213,7 +211,7 @@ public class GrantResourceCreatePermissionSysPersister extends Persister {
                                                Id<ResourceClassId> accessedResourceClassId,
                                                Id<DomainId> accessedResourceDomainId,
                                                Set<ResourceCreatePermission> requestedResourceCreatePermissions,
-                                               Resource grantorResource) throws AccessControlException {
+                                               Resource grantorResource) {
       SQLStatement statement = null;
       try {
          // add the new create system permissions
@@ -232,7 +230,7 @@ public class GrantResourceCreatePermissionSysPersister extends Persister {
          }
       }
       catch (SQLException e) {
-         throw new AccessControlException(e);
+         throw new RuntimeException(e);
       }
       finally {
          closeStatement(statement);
@@ -242,7 +240,7 @@ public class GrantResourceCreatePermissionSysPersister extends Persister {
    public void removeResourceCreateSysPermissions(SQLConnection connection,
                                                   Resource accessorResource,
                                                   Id<ResourceClassId> accessedResourceClassId,
-                                                  Id<DomainId> accessedResourceDomainId) throws AccessControlException {
+                                                  Id<DomainId> accessedResourceDomainId) {
       SQLStatement statement = null;
       try {
          // revoke any existing create system permissions this accessor has to this domain + resource class
@@ -253,7 +251,7 @@ public class GrantResourceCreatePermissionSysPersister extends Persister {
          statement.executeUpdate();
       }
       catch (SQLException e) {
-         throw new AccessControlException(e);
+         throw new RuntimeException(e);
       }
       finally {
          closeStatement(statement);

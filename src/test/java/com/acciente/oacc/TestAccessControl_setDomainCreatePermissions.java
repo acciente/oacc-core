@@ -148,7 +148,7 @@ public class TestAccessControl_setDomainCreatePermissions extends TestAccessCont
       assertThat(domainCreatePermissions_post2, is(domainCreatePermissions_pre2));
 
       // reset domain create permissions to empty set (i.e. remove all) and verify
-      accessControlContext.setDomainCreatePermissions(accessorResource, Collections.EMPTY_SET);
+      accessControlContext.setDomainCreatePermissions(accessorResource, Collections.<DomainCreatePermission>emptySet());
 
       final Set<DomainCreatePermission> domainCreatePermissions_post3 = accessControlContext.getEffectiveDomainCreatePermissions(accessorResource);
       assertThat(domainCreatePermissions_post3.isEmpty(), is(true));
@@ -551,11 +551,6 @@ public class TestAccessControl_setDomainCreatePermissions extends TestAccessCont
       Set<DomainCreatePermission> domainCreatePermissions = new HashSet<>();
       domainCreatePermissions.add(domCreatePerm_create_withGrant);
 
-      Set<DomainCreatePermission> domainCreatePermission_nullElement = new HashSet<>();
-      domainCreatePermission_nullElement.add(null);
-
-      Resource accessorResource = generateUnauthenticatableResource();
-
       // attempt to set domain create permissions with non-existent references
       try {
          accessControlContext.setDomainCreatePermissions(Resources.getInstance(-999L), domainCreatePermissions);
@@ -564,7 +559,7 @@ public class TestAccessControl_setDomainCreatePermissions extends TestAccessCont
 //      catch (IllegalArgumentException e) {
 //         assertThat(e.getMessage().toLowerCase(), containsString("could not find resource"));
 //      }
-      catch (AccessControlException e) {
+      catch (RuntimeException e) {
          // this is a real ugly check because we don't currently validate the accessor resource and thus expect the
          // database to complain with some sort of foreign key constraint violation upon adding the domain create permissions
          assertThat(e.getCause() instanceof SQLException, is(true));

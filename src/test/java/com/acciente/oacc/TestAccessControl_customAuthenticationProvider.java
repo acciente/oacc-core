@@ -175,13 +175,13 @@ public class TestAccessControl_customAuthenticationProvider extends TestAccessCo
    private static class CustomAuthenticationProvider extends SQLPasswordAuthenticationProvider {
       protected CustomAuthenticationProvider(Connection connection,
                                              String schemaName,
-                                             SQLDialect sqlDialect) throws AccessControlException {
+                                             SQLDialect sqlDialect) {
          super(connection, schemaName, sqlDialect);
       }
 
       protected CustomAuthenticationProvider(DataSource dataSource,
                                              String schemaName,
-                                             SQLDialect sqlDialect) throws AccessControlException {
+                                             SQLDialect sqlDialect) {
          super(dataSource, schemaName, sqlDialect);
       }
 

@@ -17,7 +17,6 @@
  */
 package com.acciente.oacc.sql.internal.persister;
 
-import com.acciente.oacc.AccessControlException;
 import com.acciente.oacc.ResourcePermission;
 import com.acciente.oacc.ResourcePermissions;
 import com.acciente.oacc.sql.SQLDialect;
@@ -152,7 +151,7 @@ public class SQLStrings implements Serializable {
          ResourcePermissions.INHERIT,
          false);
 
-   public static SQLStrings getSQLStrings(String schemaName, SQLDialect sqlDialect) throws AccessControlException {
+   public static SQLStrings getSQLStrings(String schemaName, SQLDialect sqlDialect) {
       return new SQLStrings(schemaName, DialectSpecificSQLGenerator.getInstance(sqlDialect));
    }
 

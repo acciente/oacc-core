@@ -17,7 +17,6 @@
  */
 package com.acciente.oacc.sql.internal.persister;
 
-import com.acciente.oacc.AccessControlException;
 import com.acciente.oacc.Resource;
 import com.acciente.oacc.sql.internal.ResourceClassInternalInfo;
 import com.acciente.oacc.sql.internal.persister.id.Id;
@@ -35,7 +34,7 @@ public class ResourceClassPersister extends Persister {
    }
 
    public Id<ResourceClassId> getResourceClassId(SQLConnection connection,
-                                                 String resourceClassName) throws AccessControlException {
+                                                 String resourceClassName) {
       SQLStatement statement = null;
 
       try {
@@ -52,7 +51,7 @@ public class ResourceClassPersister extends Persister {
          return resourceClassId;
       }
       catch (SQLException e) {
-         throw new AccessControlException(e);
+         throw new RuntimeException(e);
       }
       finally {
          closeStatement(statement);
@@ -60,11 +59,11 @@ public class ResourceClassPersister extends Persister {
    }
 
    public ResourceClassInternalInfo getResourceClassInfo(SQLConnection connection,
-                                                         String resourceClassName) throws AccessControlException {
+                                                         String resourceClassName) {
       SQLStatement statement = null;
 
       if (resourceClassName == null) {
-         throw new AccessControlException("Resource class name cannot be null");
+         throw new IllegalArgumentException("Resource class name cannot be null");
       }
 
       try {
@@ -84,7 +83,7 @@ public class ResourceClassPersister extends Persister {
          return resourceClassInternalInfo;
       }
       catch (SQLException e) {
-         throw new AccessControlException(e);
+         throw new RuntimeException(e);
       }
       finally {
          closeStatement(statement);
@@ -92,7 +91,7 @@ public class ResourceClassPersister extends Persister {
    }
 
    public ResourceClassInternalInfo getResourceClassInfoByResourceId(SQLConnection connection,
-                                                                     Resource resource) throws AccessControlException {
+                                                                     Resource resource) {
       SQLStatement statement = null;
 
       try {
@@ -116,14 +115,14 @@ public class ResourceClassPersister extends Persister {
          return resourceClassInternalInfo;
       }
       catch (SQLException e) {
-         throw new AccessControlException(e);
+         throw new RuntimeException(e);
       }
       finally {
          closeStatement(statement);
       }
    }
 
-   public List<String> getResourceClassNames(SQLConnection connection) throws AccessControlException {
+   public List<String> getResourceClassNames(SQLConnection connection) {
       SQLStatement statement = null;
 
       try {
@@ -139,7 +138,7 @@ public class ResourceClassPersister extends Persister {
          return resourceClassNames;
       }
       catch (SQLException e) {
-         throw new AccessControlException(e);
+         throw new RuntimeException(e);
       }
       finally {
          closeStatement(statement);
@@ -149,7 +148,7 @@ public class ResourceClassPersister extends Persister {
    public void addResourceClass(SQLConnection connection,
                                 String resourceClassName,
                                 boolean authenticatable,
-                                boolean nonAuthenticatedCreateAllowed) throws AccessControlException {
+                                boolean nonAuthenticatedCreateAllowed) {
       SQLStatement statement = null;
 
       try {
@@ -161,7 +160,7 @@ public class ResourceClassPersister extends Persister {
          assertOneRowInserted(statement.executeUpdate());
       }
       catch (SQLException e) {
-         throw new AccessControlException(e);
+         throw new RuntimeException(e);
       }
       finally {
          closeStatement(statement);

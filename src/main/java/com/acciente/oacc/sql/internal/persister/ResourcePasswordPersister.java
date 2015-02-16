@@ -17,7 +17,6 @@
  */
 package com.acciente.oacc.sql.internal.persister;
 
-import com.acciente.oacc.AccessControlException;
 import com.acciente.oacc.Resource;
 import com.acciente.oacc.sql.internal.persister.id.Id;
 import com.acciente.oacc.sql.internal.persister.id.ResourceId;
@@ -32,7 +31,7 @@ public class ResourcePasswordPersister extends Persister {
    }
 
    public String getEncryptedBoundPasswordByResourceId(SQLConnection connection,
-                                                       Resource resource) throws AccessControlException {
+                                                       Resource resource) {
       SQLStatement statement = null;
 
       try {
@@ -44,24 +43,24 @@ public class ResourcePasswordPersister extends Persister {
 
          // complain if we do not find the resource
          if (!resultSet.next()) {
-            throw new AccessControlException(resource + " not found!");
+            throw new IllegalArgumentException(resource + " not found!");
          }
 
          // complain if the resource has no password set
          final String encryptedBoundPassword = resultSet.getString("Password");
          if (encryptedBoundPassword == null) {
-            throw new AccessControlException(resource + " has no password set!");
+            throw new IllegalStateException(resource + " has no password set!");
          }
 
          // complain if we found more than one resource!
          // (assuming the PK constraint is being enforced by the DB, currently do not see how this can happen)
          if (resultSet.next()) {
-            throw new AccessControlException(resource + " maps to more than one resource!");
+            throw new IllegalStateException(resource + " maps to more than one resource!");
          }
          return encryptedBoundPassword;
       }
       catch (SQLException e) {
-         throw new AccessControlException(e);
+         throw new RuntimeException(e);
       }
       finally {
          closeStatement(statement);
@@ -70,19 +69,19 @@ public class ResourcePasswordPersister extends Persister {
 
    public void setEncryptedBoundPasswordByResourceId(SQLConnection connection,
                                                      Resource resource,
-                                                     String newEncryptedBoundPassword) throws AccessControlException {
+                                                     String newEncryptedBoundPassword) {
       __setEncryptedBoundPasswordByResourceId(connection, Id.<ResourceId>from(resource.getId()), newEncryptedBoundPassword);
    }
 
    public void setEncryptedBoundPasswordByResourceId(SQLConnection connection,
                                                      Id<ResourceId> resourceId,
-                                                     String newEncryptedBoundPassword) throws AccessControlException {
+                                                     String newEncryptedBoundPassword) {
       __setEncryptedBoundPasswordByResourceId(connection, resourceId, newEncryptedBoundPassword);
    }
 
    private void __setEncryptedBoundPasswordByResourceId(SQLConnection connection,
                                                         Id<ResourceId> resourceId,
-                                                        String newEncryptedBoundPassword) throws AccessControlException {
+                                                        String newEncryptedBoundPassword) {
       SQLStatement finderStatement = null;
       SQLStatement insertStatement = null;
       SQLStatement updateStatement = null;
@@ -106,7 +105,7 @@ public class ResourcePasswordPersister extends Persister {
          else {
             // complain if we found more than one resource!
             if (resultSet.next()) {
-               throw new AccessControlException("ResourceId " + resourceId + " maps to more than one resource!");
+               throw new IllegalStateException("ResourceId " + resourceId + " maps to more than one resource!");
             }
 
             // update existing row
@@ -118,7 +117,7 @@ public class ResourcePasswordPersister extends Persister {
          }
       }
       catch (SQLException e) {
-         throw new AccessControlException(e);
+         throw new RuntimeException(e);
       }
       finally {
          closeStatement(finderStatement);

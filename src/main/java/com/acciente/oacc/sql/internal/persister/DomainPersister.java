@@ -17,7 +17,6 @@
  */
 package com.acciente.oacc.sql.internal.persister;
 
-import com.acciente.oacc.AccessControlException;
 import com.acciente.oacc.Resource;
 import com.acciente.oacc.sql.internal.persister.id.DomainId;
 import com.acciente.oacc.sql.internal.persister.id.Id;
@@ -34,7 +33,7 @@ public class DomainPersister extends Persister {
    }
 
    public Id<DomainId> getResourceDomainId(SQLConnection connection,
-                                           String resourceDomainName) throws AccessControlException {
+                                           String resourceDomainName) {
       SQLStatement statement = null;
 
       if (resourceDomainName == null) {
@@ -55,7 +54,7 @@ public class DomainPersister extends Persister {
          return resourceDomainId;
       }
       catch (SQLException e) {
-         throw new AccessControlException(e);
+         throw new RuntimeException(e);
       }
       finally {
          closeStatement(statement);
@@ -63,7 +62,7 @@ public class DomainPersister extends Persister {
    }
 
    public String getResourceDomainNameByResourceId(SQLConnection connection,
-                                                   Resource resource) throws AccessControlException {
+                                                   Resource resource) {
       SQLStatement statement = null;
 
       try {
@@ -84,7 +83,7 @@ public class DomainPersister extends Persister {
          return resourceDomainName;
       }
       catch (SQLException e) {
-         throw new AccessControlException(e);
+         throw new RuntimeException(e);
       }
       finally {
          closeStatement(statement);
@@ -92,7 +91,7 @@ public class DomainPersister extends Persister {
    }
 
    public Set<String> getResourceDomainNameDescendants(SQLConnection connection,
-                                                       String resourceDomainName) throws AccessControlException {
+                                                       String resourceDomainName) {
       SQLStatement statement = null;
 
       try {
@@ -111,7 +110,7 @@ public class DomainPersister extends Persister {
          return resourceDomainNameDescendants;
       }
       catch (SQLException e) {
-         throw new AccessControlException(e);
+         throw new RuntimeException(e);
       }
       finally {
          closeStatement(statement);
@@ -119,7 +118,7 @@ public class DomainPersister extends Persister {
    }
 
    public void addResourceDomain(SQLConnection connection,
-                                 String resourceDomainName) throws AccessControlException {
+                                 String resourceDomainName) {
       SQLStatement statement = null;
 
       try {
@@ -129,7 +128,7 @@ public class DomainPersister extends Persister {
          assertOneRowInserted(statement.executeUpdate());
       }
       catch (SQLException e) {
-         throw new AccessControlException(e);
+         throw new RuntimeException(e);
       }
       finally {
          closeStatement(statement);
@@ -138,7 +137,7 @@ public class DomainPersister extends Persister {
 
    public void addResourceDomain(SQLConnection connection,
                                  String resourceDomainName,
-                                 Id<DomainId> parentResourceDomainId) throws AccessControlException {
+                                 Id<DomainId> parentResourceDomainId) {
       SQLStatement statement = null;
 
       try {
@@ -149,7 +148,7 @@ public class DomainPersister extends Persister {
          assertOneRowInserted(statement.executeUpdate());
       }
       catch (SQLException e) {
-         throw new AccessControlException(e);
+         throw new RuntimeException(e);
       }
       finally {
          closeStatement(statement);

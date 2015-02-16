@@ -263,7 +263,7 @@ public class TestAccessControl_setGlobalResourcePermissions extends TestAccessCo
       // reset permissions to empty, i.e. remove all permissions
       accessControlContext.setGlobalResourcePermissions(accessorResource,
                                                         resourceClassName,
-                                                        Collections.EMPTY_SET,
+                                                        Collections.<ResourcePermission>emptySet(),
                                                         domainName);
 
       final Set<ResourcePermission> permissions_post3 = accessControlContext.getEffectiveGlobalResourcePermissions(accessorResource, resourceClassName, domainName);
@@ -745,7 +745,7 @@ public class TestAccessControl_setGlobalResourcePermissions extends TestAccessCo
 //      catch (IllegalArgumentException e) {
 //         assertThat(e.getMessage().toLowerCase(), containsString("could not find resource"));
 //      }
-      catch (AccessControlException e) {
+      catch (RuntimeException e) {
          // this is a real ugly check because we don't currently validate the accessor resource and thus expect the
          // database to complain with some sort of foreign key constraint violation upon adding the domain create permissions
          assertThat(e.getCause() instanceof SQLException, is(true));

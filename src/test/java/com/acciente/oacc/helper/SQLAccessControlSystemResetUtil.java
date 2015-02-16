@@ -26,13 +26,13 @@ import java.sql.SQLException;
 
 public class SQLAccessControlSystemResetUtil {
    public static void resetOACC(Connection connection, String dbSchema, char[] oaccRootPwd)
-         throws SQLException, InterruptedException {
+         throws SQLException {
       deleteAllOACCData(connection, dbSchema);
       SQLAccessControlSystemInitializer.initializeOACC(connection, dbSchema, oaccRootPwd);
    }
 
    public static void resetOACC(DataSource dataSource, String dbSchema, char[] oaccRootPwd)
-         throws SQLException, InterruptedException {
+         throws SQLException {
       try (Connection connection = dataSource.getConnection()) {
          deleteAllOACCData(connection, dbSchema);
          SQLAccessControlSystemInitializer.initializeOACC(connection, dbSchema, oaccRootPwd);
@@ -40,7 +40,7 @@ public class SQLAccessControlSystemResetUtil {
    }
 
    public static void deleteAllOACCData(Connection connection,
-                                        String dbSchema) throws SQLException, InterruptedException {
+                                        String dbSchema) throws SQLException {
       PreparedStatement statement;
 
       final String schemaNameAndTablePrefix = dbSchema != null ? dbSchema + ".OAC_" : "OAC_";

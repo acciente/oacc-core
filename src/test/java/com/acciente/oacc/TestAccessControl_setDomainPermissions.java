@@ -175,7 +175,7 @@ public class TestAccessControl_setDomainPermissions extends TestAccessControlBas
       assertThat(domainPermissions_post2, is(domainPermissions_pre2));
 
       // reset domain permissions to empty set (i.e. remove all) and verify
-      accessControlContext.setDomainPermissions(accessorResource, domainName, Collections.EMPTY_SET);
+      accessControlContext.setDomainPermissions(accessorResource, domainName, Collections.<DomainPermission>emptySet());
 
       final Set<DomainPermission> domainPermissions_post3
             = accessControlContext.getEffectiveDomainPermissions(accessorResource, domainName);
@@ -534,7 +534,7 @@ public class TestAccessControl_setDomainPermissions extends TestAccessControlBas
 //      catch (IllegalArgumentException e) {
 //         assertThat(e.getMessage().toLowerCase(), containsString("could not find resource"));
 //      }
-      catch (AccessControlException e) {
+      catch (RuntimeException e) {
          // this is a real ugly check because we don't currently validate the accessor resource and thus expect the
          // database to complain with some sort of foreign key constraint violation upon adding the domain permissions
          assertThat(e.getCause() instanceof SQLException, is(true));

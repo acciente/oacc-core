@@ -17,7 +17,6 @@
  */
 package com.acciente.oacc.sql.internal.persister;
 
-import com.acciente.oacc.AccessControlException;
 import com.acciente.oacc.sql.internal.persister.id.Id;
 import com.acciente.oacc.sql.internal.persister.id.ResourceClassId;
 import com.acciente.oacc.sql.internal.persister.id.ResourcePermissionId;
@@ -35,7 +34,7 @@ public class ResourceClassPermissionPersister extends Persister {
 
    public Id<ResourcePermissionId> getResourceClassPermissionId(SQLConnection connection,
                                                                 Id<ResourceClassId> resourceClassId,
-                                                                String permissionName) throws AccessControlException {
+                                                                String permissionName) {
       SQLStatement statement = null;
       try {
          Id<ResourcePermissionId> permissionId = null;
@@ -54,14 +53,14 @@ public class ResourceClassPermissionPersister extends Persister {
          return permissionId;
       }
       catch (SQLException e) {
-         throw new AccessControlException(e);
+         throw new RuntimeException(e);
       }
       finally {
          closeStatement(statement);
       }
    }
 
-   public List<String> getPermissionNames(SQLConnection connection, String resourceClassName) throws AccessControlException {
+   public List<String> getPermissionNames(SQLConnection connection, String resourceClassName) {
       SQLStatement statement = null;
 
       try {
@@ -78,7 +77,7 @@ public class ResourceClassPermissionPersister extends Persister {
          return resourceClassNames;
       }
       catch (SQLException e) {
-         throw new AccessControlException(e);
+         throw new RuntimeException(e);
       }
       finally {
          closeStatement(statement);
@@ -87,7 +86,7 @@ public class ResourceClassPermissionPersister extends Persister {
 
    public void addResourceClassPermission(SQLConnection connection,
                                           Id<ResourceClassId> resourceClassId,
-                                          String permissionName) throws AccessControlException {
+                                          String permissionName) {
       SQLStatement statement = null;
 
       try {
@@ -98,7 +97,7 @@ public class ResourceClassPermissionPersister extends Persister {
          assertOneRowInserted(statement.executeUpdate());
       }
       catch (SQLException e) {
-         throw new AccessControlException(e);
+         throw new RuntimeException(e);
       }
       finally {
          closeStatement(statement);

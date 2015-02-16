@@ -17,7 +17,6 @@
  */
 package com.acciente.oacc.sql.internal.persister;
 
-import com.acciente.oacc.AccessControlException;
 import com.acciente.oacc.Resource;
 import com.acciente.oacc.ResourcePermission;
 import com.acciente.oacc.ResourcePermissions;
@@ -41,9 +40,9 @@ public class GrantGlobalResourcePermissionSysPersister extends Persister {
    public Set<Resource> getResourcesByGlobalSysPermission(SQLConnection connection,
                                                           Resource accessorResource,
                                                           Id<ResourceClassId> resourceClassId,
-                                                          ResourcePermission resourcePermission) throws AccessControlException {
+                                                          ResourcePermission resourcePermission) {
       if (!resourcePermission.isSystemPermission()) {
-         throw new AccessControlException("Permission: " + resourcePermission + " is not a system permission");
+         throw new IllegalArgumentException("Permission: " + resourcePermission + " is not a system permission");
       }
 
       SQLStatement statement = null;
@@ -67,7 +66,7 @@ public class GrantGlobalResourcePermissionSysPersister extends Persister {
          return resources;
       }
       catch (SQLException e) {
-         throw new AccessControlException(e);
+         throw new RuntimeException(e);
       }
       finally {
          closeStatement(statement);
@@ -78,9 +77,9 @@ public class GrantGlobalResourcePermissionSysPersister extends Persister {
                                                           Resource accessorResource,
                                                           Id<ResourceClassId> resourceClassId,
                                                           Id<DomainId> resourceDomainId,
-                                                          ResourcePermission resourcePermission) throws AccessControlException {
+                                                          ResourcePermission resourcePermission) {
       if (!resourcePermission.isSystemPermission()) {
-         throw new AccessControlException("Permission: " + resourcePermission + " is not a system permission");
+         throw new IllegalArgumentException("Permission: " + resourcePermission + " is not a system permission");
       }
 
       SQLStatement statement = null;
@@ -105,7 +104,7 @@ public class GrantGlobalResourcePermissionSysPersister extends Persister {
          return resources;
       }
       catch (SQLException e) {
-         throw new AccessControlException(e);
+         throw new RuntimeException(e);
       }
       finally {
          closeStatement(statement);
@@ -115,7 +114,7 @@ public class GrantGlobalResourcePermissionSysPersister extends Persister {
    public Set<ResourcePermission> getGlobalSysPermissionsIncludeInherited(SQLConnection connection,
                                                                           Resource accessorResource,
                                                                           Id<ResourceClassId> resourceClassId,
-                                                                          Id<DomainId> resourceDomainId) throws AccessControlException {
+                                                                          Id<DomainId> resourceDomainId) {
       SQLStatement statement = null;
       try {
          // collect the system permissions that the accessor has to the accessed resource
@@ -140,7 +139,7 @@ public class GrantGlobalResourcePermissionSysPersister extends Persister {
          return resourcePermissions;
       }
       catch (SQLException e) {
-         throw new AccessControlException(e);
+         throw new RuntimeException(e);
       }
       finally {
          closeStatement(statement);
@@ -150,7 +149,7 @@ public class GrantGlobalResourcePermissionSysPersister extends Persister {
    public Set<ResourcePermission> getGlobalSysPermissions(SQLConnection connection,
                                                           Resource accessorResource,
                                                           Id<ResourceClassId> resourceClassId,
-                                                          Id<DomainId> resourceDomainId) throws AccessControlException {
+                                                          Id<DomainId> resourceDomainId) {
       SQLStatement statement = null;
       try {
          // collect the system permissions that the accessor has to the accessed resource directly
@@ -175,7 +174,7 @@ public class GrantGlobalResourcePermissionSysPersister extends Persister {
          return resourcePermissions;
       }
       catch (SQLException e) {
-         throw new AccessControlException(e);
+         throw new RuntimeException(e);
       }
       finally {
          closeStatement(statement);
@@ -183,8 +182,7 @@ public class GrantGlobalResourcePermissionSysPersister extends Persister {
    }
 
    public Map<String, Map<String, Set<ResourcePermission>>> getGlobalSysPermissionsIncludeInherited(SQLConnection connection,
-                                                                                                    Resource accessorResource)
-         throws AccessControlException {
+                                                                                                    Resource accessorResource) {
       SQLStatement statement = null;
       try {
          // collect the system permissions that the accessor has
@@ -225,7 +223,7 @@ public class GrantGlobalResourcePermissionSysPersister extends Persister {
          return globalSysPermissionsMap;
       }
       catch (SQLException e) {
-         throw new AccessControlException(e);
+         throw new RuntimeException(e);
       }
       finally {
          closeStatement(statement);
@@ -233,8 +231,7 @@ public class GrantGlobalResourcePermissionSysPersister extends Persister {
    }
 
    public Map<String, Map<String, Set<ResourcePermission>>> getGlobalSysPermissions(SQLConnection connection,
-                                                                                    Resource accessorResource)
-         throws AccessControlException {
+                                                                                    Resource accessorResource) {
       SQLStatement statement = null;
       try {
          // collect the system permissions that the accessor has
@@ -275,7 +272,7 @@ public class GrantGlobalResourcePermissionSysPersister extends Persister {
          return globalSysPermissionsMap;
       }
       catch (SQLException e) {
-         throw new AccessControlException(e);
+         throw new RuntimeException(e);
       }
       finally {
          closeStatement(statement);
@@ -287,7 +284,7 @@ public class GrantGlobalResourcePermissionSysPersister extends Persister {
                                        Id<ResourceClassId> accessedResourceClassId,
                                        Id<DomainId> accessedResourceDomainId,
                                        Set<ResourcePermission> requestedResourcePermissions,
-                                       Resource grantorResource) throws AccessControlException {
+                                       Resource grantorResource) {
       SQLStatement statement = null;
       try {
          // add the new system permissions
@@ -306,7 +303,7 @@ public class GrantGlobalResourcePermissionSysPersister extends Persister {
          }
       }
       catch (SQLException e) {
-         throw new AccessControlException(e);
+         throw new RuntimeException(e);
       }
       finally {
          closeStatement(statement);
@@ -316,7 +313,7 @@ public class GrantGlobalResourcePermissionSysPersister extends Persister {
    public void removeGlobalSysPermissions(SQLConnection connection,
                                           Resource accessorResource,
                                           Id<ResourceClassId> accessedResourceClassId,
-                                          Id<DomainId> accessedResourceDomainId) throws AccessControlException {
+                                          Id<DomainId> accessedResourceDomainId) {
 
       SQLStatement statement = null;
       try {
@@ -328,7 +325,7 @@ public class GrantGlobalResourcePermissionSysPersister extends Persister {
          statement.executeUpdate();
       }
       catch (SQLException e) {
-         throw new AccessControlException(e);
+         throw new RuntimeException(e);
       }
       finally {
          closeStatement(statement);
