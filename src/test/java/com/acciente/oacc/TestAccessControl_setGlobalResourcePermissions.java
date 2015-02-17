@@ -742,13 +742,8 @@ public class TestAccessControl_setGlobalResourcePermissions extends TestAccessCo
                                                            domainName);
          fail("setting permissions with non-existent accessor resource reference should have failed");
       }
-//      catch (IllegalArgumentException e) {
-//         assertThat(e.getMessage().toLowerCase(), containsString("could not find resource"));
-//      }
-      catch (RuntimeException e) {
-         // this is a real ugly check because we don't currently validate the accessor resource and thus expect the
-         // database to complain with some sort of foreign key constraint violation upon adding the domain create permissions
-         assertThat(e.getCause() instanceof SQLException, is(true));
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("not found"));
       }
 
       try {

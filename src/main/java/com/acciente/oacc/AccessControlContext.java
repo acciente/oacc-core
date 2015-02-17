@@ -609,8 +609,9 @@ public interface AccessControlContext {
     *
     * @param accessorResource        the resource to which the privilege should be granted
     * @param domainCreatePermissions the permissions to be granted to the specified domain
-    * @throws java.lang.IllegalArgumentException if domainCreatePermissions does not contain the *CREATE permission
-    * @throws AccessControlException             if accessorResource reference is invalid, or if an error occurs
+    * @throws java.lang.IllegalArgumentException if domainCreatePermissions does not contain the *CREATE permission, or
+    *                                            if accessorResource reference is invalid
+    * @throws AccessControlException             if an error occurs
     */
    public void setDomainCreatePermissions(Resource accessorResource,
                                           Set<DomainCreatePermission> domainCreatePermissions)
@@ -654,8 +655,9 @@ public interface AccessControlContext {
     * @param accessorResource  the resource to which the privilege should be granted
     * @param domainName        a string domain name
     * @param domainPermissions the permissions to be granted on the specified domain
-    * @throws java.lang.IllegalArgumentException if no domain of domainName exists
-    * @throws AccessControlException             if accessorResource reference is invalid, or if an error occurs
+    * @throws java.lang.IllegalArgumentException if accessorResource reference is invalid, or
+    *                                            if no domain of domainName exists
+    * @throws AccessControlException             if an error occurs
     */
    public void setDomainPermissions(Resource accessorResource,
                                     String domainName,
@@ -754,7 +756,8 @@ public interface AccessControlContext {
     * @param resourceClassName         a string resource class name
     * @param resourceCreatePermissions a set of resource create permissions to be granted
     * @param domainName                a string representing a valid domain name
-    * @throws java.lang.IllegalArgumentException if no domain of domainName exists, or
+    * @throws java.lang.IllegalArgumentException if accessorResource reference is invalid, or
+    *                                            if no domain of domainName exists, or
     *                                            if no resource class of resourceClassName exists, or
     *                                            if resourceCreatePermissions does not contain *CREATE permission, or
     *                                            if resourceCreatePermissions contains post-create permissions invalid for
@@ -762,7 +765,7 @@ public interface AccessControlContext {
     *                                            unauthenticatable resource classes), or
     *                                            if resourceCreatePermissions contains multiple instances of the same
     *                                            post-create permission that only differ in the 'withGrant' attribute
-    * @throws AccessControlException             if accessorResource reference is invalid, or if an error occurs
+    * @throws AccessControlException             if an error occurs
     */
    public void setResourceCreatePermissions(Resource accessorResource,
                                             String resourceClassName,
@@ -839,14 +842,15 @@ public interface AccessControlContext {
     * @param accessorResource          the resource to which the privilege should be granted
     * @param resourceClassName         a string resource class name
     * @param resourceCreatePermissions a set of resource create permissions to be granted
-    * @throws java.lang.IllegalArgumentException if no resource class of resourceClassName exists, or
+    * @throws java.lang.IllegalArgumentException if accessorResource reference is invalid, or
+    *                                            if no resource class of resourceClassName exists, or
     *                                            if resourceCreatePermissions does not contain *CREATE permission, or
     *                                            if resourceCreatePermissions contains post-create permissions invalid for
     *                                            the specified resource class (incl. RESET-CREDENTIALS or IMPERSONATE for
     *                                            unauthenticatable resource classes), or
     *                                            if resourceCreatePermissions contains multiple instances of the same
     *                                            post-create permission that only differ in the 'withGrant' attribute
-    * @throws AccessControlException             if accessorResource reference is invalid, or if an error occurs
+    * @throws AccessControlException             if an error occurs
     */
    public void setResourceCreatePermissions(Resource accessorResource,
                                             String resourceClassName,
@@ -1022,7 +1026,8 @@ public interface AccessControlContext {
     * @param resourcePermissions the set of resource permissions to be granted globally to
     *                            the specified resource class and domain
     * @param domainName          a string domain name
-    * @throws java.lang.IllegalArgumentException if no resource class of resourceClassName exists, or
+    * @throws java.lang.IllegalArgumentException if accessorResource reference is invalid, or
+    *                                            if no resource class of resourceClassName exists, or
     *                                            if no domain of domainName exists, or
     *                                            if resourcePermissions contains INHERIT permission, or
     *                                            if resourcePermissions contains permissions invalid for the specified
@@ -1030,8 +1035,7 @@ public interface AccessControlContext {
     *                                            unauthenticatable resource classes), or
     *                                            if resourcePermissions contains multiple instances of the same
     *                                            permission that only differ in the 'withGrant' attribute
-    * @throws AccessControlException             if accessorResource reference is invalid, or
-    *                                            if an error occurs
+    * @throws AccessControlException             if an error occurs
     */
    public void setGlobalResourcePermissions(Resource accessorResource,
                                             String resourceClassName,
@@ -1106,15 +1110,15 @@ public interface AccessControlContext {
     * @param resourceClassName   a string resource class name
     * @param resourcePermissions the set of resource permissions to be granted globally to the
     *                            specified resource class and session resource's domain
-    * @throws java.lang.IllegalArgumentException if no resource class of resourceClassName exists, or
+    * @throws java.lang.IllegalArgumentException if accessorResource reference is invalid, or
+    *                                            if no resource class of resourceClassName exists, or
     *                                            if resourcePermissions contains INHERIT permission, or
     *                                            if resourcePermissions contains permissions invalid for the specified
     *                                            resource class (incl. RESET-CREDENTIALS or IMPERSONATE for
     *                                            unauthenticatable resource classes), or
     *                                            if resourcePermissions contains multiple instances of the same
     *                                            permission that only differ in the 'withGrant' attribute
-    * @throws AccessControlException             if accessorResource reference is invalid, or
-    *                                            if an error occurs
+    * @throws AccessControlException             if an error occurs
     */
    public void setGlobalResourcePermissions(Resource accessorResource,
                                             String resourceClassName,

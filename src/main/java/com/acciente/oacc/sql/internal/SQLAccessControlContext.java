@@ -904,6 +904,8 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       }
 
       if (!newDomainMode) {
+         resourcePersister.verifyResourceExists(connection, accessorResource);
+
          // check if the grantor (=session resource) has permissions to grant the requested permissions
          final Set<DomainPermission>
                grantorPermissions
@@ -1132,6 +1134,8 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
                                                    Resource accessorResource,
                                                    Set<DomainCreatePermission> requestedDomainCreatePermissions) throws AccessControlException {
       __assertSetContainsDomainCreateSystemPermission(requestedDomainCreatePermissions);
+
+      resourcePersister.verifyResourceExists(connection, accessorResource);
 
       // check if grantor (=session resource) is authorized to add/remove requested permissions
       final Set<DomainCreatePermission>
@@ -1362,6 +1366,8 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
                                                      String resourceClassName,
                                                      Set<ResourceCreatePermission> requestedResourceCreatePermissions,
                                                      String domainName) throws AccessControlException {
+      resourcePersister.verifyResourceExists(connection, accessorResource);
+
       // verify that resource class is defined and get its metadata
       final ResourceClassInternalInfo resourceClassInfo
             = resourceClassPersister.getResourceClassInfo(connection, resourceClassName);
@@ -1947,6 +1953,8 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       // if this method is being called to set the post create permissions on a newly created resource
       // we do not perform the security checks below, since it would be incorrect
       if (!newResourceMode) {
+         resourcePersister.verifyResourceExists(connection, accessorResource);
+
          if (!__isSuperUserOfResource(connection, grantorResource, accessedResource)) {
             // next check if the grantor (i.e. session resource) has permissions to grant the requested permissions
             final Set<ResourcePermission>
@@ -2249,6 +2257,8 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
                                              Set<ResourcePermission> requestedResourcePermissions,
                                              String domainName)
          throws AccessControlException {
+      resourcePersister.verifyResourceExists(connection, accessorResource);
+
       // verify that resource class is defined
       final Id<ResourceClassId> resourceClassId = resourceClassPersister.getResourceClassId(connection, resourceClassName);
 

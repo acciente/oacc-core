@@ -45,13 +45,13 @@ public class ResourcePersister extends Persister {
 
          // complain if we do not find the resource
          if (!resultSet.next()) {
-            throw new IllegalArgumentException(resource + " not found!");
+            throw new IllegalArgumentException("Resource " + resource + " not found!");
          }
 
          // complain if we found more than one resource!
          // (assuming the PK constraint is being enforced by the DB, currently do not see how this can happen)
          if (resultSet.next()) {
-            throw new IllegalStateException(resource + " maps to more than one resource!");
+            throw new IllegalStateException("Resource reference " + resource + " maps to more than one resource!");
          }
       }
       catch (SQLException e) {

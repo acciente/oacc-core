@@ -531,13 +531,8 @@ public class TestAccessControl_setDomainPermissions extends TestAccessControlBas
          accessControlContext.setDomainPermissions(Resources.getInstance(-999L), domainName, domainPermissions);
          fail("setting domain permissions with non-existent accessor resource reference should have failed");
       }
-//      catch (IllegalArgumentException e) {
-//         assertThat(e.getMessage().toLowerCase(), containsString("could not find resource"));
-//      }
-      catch (RuntimeException e) {
-         // this is a real ugly check because we don't currently validate the accessor resource and thus expect the
-         // database to complain with some sort of foreign key constraint violation upon adding the domain permissions
-         assertThat(e.getCause() instanceof SQLException, is(true));
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("not found"));
       }
 
       try {

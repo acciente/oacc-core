@@ -892,7 +892,7 @@ public class TestAccessControl_setResourcePermissions extends TestAccessControlB
          fail("setting permissions with non-existent accessor resource reference should have failed");
       }
       catch (IllegalArgumentException e) {
-         assertThat(e.getMessage().toLowerCase(), containsString("could not determine domain for resource"));
+         assertThat(e.getMessage().toLowerCase(), containsString("not found"));
       }
 
       try {
