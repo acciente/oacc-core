@@ -3134,6 +3134,12 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       try {
          connection = __getConnection();
 
+         resourcePersister.verifyResourceExists(connection, accessorResource);
+
+         final ResourceClassInternalInfo resourceClassInternalInfo
+               = resourceClassPersister.getResourceClassInfoByResourceId(connection, accessedResource);
+         __assertPermissionValid(connection, resourceClassInternalInfo.getResourceClassName(), requestedResourcePermission);
+
          if (!__hasPermission(connection, accessorResource, accessedResource, requestedResourcePermission)) {
             // if none of the above then complain...
             if (sessionResource.equals(accessorResource)) {
@@ -3625,7 +3631,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
 
    private void __assertCredentialsNotSpecified(Credentials credentials) {
       if (credentials != null) {
-         throw new IllegalArgumentException("Credentials not supported, but specified");
+         throw new IllegalArgumentException("Credentials not supported, but specified for unauthenticatable resource class");
       }
    }
 

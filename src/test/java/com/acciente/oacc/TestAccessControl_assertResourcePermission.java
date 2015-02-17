@@ -31,11 +31,11 @@ public class TestAccessControl_assertResourcePermission extends TestAccessContro
    public void assertResourcePermission_succeedsAsSystemResource() throws AccessControlException {
       authenticateSystemResource();
 
-      final Resource accessedResource = generateUnauthenticatableResource();
-
       // setup permission without granting it to anything
       final String resourceClassName = generateResourceClass(false, false);
       final String customPermissionName = generateResourceClassPermission(resourceClassName);
+
+      final Resource accessedResource = accessControlContext.createResource(resourceClassName);
 
       // verify setup
       final Set<ResourcePermission> allResourcePermissions
@@ -52,13 +52,14 @@ public class TestAccessControl_assertResourcePermission extends TestAccessContro
    public void assertResourcePermission_noPermissions_shouldFailAsAuthenticated() throws AccessControlException {
       authenticateSystemResource();
 
-      final Resource accessedResource = generateUnauthenticatableResource();
-
       // setup permission without granting it to anything
-      final String resourceClassName = generateResourceClass(false, false);
+      final String resourceClassName = generateResourceClass(true, false);
       final String customPermissionName = generateResourceClassPermission(resourceClassName);
       final char[] password = generateUniquePassword();
       final Resource accessorResource = generateAuthenticatableResource(password);
+
+      final Resource accessedResource
+            = accessControlContext.createResource(resourceClassName, PasswordCredentials.newInstance(generateUniquePassword()));
 
       // verify setup
       final Set<ResourcePermission> allResourcePermissions
@@ -384,22 +385,20 @@ public class TestAccessControl_assertResourcePermission extends TestAccessContro
       try {
          accessControlContext.assertResourcePermission(invalidResource, accessedResource, customPermission);
       }
-      catch (AccessControlException e) {
-         assertThat(e.isNotAuthorizedError(), is(true));
-         assertThat(e.getMessage().toLowerCase(), containsString("does not have requested permission"));
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("not found"));
       }
       try {
          accessControlContext.assertResourcePermission(accessorResource, invalidResource, customPermission);
       }
       catch (IllegalArgumentException e) {
-         assertThat(e.getMessage().toLowerCase(), containsString("could not determine domain for resource"));
+         assertThat(e.getMessage().toLowerCase(), containsString("could not determine resource class for resource"));
       }
       try {
          accessControlContext.assertResourcePermission(accessorResource, accessedResource, invalidPermission);
       }
-      catch (AccessControlException e) {
-         assertThat(e.isNotAuthorizedError(), is(true));
-         assertThat(e.getMessage().toLowerCase(), containsString("does not have requested permission"));
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("is not defined for resource class"));
       }
    }
 }

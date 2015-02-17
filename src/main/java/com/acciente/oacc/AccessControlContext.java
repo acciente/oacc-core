@@ -237,10 +237,10 @@ public interface AccessControlContext {
     * @param accessorResource   the resource requesting the access
     * @param accessedResource   the resource on which access is being requested
     * @param resourcePermission the permission to be checked
-    * @throws java.lang.IllegalArgumentException if accessedResource does not exists
+    * @throws java.lang.IllegalArgumentException if the accessorResource or the accessedResource does not exists, or
+    *                                            if resourcePermission is invalid for the resource class of accessedResource
     * @throws AccessControlException             if the accessor resource <strong>does not</strong> have the
     *                                            specified permission, or
-    *                                            if the accessor resource does not exist, or
     *                                            if an error occurs
     */
    public void assertResourcePermission(Resource accessorResource,
