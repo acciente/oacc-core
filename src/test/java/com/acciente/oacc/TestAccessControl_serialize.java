@@ -32,7 +32,6 @@ import java.io.ObjectOutputStream;
 import java.sql.SQLException;
 
 import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.fail;
 
 public class TestAccessControl_serialize extends TestAccessControlBase {

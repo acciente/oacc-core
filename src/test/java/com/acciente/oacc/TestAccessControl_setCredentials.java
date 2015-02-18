@@ -40,7 +40,7 @@ public class TestAccessControl_setCredentials extends TestAccessControlBase {
                                            PasswordCredentials.newInstance(Constants.OACC_ROOT_PWD));
          fail("authenticating with old credentials should have failed");
       }
-      catch (AccessControlException e) {
+      catch (IncorrectCredentialsException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("invalid password"));
       }
       accessControlContext.authenticate(getSystemResource(), PasswordCredentials.newInstance(newPwd));
@@ -52,7 +52,7 @@ public class TestAccessControl_setCredentials extends TestAccessControlBase {
          accessControlContext.authenticate(getSystemResource(), PasswordCredentials.newInstance(newPwd));
          fail("authenticating with old credentials should have failed");
       }
-      catch (AccessControlException e) {
+      catch (IncorrectCredentialsException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("invalid password"));
       }
       try {
@@ -60,7 +60,7 @@ public class TestAccessControl_setCredentials extends TestAccessControlBase {
                                            PasswordCredentials.newInstance(Constants.OACC_ROOT_PWD));
          fail("authenticating with old credentials should have failed");
       }
-      catch (AccessControlException e) {
+      catch (IncorrectCredentialsException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("invalid password"));
       }
       accessControlContext.authenticate(getSystemResource(), PasswordCredentials.newInstance(intermediatePwd));
@@ -80,7 +80,7 @@ public class TestAccessControl_setCredentials extends TestAccessControlBase {
                                              PasswordCredentials.newInstance(null));
          fail("setting password credentials with null password should have failed");
       }
-      catch (AccessControlException e) {
+      catch (InvalidCredentialsException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("password required, none specified"));
       }
 
@@ -89,7 +89,7 @@ public class TestAccessControl_setCredentials extends TestAccessControlBase {
                                              PasswordCredentials.newInstance("".toCharArray()));
          fail("setting password credentials with empty password should have failed");
       }
-      catch (AccessControlException e) {
+      catch (InvalidCredentialsException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("password cannot be zero length"));
       }
 
@@ -98,7 +98,7 @@ public class TestAccessControl_setCredentials extends TestAccessControlBase {
                                              PasswordCredentials.newInstance("\t ".toCharArray()));
          fail("setting password credentials with blank password should have failed");
       }
-      catch (AccessControlException e) {
+      catch (InvalidCredentialsException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("password cannot be blank"));
       }
    }
@@ -120,7 +120,7 @@ public class TestAccessControl_setCredentials extends TestAccessControlBase {
                                            PasswordCredentials.newInstance(password));
          fail("authenticating with old credentials should have failed");
       }
-      catch (AccessControlException e) {
+      catch (IncorrectCredentialsException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("invalid password"));
       }
       accessControlContext.authenticate(authenticatableResource,
@@ -188,7 +188,7 @@ public class TestAccessControl_setCredentials extends TestAccessControlBase {
                                            PasswordCredentials.newInstance(password));
          fail("authenticating with old credentials should have failed");
       }
-      catch (AccessControlException e) {
+      catch (IncorrectCredentialsException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("invalid password"));
       }
       accessControlContext.authenticate(authenticatableResource,

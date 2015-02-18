@@ -289,7 +289,7 @@ public class TestAccessControl_createResource extends TestAccessControlBase {
          accessControlContext.createResource(resourceClassName, domainName);
          fail("creating resource without credentials for authenticatable resource class should have failed");
       }
-      catch (AccessControlException e) {
+      catch (InvalidCredentialsException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("credentials required"));
       }
 
@@ -297,7 +297,7 @@ public class TestAccessControl_createResource extends TestAccessControlBase {
          accessControlContext.createResource(resourceClassName);
          fail("creating resource without credentials for authenticatable resource class should have failed");
       }
-      catch (AccessControlException e) {
+      catch (InvalidCredentialsException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("credentials required"));
       }
    }

@@ -33,12 +33,12 @@ public class AccessControlContextProxy implements AccessControlContext {
    private AccessControlContext accessControlContext;
 
    @Override
-   public void authenticate(Resource resource, Credentials credentials) throws AccessControlException {
+   public void authenticate(Resource resource, Credentials credentials) {
       accessControlContext.authenticate(resource, credentials);
    }
 
    @Override
-   public void authenticate(Resource resource) throws AccessControlException {
+   public void authenticate(Resource resource) {
       accessControlContext.authenticate(resource);
    }
 

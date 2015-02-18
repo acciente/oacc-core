@@ -19,7 +19,6 @@ package com.acciente.oacc;
 
 import org.junit.Test;
 
-import java.sql.SQLException;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;

@@ -281,7 +281,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
    }
 
    @Override
-   public void authenticate(Resource resource, Credentials credentials) throws AccessControlException {
+   public void authenticate(Resource resource, Credentials credentials) {
       __assertResourceSpecified(resource);
       __assertCredentialsSpecified(credentials);
 
@@ -289,13 +289,13 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
    }
 
    @Override
-   public void authenticate(Resource resource) throws AccessControlException {
+   public void authenticate(Resource resource) {
       __assertResourceSpecified(resource);
 
       __authenticate(resource, null);
    }
 
-   private void __authenticate(Resource resource, Credentials credentials) throws AccessControlException {
+   private void __authenticate(Resource resource, Credentials credentials) {
       // before delegating to the authentication provider we do some basic validation
       SQLConnection connection = null;
 

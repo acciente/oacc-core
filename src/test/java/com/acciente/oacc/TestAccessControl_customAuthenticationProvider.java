@@ -87,7 +87,7 @@ public class TestAccessControl_customAuthenticationProvider extends TestAccessCo
                                                  PasswordCredentials.newInstance(Constants.OACC_ROOT_PWD));
          fail("authenticating as system resource should have failed for custom authentication provider");
       }
-      catch (AccessControlException e) {
+      catch (IllegalArgumentException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("system resource authentication is not supported"));
       }
    }
@@ -133,7 +133,7 @@ public class TestAccessControl_customAuthenticationProvider extends TestAccessCo
                                                    PasswordCredentials.newInstance("tooshort".toCharArray()));
          fail("creating resource with invalid credentials should have failed");
       }
-      catch (AccessControlException e) {
+      catch (InvalidCredentialsException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("does not meet minimum length"));
       }
    }
@@ -167,7 +167,7 @@ public class TestAccessControl_customAuthenticationProvider extends TestAccessCo
                                                    PasswordCredentials.newInstance("tooshort".toCharArray()));
          fail("setting credentials with invalid credentials should have failed");
       }
-      catch (AccessControlException e) {
+      catch (InvalidCredentialsException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("does not meet minimum length"));
       }
    }
@@ -186,21 +186,21 @@ public class TestAccessControl_customAuthenticationProvider extends TestAccessCo
       }
 
       @Override
-      public void authenticate(Resource resource, Credentials credentials) throws AccessControlException {
+      public void authenticate(Resource resource, Credentials credentials) {
          if (SYS_RESOURCE.equals(resource)) {
-            throw new AccessControlException("system resource authentication is not supported");
+            throw new IllegalArgumentException("system resource authentication is not supported");
          }
 
          super.authenticate(resource, credentials);
       }
 
       @Override
-      public void authenticate(Resource resource) throws AccessControlException {
+      public void authenticate(Resource resource) {
          if (guestResource != null && guestResource.equals(resource)) {
             super.authenticate(guestResource, PasswordCredentials.newInstance(GUEST_PASSWORD));
          }
          else if (SYS_RESOURCE.equals(resource)) {
-            throw new AccessControlException("system resource authentication is not supported");
+            throw new IllegalArgumentException("system resource authentication is not supported");
          }
          else {
             super.authenticate(resource);
@@ -208,14 +208,14 @@ public class TestAccessControl_customAuthenticationProvider extends TestAccessCo
       }
 
       @Override
-      public void validateCredentials(String resourceClassName, String domainName, Credentials credentials) throws AccessControlException {
+      public void validateCredentials(String resourceClassName, String domainName, Credentials credentials) {
          // unlike super.validateCredentials(), our custom validator passes if credentials are null
          if (credentials != null) {
             if (credentials instanceof PasswordCredentials
                   && strictResourceClass.equalsIgnoreCase(resourceClassName)
                   && strictDomain.equalsIgnoreCase(domainName)
                   && ((PasswordCredentials) credentials).getPassword().length < strictMinPasswordLength) {
-               throw new AccessControlException("password does not meet minimum length criteria (" + strictMinPasswordLength + ")");
+               throw new InvalidCredentialsException("password does not meet minimum length criteria (" + strictMinPasswordLength + ")");
             }
 
             super.validateCredentials(resourceClassName, domainName, credentials);
@@ -223,12 +223,12 @@ public class TestAccessControl_customAuthenticationProvider extends TestAccessCo
       }
 
       @Override
-      public void setCredentials(Resource resource, Credentials credentials) throws AccessControlException {
+      public void setCredentials(Resource resource, Credentials credentials) {
          if (SYS_RESOURCE.equals(resource)) {
-            throw new AccessControlException("setting credentials of system resource is not supported");
+            throw new IllegalArgumentException("setting credentials of system resource is not supported");
          }
          else if (guestResource != null && guestResource.equals(resource)) {
-            throw new AccessControlException("setting credentials of guest resource is not supported");
+            throw new IllegalArgumentException("setting credentials of guest resource is not supported");
          }
 
          super.setCredentials(resource, credentials);

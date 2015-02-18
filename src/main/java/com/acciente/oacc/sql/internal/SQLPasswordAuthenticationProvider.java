@@ -1,10 +1,12 @@
 package com.acciente.oacc.sql.internal;
 
-import com.acciente.oacc.AccessControlException;
 import com.acciente.oacc.AuthenticationProvider;
 import com.acciente.oacc.Credentials;
+import com.acciente.oacc.IncorrectCredentialsException;
+import com.acciente.oacc.InvalidCredentialsException;
 import com.acciente.oacc.PasswordCredentials;
 import com.acciente.oacc.Resource;
+import com.acciente.oacc.UnsupportedCredentialsException;
 import com.acciente.oacc.sql.SQLDialect;
 import com.acciente.oacc.sql.internal.persister.ResourcePasswordPersister;
 import com.acciente.oacc.sql.internal.persister.SQLConnection;
@@ -68,14 +70,14 @@ public class SQLPasswordAuthenticationProvider implements AuthenticationProvider
    }
 
    @Override
-   public void authenticate(Resource resource, Credentials credentials) throws AccessControlException {
+   public void authenticate(Resource resource, Credentials credentials) {
       assertCredentialSpecified(credentials);
       assertSupportedCredentials(credentials);
 
       final PasswordCredentials passwordCredentials = ((PasswordCredentials) credentials);
 
       if (passwordCredentials.getPassword() == null) {
-         throw new AccessControlException("Password required, none specified");
+         throw new InvalidCredentialsException("Password required, none specified");
       }
 
       SQLConnection connection = null;
@@ -84,21 +86,17 @@ public class SQLPasswordAuthenticationProvider implements AuthenticationProvider
 
          __authenticate(connection, resource, passwordCredentials.getPassword());
       }
-      catch (SQLException e) {
-         throw new AccessControlException(e);
-      }
       finally {
          closeConnection(connection);
       }
    }
 
    @Override
-   public void authenticate(Resource resource) throws AccessControlException {
-      throw new AccessControlException("The built-in password authentication provider does not support authentication without credentials");
+   public void authenticate(Resource resource) {
+      throw new UnsupportedOperationException("The built-in password authentication provider does not support authentication without credentials");
    }
 
-   private void __authenticate(SQLConnection connection, Resource resource, char[] password)
-         throws AccessControlException {
+   private void __authenticate(SQLConnection connection, Resource resource, char[] password) {
       // first locate the resource
       final String encryptedBoundPassword = resourcePasswordPersister.getEncryptedBoundPasswordByResourceId(connection, resource);
 
@@ -107,7 +105,7 @@ public class SQLPasswordAuthenticationProvider implements AuthenticationProvider
          plainBoundPassword = PasswordUtils.computeBoundPassword(resource, password);
 
          if (!passwordEncryptor.checkPassword(plainBoundPassword, encryptedBoundPassword)) {
-            throw new AccessControlException("Invalid password for " + resource, true);
+            throw new IncorrectCredentialsException("Invalid password for resource " + resource);
          }
       }
       finally {
@@ -116,27 +114,33 @@ public class SQLPasswordAuthenticationProvider implements AuthenticationProvider
    }
 
    @Override
-   public void validateCredentials(String resourceClassName, String domainName, Credentials credentials) throws AccessControlException {
-      assertCredentialSpecified(credentials);
+   public void validateCredentials(String resourceClassName, String domainName, Credentials credentials) {
+      if (credentials == null) {
+         // instead of a NullPointerException we explicitly throw the InvalidCredentialsException
+         // to distinguish from a programming error the indication that this implementation
+         // does not support null credentials
+         throw new InvalidCredentialsException("Credentials required, none specified");
+      }
+
       assertSupportedCredentials(credentials);
 
       final char[] password = ((PasswordCredentials) credentials).getPassword();
 
       if (password == null) {
-         throw new AccessControlException("Password required, none specified");
+         throw new InvalidCredentialsException("Password required, none specified");
       }
 
       if (password.length == 0) {
-         throw new AccessControlException("Password cannot be zero length");
+         throw new InvalidCredentialsException("Password cannot be zero length");
       }
 
       if (isBlank(password)) {
-         throw new AccessControlException("Password cannot be blank");
+         throw new InvalidCredentialsException("Password cannot be blank");
       }
    }
 
    @Override
-   public void setCredentials(Resource resource, Credentials credentials) throws AccessControlException {
+   public void setCredentials(Resource resource, Credentials credentials) {
       assertCredentialSpecified(credentials);
       assertSupportedCredentials(credentials);
 
@@ -149,9 +153,6 @@ public class SQLPasswordAuthenticationProvider implements AuthenticationProvider
          __setResourcePassword(connection,
                                resource,
                                passwordCredentials.getPassword());
-      }
-      catch (SQLException e) {
-         throw new AccessControlException(e);
       }
       finally {
          closeConnection(connection);
@@ -172,15 +173,15 @@ public class SQLPasswordAuthenticationProvider implements AuthenticationProvider
       }
    }
 
-   private void assertCredentialSpecified(Credentials credentials) throws AccessControlException {
+   private void assertCredentialSpecified(Credentials credentials) {
       if (credentials == null) {
-         throw new AccessControlException("Credentials required, none specified");
+         throw new NullPointerException("Credentials required, none specified");
       }
    }
 
-   private void assertSupportedCredentials(Credentials credentials) throws AccessControlException {
+   private void assertSupportedCredentials(Credentials credentials) {
       if (!(credentials instanceof PasswordCredentials)) {
-         throw new AccessControlException("Unsupported credentials implementation: " + credentials.getClass());
+         throw new UnsupportedCredentialsException(credentials.getClass());
       }
    }
 
@@ -195,19 +196,24 @@ public class SQLPasswordAuthenticationProvider implements AuthenticationProvider
 
    // private connection management helper methods
 
-   private SQLConnection getConnection() throws SQLException, AccessControlException {
+   private SQLConnection getConnection() {
       if (dataSource != null) {
-         return new SQLConnection(dataSource.getConnection());
+         try {
+            return new SQLConnection(dataSource.getConnection());
+         }
+         catch (SQLException e) {
+            throw new RuntimeException(e);
+         }
       }
       else if (connection != null) {
          return new SQLConnection(connection);
       }
       else {
-         throw new AccessControlException("Not initialized! No data source or connection, perhaps missing call to postDeserialize()?");
+         throw new IllegalStateException("Not initialized! No data source or connection, perhaps missing call to postDeserialize()?");
       }
    }
 
-   private void closeConnection(SQLConnection connection) throws AccessControlException {
+   private void closeConnection(SQLConnection connection) {
       // only close the connection if we got it from a pool, otherwise just leave the connection open
       if (dataSource != null) {
          if (connection != null) {
@@ -215,7 +221,7 @@ public class SQLPasswordAuthenticationProvider implements AuthenticationProvider
                connection.close();
             }
             catch (SQLException e) {
-               throw new AccessControlException(e);
+               throw new RuntimeException(e);
             }
          }
       }

@@ -223,7 +223,7 @@ public class TestAccessControl_createAuthenticatableResource extends TestAccessC
                                            PasswordCredentials.newInstance(password_whitespaced));
          fail("authentication of resource with extra leading/trailing password should not have succeeded");
       }
-      catch (AccessControlException e) {
+      catch (IncorrectCredentialsException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("invalid password"));
       }
       try {
@@ -231,7 +231,7 @@ public class TestAccessControl_createAuthenticatableResource extends TestAccessC
                                            PasswordCredentials.newInstance(password_whitespaced));
          fail("authentication of resource with extra leading/trailing password should not have succeeded");
       }
-      catch (AccessControlException e) {
+      catch (IncorrectCredentialsException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("invalid password"));
       }
 
@@ -321,14 +321,14 @@ public class TestAccessControl_createAuthenticatableResource extends TestAccessC
             accessControlContext.authenticate(resource_lowlow, PasswordCredentials.newInstance(password_UPPER));
             fail("authentication of system resource with case-insensitive password should not have succeeded");
          }
-         catch (AccessControlException e) {
+         catch (IncorrectCredentialsException e) {
             assertThat(e.getMessage().toLowerCase(), containsString("invalid password"));
          }
          try {
             accessControlContext.authenticate(resource_UPUP, PasswordCredentials.newInstance(password_lower));
             fail("authentication of system resource with case-insensitive password should not have succeeded");
          }
-         catch (AccessControlException e) {
+         catch (IncorrectCredentialsException e) {
             assertThat(e.getMessage().toLowerCase(), containsString("invalid password"));
          }
       }
@@ -394,14 +394,14 @@ public class TestAccessControl_createAuthenticatableResource extends TestAccessC
             accessControlContext.authenticate(resource_lowlow, PasswordCredentials.newInstance(password_UPPER));
             fail("authentication of system resource with case-insensitive password should not have succeeded");
          }
-         catch (AccessControlException e) {
+         catch (IncorrectCredentialsException e) {
             assertThat(e.getMessage().toLowerCase(), containsString("invalid password"));
          }
          try {
             accessControlContext.authenticate(resource_UPUP, PasswordCredentials.newInstance(password_lower));
             fail("authentication of system resource with case-insensitive password should not have succeeded");
          }
-         catch (AccessControlException e) {
+         catch (IncorrectCredentialsException e) {
             assertThat(e.getMessage().toLowerCase(), containsString("invalid password"));
          }
       }
@@ -462,7 +462,7 @@ public class TestAccessControl_createAuthenticatableResource extends TestAccessC
          accessControlContext.createResource(resourceClassName, PasswordCredentials.newInstance(null));
          fail("creating authenticatable resource with null password should have failed");
       }
-      catch (AccessControlException e) {
+      catch (InvalidCredentialsException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("password required, none specified"));
       }
 
@@ -494,7 +494,7 @@ public class TestAccessControl_createAuthenticatableResource extends TestAccessC
          accessControlContext.createResource(resourceClassName, domainName, PasswordCredentials.newInstance(null));
          fail("creating authenticatable resource with null password should have failed");
       }
-      catch (AccessControlException e) {
+      catch (InvalidCredentialsException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("password required, none specified"));
       }
    }
@@ -521,7 +521,7 @@ public class TestAccessControl_createAuthenticatableResource extends TestAccessC
                                              PasswordCredentials.newInstance(null));
          fail("creating authenticatable resource with null password should have failed");
       }
-      catch (AccessControlException e) {
+      catch (InvalidCredentialsException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("password required, none specified"));
       }
    }
@@ -554,14 +554,14 @@ public class TestAccessControl_createAuthenticatableResource extends TestAccessC
          accessControlContext.createResource(resourceClassName, PasswordCredentials.newInstance("".toCharArray()));
          fail("creating authenticatable resource with empty password should have failed");
       }
-      catch (AccessControlException e) {
+      catch (InvalidCredentialsException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("password cannot be zero length"));
       }
       try {
          accessControlContext.createResource(resourceClassName, PasswordCredentials.newInstance(" \t".toCharArray()));
          fail("creating authenticatable resource with empty password should have failed");
       }
-      catch (AccessControlException e) {
+      catch (InvalidCredentialsException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("password cannot be blank"));
       }
 
@@ -601,7 +601,7 @@ public class TestAccessControl_createAuthenticatableResource extends TestAccessC
                                              PasswordCredentials.newInstance("".toCharArray()));
          fail("creating authenticatable resource with empty password should have failed");
       }
-      catch (AccessControlException e) {
+      catch (InvalidCredentialsException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("password cannot be zero length"));
       }
       try {
@@ -610,7 +610,7 @@ public class TestAccessControl_createAuthenticatableResource extends TestAccessC
                                              PasswordCredentials.newInstance(" \t".toCharArray()));
          fail("creating authenticatable resource with empty password should have failed");
       }
-      catch (AccessControlException e) {
+      catch (InvalidCredentialsException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("password cannot be blank"));
       }
    }

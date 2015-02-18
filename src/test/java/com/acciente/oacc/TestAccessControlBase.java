@@ -116,12 +116,12 @@ public class TestAccessControlBase {
       return permissionName;
    }
 
-   protected static void authenticateSystemAccessControlContext() throws AccessControlException {
+   protected static void authenticateSystemAccessControlContext() {
       systemAccessControlContext.authenticate(SYS_RESOURCE,
                                               PasswordCredentials.newInstance(Constants.OACC_ROOT_PWD));
    }
 
-   protected void authenticateSystemResource() throws AccessControlException {
+   protected void authenticateSystemResource() {
       accessControlContext.authenticate(SYS_RESOURCE,
                                         PasswordCredentials.newInstance(Constants.OACC_ROOT_PWD));
    }

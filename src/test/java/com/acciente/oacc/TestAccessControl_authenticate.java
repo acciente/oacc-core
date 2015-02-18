@@ -73,7 +73,7 @@ public class TestAccessControl_authenticate extends TestAccessControlBase {
                                            PasswordCredentials.newInstance("invalid".toCharArray()));
          fail("authentication of system resource with invalid password should not have succeeded");
       }
-      catch (AccessControlException e) {
+      catch (IncorrectCredentialsException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("invalid password"));
       }
 
@@ -81,7 +81,7 @@ public class TestAccessControl_authenticate extends TestAccessControlBase {
          accessControlContext.authenticate(SYS_RESOURCE, PasswordCredentials.newInstance("".toCharArray()));
          fail("authentication of system resource with invalid empty password should not have succeeded");
       }
-      catch (AccessControlException e) {
+      catch (IncorrectCredentialsException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("invalid password"));
       }
 
@@ -89,7 +89,7 @@ public class TestAccessControl_authenticate extends TestAccessControlBase {
          accessControlContext.authenticate(SYS_RESOURCE, PasswordCredentials.newInstance(" \t".toCharArray()));
          fail("authentication of system resource with invalid blank password should not have succeeded");
       }
-      catch (AccessControlException e) {
+      catch (IncorrectCredentialsException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("invalid password"));
       }
    }
@@ -113,7 +113,7 @@ public class TestAccessControl_authenticate extends TestAccessControlBase {
                                            PasswordCredentials.newInstance(oaccRootPwd_whitespaced.toCharArray()));
          fail("authentication of sys resource with whitespaced password should not have succeeded");
       }
-      catch (AccessControlException e) {
+      catch (IncorrectCredentialsException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("invalid password"));
       }
       try {
@@ -121,7 +121,7 @@ public class TestAccessControl_authenticate extends TestAccessControlBase {
                                            PasswordCredentials.newInstance(oaccRootPwd_mixedCase.toCharArray()));
          fail("authentication of sys resource with different cased password should not have succeeded");
       }
-      catch (AccessControlException e) {
+      catch (IncorrectCredentialsException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("invalid password"));
       }
    }
@@ -146,7 +146,7 @@ public class TestAccessControl_authenticate extends TestAccessControlBase {
          accessControlContext.authenticate(getSystemResource(), PasswordCredentials.newInstance(null));
          fail("authentication of system resource with null password should not have succeeded");
       }
-      catch (AccessControlException e) {
+      catch (InvalidCredentialsException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("password required, none specified"));
       }
    }

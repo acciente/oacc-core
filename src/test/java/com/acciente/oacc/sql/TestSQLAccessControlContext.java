@@ -19,15 +19,16 @@ package com.acciente.oacc.sql;
 
 import com.acciente.oacc.AccessControlContext;
 import com.acciente.oacc.AccessControlException;
-import com.acciente.oacc.DomainCreatePermissions;
-import com.acciente.oacc.DomainPermissions;
-import com.acciente.oacc.PasswordCredentials;
-import com.acciente.oacc.ResourceCreatePermission;
 import com.acciente.oacc.DomainCreatePermission;
+import com.acciente.oacc.DomainCreatePermissions;
 import com.acciente.oacc.DomainPermission;
+import com.acciente.oacc.DomainPermissions;
+import com.acciente.oacc.OaccException;
+import com.acciente.oacc.PasswordCredentials;
+import com.acciente.oacc.Resource;
+import com.acciente.oacc.ResourceCreatePermission;
 import com.acciente.oacc.ResourceCreatePermissions;
 import com.acciente.oacc.ResourcePermission;
-import com.acciente.oacc.Resource;
 import com.acciente.oacc.ResourcePermissions;
 import com.acciente.oacc.Resources;
 import com.acciente.oacc.helper.SQLAccessControlSystemResetUtil;
@@ -100,7 +101,7 @@ public class TestSQLAccessControlContext extends TestSQLAccessControlContextBase
          accessControlContext.authenticate(sysAuthResource, PasswordCredentials.newInstance(oaccRootPwd));
          setupOK();
       }
-      catch (AccessControlException e) {
+      catch (OaccException e) {
          setupFail(e);
       }
    }
@@ -117,7 +118,7 @@ public class TestSQLAccessControlContext extends TestSQLAccessControlContextBase
          accessControlContext.authenticate(sysAuthResource, PasswordCredentials.newInstance(PASSWORD));
          testFail();
       }
-      catch (AccessControlException e) {
+      catch (OaccException e) {
          if (e.getMessage().toLowerCase().contains("invalid password")) {
             testOK();
          }
@@ -132,7 +133,7 @@ public class TestSQLAccessControlContext extends TestSQLAccessControlContextBase
 
          testOK();
       }
-      catch (AccessControlException e) {
+      catch (Exception e) {
          testFail(e);
       }
    }
@@ -401,7 +402,7 @@ public class TestSQLAccessControlContext extends TestSQLAccessControlContextBase
          accessControlContext.authenticate(acmeRootUser, PasswordCredentials.newInstance(PASSWORD));
          setupOK();
       }
-      catch (AccessControlException e) {
+      catch (OaccException e) {
          setupFail(e);
       }
 
@@ -508,7 +509,7 @@ public class TestSQLAccessControlContext extends TestSQLAccessControlContextBase
          accessControlContext.authenticate(acmeRootUser, PasswordCredentials.newInstance(PASSWORD));
          setupOK();
       }
-      catch (AccessControlException e) {
+      catch (OaccException e) {
          setupFail(e);
       }
 
@@ -581,7 +582,7 @@ public class TestSQLAccessControlContext extends TestSQLAccessControlContextBase
          accessControlContext.authenticate(acmeRootUser, PasswordCredentials.newInstance(PASSWORD));
          setupOK();
       }
-      catch (AccessControlException e) {
+      catch (OaccException e) {
          setupFail(e);
       }
 
@@ -671,7 +672,7 @@ public class TestSQLAccessControlContext extends TestSQLAccessControlContextBase
          accessControlContext.authenticate(acmeRootUser, PasswordCredentials.newInstance(PASSWORD));
          setupOK();
       }
-      catch (AccessControlException e) {
+      catch (OaccException e) {
          setupFail(e);
       }
 
@@ -949,7 +950,7 @@ public class TestSQLAccessControlContext extends TestSQLAccessControlContextBase
          accessControlContext.authenticate(newUser_1, PasswordCredentials.newInstance(PASSWORD));
          setupOK();
       }
-      catch (AccessControlException e) {
+      catch (OaccException e) {
          setupFail(e);
       }
 
@@ -985,7 +986,7 @@ public class TestSQLAccessControlContext extends TestSQLAccessControlContextBase
          accessControlContext.authenticate(newUser_2, PasswordCredentials.newInstance(PASSWORD2));
          setupOK();
       }
-      catch (AccessControlException e) {
+      catch (OaccException e) {
          setupFail(e);
       }
 
@@ -1021,7 +1022,7 @@ public class TestSQLAccessControlContext extends TestSQLAccessControlContextBase
          accessControlContext.authenticate(newUser_2, PasswordCredentials.newInstance(PASSWORD2));
          setupOK();
       }
-      catch (AccessControlException e) {
+      catch (OaccException e) {
          setupFail(e);
       }
 

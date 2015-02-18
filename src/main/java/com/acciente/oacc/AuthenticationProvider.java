@@ -30,21 +30,20 @@ public interface AuthenticationProvider {
     *
     * @param resource the resource to be authenticated
     * @param credentials the credentials to authenticate the resource
-    * @throws AccessControlException if authentication failed or an error occurs
+    * @throws com.acciente.oacc.IncorrectCredentialsException if authentication failed due to incorrect credentials
     */
-   void authenticate(Resource resource, Credentials credentials) throws AccessControlException;
+   void authenticate(Resource resource, Credentials credentials);
 
    /**
     * Verifies that the specified resource is authenticated.
     * <p/>
-    * The authentication provider implementation should throw an AccessControlException if the
+    * The authentication provider implementation should throw a NotAuthenticatedException if the
     * specified resource is currently NOT authenticated, or should throw an UnsupportedOperationException
     * if it does not support reporting of the authentication status without credentials.
     *
     * @param resource the resource to be authenticated
-    * @throws AccessControlException if the resource is not authenticated or if an error occurs
     */
-   void authenticate(Resource resource) throws AccessControlException;
+   void authenticate(Resource resource);
 
    /**
     * Checks if the the authentication credentials are valid for the specified resource class and domain.
@@ -54,16 +53,15 @@ public interface AuthenticationProvider {
     * @param resourceClassName the resource class for which to validate the specified credentials
     * @param domainName the domain for which to validate the specified credentials
     * @param credentials the authentication credentials to validate
-    * @throws AccessControlException if the credentials are invalid.
+    * @throws com.acciente.oacc.InvalidCredentialsException if the credentials are invalid
     */
-   void validateCredentials(String resourceClassName, String domainName, Credentials credentials) throws AccessControlException;
+   void validateCredentials(String resourceClassName, String domainName, Credentials credentials);
 
    /**
     * Sets (or resets) the authentication credentials of the specified resource.
     *
     * @param resource the resource for which the credentials should be set
     * @param credentials the new authentication credentials for the resource
-    * @throws AccessControlException if an error occurs.
     */
-   void setCredentials(Resource resource, Credentials credentials) throws AccessControlException;
+   void setCredentials(Resource resource, Credentials credentials);
 }

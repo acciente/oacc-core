@@ -63,11 +63,10 @@ public interface AccessControlContext {
     *
     * @param resource the resource to be authenticated
     * @param credentials the credentials to authenticate the resource
-    * @throws java.lang.IllegalArgumentException if the resource does not exist or is not of an authenticatable resource class
-    * @throws AccessControlException             if authentication fails, or if an error occurs
+    * @throws java.lang.IllegalArgumentException        if the resource does not exist or is not of an authenticatable resource class
+    * @throws com.acciente.oacc.AuthenticationException if authentication fails
     */
-   public void authenticate(Resource resource, Credentials credentials)
-         throws AccessControlException;
+   public void authenticate(Resource resource, Credentials credentials);
 
    /**
     * Authenticates this security session against an {@link AuthenticationProvider} without
@@ -79,10 +78,8 @@ public interface AccessControlContext {
     *
     * @param resource the resource to be authenticated
     * @throws java.lang.IllegalArgumentException if the resource does not exist or is not of an authenticatable resource class
-    * @throws AccessControlException             if authentication fails, or if an error occurs
     */
-   public void authenticate(Resource resource)
-         throws AccessControlException;
+   public void authenticate(Resource resource);
 
    /**
     * Logs out of this session, to be specific, disassociates any security credentials from this session.
@@ -142,10 +139,11 @@ public interface AccessControlContext {
     *                    to the domain containing the resource whose credentials are to be changed or must have RESET-CREDENTIALS
     *                    permissions to the resource whose credentials are to be changed, otherwise an exception is thrown.
     * @param newCredentials the new credentials for the resource
-    * @throws java.lang.IllegalArgumentException if the resource does not exist, or
-    *                                            if the resource is not of an authenticatable resource class
-    * @throws java.lang.IllegalStateException    if called while impersonating another resource
-    * @throws AccessControlException             if an error occurs
+    * @throws java.lang.IllegalArgumentException            if the resource does not exist, or
+    *                                                       if the resource is not of an authenticatable resource class
+    * @throws java.lang.IllegalStateException               if called while impersonating another resource
+    * @throws com.acciente.oacc.InvalidCredentialsException if newCredentials is invalid
+    * @throws AccessControlException                        if an error occurs
     */
    public void setCredentials(Resource resource, Credentials newCredentials)
          throws AccessControlException;

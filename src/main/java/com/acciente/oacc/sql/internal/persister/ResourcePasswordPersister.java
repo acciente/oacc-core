@@ -93,7 +93,6 @@ public class ResourcePasswordPersister extends Persister {
          finderStatement.setResourceId(1, resourceId);
          resultSet = finderStatement.executeQuery();
 
-         // complain if we do not find the resource
          if (!resultSet.next()) {
             // insert new row
             insertStatement = connection.prepareStatement(sqlPasswordStrings.SQL_createInResourcePassword_WITH_ResourceID_ResourceClassID_DomainID_Password);
