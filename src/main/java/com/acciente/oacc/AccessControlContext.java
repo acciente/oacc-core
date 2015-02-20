@@ -40,7 +40,8 @@ import java.util.Set;
  * This is the same as the authenticated resource, unless another resource is being {@link #impersonate impersonated}.
  * </dl>
  * Unless a session is authenticated, all attempts to call any methods other than <code>authenticate</code>,
- * <code>unauthenticate</code> or <code>unimpersonate</code> will fail.
+ * <code>unauthenticate</code>, <code>unimpersonate</code> or a special case of <code>createResource</code>, will fail
+ * with a {@link com.acciente.oacc.NotAuthenticatedException}.
  * <p/>
  * In general, all methods should throw the following unchecked exceptions as described below:
  * <dl>
