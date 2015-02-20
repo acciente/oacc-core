@@ -26,7 +26,7 @@ import static org.junit.Assert.fail;
 
 public class TestAccessControl_getDomainDescendants extends TestAccessControlBase {
    @Test
-   public void getDomainDescendents_validAsSystemResource() throws AccessControlException {
+   public void getDomainDescendents_validAsSystemResource() {
       authenticateSystemResource();
 
       final String sysDomainName = accessControlContext.getDomainNameByResource(SYS_RESOURCE);
@@ -35,7 +35,7 @@ public class TestAccessControl_getDomainDescendants extends TestAccessControlBas
    }
 
    @Test
-   public void getDomainDescendents_validAsAuthenticatedResource() throws AccessControlException {
+   public void getDomainDescendents_validAsAuthenticatedResource() {
       authenticateSystemResource();
 
       final char[] password = generateUniquePassword();
@@ -53,7 +53,7 @@ public class TestAccessControl_getDomainDescendants extends TestAccessControlBas
    }
 
    @Test
-   public void getDomainDescendents_hierarchy_succeedsAsAuthenticatedResource() throws AccessControlException {
+   public void getDomainDescendents_hierarchy_succeedsAsAuthenticatedResource() {
       authenticateSystemResource();
 
       final char[] password = generateUniquePassword();
@@ -90,7 +90,7 @@ public class TestAccessControl_getDomainDescendants extends TestAccessControlBas
    }
 
    @Test
-   public void getDomainDescendents_whitespaceConsistent() throws AccessControlException {
+   public void getDomainDescendents_whitespaceConsistent() {
       authenticateSystemResource();
 
       final String sysDomainName = accessControlContext.getDomainNameByResource(SYS_RESOURCE);
@@ -100,7 +100,7 @@ public class TestAccessControl_getDomainDescendants extends TestAccessControlBas
    }
 
    @Test
-   public void getDomainDescendents_nonExistingDomain() throws AccessControlException {
+   public void getDomainDescendents_nonExistingDomain() {
       authenticateSystemResource();
 
       // because we don't have a getter for *all* domains, I'm using unique domain name for each test run
@@ -108,7 +108,7 @@ public class TestAccessControl_getDomainDescendants extends TestAccessControlBas
    }
 
    @Test
-   public void getDomainDescendents_nulls() throws AccessControlException {
+   public void getDomainDescendents_nulls() {
       authenticateSystemResource();
 
       try {

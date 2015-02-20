@@ -35,7 +35,7 @@ public class TestResourcePermission {
    }
 
    @Test
-   public void constructSystemPermission_valid() throws AccessControlException {
+   public void constructSystemPermission_valid() {
       for(String systemPermissionName : ResourcePermissions.getSysPermissionNames()) {
          ResourcePermissions.getInstance(systemPermissionName);
       }
@@ -50,21 +50,21 @@ public class TestResourcePermission {
    }
 
    @Test
-   public void constructCustomPermission_valid() throws AccessControlException {
+   public void constructCustomPermission_valid() {
       final String permissionName = "this_is_a_valid_permission_name";
       final ResourcePermission resourcePermission = ResourcePermissions.getInstance(permissionName);
       assertThat(resourcePermission.getPermissionName(), is(permissionName));
    }
 
    @Test
-   public void constructCustomPermission_withGrant_valid() throws AccessControlException {
+   public void constructCustomPermission_withGrant_valid() {
       final String permissionName = "this_is_also_a_valid_permission_name";
       final ResourcePermission resourcePermission = ResourcePermissions.getInstance(permissionName, true);
       assertThat(resourcePermission.getPermissionName(), is(permissionName));
    }
 
    @Test
-   public void constructSystemPermission_whitespaceConsistent() throws AccessControlException {
+   public void constructSystemPermission_whitespaceConsistent() {
       for(String systemPermissionName : ResourcePermissions.getSysPermissionNames()) {
          final ResourcePermission resourcePermission = ResourcePermissions.getInstance(" " + systemPermissionName + "\t");
          assertThat(resourcePermission.getPermissionName(), is(systemPermissionName));
@@ -78,7 +78,7 @@ public class TestResourcePermission {
    }
 
    @Test
-   public void constructCustomPermission_whitespaceConsistent() throws AccessControlException {
+   public void constructCustomPermission_whitespaceConsistent() {
       final String permissionName = "this_is_a_valid_permission_name";
 
       final ResourcePermission resourcePermission = ResourcePermissions.getInstance(" " + permissionName + "\t");
@@ -91,7 +91,7 @@ public class TestResourcePermission {
    }
 
    @Test
-   public void constructSystemPermission_caseSensitiveConsistent() throws AccessControlException {
+   public void constructSystemPermission_caseSensitiveConsistent() {
       for(String systemPermissionName : ResourcePermissions.getSysPermissionNames()) {
          String mixedCasePermissionName
                = systemPermissionName.substring(0, systemPermissionName.length()/2).toLowerCase()
@@ -115,7 +115,7 @@ public class TestResourcePermission {
    }
 
    @Test
-   public void constructPermission_nulls_shouldFail() throws AccessControlException {
+   public void constructPermission_nulls_shouldFail() {
       try {
          ResourcePermissions.getInstance(null);
          fail("creation of resource permission with null name should have failed");
@@ -134,7 +134,7 @@ public class TestResourcePermission {
    }
 
    @Test
-   public void constructPermission_emptyNames_shouldFail() throws AccessControlException {
+   public void constructPermission_emptyNames_shouldFail() {
       try {
          ResourcePermissions.getInstance("");
          fail("creation of resource permission with empty name should have failed");
@@ -167,7 +167,7 @@ public class TestResourcePermission {
    }
 
    @Test
-   public void constructSystemPermission_invalidSystemPermissionName_shouldFail() throws AccessControlException {
+   public void constructSystemPermission_invalidSystemPermissionName_shouldFail() {
       try {
          ResourcePermissions.getInstance("*this_is_an_invalid_system_permission_name_that_starts_with_asterisk");
          fail("creating system resource permission with invalid system permission name should fail");

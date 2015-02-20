@@ -28,7 +28,7 @@ import static org.junit.Assert.fail;
 
 public class TestAccessControl_assertGlobalResourcePermission extends TestAccessControlBase {
    @Test
-   public void assertGlobalResourcePermission_succeedsAsSystemResource() throws AccessControlException {
+   public void assertGlobalResourcePermission_succeedsAsSystemResource() {
       authenticateSystemResource();
       // setup permission without granting it to anything
       final String resourceClassName = generateResourceClass(false, false);
@@ -55,7 +55,7 @@ public class TestAccessControl_assertGlobalResourcePermission extends TestAccess
    }
 
    @Test
-   public void assertGlobalResourcePermission_noPermissions_shouldFailAsAuthenticated() throws AccessControlException {
+   public void assertGlobalResourcePermission_noPermissions_shouldFailAsAuthenticated() {
       authenticateSystemResource();
 
       // setup permission without granting it to anything
@@ -79,9 +79,8 @@ public class TestAccessControl_assertGlobalResourcePermission extends TestAccess
                                                              ResourcePermissions.getInstance(customPermissionName));
          fail("asserting global resource permission when none has been granted should not have succeeded for authenticated resource");
       }
-      catch (AccessControlException e) {
-         assertThat(e.isNotAuthorizedError(), is(true));
-         assertThat(e.getMessage().toLowerCase(), containsString("no global permission"));
+      catch (NotAuthorizedException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("global permission"));
       }
 
       final String domainName = generateDomain();
@@ -95,14 +94,13 @@ public class TestAccessControl_assertGlobalResourcePermission extends TestAccess
                                                              domainName);
          fail("asserting global resource permission for domain when none has been granted should not have succeeded for authenticated resource");
       }
-      catch (AccessControlException e) {
-         assertThat(e.isNotAuthorizedError(), is(true));
-         assertThat(e.getMessage().toLowerCase(), containsString("no global permission"));
+      catch (NotAuthorizedException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("global permission"));
       }
    }
 
    @Test
-   public void assertGlobalResourcePermission_direct_succeedsAsAuthenticatedResource() throws AccessControlException {
+   public void assertGlobalResourcePermission_direct_succeedsAsAuthenticatedResource() {
       authenticateSystemResource();
 
       final char[] password = generateUniquePassword();
@@ -150,7 +148,7 @@ public class TestAccessControl_assertGlobalResourcePermission extends TestAccess
    }
 
    @Test
-   public void assertGlobalResourcePermission_directWithDifferentGrantingRights_succeedsAsAuthenticatedResource() throws AccessControlException {
+   public void assertGlobalResourcePermission_directWithDifferentGrantingRights_succeedsAsAuthenticatedResource() {
       authenticateSystemResource();
 
       final char[] password = generateUniquePassword();
@@ -213,13 +211,13 @@ public class TestAccessControl_assertGlobalResourcePermission extends TestAccess
                                                              otherDomainName);
          fail("asserting global resource permission without grant for a direct global permission (for a domain) with grant should have succeeded for authenticated resource");
       }
-      catch (AccessControlException e) {
-         assertThat(e.getMessage().toLowerCase(), containsString("no global permission"));
+      catch (NotAuthorizedException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("global permission"));
       }
    }
 
    @Test
-   public void assertGlobalResourcePermission_resourceInherited_succeedsAsAuthenticatedResource() throws AccessControlException {
+   public void assertGlobalResourcePermission_resourceInherited_succeedsAsAuthenticatedResource() {
       authenticateSystemResource();
 
       final char[] password = generateUniquePassword();
@@ -273,7 +271,7 @@ public class TestAccessControl_assertGlobalResourcePermission extends TestAccess
    }
 
    @Test
-   public void assertGlobalResourcePermission_domainInherited_succeedsAsAuthenticatedResource() throws AccessControlException {
+   public void assertGlobalResourcePermission_domainInherited_succeedsAsAuthenticatedResource() {
       authenticateSystemResource();
       final String parentDomainName = generateDomain();
       final String intermediaryDomainName = generateUniqueDomainName();
@@ -358,7 +356,7 @@ public class TestAccessControl_assertGlobalResourcePermission extends TestAccess
    }
 
    @Test
-   public void assertGlobalResourcePermission_domainInheritedInherited_succeedsAsAuthenticatedResource() throws AccessControlException {
+   public void assertGlobalResourcePermission_domainInheritedInherited_succeedsAsAuthenticatedResource() {
       authenticateSystemResource();
       final String parentDomainName = generateDomain();
       final String donorDomainName = generateUniqueDomainName();
@@ -413,7 +411,7 @@ public class TestAccessControl_assertGlobalResourcePermission extends TestAccess
    }
 
    @Test
-   public void assertGlobalResourcePermission_superUser_succeedsAsAuthenticatedResource() throws AccessControlException {
+   public void assertGlobalResourcePermission_superUser_succeedsAsAuthenticatedResource() {
       authenticateSystemResource();
       final String parentDomainName = generateDomain();
       final String intermediaryDomainName = generateUniqueDomainName();
@@ -487,7 +485,7 @@ public class TestAccessControl_assertGlobalResourcePermission extends TestAccess
    }
 
    @Test
-   public void assertGlobalResourcePermission_superUserInherited_succeedsAsAuthenticatedResource() throws AccessControlException {
+   public void assertGlobalResourcePermission_superUserInherited_succeedsAsAuthenticatedResource() {
       authenticateSystemResource();
       final String parentDomainName = generateDomain();
       final String intermediaryDomainName = generateUniqueDomainName();
@@ -566,7 +564,7 @@ public class TestAccessControl_assertGlobalResourcePermission extends TestAccess
    }
 
    @Test
-   public void assertGlobalResourcePermission_whitespaceConsistent() throws AccessControlException {
+   public void assertGlobalResourcePermission_whitespaceConsistent() {
       authenticateSystemResource();
       // setup permission without granting it to anything
       final String resourceClassName = generateResourceClass(false, false);
@@ -590,7 +588,7 @@ public class TestAccessControl_assertGlobalResourcePermission extends TestAccess
    }
 
    @Test
-   public void assertGlobalResourcePermission_whitespaceConsistent_asAuthenticatedResource() throws AccessControlException {
+   public void assertGlobalResourcePermission_whitespaceConsistent_asAuthenticatedResource() {
       authenticateSystemResource();
 
       final String resourceClassName = generateResourceClass(false, false);
@@ -632,7 +630,7 @@ public class TestAccessControl_assertGlobalResourcePermission extends TestAccess
    }
 
    @Test
-   public void assertGlobalResourcePermission_nulls_shouldFail() throws AccessControlException {
+   public void assertGlobalResourcePermission_nulls_shouldFail() {
       authenticateSystemResource();
 
       final String resourceClassName = generateResourceClass(false, false);
@@ -710,7 +708,7 @@ public class TestAccessControl_assertGlobalResourcePermission extends TestAccess
    }
 
    @Test
-   public void assertGlobalResourcePermission_nonExistentReferences_shouldFail() throws AccessControlException {
+   public void assertGlobalResourcePermission_nonExistentReferences_shouldFail() {
       authenticateSystemResource();
 
       final String resourceClassName = generateResourceClass(false, false);
@@ -722,9 +720,8 @@ public class TestAccessControl_assertGlobalResourcePermission extends TestAccess
                                                              ResourcePermissions.getInstance(customPermissionName));
          fail("asserting global resource permission for invalid accessor resource reference should have failed for system resource");
       }
-      catch (AccessControlException e) {
-         assertThat(e.isNotAuthorizedError(), is(true));
-         assertThat(e.getMessage().toLowerCase(), containsString("no global permission"));
+      catch (NotAuthorizedException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("global permission"));
       }
       try {
          accessControlContext.assertGlobalResourcePermission(SYS_RESOURCE,
@@ -753,9 +750,8 @@ public class TestAccessControl_assertGlobalResourcePermission extends TestAccess
                                                              domainName);
          fail("asserting global resource permission (by domain) for invalid resource reference should have failed for system resource");
       }
-      catch (AccessControlException e) {
-         assertThat(e.isNotAuthorizedError(), is(true));
-         assertThat(e.getMessage().toLowerCase(), containsString("no global permission"));
+      catch (NotAuthorizedException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("global permission"));
       }
       try {
          accessControlContext.assertGlobalResourcePermission(SYS_RESOURCE,

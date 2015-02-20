@@ -29,7 +29,7 @@ import static org.junit.Assert.fail;
 
 public class TestAccessControl_getGlobalResourcePermissions extends TestAccessControlBase {
    @Test
-   public void getGlobalResourcePermissions_emptyAsSystemResource() throws AccessControlException {
+   public void getGlobalResourcePermissions_emptyAsSystemResource() {
       authenticateSystemResource();
 
       final Resource accessorResource = generateUnauthenticatableResource();
@@ -49,7 +49,7 @@ public class TestAccessControl_getGlobalResourcePermissions extends TestAccessCo
    }
 
    @Test
-   public void getGlobalResourcePermissions_emptyAsAuthenticated() throws AccessControlException {
+   public void getGlobalResourcePermissions_emptyAsAuthenticated() {
       generateResourceAndAuthenticate();
 
       final Resource accessorResource = generateUnauthenticatableResource();
@@ -69,7 +69,7 @@ public class TestAccessControl_getGlobalResourcePermissions extends TestAccessCo
    }
 
    @Test
-   public void getGlobalResourcePermissions_validAsSystemResource() throws AccessControlException {
+   public void getGlobalResourcePermissions_validAsSystemResource() {
       authenticateSystemResource();
       final String authenticatableResourceClassName = generateResourceClass(true, false);
       final Resource accessorResource = generateUnauthenticatableResource();
@@ -104,7 +104,7 @@ public class TestAccessControl_getGlobalResourcePermissions extends TestAccessCo
    }
 
    @Test
-   public void getGlobalResourcePermissions_validAsAuthenticatedResource() throws AccessControlException {
+   public void getGlobalResourcePermissions_validAsAuthenticatedResource() {
       authenticateSystemResource();
       final String resourceClassName = generateResourceClass(true, false);
       final String customPermissionName = generateResourceClassPermission(resourceClassName);
@@ -154,7 +154,7 @@ public class TestAccessControl_getGlobalResourcePermissions extends TestAccessCo
    }
 
    @Test
-   public void getGlobalResourcePermissions_validInheritFromParentDomain() throws AccessControlException {
+   public void getGlobalResourcePermissions_validInheritFromParentDomain() {
       authenticateSystemResource();
       final String authenticatableResourceClassName = generateResourceClass(true, false);
       final Resource accessorResource = generateUnauthenticatableResource();
@@ -213,7 +213,7 @@ public class TestAccessControl_getGlobalResourcePermissions extends TestAccessCo
    }
 
    @Test
-   public void getGlobalResourcePermissions_validWithInheritFromResource() throws AccessControlException {
+   public void getGlobalResourcePermissions_validWithInheritFromResource() {
       authenticateSystemResource();
       final String resourceClassName = generateResourceClass(true, false);
       final ResourcePermission resPerm_impersonate
@@ -270,7 +270,7 @@ public class TestAccessControl_getGlobalResourcePermissions extends TestAccessCo
    }
 
    @Test
-   public void getGlobalResourcePermissions_whitespaceConsistent() throws AccessControlException {
+   public void getGlobalResourcePermissions_whitespaceConsistent() {
       authenticateSystemResource();
       final String resourceClassName = generateResourceClass(true, false);
       final String resourceClassName_whitespaced = " " + resourceClassName + "\t";
@@ -301,7 +301,7 @@ public class TestAccessControl_getGlobalResourcePermissions extends TestAccessCo
    }
 
    @Test
-   public void getGlobalResourcePermissions_nulls_shouldFail() throws AccessControlException {
+   public void getGlobalResourcePermissions_nulls_shouldFail() {
       authenticateSystemResource();
 
       try {
@@ -355,7 +355,7 @@ public class TestAccessControl_getGlobalResourcePermissions extends TestAccessCo
    }
 
    @Test
-   public void getGlobalResourcePermissions_nonExistentReferences_shouldSucceed() throws AccessControlException {
+   public void getGlobalResourcePermissions_nonExistentReferences_shouldSucceed() {
       authenticateSystemResource();
 
       final Resource invalidResource = Resources.getInstance(-999L);
@@ -372,7 +372,7 @@ public class TestAccessControl_getGlobalResourcePermissions extends TestAccessCo
    }
 
    @Test
-   public void getGlobalResourcePermissions_nonExistentReferences_shouldFail() throws AccessControlException {
+   public void getGlobalResourcePermissions_nonExistentReferences_shouldFail() {
       authenticateSystemResource();
 
       final Resource validResource = generateUnauthenticatableResource();

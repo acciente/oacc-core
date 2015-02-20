@@ -24,7 +24,7 @@ import static org.junit.Assert.assertThat;
 
 public class TestAccessControl_unimpersonate extends TestAccessControlBase {
    @Test
-   public void unimpersonate_valid_asSystemResource() throws AccessControlException {
+   public void unimpersonate_valid_asSystemResource() {
       authenticateSystemResource();
 
       final Resource impersonatedResource = generateAuthenticatableResource(generateUniquePassword());
@@ -38,7 +38,7 @@ public class TestAccessControl_unimpersonate extends TestAccessControlBase {
    }
 
    @Test
-   public void unimpersonate_unimpersonated_succeedsAsSystemResource() throws AccessControlException {
+   public void unimpersonate_unimpersonated_succeedsAsSystemResource() {
       authenticateSystemResource();
 
       generateAuthenticatableResource(generateUniquePassword());
@@ -51,7 +51,7 @@ public class TestAccessControl_unimpersonate extends TestAccessControlBase {
    }
 
    @Test
-   public void unimpersonate_valid_asAuthenticatedResource() throws AccessControlException {
+   public void unimpersonate_valid_asAuthenticatedResource() {
       authenticateSystemResource();
 
       final char[] password = generateUniquePassword();
@@ -74,7 +74,7 @@ public class TestAccessControl_unimpersonate extends TestAccessControlBase {
    }
 
    @Test
-   public void unimpersonate_unimpersonated_succeedsAsAuthenticatedResource() throws AccessControlException {
+   public void unimpersonate_unimpersonated_succeedsAsAuthenticatedResource() {
       authenticateSystemResource();
 
       final char[] password = generateUniquePassword();

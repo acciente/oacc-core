@@ -29,7 +29,7 @@ import static org.junit.Assert.assertThat;
 
 public class TestAccessControl_getResourceClassNames extends TestAccessControlBase {
    @Test
-   public void getResourceClassNames_empty_asSystemResource() throws AccessControlException {
+   public void getResourceClassNames_empty_asSystemResource() {
       authenticateSystemResource();
 
       // verify
@@ -39,7 +39,7 @@ public class TestAccessControl_getResourceClassNames extends TestAccessControlBa
    }
 
    @Test
-   public void getResourceClassNames_validAsSystemResource() throws AccessControlException {
+   public void getResourceClassNames_validAsSystemResource() {
       authenticateSystemResource();
 
       final String resourceClassName1 = generateResourceClass(true, false);
@@ -53,7 +53,7 @@ public class TestAccessControl_getResourceClassNames extends TestAccessControlBa
    }
 
    @Test
-   public void getResourceClassNames_validAsAuthenticated() throws AccessControlException {
+   public void getResourceClassNames_validAsAuthenticated() {
       authenticateSystemResource();
 
       final char[] password = generateUniquePassword();

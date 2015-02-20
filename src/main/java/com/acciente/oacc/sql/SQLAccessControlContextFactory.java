@@ -18,7 +18,6 @@
 package com.acciente.oacc.sql;
 
 import com.acciente.oacc.AccessControlContext;
-import com.acciente.oacc.AccessControlException;
 import com.acciente.oacc.AuthenticationProvider;
 import com.acciente.oacc.sql.internal.SQLAccessControlContext;
 
@@ -28,8 +27,7 @@ import java.sql.Connection;
 public class SQLAccessControlContextFactory {
    public static AccessControlContext getAccessControlContext(Connection connection,
                                                               String schemaName,
-                                                              SQLDialect sqlDialect)
-         throws AccessControlException {
+                                                              SQLDialect sqlDialect) {
       return SQLAccessControlContext.getAccessControlContext(connection,
                                                              schemaName,
                                                              sqlDialect);
@@ -37,8 +35,7 @@ public class SQLAccessControlContextFactory {
 
    public static AccessControlContext getAccessControlContext(DataSource dataSource,
                                                               String schemaName,
-                                                              SQLDialect sqlDialect)
-         throws AccessControlException {
+                                                              SQLDialect sqlDialect) {
       return SQLAccessControlContext.getAccessControlContext(dataSource,
                                                              schemaName,
                                                              sqlDialect);
@@ -47,8 +44,7 @@ public class SQLAccessControlContextFactory {
    public static AccessControlContext getAccessControlContext(Connection connection,
                                                               String schemaName,
                                                               SQLDialect sqlDialect,
-                                                              AuthenticationProvider authenticationProvider)
-         throws AccessControlException {
+                                                              AuthenticationProvider authenticationProvider) {
       return SQLAccessControlContext.getAccessControlContext(connection,
                                                              schemaName,
                                                              sqlDialect,
@@ -58,8 +54,7 @@ public class SQLAccessControlContextFactory {
    public static AccessControlContext getAccessControlContext(DataSource dataSource,
                                                               String schemaName,
                                                               SQLDialect sqlDialect,
-                                                              AuthenticationProvider authenticationProvider)
-         throws AccessControlException {
+                                                              AuthenticationProvider authenticationProvider) {
       return SQLAccessControlContext.getAccessControlContext(dataSource,
                                                              schemaName,
                                                              sqlDialect,

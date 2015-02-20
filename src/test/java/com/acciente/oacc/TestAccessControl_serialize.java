@@ -29,14 +29,13 @@ import java.io.IOException;
 import java.io.NotSerializableException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.sql.SQLException;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.fail;
 
 public class TestAccessControl_serialize extends TestAccessControlBase {
    @Test
-   public void serialize_withoutPreSerialization_shouldFail() throws AccessControlException, IOException {
+   public void serialize_withoutPreSerialization_shouldFail() throws IOException {
       ObjectOutputStream objectOutputStream = null;
       try {
          objectOutputStream = new ObjectOutputStream(new ByteArrayOutputStream());
@@ -55,7 +54,7 @@ public class TestAccessControl_serialize extends TestAccessControlBase {
    }
 
    @Test
-   public void serialize_withPreSerialization_shouldSucceed() throws AccessControlException, IOException, ClassNotFoundException, SQLException {
+   public void serialize_withPreSerialization_shouldSucceed() throws IOException, ClassNotFoundException {
       Resource systemAuthResource = getSystemResource();
       accessControlContext.authenticate(systemAuthResource,
                                         PasswordCredentials.newInstance(Constants.OACC_ROOT_PWD));

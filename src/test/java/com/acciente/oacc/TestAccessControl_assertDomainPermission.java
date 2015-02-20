@@ -30,7 +30,7 @@ import static org.junit.Assert.fail;
 
 public class TestAccessControl_assertDomainPermission extends TestAccessControlBase {
    @Test
-   public void assertDomainPermission_succeedsAsSystemResource() throws AccessControlException {
+   public void assertDomainPermission_succeedsAsSystemResource() {
       authenticateSystemResource();
 
       final String domainName = generateDomain();
@@ -61,9 +61,8 @@ public class TestAccessControl_assertDomainPermission extends TestAccessControlB
                                                      domainName);
          fail("asserting domain permission for accessor resource when none exist should have failed");
       }
-      catch (AccessControlException e) {
-         assertThat(e.isNotAuthorizedError(), is(true));
-         assertThat(e.getMessage().toLowerCase(), containsString("does not have requested permission"));
+      catch (NotAuthorizedException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("does not have domain permission"));
       }
       try {
          accessControlContext.assertDomainPermission(accessorResource,
@@ -71,14 +70,13 @@ public class TestAccessControl_assertDomainPermission extends TestAccessControlB
                                                      domainName);
          fail("asserting domain permission for accessor resource when none exist should have failed");
       }
-      catch (AccessControlException e) {
-         assertThat(e.isNotAuthorizedError(), is(true));
-         assertThat(e.getMessage().toLowerCase(), containsString("does not have requested permission"));
+      catch (NotAuthorizedException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("does not have domain permission"));
       }
    }
 
    @Test
-   public void assertDomainPermission_emptyAsAuthenticated() throws AccessControlException {
+   public void assertDomainPermission_emptyAsAuthenticated() {
       final Resource accessorResource = generateUnauthenticatableResource();
 
       final String domainName = generateDomain();
@@ -95,9 +93,8 @@ public class TestAccessControl_assertDomainPermission extends TestAccessControlB
                                                      domainName);
          fail("asserting domain permission for authenticated accessor resource when none exist should have failed");
       }
-      catch (AccessControlException e) {
-         assertThat(e.isNotAuthorizedError(), is(true));
-         assertThat(e.getMessage().toLowerCase(), containsString("does not have requested permission"));
+      catch (NotAuthorizedException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("does not have domain permission"));
       }
       try {
          accessControlContext.assertDomainPermission(accessorResource,
@@ -105,14 +102,13 @@ public class TestAccessControl_assertDomainPermission extends TestAccessControlB
                                                      domainName);
          fail("asserting domain permission for authenticated accessor resource when none exist should have failed");
       }
-      catch (AccessControlException e) {
-         assertThat(e.isNotAuthorizedError(), is(true));
-         assertThat(e.getMessage().toLowerCase(), containsString("does not have requested permission"));
+      catch (NotAuthorizedException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("does not have domain permission"));
       }
    }
 
    @Test
-   public void assertDomainPermission_validAsSystemResource() throws AccessControlException {
+   public void assertDomainPermission_validAsSystemResource() {
       authenticateSystemResource();
       final DomainPermission domPerm_superuser
             = DomainPermissions.getInstance(DomainPermissions.SUPER_USER);
@@ -156,7 +152,7 @@ public class TestAccessControl_assertDomainPermission extends TestAccessControlB
    }
 
    @Test
-   public void assertDomainPermission_validWithInheritFromParentDomain() throws AccessControlException {
+   public void assertDomainPermission_validWithInheritFromParentDomain() {
       authenticateSystemResource();
       final DomainPermission domPerm_superuser
             = DomainPermissions.getInstance(DomainPermissions.SUPER_USER);
@@ -186,7 +182,7 @@ public class TestAccessControl_assertDomainPermission extends TestAccessControlB
    }
 
    @Test
-   public void assertDomainPermission_validWithInheritFromAncestorDomainWithEmptyIntermediaryAncestors() throws AccessControlException {
+   public void assertDomainPermission_validWithInheritFromAncestorDomainWithEmptyIntermediaryAncestors() {
       authenticateSystemResource();
       final DomainPermission domPerm_superuser
             = DomainPermissions.getInstance(DomainPermissions.SUPER_USER);
@@ -199,12 +195,12 @@ public class TestAccessControl_assertDomainPermission extends TestAccessControlB
 
       final String parentDomain = generateDomain();
       final String childDomain = generateUniqueDomainName();
-      final String grandChildDomain = generateUniqueDomainName();
-      final String greatGrandChildDomain = generateUniqueDomainName();
-      final String greatGreatGrandChildDomain = generateUniqueDomainName();
       accessControlContext.createDomain(childDomain, parentDomain);
+      final String grandChildDomain = generateUniqueDomainName();
       accessControlContext.createDomain(grandChildDomain, childDomain);
+      final String greatGrandChildDomain = generateUniqueDomainName();
       accessControlContext.createDomain(greatGrandChildDomain, grandChildDomain);
+      final String greatGreatGrandChildDomain = generateUniqueDomainName();
       accessControlContext.createDomain(greatGreatGrandChildDomain, greatGrandChildDomain);
 
       // set parent domain create permissions
@@ -228,7 +224,7 @@ public class TestAccessControl_assertDomainPermission extends TestAccessControlB
    }
 
    @Test
-   public void assertDomainPermission_validWithInheritFromResource() throws AccessControlException {
+   public void assertDomainPermission_validWithInheritFromResource() {
       authenticateSystemResource();
       final DomainPermission domPerm_superuser
             = DomainPermissions.getInstance(DomainPermissions.SUPER_USER);
@@ -265,7 +261,7 @@ public class TestAccessControl_assertDomainPermission extends TestAccessControlB
    }
 
    @Test
-   public void assertDomainPermission_validWithInheritFromAncestorDomainAndResource() throws AccessControlException {
+   public void assertDomainPermission_validWithInheritFromAncestorDomainAndResource() {
       authenticateSystemResource();
       final DomainPermission domPerm_superuser_withGrant
             = DomainPermissions.getInstance(DomainPermissions.SUPER_USER, true);
@@ -302,7 +298,7 @@ public class TestAccessControl_assertDomainPermission extends TestAccessControlB
    }
 
    @Test
-   public void assertDomainPermission_whitespaceConsistent() throws AccessControlException {
+   public void assertDomainPermission_whitespaceConsistent() {
       authenticateSystemResource();
       final DomainPermission domCreatePerm_superuser
             = DomainPermissions.getInstance(DomainPermissions.SUPER_USER);
@@ -321,7 +317,7 @@ public class TestAccessControl_assertDomainPermission extends TestAccessControlB
    }
 
    @Test
-   public void assertDomainPermission_nulls_shouldFail() throws AccessControlException {
+   public void assertDomainPermission_nulls_shouldFail() {
       authenticateSystemResource();
       final Resource accessorResource = generateUnauthenticatableResource();
       final DomainPermission domPerm_superUser = DomainPermissions.getInstance(DomainPermissions.SUPER_USER);
@@ -353,7 +349,7 @@ public class TestAccessControl_assertDomainPermission extends TestAccessControlB
    }
 
    @Test
-   public void assertDomainPermission_nonExistentReferences_shouldSucceed() throws AccessControlException {
+   public void assertDomainPermission_nonExistentReferences_shouldSucceed() {
       authenticateSystemResource();
 
       final DomainPermission domPerm_superUser = DomainPermissions.getInstance(DomainPermissions.SUPER_USER);
@@ -366,19 +362,17 @@ public class TestAccessControl_assertDomainPermission extends TestAccessControlB
          accessControlContext.assertDomainPermission(invalidResource, domPerm_superUser, domainName);
          fail("asserting domain permissions for invalid accessor resource should have failed");
       }
-      catch (AccessControlException e) {
-         assertThat(e.getMessage().toLowerCase(), containsString("does not have requested permission"));
+      catch (NotAuthorizedException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("does not have domain permission"));
       }
    }
 
    @Test
-   public void assertDomainPermission_nonExistentReferences_shouldFail() throws AccessControlException {
+   public void assertDomainPermission_nonExistentReferences_shouldFail() {
       authenticateSystemResource();
 
       final Resource accessorResource = generateUnauthenticatableResource();
       final DomainPermission domPerm_superUser = DomainPermissions.getInstance(DomainPermissions.SUPER_USER);
-      final String domainName = generateDomain();
-
 
       try {
          accessControlContext.assertDomainPermission(accessorResource, domPerm_superUser, "invalid_domain");

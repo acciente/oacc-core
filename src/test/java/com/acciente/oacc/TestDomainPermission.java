@@ -34,7 +34,7 @@ public class TestDomainPermission {
    }
 
    @Test
-   public void construct_valid() throws AccessControlException {
+   public void construct_valid() {
       for(String systemPermissionName : DomainPermissions.getSysPermissionNames()) {
          DomainPermissions.getInstance(systemPermissionName);
       }
@@ -48,7 +48,7 @@ public class TestDomainPermission {
    }
 
    @Test
-   public void construct_whitespaceConsistent() throws AccessControlException {
+   public void construct_whitespaceConsistent() {
       for(String systemPermissionName : DomainPermissions.getSysPermissionNames()) {
          DomainPermissions.getInstance(" " + systemPermissionName + "\t");
          DomainPermissions.getInstance(" " + systemPermissionName + "\t", false);
@@ -57,7 +57,7 @@ public class TestDomainPermission {
    }
 
    @Test
-   public void construct_caseSensitiveConsistent() throws AccessControlException {
+   public void construct_caseSensitiveConsistent() {
       for(String systemPermissionName : DomainPermissions.getSysPermissionNames()) {
          String mixedCasePermissionName
                = systemPermissionName.substring(0, systemPermissionName.length()/2).toLowerCase()
@@ -81,7 +81,7 @@ public class TestDomainPermission {
    }
 
    @Test
-   public void construct_nulls_shouldFail() throws AccessControlException {
+   public void construct_nulls_shouldFail() {
       try {
          DomainPermissions.getInstance(null);
          fail("creation of domain permission with null name should have failed");
@@ -100,7 +100,7 @@ public class TestDomainPermission {
    }
 
    @Test
-   public void construct_asteriskPermissionPrefix_shouldFail() throws AccessControlException {
+   public void construct_asteriskPermissionPrefix_shouldFail() {
       try {
          DomainPermissions.getInstance("*invalid");
          fail("creation of domain permission with asterisk-prefixed name should have failed");
@@ -119,7 +119,7 @@ public class TestDomainPermission {
    }
 
    @Test
-   public void construct_blankNames_shouldFail() throws AccessControlException {
+   public void construct_blankNames_shouldFail() {
       try {
          DomainPermissions.getInstance("");
          fail("creation of domain permission with empty name should have failed");
@@ -152,7 +152,7 @@ public class TestDomainPermission {
    }
 
    @Test
-   public void construct_nonSystemDomainPermission_shouldFail() throws AccessControlException {
+   public void construct_nonSystemDomainPermission_shouldFail() {
       try {
          DomainPermissions.getInstance("invalid");
          fail("creation of domain permission non-system domain permission name should have failed");

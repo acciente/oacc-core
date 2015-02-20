@@ -26,7 +26,6 @@ import org.junit.After;
 import org.junit.Before;
 
 import javax.sql.DataSource;
-import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
@@ -42,15 +41,10 @@ public class TestAccessControlBase {
 
    static {
       sqlDialect = TestDataSourceFactory.getSQLDialect();
-      try {
-         dataSource = TestDataSourceFactory.getDataSource();
-         isDBCaseSensitive = TestDataSourceFactory.isDatabaseCaseSensitive();
-         systemAccessControlContext
-               = SQLAccessControlContextFactory.getAccessControlContext(dataSource, Constants.DB_SCHEMA, sqlDialect);
-      }
-      catch (SQLException | AccessControlException e) {
-         throw new RuntimeException(e);
-      }
+      dataSource = TestDataSourceFactory.getDataSource();
+      isDBCaseSensitive = TestDataSourceFactory.isDatabaseCaseSensitive();
+      systemAccessControlContext
+            = SQLAccessControlContextFactory.getAccessControlContext(dataSource, Constants.DB_SCHEMA, sqlDialect);
    }
 
    protected AccessControlContext accessControlContext;
@@ -87,14 +81,14 @@ public class TestAccessControlBase {
       return resultSet;
    }
 
-   protected static String generateDomain() throws AccessControlException {
+   protected static String generateDomain() {
       authenticateSystemAccessControlContext();
       final String domainName = generateUniqueDomainName();
       systemAccessControlContext.createDomain(domainName);
       return domainName;
    }
 
-   protected static String generateChildDomain(String parentDomainName) throws AccessControlException {
+   protected static String generateChildDomain(String parentDomainName) {
       authenticateSystemAccessControlContext();
       final String domainName = generateUniqueDomainName();
       systemAccessControlContext.createDomain(domainName, parentDomainName);
@@ -102,14 +96,14 @@ public class TestAccessControlBase {
    }
 
    protected static String generateResourceClass(boolean authenticatable,
-                                                 boolean nonAuthenticatedCreateAllowed) throws AccessControlException {
+                                                 boolean nonAuthenticatedCreateAllowed) {
       authenticateSystemAccessControlContext();
       final String resourceClassName = generateUniqueResourceClassName();
       systemAccessControlContext.createResourceClass(resourceClassName, authenticatable, nonAuthenticatedCreateAllowed);
       return resourceClassName;
    }
 
-   protected static String generateResourceClassPermission(String resourceClassName) throws AccessControlException {
+   protected static String generateResourceClassPermission(String resourceClassName) {
       authenticateSystemAccessControlContext();
       final String permissionName = generateUniquePermissionName();
       systemAccessControlContext.createResourcePermission(resourceClassName, permissionName);
@@ -146,7 +140,7 @@ public class TestAccessControlBase {
       return System.nanoTime();
    }
 
-   protected Resource generateResourceAndAuthenticate() throws AccessControlException {
+   protected Resource generateResourceAndAuthenticate() {
       authenticateSystemAccessControlContext();
       final char[] password = generateUniquePassword();
       final Resource authenticatableResource = generateAuthenticatableResource(password);
@@ -155,26 +149,26 @@ public class TestAccessControlBase {
       return authenticatableResource;
    }
 
-   protected static Resource generateAuthenticatableResource(char[] password) throws AccessControlException {
+   protected static Resource generateAuthenticatableResource(char[] password) {
       authenticateSystemAccessControlContext();
       return systemAccessControlContext.createResource(generateResourceClass(true, false),
                                                        generateDomain(),
                                                        PasswordCredentials.newInstance(password));
    }
 
-   protected static Resource generateAuthenticatableResource(char[] password, String domainName) throws AccessControlException {
+   protected static Resource generateAuthenticatableResource(char[] password, String domainName) {
       authenticateSystemAccessControlContext();
       return systemAccessControlContext.createResource(generateResourceClass(true, false),
                                                        domainName,
                                                        PasswordCredentials.newInstance(password));
    }
 
-   protected static Resource generateUnauthenticatableResource() throws AccessControlException {
+   protected static Resource generateUnauthenticatableResource() {
       authenticateSystemAccessControlContext();
       return systemAccessControlContext.createResource(generateResourceClass(false, true), generateDomain());
    }
 
-   protected static void grantDomainCreatePermission(Resource accessorResource) throws AccessControlException {
+   protected static void grantDomainCreatePermission(Resource accessorResource) {
       authenticateSystemAccessControlContext();
       Set<DomainCreatePermission> domainCreatePermissions = new HashSet<>();
       domainCreatePermissions.add(DomainCreatePermissions.getInstance(DomainCreatePermissions.CREATE,
@@ -183,7 +177,7 @@ public class TestAccessControlBase {
       systemAccessControlContext.setDomainCreatePermissions(accessorResource, domainCreatePermissions);
    }
 
-   protected static void grantDomainAndChildCreatePermission(Resource accessorResource) throws AccessControlException {
+   protected static void grantDomainAndChildCreatePermission(Resource accessorResource) {
       authenticateSystemAccessControlContext();
       Set<DomainCreatePermission> domainCreatePermissions = new HashSet<>();
       domainCreatePermissions.add(DomainCreatePermissions.getInstance(DomainCreatePermissions.CREATE,
@@ -197,7 +191,7 @@ public class TestAccessControlBase {
    protected static void grantResourceCreatePermission(Resource accessorResource,
                                                        String resourceClassName,
                                                        String domainName,
-                                                       String... permissionNames) throws AccessControlException {
+                                                       String... permissionNames) {
       authenticateSystemAccessControlContext();
       Set<ResourceCreatePermission> resourceCreatePermissions = new HashSet<>();
       resourceCreatePermissions.add(ResourceCreatePermissions.getInstance(ResourceCreatePermissions.CREATE, false));
@@ -219,7 +213,7 @@ public class TestAccessControlBase {
                                                        String resourceClassName,
                                                        String domainName,
                                                        ResourceCreatePermission firstCreatePermission,
-                                                       ResourceCreatePermission... otherCreatePermissions) throws AccessControlException {
+                                                       ResourceCreatePermission... otherCreatePermissions) {
       authenticateSystemAccessControlContext();
       Set<ResourceCreatePermission> resourceCreatePermissions = new HashSet<>();
       resourceCreatePermissions.add(firstCreatePermission);

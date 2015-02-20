@@ -163,8 +163,8 @@ public class TestAccessControl_setCredentials extends TestAccessControlBase {
                                              PasswordCredentials.newInstance(newPassword));
          fail("setting credentials without authorization should have failed");
       }
-      catch (AccessControlException e) {
-         assertThat(e.getMessage().toLowerCase(), containsString("not authorized"));
+      catch (NotAuthorizedException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("reset credentials"));
       }
    }
 

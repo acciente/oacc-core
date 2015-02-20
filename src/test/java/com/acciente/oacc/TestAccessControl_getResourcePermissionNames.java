@@ -29,7 +29,7 @@ import static org.junit.Assert.fail;
 
 public class TestAccessControl_getResourcePermissionNames extends TestAccessControlBase {
    @Test
-   public void getResourcePermissionNames_validAsSystemResource() throws AccessControlException {
+   public void getResourcePermissionNames_validAsSystemResource() {
       authenticateSystemResource();
 
       final Resource resource = generateUnauthenticatableResource();
@@ -45,7 +45,7 @@ public class TestAccessControl_getResourcePermissionNames extends TestAccessCont
    }
 
    @Test
-   public void getResourcePermissionNames_whitespaceConsistent() throws AccessControlException {
+   public void getResourcePermissionNames_whitespaceConsistent() {
       authenticateSystemResource();
 
       final Resource resource = generateUnauthenticatableResource();
@@ -62,14 +62,14 @@ public class TestAccessControl_getResourcePermissionNames extends TestAccessCont
    }
 
    @Test
-   public void getResourcePermissionNames_nonExistentReferences_shouldSucceed() throws AccessControlException {
+   public void getResourcePermissionNames_nonExistentReferences_shouldSucceed() {
       authenticateSystemResource();
 
       assertThat(accessControlContext.getResourcePermissionNames("does_not_exist").isEmpty(), is(true));
    }
 
    @Test
-   public void getResourcePermissionNames_nulls() throws AccessControlException {
+   public void getResourcePermissionNames_nulls() {
       authenticateSystemResource();
 
       try {

@@ -23,7 +23,6 @@ import javax.sql.DataSource;
 import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.sql.SQLException;
 import java.util.Properties;
 
 public class TestDataSourceFactory {
@@ -99,11 +98,11 @@ public class TestDataSourceFactory {
       return sqlDialect;
    }
 
-   public static DataSource getDataSource() throws SQLException {
+   public static DataSource getDataSource() {
       return dataSource;
    }
 
-   public static boolean isDatabaseCaseSensitive() throws SQLException {
+   public static boolean isDatabaseCaseSensitive() {
       return isDatabaseCaseSensitive;
    }
 }

@@ -30,7 +30,7 @@ import static org.junit.Assert.fail;
 
 public class TestAccessControl_getEffectiveResourceCreatePermissions extends TestAccessControlBase {
    @Test
-   public void getEffectiveResourceCreatePermissions_emptyAsSystemResource() throws AccessControlException {
+   public void getEffectiveResourceCreatePermissions_emptyAsSystemResource() {
       authenticateSystemResource();
 
       final Resource accessorResource = generateUnauthenticatableResource();
@@ -50,7 +50,7 @@ public class TestAccessControl_getEffectiveResourceCreatePermissions extends Tes
    }
 
    @Test
-   public void getEffectiveResourceCreatePermissions_emptyAsAuthenticated() throws AccessControlException {
+   public void getEffectiveResourceCreatePermissions_emptyAsAuthenticated() {
       generateResourceAndAuthenticate();
 
       final Resource accessorResource = generateUnauthenticatableResource();
@@ -70,7 +70,7 @@ public class TestAccessControl_getEffectiveResourceCreatePermissions extends Tes
    }
 
    @Test
-   public void getEffectiveResourceCreatePermissions_validAsSystemResource() throws AccessControlException {
+   public void getEffectiveResourceCreatePermissions_validAsSystemResource() {
       authenticateSystemResource();
       final ResourceCreatePermission createPerm_create_withGrant
             = ResourceCreatePermissions.getInstance(ResourceCreatePermissions.CREATE, true);
@@ -133,7 +133,7 @@ public class TestAccessControl_getEffectiveResourceCreatePermissions extends Tes
    }
 
    @Test
-   public void getEffectiveResourceCreatePermissions_validAsAuthenticatedResource() throws AccessControlException {
+   public void getEffectiveResourceCreatePermissions_validAsAuthenticatedResource() {
       authenticateSystemResource();
       final ResourceCreatePermission createPerm_create_withGrant
             = ResourceCreatePermissions.getInstance(ResourceCreatePermissions.CREATE, true);
@@ -205,7 +205,7 @@ public class TestAccessControl_getEffectiveResourceCreatePermissions extends Tes
    }
 
    @Test
-   public void getEffectiveResourceCreatePermissions_validWithInheritFromParentDomain() throws AccessControlException {
+   public void getEffectiveResourceCreatePermissions_validWithInheritFromParentDomain() {
       authenticateSystemResource();
       final ResourceCreatePermission createPerm_create_withGrant
             = ResourceCreatePermissions.getInstance(ResourceCreatePermissions.CREATE, true);
@@ -294,7 +294,7 @@ public class TestAccessControl_getEffectiveResourceCreatePermissions extends Tes
    }
 
    @Test
-   public void getEffectiveResourceCreatePermissions_inheritSysPermissionWithDifferentGrantingRights_shouldSucceedAsAuthorized() throws AccessControlException {
+   public void getEffectiveResourceCreatePermissions_inheritSysPermissionWithDifferentGrantingRights_shouldSucceedAsAuthorized() {
       authenticateSystemResource();
       final String domainName = generateDomain();
       final char[] password = generateUniquePassword();
@@ -339,7 +339,7 @@ public class TestAccessControl_getEffectiveResourceCreatePermissions extends Tes
    }
 
    @Test
-   public void getEffectiveDomainCreatePermissions_inheritWithDifferentGrantingRights_shouldSucceedAsAuthorized() throws AccessControlException {
+   public void getEffectiveDomainCreatePermissions_inheritWithDifferentGrantingRights_shouldSucceedAsAuthorized() {
       authenticateSystemResource();
       final String donorPermissionName_impersonate = ResourcePermissions.IMPERSONATE;
       final String donorPermissionName_resetCredentials = ResourcePermissions.RESET_CREDENTIALS;
@@ -406,7 +406,7 @@ public class TestAccessControl_getEffectiveResourceCreatePermissions extends Tes
    }
 
    @Test
-   public void getEffectiveDomainCreatePermissions_inheritFromTwoResourcesWithDifferentGrantingRights_shouldSucceedAsAuthorized() throws AccessControlException {
+   public void getEffectiveDomainCreatePermissions_inheritFromTwoResourcesWithDifferentGrantingRights_shouldSucceedAsAuthorized() {
       authenticateSystemResource();
       final String donorPermissionName_impersonate = ResourcePermissions.IMPERSONATE;
       final String donorPermissionName_resetCredentials = ResourcePermissions.RESET_CREDENTIALS;
@@ -486,7 +486,7 @@ public class TestAccessControl_getEffectiveResourceCreatePermissions extends Tes
    }
 
    @Test
-   public void getEffectiveResourceCreatePermissions_multiLevelInheritance_shouldSucceedAsAuthorized() throws AccessControlException {
+   public void getEffectiveResourceCreatePermissions_multiLevelInheritance_shouldSucceedAsAuthorized() {
       authenticateSystemResource();
       final String donorPermissionName_impersonate = ResourcePermissions.IMPERSONATE;
       final String inheritorPermissionName_impersonate = ResourcePermissions.IMPERSONATE;
@@ -568,7 +568,7 @@ public class TestAccessControl_getEffectiveResourceCreatePermissions extends Tes
    }
 
    @Test
-   public void getEffectiveResourceCreatePermissions_multiLevelInheritanceWithEmptyIntermediaryLevel_shouldSucceedAsAuthorized() throws AccessControlException {
+   public void getEffectiveResourceCreatePermissions_multiLevelInheritanceWithEmptyIntermediaryLevel_shouldSucceedAsAuthorized() {
       authenticateSystemResource();
       final String donorPermissionName_impersonate = ResourcePermissions.IMPERSONATE;
       final String accessorPermissionName_resetCredentials = ResourcePermissions.RESET_CREDENTIALS;
@@ -632,7 +632,7 @@ public class TestAccessControl_getEffectiveResourceCreatePermissions extends Tes
    }
 
    @Test
-   public void getEffectiveResourceCreatePermissions_whitespaceConsistent() throws AccessControlException {
+   public void getEffectiveResourceCreatePermissions_whitespaceConsistent() {
       authenticateSystemResource();
       final ResourceCreatePermission createPerm_create_withGrant
             = ResourceCreatePermissions.getInstance(ResourceCreatePermissions.CREATE, true);
@@ -685,7 +685,7 @@ public class TestAccessControl_getEffectiveResourceCreatePermissions extends Tes
    }
 
    @Test
-   public void getEffectiveResourceCreatePermissions_nulls_shouldFail() throws AccessControlException {
+   public void getEffectiveResourceCreatePermissions_nulls_shouldFail() {
       authenticateSystemResource();
 
       try {
@@ -739,7 +739,7 @@ public class TestAccessControl_getEffectiveResourceCreatePermissions extends Tes
    }
 
    @Test
-   public void getEffectiveResourceCreatePermissions_notExistentReferences_shouldSucceed() throws AccessControlException {
+   public void getEffectiveResourceCreatePermissions_notExistentReferences_shouldSucceed() {
       authenticateSystemResource();
 
       final String resourceClassName = generateResourceClass(false, false);
@@ -756,7 +756,7 @@ public class TestAccessControl_getEffectiveResourceCreatePermissions extends Tes
    }
 
    @Test
-   public void getEffectiveResourceCreatePermissions_notExistentReferences_shouldFail() throws AccessControlException {
+   public void getEffectiveResourceCreatePermissions_notExistentReferences_shouldFail() {
       authenticateSystemResource();
 
       final Resource accessorResource = generateUnauthenticatableResource();

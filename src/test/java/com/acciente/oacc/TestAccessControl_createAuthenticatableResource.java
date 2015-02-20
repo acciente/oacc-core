@@ -30,7 +30,7 @@ import static org.junit.Assert.fail;
 
 public class TestAccessControl_createAuthenticatableResource extends TestAccessControlBase {
    @Test
-   public void createAuthenticatableResource_validAsSystemResource() throws AccessControlException {
+   public void createAuthenticatableResource_validAsSystemResource() {
       authenticateSystemResource();
 
       final String domainName = generateDomain();
@@ -49,7 +49,7 @@ public class TestAccessControl_createAuthenticatableResource extends TestAccessC
    }
 
    @Test
-   public void createAuthenticatableResource_validAsAuthorized() throws AccessControlException {
+   public void createAuthenticatableResource_validAsAuthorized() {
       final String domainName = generateDomain();
       final String resourceClassName = generateResourceClass(true, false);
       final char[] password = generateUniquePassword();
@@ -109,7 +109,7 @@ public class TestAccessControl_createAuthenticatableResource extends TestAccessC
    }
 
    @Test
-   public void createAuthenticatableResource_validAsUnauthenticated() throws AccessControlException {
+   public void createAuthenticatableResource_validAsUnauthenticated() {
       final String domainName = generateDomain();
       final String resourceClassName = generateResourceClass(true, true);
       final String permissionName = generateResourceClassPermission(resourceClassName);
@@ -150,7 +150,7 @@ public class TestAccessControl_createAuthenticatableResource extends TestAccessC
    }
 
    @Test
-   public void createAuthenticatableResource_validWithDefaultSessionDomain() throws AccessControlException {
+   public void createAuthenticatableResource_validWithDefaultSessionDomain() {
       final String resourceClassName = generateResourceClass(true, false);
       final char[] password = generateUniquePassword();
 
@@ -178,7 +178,7 @@ public class TestAccessControl_createAuthenticatableResource extends TestAccessC
    }
 
    @Test
-   public void createAuthenticatableResource_whitespaceConsistent_AsAuthorized() throws AccessControlException {
+   public void createAuthenticatableResource_whitespaceConsistent_AsAuthorized() {
       final String domainName = generateDomain();
       final String resourceClassName = generateResourceClass(true, false);
       final char[] password = generateUniquePassword();
@@ -241,7 +241,7 @@ public class TestAccessControl_createAuthenticatableResource extends TestAccessC
    }
 
    @Test
-   public void createAuthenticatableResource_caseSensitiveConsistent_AsAuthorized() throws AccessControlException {
+   public void createAuthenticatableResource_caseSensitiveConsistent_AsAuthorized() {
       authenticateSystemResource();
       final String domainBase = generateUniqueDomainName();
       final String resourceClassBase = generateUniqueResourceClassName();
@@ -408,7 +408,7 @@ public class TestAccessControl_createAuthenticatableResource extends TestAccessC
    }
 
    @Test
-   public void createAuthenticatableResource_unauthenticatableResourceClass_shouldFail() throws AccessControlException {
+   public void createAuthenticatableResource_unauthenticatableResourceClass_shouldFail() {
       authenticateSystemResource();
 
       final String domainName = generateDomain();
@@ -434,7 +434,7 @@ public class TestAccessControl_createAuthenticatableResource extends TestAccessC
    }
 
    @Test
-   public void createAuthenticatableResource_nulls_shouldFail() throws AccessControlException {
+   public void createAuthenticatableResource_nulls_shouldFail() {
       authenticateSystemResource();
 
       final String domainName = generateDomain();
@@ -500,7 +500,7 @@ public class TestAccessControl_createAuthenticatableResource extends TestAccessC
    }
 
    @Test
-   public void createAuthenticatableResource_invalidPassword_shouldFail() throws AccessControlException {
+   public void createAuthenticatableResource_invalidPassword_shouldFail() {
       authenticateSystemResource();
 
       final String domainName = generateDomain();
@@ -527,7 +527,7 @@ public class TestAccessControl_createAuthenticatableResource extends TestAccessC
    }
 
    @Test
-   public void createAuthenticatableResource_blankNames_shouldFail() throws AccessControlException {
+   public void createAuthenticatableResource_blankNames_shouldFail() {
       authenticateSystemResource();
 
       final String domainName = generateDomain();
@@ -616,7 +616,7 @@ public class TestAccessControl_createAuthenticatableResource extends TestAccessC
    }
 
    @Test
-   public void createAuthenticatableResource_nonExistentReferences_shouldFail() throws AccessControlException {
+   public void createAuthenticatableResource_nonExistentReferences_shouldFail() {
       authenticateSystemResource();
 
       final String domainName = generateDomain();
@@ -652,7 +652,7 @@ public class TestAccessControl_createAuthenticatableResource extends TestAccessC
    }
 
    @Test
-   public void createAuthenticatableResource_notAuthorized_shouldFail() throws AccessControlException {
+   public void createAuthenticatableResource_notAuthorized_shouldFail() {
       final String domainName = generateDomain();
       final String resourceClassName = generateResourceClass(true, false);
       final char[] password = generateUniquePassword();
@@ -666,13 +666,13 @@ public class TestAccessControl_createAuthenticatableResource extends TestAccessC
                                              PasswordCredentials.newInstance(password));
          fail("creating authenticatable resource without authorization should fail");
       }
-      catch (AccessControlException e) {
-         assertThat(e.getMessage().toLowerCase(), containsString("not authorized"));
+      catch (NotAuthorizedException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("create resource"));
       }
    }
 
    @Test
-   public void createAuthenticatableResource_notAuthorizedWithDefaultSessionDomain_shouldFail() throws AccessControlException {
+   public void createAuthenticatableResource_notAuthorizedWithDefaultSessionDomain_shouldFail() {
       final String resourceClassName = generateResourceClass(true, false);
       final char[] password = generateUniquePassword();
 
@@ -683,8 +683,8 @@ public class TestAccessControl_createAuthenticatableResource extends TestAccessC
          accessControlContext.createResource(resourceClassName, PasswordCredentials.newInstance(password));
          fail("creating authenticatable resource without authorization should fail");
       }
-      catch (AccessControlException e) {
-         assertThat(e.getMessage().toLowerCase(), containsString("not authorized"));
+      catch (NotAuthorizedException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("create resource"));
       }
    }
 }

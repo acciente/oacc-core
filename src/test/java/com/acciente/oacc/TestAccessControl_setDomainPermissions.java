@@ -32,7 +32,7 @@ import static org.junit.Assert.fail;
 
 public class TestAccessControl_setDomainPermissions extends TestAccessControlBase {
    @Test
-   public void setDomainPermissions_validAsSystemResource() throws AccessControlException {
+   public void setDomainPermissions_validAsSystemResource() {
       authenticateSystemResource();
       final DomainPermission domainPermission_superUser = DomainPermissions.getInstance(DomainPermissions.SUPER_USER);
       final DomainPermission domainPermission_child_withGrant = DomainPermissions.getInstance(DomainPermissions.CREATE_CHILD_DOMAIN,
@@ -55,7 +55,7 @@ public class TestAccessControl_setDomainPermissions extends TestAccessControlBas
    }
 
    @Test
-   public void setDomainPermissions_validAsAuthorized() throws AccessControlException {
+   public void setDomainPermissions_validAsAuthorized() {
       authenticateSystemResource();
       final DomainPermission domPerm_superuser_withGrant
             = DomainPermissions.getInstance(DomainPermissions.SUPER_USER, true);
@@ -98,7 +98,7 @@ public class TestAccessControl_setDomainPermissions extends TestAccessControlBas
    }
 
    @Test
-   public void setDomainPermissions_authorizedAsSuperUserWithoutGrant() throws AccessControlException {
+   public void setDomainPermissions_authorizedAsSuperUserWithoutGrant() {
       // Note: SuperUser privilege is enough to grant permissions on a domain, i.e. the 'with grant' option is meaningless for super users
 
       authenticateSystemResource();
@@ -141,7 +141,7 @@ public class TestAccessControl_setDomainPermissions extends TestAccessControlBas
    }
 
    @Test
-   public void setDomainPermissions_resetPermissions() throws AccessControlException {
+   public void setDomainPermissions_resetPermissions() {
       authenticateSystemResource();
       final DomainPermission domainPermission_superUser = DomainPermissions.getInstance(DomainPermissions.SUPER_USER);
       final DomainPermission domainPermission_child = DomainPermissions.getInstance(DomainPermissions.CREATE_CHILD_DOMAIN);
@@ -182,7 +182,7 @@ public class TestAccessControl_setDomainPermissions extends TestAccessControlBas
    }
 
    @Test
-   public void setDomainPermission_addPermission_withUnauthorizedPermissionsGrantedElsewhere_shouldSucceedAsAuthorized() throws AccessControlException {
+   public void setDomainPermission_addPermission_withUnauthorizedPermissionsGrantedElsewhere_shouldSucceedAsAuthorized() {
       authenticateSystemResource();
       final String grantedPermissionName = DomainPermissions.CREATE_CHILD_DOMAIN;
       final String ungrantedPermissionName = DomainPermissions.SUPER_USER;
@@ -225,7 +225,7 @@ public class TestAccessControl_setDomainPermissions extends TestAccessControlBas
    }
 
    @Test
-   public void setDomainPermission_removePermission_withUnauthorizedPermissionsGrantedElsewhere_shouldSucceedAsAuthorized() throws AccessControlException {
+   public void setDomainPermission_removePermission_withUnauthorizedPermissionsGrantedElsewhere_shouldSucceedAsAuthorized() {
       authenticateSystemResource();
       final String grantedPermissionName = DomainPermissions.CREATE_CHILD_DOMAIN;
       final String ungrantedPermissionName = DomainPermissions.SUPER_USER;
@@ -267,7 +267,7 @@ public class TestAccessControl_setDomainPermissions extends TestAccessControlBas
    }
 
    @Test
-   public void setDomainPermission_downgradeGrantingRights_shouldSucceedAsAuthorized() throws AccessControlException {
+   public void setDomainPermission_downgradeGrantingRights_shouldSucceedAsAuthorized() {
       authenticateSystemResource();
       final String grantedPermissionName = DomainPermissions.CREATE_CHILD_DOMAIN;
       final char[] password = generateUniquePassword();
@@ -307,7 +307,7 @@ public class TestAccessControl_setDomainPermissions extends TestAccessControlBas
    }
 
    @Test
-   public void setDomainPermission_downgradeGrantingRights_forUnauthorizedPermissionGrantedElsewhere_shouldFail() throws AccessControlException {
+   public void setDomainPermission_downgradeGrantingRights_forUnauthorizedPermissionGrantedElsewhere_shouldFail() {
       authenticateSystemResource();
       final String grantedPermissionName = DomainPermissions.CREATE_CHILD_DOMAIN;
       final String ungrantedPermissionName = DomainPermissions.SUPER_USER;
@@ -341,15 +341,14 @@ public class TestAccessControl_setDomainPermissions extends TestAccessControlBas
          accessControlContext.setDomainPermissions(accessorResource, domainName, requestedPermissions);
          fail("Downgrading (=removal of granting rights) of domain permission granted elsewhere, to which I have no granting rights, should have failed");
       }
-      catch (AccessControlException e) {
-         assertThat(e.getMessage().toLowerCase(), containsString("not authorized"));
+      catch (NotAuthorizedException e) {
          assertThat(e.getMessage().toLowerCase(), containsString(ungrantedPermissionName.toLowerCase()));
          assertThat(e.getMessage().toLowerCase(), not(containsString(grantedPermissionName)));
       }
    }
 
    @Test
-   public void setDomainPermission_upgradeGrantingRights_shouldSucceedAsAuthorized() throws AccessControlException {
+   public void setDomainPermission_upgradeGrantingRights_shouldSucceedAsAuthorized() {
       authenticateSystemResource();
       final String grantedPermissionName = DomainPermissions.CREATE_CHILD_DOMAIN;
       final char[] password = generateUniquePassword();
@@ -389,7 +388,7 @@ public class TestAccessControl_setDomainPermissions extends TestAccessControlBas
    }
 
    @Test
-   public void setDomainPermission_upgradeGrantingRights_forUnauthorizedPermissionGrantedElsewhere_shouldFail() throws AccessControlException {
+   public void setDomainPermission_upgradeGrantingRights_forUnauthorizedPermissionGrantedElsewhere_shouldFail() {
       authenticateSystemResource();
       final String grantedPermissionName = DomainPermissions.CREATE_CHILD_DOMAIN;
       final String ungrantedPermissionName = DomainPermissions.SUPER_USER;
@@ -423,15 +422,14 @@ public class TestAccessControl_setDomainPermissions extends TestAccessControlBas
          accessControlContext.setDomainPermissions(accessorResource, domainName, requestedPermissions);
          fail("Upgrading (=addition of granting rights) of domain permission granted elsewhere, to which I have no granting rights, should have failed");
       }
-      catch (AccessControlException e) {
-         assertThat(e.getMessage().toLowerCase(), containsString("not authorized"));
+      catch (NotAuthorizedException e) {
          assertThat(e.getMessage().toLowerCase(), containsString(ungrantedPermissionName.toLowerCase()));
          assertThat(e.getMessage().toLowerCase(), not(containsString(grantedPermissionName)));
       }
    }
 
    @Test
-   public void setDomainPermissions_whitespaceConsistent() throws AccessControlException {
+   public void setDomainPermissions_whitespaceConsistent() {
       authenticateSystemResource();
 
       final DomainPermission domCreatePerm_superuser_trailingspaces
@@ -466,7 +464,7 @@ public class TestAccessControl_setDomainPermissions extends TestAccessControlBas
    // hence we don't test for duplicate permissions (until the api changes, e.g. with variable argument lists instead of sets)
 
    @Test
-   public void setDomainPermissions_nulls_shouldFail() throws AccessControlException {
+   public void setDomainPermissions_nulls_shouldFail() {
       authenticateSystemResource();
       final DomainPermission domCreatePerm_child_withGrant
             = DomainPermissions.getInstance(DomainPermissions.CREATE_CHILD_DOMAIN, true);
@@ -515,7 +513,7 @@ public class TestAccessControl_setDomainPermissions extends TestAccessControlBas
    }
 
    @Test
-   public void setDomainPermissions_nonExistentReferences_shouldFail() throws AccessControlException {
+   public void setDomainPermissions_nonExistentReferences_shouldFail() {
       authenticateSystemResource();
       final DomainPermission domCreatePerm_child_withGrant
             = DomainPermissions.getInstance(DomainPermissions.CREATE_CHILD_DOMAIN, true);
@@ -544,7 +542,7 @@ public class TestAccessControl_setDomainPermissions extends TestAccessControlBas
    }
 
    @Test
-   public void setDomainPermissions_notAuthorized_shouldFail() throws AccessControlException {
+   public void setDomainPermissions_notAuthorized_shouldFail() {
       authenticateSystemResource();
       final DomainPermission domCreatePerm_superuser
             = DomainPermissions.getInstance(DomainPermissions.SUPER_USER);
@@ -582,7 +580,7 @@ public class TestAccessControl_setDomainPermissions extends TestAccessControlBas
          accessControlContext.setDomainPermissions(accessorResource, dmainName, domainPermissions_pre);
          fail("setting domain permissions without having rights to grant should have failed");
       }
-      catch (AccessControlException e) {
+      catch (NotAuthorizedException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("not authorized"));
       }
 
@@ -597,7 +595,7 @@ public class TestAccessControl_setDomainPermissions extends TestAccessControlBas
          accessControlContext.setDomainPermissions(accessorResource, dmainName, domainPermissions_pre);
          fail("setting domain permissions without having rights to grant should have failed");
       }
-      catch (AccessControlException e) {
+      catch (NotAuthorizedException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("not authorized"));
       }
    }

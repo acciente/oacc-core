@@ -31,7 +31,7 @@ import static org.junit.Assert.fail;
 
 public class TestAccessControl_authenticate extends TestAccessControlBase {
    @Test
-   public void authenticateSystemUser_validPwd_shouldSucceed() throws AccessControlException {
+   public void authenticateSystemUser_validPwd_shouldSucceed() {
       accessControlContext.authenticate(SYS_RESOURCE,
                                         PasswordCredentials.newInstance(Constants.OACC_ROOT_PWD));
       assertThat(accessControlContext.getAuthenticatedResource(), is(SYS_RESOURCE));
@@ -41,7 +41,7 @@ public class TestAccessControl_authenticate extends TestAccessControlBase {
    }
 
    @Test
-   public void authenticateSystemUser_reAuthenticate_shouldSucceed() throws AccessControlException {
+   public void authenticateSystemUser_reAuthenticate_shouldSucceed() {
       accessControlContext.authenticate(SYS_RESOURCE,
                                         PasswordCredentials.newInstance(Constants.OACC_ROOT_PWD));
       // authenticate again
@@ -52,7 +52,7 @@ public class TestAccessControl_authenticate extends TestAccessControlBase {
    }
 
    @Test
-   public void authenticateSystemUser_reAuthenticateAfterImpersonate_shouldSucceed() throws AccessControlException {
+   public void authenticateSystemUser_reAuthenticateAfterImpersonate_shouldSucceed() {
       accessControlContext.authenticate(SYS_RESOURCE,
                                         PasswordCredentials.newInstance(Constants.OACC_ROOT_PWD));
 
@@ -95,7 +95,7 @@ public class TestAccessControl_authenticate extends TestAccessControlBase {
    }
 
    @Test
-   public void authenticate_whitespaceAndCaseSensitivePasswords() throws SQLException, InterruptedException, AccessControlException {
+   public void authenticate_whitespaceAndCaseSensitivePasswords() {
       final String oaccRootPwd = new String(Constants.OACC_ROOT_PWD);
       final String oaccRootPwd_whitespaced = " " + oaccRootPwd + "\t";
       final String oaccRootPwd_mixedCase
@@ -127,7 +127,7 @@ public class TestAccessControl_authenticate extends TestAccessControlBase {
    }
 
    @Test
-   public void authenticateSystemUser_nulls() throws SQLException, InterruptedException, AccessControlException {
+   public void authenticateSystemUser_nulls() {
       try {
          accessControlContext.authenticate(null, PasswordCredentials.newInstance(null));
          fail("authentication of null-resource should not have succeeded");
@@ -152,7 +152,7 @@ public class TestAccessControl_authenticate extends TestAccessControlBase {
    }
 
    @Test
-   public void authenticate_nonExistentResource_shouldFail() throws InterruptedException, AccessControlException, SQLException {
+   public void authenticate_nonExistentResource_shouldFail() {
       try {
          accessControlContext.authenticate(Resources.getInstance(-999L),
                                            PasswordCredentials.newInstance("any_password".toCharArray()));
@@ -164,7 +164,7 @@ public class TestAccessControl_authenticate extends TestAccessControlBase {
    }
 
    @Test
-   public void authenticate_unauthenticatableResource_shouldFail() throws InterruptedException, AccessControlException, SQLException {
+   public void authenticate_unauthenticatableResource_shouldFail() {
       Resource unauthenticatableResource = generateUnauthenticatableResource();
       try {
          accessControlContext.authenticate(unauthenticatableResource,

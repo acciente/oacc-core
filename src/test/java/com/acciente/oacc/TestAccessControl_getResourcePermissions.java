@@ -29,7 +29,7 @@ import static org.junit.Assert.fail;
 
 public class TestAccessControl_getResourcePermissions extends TestAccessControlBase {
    @Test
-   public void getResourcePermissions_emptyAsSystemResource() throws AccessControlException {
+   public void getResourcePermissions_emptyAsSystemResource() {
       authenticateSystemResource();
 
       final Resource accessorResource = generateUnauthenticatableResource();
@@ -40,7 +40,7 @@ public class TestAccessControl_getResourcePermissions extends TestAccessControlB
    }
 
    @Test
-   public void getResourcePermissions_emptyAsAuthenticated() throws AccessControlException {
+   public void getResourcePermissions_emptyAsAuthenticated() {
       generateResourceAndAuthenticate();
 
       final Resource accessorResource = generateUnauthenticatableResource();
@@ -51,11 +51,11 @@ public class TestAccessControl_getResourcePermissions extends TestAccessControlB
    }
 
    @Test
-   public void getResourcePermissions_validAsSystemResource() throws AccessControlException {
+   public void getResourcePermissions_validAsSystemResource() {
       authenticateSystemResource();
       final String resourceClassName = generateResourceClass(false, false);
       final Resource accessorResource = generateUnauthenticatableResource();
-      final Resource accessedResource = accessControlContext.createResource(resourceClassName, generateDomain());;
+      final Resource accessedResource = accessControlContext.createResource(resourceClassName, generateDomain());
       assertThat(accessControlContext.getResourcePermissions(accessorResource, accessedResource).isEmpty(), is(true));
 
       // setup permissions
@@ -71,12 +71,12 @@ public class TestAccessControl_getResourcePermissions extends TestAccessControlB
    }
 
    @Test
-   public void getResourcePermissions_validAsAuthenticatedResource() throws AccessControlException {
+   public void getResourcePermissions_validAsAuthenticatedResource() {
       authenticateSystemResource();
       final String resourceClassName = generateResourceClass(false, false);
       final String customPermissionName = generateResourceClassPermission(resourceClassName);
       final Resource accessorResource = generateUnauthenticatableResource();
-      final Resource accessedResource = accessControlContext.createResource(resourceClassName, generateDomain());;
+      final Resource accessedResource = accessControlContext.createResource(resourceClassName, generateDomain());
       assertThat(accessControlContext.getResourcePermissions(accessorResource, accessedResource).isEmpty(), is(true));
 
       Set<ResourcePermission> permissions_pre
@@ -94,7 +94,7 @@ public class TestAccessControl_getResourcePermissions extends TestAccessControlB
    }
 
    @Test
-   public void getResourcePermissions_validWithDirect() throws AccessControlException {
+   public void getResourcePermissions_validWithDirect() {
       authenticateSystemResource();
       final String resourceClassName = generateResourceClass(false, false);
       final String directPermissionName = generateResourceClassPermission(resourceClassName);
@@ -115,7 +115,7 @@ public class TestAccessControl_getResourcePermissions extends TestAccessControlB
    }
 
    @Test
-   public void getResourcePermissions_validWithInherited() throws AccessControlException {
+   public void getResourcePermissions_validWithInherited() {
       authenticateSystemResource();
       final String resourceClassName = generateResourceClass(false, false);
       final String inheritedPermissionName = generateResourceClassPermission(resourceClassName);
@@ -145,7 +145,7 @@ public class TestAccessControl_getResourcePermissions extends TestAccessControlB
    }
 
    @Test
-   public void getResourcePermissions_validWithGlobal() throws AccessControlException {
+   public void getResourcePermissions_validWithGlobal() {
       authenticateSystemResource();
       final String resourceClassName = generateResourceClass(false, false);
       final String directGlobalPermissionName = generateResourceClassPermission(resourceClassName);
@@ -169,7 +169,7 @@ public class TestAccessControl_getResourcePermissions extends TestAccessControlB
    }
 
    @Test
-   public void getResourcePermissions_validWithDomainInherited() throws AccessControlException {
+   public void getResourcePermissions_validWithDomainInherited() {
       authenticateSystemResource();
       final String resourceClassName = generateResourceClass(false, false);
       final String domainInheritedGlobalPermissionName = generateResourceClassPermission(resourceClassName);
@@ -196,7 +196,7 @@ public class TestAccessControl_getResourcePermissions extends TestAccessControlB
    }
 
    @Test
-   public void getResourcePermissions_validWithDirectAndInheritedAndGlobalAndDomainInherited() throws AccessControlException {
+   public void getResourcePermissions_validWithDirectAndInheritedAndGlobalAndDomainInherited() {
       authenticateSystemResource();
       final String resourceClassName = generateResourceClass(false, false);
       final String directPermissionName = generateResourceClassPermission(resourceClassName);
@@ -255,7 +255,7 @@ public class TestAccessControl_getResourcePermissions extends TestAccessControlB
    }
 
    @Test
-   public void getResourcePermissions_nulls_shouldFail() throws AccessControlException {
+   public void getResourcePermissions_nulls_shouldFail() {
       authenticateSystemResource();
 
       Resource accessedResource = generateUnauthenticatableResource();
@@ -278,7 +278,7 @@ public class TestAccessControl_getResourcePermissions extends TestAccessControlB
    }
 
    @Test
-   public void getResourcePermissions_nonExistentReferences_shouldSucceed() throws AccessControlException {
+   public void getResourcePermissions_nonExistentReferences_shouldSucceed() {
       authenticateSystemResource();
 
       final Resource validResource = generateUnauthenticatableResource();

@@ -28,7 +28,7 @@ import static org.junit.Assert.fail;
 
 public class TestAccessControl_getResourceClassInfoByResource extends TestAccessControlBase {
    @Test
-   public void getResourceClassInfoByResource_validAsSystemResource() throws AccessControlException {
+   public void getResourceClassInfoByResource_validAsSystemResource() {
       authenticateSystemResource();
 
       generateUnauthenticatableResource();
@@ -45,7 +45,7 @@ public class TestAccessControl_getResourceClassInfoByResource extends TestAccess
    }
 
    @Test
-   public void getResourceClassInfoByResource_validAsAuthenticated() throws AccessControlException {
+   public void getResourceClassInfoByResource_validAsAuthenticated() {
       authenticateSystemResource();
 
       final char[] password = generateUniquePassword();
@@ -66,7 +66,7 @@ public class TestAccessControl_getResourceClassInfoByResource extends TestAccess
    }
 
    @Test
-   public void getResourceClassInfoByResource_nonExistentReferences_shouldFail() throws AccessControlException {
+   public void getResourceClassInfoByResource_nonExistentReferences_shouldFail() {
       authenticateSystemResource();
 
       final char[] password = generateUniquePassword();
@@ -87,7 +87,7 @@ public class TestAccessControl_getResourceClassInfoByResource extends TestAccess
    }
 
    @Test
-   public void getResourceClassInfoByResource_nulls() throws AccessControlException {
+   public void getResourceClassInfoByResource_nulls() {
       final char[] password = generateUniquePassword();
       final Resource accessorResource = generateAuthenticatableResource(password);
 

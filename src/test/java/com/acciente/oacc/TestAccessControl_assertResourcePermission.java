@@ -28,7 +28,7 @@ import static org.junit.Assert.fail;
 
 public class TestAccessControl_assertResourcePermission extends TestAccessControlBase {
    @Test
-   public void assertResourcePermission_succeedsAsSystemResource() throws AccessControlException {
+   public void assertResourcePermission_succeedsAsSystemResource() {
       authenticateSystemResource();
 
       // setup permission without granting it to anything
@@ -49,7 +49,7 @@ public class TestAccessControl_assertResourcePermission extends TestAccessContro
    }
 
    @Test
-   public void assertResourcePermission_noPermissions_shouldFailAsAuthenticated() throws AccessControlException {
+   public void assertResourcePermission_noPermissions_shouldFailAsAuthenticated() {
       authenticateSystemResource();
 
       // setup permission without granting it to anything
@@ -76,14 +76,13 @@ public class TestAccessControl_assertResourcePermission extends TestAccessContro
                                                        ResourcePermissions.getInstance(customPermissionName));
          fail("asserting resource permission for domain when none has been granted should not have succeeded for authenticated resource");
       }
-      catch (AccessControlException e) {
-         assertThat(e.isNotAuthorizedError(), is(true));
-         assertThat(e.getMessage().toLowerCase(), containsString("does not have requested permission"));
+      catch (NotAuthorizedException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("does not have permission"));
       }
    }
 
    @Test
-   public void assertResourcePermission_direct_succeedsAsAuthenticatedResource() throws AccessControlException {
+   public void assertResourcePermission_direct_succeedsAsAuthenticatedResource() {
       authenticateSystemResource();
 
       final char[] password = generateUniquePassword();
@@ -107,7 +106,7 @@ public class TestAccessControl_assertResourcePermission extends TestAccessContro
    }
 
    @Test
-   public void assertResourcePermission_directWithDifferentGrantingRights_succeedsAsAuthenticatedResource() throws AccessControlException {
+   public void assertResourcePermission_directWithDifferentGrantingRights_succeedsAsAuthenticatedResource() {
       authenticateSystemResource();
 
       final char[] password = generateUniquePassword();
@@ -145,14 +144,13 @@ public class TestAccessControl_assertResourcePermission extends TestAccessContro
          accessControlContext.assertResourcePermission(accessorResource, accessedResource, customPermission2_withGrant);
          fail("asserting resource permission with grant when the one granted does not have grant should not have succeeded for authenticated resource");
       }
-      catch (AccessControlException e) {
-         assertThat(e.isNotAuthorizedError(), is(true));
-         assertThat(e.getMessage().toLowerCase(), containsString("does not have requested permission"));
+      catch (NotAuthorizedException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("does not have permission"));
       }
    }
 
    @Test
-   public void assertResourcePermission_resourceInherited_succeedsAsAuthenticatedResource() throws AccessControlException {
+   public void assertResourcePermission_resourceInherited_succeedsAsAuthenticatedResource() {
       authenticateSystemResource();
 
       final char[] password = generateUniquePassword();
@@ -182,7 +180,7 @@ public class TestAccessControl_assertResourcePermission extends TestAccessContro
    }
 
    @Test
-   public void assertResourcePermission_domainInherited_succeedsAsAuthenticatedResource() throws AccessControlException {
+   public void assertResourcePermission_domainInherited_succeedsAsAuthenticatedResource() {
       authenticateSystemResource();
 
       final String parentDomainName = generateDomain();
@@ -213,7 +211,7 @@ public class TestAccessControl_assertResourcePermission extends TestAccessContro
    }
 
    @Test
-   public void assertResourcePermission_domainInheritedInherited_succeedsAsAuthenticatedResource() throws AccessControlException {
+   public void assertResourcePermission_domainInheritedInherited_succeedsAsAuthenticatedResource() {
       authenticateSystemResource();
 
       final String parentDomainName = generateDomain();
@@ -250,7 +248,7 @@ public class TestAccessControl_assertResourcePermission extends TestAccessContro
    }
 
    @Test
-   public void assertResourcePermission_superUser_succeedsAsAuthenticatedResource() throws AccessControlException {
+   public void assertResourcePermission_superUser_succeedsAsAuthenticatedResource() {
       authenticateSystemResource();
 
       final String parentDomainName = generateDomain();
@@ -281,7 +279,7 @@ public class TestAccessControl_assertResourcePermission extends TestAccessContro
    }
 
    @Test
-   public void assertResourcePermission_superUserInherited_succeedsAsAuthenticatedResource() throws AccessControlException {
+   public void assertResourcePermission_superUserInherited_succeedsAsAuthenticatedResource() {
       authenticateSystemResource();
 
       final String parentDomainName = generateDomain();
@@ -318,7 +316,7 @@ public class TestAccessControl_assertResourcePermission extends TestAccessContro
    }
 
    @Test
-   public void assertResourcePermission_nulls_shouldFail() throws AccessControlException {
+   public void assertResourcePermission_nulls_shouldFail() {
       authenticateSystemResource();
 
       final char[] password = generateUniquePassword();
@@ -359,7 +357,7 @@ public class TestAccessControl_assertResourcePermission extends TestAccessContro
    }
 
    @Test
-   public void assertResourcePermission_nonExistentReferences_shouldFail() throws AccessControlException {
+   public void assertResourcePermission_nonExistentReferences_shouldFail() {
       authenticateSystemResource();
 
       final char[] password = generateUniquePassword();

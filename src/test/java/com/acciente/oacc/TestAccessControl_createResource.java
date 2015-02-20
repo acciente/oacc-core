@@ -30,7 +30,7 @@ import static org.junit.Assert.fail;
 
 public class TestAccessControl_createResource extends TestAccessControlBase {
    @Test
-   public void createResource_validAsSystemResource() throws AccessControlException {
+   public void createResource_validAsSystemResource() {
       authenticateSystemResource();
 
       final String domainName = generateDomain();
@@ -46,7 +46,7 @@ public class TestAccessControl_createResource extends TestAccessControlBase {
    }
 
    @Test
-   public void createResource_validAsAuthorized() throws AccessControlException {
+   public void createResource_validAsAuthorized() {
       final String domainName = generateDomain();
       final String resourceClassName = generateResourceClass(false, false);
 
@@ -82,7 +82,7 @@ public class TestAccessControl_createResource extends TestAccessControlBase {
    }
 
    @Test
-   public void createResource_validAsUnauthenticated() throws AccessControlException {
+   public void createResource_validAsUnauthenticated() {
       final String domainName = generateDomain();
       final String resourceClassName = generateResourceClass(false, true);
       final String permissionName = generateResourceClassPermission(resourceClassName);
@@ -118,7 +118,7 @@ public class TestAccessControl_createResource extends TestAccessControlBase {
    }
 
    @Test
-   public void createResource_validWithDefaultSessionDomain() throws AccessControlException {
+   public void createResource_validWithDefaultSessionDomain() {
       final String resourceClassName = generateResourceClass(false, false);
 
       // set up an authenticatable resource with resource class create permission
@@ -141,7 +141,7 @@ public class TestAccessControl_createResource extends TestAccessControlBase {
    }
 
    @Test
-   public void createResource_whitespaceConsistent_AsAuthorized() throws AccessControlException {
+   public void createResource_whitespaceConsistent_AsAuthorized() {
       final String domainName = generateDomain();
       final String resourceClassName = generateResourceClass(false, false);
 
@@ -173,7 +173,7 @@ public class TestAccessControl_createResource extends TestAccessControlBase {
    }
 
    @Test
-   public void createResource_caseSensitiveConsistent_AsAuthorized() throws AccessControlException {
+   public void createResource_caseSensitiveConsistent_AsAuthorized() {
       authenticateSystemResource();
       final String domainBase = generateUniqueDomainName();
       final String resourceClassBase = generateUniqueResourceClassName();
@@ -278,7 +278,7 @@ public class TestAccessControl_createResource extends TestAccessControlBase {
    }
 
    @Test
-   public void createResource_authenticatableResourceClass_withoutCredentials_shouldFail() throws AccessControlException {
+   public void createResource_authenticatableResourceClass_withoutCredentials_shouldFail() {
       authenticateSystemResource();
 
       final String domainName = generateDomain();
@@ -303,7 +303,7 @@ public class TestAccessControl_createResource extends TestAccessControlBase {
    }
 
    @Test
-   public void createResource_nulls_shouldFail() throws AccessControlException {
+   public void createResource_nulls_shouldFail() {
       authenticateSystemResource();
 
       final String domainName = generateDomain();
@@ -336,7 +336,7 @@ public class TestAccessControl_createResource extends TestAccessControlBase {
    }
 
    @Test
-   public void createResource_emptyNames_shouldFail() throws AccessControlException {
+   public void createResource_emptyNames_shouldFail() {
       authenticateSystemResource();
 
       final String domainName = generateDomain();
@@ -393,7 +393,7 @@ public class TestAccessControl_createResource extends TestAccessControlBase {
    }
 
    @Test
-   public void createResource_nonExistentReferences_shouldFail() throws AccessControlException {
+   public void createResource_nonExistentReferences_shouldFail() {
       authenticateSystemResource();
 
       final String domainName = generateDomain();
@@ -426,7 +426,7 @@ public class TestAccessControl_createResource extends TestAccessControlBase {
    }
 
    @Test
-   public void createResource_notAuthorized_shouldFail() throws AccessControlException {
+   public void createResource_notAuthorized_shouldFail() {
       final String domainName = generateDomain();
       final String resourceClassName = generateResourceClass(false, false);
 
@@ -437,13 +437,13 @@ public class TestAccessControl_createResource extends TestAccessControlBase {
          accessControlContext.createResource(resourceClassName, domainName);
          fail("creating resource without authorization should fail");
       }
-      catch (AccessControlException e) {
-         assertThat(e.getMessage().toLowerCase(), containsString("not authorized"));
+      catch (NotAuthorizedException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("create resource"));
       }
    }
 
    @Test
-   public void createResource_notAuthorizedWithDefaultSessionDomain_shouldFail() throws AccessControlException {
+   public void createResource_notAuthorizedWithDefaultSessionDomain_shouldFail() {
       final String resourceClassName = generateResourceClass(false, false);
 
       generateResourceAndAuthenticate();
@@ -453,8 +453,8 @@ public class TestAccessControl_createResource extends TestAccessControlBase {
          accessControlContext.createResource(resourceClassName);
          fail("creating resource without authorization should fail");
       }
-      catch (AccessControlException e) {
-         assertThat(e.getMessage().toLowerCase(), containsString("not authorized"));
+      catch (NotAuthorizedException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("create resource"));
       }
    }
 }

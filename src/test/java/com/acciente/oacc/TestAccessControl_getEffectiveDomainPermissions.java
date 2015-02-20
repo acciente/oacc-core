@@ -30,7 +30,7 @@ import static org.junit.Assert.fail;
 
 public class TestAccessControl_getEffectiveDomainPermissions extends TestAccessControlBase {
    @Test
-   public void getEffectiveDomainPermissions_emptyAsSystemResource() throws AccessControlException {
+   public void getEffectiveDomainPermissions_emptyAsSystemResource() {
       authenticateSystemResource();
 
       final Resource accessorResource = generateUnauthenticatableResource();
@@ -43,7 +43,7 @@ public class TestAccessControl_getEffectiveDomainPermissions extends TestAccessC
    }
 
    @Test
-   public void getEffectiveDomainPermissions_emptyAsAuthenticated() throws AccessControlException {
+   public void getEffectiveDomainPermissions_emptyAsAuthenticated() {
       final Resource accessorResource = generateUnauthenticatableResource();
 
       generateResourceAndAuthenticate();
@@ -57,7 +57,7 @@ public class TestAccessControl_getEffectiveDomainPermissions extends TestAccessC
    }
 
    @Test
-   public void getEffectiveDomainPermissions_validAsSystemResource() throws AccessControlException {
+   public void getEffectiveDomainPermissions_validAsSystemResource() {
       authenticateSystemResource();
       final DomainPermission domCreatePerm_superuser
             = DomainPermissions.getInstance(DomainPermissions.SUPER_USER);
@@ -100,7 +100,7 @@ public class TestAccessControl_getEffectiveDomainPermissions extends TestAccessC
    }
 
    @Test
-   public void getEffectiveDomainPermissions_validWithInheritFromParentDomain() throws AccessControlException {
+   public void getEffectiveDomainPermissions_validWithInheritFromParentDomain() {
       authenticateSystemResource();
       final DomainPermission domPerm_superuser
             = DomainPermissions.getInstance(DomainPermissions.SUPER_USER);
@@ -143,7 +143,7 @@ public class TestAccessControl_getEffectiveDomainPermissions extends TestAccessC
    }
 
    @Test
-   public void getEffectiveDomainPermissions_validWithInheritFromAncestorDomainWithEmptyIntermediaryAncestors() throws AccessControlException {
+   public void getEffectiveDomainPermissions_validWithInheritFromAncestorDomainWithEmptyIntermediaryAncestors() {
       authenticateSystemResource();
       final DomainPermission domPerm_superuser
             = DomainPermissions.getInstance(DomainPermissions.SUPER_USER);
@@ -213,7 +213,7 @@ public class TestAccessControl_getEffectiveDomainPermissions extends TestAccessC
    }
 
    @Test
-   public void getEffectiveDomainPermissions_validWithInheritFromResource() throws AccessControlException {
+   public void getEffectiveDomainPermissions_validWithInheritFromResource() {
       authenticateSystemResource();
       final DomainPermission domPerm_superuser
             = DomainPermissions.getInstance(DomainPermissions.SUPER_USER);
@@ -259,7 +259,7 @@ public class TestAccessControl_getEffectiveDomainPermissions extends TestAccessC
    }
 
    @Test
-   public void getEffectiveDomainPermissions_validWithInheritFromAncestorDomainAndResource() throws AccessControlException {
+   public void getEffectiveDomainPermissions_validWithInheritFromAncestorDomainAndResource() {
       authenticateSystemResource();
       final DomainPermission domPerm_superuser_withGrant
             = DomainPermissions.getInstance(DomainPermissions.SUPER_USER, true);
@@ -314,7 +314,7 @@ public class TestAccessControl_getEffectiveDomainPermissions extends TestAccessC
    }
 
    @Test
-   public void getEffectiveDomainPermissions_whitespaceConsistent() throws AccessControlException {
+   public void getEffectiveDomainPermissions_whitespaceConsistent() {
       authenticateSystemResource();
       final DomainPermission domCreatePerm_superuser
             = DomainPermissions.getInstance(DomainPermissions.SUPER_USER);
@@ -338,7 +338,7 @@ public class TestAccessControl_getEffectiveDomainPermissions extends TestAccessC
    }
 
    @Test
-   public void getEffectiveDomainPermissions_nulls_shouldFail() throws AccessControlException {
+   public void getEffectiveDomainPermissions_nulls_shouldFail() {
       authenticateSystemResource();
 
       try {
@@ -367,7 +367,7 @@ public class TestAccessControl_getEffectiveDomainPermissions extends TestAccessC
    }
 
    @Test
-   public void getEffectiveDomainPermissions_nonExistentReferences_shouldSucceed() throws AccessControlException {
+   public void getEffectiveDomainPermissions_nonExistentReferences_shouldSucceed() {
       authenticateSystemResource();
 
       final String domainName = generateDomain();
@@ -382,7 +382,7 @@ public class TestAccessControl_getEffectiveDomainPermissions extends TestAccessC
    }
 
    @Test
-   public void getEffectiveDomainPermissions_nonExistentReferences_shouldFail() throws AccessControlException {
+   public void getEffectiveDomainPermissions_nonExistentReferences_shouldFail() {
       authenticateSystemResource();
 
       final Resource accessorResource = generateUnauthenticatableResource();

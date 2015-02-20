@@ -32,7 +32,7 @@ import static org.junit.Assert.fail;
 
 public class TestAccessControl_setResourceCreatePermissions extends TestAccessControlBase {
    @Test
-   public void setResourceCreatePermissions_validAsSystemResource() throws AccessControlException {
+   public void setResourceCreatePermissions_validAsSystemResource() {
       authenticateSystemResource();
       final ResourceCreatePermission createPerm_create_withGrant
             = ResourceCreatePermissions.getInstance(ResourceCreatePermissions.CREATE, true);
@@ -66,7 +66,7 @@ public class TestAccessControl_setResourceCreatePermissions extends TestAccessCo
    }
 
    @Test
-   public void setResourceCreatePermission_resetCredentialsPermissionOnUnauthenticatables_shouldFail() throws AccessControlException {
+   public void setResourceCreatePermission_resetCredentialsPermissionOnUnauthenticatables_shouldFail() {
       authenticateSystemResource();
       final String resourceClassName = generateResourceClass(false, false);
       final Resource accessorResource = generateAuthenticatableResource(generateUniquePassword());
@@ -98,7 +98,7 @@ public class TestAccessControl_setResourceCreatePermissions extends TestAccessCo
    }
 
    @Test
-   public void setResourceCreatePermission_impersonatePermissionOnUnauthenticatables_shouldFail() throws AccessControlException {
+   public void setResourceCreatePermission_impersonatePermissionOnUnauthenticatables_shouldFail() {
       authenticateSystemResource();
       final String resourceClassName = generateResourceClass(false, false);
       final Resource accessorResource = generateAuthenticatableResource(generateUniquePassword());
@@ -129,7 +129,7 @@ public class TestAccessControl_setResourceCreatePermissions extends TestAccessCo
    }
 
    @Test
-   public void setResourceCreatePermissions_validAsAuthorized() throws AccessControlException {
+   public void setResourceCreatePermissions_validAsAuthorized() {
       final ResourcePermission resourcePermission_inherit_withGrant
             = ResourcePermissions.getInstance(ResourcePermissions.INHERIT, true);
       final ResourceCreatePermission createPerm_create_withGrant
@@ -178,7 +178,7 @@ public class TestAccessControl_setResourceCreatePermissions extends TestAccessCo
    }
 
    @Test
-   public void setResourceCreatePermissions_validWithDefaultSessionDomain() throws AccessControlException {
+   public void setResourceCreatePermissions_validWithDefaultSessionDomain() {
       final ResourcePermission resourcePermission_inherit_withGrant
             = ResourcePermissions.getInstance(ResourcePermissions.INHERIT, true);
       final ResourceCreatePermission createPerm_create_withGrant
@@ -226,7 +226,7 @@ public class TestAccessControl_setResourceCreatePermissions extends TestAccessCo
    }
 
    @Test
-   public void setResourceCreatePermissions_resetPermissions() throws AccessControlException {
+   public void setResourceCreatePermissions_resetPermissions() {
       authenticateSystemResource();
       final ResourceCreatePermission createPerm_create_withGrant
             = ResourceCreatePermissions.getInstance(ResourceCreatePermissions.CREATE, true);
@@ -288,7 +288,7 @@ public class TestAccessControl_setResourceCreatePermissions extends TestAccessCo
    }
 
    @Test
-   public void setResourceCreatePermissions_whitespaceConsistent() throws AccessControlException {
+   public void setResourceCreatePermissions_whitespaceConsistent() {
       authenticateSystemResource();
       final Resource accessorResource = generateUnauthenticatableResource();
       final String domainName = generateDomain();
@@ -336,7 +336,7 @@ public class TestAccessControl_setResourceCreatePermissions extends TestAccessCo
    }
 
    @Test
-   public void setResourceCreatePermissions_caseSensitiveConsistent() throws AccessControlException {
+   public void setResourceCreatePermissions_caseSensitiveConsistent() {
       authenticateSystemResource();
       final Resource accessorResource = generateUnauthenticatableResource();
       final String domainName = generateDomain();
@@ -391,14 +391,14 @@ public class TestAccessControl_setResourceCreatePermissions extends TestAccessCo
             );
             fail("setting resource create permission with the name of an existing permission that differs in case only should have failed for case-insensitive databases");
          }
-         catch (AccessControlException e) {
+         catch (IllegalArgumentException e) {
             assertThat(e.getMessage().toLowerCase(), containsString("does not exist"));
          }
       }
    }
 
    @Test
-   public void setResourceCreatePermission_addPermission_withUnauthorizedPermissionsGrantedElsewhere_shouldSucceedAsAuthorized() throws AccessControlException {
+   public void setResourceCreatePermission_addPermission_withUnauthorizedPermissionsGrantedElsewhere_shouldSucceedAsAuthorized() {
       authenticateSystemResource();
       final String resourceClassName = generateResourceClass(false, false);
       final String grantedPermissionName = generateResourceClassPermission(resourceClassName);
@@ -456,7 +456,7 @@ public class TestAccessControl_setResourceCreatePermissions extends TestAccessCo
    }
 
    @Test
-   public void setResourceCreatePermission_removePermission_withUnauthorizedPermissionsGrantedElsewhere_shouldSucceedAsAuthorized() throws AccessControlException {
+   public void setResourceCreatePermission_removePermission_withUnauthorizedPermissionsGrantedElsewhere_shouldSucceedAsAuthorized() {
       authenticateSystemResource();
       final String resourceClassName = generateResourceClass(false, false);
       final String grantedPermissionName = generateResourceClassPermission(resourceClassName);
@@ -512,7 +512,7 @@ public class TestAccessControl_setResourceCreatePermissions extends TestAccessCo
    }
 
    @Test
-   public void setResourceCreatePermission_downgradeGrantingRights_shouldSucceedAsAuthorized() throws AccessControlException {
+   public void setResourceCreatePermission_downgradeGrantingRights_shouldSucceedAsAuthorized() {
       authenticateSystemResource();
       final String resourceClassName = generateResourceClass(false, false);
       final String grantedPermissionName = generateResourceClassPermission(resourceClassName);
@@ -563,7 +563,7 @@ public class TestAccessControl_setResourceCreatePermissions extends TestAccessCo
    }
 
    @Test
-   public void setResourceCreatePermission_downgradeGrantingRights_forUnauthorizedPermissionGrantedElsewhere_shouldFail() throws AccessControlException {
+   public void setResourceCreatePermission_downgradeGrantingRights_forUnauthorizedPermissionGrantedElsewhere_shouldFail() {
       authenticateSystemResource();
       final String resourceClassName = generateResourceClass(false, false);
       final String grantedPermissionName = generateResourceClassPermission(resourceClassName);
@@ -608,15 +608,14 @@ public class TestAccessControl_setResourceCreatePermissions extends TestAccessCo
          accessControlContext.setResourceCreatePermissions(accessorResource, resourceClassName, requestedPermissions, domainName);
          fail("Downgrading (=removal of granting rights) of create-permission granted elsewhere, to which I have no granting rights, should have failed");
       }
-      catch (AccessControlException e) {
-         assertThat(e.getMessage().toLowerCase(), containsString("not authorized"));
+      catch (NotAuthorizedException e) {
          assertThat(e.getMessage().toLowerCase(), containsString(ungrantedPermissionName.toLowerCase()));
          assertThat(e.getMessage().toLowerCase(), not(containsString(grantedPermissionName)));
       }
    }
 
    @Test
-   public void setResourceCreatePermission_upgradeGrantingRightsAndPostCreateGrantingRights_shouldSucceedAsAuthorized() throws AccessControlException {
+   public void setResourceCreatePermission_upgradeGrantingRightsAndPostCreateGrantingRights_shouldSucceedAsAuthorized() {
       authenticateSystemResource();
       final String resourceClassName = generateResourceClass(false, false);
       final String grantedPermissionName = generateResourceClassPermission(resourceClassName);
@@ -669,7 +668,7 @@ public class TestAccessControl_setResourceCreatePermissions extends TestAccessCo
    }
 
    @Test
-   public void setResourceCreatePermission_upgradeGrantingRights_forUnauthorizedPermissionGrantedElsewhere_shouldFail() throws AccessControlException {
+   public void setResourceCreatePermission_upgradeGrantingRights_forUnauthorizedPermissionGrantedElsewhere_shouldFail() {
       authenticateSystemResource();
       final String resourceClassName = generateResourceClass(false, false);
       final String grantedPermissionName = generateResourceClassPermission(resourceClassName);
@@ -714,15 +713,14 @@ public class TestAccessControl_setResourceCreatePermissions extends TestAccessCo
          accessControlContext.setResourceCreatePermissions(accessorResource, resourceClassName, requestedPermissions, domainName);
          fail("Upgrading (=addition of granting rights) of create-permission granted elsewhere, to which I have no granting rights, should have failed");
       }
-      catch (AccessControlException e) {
-         assertThat(e.getMessage().toLowerCase(), containsString("not authorized"));
+      catch (NotAuthorizedException e) {
          assertThat(e.getMessage().toLowerCase(), containsString(ungrantedPermissionName.toLowerCase()));
          assertThat(e.getMessage().toLowerCase(), not(containsString(grantedPermissionName)));
       }
    }
 
    @Test
-   public void setResourceCreatePermission_upgradePostCreateGrantingRights_shouldSucceedAsAuthorized() throws AccessControlException {
+   public void setResourceCreatePermission_upgradePostCreateGrantingRights_shouldSucceedAsAuthorized() {
       authenticateSystemResource();
       final String resourceClassName = generateResourceClass(false, false);
       final String grantedPermissionName = generateResourceClassPermission(resourceClassName);
@@ -775,7 +773,7 @@ public class TestAccessControl_setResourceCreatePermissions extends TestAccessCo
    }
 
    @Test
-   public void setResourceCreatePermission_downgradePostCreateGrantingRights_shouldSucceedAsAuthorized() throws AccessControlException {
+   public void setResourceCreatePermission_downgradePostCreateGrantingRights_shouldSucceedAsAuthorized() {
       authenticateSystemResource();
       final String resourceClassName = generateResourceClass(false, false);
       final String grantedPermissionName = generateResourceClassPermission(resourceClassName);
@@ -827,7 +825,7 @@ public class TestAccessControl_setResourceCreatePermissions extends TestAccessCo
    }
 
    @Test
-   public void setResourceCreatePermission_upgradePostCreateGrantingRights_shouldFsil() throws AccessControlException {
+   public void setResourceCreatePermission_upgradePostCreateGrantingRights_shouldFsil() {
       authenticateSystemResource();
       final String resourceClassName = generateResourceClass(false, false);
       final String grantedPermissionName = generateResourceClassPermission(resourceClassName);
@@ -870,14 +868,13 @@ public class TestAccessControl_setResourceCreatePermissions extends TestAccessCo
          accessControlContext.setResourceCreatePermissions(accessorResource, resourceClassName, requestedPermissions, domainName);
          fail("Upgrading (=addition of granting rights) a post-create permission, to which I have no post-create granting rights, should have failed");
       }
-      catch (AccessControlException e) {
-         assertThat(e.getMessage().toLowerCase(), containsString("not authorized"));
+      catch (NotAuthorizedException e) {
          assertThat(e.getMessage().toLowerCase(), containsString(grantedPermissionName));
       }
    }
 
    @Test
-   public void setResourceCreatePermission_downgradePostCreateGrantingRights_shouldFsil() throws AccessControlException {
+   public void setResourceCreatePermission_downgradePostCreateGrantingRights_shouldFsil() {
       authenticateSystemResource();
       final String resourceClassName = generateResourceClass(false, false);
       final String grantedPermissionName = generateResourceClassPermission(resourceClassName);
@@ -920,15 +917,14 @@ public class TestAccessControl_setResourceCreatePermissions extends TestAccessCo
          accessControlContext.setResourceCreatePermissions(accessorResource, resourceClassName, requestedPermissions, domainName);
          fail("Downgrading (=removal of granting rights) a post-create permission, to which I have no post-create granting rights, should have failed");
       }
-      catch (AccessControlException e) {
-         assertThat(e.getMessage().toLowerCase(), containsString("not authorized"));
+      catch (NotAuthorizedException e) {
          assertThat(e.getMessage().toLowerCase(), containsString(grantedPermissionName));
       }
    }
 
 
    @Test
-   public void setResourceCreatePermissions_duplicatePermissionNames_shouldFail() throws AccessControlException {
+   public void setResourceCreatePermissions_duplicatePermissionNames_shouldFail() {
       authenticateSystemResource();
       final ResourceCreatePermission createPerm_create_withGrant = ResourceCreatePermissions.getInstance(
             ResourceCreatePermissions.CREATE,
@@ -964,7 +960,7 @@ public class TestAccessControl_setResourceCreatePermissions extends TestAccessCo
    }
 
    @Test
-   public void setResourceCreatePermissions_withoutCreate_shouldFail() throws AccessControlException {
+   public void setResourceCreatePermissions_withoutCreate_shouldFail() {
       authenticateSystemResource();
       final ResourceCreatePermission createPerm_inherit
             = ResourceCreatePermissions.getInstance(ResourcePermissions.getInstance(ResourcePermissions.INHERIT, true));
@@ -993,7 +989,7 @@ public class TestAccessControl_setResourceCreatePermissions extends TestAccessCo
    }
 
    @Test
-   public void setResourceCreatePermissions_nulls_shouldFail() throws AccessControlException {
+   public void setResourceCreatePermissions_nulls_shouldFail() {
       authenticateSystemResource();
       final ResourceCreatePermission createPerm_create_withGrant
             = ResourceCreatePermissions.getInstance(ResourceCreatePermissions.CREATE, true);
@@ -1109,7 +1105,7 @@ public class TestAccessControl_setResourceCreatePermissions extends TestAccessCo
    }
 
    @Test
-   public void setResourceCreatePermissions_nonExistentReferences_shouldFail() throws AccessControlException {
+   public void setResourceCreatePermissions_nonExistentReferences_shouldFail() {
       authenticateSystemResource();
       final Resource accessorResource = generateUnauthenticatableResource();
       final String domainName = generateDomain();
@@ -1178,7 +1174,7 @@ public class TestAccessControl_setResourceCreatePermissions extends TestAccessCo
    }
 
    @Test
-   public void setResourceCreatePermissions_notAuthorized_shouldFail() throws AccessControlException {
+   public void setResourceCreatePermissions_notAuthorized_shouldFail() {
       final ResourcePermission resourcePermission_inherit_withGrant
             = ResourcePermissions.getInstance(ResourcePermissions.INHERIT, true);
       final ResourceCreatePermission createPerm_inherit_withGrant
@@ -1227,7 +1223,7 @@ public class TestAccessControl_setResourceCreatePermissions extends TestAccessCo
          );
          fail("setting create permissions without having rights to grant should have failed");
       }
-      catch (AccessControlException e) {
+      catch (NotAuthorizedException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("not authorized"));
       }
    }

@@ -18,13 +18,15 @@
 package com.acciente.oacc.sql.internal;
 
 import com.acciente.oacc.AccessControlContext;
-import com.acciente.oacc.AccessControlException;
 import com.acciente.oacc.AuthenticationProvider;
 import com.acciente.oacc.Credentials;
 import com.acciente.oacc.DomainCreatePermission;
 import com.acciente.oacc.DomainCreatePermissions;
 import com.acciente.oacc.DomainPermission;
 import com.acciente.oacc.DomainPermissions;
+import com.acciente.oacc.NotAuthenticatedException;
+import com.acciente.oacc.NotAuthorizedException;
+import com.acciente.oacc.OaccException;
 import com.acciente.oacc.Resource;
 import com.acciente.oacc.ResourceClassInfo;
 import com.acciente.oacc.ResourceCreatePermission;
@@ -129,31 +131,27 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
 
    public static AccessControlContext getAccessControlContext(Connection connection,
                                                               String schemaName,
-                                                              SQLDialect sqlDialect)
-         throws AccessControlException {
+                                                              SQLDialect sqlDialect) {
       return new SQLAccessControlContext(connection, schemaName, sqlDialect);
    }
 
    public static AccessControlContext getAccessControlContext(DataSource dataSource,
                                                               String schemaName,
-                                                              SQLDialect sqlDialect)
-         throws AccessControlException {
+                                                              SQLDialect sqlDialect) {
       return new SQLAccessControlContext(dataSource, schemaName, sqlDialect);
    }
 
    public static AccessControlContext getAccessControlContext(Connection connection,
                                                               String schemaName,
                                                               SQLDialect sqlDialect,
-                                                              AuthenticationProvider authenticationProvider)
-         throws AccessControlException {
+                                                              AuthenticationProvider authenticationProvider) {
       return new SQLAccessControlContext(connection, schemaName, sqlDialect, authenticationProvider);
    }
 
    public static AccessControlContext getAccessControlContext(DataSource dataSource,
                                                               String schemaName,
                                                               SQLDialect sqlDialect,
-                                                              AuthenticationProvider authenticationProvider)
-         throws AccessControlException {
+                                                              AuthenticationProvider authenticationProvider) {
       return new SQLAccessControlContext(dataSource, schemaName, sqlDialect, authenticationProvider);
    }
 
@@ -334,14 +332,13 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
    }
 
    @Override
-   public void unauthenticate()
-         throws AccessControlException {
+   public void unauthenticate() {
       sessionResource = authenticatedResource = null;
       sessionResourceDomainName = authenticatedResourceDomainName = null;
    }
 
    @Override
-   public void impersonate(Resource resource) throws AccessControlException {
+   public void impersonate(Resource resource) {
       SQLConnection connection = null;
 
       __assertAuthenticated();
@@ -361,7 +358,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       }
    }
 
-   private void __assertImpersonatePermission(SQLConnection connection, Resource resource) throws AccessControlException {
+   private void __assertImpersonatePermission(SQLConnection connection, Resource resource) {
       // this call will throw an exception if the resource is not found
       resourcePersister.verifyResourceExists(connection, resource);
 
@@ -410,20 +407,18 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       }
 
       if (!impersonatePermissionOK) {
-         throw new AccessControlException("Not authorized to impersonate: " + resource,
-                                          true);
+         throw new NotAuthorizedException(authenticatedResource, "impersonate", resource);
       }
    }
 
    @Override
-   public void unimpersonate()
-         throws AccessControlException {
+   public void unimpersonate() {
       sessionResource = authenticatedResource;
       sessionResourceDomainName = authenticatedResourceDomainName;
    }
 
    @Override
-   public void setCredentials(Resource resource, Credentials newCredentials) throws AccessControlException {
+   public void setCredentials(Resource resource, Credentials newCredentials) {
       SQLConnection connection = null;
 
       __assertAuthenticated();
@@ -470,7 +465,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
    private void __assertResetCredentialsResourcePermission(SQLConnection connection,
                                                            Resource resource,
                                                            String resourceClassName,
-                                                           String domainName) throws AccessControlException {
+                                                           String domainName) {
       // first check direct permissions
       boolean hasResetCredentialsPermission = false;
 
@@ -504,14 +499,14 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       }
 
       if (!hasResetCredentialsPermission) {
-         throw new AccessControlException("Not authorized to reset credentials for: " + resource, true);
+         throw new NotAuthorizedException(authenticatedResource, "reset credentials", resource);
       }
    }
 
    @Override
    public void createResourceClass(String resourceClassName,
                                    boolean authenticatable,
-                                   boolean unauthenticatedCreateAllowed) throws AccessControlException {
+                                   boolean unauthenticatedCreateAllowed) {
       SQLConnection connection = null;
 
       __assertAuthenticated();
@@ -536,7 +531,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
    }
 
    @Override
-   public void createResourcePermission(String resourceClassName, String permissionName) throws AccessControlException {
+   public void createResourcePermission(String resourceClassName, String permissionName) {
       SQLConnection connection = null;
 
       __assertAuthenticated();
@@ -573,7 +568,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
    }
 
    @Override
-   public void createDomain(String domainName) throws AccessControlException {
+   public void createDomain(String domainName) {
       SQLConnection connection = null;
 
       __assertAuthenticated();
@@ -592,7 +587,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
 
    @Override
    public void createDomain(String domainName,
-                            String parentDomainName) throws AccessControlException {
+                            String parentDomainName) {
       SQLConnection connection = null;
 
       __assertAuthenticated();
@@ -614,7 +609,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
 
    private void __createDomain(SQLConnection connection,
                                String domainName,
-                               String parentDomainName) throws AccessControlException {
+                               String parentDomainName) {
       // we need to check if the currently authenticated resource is allowed to create domains
       final Set<DomainCreatePermission> domainCreatePermissions
             = grantDomainCreatePermissionSysPersister.getDomainCreateSysPermissionsIncludeInherited(connection,
@@ -622,8 +617,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
 
       // if there is at least one permission, then it implies that this resource is allowed to create domains
       if (domainCreatePermissions.isEmpty()) {
-         throw new AccessControlException("Not authorized to create domains, domain: " + domainName,
-                                          true);
+         throw new NotAuthorizedException(sessionResource, "create domain");
       }
 
       // determine the post create permissions on the new domain
@@ -657,9 +651,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
                && !parentDomainPermissions.contains(DomainPermission_CREATE_CHILD_DOMAIN_GRANT)
                && !parentDomainPermissions.contains(DomainPermission_SUPER_USER)
                && !parentDomainPermissions.contains(DomainPermission_SUPER_USER_GRANT)) {
-            throw new AccessControlException("Not authorized to create child domains in domain: "
-                                                   + parentDomainName,
-                                             true);
+            throw new NotAuthorizedException(sessionResource, "create child domain in domain: " + parentDomainName);
          }
 
          // create the new child domain
@@ -677,7 +669,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
    }
 
    @Override
-   public Resource createResource(String resourceClassName) throws AccessControlException {
+   public Resource createResource(String resourceClassName) {
       SQLConnection connection = null;
 
       __assertAuthenticated();
@@ -693,7 +685,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
    }
 
    @Override
-   public Resource createResource(String resourceClassName, String domainName) throws AccessControlException {
+   public Resource createResource(String resourceClassName, String domainName) {
       SQLConnection connection = null;
 
       try {
@@ -707,7 +699,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
    }
 
    @Override
-   public Resource createResource(String resourceClassName, Credentials credentials) throws AccessControlException {
+   public Resource createResource(String resourceClassName, Credentials credentials) {
       SQLConnection connection = null;
 
       __assertAuthenticated();
@@ -726,7 +718,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
    @Override
    public Resource createResource(String resourceClassName,
                                   String domainName,
-                                  Credentials credentials) throws AccessControlException {
+                                  Credentials credentials) {
       SQLConnection connection = null;
 
       __assertCredentialsSpecified(credentials);
@@ -744,7 +736,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
    private Resource __createResource(SQLConnection connection,
                                      String resourceClassName,
                                      String domainName,
-                                     Credentials credentials) throws AccessControlException {
+                                     Credentials credentials) {
       __assertResourceClassSpecified(resourceClassName);
       __assertDomainSpecified(domainName);
 
@@ -818,7 +810,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
          }
 
          if (!createPermissionOK) {
-            throw new AccessControlException("Not authorized to create resource, class: " + resourceClassName, true);
+            throw new NotAuthorizedException(sessionResource, "create resource of resource class " + resourceClassName);
          }
       }
 
@@ -826,7 +818,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       final Id<ResourceId> newResourceId = resourcePersister.getNextResourceId(connection);
 
       if (newResourceId == null) {
-         throw new AccessControlException("Error generating new resource ID");
+         throw new IllegalStateException("Error generating new resource ID");
       }
 
       // create the new resource
@@ -868,7 +860,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
    @Override
    public void setDomainPermissions(Resource accessorResource,
                                     String domainName,
-                                    Set<DomainPermission> permissions) throws AccessControlException {
+                                    Set<DomainPermission> permissions) {
       SQLConnection connection = null;
 
       __assertAuthenticated();
@@ -890,7 +882,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
                                              Resource accessorResource,
                                              String domainName,
                                              Set<DomainPermission> requestedDomainPermissions,
-                                             boolean newDomainMode) throws AccessControlException {
+                                             boolean newDomainMode) {
       // determine the domain ID of the domain, for use in the grant below
       Id<DomainId> domainId = domainPersister.getResourceDomainId(connection, domainName);
 
@@ -931,9 +923,8 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
                      = __subtractDomainPermissionsIfGrantableFrom(requestedAddPermissions, grantorPermissions);
 
                if (unauthorizedAddPermissions.size() > 0) {
-                  throw new AccessControlException("Not authorized to add the following domain permission(s): "
-                                                         + unauthorizedAddPermissions,
-                                                   true);
+                  throw new NotAuthorizedException(sessionResource,
+                                                   "add the following domain permission(s): " + unauthorizedAddPermissions);
                }
             }
 
@@ -947,9 +938,8 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
                      = __subtractDomainPermissionsIfGrantableFrom(requestedRemovePermissions, grantorPermissions);
 
                if (unauthorizedRemovePermissions.size() > 0) {
-                  throw new AccessControlException("Not authorized to remove the following domain permission(s): "
-                                                         + unauthorizedRemovePermissions,
-                                                   true);
+                  throw new NotAuthorizedException(sessionResource,
+                                                   "remove the following domain permission(s): " + unauthorizedRemovePermissions);
                }
             }
          }
@@ -991,7 +981,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
 
    @Override
    public Set<DomainPermission> getDomainPermissions(Resource accessorResource,
-                                                     String domainName) throws AccessControlException {
+                                                     String domainName) {
       SQLConnection connection = null;
 
       __assertAuthenticated();
@@ -1015,7 +1005,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
    }
 
    @Override
-   public Map<String, Set<DomainPermission>> getDomainPermissionsMap(Resource accessorResource) throws AccessControlException {
+   public Map<String, Set<DomainPermission>> getDomainPermissionsMap(Resource accessorResource) {
       SQLConnection connection = null;
 
       __assertAuthenticated();
@@ -1035,7 +1025,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
 
    @Override
    public Set<DomainPermission> getEffectiveDomainPermissions(Resource accessorResource,
-                                                              String domainName) throws AccessControlException {
+                                                              String domainName) {
       SQLConnection connection = null;
 
       __assertAuthenticated();
@@ -1084,7 +1074,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
    }
 
    @Override
-   public Map<String, Set<DomainPermission>> getEffectiveDomainPermissionsMap(Resource accessorResource) throws AccessControlException {
+   public Map<String, Set<DomainPermission>> getEffectiveDomainPermissionsMap(Resource accessorResource) {
       SQLConnection connection = null;
 
       __assertAuthenticated();
@@ -1113,7 +1103,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
 
    @Override
    public void setDomainCreatePermissions(Resource accessorResource,
-                                          Set<DomainCreatePermission> domainCreatePermissions) throws AccessControlException {
+                                          Set<DomainCreatePermission> domainCreatePermissions) {
       SQLConnection connection = null;
 
       __assertAuthenticated();
@@ -1132,7 +1122,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
 
    private void __setDirectDomainCreatePermissions(SQLConnection connection,
                                                    Resource accessorResource,
-                                                   Set<DomainCreatePermission> requestedDomainCreatePermissions) throws AccessControlException {
+                                                   Set<DomainCreatePermission> requestedDomainCreatePermissions) {
       __assertSetContainsDomainCreateSystemPermission(requestedDomainCreatePermissions);
 
       resourcePersister.verifyResourceExists(connection, accessorResource);
@@ -1156,9 +1146,8 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
                = __subtractDomainCreatePermissionsIfGrantableFrom(requestedAddPermissions, grantorPermissions);
 
          if (unauthorizedAddPermissions.size() > 0) {
-            throw new AccessControlException("Not authorized to add the following domain permission(s): "
-                                                   + unauthorizedAddPermissions,
-                                             true);
+            throw new NotAuthorizedException(accessorResource,
+                                             "add the following domain create permission(s): " + unauthorizedAddPermissions);
          }
       }
 
@@ -1172,9 +1161,8 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
                = __subtractDomainCreatePermissionsIfGrantableFrom(requestedRemovePermissions, grantorPermissions);
 
          if (unauthorizedRemovePermissions.size() > 0) {
-            throw new AccessControlException("Not authorized to remove the following domain permission(s): "
-                                                   + unauthorizedRemovePermissions,
-                                             true);
+            throw new NotAuthorizedException(accessorResource,
+                                             "remove the following domain create permission(s): " + unauthorizedRemovePermissions);
          }
       }
 
@@ -1246,7 +1234,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
    }
 
    @Override
-   public Set<DomainCreatePermission> getDomainCreatePermissions(Resource accessorResource) throws AccessControlException {
+   public Set<DomainCreatePermission> getDomainCreatePermissions(Resource accessorResource) {
       SQLConnection connection = null;
 
       __assertAuthenticated();
@@ -1263,7 +1251,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
    }
 
    @Override
-   public Set<DomainCreatePermission> getEffectiveDomainCreatePermissions(Resource accessorResource) throws AccessControlException {
+   public Set<DomainCreatePermission> getEffectiveDomainCreatePermissions(Resource accessorResource) {
       SQLConnection connection = null;
 
       __assertAuthenticated();
@@ -1311,7 +1299,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
    public void setResourceCreatePermissions(Resource accessorResource,
                                             String resourceClassName,
                                             Set<ResourceCreatePermission> resourceCreatePermissions,
-                                            String domainName) throws AccessControlException {
+                                            String domainName) {
       SQLConnection connection = null;
 
       __assertAuthenticated();
@@ -1338,7 +1326,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
    @Override
    public void setResourceCreatePermissions(Resource accessorResource,
                                             String resourceClassName,
-                                            Set<ResourceCreatePermission> resourceCreatePermissions) throws AccessControlException {
+                                            Set<ResourceCreatePermission> resourceCreatePermissions) {
       SQLConnection connection = null;
 
       __assertAuthenticated();
@@ -1365,7 +1353,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
                                                      Resource accessorResource,
                                                      String resourceClassName,
                                                      Set<ResourceCreatePermission> requestedResourceCreatePermissions,
-                                                     String domainName) throws AccessControlException {
+                                                     String domainName) {
       resourcePersister.verifyResourceExists(connection, accessorResource);
 
       // verify that resource class is defined and get its metadata
@@ -1417,9 +1405,8 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
                   = __subtractResourceCreatePermissionsIfGrantableFrom(requestedAddPermissions, grantorPermissions);
 
             if (unauthorizedAddPermissions.size() > 0) {
-               throw new AccessControlException("Not authorized to add the following permission(s): "
-                                                      + unauthorizedAddPermissions,
-                                                true);
+               throw new NotAuthorizedException(accessorResource,
+                                                "add the following permission(s): " + unauthorizedAddPermissions);
             }
          }
 
@@ -1433,9 +1420,8 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
                   = __subtractResourceCreatePermissionsIfGrantableFrom(requestedRemovePermissions, grantorPermissions);
 
             if (unauthorizedRemovePermissions.size() > 0) {
-               throw new AccessControlException("Not authorized to remove the following permission(s): "
-                                                      + unauthorizedRemovePermissions,
-                                                true);
+               throw new NotAuthorizedException(accessorResource,
+                                                "Not authorized to remove the following permission(s): " + unauthorizedRemovePermissions);
             }
          }
       }
@@ -1602,7 +1588,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
    @Override
    public Set<ResourceCreatePermission> getResourceCreatePermissions(Resource accessorResource,
                                                                      String resourceClassName,
-                                                                     String domainName) throws AccessControlException {
+                                                                     String domainName) {
       SQLConnection connection = null;
 
       __assertAuthenticated();
@@ -1651,7 +1637,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
 
    @Override
    public Set<ResourceCreatePermission> getResourceCreatePermissions(Resource accessorResource,
-                                                                     String resourceClassName) throws AccessControlException {
+                                                                     String resourceClassName) {
       SQLConnection connection = null;
 
       __assertAuthenticated();
@@ -1673,7 +1659,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
    }
 
    @Override
-   public Map<String, Map<String, Set<ResourceCreatePermission>>> getResourceCreatePermissionsMap(Resource accessorResource) throws AccessControlException {
+   public Map<String, Map<String, Set<ResourceCreatePermission>>> getResourceCreatePermissionsMap(Resource accessorResource) {
       SQLConnection connection = null;
 
       __assertAuthenticated();
@@ -1716,7 +1702,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
    @Override
    public Set<ResourceCreatePermission> getEffectiveResourceCreatePermissions(Resource accessorResource,
                                                                               String resourceClassName,
-                                                                              String domainName) throws AccessControlException {
+                                                                              String domainName) {
       SQLConnection connection = null;
 
       __assertAuthenticated();
@@ -1741,7 +1727,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
 
    @Override
    public Set<ResourceCreatePermission> getEffectiveResourceCreatePermissions(Resource accessorResource,
-                                                                              String resourceClassName) throws AccessControlException {
+                                                                              String resourceClassName) {
       SQLConnection connection = null;
 
       __assertAuthenticated();
@@ -1824,8 +1810,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
    }
 
    @Override
-   public Map<String, Map<String, Set<ResourceCreatePermission>>> getEffectiveResourceCreatePermissionsMap(Resource accessorResource)
-         throws AccessControlException {
+   public Map<String, Map<String, Set<ResourceCreatePermission>>> getEffectiveResourceCreatePermissionsMap(Resource accessorResource) {
       SQLConnection connection = null;
 
       __assertAuthenticated();
@@ -1913,7 +1898,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
    @Override
    public void setResourcePermissions(Resource accessorResource,
                                       Resource accessedResource,
-                                      Set<ResourcePermission> resourcePermissions) throws AccessControlException {
+                                      Set<ResourcePermission> resourcePermissions) {
       SQLConnection connection = null;
 
       __assertAuthenticated();
@@ -1941,7 +1926,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
                                                Resource accessedResource,
                                                Set<ResourcePermission> requestedResourcePermissions,
                                                Resource grantorResource,
-                                               boolean newResourceMode) throws AccessControlException {
+                                               boolean newResourceMode) {
       final ResourceClassInternalInfo accessedResourceClassInternalInfo
             = resourceClassPersister.getResourceClassInfoByResourceId(connection, accessedResource);
 
@@ -1979,9 +1964,8 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
                      = __subtractResourcePermissionsIfGrantableFrom(requestedAddPermissions, grantorResourcePermissions);
 
                if (unauthorizedAddPermissions.size() > 0) {
-                  throw new AccessControlException("Not authorized to add the following permission(s): "
-                                                         + unauthorizedAddPermissions,
-                                                   true);
+                  throw new NotAuthorizedException(accessorResource,
+                                                   "add the following permission(s): " + unauthorizedAddPermissions);
                }
             }
 
@@ -1995,9 +1979,8 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
                      = __subtractResourcePermissionsIfGrantableFrom(requestedRemovePermissions, grantorResourcePermissions);
 
                if (unauthorizedRemovePermissions.size() > 0) {
-                  throw new AccessControlException("Not authorized to remove the following permission(s): "
-                                                         + unauthorizedRemovePermissions,
-                                                   true);
+                  throw new NotAuthorizedException(accessorResource,
+                                                   "remove the following permission(s): " + unauthorizedRemovePermissions);
                }
             }
          }
@@ -2011,13 +1994,12 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
 
             if (reversePathResourcePermissions.contains(ResourcePermission_INHERIT)
                   || reversePathResourcePermissions.contains(ResourcePermission_INHERIT_GRANT)) {
-               throw new AccessControlException("Granting the requested permission(s): "
+               throw new OaccException("Granting the requested permission(s): "
                                                       + requestedResourcePermissions
                                                       + " will cause a cycle between: "
                                                       + accessorResource
                                                       + " and: "
-                                                      + accessedResource,
-                                                true);
+                                                      + accessedResource);
             }
          }
 
@@ -2101,7 +2083,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
 
    @Override
    public Set<ResourcePermission> getResourcePermissions(Resource accessorResource,
-                                                         Resource accessedResource) throws AccessControlException {
+                                                         Resource accessedResource) {
       SQLConnection connection = null;
 
       __assertAuthenticated();
@@ -2137,8 +2119,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
    }
 
    @Override
-   public Set<ResourcePermission> getEffectiveResourcePermissions(Resource accessorResource, Resource accessedResource)
-         throws AccessControlException {
+   public Set<ResourcePermission> getEffectiveResourcePermissions(Resource accessorResource, Resource accessedResource) {
       SQLConnection connection = null;
 
       __assertAuthenticated();
@@ -2197,8 +2178,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
    public void setGlobalResourcePermissions(Resource accessorResource,
                                             String resourceClassName,
                                             Set<ResourcePermission> resourcePermissions,
-                                            String domainName)
-         throws AccessControlException {
+                                            String domainName) {
       SQLConnection connection = null;
 
       __assertAuthenticated();
@@ -2227,7 +2207,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
    @Override
    public void setGlobalResourcePermissions(Resource accessorResource,
                                             String resourceClassName,
-                                            Set<ResourcePermission> resourcePermissions) throws AccessControlException {
+                                            Set<ResourcePermission> resourcePermissions) {
       SQLConnection connection = null;
 
       __assertAuthenticated();
@@ -2255,8 +2235,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
                                              Resource accessorResource,
                                              String resourceClassName,
                                              Set<ResourcePermission> requestedResourcePermissions,
-                                             String domainName)
-         throws AccessControlException {
+                                             String domainName) {
       resourcePersister.verifyResourceExists(connection, accessorResource);
 
       // verify that resource class is defined
@@ -2303,9 +2282,8 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
                   = __subtractResourcePermissionsIfGrantableFrom(requestedAddPermissions, grantorPermissions);
 
             if (unauthorizedAddPermissions.size() > 0) {
-               throw new AccessControlException("Not authorized to add the following permission(s): "
-                                                      + unauthorizedAddPermissions,
-                                                true);
+               throw new NotAuthorizedException(accessorResource,
+                                                "add the following global permission(s): " + unauthorizedAddPermissions);
             }
          }
 
@@ -2319,9 +2297,8 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
                   = __subtractResourcePermissionsIfGrantableFrom(requestedRemovePermissions, grantorPermissions);
 
             if (unauthorizedRemovePermissions.size() > 0) {
-               throw new AccessControlException("Not authorized to remove the following permission(s): "
-                                                      + unauthorizedRemovePermissions,
-                                                true);
+               throw new NotAuthorizedException(accessorResource,
+                                                "remove the following global permission(s): " + unauthorizedRemovePermissions);
             }
          }
       }
@@ -2416,7 +2393,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
    @Override
    public Set<ResourcePermission> getGlobalResourcePermissions(Resource accessorResource,
                                                                String resourceClassName,
-                                                               String domainName) throws AccessControlException {
+                                                               String domainName) {
       SQLConnection connection = null;
 
       __assertAuthenticated();
@@ -2465,7 +2442,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
 
    @Override
    public Set<ResourcePermission> getGlobalResourcePermissions(Resource accessorResource,
-                                                               String resourceClassName) throws AccessControlException {
+                                                               String resourceClassName) {
       SQLConnection connection = null;
 
       __assertAuthenticated();
@@ -2489,8 +2466,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
    @Override
    public Set<ResourcePermission> getEffectiveGlobalResourcePermissions(Resource accessorResource,
                                                                         String resourceClassName,
-                                                                        String domainName)
-         throws AccessControlException {
+                                                                        String domainName) {
       SQLConnection connection = null;
 
       __assertAuthenticated();
@@ -2515,8 +2491,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
 
    @Override
    public Set<ResourcePermission> getEffectiveGlobalResourcePermissions(Resource accessorResource,
-                                                                        String resourceClassName)
-         throws AccessControlException {
+                                                                        String resourceClassName) {
       SQLConnection connection = null;
 
       __assertAuthenticated();
@@ -2589,7 +2564,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
    }
 
    @Override
-   public Map<String, Map<String, Set<ResourcePermission>>> getGlobalResourcePermissionsMap(Resource accessorResource) throws AccessControlException {
+   public Map<String, Map<String, Set<ResourcePermission>>> getGlobalResourcePermissionsMap(Resource accessorResource) {
       SQLConnection connection = null;
 
       __assertAuthenticated();
@@ -2622,8 +2597,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
    }
 
    @Override
-   public Map<String, Map<String, Set<ResourcePermission>>> getEffectiveGlobalResourcePermissionsMap(Resource accessorResource)
-         throws AccessControlException {
+   public Map<String, Map<String, Set<ResourcePermission>>> getEffectiveGlobalResourcePermissionsMap(Resource accessorResource) {
       SQLConnection connection = null;
 
       __assertAuthenticated();
@@ -2699,7 +2673,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
    }
 
    @Override
-   public String getDomainNameByResource(Resource resource) throws AccessControlException {
+   public String getDomainNameByResource(Resource resource) {
       SQLConnection connection = null;
 
       __assertAuthenticated();
@@ -2716,7 +2690,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
    }
 
    @Override
-   public Set<String> getDomainDescendants(String domainName) throws AccessControlException {
+   public Set<String> getDomainDescendants(String domainName) {
       SQLConnection connection = null;
 
       __assertAuthenticated();
@@ -2734,7 +2708,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
    }
 
    @Override
-   public ResourceClassInfo getResourceClassInfo(String resourceClassName) throws AccessControlException {
+   public ResourceClassInfo getResourceClassInfo(String resourceClassName) {
       SQLConnection connection = null;
 
       __assertAuthenticated();
@@ -2760,7 +2734,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
    }
 
    @Override
-   public ResourceClassInfo getResourceClassInfoByResource(Resource resource) throws AccessControlException {
+   public ResourceClassInfo getResourceClassInfoByResource(Resource resource) {
       SQLConnection connection = null;
 
       __assertAuthenticated();
@@ -2781,14 +2755,14 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
    }
 
    @Override
-   public Resource getAuthenticatedResource() throws AccessControlException {
+   public Resource getAuthenticatedResource() {
       __assertAuthenticated();
 
       return authenticatedResource;
    }
 
    @Override
-   public Resource getSessionResource() throws AccessControlException {
+   public Resource getSessionResource() {
       __assertAuthenticated();
 
       return sessionResource;
@@ -2796,7 +2770,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
 
    @Override
    public void assertPostCreateDomainPermission(Resource accessorResource,
-                                                DomainPermission domainPermission) throws AccessControlException {
+                                                DomainPermission domainPermission) {
 
       SQLConnection connection = null;
 
@@ -2817,8 +2791,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
 
    private void __assertPostCreateDomainPermission(SQLConnection connection,
                                                    Resource accessorResource,
-                                                   DomainPermission requestedDomainPermission)
-         throws AccessControlException {
+                                                   DomainPermission requestedDomainPermission) {
       boolean createSysPermissionFound = false;
       final Set<DomainCreatePermission> effectiveDomainCreatePermissions
             = __getEffectiveDomainCreatePermissions(connection, accessorResource);
@@ -2848,10 +2821,12 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
 
       // if none of the above then complain...
       if (createSysPermissionFound) {
-         throw new AccessControlException("No create permission: " + requestedDomainPermission, true);
+         throw new NotAuthorizedException(accessorResource,
+                                          "receive " + String.valueOf(requestedDomainPermission)
+                                                + " permission after creating a domain");
       }
       else {
-         throw new AccessControlException("No *CREATE permission to create any domains", true);
+         throw new NotAuthorizedException(accessorResource, "create any domains");
       }
    }
 
@@ -2869,7 +2844,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
    @Override
    public void assertDomainPermission(Resource accessorResource,
                                       DomainPermission domainPermission,
-                                      String domainName) throws AccessControlException {
+                                      String domainName) {
 
       SQLConnection connection = null;
 
@@ -2882,10 +2857,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
          connection = __getConnection();
 
          if (!__hasPermission(connection, accessorResource, domainPermission, domainName)) {
-            // if none of the above then complain...
-            throw new AccessControlException("Current resource " + sessionResource + " does not have requested permission: "
-                                                   + domainPermission,
-                                             true);
+            throw new NotAuthorizedException(accessorResource, domainPermission, domainName);
          }
       }
       finally {
@@ -2914,8 +2886,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
    @Override
    public void assertPostCreateResourcePermission(Resource accessorResource,
                                                   String resourceClassName,
-                                                  ResourcePermission requestedResourcePermission)
-         throws AccessControlException {
+                                                  ResourcePermission requestedResourcePermission) {
       SQLConnection connection = null;
 
       __assertAuthenticated();
@@ -2942,7 +2913,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
    public void assertPostCreateResourcePermission(Resource accessorResource,
                                                   String resourceClassName,
                                                   ResourcePermission resourcePermission,
-                                                  String domainName) throws AccessControlException {
+                                                  String domainName) {
       SQLConnection connection = null;
 
       __assertAuthenticated();
@@ -2971,8 +2942,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
                                                      Resource accessorResource,
                                                      String resourceClassName,
                                                      ResourcePermission requestedResourcePermission,
-                                                     String domainName)
-         throws AccessControlException {
+                                                     String domainName) {
       __assertPermissionValid(connection, resourceClassName, requestedResourcePermission);
 
       boolean createSysPermissionFound = false;
@@ -3017,11 +2987,14 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
 
       // if none of the above then complain...
       if (createSysPermissionFound) {
-         throw new AccessControlException("No create permission: " + requestedResourcePermission, true);
+         throw new NotAuthorizedException(accessorResource,
+                                          "receive " + String.valueOf(requestedResourcePermission)
+                                                + " permission after creating a " + resourceClassName
+                                                + " resource in domain " + domainName);
       }
       else {
-         throw new AccessControlException("No *CREATE permission to create any " + resourceClassName
-                                                + " resources in domain " + domainName, true);
+         throw new NotAuthorizedException(accessorResource,
+                                          "create any " + resourceClassName + " resources in domain " + domainName);
       }
    }
 
@@ -3039,8 +3012,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
    @Override
    public void assertGlobalResourcePermission(Resource accessorResource,
                                               String resourceClassName, 
-                                              ResourcePermission requestedResourcePermission)
-         throws AccessControlException {
+                                              ResourcePermission requestedResourcePermission) {
       SQLConnection connection = null;
 
       __assertAuthenticated();
@@ -3067,7 +3039,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
    public void assertGlobalResourcePermission(Resource accessorResource,
                                               String resourceClassName,
                                               ResourcePermission requestedResourcePermission,
-                                              String domainName) throws AccessControlException {
+                                              String domainName) {
       SQLConnection connection = null;
 
       __assertAuthenticated();
@@ -3096,8 +3068,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
                                                  Resource accessorResource,
                                                  String resourceClassName,
                                                  ResourcePermission requestedResourcePermission,
-                                                 String domainName)
-         throws AccessControlException {
+                                                 String domainName) {
       __assertPermissionValid(connection, resourceClassName, requestedResourcePermission);
 
       final Set<ResourcePermission>
@@ -3115,15 +3086,13 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       }
 
       // if none of the above then complain...
-      throw new AccessControlException("No global permission: " + requestedResourcePermission,
-                                       true);
+      throw new NotAuthorizedException(accessorResource, requestedResourcePermission, resourceClassName, domainName);
    }
 
    @Override
    public void assertResourcePermission(Resource accessorResource,
                                         Resource accessedResource,
-                                        ResourcePermission requestedResourcePermission)
-         throws AccessControlException {
+                                        ResourcePermission requestedResourcePermission) {
       SQLConnection connection = null;
 
       __assertAuthenticated();
@@ -3141,17 +3110,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
          __assertPermissionValid(connection, resourceClassInternalInfo.getResourceClassName(), requestedResourcePermission);
 
          if (!__hasPermission(connection, accessorResource, accessedResource, requestedResourcePermission)) {
-            // if none of the above then complain...
-            if (sessionResource.equals(accessorResource)) {
-               throw new AccessControlException("Current resource " + sessionResource + " does not have requested permission: "
-                                                      + requestedResourcePermission,
-                                                true);
-            }
-            else {
-               throw new AccessControlException("Resource " + accessorResource + " does not have requested permission: "
-                                                      + requestedResourcePermission,
-                                                true);
-            }
+            throw new NotAuthorizedException(accessorResource, requestedResourcePermission, accessedResource);
          }
       }
       finally {
@@ -3207,8 +3166,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
 
    @Override
    public Set<Resource> getResourcesByResourcePermission(String resourceClassName,
-                                                         ResourcePermission resourcePermission)
-         throws AccessControlException {
+                                                         ResourcePermission resourcePermission) {
       SQLConnection connection = null;
 
       __assertAuthenticated();
@@ -3230,7 +3188,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
    @Override
    public Set<Resource> getResourcesByResourcePermission(Resource accessorResource,
                                                          String resourceClassName,
-                                                         ResourcePermission resourcePermission) throws AccessControlException {
+                                                         ResourcePermission resourcePermission) {
       SQLConnection connection = null;
 
       __assertAuthenticated();
@@ -3256,9 +3214,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
             return __getResourcesByPermission(connection, accessorResource, resourceClassName, resourcePermission);
          }
          else {
-            throw new AccessControlException("Current resource must have IMPERSONATE, RESET_CREDENTIALS or INHERIT permission to: "
-                                                   + accessorResource,
-                                             true);
+            throw new NotAuthorizedException(sessionResource, "retrieve resources by permission for", accessorResource);
          }
       }
       finally {
@@ -3329,8 +3285,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
    @Override
    public Set<Resource> getResourcesByResourcePermission(String resourceClassName,
                                                          ResourcePermission resourcePermission,
-                                                         String domainName)
-         throws AccessControlException {
+                                                         String domainName) {
       SQLConnection connection = null;
 
       __assertAuthenticated();
@@ -3358,7 +3313,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
    public Set<Resource> getResourcesByResourcePermission(Resource accessorResource,
                                                          String resourceClassName,
                                                          ResourcePermission resourcePermission,
-                                                         String domainName) throws AccessControlException {
+                                                         String domainName) {
       SQLConnection connection = null;
 
       __assertAuthenticated();
@@ -3389,9 +3344,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
             );
          }
          else {
-            throw new AccessControlException("Current resource must have IMPERSONATE, RESET_CREDENTIALS or INHERIT permission to: "
-                                                   + accessorResource,
-                                             true);
+            throw new NotAuthorizedException(sessionResource, "retrieve resources by permission for", accessorResource);
          }
       }
       finally {
@@ -3478,7 +3431,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
    @Override
    public Set<Resource> getAccessorResourcesByResourcePermission(Resource accessedResource,
                                                                  String resourceClassName,
-                                                                 ResourcePermission resourcePermission) throws AccessControlException {
+                                                                 ResourcePermission resourcePermission) {
       SQLConnection connection = null;
 
       __assertAuthenticated();
@@ -3540,7 +3493,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
    }
 
    @Override
-   public List<String> getResourceClassNames() throws AccessControlException {
+   public List<String> getResourceClassNames() {
       SQLConnection connection = null;
 
       __assertAuthenticated();
@@ -3556,7 +3509,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
    }
 
    @Override
-   public List<String> getResourcePermissionNames(String resourceClassName) throws AccessControlException {
+   public List<String> getResourcePermissionNames(String resourceClassName) {
       SQLConnection connection = null;
 
       __assertAuthenticated();
@@ -3653,25 +3606,15 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       }
    }
 
-   private void __assertAuthenticatedAsSystemResource()
-         throws AccessControlException {
+   private void __assertAuthenticatedAsSystemResource() {
       if (sessionResource == null || sessionResource.getId() != SYSTEM_RESOURCE_ID) {
-         throw new AccessControlException("Operation requires this session be authenticated by the SYSTEM resource",
-                                          true);
+         throw new NotAuthorizedException(sessionResource, "perform operation reserved for the system resource");
       }
    }
 
-   private void __assertAuthenticated() throws AccessControlException {
+   private void __assertAuthenticated() {
       if (sessionResource == null) {
-         throw new AccessControlException("Session not authenticated",
-                                          true);
-      }
-   }
-
-   private void __assertNotAuth() throws AccessControlException {
-      if (sessionResource != null) {
-         throw new AccessControlException("This call is not valid when the session is authenticated",
-                                          true);
+         throw new NotAuthenticatedException("Session not authenticated");
       }
    }
 

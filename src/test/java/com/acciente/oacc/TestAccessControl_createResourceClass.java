@@ -198,8 +198,8 @@ public class TestAccessControl_createResourceClass extends TestAccessControlBase
          accessControlContext.createResourceClass(empty_ResClassName, true, true);
          fail("creating resource class without being authorized to do so should have failed");
       }
-      catch (AccessControlException e) {
-         assertThat(e.getMessage().toLowerCase(), containsString("requires this session be authenticated by the system resource"));
+      catch (NotAuthorizedException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("reserved for the system resource"));
       }
 
       assertThat(accessControlContext.getResourceClassNames().size(), is(numOfResourceClassesPreTest));

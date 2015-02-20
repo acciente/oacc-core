@@ -27,7 +27,7 @@ import static org.junit.Assert.fail;
 
 public class TestAccessControl_unauthenticate extends TestAccessControlBase {
    @Test
-   public void unauthenticate_authenticatedSystemUser() throws AccessControlException {
+   public void unauthenticate_authenticatedSystemUser() {
       accessControlContext.authenticate(getSystemResource(),
                                         PasswordCredentials.newInstance(Constants.OACC_ROOT_PWD));
 
@@ -44,7 +44,7 @@ public class TestAccessControl_unauthenticate extends TestAccessControlBase {
          accessControlContext.getAuthenticatedResource();
          fail("calling getAuthenticatedResource() from an unauthenticated context should have failed");
       }
-      catch (AccessControlException e) {
+      catch (NotAuthenticatedException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("not authenticated"));
       }
 
@@ -52,7 +52,7 @@ public class TestAccessControl_unauthenticate extends TestAccessControlBase {
          accessControlContext.getSessionResource();
          fail("calling getSessionResource() from an unauthenticated context should have failed");
       }
-      catch (AccessControlException e) {
+      catch (NotAuthenticatedException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("not authenticated"));
       }
 

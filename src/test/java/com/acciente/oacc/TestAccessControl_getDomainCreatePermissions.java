@@ -29,7 +29,7 @@ import static org.junit.Assert.assertThat;
 
 public class TestAccessControl_getDomainCreatePermissions extends TestAccessControlBase {
    @Test
-   public void getDomainCreatePermissions_emptyAsSystemResource() throws AccessControlException {
+   public void getDomainCreatePermissions_emptyAsSystemResource() {
       authenticateSystemResource();
 
       final Resource accessorResource = generateUnauthenticatableResource();
@@ -38,7 +38,7 @@ public class TestAccessControl_getDomainCreatePermissions extends TestAccessCont
    }
 
    @Test
-   public void getDomainCreatePermissions_emptyAsAuthenticated() throws AccessControlException {
+   public void getDomainCreatePermissions_emptyAsAuthenticated() {
       final Resource accessorResource = generateUnauthenticatableResource();
 
       generateResourceAndAuthenticate();
@@ -48,7 +48,7 @@ public class TestAccessControl_getDomainCreatePermissions extends TestAccessCont
    }
 
    @Test
-   public void getDomainCreatePermissions_validAsSystemResource() throws AccessControlException {
+   public void getDomainCreatePermissions_validAsSystemResource() {
       authenticateSystemResource();
       final DomainCreatePermission domCreatePerm_superuser
             = DomainCreatePermissions.getInstance(DomainPermissions.getInstance(DomainPermissions.SUPER_USER));
@@ -72,7 +72,7 @@ public class TestAccessControl_getDomainCreatePermissions extends TestAccessCont
    }
 
    @Test
-   public void getDomainCreatePermissions_inheritSysPermissionWithDifferentGrantingRights_shouldSucceedAsAuthorized() throws AccessControlException {
+   public void getDomainCreatePermissions_inheritSysPermissionWithDifferentGrantingRights_shouldSucceedAsAuthorized() {
       authenticateSystemResource();
       final char[] password = generateUniquePassword();
       final Resource accessorResource = generateAuthenticatableResource(password);
@@ -109,7 +109,7 @@ public class TestAccessControl_getDomainCreatePermissions extends TestAccessCont
    }
 
    @Test
-   public void getDomainCreatePermissions_inheritWithDifferentGrantingRights_shouldSucceedAsAuthorized() throws AccessControlException {
+   public void getDomainCreatePermissions_inheritWithDifferentGrantingRights_shouldSucceedAsAuthorized() {
       authenticateSystemResource();
       final String donorPermissionName_createChild = DomainPermissions.CREATE_CHILD_DOMAIN;
       final String donorPermissionName_superUser = DomainPermissions.SUPER_USER;
@@ -155,7 +155,7 @@ public class TestAccessControl_getDomainCreatePermissions extends TestAccessCont
    }
 
    @Test
-   public void getDomainCreatePermissions_nulls_shouldFail() throws AccessControlException {
+   public void getDomainCreatePermissions_nulls_shouldFail() {
       authenticateSystemResource();
 
       try {
@@ -168,7 +168,7 @@ public class TestAccessControl_getDomainCreatePermissions extends TestAccessCont
    }
 
    @Test
-   public void getDomainCreatePermissions_nonExistentReferences_shouldSucceed() throws AccessControlException {
+   public void getDomainCreatePermissions_nonExistentReferences_shouldSucceed() {
       authenticateSystemResource();
 
       final Resource invalidResource = Resources.getInstance(-999L);

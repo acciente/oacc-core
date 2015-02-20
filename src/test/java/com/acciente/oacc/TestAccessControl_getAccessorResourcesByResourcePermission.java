@@ -28,7 +28,7 @@ import static org.junit.Assert.fail;
 
 public class TestAccessControl_getAccessorResourcesByResourcePermission extends TestAccessControlBase {
    @Test
-   public void getAccessorResourcesByResourcePermission_emptyAsSystemResource() throws AccessControlException {
+   public void getAccessorResourcesByResourcePermission_emptyAsSystemResource() {
       authenticateSystemResource();
 
       final Resource accessorResource = generateUnauthenticatableResource();
@@ -56,7 +56,7 @@ public class TestAccessControl_getAccessorResourcesByResourcePermission extends 
    }
 
    @Test
-   public void getAccessorResourcesByResourcePermission_direct_validAsSystemResource() throws AccessControlException {
+   public void getAccessorResourcesByResourcePermission_direct_validAsSystemResource() {
       authenticateSystemResource();
 
       final Resource accessorResource = generateUnauthenticatableResource();
@@ -88,7 +88,7 @@ public class TestAccessControl_getAccessorResourcesByResourcePermission extends 
    }
 
    @Test
-   public void getAccessorResourcesByResourcePermission_direct_validAsAuthorized() throws AccessControlException {
+   public void getAccessorResourcesByResourcePermission_direct_validAsAuthorized() {
       authenticateSystemResource();
 
       final char[] password = generateUniquePassword();
@@ -123,7 +123,7 @@ public class TestAccessControl_getAccessorResourcesByResourcePermission extends 
    }
 
    @Test
-   public void getAccessorResourcesByResourcePermission_directWithAndWithoutGrant_validAsAuthorized() throws AccessControlException {
+   public void getAccessorResourcesByResourcePermission_directWithAndWithoutGrant_validAsAuthorized() {
       authenticateSystemResource();
 
       final char[] password = generateUniquePassword();
@@ -166,7 +166,7 @@ public class TestAccessControl_getAccessorResourcesByResourcePermission extends 
    }
 
    @Test
-   public void getAccessorResourcesByResourcePermission_inherited() throws AccessControlException {
+   public void getAccessorResourcesByResourcePermission_inherited() {
       authenticateSystemResource();
 
       final Resource accessorResource = generateUnauthenticatableResource();
@@ -198,7 +198,7 @@ public class TestAccessControl_getAccessorResourcesByResourcePermission extends 
    }
 
    @Test
-   public void getAccessorResourcesByResourcePermission_global() throws AccessControlException {
+   public void getAccessorResourcesByResourcePermission_global() {
       authenticateSystemResource();
 
       final Resource accessorResource = generateUnauthenticatableResource();
@@ -226,7 +226,7 @@ public class TestAccessControl_getAccessorResourcesByResourcePermission extends 
    }
 
    @Test
-   public void getAccessorResourcesByResourcePermission_superUser() throws AccessControlException {
+   public void getAccessorResourcesByResourcePermission_superUser() {
       authenticateSystemResource();
 
       final Resource accessorResource = generateUnauthenticatableResource();
@@ -251,7 +251,7 @@ public class TestAccessControl_getAccessorResourcesByResourcePermission extends 
    }
 
    @Test
-   public void getAccessorResourcesByResourcePermission_whitespaceConsistent() throws AccessControlException {
+   public void getAccessorResourcesByResourcePermission_whitespaceConsistent() {
       authenticateSystemResource();
 
       final Resource accessorResource = generateUnauthenticatableResource();
@@ -278,7 +278,7 @@ public class TestAccessControl_getAccessorResourcesByResourcePermission extends 
    }
 
    @Test
-   public void getAccessorResourcesByResourcePermission_nulls_shouldFail() throws AccessControlException {
+   public void getAccessorResourcesByResourcePermission_nulls_shouldFail() {
       authenticateSystemResource();
 
       final Resource accessorResource = generateUnauthenticatableResource();
@@ -327,7 +327,7 @@ public class TestAccessControl_getAccessorResourcesByResourcePermission extends 
    }
 
    @Test
-   public void getAccessorResourcesByResourcePermission_nonExistentReferences_shouldFail() throws AccessControlException {
+   public void getAccessorResourcesByResourcePermission_nonExistentReferences_shouldFail() {
       authenticateSystemResource();
 
       final Resource accessorResource = generateUnauthenticatableResource();
@@ -366,7 +366,7 @@ public class TestAccessControl_getAccessorResourcesByResourcePermission extends 
    }
 
    @Test
-   public void getAccessorResourcesByResourcePermission_nonExistentReferences_shouldSucceed() throws AccessControlException {
+   public void getAccessorResourcesByResourcePermission_nonExistentReferences_shouldSucceed() {
       authenticateSystemResource();
 
       final Resource accessorResource = generateUnauthenticatableResource();

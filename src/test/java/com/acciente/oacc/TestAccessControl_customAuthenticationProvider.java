@@ -28,7 +28,6 @@ import org.junit.Test;
 
 import javax.sql.DataSource;
 import java.sql.Connection;
-import java.sql.SQLException;
 
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.is;
@@ -80,7 +79,7 @@ public class TestAccessControl_customAuthenticationProvider extends TestAccessCo
    }
 
    @Test
-   public void authenticateSystemUser_custom_shouldFail() throws AccessControlException, SQLException {
+   public void authenticateSystemUser_custom_shouldFail() {
       Resource systemAuthResource = getSystemResource();
       try {
          customAccessControlContext.authenticate(systemAuthResource,
@@ -93,7 +92,7 @@ public class TestAccessControl_customAuthenticationProvider extends TestAccessCo
    }
 
    @Test
-   public void authenticate_withoutCredentials_shouldSucceed() throws AccessControlException {
+   public void authenticate_withoutCredentials_shouldSucceed() {
       customAccessControlContext.authenticate(guestResource);
 
       // verify
@@ -105,7 +104,7 @@ public class TestAccessControl_customAuthenticationProvider extends TestAccessCo
    }
 
    @Test
-   public void createResource_withoutCredentials_shouldFail() throws AccessControlException {
+   public void createResource_withoutCredentials_shouldFail() {
       customAccessControlContext.authenticate(adminResource, PasswordCredentials.newInstance(ADMIN_PASSWORD));
 
       final Resource resource = customAccessControlContext.createResource(generateResourceClass(true, true));
@@ -113,7 +112,7 @@ public class TestAccessControl_customAuthenticationProvider extends TestAccessCo
    }
 
    @Test
-   public void createResource_validCredentialCriteria_shouldSucceed() throws AccessControlException {
+   public void createResource_validCredentialCriteria_shouldSucceed() {
       customAccessControlContext.authenticate(adminResource, PasswordCredentials.newInstance(ADMIN_PASSWORD));
 
       final Resource strictAuthenticatableResource
@@ -124,7 +123,7 @@ public class TestAccessControl_customAuthenticationProvider extends TestAccessCo
    }
 
    @Test
-   public void createResource_invalidCredentialCriteria_shouldFail() throws AccessControlException {
+   public void createResource_invalidCredentialCriteria_shouldFail() {
       customAccessControlContext.authenticate(adminResource, PasswordCredentials.newInstance(ADMIN_PASSWORD));
 
       try {
@@ -139,7 +138,7 @@ public class TestAccessControl_customAuthenticationProvider extends TestAccessCo
    }
 
    @Test
-   public void setCredentials_validCredentialCriteria_shouldSucceed() throws AccessControlException {
+   public void setCredentials_validCredentialCriteria_shouldSucceed() {
       customAccessControlContext.authenticate(adminResource, PasswordCredentials.newInstance(ADMIN_PASSWORD));
 
       final Resource strictAuthenticatableResource
@@ -154,7 +153,7 @@ public class TestAccessControl_customAuthenticationProvider extends TestAccessCo
    }
 
    @Test
-   public void setCredentials_invalidCredentialCriteria_shouldFail() throws AccessControlException {
+   public void setCredentials_invalidCredentialCriteria_shouldFail() {
       customAccessControlContext.authenticate(adminResource, PasswordCredentials.newInstance(ADMIN_PASSWORD));
 
       final Resource strictAuthenticatableResource

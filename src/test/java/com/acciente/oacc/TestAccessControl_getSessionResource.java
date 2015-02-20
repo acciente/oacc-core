@@ -25,7 +25,7 @@ import static org.junit.Assert.assertThat;
 
 public class TestAccessControl_getSessionResource extends TestAccessControlBase {
    @Test
-   public void getSessionResource_authenticated_asSystemResource() throws AccessControlException {
+   public void getSessionResource_authenticated_asSystemResource() {
       authenticateSystemResource();
 
       // verify
@@ -34,7 +34,7 @@ public class TestAccessControl_getSessionResource extends TestAccessControlBase 
    }
 
    @Test
-   public void getSessionResource_authenticated_asNonSystemResource() throws AccessControlException {
+   public void getSessionResource_authenticated_asNonSystemResource() {
       // set up
       final char[] password = generateUniquePassword();
       final Resource authenticatableResource = generateAuthenticatableResource(password);
@@ -48,7 +48,7 @@ public class TestAccessControl_getSessionResource extends TestAccessControlBase 
    }
 
    @Test
-   public void getSessionResource_impersonated() throws AccessControlException {
+   public void getSessionResource_impersonated() {
       authenticateSystemResource();
 
       final char[] password = generateUniquePassword();
@@ -70,11 +70,11 @@ public class TestAccessControl_getSessionResource extends TestAccessControlBase 
    }
 
    @Test
-   public void getSessionResource_notAuthenticated_shouldFail() throws AccessControlException {
+   public void getSessionResource_notAuthenticated_shouldFail() {
       try {
          accessControlContext.getSessionResource();
       }
-      catch (AccessControlException e) {
+      catch (NotAuthenticatedException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("not authenticated"));
       }
    }

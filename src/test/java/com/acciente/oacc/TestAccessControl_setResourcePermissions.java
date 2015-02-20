@@ -31,7 +31,7 @@ import static org.junit.Assert.fail;
 
 public class TestAccessControl_setResourcePermissions extends TestAccessControlBase {
    @Test
-   public void setResourcePermission_validAsSystemResource() throws AccessControlException {
+   public void setResourcePermission_validAsSystemResource() {
       authenticateSystemResource();
       final String resourceClassName = generateResourceClass(false, false);
       final Resource accessorResource = generateUnauthenticatableResource();
@@ -50,7 +50,7 @@ public class TestAccessControl_setResourcePermissions extends TestAccessControlB
    }
 
    @Test
-   public void setResourcePermission_resetCredentialsPermissionOnUnauthenticatables_shouldFail() throws AccessControlException {
+   public void setResourcePermission_resetCredentialsPermissionOnUnauthenticatables_shouldFail() {
       authenticateSystemResource();
       final Resource accessorResource = generateAuthenticatableResource(generateUniquePassword());
       final Resource accessedResource = generateUnauthenticatableResource();
@@ -70,7 +70,7 @@ public class TestAccessControl_setResourcePermissions extends TestAccessControlB
    }
 
    @Test
-   public void setResourcePermission_impersonatePermissionOnUnauthenticatables_shouldFail() throws AccessControlException {
+   public void setResourcePermission_impersonatePermissionOnUnauthenticatables_shouldFail() {
       authenticateSystemResource();
       final Resource accessorResource = generateAuthenticatableResource(generateUniquePassword());
       final Resource accessedResource = generateUnauthenticatableResource();
@@ -90,7 +90,7 @@ public class TestAccessControl_setResourcePermissions extends TestAccessControlB
    }
 
    @Test
-   public void setResourcePermission_validAsAuthorized() throws AccessControlException {
+   public void setResourcePermission_validAsAuthorized() {
       authenticateSystemResource();
       final String resourceClassName = generateResourceClass(false, false);
       final String customPermissionName = generateResourceClassPermission(resourceClassName);
@@ -123,7 +123,7 @@ public class TestAccessControl_setResourcePermissions extends TestAccessControlB
    }
 
    @Test
-   public void setResourcePermission_resetPermissions() throws AccessControlException {
+   public void setResourcePermission_resetPermissions() {
       authenticateSystemResource();
       final String resourceClassName = generateResourceClass(false, false);
       final Resource accessorResource = generateUnauthenticatableResource();
@@ -161,7 +161,7 @@ public class TestAccessControl_setResourcePermissions extends TestAccessControlB
    }
 
    @Test
-   public void setResourcePermission_addPermission_withAndWithoutGrant_shouldFail() throws AccessControlException {
+   public void setResourcePermission_addPermission_withAndWithoutGrant_shouldFail() {
       authenticateSystemResource();
       final String resourceClassName = generateResourceClass(false, false);
       final String grantedPermissionName = generateResourceClassPermission(resourceClassName);
@@ -191,15 +191,14 @@ public class TestAccessControl_setResourcePermissions extends TestAccessControlB
          accessControlContext.setResourcePermissions(accessorResource, accessedResource, requestedPermissions);
          fail("setting additional permissions as grantor without authorization should have failed");
       }
-      catch (AccessControlException e) {
-         assertThat(e.getMessage().toLowerCase(), containsString("not authorized"));
+      catch (NotAuthorizedException e) {
          assertThat(e.getMessage().toLowerCase(), containsString(ungrantedPermissionName.toLowerCase()));
          assertThat(e.getMessage().toLowerCase(), not(containsString(grantedPermissionName)));
       }
    }
 
    @Test
-   public void setResourcePermission_removePermission_withAndWithoutGrant_shouldFail() throws AccessControlException {
+   public void setResourcePermission_removePermission_withAndWithoutGrant_shouldFail() {
       authenticateSystemResource();
       final String resourceClassName = generateResourceClass(false, false);
       final String grantedPermissionName = generateResourceClassPermission(resourceClassName);
@@ -235,15 +234,14 @@ public class TestAccessControl_setResourcePermissions extends TestAccessControlB
          accessControlContext.setResourcePermissions(accessorResource, accessedResource, requestedPermissions);
          fail("setting fewer permissions as grantor without authorization should have failed");
       }
-      catch (AccessControlException e) {
-         assertThat(e.getMessage().toLowerCase(), containsString("not authorized"));
+      catch (NotAuthorizedException e) {
          assertThat(e.getMessage().toLowerCase(), containsString(ungrantedPermissionName.toLowerCase()));
          assertThat(e.getMessage().toLowerCase(), not(containsString(grantedPermissionName)));
       }
    }
 
    @Test
-   public void setResourcePermission_addPermission_directGrant_inheritedNotSpecified_shouldSucceedAsAuthorized() throws AccessControlException {
+   public void setResourcePermission_addPermission_directGrant_inheritedNotSpecified_shouldSucceedAsAuthorized() {
       authenticateSystemResource();
       final String resourceClassName = generateResourceClass(false, false);
       final String grantorPermissionName = generateResourceClassPermission(resourceClassName);
@@ -305,7 +303,7 @@ public class TestAccessControl_setResourcePermissions extends TestAccessControlB
    }
 
    @Test
-   public void setResourcePermission_removePermission_directGrant_simplified_shouldSucceedAsAuthorized() throws AccessControlException {
+   public void setResourcePermission_removePermission_directGrant_simplified_shouldSucceedAsAuthorized() {
       authenticateSystemResource();
       final String resourceClassName = generateResourceClass(false, false);
       final String grantorPermissionName = generateResourceClassPermission(resourceClassName);
@@ -343,7 +341,7 @@ public class TestAccessControl_setResourcePermissions extends TestAccessControlB
    }
 
    @Test
-   public void setResourcePermission_removePermission_directGrant_inheritedNotSpecified_shouldSucceedAsAuthorized() throws AccessControlException {
+   public void setResourcePermission_removePermission_directGrant_inheritedNotSpecified_shouldSucceedAsAuthorized() {
       authenticateSystemResource();
       final String resourceClassName = generateResourceClass(false, false);
       final String grantorPermissionName = generateResourceClassPermission(resourceClassName);
@@ -407,7 +405,7 @@ public class TestAccessControl_setResourcePermissions extends TestAccessControlB
    }
 
    @Test
-   public void setResourcePermission_addPermission_globalGrant_inheritedNotSpecified_shouldSucceedAsAuthorized() throws AccessControlException {
+   public void setResourcePermission_addPermission_globalGrant_inheritedNotSpecified_shouldSucceedAsAuthorized() {
       authenticateSystemResource();
       final String resourceClassName = generateResourceClass(false, false);
       final String grantorPermissionName = generateResourceClassPermission(resourceClassName);
@@ -469,7 +467,7 @@ public class TestAccessControl_setResourcePermissions extends TestAccessControlB
    }
 
    @Test
-   public void setResourcePermission_removePermission_globalGrant_inheritedNotSpecified_shouldSucceedAsAuthorized() throws AccessControlException {
+   public void setResourcePermission_removePermission_globalGrant_inheritedNotSpecified_shouldSucceedAsAuthorized() {
       authenticateSystemResource();
       final String resourceClassName = generateResourceClass(false, false);
       final String grantorPermissionName = generateResourceClassPermission(resourceClassName);
@@ -527,7 +525,7 @@ public class TestAccessControl_setResourcePermissions extends TestAccessControlB
    }
 
    @Test
-   public void setResourcePermission_addPermission_withUnauthorizedPermissionsGrantedElsewhere_shouldSucceedAsAuthorized() throws AccessControlException {
+   public void setResourcePermission_addPermission_withUnauthorizedPermissionsGrantedElsewhere_shouldSucceedAsAuthorized() {
       authenticateSystemResource();
       final String resourceClassName = generateResourceClass(false, false);
       final String grantedPermissionName = generateResourceClassPermission(resourceClassName);
@@ -571,7 +569,7 @@ public class TestAccessControl_setResourcePermissions extends TestAccessControlB
    }
 
    @Test
-   public void setResourcePermission_removePermission_withUnauthorizedPermissionsGrantedElsewhere_shouldSucceedAsAuthorized() throws AccessControlException {
+   public void setResourcePermission_removePermission_withUnauthorizedPermissionsGrantedElsewhere_shouldSucceedAsAuthorized() {
       authenticateSystemResource();
       final String resourceClassName = generateResourceClass(false, false);
       final String grantedPermissionName = generateResourceClassPermission(resourceClassName);
@@ -614,7 +612,7 @@ public class TestAccessControl_setResourcePermissions extends TestAccessControlB
    }
 
    @Test
-   public void setResourcePermission_downgradeGrantingRights_shouldSucceedAsAuthorized() throws AccessControlException {
+   public void setResourcePermission_downgradeGrantingRights_shouldSucceedAsAuthorized() {
       authenticateSystemResource();
       final String resourceClassName = generateResourceClass(false, false);
       final String grantedPermissionName = generateResourceClassPermission(resourceClassName);
@@ -655,7 +653,7 @@ public class TestAccessControl_setResourcePermissions extends TestAccessControlB
    }
 
    @Test
-   public void setResourcePermission_downgradeGrantingRights_forUnauthorizedPermissionGrantedElsewhere_shouldFail() throws AccessControlException {
+   public void setResourcePermission_downgradeGrantingRights_forUnauthorizedPermissionGrantedElsewhere_shouldFail() {
       authenticateSystemResource();
       final String resourceClassName = generateResourceClass(false, false);
       final String grantedPermissionName = generateResourceClassPermission(resourceClassName);
@@ -692,15 +690,14 @@ public class TestAccessControl_setResourcePermissions extends TestAccessControlB
          accessControlContext.setResourcePermissions(accessorResource, accessedResource, requestedPermissions);
          fail("Downgrading (=removal of granting rights) of permission granted elsewhere, to which I have no granting rights, should have failed");
       }
-      catch (AccessControlException e) {
-         assertThat(e.getMessage().toLowerCase(), containsString("not authorized"));
+      catch (NotAuthorizedException e) {
          assertThat(e.getMessage().toLowerCase(), containsString(ungrantedPermissionName.toLowerCase()));
          assertThat(e.getMessage().toLowerCase(), not(containsString(grantedPermissionName)));
       }
    }
 
    @Test
-   public void setResourcePermission_upgradeGrantingRights_shouldSucceedAsAuthorized() throws AccessControlException {
+   public void setResourcePermission_upgradeGrantingRights_shouldSucceedAsAuthorized() {
       authenticateSystemResource();
       final String resourceClassName = generateResourceClass(false, false);
       final String grantedPermissionName = generateResourceClassPermission(resourceClassName);
@@ -741,7 +738,7 @@ public class TestAccessControl_setResourcePermissions extends TestAccessControlB
    }
 
    @Test
-   public void setResourcePermission_upgradeGrantingRights_forUnauthorizedPermissionGrantedElsewhere_shouldFail() throws AccessControlException {
+   public void setResourcePermission_upgradeGrantingRights_forUnauthorizedPermissionGrantedElsewhere_shouldFail() {
       authenticateSystemResource();
       final String resourceClassName = generateResourceClass(false, false);
       final String grantedPermissionName = generateResourceClassPermission(resourceClassName);
@@ -778,15 +775,14 @@ public class TestAccessControl_setResourcePermissions extends TestAccessControlB
          accessControlContext.setResourcePermissions(accessorResource, accessedResource, requestedPermissions);
          fail("Upgrading (=addition of granting rights) of permission granted elsewhere, to which I have no granting rights, should have failed");
       }
-      catch (AccessControlException e) {
-         assertThat(e.getMessage().toLowerCase(), containsString("not authorized"));
+      catch (NotAuthorizedException e) {
          assertThat(e.getMessage().toLowerCase(), containsString(ungrantedPermissionName.toLowerCase()));
          assertThat(e.getMessage().toLowerCase(), not(containsString(grantedPermissionName)));
       }
    }
 
    @Test
-   public void setResourcePermission_duplicatePermissionNames_shouldFail() throws AccessControlException {
+   public void setResourcePermission_duplicatePermissionNames_shouldFail() {
       authenticateSystemResource();
       final String resourceClassName = generateResourceClass(false, false);
       final Resource accessorResource = generateUnauthenticatableResource();
@@ -810,7 +806,7 @@ public class TestAccessControl_setResourcePermissions extends TestAccessControlB
    }
 
    @Test
-   public void setResourcePermission_nulls_shouldFail() throws AccessControlException {
+   public void setResourcePermission_nulls_shouldFail() {
       authenticateSystemResource();
       final String resourceClassName = generateResourceClass(false, false);
       final Resource accessorResource = generateUnauthenticatableResource();
@@ -857,7 +853,7 @@ public class TestAccessControl_setResourcePermissions extends TestAccessControlB
    }
 
    @Test
-   public void setResourcePermission_nonExistentReferences_shouldFail() throws AccessControlException {
+   public void setResourcePermission_nonExistentReferences_shouldFail() {
       authenticateSystemResource();
       final String resourceClassName = generateResourceClass(false, false);
       final String customPermissionName = generateResourceClassPermission(resourceClassName);
@@ -925,7 +921,7 @@ public class TestAccessControl_setResourcePermissions extends TestAccessControlB
    }
 
    @Test
-   public void setResourcePermission_notAuthorized_shouldFail() throws AccessControlException {
+   public void setResourcePermission_notAuthorized_shouldFail() {
       authenticateSystemResource();
       final String resourceClassName = generateResourceClass(false, false);
       final String customPermissionName = generateResourceClassPermission(resourceClassName);
@@ -948,8 +944,8 @@ public class TestAccessControl_setResourcePermissions extends TestAccessControlB
          accessControlContext.setResourcePermissions(accessorResource, accessedResource, permissions_pre);
          fail("setting permissions as grantor without authorization should have failed");
       }
-      catch (AccessControlException e) {
-         assertThat(e.getMessage().toLowerCase(), containsString("not authorized"));
+      catch (NotAuthorizedException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("following permission"));
       }
    }
 }

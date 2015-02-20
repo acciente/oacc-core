@@ -26,7 +26,7 @@ import static org.junit.Assert.fail;
 
 public class TestAccessControl_impersonate extends TestAccessControlBase {
    @Test
-   public void impersonate_valid_asSystemResource() throws AccessControlException {
+   public void impersonate_valid_asSystemResource() {
       authenticateSystemResource();
 
       final Resource impersonatedResource = generateAuthenticatableResource(generateUniquePassword());
@@ -37,7 +37,7 @@ public class TestAccessControl_impersonate extends TestAccessControlBase {
    }
 
    @Test
-   public void impersonate_chainedImpersonation_succeedsAsSystemResource() throws AccessControlException {
+   public void impersonate_chainedImpersonation_succeedsAsSystemResource() {
       authenticateSystemResource();
 
       final Resource impersonatedResource1 = generateAuthenticatableResource(generateUniquePassword());
@@ -53,7 +53,7 @@ public class TestAccessControl_impersonate extends TestAccessControlBase {
    }
 
    @Test
-   public void impersonate_valid_asAuthenticatedResource() throws AccessControlException {
+   public void impersonate_valid_asAuthenticatedResource() {
       authenticateSystemResource();
 
       final char[] password = generateUniquePassword();
@@ -74,7 +74,7 @@ public class TestAccessControl_impersonate extends TestAccessControlBase {
    }
 
    @Test
-   public void impersonate_chainedImpersonation_shouldFailAsAuthenticatedResource() throws AccessControlException {
+   public void impersonate_chainedImpersonation_shouldFailAsAuthenticatedResource() {
       authenticateSystemResource();
 
       final char[] password = generateUniquePassword();
@@ -104,14 +104,13 @@ public class TestAccessControl_impersonate extends TestAccessControlBase {
          accessControlContext.impersonate(impersonatedResource2);
          fail("chained impersonation without IMPERSONATE permission from authenticated resource to impersonated resource should have failed");
       }
-      catch (AccessControlException e) {
-         assertThat(e.isNotAuthorizedError(), is(true));
+      catch (NotAuthorizedException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("not authorized to impersonate"));
       }
    }
 
    @Test
-   public void impersonate_chainedImpersonationWithPermission_succeedsAsAuthenticatedResource() throws AccessControlException {
+   public void impersonate_chainedImpersonationWithPermission_succeedsAsAuthenticatedResource() {
       authenticateSystemResource();
 
       final char[] password = generateUniquePassword();
@@ -144,7 +143,7 @@ public class TestAccessControl_impersonate extends TestAccessControlBase {
    }
 
    @Test
-   public void impersonate_unauthenticatable_shouldFailAsSystemResource() throws AccessControlException {
+   public void impersonate_unauthenticatable_shouldFailAsSystemResource() {
       authenticateSystemResource();
 
       final Resource unauthenticatableResource = generateUnauthenticatableResource();
@@ -160,7 +159,7 @@ public class TestAccessControl_impersonate extends TestAccessControlBase {
    }
 
    @Test
-   public void impersonate_unauthenticatable_shouldFailAsAuthenticatedResource() throws AccessControlException {
+   public void impersonate_unauthenticatable_shouldFailAsAuthenticatedResource() {
       authenticateSystemResource();
 
       final char[] password = generateUniquePassword();
@@ -181,7 +180,7 @@ public class TestAccessControl_impersonate extends TestAccessControlBase {
    }
 
    @Test
-   public void impersonate_notAuthorized_shouldFailAsAuthenticatedResource() throws AccessControlException {
+   public void impersonate_notAuthorized_shouldFailAsAuthenticatedResource() {
       authenticateSystemResource();
 
       final char[] password = generateUniquePassword();
@@ -196,14 +195,13 @@ public class TestAccessControl_impersonate extends TestAccessControlBase {
          accessControlContext.impersonate(impersonatedResource);
          fail("impersonating a resource without authorization should have failed");
       }
-      catch (AccessControlException e) {
-         assertThat(e.isNotAuthorizedError(), is(true));
+      catch (NotAuthorizedException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("not authorized to impersonate"));
       }
    }
 
    @Test
-   public void impersonate_inherit_succeedsAsAuthenticatedResource() throws AccessControlException {
+   public void impersonate_inherit_succeedsAsAuthenticatedResource() {
       authenticateSystemResource();
 
       final char[] password = generateUniquePassword();
@@ -230,7 +228,7 @@ public class TestAccessControl_impersonate extends TestAccessControlBase {
    }
 
    @Test
-   public void impersonate_global_succeedsAsAuthenticatedResource() throws AccessControlException {
+   public void impersonate_global_succeedsAsAuthenticatedResource() {
       authenticateSystemResource();
 
       final char[] password = generateUniquePassword();
@@ -257,7 +255,7 @@ public class TestAccessControl_impersonate extends TestAccessControlBase {
    }
 
    @Test
-   public void impersonate_superUser_succeedsAsAuthenticatedResource() throws AccessControlException {
+   public void impersonate_superUser_succeedsAsAuthenticatedResource() {
       authenticateSystemResource();
 
       final char[] password = generateUniquePassword();
@@ -279,7 +277,7 @@ public class TestAccessControl_impersonate extends TestAccessControlBase {
    }
 
    @Test
-   public void impersonate_nulls_shouldFailAsAuthenticatedResource() throws AccessControlException {
+   public void impersonate_nulls_shouldFailAsAuthenticatedResource() {
       authenticateSystemResource();
 
       final char[] password = generateUniquePassword();
@@ -299,7 +297,7 @@ public class TestAccessControl_impersonate extends TestAccessControlBase {
    }
 
    @Test
-   public void impersonate_nonExistentReference_shouldFailAsAuthenticatedResource() throws AccessControlException {
+   public void impersonate_nonExistentReference_shouldFailAsAuthenticatedResource() {
       authenticateSystemResource();
 
       final char[] password = generateUniquePassword();

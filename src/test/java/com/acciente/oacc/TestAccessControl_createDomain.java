@@ -117,8 +117,8 @@ public class TestAccessControl_createDomain extends TestAccessControlBase {
          accessControlContext.createDomain(domainName_child1, domainName_parent);
          fail("create child domain without CREATE_CHILD_DOMAIN authorization should have failed");
       }
-      catch (AccessControlException e) {
-         assertThat(e.getMessage().toLowerCase(), containsString("not authorized"));
+      catch (NotAuthorizedException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("create child domain"));
       }
       assertThat(accessControlContext.getDomainDescendants(domainName_parent).size(), is(1));
       assertThat(accessControlContext.getDomainDescendants(domainName_parent), hasItem(domainName_parent));
@@ -205,7 +205,7 @@ public class TestAccessControl_createDomain extends TestAccessControlBase {
             accessControlContext.createDomain(domainName_UPPER);
             fail("creating a domain with the name of an existing domain that differs in case only should have failed for case-insensitive databases");
          }
-         catch (AccessControlException e) {
+         catch (IllegalArgumentException e) {
             assertThat(e.getMessage().toLowerCase(), containsString("duplicate domain"));
          }
       }
@@ -316,8 +316,8 @@ public class TestAccessControl_createDomain extends TestAccessControlBase {
          accessControlContext.createDomain(domainName);
          fail("creating a domain without authorization should fail");
       }
-      catch (AccessControlException e) {
-         assertThat(e.getMessage().toLowerCase(), containsString("not authorized"));
+      catch (NotAuthorizedException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("create domain"));
       }
       assertThat(accessControlContext.getDomainDescendants(domainName).isEmpty(), is(true));
    }

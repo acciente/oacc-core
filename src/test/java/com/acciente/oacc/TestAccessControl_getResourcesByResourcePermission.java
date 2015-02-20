@@ -29,7 +29,7 @@ import static org.junit.Assert.fail;
 
 public class TestAccessControl_getResourcesByResourcePermission extends TestAccessControlBase {
    @Test
-   public void getResourcesByResourcePermission_emptyAsSystemResource() throws AccessControlException {
+   public void getResourcesByResourcePermission_emptyAsSystemResource() {
       authenticateSystemResource();
 
       final Resource accessorResource = generateUnauthenticatableResource();
@@ -63,7 +63,7 @@ public class TestAccessControl_getResourcesByResourcePermission extends TestAcce
    }
 
    @Test
-   public void getResourcesByResourcePermission_direct_validAsSystemResource() throws AccessControlException {
+   public void getResourcesByResourcePermission_direct_validAsSystemResource() {
       authenticateSystemResource();
 
       final Resource accessorResource = generateUnauthenticatableResource();
@@ -110,7 +110,7 @@ public class TestAccessControl_getResourcesByResourcePermission extends TestAcce
    }
 
    @Test
-   public void getResourcesByResourcePermission_direct_validAsAuthenticated() throws AccessControlException {
+   public void getResourcesByResourcePermission_direct_validAsAuthenticated() {
       authenticateSystemResource();
 
       final char[] password = generateUniquePassword();
@@ -195,7 +195,7 @@ public class TestAccessControl_getResourcesByResourcePermission extends TestAcce
    }
 
    @Test
-   public void getResourcesByResourcePermission_unauthorized_shouldFail() throws AccessControlException {
+   public void getResourcesByResourcePermission_unauthorized_shouldFail() {
       authenticateSystemResource();
 
       final char[] password = generateUniquePassword();
@@ -243,8 +243,8 @@ public class TestAccessControl_getResourcesByResourcePermission extends TestAcce
                                                                ResourcePermissions.getInstance(queriedPermission));
          fail("getting resources by resource permission without authorization should have failed");
       }
-      catch (AccessControlException e) {
-         assertThat(e.getMessage().toLowerCase(), containsString("resource must have impersonate, reset_credentials or inherit permission"));
+      catch (NotAuthorizedException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("retrieve resources by permission"));
       }
 
       try {
@@ -254,13 +254,13 @@ public class TestAccessControl_getResourcesByResourcePermission extends TestAcce
                                                                queriedDomain);
          fail("getting resources by resource permission without authorization should have failed");
       }
-      catch (AccessControlException e) {
-         assertThat(e.getMessage().toLowerCase(), containsString("resource must have impersonate, reset_credentials or inherit permission"));
+      catch (NotAuthorizedException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("retrieve resources by permission"));
       }
    }
 
    @Test
-   public void getResourcesByResourcePermission_authorized_shouldSucceed() throws AccessControlException {
+   public void getResourcesByResourcePermission_authorized_shouldSucceed() {
       authenticateSystemResource();
 
       final char[] password = generateUniquePassword();
@@ -370,7 +370,7 @@ public class TestAccessControl_getResourcesByResourcePermission extends TestAcce
    }
 
    @Test
-   public void getResourcesByResourcePermission_directWithAndWithoutGrant_validAsAuthenticated() throws AccessControlException {
+   public void getResourcesByResourcePermission_directWithAndWithoutGrant_validAsAuthenticated() {
       authenticateSystemResource();
 
       final char[] password = generateUniquePassword();
@@ -470,7 +470,7 @@ public class TestAccessControl_getResourcesByResourcePermission extends TestAcce
    }
 
    @Test
-   public void getResourcesByResourcePermission_inherited_validAsAuthenticated() throws AccessControlException {
+   public void getResourcesByResourcePermission_inherited_validAsAuthenticated() {
       authenticateSystemResource();
 
       final char[] password = generateUniquePassword();
@@ -555,7 +555,7 @@ public class TestAccessControl_getResourcesByResourcePermission extends TestAcce
    }
 
    @Test
-   public void getResourcesByResourcePermission_global_validAsAuthenticated() throws AccessControlException {
+   public void getResourcesByResourcePermission_global_validAsAuthenticated() {
       authenticateSystemResource();
 
       final char[] password = generateUniquePassword();
@@ -632,7 +632,7 @@ public class TestAccessControl_getResourcesByResourcePermission extends TestAcce
    }
 
    @Test
-   public void getResourcesByResourcePermission_domainInherited_validAsAuthenticated() throws AccessControlException {
+   public void getResourcesByResourcePermission_domainInherited_validAsAuthenticated() {
       authenticateSystemResource();
 
       final char[] password = generateUniquePassword();
@@ -726,7 +726,7 @@ public class TestAccessControl_getResourcesByResourcePermission extends TestAcce
    }
 
    @Test
-   public void getResourcesByResourcePermission_superUser_validAsAuthenticated() throws AccessControlException {
+   public void getResourcesByResourcePermission_superUser_validAsAuthenticated() {
       authenticateSystemResource();
 
       final char[] password = generateUniquePassword();
@@ -832,7 +832,7 @@ public class TestAccessControl_getResourcesByResourcePermission extends TestAcce
    }
 
    @Test
-   public void getResourcesByResourcePermission_whitespaceConsistent() throws AccessControlException {
+   public void getResourcesByResourcePermission_whitespaceConsistent() {
       authenticateSystemResource();
 
       final char[] password = generateUniquePassword();
@@ -884,7 +884,7 @@ public class TestAccessControl_getResourcesByResourcePermission extends TestAcce
    }
 
    @Test
-   public void getResourcesByResourcePermission_nulls_shouldFail() throws AccessControlException {
+   public void getResourcesByResourcePermission_nulls_shouldFail() {
       authenticateSystemResource();
 
       final char[] password = generateUniquePassword();
@@ -995,7 +995,7 @@ public class TestAccessControl_getResourcesByResourcePermission extends TestAcce
    }
 
    @Test
-   public void getResourcesByResourcePermission_nonExistentReferences_shouldFail() throws AccessControlException {
+   public void getResourcesByResourcePermission_nonExistentReferences_shouldFail() {
       authenticateSystemResource();
 
       final char[] password = generateUniquePassword();

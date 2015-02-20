@@ -28,7 +28,7 @@ import static org.junit.Assert.fail;
 
 public class TestAccessControl_getDomainNameByResource extends TestAccessControlBase {
    @Test
-   public void getDomainNameByResource_validAsSystemResource() throws AccessControlException {
+   public void getDomainNameByResource_validAsSystemResource() {
       authenticateSystemResource();
 
       generateUnauthenticatableResource();
@@ -42,7 +42,7 @@ public class TestAccessControl_getDomainNameByResource extends TestAccessControl
    }
 
    @Test
-   public void getDomainNameByResource_validAsAuthenticated() throws AccessControlException {
+   public void getDomainNameByResource_validAsAuthenticated() {
       authenticateSystemResource();
 
       final char[] password = generateUniquePassword();
@@ -61,7 +61,7 @@ public class TestAccessControl_getDomainNameByResource extends TestAccessControl
    }
 
    @Test
-   public void getDomainNameByResource_nonExistentReferences_shouldFail() throws AccessControlException {
+   public void getDomainNameByResource_nonExistentReferences_shouldFail() {
       authenticateSystemResource();
 
       final char[] password = generateUniquePassword();
@@ -82,7 +82,7 @@ public class TestAccessControl_getDomainNameByResource extends TestAccessControl
    }
 
    @Test
-   public void getDomainNameByResource_nulls() throws AccessControlException {
+   public void getDomainNameByResource_nulls() {
       final char[] password = generateUniquePassword();
       final Resource accessorResource = generateAuthenticatableResource(password);
 

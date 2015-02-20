@@ -18,7 +18,6 @@
 package com.acciente.oacc.sql;
 
 import com.acciente.oacc.AccessControlContext;
-import com.acciente.oacc.AccessControlException;
 import com.acciente.oacc.DomainCreatePermission;
 import com.acciente.oacc.DomainCreatePermissions;
 import com.acciente.oacc.DomainPermission;
@@ -62,7 +61,7 @@ public class TestSQLAccessControlContext extends TestSQLAccessControlContextBase
    public static final  char[]           PASSWORD                                   = "foobar".toCharArray();
    public static final  char[]           PASSWORD2                                  = "goobar".toCharArray();
 
-   public static void main(String args[]) throws SQLException, IOException, ClassNotFoundException, IllegalAccessException, InstantiationException, InterruptedException, AccessControlException {
+   public static void main(String args[]) throws SQLException, IOException {
       if (!checkDBConnectArgs(args)) {
          return;
       }
@@ -87,7 +86,7 @@ public class TestSQLAccessControlContext extends TestSQLAccessControlContextBase
    }
 
    private static AccessControlContext newSQLAccessControlContext()
-         throws SQLException, InterruptedException, AccessControlException {
+         throws SQLException {
       Connection connection = DriverManager.getConnection(dbUrl, dbUser, dbPwd);
       SQLAccessControlSystemResetUtil.resetOACC(connection, dbSchema, oaccRootPwd);
       return SQLAccessControlContextFactory.getAccessControlContext(connection, dbSchema, SQLDialect.DB2_10_5);
@@ -106,7 +105,7 @@ public class TestSQLAccessControlContext extends TestSQLAccessControlContextBase
       }
    }
 
-   private static void test_authenticate() throws SQLException, InterruptedException, AccessControlException {
+   private static void test_authenticate() throws SQLException {
       testName("test_authenticate");
 
       final AccessControlContext accessControlContext = newSQLAccessControlContext();
@@ -138,7 +137,7 @@ public class TestSQLAccessControlContext extends TestSQLAccessControlContextBase
       }
    }
 
-   private static void test_createResourceClass() throws SQLException, InterruptedException, AccessControlException {
+   private static void test_createResourceClass() throws SQLException {
       testName("test_createResourceClass");
 
       final AccessControlContext accessControlContext = newSQLAccessControlContext();
@@ -148,66 +147,31 @@ public class TestSQLAccessControlContext extends TestSQLAccessControlContextBase
 
       // we attempt to create a resource which we expect to succeed
       testName("createResourceClass( USER, true )");
-      try {
-         accessControlContext.createResourceClass("USER", true, false);
-         testOK();
-      }
-      catch (AccessControlException e) {
-         testFail(e);
-      }
+      accessControlContext.createResourceClass("USER", true, false);
+      testOK();
 
       // we attempt to create a resource which we expect to succeed
       testName("createResourceClass( BLOG, false )");
-      try {
-         accessControlContext.createResourceClass("BLOG", false, false);
-         testOK();
-      }
-      catch (AccessControlException e) {
-         testFail(e);
-      }
+      accessControlContext.createResourceClass("BLOG", false, false);
+      testOK();
 
       // we attempt to create a resource which we expect to fail
       testName("createResourceClass( USER, true ) : duplicate");
-      try {
-         accessControlContext.createResourceClass("USER", true, false);
-         testFail();
-      }
-      catch (AccessControlException e) {
-         if (e.getMessage().toLowerCase().contains("duplicate")) {
-            testOK();
-         }
-         else {
-            testFail(e);
-         }
-      }
+      accessControlContext.createResourceClass("USER", true, false);
+      testFail();
 
       // we attempt to create a resource which we expect to fail
       testName("createResourceClass( BLOG, false ) : duplicate");
-      try {
-         accessControlContext.createResourceClass("BLOG", false, false);
-         testFail();
-      }
-      catch (AccessControlException e) {
-         if (e.getMessage().toLowerCase().contains("duplicate")) {
-            testOK();
-         }
-         else {
-            testFail(e);
-         }
-      }
+      accessControlContext.createResourceClass("BLOG", false, false);
+      testFail();
 
       // we attempt to create a resource which we expect to succeed
       testName("createResourceClass( SITE, false )");
-      try {
-         accessControlContext.createResourceClass("SITE", false, false);
-         testOK();
-      }
-      catch (AccessControlException e) {
-         testFail(e);
-      }
+      accessControlContext.createResourceClass("SITE", false, false);
+      testOK();
    }
 
-   private static void test_createResourceClassPermissions() throws SQLException, InterruptedException, AccessControlException {
+   private static void test_createResourceClassPermissions() throws SQLException {
       testName("test_createResourceClassPermission");
 
       final AccessControlContext accessControlContext = newSQLAccessControlContext();
@@ -217,86 +181,46 @@ public class TestSQLAccessControlContext extends TestSQLAccessControlContextBase
 
       // first we need to create a permission which we expect to succeed
       setupName("createResourceClass( USER, true )");
-      try {
-         accessControlContext.createResourceClass("USER", true, false);
-         setupOK();
-      }
-      catch (AccessControlException e) {
-         setupFail();
-      }
+      accessControlContext.createResourceClass("USER", true, false);
+      setupOK();
 
       // we attempt to create a permission which we expect to succeed
       setupName("createResourceClass( BLOG, false )");
-      try {
-         accessControlContext.createResourceClass("BLOG", false, false);
-         setupOK();
-      }
-      catch (AccessControlException e) {
-         setupFail();
-      }
+      accessControlContext.createResourceClass("BLOG", false, false);
+      setupOK();
 
       // we attempt to create a permission which we expect to succeed
       testName("createResourceClassPermissions( USER, VIEW )");
-      try {
-         accessControlContext.createResourcePermission("USER", "VIEW");
-         testOK();
-      }
-      catch (AccessControlException e) {
-         testFail(e);
-      }
+      accessControlContext.createResourcePermission("USER", "VIEW");
+      testOK();
 
       // we attempt to create a permission which we expect to succeed
       testName("createResourceClassPermissions( USER, CHANGE )");
-      try {
-         accessControlContext.createResourcePermission("USER", "CHANGE");
-         testOK();
-      }
-      catch (AccessControlException e) {
-         testFail(e);
-      }
+      accessControlContext.createResourcePermission("USER", "CHANGE");
+      testOK();
 
       // we attempt to create a permission which we expect to succeed
       testName("createResourceClassPermissions( BLOG, CREATE-POST )");
-      try {
-         accessControlContext.createResourcePermission("BLOG", "CREATE-POST");
-         testOK();
-      }
-      catch (AccessControlException e) {
-         testFail(e);
-      }
+      accessControlContext.createResourcePermission("BLOG", "CREATE-POST");
+      testOK();
 
       // we attempt to create a permission which we expect to succeed
       testName("createResourceClassPermissions( BLOG, EDIT-POST )");
-      try {
-         accessControlContext.createResourcePermission("BLOG", "EDIT-POST");
-         testOK();
-      }
-      catch (AccessControlException e) {
-         testFail(e);
-      }
+      accessControlContext.createResourcePermission("BLOG", "EDIT-POST");
+      testOK();
 
       // we attempt to create a permission which we expect to succeed
       testName("createResourceClassPermissions( USER, VIEW ) : duplicate");
-      try {
-         accessControlContext.createResourcePermission("USER", "VIEW");
-         testFail();
-      }
-      catch (AccessControlException e) {
-         testOK();
-      }
+      accessControlContext.createResourcePermission("USER", "VIEW");
+      testFail();
 
       // we attempt to create a permission which we expect to succeed
       testName("createResourceClassPermissions( USER, CHANGE ) : duplicate");
-      try {
-         accessControlContext.createResourcePermission("USER", "CHANGE");
-         testFail();
-      }
-      catch (AccessControlException e) {
-         testOK();
-      }
+      accessControlContext.createResourcePermission("USER", "CHANGE");
+      testFail();
    }
 
-   private static void test_createDomain() throws SQLException, InterruptedException, AccessControlException {
+   private static void test_createDomain() throws SQLException {
       testName("test_createDomain");
 
       final AccessControlContext accessControlContext = newSQLAccessControlContext();
@@ -310,7 +234,7 @@ public class TestSQLAccessControlContext extends TestSQLAccessControlContextBase
          accessControlContext.createDomain("ACMECorp");
          testOK();
       }
-      catch (AccessControlException e) {
+      catch (OaccException e) {
          testFail(e);
       }
 
@@ -320,12 +244,12 @@ public class TestSQLAccessControlContext extends TestSQLAccessControlContextBase
          accessControlContext.createDomain("INFO-SOLUTIONS");
          testOK();
       }
-      catch (AccessControlException e) {
+      catch (OaccException e) {
          testFail(e);
       }
    }
 
-   private static void test_createResource() throws AccessControlException, SQLException, InterruptedException {
+   private static void test_createResource() throws SQLException {
       testName("test_createResource");
 
       final AccessControlContext accessControlContext = newSQLAccessControlContext();
@@ -335,24 +259,14 @@ public class TestSQLAccessControlContext extends TestSQLAccessControlContextBase
 
       // we attempt to create a resource which we expect to succeed
       setupName("createResourceClass( USER, true )");
-      try {
-         accessControlContext.createResourceClass("USER", true, false);
-         setupOK();
-      }
-      catch (AccessControlException e) {
-         setupFail(e);
-      }
+      accessControlContext.createResourceClass("USER", true, false);
+      setupOK();
 
       // we attempt to create a resource which we expect to succeed
       setupName("createResourceClass( BLOG, false )");
-      try {
-         accessControlContext.createResourceClass("BLOG", false, false);
-         accessControlContext.createResourcePermission("BLOG", "CREATE-POST");
-         setupOK();
-      }
-      catch (AccessControlException e) {
-         setupFail(e);
-      }
+      accessControlContext.createResourceClass("BLOG", false, false);
+      accessControlContext.createResourcePermission("BLOG", "CREATE-POST");
+      setupOK();
 
       // we create a domain to hold a new user
       setupName("createDomain( ACMECorp )");
@@ -360,7 +274,7 @@ public class TestSQLAccessControlContext extends TestSQLAccessControlContextBase
          accessControlContext.createDomain("ACMECorp");
          setupOK();
       }
-      catch (AccessControlException e) {
+      catch (OaccException e) {
          setupFail(e);
       }
 
@@ -372,7 +286,7 @@ public class TestSQLAccessControlContext extends TestSQLAccessControlContextBase
          acmeRootUser = accessControlContext.createResource("USER", "ACMECorp", PasswordCredentials.newInstance(PASSWORD));
          setupOK();
       }
-      catch (AccessControlException e) {
+      catch (OaccException e) {
          setupFail(e);
       }
 
@@ -392,7 +306,7 @@ public class TestSQLAccessControlContext extends TestSQLAccessControlContextBase
          );
          setupOK();
       }
-      catch (AccessControlException e) {
+      catch (OaccException e) {
          setupFail(e);
       }
 
@@ -412,7 +326,7 @@ public class TestSQLAccessControlContext extends TestSQLAccessControlContextBase
          accessControlContext.createResource("BLOG");
          testOK();
       }
-      catch (AccessControlException e) {
+      catch (OaccException e) {
          testFail(e);
       }
 
@@ -422,12 +336,12 @@ public class TestSQLAccessControlContext extends TestSQLAccessControlContextBase
          accessControlContext.createResource("BLOG");
          testOK();
       }
-      catch (AccessControlException e) {
+      catch (OaccException e) {
          testFail(e);
       }
    }
 
-   private static void test_createResource_NonAuth() throws AccessControlException, SQLException, InterruptedException {
+   private static void test_createResource_NonAuth() throws SQLException {
       testName("test_createResource_NonAuth");
 
       final AccessControlContext accessControlContext = newSQLAccessControlContext();
@@ -437,24 +351,14 @@ public class TestSQLAccessControlContext extends TestSQLAccessControlContextBase
 
       // we attempt to create a resource which we expect to succeed
       setupName("createResourceClass( USER, true, true )");
-      try {
-         accessControlContext.createResourceClass("USER", true, true);
-         setupOK();
-      }
-      catch (AccessControlException e) {
-         setupFail(e);
-      }
+      accessControlContext.createResourceClass("USER", true, true);
+      setupOK();
 
       // we attempt to create a resource which we expect to succeed
       setupName("createResourceClass( BLOG, false )");
-      try {
-         accessControlContext.createResourceClass("BLOG", false, false);
-         accessControlContext.createResourcePermission("BLOG", "CREATE-POST");
-         setupOK();
-      }
-      catch (AccessControlException e) {
-         setupFail(e);
-      }
+      accessControlContext.createResourceClass("BLOG", false, false);
+      accessControlContext.createResourcePermission("BLOG", "CREATE-POST");
+      setupOK();
 
       // we create a domain to hold a new user
       setupName("createDomain( ACMECorp )");
@@ -462,7 +366,7 @@ public class TestSQLAccessControlContext extends TestSQLAccessControlContextBase
          accessControlContext.createDomain("ACMECorp");
          setupOK();
       }
-      catch (AccessControlException e) {
+      catch (OaccException e) {
          setupFail(e);
       }
 
@@ -476,7 +380,7 @@ public class TestSQLAccessControlContext extends TestSQLAccessControlContextBase
          acmeRootUser = accessControlContext.createResource("USER", "ACMECorp", PasswordCredentials.newInstance(PASSWORD));
          setupOK();
       }
-      catch (AccessControlException e) {
+      catch (OaccException e) {
          setupFail(e);
       }
 
@@ -499,7 +403,7 @@ public class TestSQLAccessControlContext extends TestSQLAccessControlContextBase
          );
          setupOK();
       }
-      catch (AccessControlException e) {
+      catch (OaccException e) {
          setupFail(e);
       }
 
@@ -519,7 +423,7 @@ public class TestSQLAccessControlContext extends TestSQLAccessControlContextBase
          accessControlContext.createResource("BLOG");
          testOK();
       }
-      catch (AccessControlException e) {
+      catch (OaccException e) {
          testFail(e);
       }
 
@@ -529,12 +433,12 @@ public class TestSQLAccessControlContext extends TestSQLAccessControlContextBase
          accessControlContext.createResource("BLOG");
          testOK();
       }
-      catch (AccessControlException e) {
+      catch (OaccException e) {
          testFail(e);
       }
    }
 
-   private static void test_setDomainCreate_1() throws SQLException, InterruptedException, AccessControlException {
+   private static void test_setDomainCreate_1() throws SQLException {
       testName("test_setDomainCreate_1");
 
       final AccessControlContext accessControlContext = newSQLAccessControlContext();
@@ -544,13 +448,8 @@ public class TestSQLAccessControlContext extends TestSQLAccessControlContextBase
 
       // we attempt to create a resource which we expect to succeed
       setupName("createResourceClass( USER, true )");
-      try {
-         accessControlContext.createResourceClass("USER", true, false);
-         setupOK();
-      }
-      catch (AccessControlException e) {
-         setupFail(e);
-      }
+      accessControlContext.createResourceClass("USER", true, false);
+      setupOK();
 
       // we create a domain to hold a new user
       setupName("createDomain( ACMECorp )");
@@ -558,7 +457,7 @@ public class TestSQLAccessControlContext extends TestSQLAccessControlContextBase
          accessControlContext.createDomain("ACMECorp");
          setupOK();
       }
-      catch (AccessControlException e) {
+      catch (OaccException e) {
          setupFail(e);
       }
 
@@ -572,7 +471,7 @@ public class TestSQLAccessControlContext extends TestSQLAccessControlContextBase
                                                             PasswordCredentials.newInstance(PASSWORD));
          setupOK();
       }
-      catch (AccessControlException e) {
+      catch (OaccException e) {
          setupFail(e);
       }
 
@@ -594,12 +493,12 @@ public class TestSQLAccessControlContext extends TestSQLAccessControlContextBase
          accessControlContext.createDomain(clientDomain);
          testFail();
       }
-      catch (AccessControlException e) {
+      catch (OaccException e) {
          testOK();
       }
    }
 
-   private static void test_setDomainCreate_2() throws SQLException, InterruptedException, AccessControlException {
+   private static void test_setDomainCreate_2() throws SQLException {
       testName("test_setDomainCreate_2");
 
       final AccessControlContext accessControlContext = newSQLAccessControlContext();
@@ -609,13 +508,8 @@ public class TestSQLAccessControlContext extends TestSQLAccessControlContextBase
 
       // we create a user resource type
       setupName("createResourceClass( USER, true )");
-      try {
-         accessControlContext.createResourceClass("USER", true, false);
-         setupOK();
-      }
-      catch (AccessControlException e) {
-         setupFail(e);
-      }
+      accessControlContext.createResourceClass("USER", true, false);
+      setupOK();
 
       // we create a domain to hold a new user
       setupName("createDomain( ACMECorp )");
@@ -623,7 +517,7 @@ public class TestSQLAccessControlContext extends TestSQLAccessControlContextBase
          accessControlContext.createDomain("ACMECorp");
          setupOK();
       }
-      catch (AccessControlException e) {
+      catch (OaccException e) {
          setupFail(e);
       }
 
@@ -637,7 +531,7 @@ public class TestSQLAccessControlContext extends TestSQLAccessControlContextBase
                                                             PasswordCredentials.newInstance(PASSWORD));
          setupOK();
       }
-      catch (AccessControlException e) {
+      catch (OaccException e) {
          setupFail(e);
       }
 
@@ -649,7 +543,7 @@ public class TestSQLAccessControlContext extends TestSQLAccessControlContextBase
          accessControlContext.setDomainPermissions(acmeRootUser, "ACMECorp", domainPermissions);
          setupOK();
       }
-      catch (AccessControlException e) {
+      catch (OaccException e) {
          setupFail(e);
       }
 
@@ -662,7 +556,7 @@ public class TestSQLAccessControlContext extends TestSQLAccessControlContextBase
          accessControlContext.setDomainCreatePermissions(acmeRootUser, domainCreatePermissions);
          setupOK();
       }
-      catch (AccessControlException e) {
+      catch (OaccException e) {
          setupFail(e);
       }
 
@@ -684,12 +578,12 @@ public class TestSQLAccessControlContext extends TestSQLAccessControlContextBase
          accessControlContext.createDomain(clientDomain, "ACMECorp");
          testOK();
       }
-      catch (AccessControlException e) {
+      catch (OaccException e) {
          testFail(e);
       }
    }
 
-   private static void test_setPermissions() throws SQLException, InterruptedException, AccessControlException {
+   private static void test_setPermissions() throws SQLException {
       testName("test_setPermission");
 
       final AccessControlContext accessControlContext = newSQLAccessControlContext();
@@ -699,13 +593,8 @@ public class TestSQLAccessControlContext extends TestSQLAccessControlContextBase
 
       // we attempt to create a resource which we expect to succeed
       setupName("createResourceClass( USER, true )");
-      try {
-         accessControlContext.createResourceClass("USER", true, false);
-         setupOK();
-      }
-      catch (AccessControlException e) {
-         setupFail(e);
-      }
+      accessControlContext.createResourceClass("USER", true, false);
+      setupOK();
 
       Resource newUser_1 = null;
       Resource newUser_2 = null;
@@ -716,7 +605,7 @@ public class TestSQLAccessControlContext extends TestSQLAccessControlContextBase
          newUser_1 = accessControlContext.createResource("USER", PasswordCredentials.newInstance(PASSWORD));
          setupOK();
       }
-      catch (AccessControlException e) {
+      catch (OaccException e) {
          setupFail(e);
       }
 
@@ -726,7 +615,7 @@ public class TestSQLAccessControlContext extends TestSQLAccessControlContextBase
          newUser_2 = accessControlContext.createResource("USER", PasswordCredentials.newInstance(PASSWORD2));
          setupOK();
       }
-      catch (AccessControlException e) {
+      catch (OaccException e) {
          setupFail(e);
       }
 
@@ -739,7 +628,7 @@ public class TestSQLAccessControlContext extends TestSQLAccessControlContextBase
          accessControlContext.setDomainCreatePermissions(newUser_1, domainCreatePermissions);
          setupOK();
       }
-      catch (AccessControlException e) {
+      catch (OaccException e) {
          setupFail(e);
       }
 
@@ -748,7 +637,7 @@ public class TestSQLAccessControlContext extends TestSQLAccessControlContextBase
          System.out.print(accessControlContext.getEffectiveDomainCreatePermissions(newUser_1));
          setupOK();
       }
-      catch (AccessControlException e) {
+      catch (OaccException e) {
          setupFail(e);
       }
 
@@ -757,7 +646,7 @@ public class TestSQLAccessControlContext extends TestSQLAccessControlContextBase
          System.out.print(accessControlContext.getEffectiveDomainCreatePermissions(newUser_2));
          setupOK();
       }
-      catch (AccessControlException e) {
+      catch (OaccException e) {
          setupFail(e);
       }
 
@@ -769,7 +658,7 @@ public class TestSQLAccessControlContext extends TestSQLAccessControlContextBase
          accessControlContext.setResourcePermissions(newUser_2, newUser_1, resourcePermissions);
          setupOK();
       }
-      catch (AccessControlException e) {
+      catch (OaccException e) {
          setupFail(e);
       }
 
@@ -778,7 +667,7 @@ public class TestSQLAccessControlContext extends TestSQLAccessControlContextBase
          accessControlContext.setResourcePermissions(newUser_1, newUser_2, resourcePermissions);
          testFail();
       }
-      catch (AccessControlException e) {
+      catch (OaccException e) {
          testOK(e);
       }
 
@@ -798,12 +687,12 @@ public class TestSQLAccessControlContext extends TestSQLAccessControlContextBase
             testFail();
          }
       }
-      catch (AccessControlException e) {
+      catch (OaccException e) {
          testFail(e);
       }
    }
 
-   private static void test_setGlobalPermissions() throws SQLException, InterruptedException, AccessControlException {
+   private static void test_setGlobalPermissions() throws SQLException {
       testName("test_setPermission");
 
       final AccessControlContext accessControlContext = newSQLAccessControlContext();
@@ -813,23 +702,13 @@ public class TestSQLAccessControlContext extends TestSQLAccessControlContextBase
 
       // we attempt to create a resource class which we expect to succeed
       setupName("createResourceClass( USER, true )");
-      try {
-         accessControlContext.createResourceClass("USER", true, false);
-         setupOK();
-      }
-      catch (AccessControlException e) {
-         setupFail(e);
-      }
+      accessControlContext.createResourceClass("USER", true, false);
+      setupOK();
 
       // we attempt to create a resource class permission which we expect to succeed
       setupName("createResourcePermission( USER, VIEW )");
-      try {
-         accessControlContext.createResourcePermission("USER", "VIEW");
-         setupOK();
-      }
-      catch (AccessControlException e) {
-         setupFail(e);
-      }
+      accessControlContext.createResourcePermission("USER", "VIEW");
+      setupOK();
 
       Resource newUser_1 = null;
 
@@ -839,7 +718,7 @@ public class TestSQLAccessControlContext extends TestSQLAccessControlContextBase
          newUser_1 = accessControlContext.createResource("USER", PasswordCredentials.newInstance(PASSWORD));
          setupOK();
       }
-      catch (AccessControlException e) {
+      catch (OaccException e) {
          setupFail(e);
       }
 
@@ -852,7 +731,7 @@ public class TestSQLAccessControlContext extends TestSQLAccessControlContextBase
          accessControlContext.setGlobalResourcePermissions(newUser_1, "USER", resourcePermissions);
          setupOK();
       }
-      catch (AccessControlException e) {
+      catch (OaccException e) {
          setupFail(e);
       }
 
@@ -867,13 +746,13 @@ public class TestSQLAccessControlContext extends TestSQLAccessControlContextBase
             testFail();
          }
       }
-      catch (AccessControlException e) {
+      catch (OaccException e) {
          testFail(e);
          e.printStackTrace();
       }
    }
 
-   private static void test_getResourcesByPermission() throws SQLException, InterruptedException, AccessControlException {
+   private static void test_getResourcesByPermission() throws SQLException {
       testName("test_getResourcesByPermission");
 
       final AccessControlContext accessControlContext = newSQLAccessControlContext();
@@ -883,26 +762,16 @@ public class TestSQLAccessControlContext extends TestSQLAccessControlContextBase
 
       // we create a user resource type
       setupName("createResourceClass( USER, true )");
-      try {
-         accessControlContext.createResourceClass("USER", true, false);
-         setupOK();
-      }
-      catch (AccessControlException e) {
-         setupFail(e);
-      }
+      accessControlContext.createResourceClass("USER", true, false);
+      setupOK();
 
       // we create a blog resource type
       setupName("createResourceClass( BLOG, false )");
-      try {
-         accessControlContext.createResourceClass("BLOG", false, false);
-         accessControlContext.createResourcePermission("BLOG", "CREATE-POST");
-         accessControlContext.createResourcePermission("BLOG", "EDIT-POST");
-         accessControlContext.createResourcePermission("BLOG", "DELETE-POST");
-         setupOK();
-      }
-      catch (AccessControlException e) {
-         setupFail(e);
-      }
+      accessControlContext.createResourceClass("BLOG", false, false);
+      accessControlContext.createResourcePermission("BLOG", "CREATE-POST");
+      accessControlContext.createResourcePermission("BLOG", "EDIT-POST");
+      accessControlContext.createResourcePermission("BLOG", "DELETE-POST");
+      setupOK();
 
       Resource newUser_1 = null;
       Resource newUser_2 = null;
@@ -913,7 +782,7 @@ public class TestSQLAccessControlContext extends TestSQLAccessControlContextBase
          newUser_1 = accessControlContext.createResource("USER", PasswordCredentials.newInstance(PASSWORD));
          setupOK();
       }
-      catch (AccessControlException e) {
+      catch (OaccException e) {
          setupFail(e);
       }
 
@@ -923,7 +792,7 @@ public class TestSQLAccessControlContext extends TestSQLAccessControlContextBase
          newUser_2 = accessControlContext.createResource("USER", PasswordCredentials.newInstance(PASSWORD2));
          setupOK();
       }
-      catch (AccessControlException e) {
+      catch (OaccException e) {
          setupFail(e);
       }
 
@@ -939,7 +808,7 @@ public class TestSQLAccessControlContext extends TestSQLAccessControlContextBase
          accessControlContext.setResourceCreatePermissions(newUser_1, "BLOG", resourceCreatePermissions);
          setupOK();
       }
-      catch (AccessControlException e) {
+      catch (OaccException e) {
          setupFail(e);
       }
 
@@ -962,7 +831,7 @@ public class TestSQLAccessControlContext extends TestSQLAccessControlContextBase
          }
          setupOK();
       }
-      catch (AccessControlException e) {
+      catch (OaccException e) {
          setupFail(e);
       }
 
@@ -974,7 +843,7 @@ public class TestSQLAccessControlContext extends TestSQLAccessControlContextBase
          System.out.print(newUser_1_ResourceList);
          setupOK();
       }
-      catch (AccessControlException e) {
+      catch (OaccException e) {
          newUser_1_ResourceList = null;
          setupFail(e);
       }
@@ -995,7 +864,7 @@ public class TestSQLAccessControlContext extends TestSQLAccessControlContextBase
          System.out.print(accessControlContext.getResourcesByResourcePermission("BLOG", filterPermission));
          setupOK();
       }
-      catch (AccessControlException e) {
+      catch (OaccException e) {
          setupFail(e);
       }
 
@@ -1011,7 +880,7 @@ public class TestSQLAccessControlContext extends TestSQLAccessControlContextBase
          accessControlContext.setResourcePermissions(newUser_2, newUser_1, resourcePermissions);
          setupOK();
       }
-      catch (AccessControlException e) {
+      catch (OaccException e) {
          setupFail(e);
       }
 
@@ -1033,7 +902,7 @@ public class TestSQLAccessControlContext extends TestSQLAccessControlContextBase
          System.out.print(newUser_2_ResourceList);
          setupOK();
       }
-      catch (AccessControlException e) {
+      catch (OaccException e) {
          newUser_2_ResourceList = null;
          setupFail(e);
       }
@@ -1049,7 +918,7 @@ public class TestSQLAccessControlContext extends TestSQLAccessControlContextBase
       }
    }
 
-   private static void test_getResourceClassNames() throws SQLException, InterruptedException, AccessControlException {
+   private static void test_getResourceClassNames() throws SQLException {
       testName("test_getResourceClassNames");
 
       final AccessControlContext accessControlContext = newSQLAccessControlContext();
@@ -1059,63 +928,33 @@ public class TestSQLAccessControlContext extends TestSQLAccessControlContextBase
 
       // first we need to create a permission which we expect to succeed
       setupName("createResourceClass( USER, true )");
-      try {
-         accessControlContext.createResourceClass("USER", true, false);
-         setupOK();
-      }
-      catch (AccessControlException e) {
-         setupFail();
-      }
+      accessControlContext.createResourceClass("USER", true, false);
+      setupOK();
 
       // we attempt to create a permission which we expect to succeed
       setupName("createResourceClass( BLOG, false )");
-      try {
-         accessControlContext.createResourceClass("BLOG", false, false);
-         setupOK();
-      }
-      catch (AccessControlException e) {
-         setupFail();
-      }
+      accessControlContext.createResourceClass("BLOG", false, false);
+      setupOK();
 
       // we attempt to create a permission which we expect to succeed
       testName("createResourceClassPermissions( USER, VIEW )");
-      try {
-         accessControlContext.createResourcePermission("USER", "VIEW");
-         testOK();
-      }
-      catch (AccessControlException e) {
-         testFail(e);
-      }
+      accessControlContext.createResourcePermission("USER", "VIEW");
+      testOK();
 
       // we attempt to create a permission which we expect to succeed
       testName("createResourceClassPermissions( USER, CHANGE )");
-      try {
-         accessControlContext.createResourcePermission("USER", "CHANGE");
-         testOK();
-      }
-      catch (AccessControlException e) {
-         testFail(e);
-      }
+      accessControlContext.createResourcePermission("USER", "CHANGE");
+      testOK();
 
       // we attempt to create a permission which we expect to succeed
       testName("createResourceClassPermissions( BLOG, CREATE-POST )");
-      try {
-         accessControlContext.createResourcePermission("BLOG", "CREATE-POST");
-         testOK();
-      }
-      catch (AccessControlException e) {
-         testFail(e);
-      }
+      accessControlContext.createResourcePermission("BLOG", "CREATE-POST");
+      testOK();
 
       // we attempt to create a permission which we expect to succeed
       testName("createResourceClassPermissions( BLOG, EDIT-POST )");
-      try {
-         accessControlContext.createResourcePermission("BLOG", "EDIT-POST");
-         testOK();
-      }
-      catch (AccessControlException e) {
-         testFail(e);
-      }
+      accessControlContext.createResourcePermission("BLOG", "EDIT-POST");
+      testOK();
 
       testName("new HashSet( accessControlContext.getResourceClassNames() ).equals( new HashSet( Arrays.asList( \"USER\", \"BLOG\" ) )");
       try {
@@ -1126,7 +965,7 @@ public class TestSQLAccessControlContext extends TestSQLAccessControlContextBase
             testFail();
          }
       }
-      catch (AccessControlException e) {
+      catch (OaccException e) {
          testFail(e);
       }
 
@@ -1139,7 +978,7 @@ public class TestSQLAccessControlContext extends TestSQLAccessControlContextBase
             testFail();
          }
       }
-      catch (AccessControlException e) {
+      catch (OaccException e) {
          testFail(e);
       }
 
@@ -1150,14 +989,14 @@ public class TestSQLAccessControlContext extends TestSQLAccessControlContextBase
          }
          else {
             testFail();
-         }
+            }
       }
-      catch (AccessControlException e) {
+      catch (OaccException e) {
          testFail(e);
       }
    }
 
-   private static void test_getDomainDescendants() throws SQLException, InterruptedException, AccessControlException {
+   private static void test_getDomainDescendants() throws SQLException {
       testName("test_getDomainDescendants");
 
       final AccessControlContext accessControlContext = newSQLAccessControlContext();
@@ -1171,7 +1010,7 @@ public class TestSQLAccessControlContext extends TestSQLAccessControlContextBase
          accessControlContext.createDomain("ROOT-DOMAIN-1");
          setupOK();
       }
-      catch (AccessControlException e) {
+      catch (OaccException e) {
          setupFail(e);
       }
 
@@ -1181,7 +1020,7 @@ public class TestSQLAccessControlContext extends TestSQLAccessControlContextBase
          accessControlContext.createDomain("CHILD-DOMAIN-1", "ROOT-DOMAIN-1");
          setupOK();
       }
-      catch (AccessControlException e) {
+      catch (OaccException e) {
          setupFail(e);
       }
 
@@ -1191,7 +1030,7 @@ public class TestSQLAccessControlContext extends TestSQLAccessControlContextBase
          accessControlContext.createDomain("CHILD-DOMAIN-2", "ROOT-DOMAIN-1");
          setupOK();
       }
-      catch (AccessControlException e) {
+      catch (OaccException e) {
          setupFail(e);
       }
 
@@ -1201,7 +1040,7 @@ public class TestSQLAccessControlContext extends TestSQLAccessControlContextBase
          accessControlContext.createDomain("CHILD-DOMAIN-3", "CHILD-DOMAIN-1");
          setupOK();
       }
-      catch (AccessControlException e) {
+      catch (OaccException e) {
          setupFail(e);
       }
 
@@ -1211,7 +1050,7 @@ public class TestSQLAccessControlContext extends TestSQLAccessControlContextBase
          accessControlContext.createDomain("CHILD-DOMAIN-4", "CHILD-DOMAIN-3");
          setupOK();
       }
-      catch (AccessControlException e) {
+      catch (OaccException e) {
          setupFail(e);
       }
 
@@ -1227,7 +1066,7 @@ public class TestSQLAccessControlContext extends TestSQLAccessControlContextBase
             testFail();
          }
       }
-      catch (AccessControlException e) {
+      catch (OaccException e) {
          testFail(e);
       }
 
@@ -1243,7 +1082,7 @@ public class TestSQLAccessControlContext extends TestSQLAccessControlContextBase
             testFail();
          }
       }
-      catch (AccessControlException e) {
+      catch (OaccException e) {
          testFail(e);
       }
 
@@ -1259,7 +1098,7 @@ public class TestSQLAccessControlContext extends TestSQLAccessControlContextBase
             testFail();
          }
       }
-      catch (AccessControlException e) {
+      catch (OaccException e) {
          testFail(e);
       }
 
@@ -1275,7 +1114,7 @@ public class TestSQLAccessControlContext extends TestSQLAccessControlContextBase
             testFail();
          }
       }
-      catch (AccessControlException e) {
+      catch (OaccException e) {
          testFail(e);
       }
 
@@ -1291,12 +1130,12 @@ public class TestSQLAccessControlContext extends TestSQLAccessControlContextBase
             testFail();
          }
       }
-      catch (AccessControlException e) {
+      catch (OaccException e) {
          testFail(e);
       }
    }
 
-   private static void test_serializability() throws SQLException, InterruptedException, IOException, AccessControlException {
+   private static void test_serializability() throws SQLException, IOException {
       final AccessControlContext accessControlContext = newSQLAccessControlContext();
 
       // authenticate the session with system resource

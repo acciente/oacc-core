@@ -34,7 +34,7 @@ public class TestAccessControl_createResourcePermission extends TestAccessContro
    // as a system resource, hence there won't be a ..._validAsAuthorized() test
 
    @Test
-   public void createResourcePermission_validAsSystemResource() throws AccessControlException {
+   public void createResourcePermission_validAsSystemResource() {
       authenticateSystemResource();
 
       final String resourceClassName = generateResourceClass(false, false);
@@ -58,7 +58,7 @@ public class TestAccessControl_createResourcePermission extends TestAccessContro
    }
 
    @Test
-   public void createResourcePermission_whitespaceConsistent() throws AccessControlException {
+   public void createResourcePermission_whitespaceConsistent() {
       authenticateSystemResource();
 
       final String resourceClassNameTrimmed = generateResourceClass(false, false).trim();
@@ -77,7 +77,7 @@ public class TestAccessControl_createResourcePermission extends TestAccessContro
    }
 
    @Test
-   public void createResourcePermission_caseSensitiveConsistent() throws AccessControlException {
+   public void createResourcePermission_caseSensitiveConsistent() {
       authenticateSystemResource();
 
       final String permissionNameBase = generateUniquePermissionName();
@@ -131,18 +131,13 @@ public class TestAccessControl_createResourcePermission extends TestAccessContro
          assertThat(permissionNames, hasItem(permissionName_lower));
          assertThat(permissionNames, not(hasItem(permissionName_UPPER)));
 
-         try {
-            accessControlContext.createResourcePermission(resourceClassName_lower, permissionName_UPPER);
-            fail("creating a resource permission with the name of an existing permission that differs in case only should have failed for case-insensitive databases");
-         }
-         catch (AccessControlException e) {
-            assertThat(e.getMessage().toLowerCase(), containsString("duplicate permission"));
-         }
+         accessControlContext.createResourcePermission(resourceClassName_lower, permissionName_UPPER);
+         fail("creating a resource permission with the name of an existing permission that differs in case only should have failed for case-insensitive databases");
       }
    }
 
    @Test
-   public void createResourcePermission_notAuthorized_shouldFail() throws AccessControlException {
+   public void createResourcePermission_notAuthorized_shouldFail() {
       final String resourceClassName = generateResourceClass(false, false);
       final String permissionName = generateUniquePermissionName().trim();
 
@@ -151,13 +146,13 @@ public class TestAccessControl_createResourcePermission extends TestAccessContro
          accessControlContext.createResourcePermission(resourceClassName, permissionName);
          fail("creating resource permission without authorization should fail");
       }
-      catch (AccessControlException e) {
-         assertThat(e.getMessage().toLowerCase(), containsString("authenticated by the system resource"));
+      catch (NotAuthorizedException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("reserved for the system resource"));
       }
    }
 
    @Test
-   public void createResourcePermission_nulls_shouldFail() throws AccessControlException {
+   public void createResourcePermission_nulls_shouldFail() {
       authenticateSystemResource();
 
       final String resourceClassName = generateResourceClass(false, false);
@@ -180,7 +175,7 @@ public class TestAccessControl_createResourcePermission extends TestAccessContro
    }
 
    @Test
-   public void createResourcePermission_nonExistentResourceClass_shouldFail() throws AccessControlException {
+   public void createResourcePermission_nonExistentResourceClass_shouldFail() {
       authenticateSystemResource();
 
       final String permissionName = generateUniquePermissionName();
@@ -195,7 +190,7 @@ public class TestAccessControl_createResourcePermission extends TestAccessContro
    }
 
    @Test
-   public void createResourcePermission_asteriskPermissionPrefix_shouldFail() throws AccessControlException {
+   public void createResourcePermission_asteriskPermissionPrefix_shouldFail() {
       authenticateSystemResource();
 
       final String resourceClassName = generateResourceClass(false, false);
@@ -211,7 +206,7 @@ public class TestAccessControl_createResourcePermission extends TestAccessContro
    }
 
    @Test
-   public void createResourcePermission_emptyPermission_shouldFail() throws AccessControlException {
+   public void createResourcePermission_emptyPermission_shouldFail() {
       authenticateSystemResource();
 
       final String resourceClassName = generateResourceClass(false, false);
@@ -226,7 +221,7 @@ public class TestAccessControl_createResourcePermission extends TestAccessContro
    }
 
    @Test
-   public void createResourcePermission_duplicatePermission_shouldFail() throws AccessControlException {
+   public void createResourcePermission_duplicatePermission_shouldFail() {
       authenticateSystemResource();
 
       final String resourceClassName = generateResourceClass(false, false);

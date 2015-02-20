@@ -29,7 +29,7 @@ import static org.junit.Assert.fail;
 
 public class TestAccessControl_assertPostCreateDomainPermission extends TestAccessControlBase {
    @Test
-   public void assertPostCreateDomainPermission_succeedsAsSystemResource() throws AccessControlException {
+   public void assertPostCreateDomainPermission_succeedsAsSystemResource() {
       authenticateSystemResource();
 
       // verify setup
@@ -51,7 +51,7 @@ public class TestAccessControl_assertPostCreateDomainPermission extends TestAcce
    }
 
    @Test
-   public void assertPostCreateDomainPermission_noPermissions_shouldFailAsAuthenticated() throws AccessControlException {
+   public void assertPostCreateDomainPermission_noPermissions_shouldFailAsAuthenticated() {
       authenticateSystemResource();
 
       // setup permission without granting it to anything
@@ -72,14 +72,13 @@ public class TestAccessControl_assertPostCreateDomainPermission extends TestAcce
                                                                DomainPermissions.getInstance(DomainPermissions.CREATE_CHILD_DOMAIN));
          fail("asserting post-create domain permission when none has been granted should not have succeeded for authenticated resource");
       }
-      catch (AccessControlException e) {
-         assertThat(e.isNotAuthorizedError(), is(true));
-         assertThat(e.getMessage().toLowerCase(), containsString("no *create permission"));
+      catch (NotAuthorizedException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("create any domains"));
       }
    }
 
    @Test
-   public void assertPostCreateDomainPermission_direct_succeedsAsAuthenticatedResource() throws AccessControlException {
+   public void assertPostCreateDomainPermission_direct_succeedsAsAuthenticatedResource() {
       authenticateSystemResource();
 
       final char[] password = generateUniquePassword();
@@ -97,7 +96,7 @@ public class TestAccessControl_assertPostCreateDomainPermission extends TestAcce
    }
 
    @Test
-   public void assertPostCreateDomainPermission_directWithDifferentGrantingRights_succeedsAsAuthenticatedResource() throws AccessControlException {
+   public void assertPostCreateDomainPermission_directWithDifferentGrantingRights_succeedsAsAuthenticatedResource() {
       authenticateSystemResource();
 
       final char[] password = generateUniquePassword();
@@ -129,13 +128,13 @@ public class TestAccessControl_assertPostCreateDomainPermission extends TestAcce
                                                                                              true));
          fail("asserting post-create domain permission for a direct create permission with exceeded granting rights should have failed");
       }
-      catch (AccessControlException e) {
-         assertThat(e.getMessage().toLowerCase(), containsString("no create permission"));
+      catch (NotAuthorizedException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("permission after creating a domain"));
       }
    }
 
    @Test
-   public void assertPostCreateDomainPermission_resourceInherited_succeedsAsAuthenticatedResource() throws AccessControlException {
+   public void assertPostCreateDomainPermission_resourceInherited_succeedsAsAuthenticatedResource() {
       authenticateSystemResource();
 
       final char[] password = generateUniquePassword();
@@ -158,7 +157,7 @@ public class TestAccessControl_assertPostCreateDomainPermission extends TestAcce
    }
 
    @Test
-   public void assertPostCreateDomainPermission_superUser_succeedsAsAuthenticatedResource() throws AccessControlException {
+   public void assertPostCreateDomainPermission_superUser_succeedsAsAuthenticatedResource() {
       authenticateSystemResource();
 
       final char[] password = generateUniquePassword();
@@ -188,7 +187,7 @@ public class TestAccessControl_assertPostCreateDomainPermission extends TestAcce
    }
 
    @Test
-   public void getEffectiveDomainCreatePermissions_inheritWithDifferentGrantingRights_shouldSucceedAsAuthorized() throws AccessControlException {
+   public void getEffectiveDomainCreatePermissions_inheritWithDifferentGrantingRights_shouldSucceedAsAuthorized() {
       authenticateSystemResource();
       final String donorPermissionName_createChild = DomainPermissions.CREATE_CHILD_DOMAIN;
       final String accessorPermissionName_createChild = donorPermissionName_createChild;
@@ -228,7 +227,7 @@ public class TestAccessControl_assertPostCreateDomainPermission extends TestAcce
    }
 
    @Test
-   public void getEffectiveDomainCreatePermissions_inheritFromTwoResourcesWithDifferentGrantingRights_shouldSucceedAsAuthorized() throws AccessControlException {
+   public void getEffectiveDomainCreatePermissions_inheritFromTwoResourcesWithDifferentGrantingRights_shouldSucceedAsAuthorized() {
       authenticateSystemResource();
       final String donorPermissionName_createChild = DomainPermissions.CREATE_CHILD_DOMAIN;
       final char[] password = generateUniquePassword();
@@ -279,7 +278,7 @@ public class TestAccessControl_assertPostCreateDomainPermission extends TestAcce
    }
 
    @Test
-   public void getEffectiveDomainCreatePermissions_multiLevelInheritance_shouldSucceedAsAuthorized() throws AccessControlException {
+   public void getEffectiveDomainCreatePermissions_multiLevelInheritance_shouldSucceedAsAuthorized() {
       authenticateSystemResource();
       final String donorPermissionName_createChild = DomainPermissions.CREATE_CHILD_DOMAIN;
       final String inheritorPermissionName_createChild = DomainPermissions.CREATE_CHILD_DOMAIN;
@@ -323,7 +322,7 @@ public class TestAccessControl_assertPostCreateDomainPermission extends TestAcce
    }
 
    @Test
-   public void getEffectiveDomainCreatePermissions_multiLevelInheritanceWithEmptyIntermediaryLevel_shouldSucceedAsAuthorized() throws AccessControlException {
+   public void getEffectiveDomainCreatePermissions_multiLevelInheritanceWithEmptyIntermediaryLevel_shouldSucceedAsAuthorized() {
       authenticateSystemResource();
       final String donorPermissionName_createDomain = DomainPermissions.CREATE_CHILD_DOMAIN;
       final char[] password = generateUniquePassword();
@@ -370,7 +369,7 @@ public class TestAccessControl_assertPostCreateDomainPermission extends TestAcce
    }
 
    @Test
-   public void getEffectiveDomainCreatePermissions_nulls_shouldFail() throws AccessControlException {
+   public void getEffectiveDomainCreatePermissions_nulls_shouldFail() {
       authenticateSystemResource();
       final Resource accessorResource = generateUnauthenticatableResource();
       final DomainPermission domainPermission = DomainPermissions.getInstance(DomainPermissions.CREATE_CHILD_DOMAIN);
@@ -392,7 +391,7 @@ public class TestAccessControl_assertPostCreateDomainPermission extends TestAcce
    }
 
    @Test
-   public void getEffectiveDomainCreatePermissions_nonExistentReferences_shouldSucceed() throws AccessControlException {
+   public void getEffectiveDomainCreatePermissions_nonExistentReferences_shouldSucceed() {
       authenticateSystemResource();
 
       final Resource invalidResource = Resources.getInstance(-999L);
@@ -404,8 +403,8 @@ public class TestAccessControl_assertPostCreateDomainPermission extends TestAcce
          accessControlContext.assertPostCreateDomainPermission(invalidResource, domainPermission);
          fail("asserting post-create domain permission with invalid accessor resource should have failed");
       }
-      catch (AccessControlException e) {
-         assertThat(e.getMessage().toLowerCase(), containsString("no *create permission to create any domain"));
+      catch (NotAuthorizedException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("create any domain"));
       }
    }
 }
