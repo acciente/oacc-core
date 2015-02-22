@@ -1421,7 +1421,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
 
             if (unauthorizedRemovePermissions.size() > 0) {
                throw new NotAuthorizedException(accessorResource,
-                                                "Not authorized to remove the following permission(s): " + unauthorizedRemovePermissions);
+                                                "remove the following permission(s): " + unauthorizedRemovePermissions);
             }
          }
       }
