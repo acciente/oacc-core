@@ -118,7 +118,8 @@ public class TestAccessControl_createDomain extends TestAccessControlBase {
          fail("create child domain without CREATE_CHILD_DOMAIN authorization should have failed");
       }
       catch (NotAuthorizedException e) {
-         assertThat(e.getMessage().toLowerCase(), containsString("create child domain"));
+         assertThat(e.getMessage().toLowerCase(), containsString(String.valueOf(authenticatedResource).toLowerCase()
+                                                                       + " is not authorized to create child domain"));
       }
       assertThat(accessControlContext.getDomainDescendants(domainName_parent).size(), is(1));
       assertThat(accessControlContext.getDomainDescendants(domainName_parent), hasItem(domainName_parent));
@@ -311,13 +312,14 @@ public class TestAccessControl_createDomain extends TestAccessControlBase {
       final String domainName = generateUniqueDomainName();
 
       // attempt to create domain without authorization
-      generateResourceAndAuthenticate();
+      final Resource resource = generateResourceAndAuthenticate();
       try {
          accessControlContext.createDomain(domainName);
          fail("creating a domain without authorization should fail");
       }
       catch (NotAuthorizedException e) {
-         assertThat(e.getMessage().toLowerCase(), containsString("create domain"));
+         assertThat(e.getMessage().toLowerCase(), containsString(String.valueOf(resource).toLowerCase()
+                                                                       + " is not authorized to create domain"));
       }
       assertThat(accessControlContext.getDomainDescendants(domainName).isEmpty(), is(true));
    }

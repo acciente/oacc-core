@@ -602,6 +602,8 @@ public class TestAccessControl_setDomainCreatePermissions extends TestAccessCont
          fail("setting domain create permissions without having rights to grant should have failed");
       }
       catch (NotAuthorizedException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString(String.valueOf(authenticatableResource).toLowerCase()
+                                                                       + " is not authorized"));
          assertThat(e.getMessage().toLowerCase(), containsString("domain create permission"));
       }
    }

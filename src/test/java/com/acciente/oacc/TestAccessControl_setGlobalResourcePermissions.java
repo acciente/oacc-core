@@ -805,6 +805,8 @@ public class TestAccessControl_setGlobalResourcePermissions extends TestAccessCo
          fail("setting global permissions as grantor without authorization should have failed");
       }
       catch (NotAuthorizedException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString(String.valueOf(grantorResource).toLowerCase()
+                                                                       + " is not authorized"));
          assertThat(e.getMessage().toLowerCase(), containsString("global permission"));
       }
    }

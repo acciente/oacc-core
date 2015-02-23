@@ -945,6 +945,8 @@ public class TestAccessControl_setResourcePermissions extends TestAccessControlB
          fail("setting permissions as grantor without authorization should have failed");
       }
       catch (NotAuthorizedException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString(String.valueOf(grantorResource).toLowerCase()
+                                                                       + " is not authorized"));
          assertThat(e.getMessage().toLowerCase(), containsString("following permission"));
       }
    }

@@ -581,7 +581,9 @@ public class TestAccessControl_setDomainPermissions extends TestAccessControlBas
          fail("setting domain permissions without having rights to grant should have failed");
       }
       catch (NotAuthorizedException e) {
-         assertThat(e.getMessage().toLowerCase(), containsString("not authorized"));
+         assertThat(e.getMessage().toLowerCase(), containsString(String.valueOf(authenticatableResource).toLowerCase()
+                                                                 + " is not authorized"));
+         assertThat(e.getMessage().toLowerCase(), containsString("domain permission"));
       }
 
       // attempt again, but for permission that we neither have with nor without granting rights
@@ -589,14 +591,14 @@ public class TestAccessControl_setDomainPermissions extends TestAccessControlBas
       domainPermissions_pre.add(domCreatePerm_superuser);
       assertThat(domainPermissions_pre, is(not(domainPermissions_granter)));
 
-      accessControlContext.authenticate(authenticatableResource, PasswordCredentials.newInstance(password));
-
       try {
          accessControlContext.setDomainPermissions(accessorResource, dmainName, domainPermissions_pre);
          fail("setting domain permissions without having rights to grant should have failed");
       }
       catch (NotAuthorizedException e) {
-         assertThat(e.getMessage().toLowerCase(), containsString("not authorized"));
+         assertThat(e.getMessage().toLowerCase(), containsString(String.valueOf(authenticatableResource).toLowerCase()
+                                                                       + " is not authorized"));
+         assertThat(e.getMessage().toLowerCase(), containsString("domain permission"));
       }
    }
 }

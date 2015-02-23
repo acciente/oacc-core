@@ -430,7 +430,7 @@ public class TestAccessControl_createResource extends TestAccessControlBase {
       final String domainName = generateDomain();
       final String resourceClassName = generateResourceClass(false, false);
 
-      generateResourceAndAuthenticate();
+      final Resource resource = generateResourceAndAuthenticate();
 
       // attempt to create resource without create-permission authorization
       try {
@@ -438,7 +438,8 @@ public class TestAccessControl_createResource extends TestAccessControlBase {
          fail("creating resource without authorization should fail");
       }
       catch (NotAuthorizedException e) {
-         assertThat(e.getMessage().toLowerCase(), containsString("create resource"));
+         assertThat(e.getMessage().toLowerCase(), containsString(String.valueOf(resource).toLowerCase()
+                                                                       + " is not authorized to create resource"));
       }
    }
 
@@ -446,7 +447,7 @@ public class TestAccessControl_createResource extends TestAccessControlBase {
    public void createResource_notAuthorizedWithDefaultSessionDomain_shouldFail() {
       final String resourceClassName = generateResourceClass(false, false);
 
-      generateResourceAndAuthenticate();
+      final Resource resource = generateResourceAndAuthenticate();
 
       // attempt to create resource without create-permission authorization
       try {
@@ -454,7 +455,8 @@ public class TestAccessControl_createResource extends TestAccessControlBase {
          fail("creating resource without authorization should fail");
       }
       catch (NotAuthorizedException e) {
-         assertThat(e.getMessage().toLowerCase(), containsString("create resource"));
+         assertThat(e.getMessage().toLowerCase(), containsString(String.valueOf(resource).toLowerCase()
+                                                                       + " is not authorized to create resource"));
       }
    }
 }

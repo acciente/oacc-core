@@ -1224,6 +1224,8 @@ public class TestAccessControl_setResourceCreatePermissions extends TestAccessCo
          fail("setting create permissions without having rights to grant should have failed");
       }
       catch (NotAuthorizedException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString(String.valueOf(grantorResource).toLowerCase()
+                                                                       + " is not authorized"));
          assertThat(e.getMessage().toLowerCase(), containsString("not authorized"));
       }
    }

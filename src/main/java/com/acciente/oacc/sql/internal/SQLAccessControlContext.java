@@ -1146,7 +1146,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
                = __subtractDomainCreatePermissionsIfGrantableFrom(requestedAddPermissions, grantorPermissions);
 
          if (unauthorizedAddPermissions.size() > 0) {
-            throw new NotAuthorizedException(accessorResource,
+            throw new NotAuthorizedException(sessionResource,
                                              "add the following domain create permission(s): " + unauthorizedAddPermissions);
          }
       }
@@ -1161,7 +1161,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
                = __subtractDomainCreatePermissionsIfGrantableFrom(requestedRemovePermissions, grantorPermissions);
 
          if (unauthorizedRemovePermissions.size() > 0) {
-            throw new NotAuthorizedException(accessorResource,
+            throw new NotAuthorizedException(sessionResource,
                                              "remove the following domain create permission(s): " + unauthorizedRemovePermissions);
          }
       }
@@ -1405,7 +1405,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
                   = __subtractResourceCreatePermissionsIfGrantableFrom(requestedAddPermissions, grantorPermissions);
 
             if (unauthorizedAddPermissions.size() > 0) {
-               throw new NotAuthorizedException(accessorResource,
+               throw new NotAuthorizedException(sessionResource,
                                                 "add the following permission(s): " + unauthorizedAddPermissions);
             }
          }
@@ -1420,7 +1420,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
                   = __subtractResourceCreatePermissionsIfGrantableFrom(requestedRemovePermissions, grantorPermissions);
 
             if (unauthorizedRemovePermissions.size() > 0) {
-               throw new NotAuthorizedException(accessorResource,
+               throw new NotAuthorizedException(sessionResource,
                                                 "remove the following permission(s): " + unauthorizedRemovePermissions);
             }
          }
@@ -1964,7 +1964,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
                      = __subtractResourcePermissionsIfGrantableFrom(requestedAddPermissions, grantorResourcePermissions);
 
                if (unauthorizedAddPermissions.size() > 0) {
-                  throw new NotAuthorizedException(accessorResource,
+                  throw new NotAuthorizedException(grantorResource,
                                                    "add the following permission(s): " + unauthorizedAddPermissions);
                }
             }
@@ -1979,7 +1979,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
                      = __subtractResourcePermissionsIfGrantableFrom(requestedRemovePermissions, grantorResourcePermissions);
 
                if (unauthorizedRemovePermissions.size() > 0) {
-                  throw new NotAuthorizedException(accessorResource,
+                  throw new NotAuthorizedException(grantorResource,
                                                    "remove the following permission(s): " + unauthorizedRemovePermissions);
                }
             }
@@ -1995,11 +1995,11 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
             if (reversePathResourcePermissions.contains(ResourcePermission_INHERIT)
                   || reversePathResourcePermissions.contains(ResourcePermission_INHERIT_GRANT)) {
                throw new OaccException("Granting the requested permission(s): "
-                                                      + requestedResourcePermissions
-                                                      + " will cause a cycle between: "
-                                                      + accessorResource
-                                                      + " and: "
-                                                      + accessedResource);
+                                             + requestedResourcePermissions
+                                             + " will cause a cycle between: "
+                                             + accessorResource
+                                             + " and: "
+                                             + accessedResource);
             }
          }
 
@@ -2282,7 +2282,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
                   = __subtractResourcePermissionsIfGrantableFrom(requestedAddPermissions, grantorPermissions);
 
             if (unauthorizedAddPermissions.size() > 0) {
-               throw new NotAuthorizedException(accessorResource,
+               throw new NotAuthorizedException(sessionResource,
                                                 "add the following global permission(s): " + unauthorizedAddPermissions);
             }
          }
@@ -2297,7 +2297,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
                   = __subtractResourcePermissionsIfGrantableFrom(requestedRemovePermissions, grantorPermissions);
 
             if (unauthorizedRemovePermissions.size() > 0) {
-               throw new NotAuthorizedException(accessorResource,
+               throw new NotAuthorizedException(sessionResource,
                                                 "remove the following global permission(s): " + unauthorizedRemovePermissions);
             }
          }
