@@ -164,6 +164,24 @@ public interface AccessControlContext {
                                       String domainName);
 
    /**
+    * Checks if the specified accessor resource has the specified domain permission on
+    * the specified domain.
+    * This method takes into account any direct domain permissions, inherited domain permissions
+    * and any domain permissions the accessor may have to ancestors of the specified domain, as well
+    * as any super-user privileges.
+    *
+    * @param accessorResource the resource on which access is being checked
+    * @param domainPermission the permission to be checked
+    * @param domainName       the domain for which the permission should be checked
+    * @return  <strong>true</strong> if the accessor resource has the specified domain permission,
+    *          <strong>false</strong> otherwise or if the accessor resource does not exist
+    * @throws java.lang.IllegalArgumentException  if no domain of domainName exists
+    */
+   public boolean hasDomainPermission(Resource accessorResource,
+                                      DomainPermission domainPermission,
+                                      String domainName);
+
+   /**
     * Checks if the specified accessor resource would receive the specified domain permission, if the accessor
     * were to create a domain.
     * The method takes into account any direct and inherited domain create permissions the accessor might have.

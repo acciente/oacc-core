@@ -2846,7 +2846,6 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
    public void assertDomainPermission(Resource accessorResource,
                                       DomainPermission domainPermission,
                                       String domainName) {
-
       SQLConnection connection = null;
 
       __assertAuthenticated();
@@ -2860,6 +2859,27 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
          if (!__hasPermission(connection, accessorResource, domainPermission, domainName)) {
             throw new NotAuthorizedException(accessorResource, domainPermission, domainName);
          }
+      }
+      finally {
+         __closeConnection(connection);
+      }
+   }
+
+   @Override
+   public boolean hasDomainPermission(Resource accessorResource,
+                                      DomainPermission domainPermission,
+                                      String domainName) {
+      SQLConnection connection = null;
+
+      __assertAuthenticated();
+      __assertResourceSpecified(accessorResource);
+      __assertPermissionSpecified(domainPermission);
+      __assertDomainSpecified(domainName);
+
+      try {
+         connection = __getConnection();
+
+         return __hasPermission(connection, accessorResource, domainPermission, domainName);
       }
       finally {
          __closeConnection(connection);
