@@ -17,6 +17,7 @@
  */
 package com.acciente.oacc;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.util.Collections;
@@ -778,6 +779,174 @@ public class TestAccessControl_setResourcePermissions extends TestAccessControlB
       catch (NotAuthorizedException e) {
          assertThat(e.getMessage().toLowerCase(), containsString(ungrantedPermissionName.toLowerCase()));
          assertThat(e.getMessage().toLowerCase(), not(containsString(grantedPermissionName)));
+      }
+   }
+
+   @Test
+   public void setResourcePermission_inheritanceCycle_onSelf_fromSysResource_shouldFail() {
+      authenticateSystemResource();
+
+      final String accessorDomain = generateDomain();
+      final String accessorResourceClass = generateResourceClass(true, false);
+      final PasswordCredentials accessorCredentials = PasswordCredentials.newInstance(generateUniquePassword());
+      final Resource accessorResource = accessControlContext.createResource(accessorResourceClass, accessorDomain, accessorCredentials);
+
+      // attempt to grant accessor INHERIT/G on itself (so it may grant it to the accessed later)
+      try {
+         accessControlContext.setResourcePermissions(accessorResource,
+                                                     accessorResource,
+                                                     setOf(ResourcePermissions.getInstance(ResourcePermissions.INHERIT, true)));
+         fail("setting direct resource permission of INHERIT to itself would constitute a cycle and should not have succeeded");
+      }
+      catch (OaccException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("cycle"));
+      }
+   }
+
+   @Test
+   public void setResourcePermission_inheritanceCycle_onSelf_fromAuthResource_shouldFail() {
+      // don't authenticate system resource - we're creating accessor from unauthenticated context here so
+      // as to get all default (non-system) permissions
+
+      final String accessorDomain = generateDomain();
+      final String accessorResourceClass = generateResourceClass(true, true);
+      final PasswordCredentials accessorCredentials = PasswordCredentials.newInstance(generateUniquePassword());
+      final Resource accessorResource = accessControlContext.createResource(accessorResourceClass, accessorDomain, accessorCredentials);
+
+      // authenticate as accessor resource
+      accessControlContext.authenticate(accessorResource, accessorCredentials);
+
+      // attempt to grant accessor INHERIT/G on itself (so it may grant it to the accessed later)
+      // NOTE: this won't work - not because of a cycle - but because currently the accessor resource
+      // lacks permission to actually grant system permissions about itself, including to itself!
+      try {
+         accessControlContext.setResourcePermissions(accessorResource,
+                                                     accessorResource,
+                                                     setOf(ResourcePermissions.getInstance(ResourcePermissions.INHERIT, true)));
+         fail("setting direct resource permission of INHERIT to itself should not have succeeded because accessor doesn't (and can't) have grant permission to itself");
+      }
+      catch (NotAuthorizedException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString(String.valueOf(accessorResource).toLowerCase()
+                                                                       + " is not authorized"));
+         assertThat(e.getMessage().toLowerCase(), containsString("following permission"));
+      }
+   }
+
+   @Test
+   public void setResourcePermission_inheritanceCycle_fromAccessorAsSuperUser_shouldFail() {
+      authenticateSystemResource();
+
+      final String accessorDomain = generateDomain();
+      final String accessorResourceClass = generateResourceClass(true, false);
+      final PasswordCredentials accessorCredentials = PasswordCredentials.newInstance(generateUniquePassword());
+      final Resource accessorResource = accessControlContext.createResource(accessorResourceClass, accessorDomain, accessorCredentials);
+
+      final String accessedDomain = generateDomain();
+      final String accessedResourceClass = generateResourceClass(true, false);
+
+      // set up accessor resource as a super user on the accessor domain (so we can later grant accessed permission on ourselves)
+      accessControlContext.setDomainPermissions(accessorResource,
+                                                accessorDomain,
+                                                setOf(DomainPermissions.getInstance(DomainPermissions.SUPER_USER)));
+
+      accessControlContext.assertDomainPermission(accessorResource,
+                                                  DomainPermissions.getInstance(DomainPermissions.SUPER_USER),
+                                                  accessorDomain);
+
+      // grant resource create permissions to accessor resource, including INHERIT post-create permission
+      final Set<ResourceCreatePermission> resourceCreatePermissions
+            = setOf(ResourceCreatePermissions.getInstance(ResourceCreatePermissions.CREATE),
+                    ResourceCreatePermissions.getInstance(ResourcePermissions.getInstance(ResourcePermissions.INHERIT)),
+                    ResourceCreatePermissions.getInstance(ResourcePermissions.getInstance(ResourcePermissions.RESET_CREDENTIALS)));
+      accessControlContext.setResourceCreatePermissions(accessorResource,
+                                                        accessedResourceClass,
+                                                        resourceCreatePermissions,
+                                                        accessedDomain);
+
+      accessControlContext.assertPostCreateResourcePermission(accessorResource,
+                                                              accessedResourceClass,
+                                                              ResourcePermissions.getInstance(ResourcePermissions.INHERIT),
+                                                              accessedDomain);
+
+      // authenticate as accessor resource
+      accessControlContext.authenticate(accessorResource, accessorCredentials);
+
+      // create resource
+      final Resource accessedResource = accessControlContext.createResource(accessedResourceClass,
+                                                                            accessedDomain,
+                                                                            PasswordCredentials.newInstance(generateUniquePassword()));
+
+      accessControlContext.assertResourcePermission(accessorResource,
+                                                    accessedResource,
+                                                    ResourcePermissions.getInstance(ResourcePermissions.INHERIT));
+
+      // attempt to grant to new resource inherit permission on accessor resource
+      try {
+         accessControlContext.setResourcePermissions(accessedResource,
+                                                     accessorResource,
+                                                     setOf(ResourcePermissions.getInstance(ResourcePermissions.INHERIT)));
+         fail("setting direct resource permissions that would create an inherit cycle should have failed");
+      }
+      catch (OaccException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("will cause a cycle"));
+      }
+   }
+
+   @Test
+   public void setResourcePermission_inheritanceCycle_fromPostCreateInherit_shouldFail() {
+      // the test case of granting accessed --INHERIT-> accessor with accessor resource as the grantor
+      // can't be produced because we can't grant *ourselves* INHERIT /G (see setResourcePermission_inheritanceCycle_onSelf_fromAuthResource_shouldFail);
+      // so instead, we'll be granting accessed --INHERIT-> accessor with system resource as the grantor, again
+      authenticateSystemResource();
+
+      final String accessorDomain = generateDomain();
+      final String accessorResourceClass = generateResourceClass(true, false);
+      final PasswordCredentials accessorCredentials = PasswordCredentials.newInstance(generateUniquePassword());
+      final Resource accessorResource = accessControlContext.createResource(accessorResourceClass, accessorDomain, accessorCredentials);
+
+      final String accessedDomain = generateDomain();
+      final String accessedResourceClass = generateResourceClass(true, false);
+
+      // grant resource create permissions to accessor resource, including INHERIT post-create permission
+      final Set<ResourceCreatePermission> resourceCreatePermissions
+            = setOf(ResourceCreatePermissions.getInstance(ResourceCreatePermissions.CREATE),
+                    ResourceCreatePermissions.getInstance(ResourcePermissions.getInstance(ResourcePermissions.INHERIT)),
+                    ResourceCreatePermissions.getInstance(ResourcePermissions.getInstance(ResourcePermissions.RESET_CREDENTIALS)));
+      accessControlContext.setResourceCreatePermissions(accessorResource,
+                                                        accessedResourceClass,
+                                                        resourceCreatePermissions,
+                                                        accessedDomain);
+
+      accessControlContext.assertPostCreateResourcePermission(accessorResource,
+                                                              accessedResourceClass,
+                                                              ResourcePermissions.getInstance(ResourcePermissions.INHERIT),
+                                                              accessedDomain);
+
+      // authenticate as accessor resource
+      accessControlContext.authenticate(accessorResource, accessorCredentials);
+
+      // create resource
+      final Resource accessedResource = accessControlContext.createResource(accessedResourceClass,
+                                                                            accessedDomain,
+                                                                            PasswordCredentials.newInstance(generateUniquePassword()));
+
+      accessControlContext.assertResourcePermission(accessorResource,
+                                                    accessedResource,
+                                                    ResourcePermissions.getInstance(ResourcePermissions.INHERIT));
+
+      // unauthenticate (so that sys resource will attempt to grant accessed --INHERIT-> accessor)
+      accessControlContext.unauthenticate();
+      authenticateSystemResource();
+
+      // attempt to grant to new resource inherit permission on accessor resource
+      try {
+         accessControlContext.setResourcePermissions(accessedResource,
+                                                     accessorResource,
+                                                     setOf(ResourcePermissions.getInstance(ResourcePermissions.INHERIT)));
+         fail("setting direct resource permissions that would create an inherit cycle should have failed");
+      }
+      catch (OaccException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("will cause a cycle"));
       }
    }
 

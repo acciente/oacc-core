@@ -1993,7 +1993,8 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
                                                                                                        accessorResource);
 
             if (reversePathResourcePermissions.contains(ResourcePermission_INHERIT)
-                  || reversePathResourcePermissions.contains(ResourcePermission_INHERIT_GRANT)) {
+                  || reversePathResourcePermissions.contains(ResourcePermission_INHERIT_GRANT)
+                  || accessorResource.equals(accessedResource)) {
                throw new OaccException("Granting the requested permission(s): "
                                              + requestedResourcePermissions
                                              + " will cause a cycle between: "
