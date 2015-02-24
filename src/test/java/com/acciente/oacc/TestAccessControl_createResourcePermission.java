@@ -131,8 +131,13 @@ public class TestAccessControl_createResourcePermission extends TestAccessContro
          assertThat(permissionNames, hasItem(permissionName_lower));
          assertThat(permissionNames, not(hasItem(permissionName_UPPER)));
 
-         accessControlContext.createResourcePermission(resourceClassName_lower, permissionName_UPPER);
-         fail("creating a resource permission with the name of an existing permission that differs in case only should have failed for case-insensitive databases");
+         try {
+            accessControlContext.createResourcePermission(resourceClassName_lower, permissionName_UPPER);
+            fail("creating a resource permission with the name of an existing permission that differs in case only should have failed for case-insensitive databases");
+         }
+         catch (IllegalArgumentException e) {
+            assertThat(e.getMessage().toLowerCase(), containsString("duplicate permission"));
+         }
       }
    }
 
