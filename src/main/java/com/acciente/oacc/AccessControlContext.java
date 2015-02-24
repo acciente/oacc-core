@@ -161,8 +161,7 @@ public interface AccessControlContext {
     */
    public void assertDomainPermission(Resource accessorResource,
                                       DomainPermission domainPermission,
-                                      String domainName)
-   ;
+                                      String domainName);
 
    /**
     * Checks if the specified accessor resource would receive the specified domain permission, if the accessor
@@ -502,8 +501,7 @@ public interface AccessControlContext {
     * @throws com.acciente.oacc.NotAuthorizedException if the session resource is not authorized to create
     *                                                  child domains under the specified parent domain
     */
-   public void createDomain(String domainName, String parentDomainName)
-   ;
+   public void createDomain(String domainName, String parentDomainName);
 
    /**
     * Creates a new resource of the specified resource class in the same domain as this session resource.
@@ -589,8 +587,7 @@ public interface AccessControlContext {
     *                                                  domain create permissions on the specified accessor resource
     */
    public void setDomainCreatePermissions(Resource accessorResource,
-                                          Set<DomainCreatePermission> domainCreatePermissions)
-   ;
+                                          Set<DomainCreatePermission> domainCreatePermissions);
 
    /**
     * Gets all direct domain create permissions the specified accessor resource has.
@@ -633,8 +630,7 @@ public interface AccessControlContext {
     */
    public void setDomainPermissions(Resource accessorResource,
                                     String domainName,
-                                    Set<DomainPermission> domainPermissions)
-   ;
+                                    Set<DomainPermission> domainPermissions);
 
    /**
     * Gets all domain permissions the accessor resource has directly to the specified domain.
