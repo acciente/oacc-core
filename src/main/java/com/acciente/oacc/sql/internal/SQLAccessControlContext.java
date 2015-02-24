@@ -3139,6 +3139,33 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       }
    }
 
+   @Override
+   public boolean hasResourcePermission(Resource accessorResource,
+                                        Resource accessedResource,
+                                        ResourcePermission resourcePermission) {
+      SQLConnection connection = null;
+
+      __assertAuthenticated();
+      __assertResourceSpecified(accessorResource);
+      __assertResourceSpecified(accessedResource);
+      __assertPermissionSpecified(resourcePermission);
+
+      try {
+         connection = __getConnection();
+
+         resourcePersister.verifyResourceExists(connection, accessorResource);
+
+         final ResourceClassInternalInfo resourceClassInternalInfo
+               = resourceClassPersister.getResourceClassInfoByResourceId(connection, accessedResource);
+         __assertPermissionValid(connection, resourceClassInternalInfo.getResourceClassName(), resourcePermission);
+
+         return __hasPermission(connection, accessorResource, accessedResource, resourcePermission);
+      }
+      finally {
+         __closeConnection(connection);
+      }
+   }
+
    private boolean __hasPermission(SQLConnection connection,
                                    Resource accessorResource,
                                    Resource accessedResource,

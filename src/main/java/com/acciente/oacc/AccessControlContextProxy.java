@@ -103,6 +103,13 @@ public class AccessControlContextProxy implements AccessControlContext {
    }
 
    @Override
+   public boolean hasResourcePermission(Resource accessorResource,
+                                        Resource accessedResource,
+                                        ResourcePermission resourcePermission) {
+      return accessControlContext.hasResourcePermission(accessorResource, accessedResource, resourcePermission);
+   }
+
+   @Override
    public void assertPostCreateResourcePermission(Resource accessorResource,
                                                   String resourceClassName,
                                                   ResourcePermission resourcePermission) {
