@@ -209,7 +209,7 @@ public class TestAccessControl_assertGlobalResourcePermission extends TestAccess
                                                              resourceClassName,
                                                              customPermission_forOtherDomain_withGrant,
                                                              otherDomainName);
-         fail("asserting global resource permission without grant for a direct global permission (for a domain) with grant should have succeeded for authenticated resource");
+         fail("asserting global resource permission without grant for a direct global permission (for a domain) with grant should have failed for authenticated resource");
       }
       catch (NotAuthorizedException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("global permission"));

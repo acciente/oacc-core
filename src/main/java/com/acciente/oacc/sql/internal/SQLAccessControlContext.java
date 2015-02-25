@@ -3085,7 +3085,76 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       }
    }
 
+   @Override
+   public boolean hasGlobalResourcePermission(Resource accessorResource,
+                                              String resourceClassName,
+                                              ResourcePermission resourcePermission) {
+      SQLConnection connection = null;
+
+      __assertAuthenticated();
+      __assertResourceSpecified(accessorResource);
+      __assertResourceClassSpecified(resourceClassName);
+      __assertPermissionSpecified(resourcePermission);
+
+      try {
+         connection = __getConnection();
+         resourceClassName = resourceClassName.trim();
+
+         return __hasGlobalResourcePermission(connection,
+                                              accessorResource,
+                                              resourceClassName,
+                                              resourcePermission,
+                                              sessionResourceDomainName);
+      }
+      finally {
+         __closeConnection(connection);
+      }
+   }
+
+   @Override
+   public boolean hasGlobalResourcePermission(Resource accessorResource,
+                                              String resourceClassName,
+                                              ResourcePermission resourcePermission,
+                                              String domainName) {
+      SQLConnection connection = null;
+
+      __assertAuthenticated();
+      __assertResourceSpecified(accessorResource);
+      __assertResourceClassSpecified(resourceClassName);
+      __assertPermissionSpecified(resourcePermission);
+      __assertDomainSpecified(domainName);
+
+      try {
+         connection = __getConnection();
+         resourceClassName = resourceClassName.trim();
+         domainName = domainName.trim();
+
+         return __hasGlobalResourcePermission(connection,
+                                              accessorResource,
+                                              resourceClassName,
+                                              resourcePermission,
+                                              domainName);
+      }
+      finally {
+         __closeConnection(connection);
+      }
+   }
+
    private void __assertGlobalResourcePermission(SQLConnection connection,
+                                                 Resource accessorResource,
+                                                 String resourceClassName,
+                                                 ResourcePermission requestedResourcePermission,
+                                                 String domainName) {
+      if (!__hasGlobalResourcePermission(connection,
+                                         accessorResource,
+                                         resourceClassName,
+                                         requestedResourcePermission,
+                                         domainName)) {
+         throw new NotAuthorizedException(accessorResource, requestedResourcePermission, resourceClassName, domainName);
+      }
+   }
+
+   private boolean __hasGlobalResourcePermission(SQLConnection connection,
                                                  Resource accessorResource,
                                                  String resourceClassName,
                                                  ResourcePermission requestedResourcePermission,
@@ -3099,15 +3168,13 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
                                                                                 domainName);
 
       if (__isPermissible(requestedResourcePermission, globalResourcePermissions)) {
-         return;
+         return true;
       }
 
       if (__isSuperUserOfDomain(connection, accessorResource, domainName)) {
-         return;
+         return true;
       }
-
-      // if none of the above then complain...
-      throw new NotAuthorizedException(accessorResource, requestedResourcePermission, resourceClassName, domainName);
+      return false;
    }
 
    @Override
