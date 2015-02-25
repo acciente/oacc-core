@@ -359,6 +359,47 @@ public interface AccessControlContext {
                                                   String domainName);
 
    /**
+    * Checks if the specified accessor resource would receive the specified permission on an object of
+    * the specified class in the session resource's domain, if it were to create such an object.
+    * The method takes into account any resource create permissions and global resource permissions
+    * of the specified accessor resource.
+    *
+    * @param accessorResource   the resource requesting the access
+    * @param resourceClassName  a string resource class name
+    * @param resourcePermission the permission to be checked
+    * @return <strong>true</strong> if the accessor resource would receive the specified permission after creating a
+    *         resource of the specified class in the current session domain,
+    *         <strong>false</strong> otherwise, or if the accessor resource does not exist
+    * @throws java.lang.IllegalArgumentException       if no resource class of resourceClassName exists, or
+    *                                                  if resourcePermission is invalid for the resource class
+    */
+   public boolean hasPostCreateResourcePermission(Resource accessorResource,
+                                                  String resourceClassName,
+                                                  ResourcePermission resourcePermission);
+
+   /**
+    * Checks if the specified accessor resource would receive the specified permission on an object of
+    * the specified class in the specified domain, if it were to create such an object.
+    * The method takes into account any resource create permissions and global resource permissions
+    * of the specified accessor resource.
+    *
+    * @param accessorResource   the resource requesting the access
+    * @param resourceClassName  a string resource class name
+    * @param resourcePermission the permission to be checked
+    * @param domainName         the domain in which the permission should be checked
+    * @return <strong>true</strong> if the accessor resource would receive the specified permission after creating a
+    *         resource of the specified class in the specified domain,
+    *         <strong>false</strong> otherwise, or if the accessor resource does not exist
+    * @throws java.lang.IllegalArgumentException       if no resource class of resourceClassName exists, or
+    *                                                  if resourcePermission is invalid for the resource class, or
+    *                                                  if no domain of domainName exists
+    */
+   public boolean hasPostCreateResourcePermission(Resource accessorResource,
+                                                  String resourceClassName,
+                                                  ResourcePermission resourcePermission,
+                                                  String domainName);
+
+   /**
     * Returns the domain to which the specified resource belongs.
     *
     * @param resource the resource for which to retrieve the domain name
