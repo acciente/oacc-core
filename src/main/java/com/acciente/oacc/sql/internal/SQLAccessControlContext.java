@@ -2781,16 +2781,37 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
 
       try {
          connection = __getConnection();
-         __assertPostCreateDomainPermission(connection,
-                                            accessorResource,
-                                            domainPermission);
+         if (!__hasPostCreateDomainPermission(connection, accessorResource, domainPermission)) {
+            throw new NotAuthorizedException(accessorResource,
+                                             "receive " + String.valueOf(domainPermission)
+                                                   + " permission after creating a domain");
+         }
       }
       finally {
          __closeConnection(connection);
       }
    }
 
-   private void __assertPostCreateDomainPermission(SQLConnection connection,
+   @Override
+   public boolean hasPostCreateDomainPermission(Resource accessorResource, DomainPermission domainPermission) {
+      SQLConnection connection = null;
+
+      __assertAuthenticated();
+      __assertResourceSpecified(accessorResource);
+      __assertPermissionSpecified(domainPermission);
+
+      try {
+         connection = __getConnection();
+         return __hasPostCreateDomainPermission(connection,
+                                                accessorResource,
+                                                domainPermission);
+      }
+      finally {
+         __closeConnection(connection);
+      }
+   }
+
+   private boolean __hasPostCreateDomainPermission(SQLConnection connection,
                                                    Resource accessorResource,
                                                    DomainPermission requestedDomainPermission) {
       boolean createSysPermissionFound = false;
@@ -2811,24 +2832,16 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
                = __getPostCreateDomainPermissions(effectiveDomainCreatePermissions);
 
          if (__isPermissible(requestedDomainPermission, postCreateDomainPermissions)) {
-            return;
+            return true;
          }
 
          if (postCreateDomainPermissions.contains(DomainPermission_SUPER_USER)
                || postCreateDomainPermissions.contains(DomainPermission_SUPER_USER_GRANT)) {
-            return;
+            return true;
          }
       }
 
-      // if none of the above then complain...
-      if (createSysPermissionFound) {
-         throw new NotAuthorizedException(accessorResource,
-                                          "receive " + String.valueOf(requestedDomainPermission)
-                                                + " permission after creating a domain");
-      }
-      else {
-         throw new NotAuthorizedException(accessorResource, "create any domains");
-      }
+      return false;
    }
 
    private boolean __isPermissible(DomainPermission queriedDomainPermission,

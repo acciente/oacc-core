@@ -195,6 +195,18 @@ public interface AccessControlContext {
                                                 DomainPermission domainPermission);
 
    /**
+    * Checks if the specified accessor resource would receive the specified domain permission, if the accessor
+    * were to create a domain.
+    * The method takes into account any direct and inherited domain create permissions the accessor might have.
+    *
+    * @param accessorResource the resource requesting the access
+    * @param domainPermission the permission to be checked
+    * @return <strong>true</strong> if the accessor resource would receive the specified permission after creating a domain
+    */
+   public boolean hasPostCreateDomainPermission(Resource accessorResource,
+                                                DomainPermission domainPermission);
+
+   /**
     * Checks if the specified accessor resource has the specified global resource permission on
     * the specified resource class in the session resource's domain.
     * This method takes into account any global permissions that the accessor resource may have.

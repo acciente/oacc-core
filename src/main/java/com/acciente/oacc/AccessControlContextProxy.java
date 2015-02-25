@@ -81,6 +81,11 @@ public class AccessControlContextProxy implements AccessControlContext {
    }
 
    @Override
+   public boolean hasPostCreateDomainPermission(Resource accessorResource, DomainPermission domainPermission) {
+      return accessControlContext.hasPostCreateDomainPermission(accessorResource, domainPermission);
+   }
+
+   @Override
    public void assertGlobalResourcePermission(Resource accessorResource,
                                               String resourceClassName,
                                               ResourcePermission resourcePermission) {
