@@ -2917,6 +2917,66 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
    }
 
    @Override
+   public void assertDomainCreatePermission(Resource accessorResource, DomainCreatePermission domainCreatePermission) {
+      SQLConnection connection = null;
+
+      __assertAuthenticated();
+      __assertResourceSpecified(accessorResource);
+      __assertPermissionSpecified(domainCreatePermission);
+
+      try {
+         connection = __getConnection();
+
+         if (!__hasDomainCreatePermission(connection, accessorResource, domainCreatePermission)) {
+            throw new NotAuthorizedException(accessorResource, domainCreatePermission);
+         }
+      }
+      finally {
+         __closeConnection(connection);
+      }
+   }
+
+   @Override
+   public boolean hasDomainCreatePermission(Resource accessorResource, DomainCreatePermission domainCreatePermission) {
+      SQLConnection connection = null;
+
+      __assertAuthenticated();
+      __assertResourceSpecified(accessorResource);
+      __assertPermissionSpecified(domainCreatePermission);
+
+      try {
+         connection = __getConnection();
+
+         return __hasDomainCreatePermission(connection, accessorResource, domainCreatePermission);
+      }
+      finally {
+         __closeConnection(connection);
+      }
+   }
+
+   private boolean __hasDomainCreatePermission(SQLConnection connection,
+                                               Resource accessorResource,
+                                               DomainCreatePermission domainCreatePermission) {
+      if (__isPermissible(domainCreatePermission,
+                          __getEffectiveDomainCreatePermissions(connection, accessorResource))) {
+         return true;
+      }
+
+      return false;
+   }
+
+   private boolean __isPermissible(DomainCreatePermission queriedDomainCreatePermission,
+                                   Set<DomainCreatePermission> domainCreatePermissions) {
+      for (DomainCreatePermission domainCreatePermission : domainCreatePermissions) {
+         if (queriedDomainCreatePermission.equals(domainCreatePermission)
+               || queriedDomainCreatePermission.isGrantableFrom(domainCreatePermission)) {
+            return true;
+         }
+      }
+      return false;
+   }
+
+   @Override
    public void assertPostCreateResourcePermission(Resource accessorResource,
                                                   String resourceClassName,
                                                   ResourcePermission requestedResourcePermission) {
@@ -3801,6 +3861,12 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
    private void __assertPermissionSpecified(ResourcePermission resourcePermission) {
       if (resourcePermission == null) {
          throw new NullPointerException("Resource permission required, none specified");
+      }
+   }
+
+   private void __assertPermissionSpecified(DomainCreatePermission domainCreatePermission) {
+      if (domainCreatePermission == null) {
+         throw new NullPointerException("Domain create permission required, none specified");
       }
    }
 

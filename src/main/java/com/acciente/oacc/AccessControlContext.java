@@ -182,6 +182,33 @@ public interface AccessControlContext {
                                       String domainName);
 
    /**
+    * Checks if the specified accessor resource has the specified domain create permission on
+    * the specified domain.
+    * This method takes into account any direct and inherited domain create permissions.
+    *
+    * @param accessorResource       the resource on which access is being checked
+    * @param domainCreatePermission the domain create permission to be checked
+    * @throws com.acciente.oacc.NotAuthorizedException if the accessor resource <strong>does not</strong> have the
+    *                                                  specified domain create permission, or
+    *                                                  if the accessor resource does not exist
+    */
+   public void assertDomainCreatePermission(Resource accessorResource,
+                                            DomainCreatePermission domainCreatePermission);
+
+   /**
+    * Checks if the specified accessor resource has the specified domain create permission on
+    * the specified domain.
+    * This method takes into account any direct and inherited domain create permissions.
+    *
+    * @param accessorResource       the resource on which access is being checked
+    * @param domainCreatePermission the domain create permission to be checked
+    * @return  <strong>true</strong> if the accessor resource has the specified domain create permission,
+    *          <strong>false</strong> otherwise or if the accessor resource does not exist
+    */
+   public boolean hasDomainCreatePermission(Resource accessorResource,
+                                            DomainCreatePermission domainCreatePermission);
+
+   /**
     * Checks if the specified accessor resource would receive the specified domain permission, if the accessor
     * were to create a domain.
     * The method takes into account any direct and inherited domain create permissions the accessor might have.

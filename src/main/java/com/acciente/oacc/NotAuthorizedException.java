@@ -42,6 +42,11 @@ public class NotAuthorizedException extends AuthorizationException {
                   + " resource " + String.valueOf(accessedResource));
    }
 
+   public NotAuthorizedException(Resource accessorResource, DomainCreatePermission domainCreatePermission) {
+      super("Resource " + String.valueOf(accessorResource)
+                  + " does not have domain create permission " + String.valueOf(domainCreatePermission));
+   }
+
    public NotAuthorizedException(Resource accessorResource, DomainPermission domainPermission, String domainName) {
       super("Resource " + String.valueOf(accessorResource)
                   + " does not have domain permission " + String.valueOf(domainPermission)
