@@ -2772,7 +2772,6 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
    @Override
    public void assertPostCreateDomainPermission(Resource accessorResource,
                                                 DomainPermission domainPermission) {
-
       SQLConnection connection = null;
 
       __assertAuthenticated();
@@ -3112,11 +3111,16 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
          connection = __getConnection();
          resourceClassName = resourceClassName.trim();
 
-         __assertGlobalResourcePermission(connection,
-                                          accessorResource,
-                                          resourceClassName,
-                                          requestedResourcePermission,
-                                          sessionResourceDomainName);
+         if (!__hasGlobalResourcePermission(connection,
+                                            accessorResource,
+                                            resourceClassName,
+                                            requestedResourcePermission,
+                                            sessionResourceDomainName)) {
+            throw new NotAuthorizedException(accessorResource,
+                                             requestedResourcePermission,
+                                             resourceClassName,
+                                             sessionResourceDomainName);
+         }
       }
       finally {
          __closeConnection(connection);
@@ -3141,11 +3145,16 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
          resourceClassName = resourceClassName.trim();
          domainName = domainName.trim();
 
-         __assertGlobalResourcePermission(connection,
-                                          accessorResource,
-                                          resourceClassName,
-                                          requestedResourcePermission,
-                                          domainName);
+         if (!__hasGlobalResourcePermission(connection,
+                                            accessorResource,
+                                            resourceClassName,
+                                            requestedResourcePermission,
+                                            domainName)) {
+            throw new NotAuthorizedException(accessorResource,
+                                             requestedResourcePermission,
+                                             resourceClassName,
+                                             domainName);
+         }
       }
       finally {
          __closeConnection(connection);
@@ -3207,20 +3216,6 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       }
    }
 
-   private void __assertGlobalResourcePermission(SQLConnection connection,
-                                                 Resource accessorResource,
-                                                 String resourceClassName,
-                                                 ResourcePermission requestedResourcePermission,
-                                                 String domainName) {
-      if (!__hasGlobalResourcePermission(connection,
-                                         accessorResource,
-                                         resourceClassName,
-                                         requestedResourcePermission,
-                                         domainName)) {
-         throw new NotAuthorizedException(accessorResource, requestedResourcePermission, resourceClassName, domainName);
-      }
-   }
-
    private boolean __hasGlobalResourcePermission(SQLConnection connection,
                                                  Resource accessorResource,
                                                  String resourceClassName,
@@ -3258,12 +3253,6 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       try {
          connection = __getConnection();
 
-         resourcePersister.verifyResourceExists(connection, accessorResource);
-
-         final ResourceClassInternalInfo resourceClassInternalInfo
-               = resourceClassPersister.getResourceClassInfoByResourceId(connection, accessedResource);
-         __assertPermissionValid(connection, resourceClassInternalInfo.getResourceClassName(), requestedResourcePermission);
-
          if (!__hasPermission(connection, accessorResource, accessedResource, requestedResourcePermission)) {
             throw new NotAuthorizedException(accessorResource, requestedResourcePermission, accessedResource);
          }
@@ -3287,12 +3276,6 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       try {
          connection = __getConnection();
 
-         resourcePersister.verifyResourceExists(connection, accessorResource);
-
-         final ResourceClassInternalInfo resourceClassInternalInfo
-               = resourceClassPersister.getResourceClassInfoByResourceId(connection, accessedResource);
-         __assertPermissionValid(connection, resourceClassInternalInfo.getResourceClassName(), resourcePermission);
-
          return __hasPermission(connection, accessorResource, accessedResource, resourcePermission);
       }
       finally {
@@ -3304,6 +3287,12 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
                                    Resource accessorResource,
                                    Resource accessedResource,
                                    ResourcePermission requestedResourcePermission) {
+      resourcePersister.verifyResourceExists(connection, accessorResource);
+
+      final ResourceClassInternalInfo resourceClassInternalInfo
+            = resourceClassPersister.getResourceClassInfoByResourceId(connection, accessedResource);
+      __assertPermissionValid(connection, resourceClassInternalInfo.getResourceClassName(), requestedResourcePermission);
+
       // first check for effective permissions
       if (__isPermissible(requestedResourcePermission,
                           __getEffectiveResourcePermissions(connection, accessorResource, accessedResource))) {
