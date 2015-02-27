@@ -343,6 +343,90 @@ public interface AccessControlContext {
                                         ResourcePermission resourcePermission);
 
    /**
+    * Checks if the specified accessor resource has the specified create permission on an object of
+    * the specified class in the session resource's domain.
+    * The method takes into account any any direct and inherited resource create permissions of the
+    * specified accessor resource.
+    *
+    * @param accessorResource         the resource requesting the access
+    * @param resourceClassName        a string resource class name
+    * @param resourceCreatePermission the create permission to be checked
+    * @throws java.lang.IllegalArgumentException       if no resource class of resourceClassName exists, or
+    *                                                  if resourceCreatePermission is invalid for the resource class
+    * @throws com.acciente.oacc.NotAuthorizedException if the accessor resource does <strong>not</strong> have the
+    *                                                  specified resource create permission for the specified class
+    *                                                  in the current session domain, or
+    *                                                  if the accessor resource does not exist
+    */
+   public void assertResourceCreatePermission(Resource accessorResource,
+                                              String resourceClassName,
+                                              ResourceCreatePermission resourceCreatePermission);
+
+   /**
+    * Checks if the specified accessor resource has the specified create permission on an object of
+    * the specified class in the specified domain.
+    * The method takes into account any any direct and inherited resource create permissions of the
+    * specified accessor resource.
+    *
+    * @param accessorResource         the resource requesting the access
+    * @param resourceClassName        a string resource class name
+    * @param resourceCreatePermission the create permission to be checked
+    * @param domainName               the domain in which the permission should be checked
+    * @throws java.lang.IllegalArgumentException       if no resource class of resourceClassName exists, or
+    *                                                  if resourceCreatePermission is invalid for the resource class, or
+    *                                                  if no domain of domainName exists
+    * @throws com.acciente.oacc.NotAuthorizedException if the accessor resource does <strong>not</strong> have the
+    *                                                  specified resource create permission for the specified class
+    *                                                  in the specified domain, or
+    *                                                  if the accessor resource does not exist
+    */
+   public void assertResourceCreatePermission(Resource accessorResource,
+                                              String resourceClassName,
+                                              ResourceCreatePermission resourceCreatePermission,
+                                              String domainName);
+
+   /**
+    * Checks if the specified accessor resource has the specified create permission on an object of
+    * the specified class in the session resource's domain.
+    * The method takes into account any any direct and inherited resource create permissions of the
+    * specified accessor resource.
+    *
+    * @param accessorResource         the resource requesting the access
+    * @param resourceClassName        a string resource class name
+    * @param resourceCreatePermission the create permission to be checked
+    * @return <strong>true</strong> if the accessor resource has the specified resource create permission for the
+    *         specified resource class in the current session domain,
+    *         <strong>false</strong> otherwise, or if the accessor resource does not exist
+    * @throws java.lang.IllegalArgumentException  if no resource class of resourceClassName exists, or
+    *                                             if resourceCreatePermission is invalid for the resource class
+    */
+   public boolean hasResourceCreatePermission(Resource accessorResource,
+                                              String resourceClassName,
+                                              ResourceCreatePermission resourceCreatePermission);
+
+   /**
+    * Checks if the specified accessor resource has the specified create permission on an object of
+    * the specified class in the specified domain.
+    * The method takes into account any any direct and inherited resource create permissions of the
+    * specified accessor resource.
+    *
+    * @param accessorResource         the resource requesting the access
+    * @param resourceClassName        a string resource class name
+    * @param resourceCreatePermission the create permission to be checked
+    * @param domainName               the domain in which the permission should be checked
+    * @return <strong>true</strong> if the accessor resource has the specified resource create permission for the
+    *         specified resource class in the specified domain,
+    *         <strong>false</strong> otherwise, or if the accessor resource does not exist
+    * @throws java.lang.IllegalArgumentException if no resource class of resourceClassName exists, or
+    *                                            if resourceCreatePermission is invalid for the resource class, or
+    *                                            if no domain of domainName exists
+    */
+   public boolean hasResourceCreatePermission(Resource accessorResource,
+                                              String resourceClassName,
+                                              ResourceCreatePermission resourceCreatePermission,
+                                              String domainName);
+
+   /**
     * Checks if the specified accessor resource would receive the specified permission on an object of
     * the specified class in the session resource's domain, if it were to create such an object.
     * The method takes into account any resource create permissions and global resource permissions

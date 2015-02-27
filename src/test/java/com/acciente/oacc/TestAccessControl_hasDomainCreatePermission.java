@@ -327,6 +327,13 @@ public class TestAccessControl_hasDomainCreatePermission extends TestAccessContr
                                                           false))) {
          fail("checking domain create permission inherited from two sources with different granting rights should have succeeded for authenticated resource");
       }
+      if (!accessControlContext
+            .hasDomainCreatePermission(accessorResource,
+                                       DomainCreatePermissions
+                                             .getInstance(DomainPermissions.getInstance(donorPermissionName_createChild, false),
+                                                          false))) {
+         fail("checking domain create permission inherited from two sources with different granting rights should have succeeded for authenticated resource");
+      }
 
       if (accessControlContext
             .hasDomainCreatePermission(accessorResource,

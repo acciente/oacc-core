@@ -140,6 +140,36 @@ public class AccessControlContextProxy implements AccessControlContext {
    }
 
    @Override
+   public void assertResourceCreatePermission(Resource accessorResource,
+                                              String resourceClassName,
+                                              ResourceCreatePermission resourceCreatePermission) {
+      accessControlContext.assertResourceCreatePermission(accessorResource, resourceClassName, resourceCreatePermission);
+   }
+
+   @Override
+   public void assertResourceCreatePermission(Resource accessorResource,
+                                              String resourceClassName,
+                                              ResourceCreatePermission resourceCreatePermission,
+                                              String domainName) {
+      accessControlContext.assertResourceCreatePermission(accessorResource, resourceClassName, resourceCreatePermission, domainName);
+   }
+
+   @Override
+   public boolean hasResourceCreatePermission(Resource accessorResource,
+                                              String resourceClassName,
+                                              ResourceCreatePermission resourceCreatePermission) {
+      return accessControlContext.hasResourceCreatePermission(accessorResource, resourceClassName, resourceCreatePermission);
+   }
+
+   @Override
+   public boolean hasResourceCreatePermission(Resource accessorResource,
+                                              String resourceClassName,
+                                              ResourceCreatePermission resourceCreatePermission,
+                                              String domainName) {
+      return accessControlContext.hasResourceCreatePermission(accessorResource, resourceClassName, resourceCreatePermission, domainName);
+   }
+
+   @Override
    public void assertPostCreateResourcePermission(Resource accessorResource,
                                                   String resourceClassName,
                                                   ResourcePermission resourcePermission) {
@@ -151,7 +181,7 @@ public class AccessControlContextProxy implements AccessControlContext {
                                                   String resourceClassName,
                                                   ResourcePermission resourcePermission,
                                                   String domainName) {
-
+      accessControlContext.assertPostCreateResourcePermission(accessorResource, resourceClassName, resourcePermission, domainName);
    }
 
    @Override
