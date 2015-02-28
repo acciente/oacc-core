@@ -2772,22 +2772,10 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
    @Override
    public void assertPostCreateDomainPermission(Resource accessorResource,
                                                 DomainPermission domainPermission) {
-      SQLConnection connection = null;
-
-      __assertAuthenticated();
-      __assertResourceSpecified(accessorResource);
-      __assertPermissionSpecified(domainPermission);
-
-      try {
-         connection = __getConnection();
-         if (!__hasPostCreateDomainPermission(connection, accessorResource, domainPermission)) {
-            throw new NotAuthorizedException(accessorResource,
-                                             "receive " + String.valueOf(domainPermission)
-                                                   + " permission after creating a domain");
-         }
-      }
-      finally {
-         __closeConnection(connection);
+      if (!hasPostCreateDomainPermission(accessorResource, domainPermission)) {
+         throw new NotAuthorizedException(accessorResource,
+                                          "receive " + String.valueOf(domainPermission)
+                                                + " permission after creating a domain");
       }
    }
 
@@ -2858,22 +2846,8 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
    public void assertDomainPermission(Resource accessorResource,
                                       DomainPermission domainPermission,
                                       String domainName) {
-      SQLConnection connection = null;
-
-      __assertAuthenticated();
-      __assertResourceSpecified(accessorResource);
-      __assertPermissionSpecified(domainPermission);
-      __assertDomainSpecified(domainName);
-
-      try {
-         connection = __getConnection();
-
-         if (!__hasPermission(connection, accessorResource, domainPermission, domainName)) {
-            throw new NotAuthorizedException(accessorResource, domainPermission, domainName);
-         }
-      }
-      finally {
-         __closeConnection(connection);
+      if (!hasDomainPermission(accessorResource, domainPermission, domainName)) {
+         throw new NotAuthorizedException(accessorResource, domainPermission, domainName);
       }
    }
 
@@ -2891,17 +2865,17 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       try {
          connection = __getConnection();
 
-         return __hasPermission(connection, accessorResource, domainPermission, domainName);
+         return __hasDomainPermission(connection, accessorResource, domainPermission, domainName);
       }
       finally {
          __closeConnection(connection);
       }
    }
 
-   private boolean __hasPermission(SQLConnection connection,
-                                   Resource accessorResource,
-                                   DomainPermission requestedDomainPermission,
-                                   String domainName) {
+   private boolean __hasDomainPermission(SQLConnection connection,
+                                         Resource accessorResource,
+                                         DomainPermission requestedDomainPermission,
+                                         String domainName) {
       // first check for effective permissions
       if (__isPermissible(requestedDomainPermission,
                           __getEffectiveDomainPermissions(connection, accessorResource, domainName))) {
@@ -2918,21 +2892,8 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
 
    @Override
    public void assertDomainCreatePermission(Resource accessorResource, DomainCreatePermission domainCreatePermission) {
-      SQLConnection connection = null;
-
-      __assertAuthenticated();
-      __assertResourceSpecified(accessorResource);
-      __assertPermissionSpecified(domainCreatePermission);
-
-      try {
-         connection = __getConnection();
-
-         if (!__hasDomainCreatePermission(connection, accessorResource, domainCreatePermission)) {
-            throw new NotAuthorizedException(accessorResource, domainCreatePermission);
-         }
-      }
-      finally {
-         __closeConnection(connection);
+      if (!hasDomainCreatePermission(accessorResource, domainCreatePermission)) {
+         throw new NotAuthorizedException(accessorResource, domainCreatePermission);
       }
    }
 
@@ -2980,29 +2941,14 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
    public void assertPostCreateResourcePermission(Resource accessorResource,
                                                   String resourceClassName,
                                                   ResourcePermission requestedResourcePermission) {
-      SQLConnection connection = null;
-
-      __assertAuthenticated();
-      __assertResourceSpecified(accessorResource);
-      __assertResourceClassSpecified(resourceClassName);
-      __assertPermissionSpecified(requestedResourcePermission);
-
-      try {
-         connection = __getConnection();
-         resourceClassName = resourceClassName.trim();
-         if (!__hasPostCreateResourcePermission(connection,
-                                                accessorResource,
-                                                resourceClassName,
-                                                requestedResourcePermission,
-                                                sessionResourceDomainName)) {
-            throw new NotAuthorizedException(accessorResource,
-                                             "receive " + String.valueOf(requestedResourcePermission)
-                                                   + " permission after creating a " + resourceClassName
-                                                   + " resource in domain " + sessionResourceDomainName);
-         }
-      }
-      finally {
-         __closeConnection(connection);
+      if (!hasPostCreateResourcePermission(accessorResource,
+                                           resourceClassName,
+                                           requestedResourcePermission,
+                                           sessionResourceDomainName)) {
+         throw new NotAuthorizedException(accessorResource,
+                                          "receive " + String.valueOf(requestedResourcePermission)
+                                                + " permission after creating a " + resourceClassName
+                                                + " resource in domain " + sessionResourceDomainName);
       }
    }
 
@@ -3011,32 +2957,14 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
                                                   String resourceClassName,
                                                   ResourcePermission resourcePermission,
                                                   String domainName) {
-      SQLConnection connection = null;
-
-      __assertAuthenticated();
-      __assertResourceSpecified(accessorResource);
-      __assertResourceClassSpecified(resourceClassName);
-      __assertPermissionSpecified(resourcePermission);
-      __assertDomainSpecified(domainName);
-
-      try {
-         connection = __getConnection();
-         resourceClassName = resourceClassName.trim();
-         domainName = domainName.trim();
-
-         if (!__hasPostCreateResourcePermission(connection,
-                                                accessorResource,
-                                                resourceClassName,
-                                                resourcePermission,
-                                                domainName)) {
-            throw new NotAuthorizedException(accessorResource,
-                                             "receive " + String.valueOf(resourcePermission)
-                                                   + " permission after creating a " + resourceClassName
-                                                   + " resource in domain " + domainName);
-         }
-      }
-      finally {
-         __closeConnection(connection);
+      if (!hasPostCreateResourcePermission(accessorResource,
+                                           resourceClassName,
+                                           resourcePermission,
+                                           domainName)) {
+         throw new NotAuthorizedException(accessorResource,
+                                          "receive " + String.valueOf(resourcePermission)
+                                                + " permission after creating a " + resourceClassName
+                                                + " resource in domain " + domainName);
       }
    }
 
@@ -3158,66 +3086,32 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
 
    @Override
    public void assertGlobalResourcePermission(Resource accessorResource,
-                                              String resourceClassName, 
+                                              String resourceClassName,
                                               ResourcePermission requestedResourcePermission) {
-      SQLConnection connection = null;
-
-      __assertAuthenticated();
-      __assertResourceSpecified(accessorResource);
-      __assertResourceClassSpecified(resourceClassName);
-      __assertPermissionSpecified(requestedResourcePermission);
-
-      try {
-         connection = __getConnection();
-         resourceClassName = resourceClassName.trim();
-
-         if (!__hasGlobalResourcePermission(connection,
-                                            accessorResource,
-                                            resourceClassName,
-                                            requestedResourcePermission,
-                                            sessionResourceDomainName)) {
-            throw new NotAuthorizedException(accessorResource,
-                                             requestedResourcePermission,
-                                             resourceClassName,
-                                             sessionResourceDomainName);
-         }
-      }
-      finally {
-         __closeConnection(connection);
+      if (!hasGlobalResourcePermission(accessorResource,
+                                       resourceClassName,
+                                       requestedResourcePermission,
+                                       sessionResourceDomainName)) {
+         throw new NotAuthorizedException(accessorResource,
+                                          requestedResourcePermission,
+                                          resourceClassName,
+                                          sessionResourceDomainName);
       }
    }
-
+   
    @Override
    public void assertGlobalResourcePermission(Resource accessorResource,
                                               String resourceClassName,
                                               ResourcePermission requestedResourcePermission,
                                               String domainName) {
-      SQLConnection connection = null;
-
-      __assertAuthenticated();
-      __assertResourceSpecified(accessorResource);
-      __assertResourceClassSpecified(resourceClassName);
-      __assertPermissionSpecified(requestedResourcePermission);
-      __assertDomainSpecified(domainName);
-
-      try {
-         connection = __getConnection();
-         resourceClassName = resourceClassName.trim();
-         domainName = domainName.trim();
-
-         if (!__hasGlobalResourcePermission(connection,
-                                            accessorResource,
-                                            resourceClassName,
-                                            requestedResourcePermission,
-                                            domainName)) {
-            throw new NotAuthorizedException(accessorResource,
-                                             requestedResourcePermission,
-                                             resourceClassName,
-                                             domainName);
-         }
-      }
-      finally {
-         __closeConnection(connection);
+      if (!hasGlobalResourcePermission(accessorResource,
+                                       resourceClassName,
+                                       requestedResourcePermission,
+                                       domainName)) {
+         throw new NotAuthorizedException(accessorResource,
+                                          requestedResourcePermission,
+                                          resourceClassName,
+                                          domainName);
       }
    }
 
@@ -3303,22 +3197,8 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
    public void assertResourcePermission(Resource accessorResource,
                                         Resource accessedResource,
                                         ResourcePermission requestedResourcePermission) {
-      SQLConnection connection = null;
-
-      __assertAuthenticated();
-      __assertResourceSpecified(accessorResource);
-      __assertResourceSpecified(accessedResource);
-      __assertPermissionSpecified(requestedResourcePermission);
-
-      try {
-         connection = __getConnection();
-
-         if (!__hasPermission(connection, accessorResource, accessedResource, requestedResourcePermission)) {
-            throw new NotAuthorizedException(accessorResource, requestedResourcePermission, accessedResource);
-         }
-      }
-      finally {
-         __closeConnection(connection);
+      if (!hasResourcePermission(accessorResource, accessedResource, requestedResourcePermission)) {
+         throw new NotAuthorizedException(accessorResource, requestedResourcePermission, accessedResource);
       }
    }
 
@@ -3336,17 +3216,17 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       try {
          connection = __getConnection();
 
-         return __hasPermission(connection, accessorResource, accessedResource, resourcePermission);
+         return __hasResourcePermission(connection, accessorResource, accessedResource, resourcePermission);
       }
       finally {
          __closeConnection(connection);
       }
    }
 
-   private boolean __hasPermission(SQLConnection connection,
-                                   Resource accessorResource,
-                                   Resource accessedResource,
-                                   ResourcePermission requestedResourcePermission) {
+   private boolean __hasResourcePermission(SQLConnection connection,
+                                           Resource accessorResource,
+                                           Resource accessedResource,
+                                           ResourcePermission requestedResourcePermission) {
       resourcePersister.verifyResourceExists(connection, accessorResource);
 
       final ResourceClassInternalInfo resourceClassInternalInfo
@@ -3374,28 +3254,11 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
    public void assertResourceCreatePermission(Resource accessorResource,
                                               String resourceClassName,
                                               ResourceCreatePermission resourceCreatePermission) {
-      SQLConnection connection = null;
-
-      __assertAuthenticated();
-      __assertResourceSpecified(accessorResource);
-      __assertResourceClassSpecified(resourceClassName);
-      __assertPermissionSpecified(resourceCreatePermission);
-
-      try {
-         connection = __getConnection();
-
-         resourceClassName = resourceClassName.trim();
-
-         if (!__hasResourceCreatePermission(connection,
-                                              accessorResource,
-                                              resourceClassName,
-                                              resourceCreatePermission,
-                                              sessionResourceDomainName)) {
-            throw new NotAuthorizedException(accessorResource, resourceCreatePermission);
-         }
-      }
-      finally {
-         __closeConnection(connection);
+      if (!hasResourceCreatePermission(accessorResource,
+                                       resourceClassName,
+                                       resourceCreatePermission,
+                                       sessionResourceDomainName)) {
+         throw new NotAuthorizedException(accessorResource, resourceCreatePermission);
       }
    }
 
@@ -3404,30 +3267,11 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
                                               String resourceClassName,
                                               ResourceCreatePermission resourceCreatePermission,
                                               String domainName) {
-      SQLConnection connection = null;
-
-      __assertAuthenticated();
-      __assertResourceSpecified(accessorResource);
-      __assertResourceClassSpecified(resourceClassName);
-      __assertPermissionSpecified(resourceCreatePermission);
-      __assertDomainSpecified(domainName);
-
-      try {
-         connection = __getConnection();
-
-         resourceClassName = resourceClassName.trim();
-         domainName = domainName.trim();
-
-         if (!__hasResourceCreatePermission(connection,
-                                            accessorResource,
-                                            resourceClassName,
-                                            resourceCreatePermission,
-                                            domainName)) {
-            throw new NotAuthorizedException(accessorResource, resourceCreatePermission);
-         }
-      }
-      finally {
-         __closeConnection(connection);
+      if (!hasResourceCreatePermission(accessorResource,
+                                       resourceClassName,
+                                       resourceCreatePermission,
+                                       domainName)) {
+         throw new NotAuthorizedException(accessorResource, resourceCreatePermission);
       }
    }
 
