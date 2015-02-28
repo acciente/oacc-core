@@ -17,6 +17,7 @@
  */
 package com.acciente.oacc;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.util.Set;
@@ -629,6 +630,59 @@ public class TestAccessControl_hasGlobalResourcePermission extends TestAccessCon
                                                             customPermission_forParentDomain,
                                                             otherDomainName)) {
          fail("checking implicit domain-inherited global resource permission (on sibling domain) when having inherited super-user privileges should have succeeded for authenticated resource");
+      }
+   }
+
+   @Test
+   public void hasGlobalResourcePermission_superUserInvalidPermission_shouldFailAsSystemResource() {
+      authenticateSystemResource();
+      // setup resourceClass without any permissions
+      final String resourceClassName = generateResourceClass(false, false);
+
+      // verify
+      try {
+         accessControlContext
+               .hasGlobalResourcePermission(SYS_RESOURCE,
+                                            resourceClassName,
+                                            ResourcePermissions.getInstance(ResourcePermissions.RESET_CREDENTIALS));
+         fail("checking implicit global resource permission invalid for resource class should have failed for system resource");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("not valid for unauthenticatable resource class"));
+      }
+      try {
+         accessControlContext
+               .hasGlobalResourcePermission(SYS_RESOURCE,
+                                            resourceClassName,
+                                            ResourcePermissions.getInstance(ResourcePermissions.IMPERSONATE));
+         fail("checking implicit global resource permission invalid for resource class should have failed for system resource");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("not valid for unauthenticatable resource class"));
+      }
+
+      final String domainName = generateDomain();
+      try {
+         accessControlContext
+               .hasGlobalResourcePermission(SYS_RESOURCE,
+                                            resourceClassName,
+                                            ResourcePermissions.getInstance(ResourcePermissions.RESET_CREDENTIALS),
+                                            domainName);
+         fail("checking implicit global resource permission (for a domain) invalid for resource class should have failed for system resource");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("not valid for unauthenticatable resource class"));
+      }
+      try {
+         accessControlContext
+               .hasGlobalResourcePermission(SYS_RESOURCE,
+                                            resourceClassName,
+                                            ResourcePermissions.getInstance(ResourcePermissions.IMPERSONATE),
+                                            domainName);
+         fail("checking implicit global resource permission (for a domain) invalid for resource class should have failed for system resource");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("not valid for unauthenticatable resource class"));
       }
    }
 

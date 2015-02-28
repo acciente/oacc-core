@@ -17,7 +17,6 @@
  */
 package com.acciente.oacc;
 
-import org.junit.Ignore;
 import org.junit.Test;
 
 import java.util.HashSet;
@@ -786,11 +785,10 @@ public class TestAccessControl_hasResourceCreatePermission extends TestAccessCon
       }
    }
 
-   @Ignore
    @Test
    public void hasResourceCreatePermission_superUserInvalidPermission_shouldFailAsSystemResource() {
       authenticateSystemResource();
-      // setup permission without granting it to anything
+      // setup resourceClass without any permissions
       final String resourceClassName = generateResourceClass(false, false);
 
       // verify setup
@@ -805,10 +803,10 @@ public class TestAccessControl_hasResourceCreatePermission extends TestAccessCon
                                             resourceClassName,
                                             ResourceCreatePermissions
                                                   .getInstance(ResourcePermissions.getInstance(ResourcePermissions.RESET_CREDENTIALS)));
-         fail("checking implicit custom resource create permission invalid for resource class should have failed for system resource");
+         fail("checking implicit resource create permission invalid for resource class should have failed for system resource");
       }
       catch (IllegalArgumentException e) {
-         assertThat(e.getMessage().toLowerCase(), containsString("is not defined for resource class"));
+         assertThat(e.getMessage().toLowerCase(), containsString("not valid for unauthenticatable resource class"));
       }
       try {
          accessControlContext
@@ -816,10 +814,10 @@ public class TestAccessControl_hasResourceCreatePermission extends TestAccessCon
                                             resourceClassName,
                                             ResourceCreatePermissions
                                                   .getInstance(ResourcePermissions.getInstance(ResourcePermissions.IMPERSONATE)));
-         fail("checking implicit custom resource create permission invalid for resource class should have failed for system resource");
+         fail("checking implicit resource create permission invalid for resource class should have failed for system resource");
       }
       catch (IllegalArgumentException e) {
-         assertThat(e.getMessage().toLowerCase(), containsString("is not defined for resource class"));
+         assertThat(e.getMessage().toLowerCase(), containsString("not valid for unauthenticatable resource class"));
       }
 
       final String domainName = generateDomain();
@@ -834,10 +832,10 @@ public class TestAccessControl_hasResourceCreatePermission extends TestAccessCon
                                             ResourceCreatePermissions
                                                   .getInstance(ResourcePermissions.getInstance(ResourcePermissions.RESET_CREDENTIALS)),
                                             domainName);
-         fail("checking implicit custom resource create permission invalid for resource class should have failed for system resource");
+         fail("checking implicit resource create permission invalid for resource class should have failed for system resource");
       }
       catch (IllegalArgumentException e) {
-         assertThat(e.getMessage().toLowerCase(), containsString("is not defined for resource class"));
+         assertThat(e.getMessage().toLowerCase(), containsString("not valid for unauthenticatable resource class"));
       }
       try {
          accessControlContext
@@ -846,10 +844,10 @@ public class TestAccessControl_hasResourceCreatePermission extends TestAccessCon
                                             ResourceCreatePermissions
                                                   .getInstance(ResourcePermissions.getInstance(ResourcePermissions.IMPERSONATE)),
                                             domainName);
-         fail("checking implicit custom resource create permission invalid for resource class should have failed for system resource");
+         fail("checking implicit resource create permission invalid for resource class should have failed for system resource");
       }
       catch (IllegalArgumentException e) {
-         assertThat(e.getMessage().toLowerCase(), containsString("is not defined for resource class"));
+         assertThat(e.getMessage().toLowerCase(), containsString("not valid for unauthenticatable resource class"));
       }
    }
 

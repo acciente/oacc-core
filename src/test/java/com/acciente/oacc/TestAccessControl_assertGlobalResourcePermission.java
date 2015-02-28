@@ -564,6 +564,59 @@ public class TestAccessControl_assertGlobalResourcePermission extends TestAccess
    }
 
    @Test
+   public void assertGlobalResourcePermission_superUserInvalidPermission_shouldFailAsSystemResource() {
+      authenticateSystemResource();
+      // setup resourceClass without any permissions
+      final String resourceClassName = generateResourceClass(false, false);
+
+      // verify
+      try {
+         accessControlContext
+               .assertGlobalResourcePermission(SYS_RESOURCE,
+                                               resourceClassName,
+                                               ResourcePermissions.getInstance(ResourcePermissions.RESET_CREDENTIALS));
+         fail("asserting implicit global resource permission invalid for resource class should have failed for system resource");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("not valid for unauthenticatable resource class"));
+      }
+      try {
+         accessControlContext
+               .assertGlobalResourcePermission(SYS_RESOURCE,
+                                               resourceClassName,
+                                               ResourcePermissions.getInstance(ResourcePermissions.IMPERSONATE));
+         fail("asserting implicit global resource permission invalid for resource class should have failed for system resource");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("not valid for unauthenticatable resource class"));
+      }
+
+      final String domainName = generateDomain();
+      try {
+         accessControlContext
+               .assertGlobalResourcePermission(SYS_RESOURCE,
+                                               resourceClassName,
+                                               ResourcePermissions.getInstance(ResourcePermissions.RESET_CREDENTIALS),
+                                               domainName);
+         fail("asserting implicit global resource permission (for a domain) invalid for resource class should have failed for system resource");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("not valid for unauthenticatable resource class"));
+      }
+      try {
+         accessControlContext
+               .assertGlobalResourcePermission(SYS_RESOURCE,
+                                               resourceClassName,
+                                               ResourcePermissions.getInstance(ResourcePermissions.IMPERSONATE),
+                                               domainName);
+         fail("asserting implicit global resource permission (for a domain) invalid for resource class should have failed for system resource");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("not valid for unauthenticatable resource class"));
+      }
+   }
+
+   @Test
    public void assertGlobalResourcePermission_whitespaceConsistent() {
       authenticateSystemResource();
       // setup permission without granting it to anything

@@ -316,6 +316,33 @@ public class TestAccessControl_assertResourcePermission extends TestAccessContro
    }
 
    @Test
+   public void assertResourcePermission_superUserInvalidPermission_shouldFailAsSystemResource() {
+      authenticateSystemResource();
+      // setup unauthenticatable resource without any permissions
+      final Resource unauthenticatableResource = generateUnauthenticatableResource();
+
+      // verify
+      try {
+         accessControlContext.assertResourcePermission(SYS_RESOURCE,
+                                                       unauthenticatableResource,
+                                                       ResourcePermissions.getInstance(ResourcePermissions.RESET_CREDENTIALS));
+         fail("asserting implicit resource permission invalid for resource class should have failed for system resource");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("not valid for unauthenticatable resource class"));
+      }
+      try {
+         accessControlContext.assertResourcePermission(SYS_RESOURCE,
+                                                       unauthenticatableResource,
+                                                       ResourcePermissions.getInstance(ResourcePermissions.IMPERSONATE));
+         fail("asserting implicit global resource permission invalid for resource class should have failed for system resource");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("not valid for unauthenticatable resource class"));
+      }
+   }
+
+   @Test
    public void assertResourcePermission_nulls_shouldFail() {
       authenticateSystemResource();
 

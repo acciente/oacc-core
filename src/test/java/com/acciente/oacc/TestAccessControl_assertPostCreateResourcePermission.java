@@ -749,6 +749,64 @@ public class TestAccessControl_assertPostCreateResourcePermission extends TestAc
    }
 
    @Test
+   public void assertPostCreateResourcePermission_superUserInvalidPermission_shouldFailAsSystemResource() {
+      authenticateSystemResource();
+      // setup resourceClass without any permissions
+      final String resourceClassName = generateResourceClass(false, false);
+
+      // verify setup
+      final Set<ResourceCreatePermission> allResourceCreatePermissionsForResourceClass
+            = accessControlContext.getEffectiveResourceCreatePermissions(SYS_RESOURCE, resourceClassName);
+      assertThat(allResourceCreatePermissionsForResourceClass.isEmpty(), is(true));
+
+      // verify
+      try {
+         accessControlContext
+               .assertPostCreateResourcePermission(SYS_RESOURCE,
+                                                   resourceClassName,
+                                                   ResourcePermissions.getInstance(ResourcePermissions.RESET_CREDENTIALS));
+         fail("asserting implicit resource create permission invalid for resource class should have failed for system resource");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("not valid for unauthenticatable resource class"));
+      }
+      try {
+         accessControlContext
+               .assertPostCreateResourcePermission(SYS_RESOURCE,
+                                                   resourceClassName,
+                                                   ResourcePermissions.getInstance(ResourcePermissions.IMPERSONATE));
+         fail("asserting implicit resource create permission invalid for resource class should have failed for system resource");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("not valid for unauthenticatable resource class"));
+      }
+
+      final String domainName = generateDomain();
+      try {
+         accessControlContext
+               .assertPostCreateResourcePermission(SYS_RESOURCE,
+                                                   resourceClassName,
+                                                   ResourcePermissions.getInstance(ResourcePermissions.RESET_CREDENTIALS),
+                                                   domainName);
+         fail("asserting implicit resource create permission (for a domain) invalid for resource class should have failed for system resource");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("not valid for unauthenticatable resource class"));
+      }
+      try {
+         accessControlContext
+               .assertPostCreateResourcePermission(SYS_RESOURCE,
+                                                   resourceClassName,
+                                                   ResourcePermissions.getInstance(ResourcePermissions.IMPERSONATE),
+                                                   domainName);
+         fail("asserting implicit resource create permission (for a domain) invalid for resource class should have failed for system resource");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("not valid for unauthenticatable resource class"));
+      }
+   }
+
+   @Test
    public void assertPostCreateResourcePermission_whitespaceConsistent() {
       authenticateSystemResource();
       // setup permission without granting it to anything

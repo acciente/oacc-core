@@ -3914,7 +3914,21 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
    private void __assertPermissionValid(SQLConnection connection,
                                         String resourceClassName,
                                         ResourcePermission resourcePermission) {
-      if (!resourcePermission.isSystemPermission()) {
+      if (resourcePermission.isSystemPermission()) {
+         if (ResourcePermissions.IMPERSONATE.equals(resourcePermission.getPermissionName())
+               || ResourcePermissions.RESET_CREDENTIALS.equals(resourcePermission.getPermissionName())) {
+            final ResourceClassInternalInfo resourceClassInfo
+                  = resourceClassPersister.getResourceClassInfo(connection, resourceClassName);
+
+            if (!resourceClassInfo.isAuthenticatable()) {
+               throw new IllegalArgumentException("Permission "
+                                                        + String.valueOf(resourcePermission)
+                                                        + " not valid for unauthenticatable resource class "
+                                                        + resourceClassName);
+            }
+         }
+      }
+      else {
          final List<String> permissionNames
                = resourceClassPermissionPersister.getPermissionNames(connection, resourceClassName);
          if (!permissionNames.contains(resourcePermission.getPermissionName())) {
