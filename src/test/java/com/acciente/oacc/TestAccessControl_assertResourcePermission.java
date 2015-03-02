@@ -43,9 +43,9 @@ public class TestAccessControl_assertResourcePermission extends TestAccessContro
       assertThat(allResourcePermissions.isEmpty(), is(true));
 
       // verify
-      accessControlContext.assertResourcePermission(SYS_RESOURCE,
-                                                    accessedResource,
-                                                    ResourcePermissions.getInstance(customPermissionName));
+      accessControlContext.assertResourcePermissions(SYS_RESOURCE,
+                                                     accessedResource,
+                                                     ResourcePermissions.getInstance(customPermissionName));
    }
 
    @Test
@@ -71,9 +71,9 @@ public class TestAccessControl_assertResourcePermission extends TestAccessContro
 
       // verify
       try {
-         accessControlContext.assertResourcePermission(accessorResource,
-                                                       accessedResource,
-                                                       ResourcePermissions.getInstance(customPermissionName));
+         accessControlContext.assertResourcePermissions(accessorResource,
+                                                        accessedResource,
+                                                        ResourcePermissions.getInstance(customPermissionName));
          fail("asserting resource permission for domain when none has been granted should not have succeeded for authenticated resource");
       }
       catch (NotAuthorizedException e) {
@@ -102,7 +102,7 @@ public class TestAccessControl_assertResourcePermission extends TestAccessContro
       accessControlContext.authenticate(accessorResource, PasswordCredentials.newInstance(password));
 
       // verify
-      accessControlContext.assertResourcePermission(accessorResource, accessedResource, customPermission);
+      accessControlContext.assertResourcePermissions(accessorResource, accessedResource, customPermission);
    }
 
    @Test
@@ -136,12 +136,12 @@ public class TestAccessControl_assertResourcePermission extends TestAccessContro
       accessControlContext.authenticate(accessorResource, PasswordCredentials.newInstance(password));
 
       // verify
-      accessControlContext.assertResourcePermission(accessorResource, accessedResource, customPermission1_withoutGrant);
-      accessControlContext.assertResourcePermission(accessorResource, accessedResource, customPermission1_withGrant);
-      accessControlContext.assertResourcePermission(accessorResource, accessedResource, customPermission2_withoutGrant);
+      accessControlContext.assertResourcePermissions(accessorResource, accessedResource, customPermission1_withoutGrant);
+      accessControlContext.assertResourcePermissions(accessorResource, accessedResource, customPermission1_withGrant);
+      accessControlContext.assertResourcePermissions(accessorResource, accessedResource, customPermission2_withoutGrant);
 
       try {
-         accessControlContext.assertResourcePermission(accessorResource, accessedResource, customPermission2_withGrant);
+         accessControlContext.assertResourcePermissions(accessorResource, accessedResource, customPermission2_withGrant);
          fail("asserting resource permission with grant when the one granted does not have grant should not have succeeded for authenticated resource");
       }
       catch (NotAuthorizedException e) {
@@ -176,7 +176,7 @@ public class TestAccessControl_assertResourcePermission extends TestAccessContro
       accessControlContext.authenticate(accessorResource, PasswordCredentials.newInstance(password));
 
       // verify
-      accessControlContext.assertResourcePermission(accessorResource, accessedResource, customPermission);
+      accessControlContext.assertResourcePermissions(accessorResource, accessedResource, customPermission);
    }
 
    @Test
@@ -207,7 +207,7 @@ public class TestAccessControl_assertResourcePermission extends TestAccessContro
       accessControlContext.authenticate(accessorResource, PasswordCredentials.newInstance(password));
 
       // verify
-      accessControlContext.assertResourcePermission(accessorResource, accessedResource, customPermission);
+      accessControlContext.assertResourcePermissions(accessorResource, accessedResource, customPermission);
    }
 
    @Test
@@ -244,7 +244,7 @@ public class TestAccessControl_assertResourcePermission extends TestAccessContro
       accessControlContext.authenticate(accessorResource, PasswordCredentials.newInstance(password));
 
       // verify
-      accessControlContext.assertResourcePermission(accessorResource, accessedResource, customPermission);
+      accessControlContext.assertResourcePermissions(accessorResource, accessedResource, customPermission);
    }
 
    @Test
@@ -275,7 +275,7 @@ public class TestAccessControl_assertResourcePermission extends TestAccessContro
       final String customPermissionName = generateResourceClassPermission(accessedResourceClassName);
       final ResourcePermission customPermission = ResourcePermissions.getInstance(customPermissionName);
 
-      accessControlContext.assertResourcePermission(accessorResource, accessedResource, customPermission);
+      accessControlContext.assertResourcePermissions(accessorResource, accessedResource, customPermission);
    }
 
    @Test
@@ -312,7 +312,7 @@ public class TestAccessControl_assertResourcePermission extends TestAccessContro
       final String customPermissionName = generateResourceClassPermission(accessedResourceClassName);
       final ResourcePermission customPermission = ResourcePermissions.getInstance(customPermissionName);
 
-      accessControlContext.assertResourcePermission(accessorResource, accessedResource, customPermission);
+      accessControlContext.assertResourcePermissions(accessorResource, accessedResource, customPermission);
    }
 
    @Test
@@ -323,18 +323,18 @@ public class TestAccessControl_assertResourcePermission extends TestAccessContro
 
       // verify
       try {
-         accessControlContext.assertResourcePermission(SYS_RESOURCE,
-                                                       unauthenticatableResource,
-                                                       ResourcePermissions.getInstance(ResourcePermissions.RESET_CREDENTIALS));
+         accessControlContext.assertResourcePermissions(SYS_RESOURCE,
+                                                        unauthenticatableResource,
+                                                        ResourcePermissions.getInstance(ResourcePermissions.RESET_CREDENTIALS));
          fail("asserting implicit resource permission invalid for resource class should have failed for system resource");
       }
       catch (IllegalArgumentException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("not valid for unauthenticatable resource class"));
       }
       try {
-         accessControlContext.assertResourcePermission(SYS_RESOURCE,
-                                                       unauthenticatableResource,
-                                                       ResourcePermissions.getInstance(ResourcePermissions.IMPERSONATE));
+         accessControlContext.assertResourcePermissions(SYS_RESOURCE,
+                                                        unauthenticatableResource,
+                                                        ResourcePermissions.getInstance(ResourcePermissions.IMPERSONATE));
          fail("asserting implicit global resource permission invalid for resource class should have failed for system resource");
       }
       catch (IllegalArgumentException e) {
@@ -364,19 +364,19 @@ public class TestAccessControl_assertResourcePermission extends TestAccessContro
 
       // verify
       try {
-         accessControlContext.assertResourcePermission(null, accessedResource, customPermission);
+         accessControlContext.assertResourcePermissions(null, accessedResource, customPermission);
       }
       catch (NullPointerException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("resource required"));
       }
       try {
-         accessControlContext.assertResourcePermission(accessorResource, null, customPermission);
+         accessControlContext.assertResourcePermissions(accessorResource, null, customPermission);
       }
       catch (NullPointerException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("resource required"));
       }
       try {
-         accessControlContext.assertResourcePermission(accessorResource, accessedResource, null);
+         accessControlContext.assertResourcePermissions(accessorResource, accessedResource, null);
       }
       catch (NullPointerException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("resource permission required"));
@@ -408,19 +408,19 @@ public class TestAccessControl_assertResourcePermission extends TestAccessContro
       final ResourcePermission invalidPermission = ResourcePermissions.getInstance("invalid_permission");
 
       try {
-         accessControlContext.assertResourcePermission(invalidResource, accessedResource, customPermission);
+         accessControlContext.assertResourcePermissions(invalidResource, accessedResource, customPermission);
       }
       catch (IllegalArgumentException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("not found"));
       }
       try {
-         accessControlContext.assertResourcePermission(accessorResource, invalidResource, customPermission);
+         accessControlContext.assertResourcePermissions(accessorResource, invalidResource, customPermission);
       }
       catch (IllegalArgumentException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("could not determine resource class for resource"));
       }
       try {
-         accessControlContext.assertResourcePermission(accessorResource, accessedResource, invalidPermission);
+         accessControlContext.assertResourcePermissions(accessorResource, accessedResource, invalidPermission);
       }
       catch (IllegalArgumentException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("is not defined for resource class"));

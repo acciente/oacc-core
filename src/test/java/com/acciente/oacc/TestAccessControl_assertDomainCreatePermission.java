@@ -39,25 +39,25 @@ public class TestAccessControl_assertDomainCreatePermission extends TestAccessCo
 
       // verify
       accessControlContext
-            .assertDomainCreatePermission(SYS_RESOURCE,
-                                          DomainCreatePermissions.getInstance(DomainCreatePermissions.CREATE));
+            .assertDomainCreatePermissions(SYS_RESOURCE,
+                                           DomainCreatePermissions.getInstance(DomainCreatePermissions.CREATE));
       accessControlContext
-            .assertDomainCreatePermission(SYS_RESOURCE,
-                                          DomainCreatePermissions.getInstance(DomainCreatePermissions.CREATE, true));
+            .assertDomainCreatePermissions(SYS_RESOURCE,
+                                           DomainCreatePermissions.getInstance(DomainCreatePermissions.CREATE, true));
       accessControlContext
-            .assertDomainCreatePermission(SYS_RESOURCE,
-                                          DomainCreatePermissions.getInstance(DomainPermissions.getInstance(DomainPermissions.CREATE_CHILD_DOMAIN)));
+            .assertDomainCreatePermissions(SYS_RESOURCE,
+                                           DomainCreatePermissions.getInstance(DomainPermissions.getInstance(DomainPermissions.CREATE_CHILD_DOMAIN)));
       accessControlContext
-            .assertDomainCreatePermission(SYS_RESOURCE,
-                                          DomainCreatePermissions.getInstance(DomainPermissions.getInstance(DomainPermissions.CREATE_CHILD_DOMAIN),
-                                                                              true));
+            .assertDomainCreatePermissions(SYS_RESOURCE,
+                                           DomainCreatePermissions.getInstance(DomainPermissions.getInstance(DomainPermissions.CREATE_CHILD_DOMAIN),
+                                                                               true));
       accessControlContext
-            .assertDomainCreatePermission(SYS_RESOURCE,
-                                          DomainCreatePermissions.getInstance(DomainPermissions.getInstance(DomainPermissions.SUPER_USER)));
+            .assertDomainCreatePermissions(SYS_RESOURCE,
+                                           DomainCreatePermissions.getInstance(DomainPermissions.getInstance(DomainPermissions.SUPER_USER)));
       accessControlContext
-            .assertDomainCreatePermission(SYS_RESOURCE,
-                                          DomainCreatePermissions.getInstance(DomainPermissions.getInstance(DomainPermissions.SUPER_USER),
-                                                                              true));
+            .assertDomainCreatePermissions(SYS_RESOURCE,
+                                           DomainCreatePermissions.getInstance(DomainPermissions.getInstance(DomainPermissions.SUPER_USER),
+                                                                               true));
    }
 
    @Test
@@ -78,9 +78,9 @@ public class TestAccessControl_assertDomainCreatePermission extends TestAccessCo
 
       // verify
       try {
-         accessControlContext.assertDomainCreatePermission(accessorResource,
-                                                           DomainCreatePermissions
-                                                                 .getInstance(DomainCreatePermissions.CREATE));
+         accessControlContext.assertDomainCreatePermissions(accessorResource,
+                                                            DomainCreatePermissions
+                                                                  .getInstance(DomainCreatePermissions.CREATE));
          fail("asserting domain create permission when none has been granted should not have succeeded for authenticated resource");
       }
       catch (NotAuthorizedException e) {
@@ -104,9 +104,10 @@ public class TestAccessControl_assertDomainCreatePermission extends TestAccessCo
 
       // verify
       accessControlContext
-            .assertDomainCreatePermission(accessorResource,
-                                          DomainCreatePermissions
-                                                .getInstance(DomainPermissions.getInstance(DomainPermissions.CREATE_CHILD_DOMAIN)));
+            .assertDomainCreatePermissions(accessorResource,
+                                           DomainCreatePermissions
+                                                 .getInstance(DomainPermissions
+                                                                    .getInstance(DomainPermissions.CREATE_CHILD_DOMAIN)));
    }
 
    @Test
@@ -135,15 +136,17 @@ public class TestAccessControl_assertDomainCreatePermission extends TestAccessCo
 
       // verify
       accessControlContext
-            .assertDomainCreatePermission(accessorResource,
-                                          DomainCreatePermissions
-                                                .getInstance(DomainPermissions.getInstance(DomainPermissions.CREATE_CHILD_DOMAIN)));
+            .assertDomainCreatePermissions(accessorResource,
+                                           DomainCreatePermissions
+                                                 .getInstance(DomainPermissions
+                                                                    .getInstance(DomainPermissions.CREATE_CHILD_DOMAIN)));
       try {
          accessControlContext
-               .assertDomainCreatePermission(accessorResource,
-                                             DomainCreatePermissions
-                                                   .getInstance(DomainPermissions.getInstance(DomainPermissions.CREATE_CHILD_DOMAIN,
-                                                                                              true)));
+               .assertDomainCreatePermissions(accessorResource,
+                                              DomainCreatePermissions
+                                                    .getInstance(DomainPermissions
+                                                                       .getInstance(DomainPermissions.CREATE_CHILD_DOMAIN,
+                                                                                    true)));
          fail("asserting direct domain create permission with exceeded granting rights should have failed for authenticated resource");
       }
       catch (NotAuthorizedException e) {
@@ -172,9 +175,10 @@ public class TestAccessControl_assertDomainCreatePermission extends TestAccessCo
 
       // verify
       accessControlContext
-            .assertDomainCreatePermission(accessorResource,
-                                          DomainCreatePermissions
-                                                .getInstance(DomainPermissions.getInstance(DomainPermissions.CREATE_CHILD_DOMAIN)));
+            .assertDomainCreatePermissions(accessorResource,
+                                           DomainCreatePermissions
+                                                 .getInstance(DomainPermissions
+                                                                    .getInstance(DomainPermissions.CREATE_CHILD_DOMAIN)));
    }
 
    @Test
@@ -196,15 +200,18 @@ public class TestAccessControl_assertDomainCreatePermission extends TestAccessCo
 
       // verify
       accessControlContext
-            .assertDomainCreatePermission(accessorResource,
-                                          DomainCreatePermissions
-                                                .getInstance(DomainPermissions.getInstance(DomainPermissions.SUPER_USER)));
+            .assertDomainCreatePermissions(accessorResource,
+                                           DomainCreatePermissions
+                                                 .getInstance(DomainPermissions
+                                                                    .getInstance(DomainPermissions.SUPER_USER)));
 
       try {
          accessControlContext
-               .assertDomainCreatePermission(accessorResource,
-                                             DomainCreatePermissions
-                                                   .getInstance(DomainPermissions.getInstance(DomainPermissions.SUPER_USER, true)));
+               .assertDomainCreatePermissions(accessorResource,
+                                              DomainCreatePermissions
+                                                    .getInstance(DomainPermissions
+                                                                       .getInstance(DomainPermissions.SUPER_USER,
+                                                                                    true)));
          fail("asserting direct super-user /G domain create permission should have failed for authenticated resource");
       }
       catch (NotAuthorizedException e) {
@@ -214,9 +221,10 @@ public class TestAccessControl_assertDomainCreatePermission extends TestAccessCo
 
       try {
          accessControlContext
-               .assertDomainCreatePermission(accessorResource,
-                                             DomainCreatePermissions
-                                                   .getInstance(DomainPermissions.getInstance(DomainPermissions.CREATE_CHILD_DOMAIN)));
+               .assertDomainCreatePermissions(accessorResource,
+                                              DomainCreatePermissions
+                                                    .getInstance(DomainPermissions
+                                                                       .getInstance(DomainPermissions.CREATE_CHILD_DOMAIN)));
          fail("asserting create-child-domain domain create permission when only super-user domain create permission is given should have failed for authenticated resource");
       }
       catch (NotAuthorizedException e) {
@@ -261,10 +269,11 @@ public class TestAccessControl_assertDomainCreatePermission extends TestAccessCo
 
       // verify
       accessControlContext
-            .assertDomainCreatePermission(accessorResource,
-                                          DomainCreatePermissions
-                                                .getInstance(DomainPermissions.getInstance(accessorPermissionName_createChild, true),
-                                                             true));
+            .assertDomainCreatePermissions(accessorResource,
+                                           DomainCreatePermissions
+                                                 .getInstance(DomainPermissions.getInstance(accessorPermissionName_createChild,
+                                                                                            true),
+                                                              true));
    }
 
    @Test
@@ -314,22 +323,22 @@ public class TestAccessControl_assertDomainCreatePermission extends TestAccessCo
 
       // verify
       accessControlContext
-            .assertDomainCreatePermission(accessorResource,
-                                          DomainCreatePermissions
-                                                .getInstance(DomainPermissions.getInstance(donorPermissionName_createChild, false),
-                                                             true));
+            .assertDomainCreatePermissions(accessorResource,
+                                           DomainCreatePermissions
+                                                 .getInstance(DomainPermissions.getInstance(donorPermissionName_createChild, false),
+                                                              true));
       accessControlContext
-            .assertDomainCreatePermission(accessorResource,
-                                          DomainCreatePermissions
-                                                .getInstance(DomainPermissions.getInstance(donorPermissionName_createChild, true),
-                                                             false));
+            .assertDomainCreatePermissions(accessorResource,
+                                           DomainCreatePermissions
+                                                 .getInstance(DomainPermissions.getInstance(donorPermissionName_createChild, true),
+                                                              false));
 
       try {
          accessControlContext
-               .assertDomainCreatePermission(accessorResource,
-                                             DomainCreatePermissions
-                                                   .getInstance(DomainPermissions.getInstance(donorPermissionName_createChild, true),
-                                                                true));
+               .assertDomainCreatePermissions(accessorResource,
+                                              DomainCreatePermissions
+                                                    .getInstance(DomainPermissions.getInstance(donorPermissionName_createChild, true),
+                                                                 true));
          fail("asserting domain create permission inherited from two sources with different granting rights should have failed for authenticated resource");
       }
       catch (NotAuthorizedException e) {
@@ -379,22 +388,22 @@ public class TestAccessControl_assertDomainCreatePermission extends TestAccessCo
 
       // verify
       accessControlContext
-            .assertDomainCreatePermission(accessorResource,
-                                          DomainCreatePermissions
-                                                .getInstance(DomainPermissions.getInstance(donorPermissionName_createChild, true),
-                                                             false));
+            .assertDomainCreatePermissions(accessorResource,
+                                           DomainCreatePermissions
+                                                 .getInstance(DomainPermissions.getInstance(donorPermissionName_createChild, true),
+                                                              false));
       accessControlContext
-            .assertDomainCreatePermission(accessorResource,
-                                          DomainCreatePermissions
-                                                .getInstance(DomainPermissions.getInstance(donorPermissionName_createChild, false),
-                                                             true));
+            .assertDomainCreatePermissions(accessorResource,
+                                           DomainCreatePermissions
+                                                 .getInstance(DomainPermissions.getInstance(donorPermissionName_createChild, false),
+                                                              true));
 
       try {
          accessControlContext
-               .assertDomainCreatePermission(accessorResource,
-                                             DomainCreatePermissions
-                                                   .getInstance(DomainPermissions.getInstance(donorPermissionName_createChild, true),
-                                                                true));
+               .assertDomainCreatePermissions(accessorResource,
+                                              DomainCreatePermissions
+                                                    .getInstance(DomainPermissions.getInstance(donorPermissionName_createChild, true),
+                                                                 true));
          fail("asserting double-inherited domain create permission with different granting rights should have failed for authenticated resource");
       }
       catch (NotAuthorizedException e) {
@@ -447,9 +456,9 @@ public class TestAccessControl_assertDomainCreatePermission extends TestAccessCo
       permissions_expected.add(DomainCreatePermissions.getInstance(DomainPermissions.getInstance(donorPermissionName_createDomain)));
 
       accessControlContext
-            .assertDomainCreatePermission(accessorResource,
-                                          DomainCreatePermissions
-                                                .getInstance(DomainPermissions.getInstance(donorPermissionName_createDomain)));
+            .assertDomainCreatePermissions(accessorResource,
+                                           DomainCreatePermissions
+                                                 .getInstance(DomainPermissions.getInstance(donorPermissionName_createDomain)));
    }
 
    @Test
@@ -459,14 +468,14 @@ public class TestAccessControl_assertDomainCreatePermission extends TestAccessCo
       final DomainCreatePermission domainCreatePermission = DomainCreatePermissions.getInstance(DomainCreatePermissions.CREATE);
 
       try {
-         accessControlContext.assertDomainCreatePermission(null, domainCreatePermission);
+         accessControlContext.assertDomainCreatePermissions(null, domainCreatePermission);
          fail("asserting domain create permission with null accessor resource should have failed");
       }
       catch (NullPointerException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("resource required"));
       }
       try {
-         accessControlContext.assertDomainCreatePermission(accessorResource, null);
+         accessControlContext.assertDomainCreatePermissions(accessorResource, null);
          fail("asserting domain create permission with null permission should have failed");
       }
       catch (NullPointerException e) {
@@ -484,7 +493,7 @@ public class TestAccessControl_assertDomainCreatePermission extends TestAccessCo
       try {
          // the assert will "succeed" in the sense that it will fail to assert the permission on the
          // invalid resource, since that resource does not have the specified permission
-         accessControlContext.assertDomainCreatePermission(invalidResource, domainCreatePermission);
+         accessControlContext.assertDomainCreatePermissions(invalidResource, domainCreatePermission);
          fail("asserting domain create permission with invalid accessor resource should have failed");
       }
       catch (NotAuthorizedException e) {

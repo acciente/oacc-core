@@ -159,9 +159,9 @@ public interface AccessControlContext {
     *                                                  specified domain permission, or
     *                                                  if the accessor resource does not exist
     */
-   public void assertDomainPermission(Resource accessorResource,
-                                      String domainName,
-                                      DomainPermission domainPermission);
+   public void assertDomainPermissions(Resource accessorResource,
+                                       String domainName,
+                                       DomainPermission domainPermission);
 
    /**
     * Checks if the specified accessor resource has the specified domain permission on
@@ -177,9 +177,9 @@ public interface AccessControlContext {
     *          <strong>false</strong> otherwise or if the accessor resource does not exist
     * @throws java.lang.IllegalArgumentException  if no domain of domainName exists
     */
-   public boolean hasDomainPermission(Resource accessorResource,
-                                      String domainName,
-                                      DomainPermission domainPermission);
+   public boolean hasDomainPermissions(Resource accessorResource,
+                                       String domainName,
+                                       DomainPermission domainPermission);
 
    /**
     * Checks if the specified accessor resource has the specified domain create permission on
@@ -192,8 +192,8 @@ public interface AccessControlContext {
     *                                                  specified domain create permission, or
     *                                                  if the accessor resource does not exist
     */
-   public void assertDomainCreatePermission(Resource accessorResource,
-                                            DomainCreatePermission domainCreatePermission);
+   public void assertDomainCreatePermissions(Resource accessorResource,
+                                             DomainCreatePermission domainCreatePermission);
 
    /**
     * Checks if the specified accessor resource has the specified domain create permission on
@@ -205,8 +205,8 @@ public interface AccessControlContext {
     * @return  <strong>true</strong> if the accessor resource has the specified domain create permission,
     *          <strong>false</strong> otherwise or if the accessor resource does not exist
     */
-   public boolean hasDomainCreatePermission(Resource accessorResource,
-                                            DomainCreatePermission domainCreatePermission);
+   public boolean hasDomainCreatePermissions(Resource accessorResource,
+                                             DomainCreatePermission domainCreatePermission);
 
    /**
     * Checks if the specified accessor resource would receive the specified domain permission, if the accessor
@@ -218,8 +218,8 @@ public interface AccessControlContext {
     * @throws com.acciente.oacc.NotAuthorizedException if the accessor resource would <strong>not</strong> receive the
     *                                                  specified permission after creating a domain, or if an error occurs
     */
-   public void assertPostCreateDomainPermission(Resource accessorResource,
-                                                DomainPermission domainPermission);
+   public void assertPostCreateDomainPermissions(Resource accessorResource,
+                                                 DomainPermission domainPermission);
 
    /**
     * Checks if the specified accessor resource would receive the specified domain permission, if the accessor
@@ -230,8 +230,8 @@ public interface AccessControlContext {
     * @param domainPermission the permission to be checked
     * @return <strong>true</strong> if the accessor resource would receive the specified permission after creating a domain
     */
-   public boolean hasPostCreateDomainPermission(Resource accessorResource,
-                                                DomainPermission domainPermission);
+   public boolean hasPostCreateDomainPermissions(Resource accessorResource,
+                                                 DomainPermission domainPermission);
 
    /**
     * Checks if the specified accessor resource has the specified global resource permission on
@@ -247,9 +247,9 @@ public interface AccessControlContext {
     *                                                  specified global permission, or
     *                                                  if the accessor resource does not exist
     */
-   public void assertGlobalResourcePermission(Resource accessorResource,
-                                              String resourceClassName,
-                                              ResourcePermission resourcePermission);
+   public void assertGlobalResourcePermissions(Resource accessorResource,
+                                               String resourceClassName,
+                                               ResourcePermission resourcePermission);
 
    /**
     * Checks if the specified accessor resource has the specified global resource permission on
@@ -267,10 +267,10 @@ public interface AccessControlContext {
     *                                                  specified global permission, or
     *                                                  if the accessor resource does not exist
     */
-   public void assertGlobalResourcePermission(Resource accessorResource,
-                                              String resourceClassName,
-                                              String domainName,
-                                              ResourcePermission resourcePermission);
+   public void assertGlobalResourcePermissions(Resource accessorResource,
+                                               String resourceClassName,
+                                               String domainName,
+                                               ResourcePermission resourcePermission);
 
    /**
     * Checks if the specified accessor resource has the specified global resource permission on
@@ -285,9 +285,9 @@ public interface AccessControlContext {
     * @throws java.lang.IllegalArgumentException if no resource class of resourceClassName exists, or
     *                                            if resourcePermission is invalid for the resource class
     */
-   public boolean hasGlobalResourcePermission(Resource accessorResource,
-                                              String resourceClassName,
-                                              ResourcePermission resourcePermission);
+   public boolean hasGlobalResourcePermissions(Resource accessorResource,
+                                               String resourceClassName,
+                                               ResourcePermission resourcePermission);
 
    /**
     * Checks if the specified accessor resource has the specified global resource permission on
@@ -304,10 +304,10 @@ public interface AccessControlContext {
     *                                            if resourcePermission is invalid for the resource class, or
     *                                            if no domain of domainName exists
     */
-   public boolean hasGlobalResourcePermission(Resource accessorResource,
-                                              String resourceClassName,
-                                              String domainName,
-                                              ResourcePermission resourcePermission);
+   public boolean hasGlobalResourcePermissions(Resource accessorResource,
+                                               String resourceClassName,
+                                               String domainName,
+                                               ResourcePermission resourcePermission);
 
    /**
     * Checks if the specified accessor resource has the specified resource permission
@@ -322,9 +322,9 @@ public interface AccessControlContext {
     * @throws com.acciente.oacc.NotAuthorizedException if the accessor resource <strong>does not</strong> have the
     *                                                  specified permission
     */
-   public void assertResourcePermission(Resource accessorResource,
-                                        Resource accessedResource,
-                                        ResourcePermission resourcePermission);
+   public void assertResourcePermissions(Resource accessorResource,
+                                         Resource accessedResource,
+                                         ResourcePermission resourcePermission);
 
    /**
     * Checks if the specified accessor resource has the specified resource permission
@@ -338,9 +338,9 @@ public interface AccessControlContext {
     * @throws java.lang.IllegalArgumentException if the accessorResource or the accessedResource does not exists, or
     *                                            if resourcePermission is invalid for the resource class of accessedResource
     */
-   public boolean hasResourcePermission(Resource accessorResource,
-                                        Resource accessedResource,
-                                        ResourcePermission resourcePermission);
+   public boolean hasResourcePermissions(Resource accessorResource,
+                                         Resource accessedResource,
+                                         ResourcePermission resourcePermission);
 
    /**
     * Checks if the specified accessor resource has the specified create permission on an object of
@@ -358,9 +358,9 @@ public interface AccessControlContext {
     *                                                  in the current session domain, or
     *                                                  if the accessor resource does not exist
     */
-   public void assertResourceCreatePermission(Resource accessorResource,
-                                              String resourceClassName,
-                                              ResourceCreatePermission resourceCreatePermission);
+   public void assertResourceCreatePermissions(Resource accessorResource,
+                                               String resourceClassName,
+                                               ResourceCreatePermission resourceCreatePermission);
 
    /**
     * Checks if the specified accessor resource has the specified create permission on an object of
@@ -380,10 +380,10 @@ public interface AccessControlContext {
     *                                                  in the specified domain, or
     *                                                  if the accessor resource does not exist
     */
-   public void assertResourceCreatePermission(Resource accessorResource,
-                                              String resourceClassName,
-                                              String domainName,
-                                              ResourceCreatePermission resourceCreatePermission);
+   public void assertResourceCreatePermissions(Resource accessorResource,
+                                               String resourceClassName,
+                                               String domainName,
+                                               ResourceCreatePermission resourceCreatePermission);
 
    /**
     * Checks if the specified accessor resource has the specified create permission on an object of
@@ -400,9 +400,9 @@ public interface AccessControlContext {
     * @throws java.lang.IllegalArgumentException  if no resource class of resourceClassName exists, or
     *                                             if resourceCreatePermission is invalid for the resource class
     */
-   public boolean hasResourceCreatePermission(Resource accessorResource,
-                                              String resourceClassName,
-                                              ResourceCreatePermission resourceCreatePermission);
+   public boolean hasResourceCreatePermissions(Resource accessorResource,
+                                               String resourceClassName,
+                                               ResourceCreatePermission resourceCreatePermission);
 
    /**
     * Checks if the specified accessor resource has the specified create permission on an object of
@@ -421,10 +421,10 @@ public interface AccessControlContext {
     *                                            if resourceCreatePermission is invalid for the resource class, or
     *                                            if no domain of domainName exists
     */
-   public boolean hasResourceCreatePermission(Resource accessorResource,
-                                              String resourceClassName,
-                                              String domainName,
-                                              ResourceCreatePermission resourceCreatePermission);
+   public boolean hasResourceCreatePermissions(Resource accessorResource,
+                                               String resourceClassName,
+                                               String domainName,
+                                               ResourceCreatePermission resourceCreatePermission);
 
    /**
     * Checks if the specified accessor resource would receive the specified permission on an object of
@@ -442,9 +442,9 @@ public interface AccessControlContext {
     *                                                  in the current session domain, or
     *                                                  if the accessor resource does not exist
     */
-   public void assertPostCreateResourcePermission(Resource accessorResource,
-                                                  String resourceClassName,
-                                                  ResourcePermission resourcePermission);
+   public void assertPostCreateResourcePermissions(Resource accessorResource,
+                                                   String resourceClassName,
+                                                   ResourcePermission resourcePermission);
 
    /**
     * Checks if the specified accessor resource would receive the specified permission on an object of
@@ -464,10 +464,10 @@ public interface AccessControlContext {
     *                                                  class in the specified domain, or
     *                                                  if the accessor resource does not exist
     */
-   public void assertPostCreateResourcePermission(Resource accessorResource,
-                                                  String resourceClassName,
-                                                  String domainName,
-                                                  ResourcePermission resourcePermission);
+   public void assertPostCreateResourcePermissions(Resource accessorResource,
+                                                   String resourceClassName,
+                                                   String domainName,
+                                                   ResourcePermission resourcePermission);
 
    /**
     * Checks if the specified accessor resource would receive the specified permission on an object of
@@ -484,9 +484,9 @@ public interface AccessControlContext {
     * @throws java.lang.IllegalArgumentException       if no resource class of resourceClassName exists, or
     *                                                  if resourcePermission is invalid for the resource class
     */
-   public boolean hasPostCreateResourcePermission(Resource accessorResource,
-                                                  String resourceClassName,
-                                                  ResourcePermission resourcePermission);
+   public boolean hasPostCreateResourcePermissions(Resource accessorResource,
+                                                   String resourceClassName,
+                                                   ResourcePermission resourcePermission);
 
    /**
     * Checks if the specified accessor resource would receive the specified permission on an object of
@@ -505,10 +505,10 @@ public interface AccessControlContext {
     *                                                  if no domain of domainName exists, or
     *                                                  if resourcePermission is invalid for the resource class
     */
-   public boolean hasPostCreateResourcePermission(Resource accessorResource,
-                                                  String resourceClassName,
-                                                  String domainName,
-                                                  ResourcePermission resourcePermission);
+   public boolean hasPostCreateResourcePermissions(Resource accessorResource,
+                                                   String resourceClassName,
+                                                   String domainName,
+                                                   ResourcePermission resourcePermission);
 
    /**
     * Returns the domain to which the specified resource belongs.

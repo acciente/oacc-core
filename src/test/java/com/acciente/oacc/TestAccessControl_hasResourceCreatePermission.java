@@ -43,49 +43,49 @@ public class TestAccessControl_hasResourceCreatePermission extends TestAccessCon
 
       // verify
       if (!accessControlContext
-            .hasResourceCreatePermission(SYS_RESOURCE,
-                                         resourceClassName,
-                                         ResourceCreatePermissions
-                                               .getInstance(ResourceCreatePermissions.CREATE))) {
+            .hasResourceCreatePermissions(SYS_RESOURCE,
+                                          resourceClassName,
+                                          ResourceCreatePermissions
+                                                .getInstance(ResourceCreatePermissions.CREATE))) {
          fail("checking implicit system resource create permission when none has been granted should have succeeded for system resource");
       }
       if (!accessControlContext
-            .hasResourceCreatePermission(SYS_RESOURCE,
-                                         resourceClassName,
-                                         ResourceCreatePermissions
-                                               .getInstance(ResourceCreatePermissions.CREATE,
-                                                            true))) {
+            .hasResourceCreatePermissions(SYS_RESOURCE,
+                                          resourceClassName,
+                                          ResourceCreatePermissions
+                                                .getInstance(ResourceCreatePermissions.CREATE,
+                                                             true))) {
          fail("checking implicit system resource create permission with grant when none has been granted should have succeeded for system resource");
       }
 
       if (!accessControlContext
-            .hasResourceCreatePermission(SYS_RESOURCE,
-                                         resourceClassName,
-                                         ResourceCreatePermissions
-                                               .getInstance(ResourcePermissions.getInstance(customPermissionName)))) {
+            .hasResourceCreatePermissions(SYS_RESOURCE,
+                                          resourceClassName,
+                                          ResourceCreatePermissions
+                                                .getInstance(ResourcePermissions.getInstance(customPermissionName)))) {
          fail("checking implicit custom resource create permission when none has been granted should have succeeded for system resource");
       }
       if (!accessControlContext
-            .hasResourceCreatePermission(SYS_RESOURCE,
-                                         resourceClassName,
-                                         ResourceCreatePermissions
-                                               .getInstance(ResourcePermissions.getInstance(customPermissionName),
-                                                            true))) {
+            .hasResourceCreatePermissions(SYS_RESOURCE,
+                                          resourceClassName,
+                                          ResourceCreatePermissions
+                                                .getInstance(ResourcePermissions.getInstance(customPermissionName),
+                                                             true))) {
          fail("checking implicit custom resource create permission with grant when none has been granted should have succeeded for system resource");
       }
       if (!accessControlContext
-            .hasResourceCreatePermission(SYS_RESOURCE,
-                                         resourceClassName,
-                                         ResourceCreatePermissions
-                                               .getInstance(ResourcePermissions.getInstance(customPermissionName, true)))) {
+            .hasResourceCreatePermissions(SYS_RESOURCE,
+                                          resourceClassName,
+                                          ResourceCreatePermissions
+                                                .getInstance(ResourcePermissions.getInstance(customPermissionName, true)))) {
          fail("checking implicit custom resource create permission when none has been granted should have succeeded for system resource");
       }
       if (!accessControlContext
-            .hasResourceCreatePermission(SYS_RESOURCE,
-                                         resourceClassName,
-                                         ResourceCreatePermissions
-                                               .getInstance(ResourcePermissions.getInstance(customPermissionName, true),
-                                                            true))) {
+            .hasResourceCreatePermissions(SYS_RESOURCE,
+                                          resourceClassName,
+                                          ResourceCreatePermissions
+                                                .getInstance(ResourcePermissions.getInstance(customPermissionName, true),
+                                                             true))) {
          fail("checking implicit custom resource create permission with grant when none has been granted should have succeeded for system resource");
       }
 
@@ -95,54 +95,54 @@ public class TestAccessControl_hasResourceCreatePermission extends TestAccessCon
       assertThat(allResourceCreatePermissionsForResourceClassAndDomain.isEmpty(), is(true));
 
       if (!accessControlContext
-            .hasResourceCreatePermission(SYS_RESOURCE,
-                                         resourceClassName,
-                                         domainName,
-                                         ResourceCreatePermissions
-                                               .getInstance(ResourceCreatePermissions.CREATE))) {
+            .hasResourceCreatePermissions(SYS_RESOURCE,
+                                          resourceClassName,
+                                          domainName,
+                                          ResourceCreatePermissions
+                                                .getInstance(ResourceCreatePermissions.CREATE))) {
          fail("checking implicit system resource create permission for domain when none has been granted should have succeeded for system resource");
       }
       if (!accessControlContext
-            .hasResourceCreatePermission(SYS_RESOURCE,
-                                         resourceClassName,
-                                         domainName,
-                                         ResourceCreatePermissions
-                                               .getInstance(ResourceCreatePermissions.CREATE,
-                                                            true))) {
+            .hasResourceCreatePermissions(SYS_RESOURCE,
+                                          resourceClassName,
+                                          domainName,
+                                          ResourceCreatePermissions
+                                                .getInstance(ResourceCreatePermissions.CREATE,
+                                                             true))) {
          fail("checking implicit system resource create permission with grant for domain when none has been granted should have succeeded for system resource");
       }
       if (!accessControlContext
-            .hasResourceCreatePermission(SYS_RESOURCE,
-                                         resourceClassName,
-                                         domainName,
-                                         ResourceCreatePermissions
-                                               .getInstance(ResourcePermissions.getInstance(customPermissionName)))) {
+            .hasResourceCreatePermissions(SYS_RESOURCE,
+                                          resourceClassName,
+                                          domainName,
+                                          ResourceCreatePermissions
+                                                .getInstance(ResourcePermissions.getInstance(customPermissionName)))) {
          fail("checking implicit custom resource create permission for domain when none has been granted should have succeeded for system resource");
       }
       if (!accessControlContext
-            .hasResourceCreatePermission(SYS_RESOURCE,
-                                         resourceClassName,
-                                         domainName,
-                                         ResourceCreatePermissions
-                                               .getInstance(ResourcePermissions.getInstance(customPermissionName),
-                                                            true))) {
+            .hasResourceCreatePermissions(SYS_RESOURCE,
+                                          resourceClassName,
+                                          domainName,
+                                          ResourceCreatePermissions
+                                                .getInstance(ResourcePermissions.getInstance(customPermissionName),
+                                                             true))) {
          fail("checking implicit custom resource create permission with grant for domain when none has been granted should have succeeded for system resource");
       }
       if (!accessControlContext
-            .hasResourceCreatePermission(SYS_RESOURCE,
-                                         resourceClassName,
-                                         domainName,
-                                         ResourceCreatePermissions
-                                               .getInstance(ResourcePermissions.getInstance(customPermissionName, true)))) {
+            .hasResourceCreatePermissions(SYS_RESOURCE,
+                                          resourceClassName,
+                                          domainName,
+                                          ResourceCreatePermissions
+                                                .getInstance(ResourcePermissions.getInstance(customPermissionName, true)))) {
          fail("checking implicit custom resource create permission for domain when none has been granted should have succeeded for system resource");
       }
       if (!accessControlContext
-            .hasResourceCreatePermission(SYS_RESOURCE,
-                                         resourceClassName,
-                                         domainName,
-                                         ResourceCreatePermissions
-                                               .getInstance(ResourcePermissions.getInstance(customPermissionName, true),
-                                                            true))) {
+            .hasResourceCreatePermissions(SYS_RESOURCE,
+                                          resourceClassName,
+                                          domainName,
+                                          ResourceCreatePermissions
+                                                .getInstance(ResourcePermissions.getInstance(customPermissionName, true),
+                                                             true))) {
          fail("checking implicit custom resource create permission with grant for domain when none has been granted should have succeeded for system resource");
       }
    }
@@ -167,10 +167,10 @@ public class TestAccessControl_hasResourceCreatePermission extends TestAccessCon
 
       // verify
       if (accessControlContext
-            .hasResourceCreatePermission(accessorResource,
-                                         resourceClassName,
-                                         ResourceCreatePermissions
-                                               .getInstance(ResourcePermissions.getInstance(customPermissionName)))) {
+            .hasResourceCreatePermissions(accessorResource,
+                                          resourceClassName,
+                                          ResourceCreatePermissions
+                                                .getInstance(ResourcePermissions.getInstance(customPermissionName)))) {
          fail("checking resource create permission when none has been granted should have failed for authenticated resource");
       }
 
@@ -179,11 +179,11 @@ public class TestAccessControl_hasResourceCreatePermission extends TestAccessCon
             = accessControlContext.getEffectiveResourceCreatePermissions(accessorResource, resourceClassName, domainName);
       assertThat(allResourceCreatePermissionsForResourceClassAndDomain.isEmpty(), is(true));
       if (accessControlContext
-            .hasResourceCreatePermission(accessorResource,
-                                         resourceClassName,
-                                         domainName,
-                                         ResourceCreatePermissions
-                                               .getInstance(ResourcePermissions.getInstance(customPermissionName)))) {
+            .hasResourceCreatePermissions(accessorResource,
+                                          resourceClassName,
+                                          domainName,
+                                          ResourceCreatePermissions
+                                                .getInstance(ResourcePermissions.getInstance(customPermissionName)))) {
          fail("checking resource create permission for domain when none has been granted should have failed for authenticated resource");
       }
    }
@@ -244,24 +244,24 @@ public class TestAccessControl_hasResourceCreatePermission extends TestAccessCon
 
       // verify
       if (!accessControlContext
-            .hasResourceCreatePermission(accessorResource,
-                                         resourceClassName,
-                                         customCreatePermission_accessorDomain_withGrant)) {
+            .hasResourceCreatePermissions(accessorResource,
+                                          resourceClassName,
+                                          customCreatePermission_accessorDomain_withGrant)) {
          fail("checking direct custom resource create permission should have succeeded for authenticated resource");
       }
 
       if (!accessControlContext
-            .hasResourceCreatePermission(accessorResource,
-                                         resourceClassName,
-                                         accessorDomainName,
-                                         customCreatePermission_accessorDomain_withGrant)) {
+            .hasResourceCreatePermissions(accessorResource,
+                                          resourceClassName,
+                                          accessorDomainName,
+                                          customCreatePermission_accessorDomain_withGrant)) {
          fail("checking direct custom resource create permission for domain should have succeeded for authenticated resource");
       }
       if (!accessControlContext
-            .hasResourceCreatePermission(accessorResource,
-                                         resourceClassName,
-                                         accessedDomainName,
-                                         customCreatePermission_accessedDomain_withoutGrant)) {
+            .hasResourceCreatePermissions(accessorResource,
+                                          resourceClassName,
+                                          accessedDomainName,
+                                          customCreatePermission_accessedDomain_withoutGrant)) {
          fail("checking direct custom resource create permission for domain should have succeeded for authenticated resource");
       }
    }
@@ -327,85 +327,85 @@ public class TestAccessControl_hasResourceCreatePermission extends TestAccessCon
 
       // verify
       if (!accessControlContext
-            .hasResourceCreatePermission(accessorResource,
-                                         resourceClassName,
-                                         ResourceCreatePermissions.getInstance(grantableCustomPermission_forAccessorDomain))) {
+            .hasResourceCreatePermissions(accessorResource,
+                                          resourceClassName,
+                                          ResourceCreatePermissions.getInstance(grantableCustomPermission_forAccessorDomain))) {
          fail("checking direct custom resource create permission with lesser create granting rights should have succeeded for authenticated resource");
       }
       if (!accessControlContext
-            .hasResourceCreatePermission(accessorResource,
-                                         resourceClassName,
-                                         ResourceCreatePermissions.getInstance(grantableCustomPermission_forAccessorDomain,
-                                                                               true))) {
+            .hasResourceCreatePermissions(accessorResource,
+                                          resourceClassName,
+                                          ResourceCreatePermissions.getInstance(grantableCustomPermission_forAccessorDomain,
+                                                                                true))) {
          fail("checking direct custom resource create permission with same granting rights should have succeeded for authenticated resource");
       }
       if (!accessControlContext
-            .hasResourceCreatePermission(accessorResource,
-                                         resourceClassName,
-                                         ResourceCreatePermissions.getInstance(ungrantableCustomPermission_forAccessorDomain))) {
+            .hasResourceCreatePermissions(accessorResource,
+                                          resourceClassName,
+                                          ResourceCreatePermissions.getInstance(ungrantableCustomPermission_forAccessorDomain))) {
          fail("checking direct custom resource create permission with lesser post-create and create granting rights should have succeeded for authenticated resource");
       }
       if (!accessControlContext
-            .hasResourceCreatePermission(accessorResource,
-                                         resourceClassName,
-                                         ResourceCreatePermissions.getInstance(ungrantableCustomPermission_forAccessorDomain,
-                                                                               true))) {
+            .hasResourceCreatePermissions(accessorResource,
+                                          resourceClassName,
+                                          ResourceCreatePermissions.getInstance(ungrantableCustomPermission_forAccessorDomain,
+                                                                                true))) {
          fail("checking direct custom resource create permission with lesser post-create granting rights should have succeeded for authenticated resource");
       }
 
       if (!accessControlContext
-            .hasResourceCreatePermission(accessorResource,
-                                         resourceClassName,
-                                         accessorDomainName,
-                                         ResourceCreatePermissions.getInstance(grantableCustomPermission_forAccessorDomain))) {
+            .hasResourceCreatePermissions(accessorResource,
+                                          resourceClassName,
+                                          accessorDomainName,
+                                          ResourceCreatePermissions.getInstance(grantableCustomPermission_forAccessorDomain))) {
          fail("checking direct custom resource create permission with lesser create granting rights should have succeeded for authenticated resource");
       }
       if (!accessControlContext
-            .hasResourceCreatePermission(accessorResource,
-                                         resourceClassName,
-                                         accessorDomainName,
-                                         ResourceCreatePermissions.getInstance(grantableCustomPermission_forAccessorDomain,
-                                                                               true))) {
+            .hasResourceCreatePermissions(accessorResource,
+                                          resourceClassName,
+                                          accessorDomainName,
+                                          ResourceCreatePermissions.getInstance(grantableCustomPermission_forAccessorDomain,
+                                                                                true))) {
          fail("checking direct custom resource create permission with same granting rights should have succeeded for authenticated resource");
       }
       if (!accessControlContext
-            .hasResourceCreatePermission(accessorResource,
-                                         resourceClassName,
-                                         accessorDomainName,
-                                         ResourceCreatePermissions.getInstance(ungrantableCustomPermission_forAccessorDomain))) {
+            .hasResourceCreatePermissions(accessorResource,
+                                          resourceClassName,
+                                          accessorDomainName,
+                                          ResourceCreatePermissions.getInstance(ungrantableCustomPermission_forAccessorDomain))) {
          fail("checking direct custom resource create permission with lesser post-create and create granting rights should have succeeded for authenticated resource");
       }
       if (!accessControlContext
-            .hasResourceCreatePermission(accessorResource,
-                                         resourceClassName,
-                                         accessorDomainName,
-                                         ResourceCreatePermissions.getInstance(ungrantableCustomPermission_forAccessorDomain,
-                                                                               true))) {
+            .hasResourceCreatePermissions(accessorResource,
+                                          resourceClassName,
+                                          accessorDomainName,
+                                          ResourceCreatePermissions.getInstance(ungrantableCustomPermission_forAccessorDomain,
+                                                                                true))) {
          fail("checking direct custom resource create permission with lesser post-create granting rights should have succeeded for authenticated resource");
       }
 
 
       if(!accessControlContext
-            .hasResourceCreatePermission(accessorResource,
-                                         resourceClassName,
-                                         accessedDomainName,
-                                         ResourceCreatePermissions.getInstance(ungrantableCustomPermission_forAccessedDomain))) {
+            .hasResourceCreatePermissions(accessorResource,
+                                          resourceClassName,
+                                          accessedDomainName,
+                                          ResourceCreatePermissions.getInstance(ungrantableCustomPermission_forAccessedDomain))) {
          fail("checking direct custom resource create permission with same granting rights should have succeeded for authenticated resource");
       }
 
       if (accessControlContext
-               .hasResourceCreatePermission(accessorResource,
-                                            resourceClassName,
-                                            accessedDomainName,
-                                            ResourceCreatePermissions.getInstance(grantableCustomPermission_forAccessedDomain))) {
+               .hasResourceCreatePermissions(accessorResource,
+                                             resourceClassName,
+                                             accessedDomainName,
+                                             ResourceCreatePermissions.getInstance(grantableCustomPermission_forAccessedDomain))) {
          fail("checking direct custom resource create permission with exceeded post-create granting rights should have failed for authenticated resource");
       }
       if (accessControlContext
-               .hasResourceCreatePermission(accessorResource,
-                                            resourceClassName,
-                                            accessedDomainName,
-                                            ResourceCreatePermissions.getInstance(ungrantableCustomPermission_forAccessedDomain,
-                                                                                  true))) {
+               .hasResourceCreatePermissions(accessorResource,
+                                             resourceClassName,
+                                             accessedDomainName,
+                                             ResourceCreatePermissions.getInstance(ungrantableCustomPermission_forAccessedDomain,
+                                                                                   true))) {
          fail("checking direct custom resource create permission with exceeded create granting rights should have failed for authenticated resource");
       }
    }
@@ -463,18 +463,18 @@ public class TestAccessControl_hasResourceCreatePermission extends TestAccessCon
 
       // verify
       if (!accessControlContext
-            .hasResourceCreatePermission(accessorResource,
-                                         resourceClassName,
-                                         ResourceCreatePermissions
-                                               .getInstance(customPermission_forAccessorDomain))) {
+            .hasResourceCreatePermissions(accessorResource,
+                                          resourceClassName,
+                                          ResourceCreatePermissions
+                                                .getInstance(customPermission_forAccessorDomain))) {
          fail("checking inherited resource create permission should have succeeded for authenticated resource");
       }
       if (!accessControlContext
-            .hasResourceCreatePermission(accessorResource,
-                                         resourceClassName,
-                                         accessedDomainName,
-                                         ResourceCreatePermissions
-                                               .getInstance(customPermission_forAccessedDomain))) {
+            .hasResourceCreatePermissions(accessorResource,
+                                          resourceClassName,
+                                          accessedDomainName,
+                                          ResourceCreatePermissions
+                                                .getInstance(customPermission_forAccessedDomain))) {
          fail("checking inherited resource create permission for domain should have succeeded for authenticated resource");
       }
    }
@@ -527,28 +527,28 @@ public class TestAccessControl_hasResourceCreatePermission extends TestAccessCon
 
       // verify
       if (!accessControlContext
-            .hasResourceCreatePermission(accessorResource,
-                                         resourceClassName,
-                                         ResourceCreatePermissions
-                                               .getInstance(customPermission_forAccessorDomain))) {
+            .hasResourceCreatePermissions(accessorResource,
+                                          resourceClassName,
+                                          ResourceCreatePermissions
+                                                .getInstance(customPermission_forAccessorDomain))) {
          fail("checking parent resource create permission should have succeeded for authenticated resource");
       }
 
       if (!accessControlContext
-            .hasResourceCreatePermission(accessorResource,
-                                         resourceClassName,
-                                         accessedDomainName,
-                                         ResourceCreatePermissions
-                                               .getInstance(customPermission_forAccessorDomain))) {
+            .hasResourceCreatePermissions(accessorResource,
+                                          resourceClassName,
+                                          accessedDomainName,
+                                          ResourceCreatePermissions
+                                                .getInstance(customPermission_forAccessorDomain))) {
          fail("checking domain-inherited resource create permission should have succeeded for authenticated resource");
       }
 
       if (!accessControlContext
-            .hasResourceCreatePermission(accessorResource,
-                                         resourceClassName,
-                                         accessedDomainName,
-                                         ResourceCreatePermissions
-                                               .getInstance(customPermission_forIntermediaryDomain))) {
+            .hasResourceCreatePermissions(accessorResource,
+                                          resourceClassName,
+                                          accessedDomainName,
+                                          ResourceCreatePermissions
+                                                .getInstance(customPermission_forIntermediaryDomain))) {
          fail("checking domain-inherited resource create permission from intermediary domain should have succeeded for authenticated resource");
       }
    }
@@ -610,28 +610,28 @@ public class TestAccessControl_hasResourceCreatePermission extends TestAccessCon
 
       // verify
       if (!accessControlContext
-            .hasResourceCreatePermission(accessorResource,
-                                         resourceClassName,
-                                         ResourceCreatePermissions
-                                               .getInstance(customPermission_forAccessorDomain))) {
+            .hasResourceCreatePermissions(accessorResource,
+                                          resourceClassName,
+                                          ResourceCreatePermissions
+                                                .getInstance(customPermission_forAccessorDomain))) {
          fail("checking inherited parent resource create permission should have succeeded for authenticated resource");
       }
 
       if (!accessControlContext
-            .hasResourceCreatePermission(accessorResource,
-                                         resourceClassName,
-                                         accessedDomainName,
-                                         ResourceCreatePermissions
-                                               .getInstance(customPermission_forAccessorDomain))) {
+            .hasResourceCreatePermissions(accessorResource,
+                                          resourceClassName,
+                                          accessedDomainName,
+                                          ResourceCreatePermissions
+                                                .getInstance(customPermission_forAccessorDomain))) {
          fail("checking inherited domain-inherited resource create permission should have succeeded for authenticated resource");
       }
 
       if (!accessControlContext
-            .hasResourceCreatePermission(accessorResource,
-                                         resourceClassName,
-                                         accessedDomainName,
-                                         ResourceCreatePermissions
-                                               .getInstance(customPermission_forIntermediaryDomain))) {
+            .hasResourceCreatePermissions(accessorResource,
+                                          resourceClassName,
+                                          accessedDomainName,
+                                          ResourceCreatePermissions
+                                                .getInstance(customPermission_forIntermediaryDomain))) {
          fail("checking inherited domain-inherited resource create permission from intermediary domain should have succeeded for authenticated resource");
       }
    }
@@ -673,19 +673,19 @@ public class TestAccessControl_hasResourceCreatePermission extends TestAccessCon
 
       // verify
       if (accessControlContext
-            .hasResourceCreatePermission(accessorResource,
-                                         resourceClassName,
-                                         ResourceCreatePermissions
-                                               .getInstance(globalResourcePermission))) {
+            .hasResourceCreatePermissions(accessorResource,
+                                          resourceClassName,
+                                          ResourceCreatePermissions
+                                                .getInstance(globalResourcePermission))) {
          fail("checking resource create permission without *CREATE or post-create should have failed for authenticated resource");
       }
 
       if (accessControlContext
-            .hasResourceCreatePermission(accessorResource,
-                                         resourceClassName,
-                                         accessorDomainName,
-                                         ResourceCreatePermissions
-                                               .getInstance(globalResourcePermission))) {
+            .hasResourceCreatePermissions(accessorResource,
+                                          resourceClassName,
+                                          accessorDomainName,
+                                          ResourceCreatePermissions
+                                                .getInstance(globalResourcePermission))) {
          fail("checking resource create permission for domain without *CREATE or post-create should have failed for authenticated resource");
       }
    }
@@ -710,34 +710,34 @@ public class TestAccessControl_hasResourceCreatePermission extends TestAccessCon
 
       // verify
       if (!accessControlContext
-            .hasResourceCreatePermission(accessorResource,
-                                         resourceClassName,
-                                         ResourceCreatePermissions
-                                               .getInstance(ResourcePermissions.getInstance(customPermissionName)))) {
+            .hasResourceCreatePermissions(accessorResource,
+                                          resourceClassName,
+                                          ResourceCreatePermissions
+                                                .getInstance(ResourcePermissions.getInstance(customPermissionName)))) {
          fail("checking implicit custom resource create permission when having super-user privileges should have succeeded for authenticated resource");
       }
       if (!accessControlContext
-            .hasResourceCreatePermission(accessorResource,
-                                         resourceClassName,
-                                         ResourceCreatePermissions
-                                               .getInstance(ResourcePermissions.getInstance(ResourcePermissions.INHERIT)))) {
+            .hasResourceCreatePermissions(accessorResource,
+                                          resourceClassName,
+                                          ResourceCreatePermissions
+                                                .getInstance(ResourcePermissions.getInstance(ResourcePermissions.INHERIT)))) {
          fail("checking implicit system resource create permission when having super-user privileges should have succeeded for authenticated resource");
       }
 
       if (!accessControlContext
-            .hasResourceCreatePermission(accessorResource,
-                                         resourceClassName,
-                                         accessorDomainName,
-                                         ResourceCreatePermissions
-                                               .getInstance(ResourcePermissions.getInstance(customPermissionName)))) {
+            .hasResourceCreatePermissions(accessorResource,
+                                          resourceClassName,
+                                          accessorDomainName,
+                                          ResourceCreatePermissions
+                                                .getInstance(ResourcePermissions.getInstance(customPermissionName)))) {
          fail("checking implicit custom resource create permission for domain when having super-user privileges should have succeeded for authenticated resource");
       }
       if (!accessControlContext
-            .hasResourceCreatePermission(accessorResource,
-                                         resourceClassName,
-                                         accessorDomainName,
-                                         ResourceCreatePermissions
-                                               .getInstance(ResourcePermissions.getInstance(ResourcePermissions.INHERIT)))) {
+            .hasResourceCreatePermissions(accessorResource,
+                                          resourceClassName,
+                                          accessorDomainName,
+                                          ResourceCreatePermissions
+                                                .getInstance(ResourcePermissions.getInstance(ResourcePermissions.INHERIT)))) {
          fail("checking implicit system resource create permission for domain when having super-user privileges should have succeeded for authenticated resource");
       }
    }
@@ -768,19 +768,19 @@ public class TestAccessControl_hasResourceCreatePermission extends TestAccessCon
 
       // verify
       if (!accessControlContext
-            .hasResourceCreatePermission(accessorResource,
-                                         resourceClassName,
-                                         ResourceCreatePermissions
-                                               .getInstance(ResourcePermissions.getInstance(customPermissionName)))) {
+            .hasResourceCreatePermissions(accessorResource,
+                                          resourceClassName,
+                                          ResourceCreatePermissions
+                                                .getInstance(ResourcePermissions.getInstance(customPermissionName)))) {
          fail("checking implicit custom resource create permission when inheriting super-user privileges should have succeeded for authenticated resource");
       }
 
       if (!accessControlContext
-            .hasResourceCreatePermission(accessorResource,
-                                         resourceClassName,
-                                         accessorDomainName,
-                                         ResourceCreatePermissions
-                                               .getInstance(ResourcePermissions.getInstance(customPermissionName)))) {
+            .hasResourceCreatePermissions(accessorResource,
+                                          resourceClassName,
+                                          accessorDomainName,
+                                          ResourceCreatePermissions
+                                                .getInstance(ResourcePermissions.getInstance(customPermissionName)))) {
          fail("checking implicit custom resource create permission for domain when inheriting super-user privileges should have succeeded for authenticated resource");
       }
    }
@@ -799,10 +799,10 @@ public class TestAccessControl_hasResourceCreatePermission extends TestAccessCon
       // verify
       try {
          accessControlContext
-               .hasResourceCreatePermission(SYS_RESOURCE,
-                                            resourceClassName,
-                                            ResourceCreatePermissions
-                                                  .getInstance(ResourcePermissions.getInstance(ResourcePermissions.RESET_CREDENTIALS)));
+               .hasResourceCreatePermissions(SYS_RESOURCE,
+                                             resourceClassName,
+                                             ResourceCreatePermissions
+                                                   .getInstance(ResourcePermissions.getInstance(ResourcePermissions.RESET_CREDENTIALS)));
          fail("checking implicit resource create permission invalid for resource class should have failed for system resource");
       }
       catch (IllegalArgumentException e) {
@@ -810,10 +810,10 @@ public class TestAccessControl_hasResourceCreatePermission extends TestAccessCon
       }
       try {
          accessControlContext
-               .hasResourceCreatePermission(SYS_RESOURCE,
-                                            resourceClassName,
-                                            ResourceCreatePermissions
-                                                  .getInstance(ResourcePermissions.getInstance(ResourcePermissions.IMPERSONATE)));
+               .hasResourceCreatePermissions(SYS_RESOURCE,
+                                             resourceClassName,
+                                             ResourceCreatePermissions
+                                                   .getInstance(ResourcePermissions.getInstance(ResourcePermissions.IMPERSONATE)));
          fail("checking implicit resource create permission invalid for resource class should have failed for system resource");
       }
       catch (IllegalArgumentException e) {
@@ -827,11 +827,11 @@ public class TestAccessControl_hasResourceCreatePermission extends TestAccessCon
 
       try {
          accessControlContext
-               .hasResourceCreatePermission(SYS_RESOURCE,
-                                            resourceClassName,
-                                            domainName,
-                                            ResourceCreatePermissions
-                                                  .getInstance(ResourcePermissions.getInstance(ResourcePermissions.RESET_CREDENTIALS)));
+               .hasResourceCreatePermissions(SYS_RESOURCE,
+                                             resourceClassName,
+                                             domainName,
+                                             ResourceCreatePermissions
+                                                   .getInstance(ResourcePermissions.getInstance(ResourcePermissions.RESET_CREDENTIALS)));
          fail("checking implicit resource create permission invalid for resource class should have failed for system resource");
       }
       catch (IllegalArgumentException e) {
@@ -839,11 +839,11 @@ public class TestAccessControl_hasResourceCreatePermission extends TestAccessCon
       }
       try {
          accessControlContext
-               .hasResourceCreatePermission(SYS_RESOURCE,
-                                            resourceClassName,
-                                            domainName,
-                                            ResourceCreatePermissions
-                                                  .getInstance(ResourcePermissions.getInstance(ResourcePermissions.IMPERSONATE)));
+               .hasResourceCreatePermissions(SYS_RESOURCE,
+                                             resourceClassName,
+                                             domainName,
+                                             ResourceCreatePermissions
+                                                   .getInstance(ResourcePermissions.getInstance(ResourcePermissions.IMPERSONATE)));
          fail("checking implicit resource create permission invalid for resource class should have failed for system resource");
       }
       catch (IllegalArgumentException e) {
@@ -867,10 +867,10 @@ public class TestAccessControl_hasResourceCreatePermission extends TestAccessCon
       // verify
 
       if (!accessControlContext
-            .hasResourceCreatePermission(SYS_RESOURCE,
-                                         resourceClassName_whitespaced,
-                                         ResourceCreatePermissions
-                                               .getInstance(ResourcePermissions.getInstance(customPermissionName)))) {
+            .hasResourceCreatePermissions(SYS_RESOURCE,
+                                          resourceClassName_whitespaced,
+                                          ResourceCreatePermissions
+                                                .getInstance(ResourcePermissions.getInstance(customPermissionName)))) {
          fail("checking implicit resource create permission for whitespaced resource class name should have succeeded for system resource");
       }
 
@@ -881,11 +881,11 @@ public class TestAccessControl_hasResourceCreatePermission extends TestAccessCon
       assertThat(allResourceCreatePermissionsForResourceClassAndDomain.isEmpty(), is(true));
 
       if (!accessControlContext
-            .hasResourceCreatePermission(SYS_RESOURCE,
-                                         resourceClassName_whitespaced,
-                                         domainName_whitespaced,
-                                         ResourceCreatePermissions
-                                               .getInstance(ResourcePermissions.getInstance(customPermissionName)))) {
+            .hasResourceCreatePermissions(SYS_RESOURCE,
+                                          resourceClassName_whitespaced,
+                                          domainName_whitespaced,
+                                          ResourceCreatePermissions
+                                                .getInstance(ResourcePermissions.getInstance(customPermissionName)))) {
          fail("checking implicit resource create permission for domain for whitespaced resource class and domain name should have succeeded for system resource");
       }
    }
@@ -913,19 +913,19 @@ public class TestAccessControl_hasResourceCreatePermission extends TestAccessCon
 
       // verify
       if (!accessControlContext
-            .hasResourceCreatePermission(accessorResource,
-                                         resourceClassName_whitespaced,
-                                         ResourceCreatePermissions
-                                               .getInstance(ResourcePermissions.getInstance(customPermissionName_forAccessorDomain)))) {
+            .hasResourceCreatePermissions(accessorResource,
+                                          resourceClassName_whitespaced,
+                                          ResourceCreatePermissions
+                                                .getInstance(ResourcePermissions.getInstance(customPermissionName_forAccessorDomain)))) {
          fail("checking resource create permission for whitespaced resource class and domain name should have succeeded for authenticated resource");
       }
       if (!accessControlContext
-            .hasResourceCreatePermission(accessorResource,
-                                         resourceClassName_whitespaced,
-                                         accessedDomainName_whitespaced,
-                                         ResourceCreatePermissions
-                                               .getInstance(ResourcePermissions.getInstance(
-                                                     customPermissionName_forAccessedDomain)))) {
+            .hasResourceCreatePermissions(accessorResource,
+                                          resourceClassName_whitespaced,
+                                          accessedDomainName_whitespaced,
+                                          ResourceCreatePermissions
+                                                .getInstance(ResourcePermissions.getInstance(
+                                                      customPermissionName_forAccessedDomain)))) {
          fail("checking resource create permission for domain for whitespaced resource class and domain name should have succeeded for authenticated resource");
       }
    }
@@ -939,10 +939,10 @@ public class TestAccessControl_hasResourceCreatePermission extends TestAccessCon
 
       try {
          accessControlContext
-               .hasResourceCreatePermission(null,
-                                            resourceClassName,
-                                            ResourceCreatePermissions
-                                                  .getInstance(ResourcePermissions.getInstance(customPermissionName)));
+               .hasResourceCreatePermissions(null,
+                                             resourceClassName,
+                                             ResourceCreatePermissions
+                                                   .getInstance(ResourcePermissions.getInstance(customPermissionName)));
          fail("checking resource create permission for null accessor resource reference should have failed for system resource");
       }
       catch (NullPointerException e) {
@@ -950,19 +950,19 @@ public class TestAccessControl_hasResourceCreatePermission extends TestAccessCon
       }
       try {
          accessControlContext
-               .hasResourceCreatePermission(SYS_RESOURCE,
-                                            null,
-                                            ResourceCreatePermissions
-                                                  .getInstance(ResourcePermissions.getInstance(customPermissionName)));
+               .hasResourceCreatePermissions(SYS_RESOURCE,
+                                             null,
+                                             ResourceCreatePermissions
+                                                   .getInstance(ResourcePermissions.getInstance(customPermissionName)));
          fail("checking resource create permission for null resource class reference should have failed for system resource");
       }
       catch (NullPointerException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("resource class required"));
       }
       try {
-         accessControlContext.hasResourceCreatePermission(SYS_RESOURCE,
-                                                          resourceClassName,
-                                                          null);
+         accessControlContext.hasResourceCreatePermissions(SYS_RESOURCE,
+                                                           resourceClassName,
+                                                           null);
          fail("checking resource create permission for null resource permission reference should have failed for system resource");
       }
       catch (NullPointerException e) {
@@ -972,11 +972,11 @@ public class TestAccessControl_hasResourceCreatePermission extends TestAccessCon
       final String domainName = generateDomain();
       try {
          accessControlContext
-               .hasResourceCreatePermission(null,
-                                            resourceClassName,
-                                            domainName,
-                                            ResourceCreatePermissions
-                                                  .getInstance(ResourcePermissions.getInstance(customPermissionName)));
+               .hasResourceCreatePermissions(null,
+                                             resourceClassName,
+                                             domainName,
+                                             ResourceCreatePermissions
+                                                   .getInstance(ResourcePermissions.getInstance(customPermissionName)));
          fail("checking resource create permission (by domain) for null accessor resource reference should have failed for system resource");
       }
       catch (NullPointerException e) {
@@ -984,21 +984,21 @@ public class TestAccessControl_hasResourceCreatePermission extends TestAccessCon
       }
       try {
          accessControlContext
-               .hasResourceCreatePermission(SYS_RESOURCE,
-                                            null,
-                                            domainName,
-                                            ResourceCreatePermissions
-                                                  .getInstance(ResourcePermissions.getInstance(customPermissionName)));
+               .hasResourceCreatePermissions(SYS_RESOURCE,
+                                             null,
+                                             domainName,
+                                             ResourceCreatePermissions
+                                                   .getInstance(ResourcePermissions.getInstance(customPermissionName)));
          fail("checking resource create permission (by domain) for null resource class reference should have failed for system resource");
       }
       catch (NullPointerException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("resource class required"));
       }
       try {
-         accessControlContext.hasResourceCreatePermission(SYS_RESOURCE,
-                                                          resourceClassName,
-                                                          domainName,
-                                                          null);
+         accessControlContext.hasResourceCreatePermissions(SYS_RESOURCE,
+                                                           resourceClassName,
+                                                           domainName,
+                                                           null);
          fail("checking resource create permission (by domain) for null resource permission reference should have failed for system resource");
       }
       catch (NullPointerException e) {
@@ -1006,11 +1006,11 @@ public class TestAccessControl_hasResourceCreatePermission extends TestAccessCon
       }
       try {
          accessControlContext
-               .hasResourceCreatePermission(SYS_RESOURCE,
-                                            resourceClassName,
-                                            null,
-                                            ResourceCreatePermissions
-                                                  .getInstance(ResourcePermissions.getInstance(customPermissionName)));
+               .hasResourceCreatePermissions(SYS_RESOURCE,
+                                             resourceClassName,
+                                             null,
+                                             ResourceCreatePermissions
+                                                   .getInstance(ResourcePermissions.getInstance(customPermissionName)));
          fail("checking resource create permission (by domain) for null domain reference should have failed for system resource");
       }
       catch (NullPointerException e) {
@@ -1026,17 +1026,17 @@ public class TestAccessControl_hasResourceCreatePermission extends TestAccessCon
       final String customPermissionName = generateResourceClassPermission(resourceClassName);
 
       if (accessControlContext
-            .hasResourceCreatePermission(Resources.getInstance(-999L),
-                                         resourceClassName,
-                                         ResourceCreatePermissions.getInstance(ResourcePermissions.getInstance(customPermissionName)))) {
+            .hasResourceCreatePermissions(Resources.getInstance(-999L),
+                                          resourceClassName,
+                                          ResourceCreatePermissions.getInstance(ResourcePermissions.getInstance(customPermissionName)))) {
          fail("checking resource create permission for invalid accessor resource reference should have failed for system resource");
       }
 
       try {
          accessControlContext
-               .hasResourceCreatePermission(SYS_RESOURCE,
-                                            "invalid_resource_class",
-                                            ResourceCreatePermissions.getInstance(ResourcePermissions.getInstance(customPermissionName)));
+               .hasResourceCreatePermissions(SYS_RESOURCE,
+                                             "invalid_resource_class",
+                                             ResourceCreatePermissions.getInstance(ResourcePermissions.getInstance(customPermissionName)));
          fail("checking resource create permission for invalid resource class reference should have failed for system resource");
       }
       catch (IllegalArgumentException e) {
@@ -1044,9 +1044,9 @@ public class TestAccessControl_hasResourceCreatePermission extends TestAccessCon
       }
       try {
          accessControlContext
-               .hasResourceCreatePermission(SYS_RESOURCE,
-                                            resourceClassName,
-                                            ResourceCreatePermissions.getInstance(ResourcePermissions.getInstance("invalid_permission")));
+               .hasResourceCreatePermissions(SYS_RESOURCE,
+                                             resourceClassName,
+                                             ResourceCreatePermissions.getInstance(ResourcePermissions.getInstance("invalid_permission")));
          fail("checking resource create permission for invalid resource permission reference should have failed for system resource");
       }
       catch (IllegalArgumentException e) {
@@ -1055,19 +1055,19 @@ public class TestAccessControl_hasResourceCreatePermission extends TestAccessCon
 
       final String domainName = generateDomain();
       if (accessControlContext
-            .hasResourceCreatePermission(Resources.getInstance(-999L),
-                                         resourceClassName,
-                                         domainName,
-                                         ResourceCreatePermissions.getInstance(ResourcePermissions.getInstance(customPermissionName)))) {
+            .hasResourceCreatePermissions(Resources.getInstance(-999L),
+                                          resourceClassName,
+                                          domainName,
+                                          ResourceCreatePermissions.getInstance(ResourcePermissions.getInstance(customPermissionName)))) {
          fail("checking resource create permission (by domain) for invalid accessor resource reference should have failed for system resource");
       }
 
       try {
          accessControlContext
-               .hasResourceCreatePermission(SYS_RESOURCE,
-                                            "invalid_resource_class",
-                                            domainName,
-                                            ResourceCreatePermissions.getInstance(ResourcePermissions.getInstance(customPermissionName)));
+               .hasResourceCreatePermissions(SYS_RESOURCE,
+                                             "invalid_resource_class",
+                                             domainName,
+                                             ResourceCreatePermissions.getInstance(ResourcePermissions.getInstance(customPermissionName)));
          fail("checking resource create permission (by domain) for invalid resource class reference should have failed for system resource");
       }
       catch (IllegalArgumentException e) {
@@ -1075,10 +1075,10 @@ public class TestAccessControl_hasResourceCreatePermission extends TestAccessCon
       }
       try {
          accessControlContext
-               .hasResourceCreatePermission(SYS_RESOURCE,
-                                            resourceClassName,
-                                            domainName,
-                                            ResourceCreatePermissions.getInstance(ResourcePermissions.getInstance("invalid_permission")));
+               .hasResourceCreatePermissions(SYS_RESOURCE,
+                                             resourceClassName,
+                                             domainName,
+                                             ResourceCreatePermissions.getInstance(ResourcePermissions.getInstance("invalid_permission")));
          fail("checking resource create permission (by domain) for invalid resource permission reference should have failed for system resource");
       }
       catch (IllegalArgumentException e) {
@@ -1086,10 +1086,10 @@ public class TestAccessControl_hasResourceCreatePermission extends TestAccessCon
       }
       try {
          accessControlContext
-               .hasResourceCreatePermission(SYS_RESOURCE,
-                                            resourceClassName,
-                                            "invalid_domain",
-                                            ResourceCreatePermissions.getInstance(ResourcePermissions.getInstance(customPermissionName)));
+               .hasResourceCreatePermissions(SYS_RESOURCE,
+                                             resourceClassName,
+                                             "invalid_domain",
+                                             ResourceCreatePermissions.getInstance(ResourcePermissions.getInstance(customPermissionName)));
          fail("checking resource create permission (by domain) for invalid domain reference should have failed for system resource");
       }
       catch (IllegalArgumentException e) {

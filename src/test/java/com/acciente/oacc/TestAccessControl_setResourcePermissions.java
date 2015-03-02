@@ -848,9 +848,9 @@ public class TestAccessControl_setResourcePermissions extends TestAccessControlB
                                                 accessorDomain,
                                                 setOf(DomainPermissions.getInstance(DomainPermissions.SUPER_USER)));
 
-      accessControlContext.assertDomainPermission(accessorResource,
-                                                  accessorDomain,
-                                                  DomainPermissions.getInstance(DomainPermissions.SUPER_USER));
+      accessControlContext.assertDomainPermissions(accessorResource,
+                                                   accessorDomain,
+                                                   DomainPermissions.getInstance(DomainPermissions.SUPER_USER));
 
       // grant resource create permissions to accessor resource, including INHERIT post-create permission
       final Set<ResourceCreatePermission> resourceCreatePermissions
@@ -862,10 +862,10 @@ public class TestAccessControl_setResourcePermissions extends TestAccessControlB
                                                         accessedDomain,
                                                         resourceCreatePermissions);
 
-      accessControlContext.assertPostCreateResourcePermission(accessorResource,
-                                                              accessedResourceClass,
-                                                              accessedDomain,
-                                                              ResourcePermissions.getInstance(ResourcePermissions.INHERIT));
+      accessControlContext.assertPostCreateResourcePermissions(accessorResource,
+                                                               accessedResourceClass,
+                                                               accessedDomain,
+                                                               ResourcePermissions.getInstance(ResourcePermissions.INHERIT));
 
       // authenticate as accessor resource
       accessControlContext.authenticate(accessorResource, accessorCredentials);
@@ -875,9 +875,9 @@ public class TestAccessControl_setResourcePermissions extends TestAccessControlB
                                                                             accessedDomain,
                                                                             PasswordCredentials.newInstance(generateUniquePassword()));
 
-      accessControlContext.assertResourcePermission(accessorResource,
-                                                    accessedResource,
-                                                    ResourcePermissions.getInstance(ResourcePermissions.INHERIT));
+      accessControlContext.assertResourcePermissions(accessorResource,
+                                                     accessedResource,
+                                                     ResourcePermissions.getInstance(ResourcePermissions.INHERIT));
 
       // attempt to grant to new resource inherit permission on accessor resource
       try {
@@ -916,10 +916,10 @@ public class TestAccessControl_setResourcePermissions extends TestAccessControlB
                                                         accessedDomain,
                                                         resourceCreatePermissions);
 
-      accessControlContext.assertPostCreateResourcePermission(accessorResource,
-                                                              accessedResourceClass,
-                                                              accessedDomain,
-                                                              ResourcePermissions.getInstance(ResourcePermissions.INHERIT));
+      accessControlContext.assertPostCreateResourcePermissions(accessorResource,
+                                                               accessedResourceClass,
+                                                               accessedDomain,
+                                                               ResourcePermissions.getInstance(ResourcePermissions.INHERIT));
 
       // authenticate as accessor resource
       accessControlContext.authenticate(accessorResource, accessorCredentials);
@@ -929,9 +929,9 @@ public class TestAccessControl_setResourcePermissions extends TestAccessControlB
                                                                             accessedDomain,
                                                                             PasswordCredentials.newInstance(generateUniquePassword()));
 
-      accessControlContext.assertResourcePermission(accessorResource,
-                                                    accessedResource,
-                                                    ResourcePermissions.getInstance(ResourcePermissions.INHERIT));
+      accessControlContext.assertResourcePermissions(accessorResource,
+                                                     accessedResource,
+                                                     ResourcePermissions.getInstance(ResourcePermissions.INHERIT));
 
       // unauthenticate (so that sys resource will attempt to grant accessed --INHERIT-> accessor)
       accessControlContext.unauthenticate();

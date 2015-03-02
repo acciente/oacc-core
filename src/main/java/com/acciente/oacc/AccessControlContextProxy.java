@@ -63,143 +63,145 @@ public class AccessControlContextProxy implements AccessControlContext {
    }
 
    @Override
-   public void assertDomainPermission(Resource accessorResource,
-                                      String domainName,
-                                      DomainPermission domainPermission) {
-      accessControlContext.assertDomainPermission(accessorResource, domainName, domainPermission);
+   public void assertDomainPermissions(Resource accessorResource,
+                                       String domainName,
+                                       DomainPermission domainPermission) {
+      accessControlContext.assertDomainPermissions(accessorResource, domainName, domainPermission);
    }
 
    @Override
-   public boolean hasDomainPermission(Resource accessorResource,
-                                      String domainName,
-                                      DomainPermission domainPermission) {
-      return accessControlContext.hasDomainPermission(accessorResource, domainName, domainPermission);
+   public boolean hasDomainPermissions(Resource accessorResource,
+                                       String domainName,
+                                       DomainPermission domainPermission) {
+      return accessControlContext.hasDomainPermissions(accessorResource, domainName, domainPermission);
    }
 
    @Override
-   public void assertDomainCreatePermission(Resource accessorResource, DomainCreatePermission domainCreatePermission) {
-      accessControlContext.assertDomainCreatePermission(accessorResource, domainCreatePermission);
+   public void assertDomainCreatePermissions(Resource accessorResource,
+                                             DomainCreatePermission domainCreatePermission) {
+      accessControlContext.assertDomainCreatePermissions(accessorResource, domainCreatePermission);
    }
 
    @Override
-   public boolean hasDomainCreatePermission(Resource accessorResource, DomainCreatePermission domainCreatePermission) {
-      return accessControlContext.hasDomainCreatePermission(accessorResource, domainCreatePermission);
+   public boolean hasDomainCreatePermissions(Resource accessorResource,
+                                             DomainCreatePermission domainCreatePermission) {
+      return accessControlContext.hasDomainCreatePermissions(accessorResource, domainCreatePermission);
    }
 
    @Override
-   public void assertPostCreateDomainPermission(Resource accessorResource,
-                                                DomainPermission domainPermission) {
-      accessControlContext.assertPostCreateDomainPermission(accessorResource, domainPermission);
+   public void assertPostCreateDomainPermissions(Resource accessorResource,
+                                                 DomainPermission domainPermission) {
+      accessControlContext.assertPostCreateDomainPermissions(accessorResource, domainPermission);
    }
 
    @Override
-   public boolean hasPostCreateDomainPermission(Resource accessorResource, DomainPermission domainPermission) {
-      return accessControlContext.hasPostCreateDomainPermission(accessorResource, domainPermission);
+   public boolean hasPostCreateDomainPermissions(Resource accessorResource,
+                                                 DomainPermission domainPermission) {
+      return accessControlContext.hasPostCreateDomainPermissions(accessorResource, domainPermission);
    }
 
    @Override
-   public void assertGlobalResourcePermission(Resource accessorResource,
-                                              String resourceClassName,
-                                              ResourcePermission resourcePermission) {
-      accessControlContext.assertGlobalResourcePermission(accessorResource, resourceClassName, resourcePermission);
+   public void assertGlobalResourcePermissions(Resource accessorResource,
+                                               String resourceClassName,
+                                               ResourcePermission resourcePermission) {
+      accessControlContext.assertGlobalResourcePermissions(accessorResource, resourceClassName, resourcePermission);
    }
 
    @Override
-   public void assertGlobalResourcePermission(Resource accessorResource,
-                                              String resourceClassName,
-                                              String domainName,
-                                              ResourcePermission resourcePermission) {
-      accessControlContext.assertGlobalResourcePermission(accessorResource, resourceClassName, domainName, resourcePermission);
+   public void assertGlobalResourcePermissions(Resource accessorResource,
+                                               String resourceClassName,
+                                               String domainName,
+                                               ResourcePermission resourcePermission) {
+      accessControlContext.assertGlobalResourcePermissions(accessorResource, resourceClassName, domainName, resourcePermission);
    }
 
    @Override
-   public boolean hasGlobalResourcePermission(Resource accessorResource,
-                                              String resourceClassName,
-                                              ResourcePermission resourcePermission) {
-      return accessControlContext.hasGlobalResourcePermission(accessorResource, resourceClassName, resourcePermission);
+   public boolean hasGlobalResourcePermissions(Resource accessorResource,
+                                               String resourceClassName,
+                                               ResourcePermission resourcePermission) {
+      return accessControlContext.hasGlobalResourcePermissions(accessorResource, resourceClassName, resourcePermission);
    }
 
    @Override
-   public boolean hasGlobalResourcePermission(Resource accessorResource,
-                                              String resourceClassName,
-                                              String domainName,
-                                              ResourcePermission resourcePermission) {
-      return accessControlContext.hasGlobalResourcePermission(accessorResource, resourceClassName, domainName, resourcePermission);
+   public boolean hasGlobalResourcePermissions(Resource accessorResource,
+                                               String resourceClassName,
+                                               String domainName,
+                                               ResourcePermission resourcePermission) {
+      return accessControlContext.hasGlobalResourcePermissions(accessorResource, resourceClassName, domainName, resourcePermission);
    }
 
    @Override
-   public void assertResourcePermission(Resource accessorResource,
-                                        Resource accessedResource,
-                                        ResourcePermission resourcePermission) {
-      accessControlContext.assertResourcePermission(accessorResource, accessedResource, resourcePermission);
+   public void assertResourcePermissions(Resource accessorResource,
+                                         Resource accessedResource,
+                                         ResourcePermission resourcePermission) {
+      accessControlContext.assertResourcePermissions(accessorResource, accessedResource, resourcePermission);
    }
 
    @Override
-   public boolean hasResourcePermission(Resource accessorResource,
-                                        Resource accessedResource,
-                                        ResourcePermission resourcePermission) {
-      return accessControlContext.hasResourcePermission(accessorResource, accessedResource, resourcePermission);
+   public boolean hasResourcePermissions(Resource accessorResource,
+                                         Resource accessedResource,
+                                         ResourcePermission resourcePermission) {
+      return accessControlContext.hasResourcePermissions(accessorResource, accessedResource, resourcePermission);
    }
 
    @Override
-   public void assertResourceCreatePermission(Resource accessorResource,
-                                              String resourceClassName,
-                                              ResourceCreatePermission resourceCreatePermission) {
-      accessControlContext.assertResourceCreatePermission(accessorResource, resourceClassName, resourceCreatePermission);
+   public void assertResourceCreatePermissions(Resource accessorResource,
+                                               String resourceClassName,
+                                               ResourceCreatePermission resourceCreatePermission) {
+      accessControlContext.assertResourceCreatePermissions(accessorResource, resourceClassName, resourceCreatePermission);
    }
 
    @Override
-   public void assertResourceCreatePermission(Resource accessorResource,
-                                              String resourceClassName,
-                                              String domainName,
-                                              ResourceCreatePermission resourceCreatePermission) {
-      accessControlContext.assertResourceCreatePermission(accessorResource, resourceClassName, domainName, resourceCreatePermission);
+   public void assertResourceCreatePermissions(Resource accessorResource,
+                                               String resourceClassName,
+                                               String domainName,
+                                               ResourceCreatePermission resourceCreatePermission) {
+      accessControlContext.assertResourceCreatePermissions(accessorResource, resourceClassName, domainName, resourceCreatePermission);
    }
 
    @Override
-   public boolean hasResourceCreatePermission(Resource accessorResource,
-                                              String resourceClassName,
-                                              ResourceCreatePermission resourceCreatePermission) {
-      return accessControlContext.hasResourceCreatePermission(accessorResource, resourceClassName, resourceCreatePermission);
+   public boolean hasResourceCreatePermissions(Resource accessorResource,
+                                               String resourceClassName,
+                                               ResourceCreatePermission resourceCreatePermission) {
+      return accessControlContext.hasResourceCreatePermissions(accessorResource, resourceClassName, resourceCreatePermission);
    }
 
    @Override
-   public boolean hasResourceCreatePermission(Resource accessorResource,
-                                              String resourceClassName,
-                                              String domainName,
-                                              ResourceCreatePermission resourceCreatePermission) {
-      return accessControlContext.hasResourceCreatePermission(accessorResource, resourceClassName, domainName, resourceCreatePermission);
+   public boolean hasResourceCreatePermissions(Resource accessorResource,
+                                               String resourceClassName,
+                                               String domainName,
+                                               ResourceCreatePermission resourceCreatePermission) {
+      return accessControlContext.hasResourceCreatePermissions(accessorResource, resourceClassName, domainName, resourceCreatePermission);
    }
 
    @Override
-   public void assertPostCreateResourcePermission(Resource accessorResource,
-                                                  String resourceClassName,
-                                                  ResourcePermission resourcePermission) {
-      accessControlContext.assertPostCreateResourcePermission(accessorResource, resourceClassName, resourcePermission);
+   public void assertPostCreateResourcePermissions(Resource accessorResource,
+                                                   String resourceClassName,
+                                                   ResourcePermission resourcePermission) {
+      accessControlContext.assertPostCreateResourcePermissions(accessorResource, resourceClassName, resourcePermission);
    }
 
    @Override
-   public void assertPostCreateResourcePermission(Resource accessorResource,
-                                                  String resourceClassName,
-                                                  String domainName,
-                                                  ResourcePermission resourcePermission) {
-      accessControlContext.assertPostCreateResourcePermission(accessorResource, resourceClassName, domainName, resourcePermission);
+   public void assertPostCreateResourcePermissions(Resource accessorResource,
+                                                   String resourceClassName,
+                                                   String domainName,
+                                                   ResourcePermission resourcePermission) {
+      accessControlContext.assertPostCreateResourcePermissions(accessorResource, resourceClassName, domainName, resourcePermission);
    }
 
    @Override
-   public boolean hasPostCreateResourcePermission(Resource accessorResource,
-                                                  String resourceClassName,
-                                                  ResourcePermission resourcePermission) {
-      return accessControlContext.hasPostCreateResourcePermission(accessorResource, resourceClassName, resourcePermission);
+   public boolean hasPostCreateResourcePermissions(Resource accessorResource,
+                                                   String resourceClassName,
+                                                   ResourcePermission resourcePermission) {
+      return accessControlContext.hasPostCreateResourcePermissions(accessorResource, resourceClassName, resourcePermission);
    }
 
    @Override
-   public boolean hasPostCreateResourcePermission(Resource accessorResource,
-                                                  String resourceClassName,
-                                                  String domainName,
-                                                  ResourcePermission resourcePermission) {
-      return accessControlContext.hasPostCreateResourcePermission(accessorResource, resourceClassName, domainName, resourcePermission);
-   }
+   public boolean hasPostCreateResourcePermissions(Resource accessorResource,
+                                                   String resourceClassName,
+                                                   String domainName,
+                                                   ResourcePermission resourcePermission) {
+      return accessControlContext.hasPostCreateResourcePermissions(accessorResource, resourceClassName, domainName, resourcePermission); }
 
    @Override
    public String getDomainNameByResource(Resource resource) {
