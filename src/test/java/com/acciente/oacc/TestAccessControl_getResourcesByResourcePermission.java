@@ -578,16 +578,16 @@ public class TestAccessControl_getResourcesByResourcePermission extends TestAcce
       // set global permission for accessor
       accessControlContext.setGlobalResourcePermissions(accessorResource,
                                                         queriedResourceClass,
-                                                        setOf(ResourcePermissions.getInstance(queriedPermission)),
-                                                        queriedDomain);
+                                                        queriedDomain,
+                                                        setOf(ResourcePermissions.getInstance(queriedPermission)));
       accessControlContext.setGlobalResourcePermissions(accessorResource,
                                                         queriedResourceClass,
-                                                        setOf(ResourcePermissions.getInstance(queriedPermission)),
-                                                        unqueriedDomain);
+                                                        unqueriedDomain,
+                                                        setOf(ResourcePermissions.getInstance(queriedPermission)));
       accessControlContext.setGlobalResourcePermissions(accessorResource,
                                                         unqueriedResourceClass,
-                                                        setOf(ResourcePermissions.getInstance(unqueriedResourceClassPermissionName)),
-                                                        queriedDomain);
+                                                        queriedDomain,
+                                                        setOf(ResourcePermissions.getInstance(unqueriedResourceClassPermissionName)));
 
       // verify as system resource
       final Set<Resource> expectedResources_anyDomain = setOf(resource_queriedClassQueriedDomain,
@@ -659,16 +659,16 @@ public class TestAccessControl_getResourcesByResourcePermission extends TestAcce
       // set global permission for accessor
       accessControlContext.setGlobalResourcePermissions(accessorResource,
                                                         queriedResourceClass,
-                                                        setOf(ResourcePermissions.getInstance(queriedPermission)),
-                                                        parentDomain);
+                                                        parentDomain,
+                                                        setOf(ResourcePermissions.getInstance(queriedPermission)));
       accessControlContext.setGlobalResourcePermissions(accessorResource,
                                                         queriedResourceClass,
-                                                        setOf(ResourcePermissions.getInstance(unqueriedPermissionName)),
-                                                        childDomain2);
+                                                        childDomain2,
+                                                        setOf(ResourcePermissions.getInstance(unqueriedPermissionName)));
       accessControlContext.setGlobalResourcePermissions(accessorResource,
                                                         unqueriedResourceClass,
-                                                        setOf(ResourcePermissions.getInstance(unqueriedPermissionName)),
-                                                        childDomain1);
+                                                        childDomain1,
+                                                        setOf(ResourcePermissions.getInstance(unqueriedPermissionName)));
 
       // verify as system resource
       final Set<Resource> expectedResources_anyDomain = setOf(resource_parentDomain,

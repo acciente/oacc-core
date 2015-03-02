@@ -204,8 +204,8 @@ public class TestAccessControl_hasResourcePermission extends TestAccessControlBa
       final ResourcePermission customPermission = ResourcePermissions.getInstance(customPermissionName);
       accessControlContext.setGlobalResourcePermissions(accessorResource,
                                                         accessedResourceClassName,
-                                                        setOf(customPermission),
-                                                        parentDomainName);
+                                                        parentDomainName,
+                                                        setOf(customPermission));
 
       // authenticate accessor resource
       accessControlContext.authenticate(accessorResource, PasswordCredentials.newInstance(password));
@@ -238,8 +238,8 @@ public class TestAccessControl_hasResourcePermission extends TestAccessControlBa
       final ResourcePermission customPermission = ResourcePermissions.getInstance(customPermissionName);
       accessControlContext.setGlobalResourcePermissions(donorResource,
                                                         accessedResourceClassName,
-                                                        setOf(customPermission),
-                                                        parentDomainName);
+                                                        parentDomainName,
+                                                        setOf(customPermission));
 
       // setup accessor --INHERIT-> donor
       accessControlContext.setResourcePermissions(accessorResource,

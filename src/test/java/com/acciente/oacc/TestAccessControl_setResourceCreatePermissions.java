@@ -57,8 +57,8 @@ public class TestAccessControl_setResourceCreatePermissions extends TestAccessCo
       // set create permissions and verify
       accessControlContext.setResourceCreatePermissions(accessorResource,
                                                         resourceClassName,
-                                                        resourceCreatePermissions_pre,
-                                                        domainName);
+                                                        domainName,
+                                                        resourceCreatePermissions_pre);
 
       final Set<ResourceCreatePermission> resourceCreatePermissions_post
             = accessControlContext.getEffectiveResourceCreatePermissions(accessorResource, resourceClassName, domainName);
@@ -89,7 +89,7 @@ public class TestAccessControl_setResourceCreatePermissions extends TestAccessCo
 
       final String domainName = generateDomain();
       try {
-         accessControlContext.setResourceCreatePermissions(accessorResource, resourceClassName, permissions_pre, domainName);
+         accessControlContext.setResourceCreatePermissions(accessorResource, resourceClassName, domainName, permissions_pre);
          fail("granting *RESET_CREDENTIALS system permission as a create permission on an unauthenticatable resource class should have failed");
       }
       catch (IllegalArgumentException e) {
@@ -120,7 +120,7 @@ public class TestAccessControl_setResourceCreatePermissions extends TestAccessCo
 
       final String domainName = generateDomain();
       try {
-         accessControlContext.setResourceCreatePermissions(accessorResource, resourceClassName, permissions_pre, domainName);
+         accessControlContext.setResourceCreatePermissions(accessorResource, resourceClassName, domainName, permissions_pre);
          fail("granting *IMPERSONATE system permission as a create permission on an unauthenticatable resource class should have failed");
       }
       catch (IllegalArgumentException e) {
@@ -150,8 +150,8 @@ public class TestAccessControl_setResourceCreatePermissions extends TestAccessCo
 
       accessControlContext.setResourceCreatePermissions(grantorResource,
                                                         resourceClassName,
-                                                        grantorPermissions,
-                                                        domainName);
+                                                        domainName,
+                                                        grantorPermissions);
       assertThat(accessControlContext.getEffectiveResourceCreatePermissions(grantorResource, resourceClassName, domainName),
                  is(grantorPermissions));
 
@@ -169,8 +169,8 @@ public class TestAccessControl_setResourceCreatePermissions extends TestAccessCo
       // set create permissions and verify
       accessControlContext.setResourceCreatePermissions(accessorResource,
                                                         resourceClassName,
-                                                        resourceCreatePermissions_pre,
-                                                        domainName);
+                                                        domainName,
+                                                        resourceCreatePermissions_pre);
 
       final Set<ResourceCreatePermission> resourceCreatePermissions_post
             = accessControlContext.getEffectiveResourceCreatePermissions(accessorResource, resourceClassName, domainName);
@@ -199,8 +199,8 @@ public class TestAccessControl_setResourceCreatePermissions extends TestAccessCo
 
       accessControlContext.setResourceCreatePermissions(grantorResource,
                                                         resourceClassName,
-                                                        grantorPermissions,
-                                                        domainName);
+                                                        domainName,
+                                                        grantorPermissions);
       assertThat(accessControlContext.getEffectiveResourceCreatePermissions(grantorResource, resourceClassName, domainName),
                  is(grantorPermissions));
 
@@ -254,8 +254,8 @@ public class TestAccessControl_setResourceCreatePermissions extends TestAccessCo
       // set create permissions and verify
       accessControlContext.setResourceCreatePermissions(accessorResource,
                                                         resourceClassName,
-                                                        resourceCreatePermissions_pre1,
-                                                        domainName);
+                                                        domainName,
+                                                        resourceCreatePermissions_pre1);
 
       final Set<ResourceCreatePermission> resourceCreatePermissions_post1
             = accessControlContext.getEffectiveResourceCreatePermissions(accessorResource, resourceClassName, domainName);
@@ -269,8 +269,8 @@ public class TestAccessControl_setResourceCreatePermissions extends TestAccessCo
 
       accessControlContext.setResourceCreatePermissions(accessorResource,
                                                         resourceClassName,
-                                                        resourceCreatePermissions_pre2,
-                                                        domainName);
+                                                        domainName,
+                                                        resourceCreatePermissions_pre2);
 
       final Set<ResourceCreatePermission> resourceCreatePermissions_post2
             = accessControlContext.getEffectiveResourceCreatePermissions(accessorResource, resourceClassName, domainName);
@@ -279,8 +279,8 @@ public class TestAccessControl_setResourceCreatePermissions extends TestAccessCo
       // reset create permissions to empty set (i.e. remove all) and verify
       accessControlContext.setResourceCreatePermissions(accessorResource,
                                                         resourceClassName,
-                                                        Collections.<ResourceCreatePermission>emptySet(),
-                                                        domainName);
+                                                        domainName,
+                                                        Collections.<ResourceCreatePermission>emptySet());
 
       final Set<ResourceCreatePermission> resourceCreatePermissions_post3
             = accessControlContext.getEffectiveResourceCreatePermissions(accessorResource, resourceClassName, domainName);
@@ -312,8 +312,8 @@ public class TestAccessControl_setResourceCreatePermissions extends TestAccessCo
       // set create permissions and verify
       accessControlContext.setResourceCreatePermissions(accessorResource,
                                                         resourceClassName_whitespaced,
-                                                        resourceCreatePermissions_pre,
-                                                        domainName_whitespaced);
+                                                        domainName_whitespaced,
+                                                        resourceCreatePermissions_pre);
 
       final Set<ResourceCreatePermission> resourceCreatePermissions_post
             = accessControlContext.getEffectiveResourceCreatePermissions(accessorResource, resourceClassName, domainName);
@@ -364,9 +364,8 @@ public class TestAccessControl_setResourceCreatePermissions extends TestAccessCo
          // set create permissions and verify
          accessControlContext.setResourceCreatePermissions(accessorResource,
                                                            resourceClassName,
-                                                           resourceCreatePermissions_pre,
-                                                           domainName
-         );
+                                                           domainName,
+                                                           resourceCreatePermissions_pre);
 
          final Set<ResourceCreatePermission> resourceCreatePermissions_post
                = accessControlContext.getEffectiveResourceCreatePermissions(accessorResource, resourceClassName, domainName);
@@ -386,9 +385,8 @@ public class TestAccessControl_setResourceCreatePermissions extends TestAccessCo
          try {
             accessControlContext.setResourceCreatePermissions(accessorResource,
                                                               resourceClassName,
-                                                              resourceCreatePermissions_pre,
-                                                              domainName
-            );
+                                                              domainName,
+                                                              resourceCreatePermissions_pre);
             fail("setting resource create permission with the name of an existing permission that differs in case only should have failed for case-insensitive databases");
          }
          catch (IllegalArgumentException e) {
@@ -414,7 +412,7 @@ public class TestAccessControl_setResourceCreatePermissions extends TestAccessCo
       accessorPermissions_pre.add(ResourceCreatePermissions.getInstance(ResourcePermissions.getInstance(
             ungrantedPermissionName)));
 
-      accessControlContext.setResourceCreatePermissions(accessorResource, resourceClassName, accessorPermissions_pre, domainName);
+      accessControlContext.setResourceCreatePermissions(accessorResource, resourceClassName, domainName, accessorPermissions_pre);
       assertThat(accessControlContext.getEffectiveResourceCreatePermissions(accessorResource, resourceClassName, domainName),
                  is(accessorPermissions_pre));
 
@@ -424,7 +422,7 @@ public class TestAccessControl_setResourceCreatePermissions extends TestAccessCo
       grantorPermissions.add(ResourceCreatePermissions.getInstance(ResourcePermissions.getInstance(grantedPermissionName),
                                                                    true));
 
-      accessControlContext.setResourceCreatePermissions(grantorResource, resourceClassName, grantorPermissions, domainName);
+      accessControlContext.setResourceCreatePermissions(grantorResource, resourceClassName, domainName, grantorPermissions);
       assertThat(accessControlContext.getEffectiveResourceCreatePermissions(grantorResource, resourceClassName, domainName),
                  is(grantorPermissions));
 
@@ -439,7 +437,7 @@ public class TestAccessControl_setResourceCreatePermissions extends TestAccessCo
       requestedPermissions.add(ResourceCreatePermissions.getInstance(ResourcePermissions.getInstance(
             ungrantedPermissionName)));
 
-      accessControlContext.setResourceCreatePermissions(accessorResource, resourceClassName, requestedPermissions, domainName);
+      accessControlContext.setResourceCreatePermissions(accessorResource, resourceClassName, domainName, requestedPermissions);
 
       Set<ResourceCreatePermission> permissions_expected = new HashSet<>();
       permissions_expected.add(ResourceCreatePermissions.getInstance(ResourceCreatePermissions.CREATE));
@@ -474,7 +472,7 @@ public class TestAccessControl_setResourceCreatePermissions extends TestAccessCo
       accessorPermissions_pre.add(ResourceCreatePermissions.getInstance(ResourcePermissions.getInstance(
             ungrantedPermissionName)));
 
-      accessControlContext.setResourceCreatePermissions(accessorResource, resourceClassName, accessorPermissions_pre, domainName);
+      accessControlContext.setResourceCreatePermissions(accessorResource, resourceClassName, domainName, accessorPermissions_pre);
       assertThat(accessControlContext.getEffectiveResourceCreatePermissions(accessorResource, resourceClassName, domainName),
                  is(accessorPermissions_pre));
 
@@ -485,7 +483,7 @@ public class TestAccessControl_setResourceCreatePermissions extends TestAccessCo
       grantorPermissions.add(ResourceCreatePermissions.getInstance(ResourcePermissions.getInstance(grantedPermissionName),
                                                                    true));
 
-      accessControlContext.setResourceCreatePermissions(grantorResource, resourceClassName, grantorPermissions, domainName);
+      accessControlContext.setResourceCreatePermissions(grantorResource, resourceClassName, domainName, grantorPermissions);
       assertThat(accessControlContext.getEffectiveResourceCreatePermissions(grantorResource, resourceClassName, domainName),
                  is(grantorPermissions));
 
@@ -498,7 +496,7 @@ public class TestAccessControl_setResourceCreatePermissions extends TestAccessCo
       requestedPermissions.add(ResourceCreatePermissions.getInstance(ResourcePermissions.getInstance(
             ungrantedPermissionName)));
 
-      accessControlContext.setResourceCreatePermissions(accessorResource, resourceClassName, requestedPermissions, domainName);
+      accessControlContext.setResourceCreatePermissions(accessorResource, resourceClassName, domainName, requestedPermissions);
 
       Set<ResourceCreatePermission> permissions_expected = new HashSet<>();
       permissions_expected.add(ResourceCreatePermissions.getInstance(ResourceCreatePermissions.CREATE));
@@ -527,7 +525,7 @@ public class TestAccessControl_setResourceCreatePermissions extends TestAccessCo
       accessorPermissions_pre.add(ResourceCreatePermissions.getInstance(ResourcePermissions.getInstance(
             grantedPermissionName), true));
 
-      accessControlContext.setResourceCreatePermissions(accessorResource, resourceClassName, accessorPermissions_pre, domainName);
+      accessControlContext.setResourceCreatePermissions(accessorResource, resourceClassName, domainName, accessorPermissions_pre);
       assertThat(accessControlContext.getEffectiveResourceCreatePermissions(accessorResource, resourceClassName, domainName),
                  is(accessorPermissions_pre));
 
@@ -537,7 +535,7 @@ public class TestAccessControl_setResourceCreatePermissions extends TestAccessCo
       grantorPermissions.add(ResourceCreatePermissions.getInstance(ResourcePermissions.getInstance(grantedPermissionName),
                                                                    true));
 
-      accessControlContext.setResourceCreatePermissions(grantorResource, resourceClassName, grantorPermissions, domainName);
+      accessControlContext.setResourceCreatePermissions(grantorResource, resourceClassName, domainName, grantorPermissions);
       assertThat(accessControlContext.getEffectiveResourceCreatePermissions(grantorResource, resourceClassName, domainName),
                  is(grantorPermissions));
 
@@ -550,7 +548,7 @@ public class TestAccessControl_setResourceCreatePermissions extends TestAccessCo
       requestedPermissions.add(ResourceCreatePermissions.getInstance(ResourcePermissions.getInstance(
             grantedPermissionName)));
 
-      accessControlContext.setResourceCreatePermissions(accessorResource, resourceClassName, requestedPermissions, domainName);
+      accessControlContext.setResourceCreatePermissions(accessorResource, resourceClassName, domainName, requestedPermissions);
 
       Set<ResourceCreatePermission> permissions_expected = new HashSet<>();
       permissions_expected.add(ResourceCreatePermissions.getInstance(ResourceCreatePermissions.CREATE));
@@ -579,7 +577,7 @@ public class TestAccessControl_setResourceCreatePermissions extends TestAccessCo
       accessorPermissions_pre.add(ResourceCreatePermissions.getInstance(ResourcePermissions.getInstance(
             ungrantedPermissionName), true));
 
-      accessControlContext.setResourceCreatePermissions(accessorResource, resourceClassName, accessorPermissions_pre, domainName);
+      accessControlContext.setResourceCreatePermissions(accessorResource, resourceClassName, domainName, accessorPermissions_pre);
       assertThat(accessControlContext.getEffectiveResourceCreatePermissions(accessorResource, resourceClassName, domainName),
                  is(accessorPermissions_pre));
 
@@ -589,7 +587,7 @@ public class TestAccessControl_setResourceCreatePermissions extends TestAccessCo
       grantorPermissions.add(ResourceCreatePermissions.getInstance(ResourcePermissions.getInstance(grantedPermissionName),
                                                                    true));
 
-      accessControlContext.setResourceCreatePermissions(grantorResource, resourceClassName, grantorPermissions, domainName);
+      accessControlContext.setResourceCreatePermissions(grantorResource, resourceClassName, domainName, grantorPermissions);
       assertThat(accessControlContext.getEffectiveResourceCreatePermissions(grantorResource, resourceClassName, domainName),
                  is(grantorPermissions));
 
@@ -605,7 +603,7 @@ public class TestAccessControl_setResourceCreatePermissions extends TestAccessCo
             ungrantedPermissionName)));
 
       try {
-         accessControlContext.setResourceCreatePermissions(accessorResource, resourceClassName, requestedPermissions, domainName);
+         accessControlContext.setResourceCreatePermissions(accessorResource, resourceClassName, domainName, requestedPermissions);
          fail("Downgrading (=removal of granting rights) of create-permission granted elsewhere, to which I have no granting rights, should have failed");
       }
       catch (NotAuthorizedException e) {
@@ -630,7 +628,7 @@ public class TestAccessControl_setResourceCreatePermissions extends TestAccessCo
       accessorPermissions_pre.add(ResourceCreatePermissions.getInstance(ResourcePermissions.getInstance(
             grantedPermissionName)));
 
-      accessControlContext.setResourceCreatePermissions(accessorResource, resourceClassName, accessorPermissions_pre, domainName);
+      accessControlContext.setResourceCreatePermissions(accessorResource, resourceClassName, domainName, accessorPermissions_pre);
       assertThat(accessControlContext.getEffectiveResourceCreatePermissions(accessorResource, resourceClassName, domainName),
                  is(accessorPermissions_pre));
 
@@ -640,7 +638,7 @@ public class TestAccessControl_setResourceCreatePermissions extends TestAccessCo
       grantorPermissions.add(ResourceCreatePermissions.getInstance(ResourcePermissions.getInstance(grantedPermissionName,
                                                                                                    true), true));
 
-      accessControlContext.setResourceCreatePermissions(grantorResource, resourceClassName, grantorPermissions, domainName);
+      accessControlContext.setResourceCreatePermissions(grantorResource, resourceClassName, domainName, grantorPermissions);
       assertThat(accessControlContext.getEffectiveResourceCreatePermissions(grantorResource, resourceClassName, domainName),
                  is(grantorPermissions));
 
@@ -654,7 +652,7 @@ public class TestAccessControl_setResourceCreatePermissions extends TestAccessCo
             grantedPermissionName,
             true)));
 
-      accessControlContext.setResourceCreatePermissions(accessorResource, resourceClassName, requestedPermissions, domainName);
+      accessControlContext.setResourceCreatePermissions(accessorResource, resourceClassName, domainName, requestedPermissions);
 
       Set<ResourceCreatePermission> permissions_expected = new HashSet<>();
       permissions_expected.add(ResourceCreatePermissions.getInstance(ResourceCreatePermissions.CREATE));
@@ -684,7 +682,7 @@ public class TestAccessControl_setResourceCreatePermissions extends TestAccessCo
       accessorPermissions_pre.add(ResourceCreatePermissions.getInstance(ResourcePermissions.getInstance(
             ungrantedPermissionName)));
 
-      accessControlContext.setResourceCreatePermissions(accessorResource, resourceClassName, accessorPermissions_pre, domainName);
+      accessControlContext.setResourceCreatePermissions(accessorResource, resourceClassName, domainName, accessorPermissions_pre);
       assertThat(accessControlContext.getEffectiveResourceCreatePermissions(accessorResource, resourceClassName, domainName),
                  is(accessorPermissions_pre));
 
@@ -694,7 +692,7 @@ public class TestAccessControl_setResourceCreatePermissions extends TestAccessCo
       grantorPermissions.add(ResourceCreatePermissions.getInstance(ResourcePermissions.getInstance(grantedPermissionName),
                                                                    true));
 
-      accessControlContext.setResourceCreatePermissions(grantorResource, resourceClassName, grantorPermissions, domainName);
+      accessControlContext.setResourceCreatePermissions(grantorResource, resourceClassName, domainName, grantorPermissions);
       assertThat(accessControlContext.getEffectiveResourceCreatePermissions(grantorResource, resourceClassName, domainName),
                  is(grantorPermissions));
 
@@ -710,7 +708,7 @@ public class TestAccessControl_setResourceCreatePermissions extends TestAccessCo
                                      .getInstance(ResourcePermissions.getInstance(ungrantedPermissionName, true)));
 
       try {
-         accessControlContext.setResourceCreatePermissions(accessorResource, resourceClassName, requestedPermissions, domainName);
+         accessControlContext.setResourceCreatePermissions(accessorResource, resourceClassName, domainName, requestedPermissions);
          fail("Upgrading (=addition of granting rights) of create-permission granted elsewhere, to which I have no granting rights, should have failed");
       }
       catch (NotAuthorizedException e) {
@@ -735,7 +733,7 @@ public class TestAccessControl_setResourceCreatePermissions extends TestAccessCo
       accessorPermissions_pre.add(ResourceCreatePermissions.getInstance(ResourcePermissions.getInstance(
             grantedPermissionName)));
 
-      accessControlContext.setResourceCreatePermissions(accessorResource, resourceClassName, accessorPermissions_pre, domainName);
+      accessControlContext.setResourceCreatePermissions(accessorResource, resourceClassName, domainName, accessorPermissions_pre);
       assertThat(accessControlContext.getEffectiveResourceCreatePermissions(accessorResource, resourceClassName, domainName),
                  is(accessorPermissions_pre));
 
@@ -745,7 +743,7 @@ public class TestAccessControl_setResourceCreatePermissions extends TestAccessCo
       grantorPermissions.add(ResourceCreatePermissions
                                    .getInstance(ResourcePermissions.getInstance(grantedPermissionName, true), true));
 
-      accessControlContext.setResourceCreatePermissions(grantorResource, resourceClassName, grantorPermissions, domainName);
+      accessControlContext.setResourceCreatePermissions(grantorResource, resourceClassName, domainName, grantorPermissions);
       assertThat(accessControlContext.getEffectiveResourceCreatePermissions(grantorResource, resourceClassName, domainName),
                  is(grantorPermissions));
 
@@ -759,7 +757,7 @@ public class TestAccessControl_setResourceCreatePermissions extends TestAccessCo
             grantedPermissionName,
             true)));
 
-      accessControlContext.setResourceCreatePermissions(accessorResource, resourceClassName, requestedPermissions, domainName);
+      accessControlContext.setResourceCreatePermissions(accessorResource, resourceClassName, domainName, requestedPermissions);
 
       Set<ResourceCreatePermission> permissions_expected = new HashSet<>();
       permissions_expected.add(ResourceCreatePermissions.getInstance(ResourceCreatePermissions.CREATE));
@@ -789,7 +787,7 @@ public class TestAccessControl_setResourceCreatePermissions extends TestAccessCo
             grantedPermissionName,
             true)));
 
-      accessControlContext.setResourceCreatePermissions(accessorResource, resourceClassName, accessorPermissions_pre, domainName);
+      accessControlContext.setResourceCreatePermissions(accessorResource, resourceClassName, domainName, accessorPermissions_pre);
       assertThat(accessControlContext.getEffectiveResourceCreatePermissions(accessorResource, resourceClassName, domainName),
                  is(accessorPermissions_pre));
 
@@ -799,7 +797,7 @@ public class TestAccessControl_setResourceCreatePermissions extends TestAccessCo
       grantorPermissions.add(ResourceCreatePermissions.getInstance(ResourcePermissions.getInstance(grantedPermissionName,
                                                                                                    true), true));
 
-      accessControlContext.setResourceCreatePermissions(grantorResource, resourceClassName, grantorPermissions, domainName);
+      accessControlContext.setResourceCreatePermissions(grantorResource, resourceClassName, domainName, grantorPermissions);
       assertThat(accessControlContext.getEffectiveResourceCreatePermissions(grantorResource, resourceClassName, domainName),
                  is(grantorPermissions));
 
@@ -812,7 +810,7 @@ public class TestAccessControl_setResourceCreatePermissions extends TestAccessCo
       requestedPermissions.add(ResourceCreatePermissions.getInstance(ResourcePermissions.getInstance(
             grantedPermissionName)));
 
-      accessControlContext.setResourceCreatePermissions(accessorResource, resourceClassName, requestedPermissions, domainName);
+      accessControlContext.setResourceCreatePermissions(accessorResource, resourceClassName, domainName, requestedPermissions);
 
       Set<ResourceCreatePermission> permissions_expected = new HashSet<>();
       permissions_expected.add(ResourceCreatePermissions.getInstance(ResourceCreatePermissions.CREATE));
@@ -840,7 +838,7 @@ public class TestAccessControl_setResourceCreatePermissions extends TestAccessCo
       accessorPermissions_pre.add(ResourceCreatePermissions.getInstance(ResourcePermissions.getInstance(
             grantedPermissionName)));
 
-      accessControlContext.setResourceCreatePermissions(accessorResource, resourceClassName, accessorPermissions_pre, domainName);
+      accessControlContext.setResourceCreatePermissions(accessorResource, resourceClassName, domainName, accessorPermissions_pre);
       assertThat(accessControlContext.getEffectiveResourceCreatePermissions(accessorResource, resourceClassName, domainName),
                  is(accessorPermissions_pre));
 
@@ -850,7 +848,7 @@ public class TestAccessControl_setResourceCreatePermissions extends TestAccessCo
       grantorPermissions.add(ResourceCreatePermissions
                                    .getInstance(ResourcePermissions.getInstance(grantedPermissionName), true));
 
-      accessControlContext.setResourceCreatePermissions(grantorResource, resourceClassName, grantorPermissions, domainName);
+      accessControlContext.setResourceCreatePermissions(grantorResource, resourceClassName, domainName, grantorPermissions);
       assertThat(accessControlContext.getEffectiveResourceCreatePermissions(grantorResource, resourceClassName, domainName),
                  is(grantorPermissions));
 
@@ -865,7 +863,7 @@ public class TestAccessControl_setResourceCreatePermissions extends TestAccessCo
             true)));
 
       try {
-         accessControlContext.setResourceCreatePermissions(accessorResource, resourceClassName, requestedPermissions, domainName);
+         accessControlContext.setResourceCreatePermissions(accessorResource, resourceClassName, domainName, requestedPermissions);
          fail("Upgrading (=addition of granting rights) a post-create permission, to which I have no post-create granting rights, should have failed");
       }
       catch (NotAuthorizedException e) {
@@ -890,7 +888,7 @@ public class TestAccessControl_setResourceCreatePermissions extends TestAccessCo
             grantedPermissionName,
             true)));
 
-      accessControlContext.setResourceCreatePermissions(accessorResource, resourceClassName, accessorPermissions_pre, domainName);
+      accessControlContext.setResourceCreatePermissions(accessorResource, resourceClassName, domainName, accessorPermissions_pre);
       assertThat(accessControlContext.getEffectiveResourceCreatePermissions(accessorResource, resourceClassName, domainName),
                  is(accessorPermissions_pre));
 
@@ -900,7 +898,7 @@ public class TestAccessControl_setResourceCreatePermissions extends TestAccessCo
       grantorPermissions.add(ResourceCreatePermissions.getInstance(ResourcePermissions.getInstance(grantedPermissionName),
                                                                    true));
 
-      accessControlContext.setResourceCreatePermissions(grantorResource, resourceClassName, grantorPermissions, domainName);
+      accessControlContext.setResourceCreatePermissions(grantorResource, resourceClassName, domainName, grantorPermissions);
       assertThat(accessControlContext.getEffectiveResourceCreatePermissions(grantorResource, resourceClassName, domainName),
                  is(grantorPermissions));
 
@@ -914,7 +912,7 @@ public class TestAccessControl_setResourceCreatePermissions extends TestAccessCo
             grantedPermissionName)));
 
       try {
-         accessControlContext.setResourceCreatePermissions(accessorResource, resourceClassName, requestedPermissions, domainName);
+         accessControlContext.setResourceCreatePermissions(accessorResource, resourceClassName, domainName, requestedPermissions);
          fail("Downgrading (=removal of granting rights) a post-create permission, to which I have no post-create granting rights, should have failed");
       }
       catch (NotAuthorizedException e) {
@@ -949,9 +947,8 @@ public class TestAccessControl_setResourceCreatePermissions extends TestAccessCo
       try {
          accessControlContext.setResourceCreatePermissions(accessorResource,
                                                            resourceClassName,
-                                                           resourceCreatePermissions_pre,
-                                                           domainName
-         );
+                                                           domainName,
+                                                           resourceCreatePermissions_pre);
          fail("setting create-permissions that include the same permission, but with different grant-options, should have failed");
       }
       catch (IllegalArgumentException e) {
@@ -978,9 +975,8 @@ public class TestAccessControl_setResourceCreatePermissions extends TestAccessCo
       try {
          accessControlContext.setResourceCreatePermissions(accessorResource,
                                                            resourceClassName,
-                                                           resourceCreatePermissions_pre,
-                                                           domainName
-         );
+                                                           domainName,
+                                                           resourceCreatePermissions_pre);
          fail("setting create-permissions without *CREATE system permission should have failed");
       }
       catch (IllegalArgumentException e) {
@@ -1023,8 +1019,8 @@ public class TestAccessControl_setResourceCreatePermissions extends TestAccessCo
       try {
          accessControlContext.setResourceCreatePermissions(null,
                                                            resourceClassName,
-                                                           resourceCreatePermissions_pre,
-                                                           domainName);
+                                                           domainName,
+                                                           resourceCreatePermissions_pre);
          fail("setting create-permissions with null accessor resource should have failed");
       }
       catch (NullPointerException e) {
@@ -1043,8 +1039,8 @@ public class TestAccessControl_setResourceCreatePermissions extends TestAccessCo
       try {
          accessControlContext.setResourceCreatePermissions(accessorResource,
                                                            null,
-                                                           resourceCreatePermissions_pre,
-                                                           domainName);
+                                                           domainName,
+                                                           resourceCreatePermissions_pre);
          fail("setting create-permissions with null resource class name should have failed");
       }
       catch (NullPointerException e) {
@@ -1063,8 +1059,8 @@ public class TestAccessControl_setResourceCreatePermissions extends TestAccessCo
       try {
          accessControlContext.setResourceCreatePermissions(accessorResource,
                                                            resourceClassName,
-                                                           null,
-                                                           domainName);
+                                                           domainName,
+                                                           null);
          fail("setting create-permissions with null permission set should have failed");
       }
       catch (NullPointerException e) {
@@ -1083,8 +1079,8 @@ public class TestAccessControl_setResourceCreatePermissions extends TestAccessCo
       try {
          accessControlContext.setResourceCreatePermissions(accessorResource,
                                                            resourceClassName,
-                                                           resourceCreatePermissions_nullElement,
-                                                           domainName);
+                                                           domainName,
+                                                           resourceCreatePermissions_nullElement);
          fail("setting create-permissions with null element in permission set should have failed");
       }
       catch (NullPointerException e) {
@@ -1094,9 +1090,8 @@ public class TestAccessControl_setResourceCreatePermissions extends TestAccessCo
       try {
          accessControlContext.setResourceCreatePermissions(accessorResource,
                                                            resourceClassName,
-                                                           resourceCreatePermissions_pre,
-                                                           null
-         );
+                                                           null,
+                                                           resourceCreatePermissions_pre);
          fail("setting create-permissions with null domain name should have failed");
       }
       catch (NullPointerException e) {
@@ -1130,9 +1125,8 @@ public class TestAccessControl_setResourceCreatePermissions extends TestAccessCo
       try {
          accessControlContext.setResourceCreatePermissions(Resources.getInstance(-999L),
                                                            resourceClassName,
-                                                           resourceCreatePermissions_valid,
-                                                           domainName
-         );
+                                                           domainName,
+                                                           resourceCreatePermissions_valid);
          fail("setting create-permissions with reference to non-existent accessor resource should have failed");
       }
       catch (IllegalArgumentException e) {
@@ -1141,9 +1135,8 @@ public class TestAccessControl_setResourceCreatePermissions extends TestAccessCo
       try {
          accessControlContext.setResourceCreatePermissions(accessorResource,
                                                            "invalid_resource_class",
-                                                           resourceCreatePermissions_valid,
-                                                           domainName
-         );
+                                                           domainName,
+                                                           resourceCreatePermissions_valid);
          fail("setting create-permissions with reference to non-existent resource class name should have failed");
       }
       catch (IllegalArgumentException e) {
@@ -1152,9 +1145,8 @@ public class TestAccessControl_setResourceCreatePermissions extends TestAccessCo
       try {
          accessControlContext.setResourceCreatePermissions(accessorResource,
                                                            resourceClassName,
-                                                           resourceCreatePermissions_valid,
-                                                           "invalid_resource_domain"
-         );
+                                                           "invalid_resource_domain",
+                                                           resourceCreatePermissions_valid);
          fail("setting create-permissions with reference to non-existent domain name should have failed");
       }
       catch (IllegalArgumentException e) {
@@ -1163,9 +1155,8 @@ public class TestAccessControl_setResourceCreatePermissions extends TestAccessCo
       try {
          accessControlContext.setResourceCreatePermissions(accessorResource,
                                                            resourceClassName,
-                                                           resourceCreatePermissions_invalid,
-                                                           domainName
-         );
+                                                           domainName,
+                                                           resourceCreatePermissions_invalid);
          fail("setting create-permissions with reference to non-existent permission name should have failed");
       }
       catch (IllegalArgumentException e) {
@@ -1197,9 +1188,8 @@ public class TestAccessControl_setResourceCreatePermissions extends TestAccessCo
 
       accessControlContext.setResourceCreatePermissions(grantorResource,
                                                         resourceClassName,
-                                                        grantorPermissions,
-                                                        domainName
-      );
+                                                        domainName,
+                                                        grantorPermissions);
       assertThat(accessControlContext.getEffectiveResourceCreatePermissions(grantorResource, resourceClassName, domainName),
                  is(grantorPermissions));
 
@@ -1218,9 +1208,8 @@ public class TestAccessControl_setResourceCreatePermissions extends TestAccessCo
       try {
          accessControlContext.setResourceCreatePermissions(accessorResource,
                                                            resourceClassName,
-                                                           resourceCreatePermissions_pre,
-                                                           domainName
-         );
+                                                           domainName,
+                                                           resourceCreatePermissions_pre);
          fail("setting create permissions without having rights to grant should have failed");
       }
       catch (NotAuthorizedException e) {

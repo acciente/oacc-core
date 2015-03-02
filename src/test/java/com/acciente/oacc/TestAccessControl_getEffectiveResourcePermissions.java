@@ -207,7 +207,7 @@ public class TestAccessControl_getEffectiveResourcePermissions extends TestAcces
       Set<ResourcePermission> globalResourcePermissions = new HashSet<>();
       globalResourcePermissions.add(ResourcePermissions.getInstance(directGlobalPermissionName));
 
-      accessControlContext.setGlobalResourcePermissions(accessorResource, resourceClassName, globalResourcePermissions, accessedDomain);
+      accessControlContext.setGlobalResourcePermissions(accessorResource, resourceClassName, accessedDomain, globalResourcePermissions);
       assertThat(accessControlContext.getEffectiveGlobalResourcePermissions(accessorResource, resourceClassName, accessedDomain), is(globalResourcePermissions));
 
       // verify
@@ -237,7 +237,7 @@ public class TestAccessControl_getEffectiveResourcePermissions extends TestAcces
       Set<ResourcePermission> domainInheritedGlobalResourcePermissions = new HashSet<>();
       domainInheritedGlobalResourcePermissions.add(ResourcePermissions.getInstance(domainInheritedGlobalPermissionName));
 
-      accessControlContext.setGlobalResourcePermissions(accessorResource, resourceClassName, domainInheritedGlobalResourcePermissions, parentDomain);
+      accessControlContext.setGlobalResourcePermissions(accessorResource, resourceClassName, parentDomain, domainInheritedGlobalResourcePermissions);
       assertThat(accessControlContext.getEffectiveGlobalResourcePermissions(accessorResource, resourceClassName, parentDomain), is(domainInheritedGlobalResourcePermissions));
 
       // verify
@@ -292,14 +292,14 @@ public class TestAccessControl_getEffectiveResourcePermissions extends TestAcces
       Set<ResourcePermission> globalResourcePermissions = new HashSet<>();
       globalResourcePermissions.add(ResourcePermissions.getInstance(directGlobalPermissionName));
 
-      accessControlContext.setGlobalResourcePermissions(accessorResource, resourceClassName, globalResourcePermissions, childDomain);
+      accessControlContext.setGlobalResourcePermissions(accessorResource, resourceClassName, childDomain, globalResourcePermissions);
       assertThat(accessControlContext.getEffectiveGlobalResourcePermissions(accessorResource, resourceClassName, childDomain), is(globalResourcePermissions));
 
       // setup domain-inherited global permissions
       Set<ResourcePermission> domainInheritedGlobalResourcePermissions = new HashSet<>();
       domainInheritedGlobalResourcePermissions.add(ResourcePermissions.getInstance(domainInheritedGlobalPermissionName));
 
-      accessControlContext.setGlobalResourcePermissions(accessorResource, resourceClassName, domainInheritedGlobalResourcePermissions, parentDomain);
+      accessControlContext.setGlobalResourcePermissions(accessorResource, resourceClassName, parentDomain, domainInheritedGlobalResourcePermissions);
       assertThat(accessControlContext.getEffectiveGlobalResourcePermissions(accessorResource, resourceClassName, parentDomain), is(domainInheritedGlobalResourcePermissions));
 
       // verify
@@ -355,14 +355,14 @@ public class TestAccessControl_getEffectiveResourcePermissions extends TestAcces
       Set<ResourcePermission> globalResourcePermissions = new HashSet<>();
       globalResourcePermissions.add(ResourcePermissions.getInstance(permissionName2));
 
-      accessControlContext.setGlobalResourcePermissions(accessorResource, resourceClassName, globalResourcePermissions, childDomain);
+      accessControlContext.setGlobalResourcePermissions(accessorResource, resourceClassName, childDomain, globalResourcePermissions);
       assertThat(accessControlContext.getEffectiveGlobalResourcePermissions(accessorResource, resourceClassName, childDomain), is(globalResourcePermissions));
 
       // setup domain-inherited global permissions
       Set<ResourcePermission> domainInheritedGlobalResourcePermissions = new HashSet<>();
       domainInheritedGlobalResourcePermissions.add(ResourcePermissions.getInstance(permissionName2, true));
 
-      accessControlContext.setGlobalResourcePermissions(accessorResource, resourceClassName, domainInheritedGlobalResourcePermissions, parentDomain);
+      accessControlContext.setGlobalResourcePermissions(accessorResource, resourceClassName, parentDomain, domainInheritedGlobalResourcePermissions);
       assertThat(accessControlContext.getEffectiveGlobalResourcePermissions(accessorResource, resourceClassName, parentDomain), is(domainInheritedGlobalResourcePermissions));
 
       // verify

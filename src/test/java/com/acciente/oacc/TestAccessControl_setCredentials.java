@@ -234,8 +234,8 @@ public class TestAccessControl_setCredentials extends TestAccessControlBase {
       // set up global permissions: accessor --RESET-CREDENTIALS-> {authenticatable class, authenticatable domain}
       accessControlContext.setGlobalResourcePermissions(accessorResource,
                                                         authenticatableResourceClassName,
-                                                        resetCredentialsPermissions,
-                                                        authenticatableDomainName);
+                                                        authenticatableDomainName,
+                                                        resetCredentialsPermissions);
 
       // authenticate and set credentials
       accessControlContext.authenticate(accessorResource, PasswordCredentials.newInstance(accessorPassword));
@@ -266,8 +266,8 @@ public class TestAccessControl_setCredentials extends TestAccessControlBase {
       // set up global permissions: accessor --RESET-CREDENTIALS-> {authenticatable class, parent domain}
       accessControlContext.setGlobalResourcePermissions(accessorResource,
                                                         authenticatableResourceClassName,
-                                                        resetCredentialsPermissions,
-                                                        parentDomainName);
+                                                        parentDomainName,
+                                                        resetCredentialsPermissions);
 
       // authenticate and set credentials
       accessControlContext.authenticate(accessorResource, PasswordCredentials.newInstance(accessorPassword));
@@ -296,8 +296,8 @@ public class TestAccessControl_setCredentials extends TestAccessControlBase {
       // set up global permissions: accessor --RESET-CREDENTIALS-> {authenticatable class, authenticatable domain}
       accessControlContext.setGlobalResourcePermissions(donorResource,
                                                         authenticatableResourceClassName,
-                                                        resetCredentialsPermissions,
-                                                        authenticatableDomainName);
+                                                        authenticatableDomainName,
+                                                        resetCredentialsPermissions);
 
       // set up inheritance : accessor --INHERIT-> donor
       accessControlContext.setResourcePermissions(accessorResource,

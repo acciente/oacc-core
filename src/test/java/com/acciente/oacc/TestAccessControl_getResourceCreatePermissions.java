@@ -97,9 +97,8 @@ public class TestAccessControl_getResourceCreatePermissions extends TestAccessCo
       // set create permissions on custom domain explicitly and verify
       accessControlContext.setResourceCreatePermissions(accessorResource,
                                                         resourceClassName,
-                                                        resourceCreatePermissions_pre1,
-                                                        domainName
-      );
+                                                        domainName,
+                                                        resourceCreatePermissions_pre1);
 
       final Set<ResourceCreatePermission> resourceCreatePermissions_post
             = accessControlContext.getResourceCreatePermissions(accessorResource, resourceClassName, domainName);
@@ -157,9 +156,8 @@ public class TestAccessControl_getResourceCreatePermissions extends TestAccessCo
       // set create permissions on custom domain explicitly and verify
       accessControlContext.setResourceCreatePermissions(accessorResource,
                                                         resourceClassName,
-                                                        resourceCreatePermissions_pre1,
-                                                        domainName
-      );
+                                                        domainName,
+                                                        resourceCreatePermissions_pre1);
 
       // create a new authenticatable 'session' resource
       final char[] password = generateUniquePassword();
@@ -175,9 +173,8 @@ public class TestAccessControl_getResourceCreatePermissions extends TestAccessCo
                                                                            createPerm_resetPwd);
       accessControlContext.setResourceCreatePermissions(accessorResource,
                                                         resourceClassName,
-                                                        resourceCreatePermissions_pre2,
-                                                        sessionDomainName
-      );
+                                                        sessionDomainName,
+                                                        resourceCreatePermissions_pre2);
 
       // authenticate the 'session' resource
       accessControlContext.authenticate(sessionResource, PasswordCredentials.newInstance(password));
@@ -235,9 +232,8 @@ public class TestAccessControl_getResourceCreatePermissions extends TestAccessCo
                                                                                 parentResourceCreatePermission_custom);
       accessControlContext.setResourceCreatePermissions(accessorResource,
                                                         resourceClassName,
-                                                        parentResourceCreatePermissions_pre,
-                                                        parentDomainName
-      );
+                                                        parentDomainName,
+                                                        parentResourceCreatePermissions_pre);
 
       // set create permissions on child domain
       Set<ResourceCreatePermission> childResourceCreatePermissions_pre = setOf(createPerm_create_withGrant,
@@ -245,9 +241,8 @@ public class TestAccessControl_getResourceCreatePermissions extends TestAccessCo
                                                                                createPerm_resetPwdGrantable_withGrant);
       accessControlContext.setResourceCreatePermissions(accessorResource,
                                                         resourceClassName,
-                                                        childResourceCreatePermissions_pre,
-                                                        childDomainName
-      );
+                                                        childDomainName,
+                                                        childResourceCreatePermissions_pre);
 
       // verify
       final Set<ResourceCreatePermission> parentResourceCreatePermissions_post
@@ -292,7 +287,7 @@ public class TestAccessControl_getResourceCreatePermissions extends TestAccessCo
       Set<ResourceCreatePermission> donorPermissions
             = setOf(ResourceCreatePermissions.getInstance(ResourceCreatePermissions.CREATE));
 
-      accessControlContext.setResourceCreatePermissions(donorResource, resourceClass, donorPermissions, domainName);
+      accessControlContext.setResourceCreatePermissions(donorResource, resourceClass, domainName, donorPermissions);
       assertThat(accessControlContext.getResourceCreatePermissions(donorResource, resourceClass, domainName),
                  is(donorPermissions));
 
@@ -300,7 +295,7 @@ public class TestAccessControl_getResourceCreatePermissions extends TestAccessCo
       Set<ResourceCreatePermission> accessorPermissions
             = setOf(ResourceCreatePermissions.getInstance(ResourceCreatePermissions.CREATE, true));
 
-      accessControlContext.setResourceCreatePermissions(accessorResource, resourceClass, accessorPermissions, domainName);
+      accessControlContext.setResourceCreatePermissions(accessorResource, resourceClass, domainName, accessorPermissions);
       assertThat(accessControlContext.getResourceCreatePermissions(accessorResource, resourceClass, domainName),
                  is(accessorPermissions));
 
@@ -344,7 +339,7 @@ public class TestAccessControl_getResourceCreatePermissions extends TestAccessCo
                                  .getInstance(ResourcePermissions.getInstance(donorPermissionName_resetCredentials, false),
                                               false));
 
-      accessControlContext.setResourceCreatePermissions(donorResource, resourceClass, donorPermissions, domainName);
+      accessControlContext.setResourceCreatePermissions(donorResource, resourceClass, domainName, donorPermissions);
       assertThat(accessControlContext.getResourceCreatePermissions(donorResource, resourceClass, domainName),
                  is(donorPermissions));
 
@@ -358,7 +353,7 @@ public class TestAccessControl_getResourceCreatePermissions extends TestAccessCo
                                     .getInstance(ResourcePermissions.getInstance(accessorPermissionName_resetCredentials, true),
                                                  true));
 
-      accessControlContext.setResourceCreatePermissions(accessorResource, resourceClass, accessorPermissions, domainName);
+      accessControlContext.setResourceCreatePermissions(accessorResource, resourceClass, domainName, accessorPermissions);
       assertThat(accessControlContext.getResourceCreatePermissions(accessorResource, resourceClass, domainName),
                  is(accessorPermissions));
 
@@ -408,9 +403,8 @@ public class TestAccessControl_getResourceCreatePermissions extends TestAccessCo
       // set create permissions on custom domain explicitly and verify
       accessControlContext.setResourceCreatePermissions(accessorResource,
                                                         resourceClassName,
-                                                        resourceCreatePermissions_pre1,
-                                                        domainName
-      );
+                                                        domainName,
+                                                        resourceCreatePermissions_pre1);
 
       final Set<ResourceCreatePermission> resourceCreatePermissions_post
             = accessControlContext.getResourceCreatePermissions(accessorResource,

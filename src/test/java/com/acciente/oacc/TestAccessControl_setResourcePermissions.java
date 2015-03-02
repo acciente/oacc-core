@@ -17,7 +17,6 @@
  */
 package com.acciente.oacc;
 
-import org.junit.Ignore;
 import org.junit.Test;
 
 import java.util.Collections;
@@ -282,7 +281,7 @@ public class TestAccessControl_setResourcePermissions extends TestAccessControlB
       Set<ResourcePermission> globalResourcePermissions = new HashSet<>();
       globalResourcePermissions.add(ResourcePermissions.getInstance(globalPermissionName));
 
-      accessControlContext.setGlobalResourcePermissions(accessorResource, resourceClassName, globalResourcePermissions, accessedDomain);
+      accessControlContext.setGlobalResourcePermissions(accessorResource, resourceClassName, accessedDomain, globalResourcePermissions);
       assertThat(accessControlContext.getEffectiveGlobalResourcePermissions(accessorResource, resourceClassName, accessedDomain), is(globalResourcePermissions));
 
       // authenticate grantor resource
@@ -388,7 +387,7 @@ public class TestAccessControl_setResourcePermissions extends TestAccessControlB
       Set<ResourcePermission> globalResourcePermissions = new HashSet<>();
       globalResourcePermissions.add(ResourcePermissions.getInstance(globalPermissionName));
 
-      accessControlContext.setGlobalResourcePermissions(accessorResource, resourceClassName, globalResourcePermissions, accessedDomain);
+      accessControlContext.setGlobalResourcePermissions(accessorResource, resourceClassName, accessedDomain, globalResourcePermissions);
       assertThat(accessControlContext.getEffectiveGlobalResourcePermissions(accessorResource, resourceClassName, accessedDomain), is(globalResourcePermissions));
 
       // authenticate grantor resource
@@ -424,7 +423,7 @@ public class TestAccessControl_setResourcePermissions extends TestAccessControlB
       Set<ResourcePermission> grantorResourcePermissions = new HashSet<>();
       grantorResourcePermissions.add(ResourcePermissions.getInstance(grantorPermissionName, true));
 
-      accessControlContext.setGlobalResourcePermissions(grantorResource, resourceClassName, grantorResourcePermissions, accessedDomain);
+      accessControlContext.setGlobalResourcePermissions(grantorResource, resourceClassName, accessedDomain, grantorResourcePermissions);
       assertThat(accessControlContext.getEffectiveResourcePermissions(grantorResource, accessedResource), is(grantorResourcePermissions));
 
       // setup donor permissions
@@ -446,7 +445,7 @@ public class TestAccessControl_setResourcePermissions extends TestAccessControlB
       Set<ResourcePermission> globalResourcePermissions = new HashSet<>();
       globalResourcePermissions.add(ResourcePermissions.getInstance(globalPermissionName));
 
-      accessControlContext.setGlobalResourcePermissions(accessorResource, resourceClassName, globalResourcePermissions, accessedDomain);
+      accessControlContext.setGlobalResourcePermissions(accessorResource, resourceClassName, accessedDomain, globalResourcePermissions);
       assertThat(accessControlContext.getEffectiveGlobalResourcePermissions(accessorResource, resourceClassName, accessedDomain), is(globalResourcePermissions));
 
       // authenticate grantor resource
@@ -486,7 +485,7 @@ public class TestAccessControl_setResourcePermissions extends TestAccessControlB
       Set<ResourcePermission> grantorResourcePermissions = new HashSet<>();
       grantorResourcePermissions.add(ResourcePermissions.getInstance(grantorPermissionName, true));
 
-      accessControlContext.setGlobalResourcePermissions(grantorResource, resourceClassName, grantorResourcePermissions, accessedDomain);
+      accessControlContext.setGlobalResourcePermissions(grantorResource, resourceClassName, accessedDomain, grantorResourcePermissions);
       assertThat(accessControlContext.getEffectiveResourcePermissions(grantorResource, accessedResource), is(grantorResourcePermissions));
 
       // setup donor permissions
@@ -508,7 +507,7 @@ public class TestAccessControl_setResourcePermissions extends TestAccessControlB
       Set<ResourcePermission> globalResourcePermissions = new HashSet<>();
       globalResourcePermissions.add(ResourcePermissions.getInstance(globalPermissionName));
 
-      accessControlContext.setGlobalResourcePermissions(accessorResource, resourceClassName, globalResourcePermissions, accessedDomain);
+      accessControlContext.setGlobalResourcePermissions(accessorResource, resourceClassName, accessedDomain, globalResourcePermissions);
       assertThat(accessControlContext.getEffectiveGlobalResourcePermissions(accessorResource, resourceClassName, accessedDomain), is(globalResourcePermissions));
 
       // authenticate grantor resource
@@ -850,8 +849,8 @@ public class TestAccessControl_setResourcePermissions extends TestAccessControlB
                                                 setOf(DomainPermissions.getInstance(DomainPermissions.SUPER_USER)));
 
       accessControlContext.assertDomainPermission(accessorResource,
-                                                  DomainPermissions.getInstance(DomainPermissions.SUPER_USER),
-                                                  accessorDomain);
+                                                  accessorDomain,
+                                                  DomainPermissions.getInstance(DomainPermissions.SUPER_USER));
 
       // grant resource create permissions to accessor resource, including INHERIT post-create permission
       final Set<ResourceCreatePermission> resourceCreatePermissions
@@ -860,13 +859,13 @@ public class TestAccessControl_setResourcePermissions extends TestAccessControlB
                     ResourceCreatePermissions.getInstance(ResourcePermissions.getInstance(ResourcePermissions.RESET_CREDENTIALS)));
       accessControlContext.setResourceCreatePermissions(accessorResource,
                                                         accessedResourceClass,
-                                                        resourceCreatePermissions,
-                                                        accessedDomain);
+                                                        accessedDomain,
+                                                        resourceCreatePermissions);
 
       accessControlContext.assertPostCreateResourcePermission(accessorResource,
                                                               accessedResourceClass,
-                                                              ResourcePermissions.getInstance(ResourcePermissions.INHERIT),
-                                                              accessedDomain);
+                                                              accessedDomain,
+                                                              ResourcePermissions.getInstance(ResourcePermissions.INHERIT));
 
       // authenticate as accessor resource
       accessControlContext.authenticate(accessorResource, accessorCredentials);
@@ -914,13 +913,13 @@ public class TestAccessControl_setResourcePermissions extends TestAccessControlB
                     ResourceCreatePermissions.getInstance(ResourcePermissions.getInstance(ResourcePermissions.RESET_CREDENTIALS)));
       accessControlContext.setResourceCreatePermissions(accessorResource,
                                                         accessedResourceClass,
-                                                        resourceCreatePermissions,
-                                                        accessedDomain);
+                                                        accessedDomain,
+                                                        resourceCreatePermissions);
 
       accessControlContext.assertPostCreateResourcePermission(accessorResource,
                                                               accessedResourceClass,
-                                                              ResourcePermissions.getInstance(ResourcePermissions.INHERIT),
-                                                              accessedDomain);
+                                                              accessedDomain,
+                                                              ResourcePermissions.getInstance(ResourcePermissions.INHERIT));
 
       // authenticate as accessor resource
       accessControlContext.authenticate(accessorResource, accessorCredentials);

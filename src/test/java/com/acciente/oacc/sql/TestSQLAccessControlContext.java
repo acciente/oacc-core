@@ -302,8 +302,8 @@ public class TestSQLAccessControlContext extends TestSQLAccessControlContextBase
       try {
          accessControlContext.setResourceCreatePermissions(acmeRootUser,
                                                            "BLOG",
-                                                           resourceCreatePermissions, "ACMECorp"
-         );
+                                                           "ACMECorp",
+                                                           resourceCreatePermissions);
          setupOK();
       }
       catch (OaccException e) {
@@ -399,8 +399,8 @@ public class TestSQLAccessControlContext extends TestSQLAccessControlContextBase
       try {
          accessControlContext.setResourceCreatePermissions(acmeRootUser,
                                                            "BLOG",
-                                                           resourceCreatePermissions, "ACMECorp"
-         );
+                                                           "ACMECorp",
+                                                           resourceCreatePermissions);
          setupOK();
       }
       catch (OaccException e) {

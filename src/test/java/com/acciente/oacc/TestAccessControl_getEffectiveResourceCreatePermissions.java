@@ -98,9 +98,8 @@ public class TestAccessControl_getEffectiveResourceCreatePermissions extends Tes
       // set create permissions on custom domain explicitly and verify
       accessControlContext.setResourceCreatePermissions(accessorResource,
                                                         resourceClassName,
-                                                        resourceCreatePermissions_pre1,
-                                                        domainName
-      );
+                                                        domainName,
+                                                        resourceCreatePermissions_pre1);
 
       final Set<ResourceCreatePermission> resourceCreatePermissions_post
             = accessControlContext.getEffectiveResourceCreatePermissions(accessorResource, resourceClassName, domainName);
@@ -160,9 +159,8 @@ public class TestAccessControl_getEffectiveResourceCreatePermissions extends Tes
       // set create permissions on custom domain explicitly and verify
       accessControlContext.setResourceCreatePermissions(accessorResource,
                                                         resourceClassName,
-                                                        resourceCreatePermissions_pre1,
-                                                        domainName
-      );
+                                                        domainName,
+                                                        resourceCreatePermissions_pre1);
 
       // create a new authenticatable 'session' resource
       final char[] password = generateUniquePassword();
@@ -179,9 +177,8 @@ public class TestAccessControl_getEffectiveResourceCreatePermissions extends Tes
       resourceCreatePermissions_pre2.add(createPerm_resetPwd);
       accessControlContext.setResourceCreatePermissions(accessorResource,
                                                         resourceClassName,
-                                                        resourceCreatePermissions_pre2,
-                                                        sessionDomainName
-      );
+                                                        sessionDomainName,
+                                                        resourceCreatePermissions_pre2);
 
       // authenticate the 'session' resource
       accessControlContext.authenticate(sessionResource, PasswordCredentials.newInstance(password));
@@ -241,9 +238,8 @@ public class TestAccessControl_getEffectiveResourceCreatePermissions extends Tes
       parentResourceCreatePermissions_pre.add(parentResourceCreatePermission_custom);
       accessControlContext.setResourceCreatePermissions(accessorResource,
                                                         resourceClassName,
-                                                        parentResourceCreatePermissions_pre,
-                                                        parentDomainName
-      );
+                                                        parentDomainName,
+                                                        parentResourceCreatePermissions_pre);
 
       // set create permissions on child domain
       Set<ResourceCreatePermission> childResourceCreatePermissions_pre = new HashSet<>();
@@ -252,9 +248,8 @@ public class TestAccessControl_getEffectiveResourceCreatePermissions extends Tes
       childResourceCreatePermissions_pre.add(createPerm_resetPwdGrantable_withGrant);
       accessControlContext.setResourceCreatePermissions(accessorResource,
                                                         resourceClassName,
-                                                        childResourceCreatePermissions_pre,
-                                                        childDomainName
-      );
+                                                        childDomainName,
+                                                        childResourceCreatePermissions_pre);
 
       // verify
       Set<ResourceCreatePermission> childResourceCreatePermissions_expected = new HashSet<>();
@@ -306,7 +301,7 @@ public class TestAccessControl_getEffectiveResourceCreatePermissions extends Tes
       Set<ResourceCreatePermission> donorPermissions = new HashSet<>();
       donorPermissions.add(ResourceCreatePermissions.getInstance(ResourceCreatePermissions.CREATE));
 
-      accessControlContext.setResourceCreatePermissions(donorResource, resourceClass, donorPermissions, domainName);
+      accessControlContext.setResourceCreatePermissions(donorResource, resourceClass, domainName, donorPermissions);
       assertThat(accessControlContext.getEffectiveResourceCreatePermissions(donorResource, resourceClass, domainName),
                  is(donorPermissions));
 
@@ -314,7 +309,7 @@ public class TestAccessControl_getEffectiveResourceCreatePermissions extends Tes
       Set<ResourceCreatePermission> accessorPermissions = new HashSet<>();
       accessorPermissions.add(ResourceCreatePermissions.getInstance(ResourceCreatePermissions.CREATE, true));
 
-      accessControlContext.setResourceCreatePermissions(accessorResource, resourceClass, accessorPermissions, domainName);
+      accessControlContext.setResourceCreatePermissions(accessorResource, resourceClass, domainName, accessorPermissions);
       assertThat(accessControlContext.getEffectiveResourceCreatePermissions(accessorResource, resourceClass, domainName),
                  is(accessorPermissions));
 
@@ -361,7 +356,7 @@ public class TestAccessControl_getEffectiveResourceCreatePermissions extends Tes
                                  .getInstance(ResourcePermissions.getInstance(donorPermissionName_resetCredentials, false),
                                               false));
 
-      accessControlContext.setResourceCreatePermissions(donorResource, resourceClass, donorPermissions, domainName);
+      accessControlContext.setResourceCreatePermissions(donorResource, resourceClass, domainName, donorPermissions);
       assertThat(accessControlContext.getEffectiveResourceCreatePermissions(donorResource, resourceClass, domainName),
                  is(donorPermissions));
 
@@ -375,7 +370,7 @@ public class TestAccessControl_getEffectiveResourceCreatePermissions extends Tes
                                     .getInstance(ResourcePermissions.getInstance(accessorPermissionName_resetCredentials, true),
                                                  true));
 
-      accessControlContext.setResourceCreatePermissions(accessorResource, resourceClass, accessorPermissions, domainName);
+      accessControlContext.setResourceCreatePermissions(accessorResource, resourceClass, domainName, accessorPermissions);
       assertThat(accessControlContext.getEffectiveResourceCreatePermissions(accessorResource, resourceClass, domainName),
                  is(accessorPermissions));
 
@@ -427,7 +422,7 @@ public class TestAccessControl_getEffectiveResourceCreatePermissions extends Tes
                                   .getInstance(ResourcePermissions.getInstance(donorPermissionName_resetCredentials, true),
                                                false));
 
-      accessControlContext.setResourceCreatePermissions(donor1Resource, resourceClass, donor1Permissions, domainName);
+      accessControlContext.setResourceCreatePermissions(donor1Resource, resourceClass, domainName, donor1Permissions);
       assertThat(accessControlContext.getEffectiveResourceCreatePermissions(donor1Resource, resourceClass, domainName),
                  is(donor1Permissions));
 
@@ -441,7 +436,7 @@ public class TestAccessControl_getEffectiveResourceCreatePermissions extends Tes
                                   .getInstance(ResourcePermissions.getInstance(donorPermissionName_resetCredentials, false),
                                                true));
 
-      accessControlContext.setResourceCreatePermissions(donor2Resource, resourceClass, donor2Permissions, domainName);
+      accessControlContext.setResourceCreatePermissions(donor2Resource, resourceClass, domainName, donor2Permissions);
       assertThat(accessControlContext.getEffectiveResourceCreatePermissions(donor2Resource, resourceClass, domainName),
                  is(donor2Permissions));
 
@@ -449,7 +444,7 @@ public class TestAccessControl_getEffectiveResourceCreatePermissions extends Tes
       Set<ResourceCreatePermission> accessorPermissions = new HashSet<>();
       accessorPermissions.add(ResourceCreatePermissions.getInstance(ResourceCreatePermissions.CREATE));
 
-      accessControlContext.setResourceCreatePermissions(accessorResource, resourceClass, accessorPermissions, domainName);
+      accessControlContext.setResourceCreatePermissions(accessorResource, resourceClass, domainName, accessorPermissions);
       assertThat(accessControlContext.getEffectiveResourceCreatePermissions(accessorResource, resourceClass, domainName),
                  is(accessorPermissions));
 
@@ -505,7 +500,7 @@ public class TestAccessControl_getEffectiveResourceCreatePermissions extends Tes
       donorPermissions.add(ResourceCreatePermissions
                                  .getInstance(ResourcePermissions.getInstance(donorPermissionName_impersonate, true), true));
 
-      accessControlContext.setResourceCreatePermissions(donorResource, resourceClass, donorPermissions, domainName);
+      accessControlContext.setResourceCreatePermissions(donorResource, resourceClass, domainName, donorPermissions);
       assertThat(accessControlContext.getEffectiveResourceCreatePermissions(donorResource, resourceClass, domainName),
                  is(donorPermissions));
 
@@ -519,7 +514,7 @@ public class TestAccessControl_getEffectiveResourceCreatePermissions extends Tes
                                      .getInstance(ResourcePermissions.getInstance(inheritorPermissionName_resetCredentials, true),
                                                   false));
 
-      accessControlContext.setResourceCreatePermissions(inheritorResource, resourceClass, inheritorPermissions, domainName);
+      accessControlContext.setResourceCreatePermissions(inheritorResource, resourceClass, domainName, inheritorPermissions);
       assertThat(accessControlContext.getEffectiveResourceCreatePermissions(inheritorResource, resourceClass, domainName),
                  is(inheritorPermissions));
 
@@ -530,7 +525,7 @@ public class TestAccessControl_getEffectiveResourceCreatePermissions extends Tes
                                     .getInstance(ResourcePermissions.getInstance(accessorPermissionName_resetCredentials),
                                                  true));
 
-      accessControlContext.setResourceCreatePermissions(accessorResource, resourceClass, accessorPermissions, domainName);
+      accessControlContext.setResourceCreatePermissions(accessorResource, resourceClass, domainName, accessorPermissions);
       assertThat(accessControlContext.getEffectiveResourceCreatePermissions(accessorResource, resourceClass, domainName),
                  is(accessorPermissions));
 
@@ -584,7 +579,7 @@ public class TestAccessControl_getEffectiveResourceCreatePermissions extends Tes
       donorPermissions.add(ResourceCreatePermissions.getInstance(ResourceCreatePermissions.CREATE));
       donorPermissions.add(ResourceCreatePermissions.getInstance(ResourcePermissions.getInstance(donorPermissionName_impersonate)));
 
-      accessControlContext.setResourceCreatePermissions(donorResource, resourceClass, donorPermissions, domainName);
+      accessControlContext.setResourceCreatePermissions(donorResource, resourceClass, domainName, donorPermissions);
       assertThat(accessControlContext.getEffectiveResourceCreatePermissions(donorResource, resourceClass, domainName),
                  is(donorPermissions));
 
@@ -597,7 +592,7 @@ public class TestAccessControl_getEffectiveResourceCreatePermissions extends Tes
                                     .getInstance(ResourcePermissions.getInstance(accessorPermissionName_resetCredentials),
                                                  true));
 
-      accessControlContext.setResourceCreatePermissions(accessorResource, resourceClass, accessorPermissions, domainName);
+      accessControlContext.setResourceCreatePermissions(accessorResource, resourceClass, domainName, accessorPermissions);
       assertThat(accessControlContext.getEffectiveResourceCreatePermissions(accessorResource, resourceClass, domainName),
                  is(accessorPermissions));
 
@@ -661,9 +656,8 @@ public class TestAccessControl_getEffectiveResourceCreatePermissions extends Tes
       // set create permissions on custom domain explicitly and verify
       accessControlContext.setResourceCreatePermissions(accessorResource,
                                                         resourceClassName,
-                                                        resourceCreatePermissions_pre1,
-                                                        domainName
-      );
+                                                        domainName,
+                                                        resourceCreatePermissions_pre1);
 
       final Set<ResourceCreatePermission> resourceCreatePermissions_post
             = accessControlContext.getEffectiveResourceCreatePermissions(accessorResource,

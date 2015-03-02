@@ -205,8 +205,8 @@ public class TestAccessControlBase {
 
       systemAccessControlContext.setResourceCreatePermissions(accessorResource,
                                                               resourceClassName,
-                                                              resourceCreatePermissions,
-                                                              domainName);
+                                                              domainName,
+                                                              resourceCreatePermissions);
    }
 
    protected static void grantResourceCreatePermission(Resource accessorResource,
@@ -221,7 +221,7 @@ public class TestAccessControlBase {
 
       systemAccessControlContext.setResourceCreatePermissions(accessorResource,
                                                               resourceClassName,
-                                                              resourceCreatePermissions,
-                                                              domainName);
+                                                              domainName,
+                                                              resourceCreatePermissions);
    }
 }

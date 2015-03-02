@@ -82,8 +82,8 @@ public class TestAccessControl_getGlobalResourcePermissions extends TestAccessCo
                     ResourcePermissions.getInstance(generateResourceClassPermission(authenticatableResourceClassName)));
       accessControlContext.setGlobalResourcePermissions(accessorResource,
                                                         authenticatableResourceClassName,
-                                                        permissions_pre,
-                                                        sysDomainName);
+                                                        sysDomainName,
+                                                        permissions_pre);
 
       // verify
       final Set<ResourcePermission> permissions_post_specific
@@ -125,14 +125,14 @@ public class TestAccessControl_getGlobalResourcePermissions extends TestAccessCo
       // setup grantor permissions
       accessControlContext.setGlobalResourcePermissions(grantorResource,
                                                         resourceClassName,
-                                                        grantorResourcePermissions,
-                                                        grantorDomainName);
+                                                        grantorDomainName,
+                                                        grantorResourcePermissions);
       assertThat(accessControlContext.getGlobalResourcePermissions(grantorResource, resourceClassName, grantorDomainName),
                  is(grantorResourcePermissions));
       accessControlContext.setGlobalResourcePermissions(accessorResource,
                                                         resourceClassName,
-                                                        permissions_pre,
-                                                        grantorDomainName);
+                                                        grantorDomainName,
+                                                        permissions_pre);
 
       // authenticate grantor resource
       accessControlContext.authenticate(grantorResource, PasswordCredentials.newInstance(password));
@@ -172,8 +172,8 @@ public class TestAccessControl_getGlobalResourcePermissions extends TestAccessCo
                     resourcePermission_parentDomain);
       accessControlContext.setGlobalResourcePermissions(accessorResource,
                                                         authenticatableResourceClassName,
-                                                        permissions_parentDomain_pre,
-                                                        sysDomainName);
+                                                        sysDomainName,
+                                                        permissions_parentDomain_pre);
 
       // setup global permissions on child domain
       final ResourcePermission resourcePermission_childDomain = ResourcePermissions.getInstance(
@@ -184,8 +184,8 @@ public class TestAccessControl_getGlobalResourcePermissions extends TestAccessCo
                     resourcePermission_childDomain);
       accessControlContext.setGlobalResourcePermissions(accessorResource,
                                                         authenticatableResourceClassName,
-                                                        permissions_childDomain_pre,
-                                                        childDomainName);
+                                                        childDomainName,
+                                                        permissions_childDomain_pre);
 
       // verify
       final Set<ResourcePermission> permissions_post_sysDomain
@@ -234,8 +234,8 @@ public class TestAccessControl_getGlobalResourcePermissions extends TestAccessCo
                                                                     resPerm_resetCredentials);
       accessControlContext.setGlobalResourcePermissions(accessorResource,
                                                         resourceClassName,
-                                                        directResourcePermissions_pre,
-                                                        domainName);
+                                                        domainName,
+                                                        directResourcePermissions_pre);
 
       // set donor permissions
       Resource donorResource = generateUnauthenticatableResource();
@@ -243,8 +243,8 @@ public class TestAccessControl_getGlobalResourcePermissions extends TestAccessCo
                                                                    resPerm_resetCredentials_withGrant);
       accessControlContext.setGlobalResourcePermissions(donorResource,
                                                         resourceClassName,
-                                                        donorResourcePermissions_pre,
-                                                        domainName);
+                                                        domainName,
+                                                        donorResourcePermissions_pre);
 
       // set accessor --INHERIT-> donor
       accessControlContext.setResourcePermissions(accessorResource, 
@@ -285,8 +285,8 @@ public class TestAccessControl_getGlobalResourcePermissions extends TestAccessCo
                     ResourcePermissions.getInstance(generateResourceClassPermission(resourceClassName)));
       accessControlContext.setGlobalResourcePermissions(accessorResource, 
                                                         resourceClassName,
-                                                        permissions_pre,
-                                                        domainName);
+                                                        domainName,
+                                                        permissions_pre);
 
       // verify
       final Set<ResourcePermission> permissions_post_specific

@@ -243,8 +243,8 @@ public class TestAccessControl_impersonate extends TestAccessControlBase {
       // set up global permission: accessor --IMPERSONATE-> {impersonated resource class, impersonated domain}
       accessControlContext.setGlobalResourcePermissions(accessorResource,
                                                         impersonatedResourceClass,
-                                                        setOf(ResourcePermissions.getInstance(ResourcePermissions.IMPERSONATE)),
-                                                        impersonatedDomain);
+                                                        impersonatedDomain,
+                                                        setOf(ResourcePermissions.getInstance(ResourcePermissions.IMPERSONATE)));
 
       // authenticate and verify
       accessControlContext.authenticate(accessorResource, PasswordCredentials.newInstance(password));

@@ -64,14 +64,16 @@ public class AccessControlContextProxy implements AccessControlContext {
 
    @Override
    public void assertDomainPermission(Resource accessorResource,
-                                      DomainPermission domainPermission,
-                                      String domainName) {
-      accessControlContext.assertDomainPermission(accessorResource, domainPermission, domainName);
+                                      String domainName,
+                                      DomainPermission domainPermission) {
+      accessControlContext.assertDomainPermission(accessorResource, domainName, domainPermission);
    }
 
    @Override
-   public boolean hasDomainPermission(Resource accessorResource, DomainPermission domainPermission, String domainName) {
-      return accessControlContext.hasDomainPermission(accessorResource, domainPermission, domainName);
+   public boolean hasDomainPermission(Resource accessorResource,
+                                      String domainName,
+                                      DomainPermission domainPermission) {
+      return accessControlContext.hasDomainPermission(accessorResource, domainName, domainPermission);
    }
 
    @Override
@@ -105,9 +107,9 @@ public class AccessControlContextProxy implements AccessControlContext {
    @Override
    public void assertGlobalResourcePermission(Resource accessorResource,
                                               String resourceClassName,
-                                              ResourcePermission resourcePermission,
-                                              String domainName) {
-      accessControlContext.assertGlobalResourcePermission(accessorResource, resourceClassName, resourcePermission, domainName);
+                                              String domainName,
+                                              ResourcePermission resourcePermission) {
+      accessControlContext.assertGlobalResourcePermission(accessorResource, resourceClassName, domainName, resourcePermission);
    }
 
    @Override
@@ -120,9 +122,9 @@ public class AccessControlContextProxy implements AccessControlContext {
    @Override
    public boolean hasGlobalResourcePermission(Resource accessorResource,
                                               String resourceClassName,
-                                              ResourcePermission resourcePermission,
-                                              String domainName) {
-      return accessControlContext.hasGlobalResourcePermission(accessorResource, resourceClassName, resourcePermission, domainName);
+                                              String domainName,
+                                              ResourcePermission resourcePermission) {
+      return accessControlContext.hasGlobalResourcePermission(accessorResource, resourceClassName, domainName, resourcePermission);
    }
 
    @Override
@@ -149,9 +151,9 @@ public class AccessControlContextProxy implements AccessControlContext {
    @Override
    public void assertResourceCreatePermission(Resource accessorResource,
                                               String resourceClassName,
-                                              ResourceCreatePermission resourceCreatePermission,
-                                              String domainName) {
-      accessControlContext.assertResourceCreatePermission(accessorResource, resourceClassName, resourceCreatePermission, domainName);
+                                              String domainName,
+                                              ResourceCreatePermission resourceCreatePermission) {
+      accessControlContext.assertResourceCreatePermission(accessorResource, resourceClassName, domainName, resourceCreatePermission);
    }
 
    @Override
@@ -164,9 +166,9 @@ public class AccessControlContextProxy implements AccessControlContext {
    @Override
    public boolean hasResourceCreatePermission(Resource accessorResource,
                                               String resourceClassName,
-                                              ResourceCreatePermission resourceCreatePermission,
-                                              String domainName) {
-      return accessControlContext.hasResourceCreatePermission(accessorResource, resourceClassName, resourceCreatePermission, domainName);
+                                              String domainName,
+                                              ResourceCreatePermission resourceCreatePermission) {
+      return accessControlContext.hasResourceCreatePermission(accessorResource, resourceClassName, domainName, resourceCreatePermission);
    }
 
    @Override
@@ -179,9 +181,9 @@ public class AccessControlContextProxy implements AccessControlContext {
    @Override
    public void assertPostCreateResourcePermission(Resource accessorResource,
                                                   String resourceClassName,
-                                                  ResourcePermission resourcePermission,
-                                                  String domainName) {
-      accessControlContext.assertPostCreateResourcePermission(accessorResource, resourceClassName, resourcePermission, domainName);
+                                                  String domainName,
+                                                  ResourcePermission resourcePermission) {
+      accessControlContext.assertPostCreateResourcePermission(accessorResource, resourceClassName, domainName, resourcePermission);
    }
 
    @Override
@@ -194,9 +196,9 @@ public class AccessControlContextProxy implements AccessControlContext {
    @Override
    public boolean hasPostCreateResourcePermission(Resource accessorResource,
                                                   String resourceClassName,
-                                                  ResourcePermission resourcePermission,
-                                                  String domainName) {
-      return accessControlContext.hasPostCreateResourcePermission(accessorResource, resourceClassName, resourcePermission, domainName);
+                                                  String domainName,
+                                                  ResourcePermission resourcePermission) {
+      return accessControlContext.hasPostCreateResourcePermission(accessorResource, resourceClassName, domainName, resourcePermission);
    }
 
    @Override
@@ -356,9 +358,9 @@ public class AccessControlContextProxy implements AccessControlContext {
    @Override
    public void setResourceCreatePermissions(Resource accessorResource,
                                             String resourceClassName,
-                                            Set<ResourceCreatePermission> resourceCreatePermissions,
-                                            String domainName) {
-      accessControlContext.setResourceCreatePermissions(accessorResource, resourceClassName, resourceCreatePermissions, domainName);
+                                            String domainName,
+                                            Set<ResourceCreatePermission> resourceCreatePermissions) {
+      accessControlContext.setResourceCreatePermissions(accessorResource, resourceClassName, domainName, resourceCreatePermissions);
    }
 
    @Override
@@ -426,9 +428,9 @@ public class AccessControlContextProxy implements AccessControlContext {
    @Override
    public void setGlobalResourcePermissions(Resource accessorResource,
                                             String resourceClassName,
-                                            Set<ResourcePermission> resourcePermissions,
-                                            String domainName) {
-      accessControlContext.setGlobalResourcePermissions(accessorResource, resourceClassName, resourcePermissions, domainName);
+                                            String domainName,
+                                            Set<ResourcePermission> resourcePermissions) {
+      accessControlContext.setGlobalResourcePermissions(accessorResource, resourceClassName, domainName, resourcePermissions);
    }
 
    @Override

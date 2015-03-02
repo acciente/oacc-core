@@ -213,8 +213,8 @@ public class TestAccessControl_getAccessorResourcesByResourcePermission extends 
       // set global permission for accessor
       accessControlContext.setGlobalResourcePermissions(accessorResource,
                                                         accessedResourceClassName,
-                                                        resourcePermissions,
-                                                        accessedDomainName);
+                                                        accessedDomainName,
+                                                        resourcePermissions);
 
       // verify
       Set<Resource> accessorsByPermission
