@@ -17,6 +17,8 @@
  */
 package com.acciente.oacc;
 
+import java.util.Arrays;
+
 public class NotAuthorizedException extends AuthorizationException {
    public NotAuthorizedException(String message) {
       super(message);
@@ -42,9 +44,9 @@ public class NotAuthorizedException extends AuthorizationException {
                   + " resource " + String.valueOf(accessedResource));
    }
 
-   public NotAuthorizedException(Resource accessorResource, DomainCreatePermission domainCreatePermission) {
+   public NotAuthorizedException(Resource accessorResource, DomainCreatePermission... domainCreatePermissions) {
       super("Resource " + String.valueOf(accessorResource)
-                  + " does not have domain create permission " + String.valueOf(domainCreatePermission));
+                  + " does not have domain create permission(s) " + Arrays.asList(domainCreatePermissions));
    }
 
    public NotAuthorizedException(Resource accessorResource, DomainPermission domainPermission, String domainName) {

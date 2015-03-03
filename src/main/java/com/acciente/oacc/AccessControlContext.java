@@ -47,7 +47,8 @@ import java.util.Set;
  * <dl>
  * <dd>{@link java.lang.NullPointerException} - if a null object reference is passed in any method parameter
  *                                              (in general, all parameters are required)
- * <dd>{@link java.lang.IllegalArgumentException} - if a method parameter is empty or blank
+ * <dd>{@link java.lang.IllegalArgumentException} - if a method parameter is empty or blank, or
+ *                                                  if a set or sequence of arguments contains null or duplicate elements
  * </dl>
  * Unchecked exceptions explicitly thrown for other reasons are described at the method-level.
  */
@@ -182,31 +183,31 @@ public interface AccessControlContext {
                                        DomainPermission domainPermission);
 
    /**
-    * Checks if the specified accessor resource has the specified domain create permission on
+    * Checks if the specified accessor resource has the specified domain create permissions on
     * the specified domain.
     * This method takes into account any direct and inherited domain create permissions.
     *
-    * @param accessorResource       the resource on which access is being checked
-    * @param domainCreatePermission the domain create permission to be checked
+    * @param accessorResource        the resource on which access is being checked
+    * @param domainCreatePermissions the domain create permissions to be checked
     * @throws com.acciente.oacc.NotAuthorizedException if the accessor resource <strong>does not</strong> have the
-    *                                                  specified domain create permission, or
+    *                                                  specified domain create permissions, or
     *                                                  if the accessor resource does not exist
     */
    public void assertDomainCreatePermissions(Resource accessorResource,
-                                             DomainCreatePermission domainCreatePermission);
+                                             DomainCreatePermission... domainCreatePermissions);
 
    /**
-    * Checks if the specified accessor resource has the specified domain create permission on
+    * Checks if the specified accessor resource has the specified domain create permissions on
     * the specified domain.
     * This method takes into account any direct and inherited domain create permissions.
     *
-    * @param accessorResource       the resource on which access is being checked
-    * @param domainCreatePermission the domain create permission to be checked
-    * @return  <strong>true</strong> if the accessor resource has the specified domain create permission,
+    * @param accessorResource        the resource on which access is being checked
+    * @param domainCreatePermissions the domain create permission to be checked
+    * @return  <strong>true</strong> if the accessor resource has the specified domain create permissions,
     *          <strong>false</strong> otherwise or if the accessor resource does not exist
     */
    public boolean hasDomainCreatePermissions(Resource accessorResource,
-                                             DomainCreatePermission domainCreatePermission);
+                                             DomainCreatePermission... domainCreatePermissions);
 
    /**
     * Checks if the specified accessor resource would receive the specified domain permission, if the accessor

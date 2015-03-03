@@ -61,6 +61,7 @@ import javax.sql.DataSource;
 import java.io.Serializable;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -2033,7 +2034,8 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
                                                                        Set<ResourcePermission> resourcePermissions,
                                                                        ResourceClassInternalInfo resourceClassInternalInfo) {
       final List<String> validPermissionNames
-            = resourceClassPermissionPersister.getPermissionNames(connection, resourceClassInternalInfo.getResourceClassName());
+            = resourceClassPermissionPersister.getPermissionNames(connection,
+                                                                  resourceClassInternalInfo.getResourceClassName());
       final Set<String> uniquePermissionNames = new HashSet<>(resourcePermissions.size());
 
       for (final ResourcePermission resourcePermission : resourcePermissions) {
@@ -2889,25 +2891,25 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
 
    @Override
    public void assertDomainCreatePermissions(Resource accessorResource,
-                                             DomainCreatePermission domainCreatePermission) {
-      if (!hasDomainCreatePermissions(accessorResource, domainCreatePermission)) {
-         throw new NotAuthorizedException(accessorResource, domainCreatePermission);
+                                             DomainCreatePermission... domainCreatePermissions) {
+      if (!hasDomainCreatePermissions(accessorResource, domainCreatePermissions)) {
+         throw new NotAuthorizedException(accessorResource, domainCreatePermissions);
       }
    }
 
    @Override
    public boolean hasDomainCreatePermissions(Resource accessorResource,
-                                             DomainCreatePermission domainCreatePermission) {
+                                             DomainCreatePermission... domainCreatePermissions) {
       SQLConnection connection = null;
 
       __assertAuthenticated();
       __assertResourceSpecified(accessorResource);
-      __assertPermissionSpecified(domainCreatePermission);
+      __assertPermissionsSpecified(domainCreatePermissions);
 
       try {
          connection = __getConnection();
 
-         return __hasDomainCreatePermission(connection, accessorResource, domainCreatePermission);
+         return __hasDomainCreatePermission(connection, accessorResource, notEmptySetOfNotNull(domainCreatePermissions));
       }
       finally {
          __closeConnection(connection);
@@ -2916,13 +2918,17 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
 
    private boolean __hasDomainCreatePermission(SQLConnection connection,
                                                Resource accessorResource,
-                                               DomainCreatePermission domainCreatePermission) {
-      if (__isPermissible(domainCreatePermission,
-                          __getEffectiveDomainCreatePermissions(connection, accessorResource))) {
-         return true;
+                                               Set<DomainCreatePermission> queriedDomainCreatePermissions) {
+      final Set<DomainCreatePermission> effectiveDomainCreatePermissions
+            = __getEffectiveDomainCreatePermissions(connection, accessorResource);
+
+      for (DomainCreatePermission domainCreatePermission : queriedDomainCreatePermissions) {
+         if (!__isPermissible(domainCreatePermission, effectiveDomainCreatePermissions)) {
+            return false;
+         }
       }
 
-      return false;
+      return true;
    }
 
    private boolean __isPermissible(DomainCreatePermission queriedDomainCreatePermission,
@@ -3866,8 +3872,8 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       }
    }
 
-   private void __assertPermissionSpecified(DomainCreatePermission domainCreatePermission) {
-      if (domainCreatePermission == null) {
+   private void __assertPermissionsSpecified(DomainCreatePermission... domainCreatePermissions) {
+      if (domainCreatePermissions == null) {
          throw new NullPointerException("Domain create permission required, none specified");
       }
    }
@@ -3934,6 +3940,41 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
             throw new IllegalArgumentException("Permission: " + resourcePermission + " is not defined for resource class: " + resourceClassName);
          }
       }
+   }
+
+   protected static <T> Set<T> notEmptySetOfNotNull(T... elements) {
+      // not null constraint
+      if (elements == null) {
+         throw new NullPointerException("An array or a sequence of arguments are required, but none were specified");
+      }
+
+      // not empty constraint
+      if (elements.length == 0) {
+         throw new IllegalArgumentException("A non-empty " + elements.getClass().getSimpleName()
+                                                  + " argument (or sequence of varargs) is required");
+      }
+
+      final HashSet<T> resultSet = new HashSet<>(elements.length);
+
+      for (T element : elements) {
+         // non-null elements constraint
+         if (element == null) {
+            throw new NullPointerException("A " + elements.getClass().getSimpleName()
+                                                 + " argument (or sequence of varargs) without null elements is required, but received: "
+                                                 + Arrays.asList(elements));
+         }
+
+         final boolean isAdded = resultSet.add(element);
+
+         // no duplicates constraint
+         if (!isAdded) {
+            throw new IllegalArgumentException("A " + elements.getClass().getSimpleName()
+                                                     + " argument (or sequence of varargs) without duplicate elements is required, but contains duplicates of: "
+                                                     + String.valueOf(element));
+         }
+      }
+
+      return resultSet;
    }
 
    // private connection management helper methods
