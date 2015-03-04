@@ -146,41 +146,41 @@ public interface AccessControlContext {
    public void setCredentials(Resource resource, Credentials newCredentials);
 
    /**
-    * Checks if the specified accessor resource has the specified domain permission on
+    * Checks if the specified accessor resource has the specified domain permissions on
     * the specified domain.
     * This method takes into account any direct domain permissions, inherited domain permissions
     * and any domain permissions the accessor may have to ancestors of the specified domain, as well
     * as any super-user privileges.
     *
-    * @param accessorResource the resource on which access is being checked
-    * @param domainName       the domain for which the permission should be checked
-    * @param domainPermission the permission to be checked
+    * @param accessorResource  the resource on which access is being checked
+    * @param domainName        the domain for which the permission should be checked
+    * @param domainPermissions the permissions to be checked
     * @throws java.lang.IllegalArgumentException       if no domain of domainName exists
     * @throws com.acciente.oacc.NotAuthorizedException if the accessor resource <strong>does not</strong> have the
-    *                                                  specified domain permission, or
+    *                                                  specified domain permissions, or
     *                                                  if the accessor resource does not exist
     */
    public void assertDomainPermissions(Resource accessorResource,
                                        String domainName,
-                                       DomainPermission domainPermission);
+                                       DomainPermission... domainPermissions);
 
    /**
-    * Checks if the specified accessor resource has the specified domain permission on
+    * Checks if the specified accessor resource has the specified domain permissions on
     * the specified domain.
     * This method takes into account any direct domain permissions, inherited domain permissions
     * and any domain permissions the accessor may have to ancestors of the specified domain, as well
     * as any super-user privileges.
     *
-    * @param accessorResource the resource on which access is being checked
-    * @param domainName       the domain for which the permission should be checked
-    * @param domainPermission the permission to be checked
-    * @return  <strong>true</strong> if the accessor resource has the specified domain permission,
+    * @param accessorResource  the resource on which access is being checked
+    * @param domainName        the domain for which the permission should be checked
+    * @param domainPermissions the permissions to be checked
+    * @return  <strong>true</strong> if the accessor resource has the specified domain permissions,
     *          <strong>false</strong> otherwise or if the accessor resource does not exist
     * @throws java.lang.IllegalArgumentException  if no domain of domainName exists
     */
    public boolean hasDomainPermissions(Resource accessorResource,
                                        String domainName,
-                                       DomainPermission domainPermission);
+                                       DomainPermission... domainPermissions);
 
    /**
     * Checks if the specified accessor resource has the specified domain create permissions on

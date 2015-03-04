@@ -62,6 +62,21 @@ public class TestAccessControl_hasDomainPermissions extends TestAccessControlBas
                                                      DomainPermissions.getInstance(DomainPermissions.CREATE_CHILD_DOMAIN, true))) {
          fail("checking CREATE_CHILD_DOMAIN /G domain permission should have succeeded for system resource");
       }
+      if (!accessControlContext.hasDomainPermissions(SYS_RESOURCE,
+                                                    domainName,
+                                                    DomainPermissions.getInstance(DomainPermissions.CREATE_CHILD_DOMAIN),
+                                                    DomainPermissions.getInstance(DomainPermissions.CREATE_CHILD_DOMAIN, true))) {
+         fail("checking multiple implicit domain permission should have succeeded for system resource");
+      }
+
+      if (!accessControlContext.hasDomainPermissions(SYS_RESOURCE,
+                                                    domainName,
+                                                    DomainPermissions.getInstance(DomainPermissions.CREATE_CHILD_DOMAIN),
+                                                    DomainPermissions.getInstance(DomainPermissions.CREATE_CHILD_DOMAIN, true),
+                                                    DomainPermissions.getInstance(DomainPermissions.SUPER_USER),
+                                                    DomainPermissions.getInstance(DomainPermissions.SUPER_USER, true))) {
+         fail("checking all implicit domain permission should have succeeded for system resource");
+      }
 
       if (accessControlContext.hasDomainPermissions(accessorResource,
                                                     domainName,
@@ -72,6 +87,12 @@ public class TestAccessControl_hasDomainPermissions extends TestAccessControlBas
                                                     domainName,
                                                     DomainPermissions.getInstance(DomainPermissions.CREATE_CHILD_DOMAIN))) {
          fail("checking domain permission for accessor resource when none exist should have failed");
+      }
+      if (accessControlContext.hasDomainPermissions(accessorResource,
+                                                    domainName,
+                                                    DomainPermissions.getInstance(DomainPermissions.CREATE_CHILD_DOMAIN),
+                                                    DomainPermissions.getInstance(DomainPermissions.SUPER_USER))) {
+         fail("checking multiple domain permission for accessor resource when none exist should have failed");
       }
    }
 
@@ -97,6 +118,14 @@ public class TestAccessControl_hasDomainPermissions extends TestAccessControlBas
                                                     DomainPermissions.getInstance(DomainPermissions.CREATE_CHILD_DOMAIN))) {
          fail("checking domain permission for authenticated accessor resource when none exist should have failed");
       }
+
+      if (accessControlContext.hasDomainPermissions(accessorResource,
+                                                    domainName,
+                                                    DomainPermissions.getInstance(DomainPermissions.CREATE_CHILD_DOMAIN),
+                                                    DomainPermissions.getInstance(DomainPermissions.SUPER_USER))) {
+         fail("checking multiple domain permission for authenticated resource when none exist should have failed");
+      }
+
    }
 
    @Test
@@ -123,10 +152,11 @@ public class TestAccessControl_hasDomainPermissions extends TestAccessControlBas
       assertThat(allDomainPermissions.size(), is(1));
       assertThat(allDomainPermissions.get(domainName1), is(domainPermissions_pre1));
 
-      if (!accessControlContext.hasDomainPermissions(accessorResource, domainName1, domPerm_superuser)) {
+      if (!accessControlContext.hasDomainPermissions(accessorResource, domainName1, domPerm_superuser, domPerm_child)) {
          fail("checking valid domain permission for system resource should have succeeded");
       }
-      if (!accessControlContext.hasDomainPermissions(accessorResource, domainName1, domPerm_child)) {
+
+      if (!accessControlContext.hasDomainPermissions(accessorResource, domainName1, domPerm_child, domPerm_superuser)) {
          fail("checking valid domain permission for system resource should have succeeded");
       }
 
@@ -143,6 +173,158 @@ public class TestAccessControl_hasDomainPermissions extends TestAccessControlBas
 
       if (!accessControlContext.hasDomainPermissions(accessorResource, domainName2, domPerm_child_withGrant)) {
          fail("checking valid domain permissions for system resource should have succeeded");
+      }
+   }
+
+   @Test
+   public void hasDomainPermissions_partiallyValidAsSystemResource() {
+      authenticateSystemResource();
+      final DomainPermission domPerm_superuser
+            = DomainPermissions.getInstance(DomainPermissions.SUPER_USER);
+      final DomainPermission domPerm_child
+            = DomainPermissions.getInstance(DomainPermissions.CREATE_CHILD_DOMAIN);
+      final DomainPermission domPerm_child_withGrant
+            = DomainPermissions.getInstance(DomainPermissions.CREATE_CHILD_DOMAIN, true);
+
+      final String domainName1 = generateDomain();
+      final String domainName2 = generateDomain();
+
+      // set domain permissions
+      Resource accessorResource = generateUnauthenticatableResource();
+      Set<DomainPermission> domainPermissions_pre1 = setOf(domPerm_child);
+      accessControlContext.setDomainPermissions(accessorResource, domainName1, domainPermissions_pre1);
+
+      // get domain create permissions and verify
+      final Map<String,Set<DomainPermission>> allDomainPermissions
+            = accessControlContext.getEffectiveDomainPermissionsMap(accessorResource);
+      assertThat(allDomainPermissions.size(), is(1));
+      assertThat(allDomainPermissions.get(domainName1), is(domainPermissions_pre1));
+
+      if (accessControlContext.hasDomainPermissions(accessorResource, domainName1, domPerm_child, domPerm_child_withGrant)) {
+         fail("checking partially valid domain permission for system resource should have failed");
+      }
+
+      if (accessControlContext.hasDomainPermissions(accessorResource, domainName1, domPerm_child_withGrant, domPerm_child)) {
+         fail("checking partially valid domain permission for system resource should have failed");
+      }
+
+      // let's try another domain
+      Set<DomainPermission> domainPermissions_pre2 = setOf(domPerm_child_withGrant);
+      accessControlContext.setDomainPermissions(accessorResource, domainName2, domainPermissions_pre2);
+
+      // get domain create permissions and verify
+      final Map<String,Set<DomainPermission>> allDomainPermissions2
+            = accessControlContext.getEffectiveDomainPermissionsMap(accessorResource);
+      assertThat(allDomainPermissions2.size(), is(2));
+      assertThat(allDomainPermissions2.get(domainName1), is(domainPermissions_pre1));
+      assertThat(allDomainPermissions2.get(domainName2), is(domainPermissions_pre2));
+
+      if (accessControlContext.hasDomainPermissions(accessorResource, domainName2, domPerm_child_withGrant, domPerm_superuser)) {
+         fail("checking partially valid domain permissions should have failed for system resource");
+      }
+
+      if (!accessControlContext.hasDomainPermissions(accessorResource, domainName2, domPerm_child_withGrant, domPerm_child)) {
+         fail("checking implied domain permissions should have succeeded for system resource");
+      }
+   }
+
+   @Test
+   public void hasDomainPermissions_superUser_suceedsAsAuthenticatedResource() {
+      authenticateSystemResource();
+      final DomainPermission domPerm_superuser
+            = DomainPermissions.getInstance(DomainPermissions.SUPER_USER);
+      final DomainPermission domPerm_superuser_withGrant
+            = DomainPermissions.getInstance(DomainPermissions.SUPER_USER, true);
+      final DomainPermission domPerm_child
+            = DomainPermissions.getInstance(DomainPermissions.CREATE_CHILD_DOMAIN);
+      final DomainPermission domPerm_child_withGrant
+            = DomainPermissions.getInstance(DomainPermissions.CREATE_CHILD_DOMAIN, true);
+
+      final String domainName1 = generateDomain();
+
+      // set super-user domain permission
+      final char[] password = generateUniquePassword();
+      Resource accessorResource = generateAuthenticatableResource(password);
+      Set<DomainPermission> domainPermissions_pre1 = setOf(domPerm_superuser);
+      accessControlContext.setDomainPermissions(accessorResource, domainName1, domainPermissions_pre1);
+
+      // get domain create permissions
+      final Map<String,Set<DomainPermission>> allDomainPermissions
+            = accessControlContext.getEffectiveDomainPermissionsMap(accessorResource);
+      assertThat(allDomainPermissions.size(), is(1));
+      assertThat(allDomainPermissions.get(domainName1), is(domainPermissions_pre1));
+
+      // authenticate accessor resource
+      accessControlContext.authenticate(accessorResource, PasswordCredentials.newInstance(password));
+
+      // verify
+      if (!accessControlContext.hasDomainPermissions(accessorResource, domainName1, domPerm_superuser_withGrant)) {
+         fail("checking implicit domain permission with exceeding grant should have succeeded for authenticated resource");
+      }
+
+      if (!accessControlContext.hasDomainPermissions(accessorResource,
+                                                     domainName1,
+                                                     domPerm_child_withGrant,
+                                                     domPerm_child,
+                                                     domPerm_superuser_withGrant,
+                                                     domPerm_superuser)) {
+         fail("checking all implicit domain permission should have succeeded for authenticated resource");
+      }
+   }
+
+   @Test
+   public void hasDomainPermissions_validWithDifferingGrantingRights_succeedsAsAuthenticatedResource() {
+      authenticateSystemResource();
+      final DomainPermission domPerm_child
+            = DomainPermissions.getInstance(DomainPermissions.CREATE_CHILD_DOMAIN);
+      final DomainPermission domPerm_child_withGrant
+            = DomainPermissions.getInstance(DomainPermissions.CREATE_CHILD_DOMAIN, true);
+
+      final String domainName1 = generateDomain();
+
+      // set super-user domain permission
+      final char[] password = generateUniquePassword();
+      Resource accessorResource = generateAuthenticatableResource(password);
+      Set<DomainPermission> domainPermissions_pre1 = setOf(domPerm_child);
+      accessControlContext.setDomainPermissions(accessorResource, domainName1, domainPermissions_pre1);
+
+      // get domain create permissions
+      final Map<String,Set<DomainPermission>> allDomainPermissions
+            = accessControlContext.getEffectiveDomainPermissionsMap(accessorResource);
+      assertThat(allDomainPermissions.size(), is(1));
+      assertThat(allDomainPermissions.get(domainName1), is(domainPermissions_pre1));
+
+      // authenticate accessor resource
+      accessControlContext.authenticate(accessorResource, PasswordCredentials.newInstance(password));
+
+      // verify
+      if (accessControlContext.hasDomainPermissions(accessorResource, domainName1, domPerm_child_withGrant)) {
+         fail("checking domain permission with exceeding granting rights should have failed for authenticated resource");
+      }
+
+      // let's try another domain
+      authenticateSystemResource();
+      final String domainName2 = generateDomain();
+      Set<DomainPermission> domainPermissions_pre2 = setOf(domPerm_child_withGrant);
+      accessControlContext.setDomainPermissions(accessorResource, domainName2, domainPermissions_pre2);
+
+      // get domain create permissions
+      final Map<String,Set<DomainPermission>> allDomainPermissions2
+            = accessControlContext.getEffectiveDomainPermissionsMap(accessorResource);
+      assertThat(allDomainPermissions2.size(), is(2));
+      assertThat(allDomainPermissions2.get(domainName1), is(domainPermissions_pre1));
+      assertThat(allDomainPermissions2.get(domainName2), is(domainPermissions_pre2));
+
+      // authenticate accessor resource
+      accessControlContext.authenticate(accessorResource, PasswordCredentials.newInstance(password));
+
+      // verify
+      if (!accessControlContext.hasDomainPermissions(accessorResource, domainName2, domPerm_child)) {
+         fail("checking domain permissions with lesser granting rights should have succeeded for authenticated resource");
+      }
+
+      if (!accessControlContext.hasDomainPermissions(accessorResource, domainName2, domPerm_child_withGrant, domPerm_child)) {
+         fail("checking domain permissions with same and lesser granting rights should have succeeded for authenticated resource");
       }
    }
 
@@ -172,10 +354,10 @@ public class TestAccessControl_hasDomainPermissions extends TestAccessControlBas
       accessControlContext.setDomainPermissions(accessorResource, childDomain, childDomainPermissions_pre);
 
       // verify
-      if (!accessControlContext.hasDomainPermissions(accessorResource, childDomain, domPerm_superuser_withGrant)) {
-         fail("checking valid inherited domain permissions for system resource should have succeeded");
-      }
-      if (!accessControlContext.hasDomainPermissions(accessorResource, childDomain, domPerm_createchilddomain_withGrant)) {
+      if (!accessControlContext.hasDomainPermissions(accessorResource,
+                                                     childDomain,
+                                                     domPerm_superuser_withGrant,
+                                                     domPerm_createchilddomain_withGrant)) {
          fail("checking valid inherited domain permissions for system resource should have succeeded");
       }
    }
@@ -220,11 +402,7 @@ public class TestAccessControl_hasDomainPermissions extends TestAccessControlBas
       // verify
       if (!accessControlContext.hasDomainPermissions(accessorResource,
                                                      greatGreatGrandChildDomain,
-                                                     domPerm_superuser_withGrant)) {
-         fail("checking valid domain permissions inherited from ancestor domain with empty intermediary should have succeeded");
-      }
-      if (!accessControlContext.hasDomainPermissions(accessorResource,
-                                                     greatGreatGrandChildDomain,
+                                                     domPerm_superuser_withGrant,
                                                      domPerm_createchilddomain_withGrant)) {
          fail("checking valid domain permissions inherited from ancestor domain with empty intermediary should have succeeded");
       }
@@ -263,10 +441,10 @@ public class TestAccessControl_hasDomainPermissions extends TestAccessControlBas
       accessControlContext.setResourcePermissions(accessorResource, donorResource, inheritanceResourcePermissions);
 
       // verify
-      if (!accessControlContext.hasDomainPermissions(accessorResource, domainName, domPerm_superuser_withGrant)) {
-         fail("checking valid domain permissions inherited from resource should have succeeded");
-      }
-      if (!accessControlContext.hasDomainPermissions(accessorResource, domainName, domPerm_createchilddomain_withGrant)) {
+      if (!accessControlContext.hasDomainPermissions(accessorResource,
+                                                     domainName,
+                                                     domPerm_superuser_withGrant,
+                                                     domPerm_createchilddomain_withGrant)) {
          fail("checking valid domain permissions inherited from resource should have succeeded");
       }
    }
@@ -304,10 +482,10 @@ public class TestAccessControl_hasDomainPermissions extends TestAccessControlBas
       accessControlContext.setResourcePermissions(accessorResource, donorResource, inheritanceResourcePermisions);
 
       // verify
-      if (!accessControlContext.hasDomainPermissions(accessorResource, childDomain, domPerm_superuser_withGrant)) {
-         fail("checking valid domain permissions inherited from ancestor domain and resource should have succeeded");
-      }
-      if (!accessControlContext.hasDomainPermissions(accessorResource, childDomain, domPerm_createchilddomain_withGrant)) {
+      if (!accessControlContext.hasDomainPermissions(accessorResource,
+                                                     childDomain,
+                                                     domPerm_superuser_withGrant,
+                                                     domPerm_createchilddomain_withGrant)) {
          fail("checking valid domain permissions inherited from ancestor domain and resource should have succeeded");
       }
    }
@@ -349,6 +527,14 @@ public class TestAccessControl_hasDomainPermissions extends TestAccessControlBas
       }
 
       try {
+         accessControlContext.hasDomainPermissions(accessorResource, null, domPerm_superUser);
+         fail("checking domain permissions with null domain name should have failed");
+      }
+      catch (NullPointerException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("domain required"));
+      }
+
+      try {
          accessControlContext.hasDomainPermissions(accessorResource, domainName, null);
          fail("checking domain permissions with null domain permission reference should have failed");
       }
@@ -357,11 +543,50 @@ public class TestAccessControl_hasDomainPermissions extends TestAccessControlBas
       }
 
       try {
-         accessControlContext.hasDomainPermissions(accessorResource, null, domPerm_superUser);
-         fail("checking domain permissions with null domain name should have failed");
+         accessControlContext.hasDomainPermissions(accessorResource, domainName, new DomainPermission[] {null});
+         fail("checking domain permissions with null domain permission element should have failed");
       }
       catch (NullPointerException e) {
-         assertThat(e.getMessage().toLowerCase(), containsString("domain required"));
+         assertThat(e.getMessage().toLowerCase(), containsString("without null element"));
+      }
+   }
+
+   @Test
+   public void hasDomainPermissions_emptyPermissions_shouldFail() {
+      authenticateSystemResource();
+      final Resource accessorResource = generateUnauthenticatableResource();
+      final String domainName = generateDomain();
+
+      try {
+         accessControlContext.hasDomainPermissions(accessorResource, domainName);
+         fail("checking domain permissions with null domain permission element should have failed");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("non-empty"));
+      }
+
+      try {
+         accessControlContext.hasDomainPermissions(accessorResource, domainName, new DomainPermission[] {});
+         fail("checking domain permissions with null domain permission element should have failed");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("non-empty"));
+      }
+   }
+
+   @Test
+   public void hasDomainPermissions_duplicatePermissions_shouldFail() {
+      authenticateSystemResource();
+      final Resource accessorResource = generateUnauthenticatableResource();
+      final DomainPermission domPerm_superUser = DomainPermissions.getInstance(DomainPermissions.SUPER_USER);
+      final String domainName = generateDomain();
+
+      try {
+         accessControlContext.hasDomainPermissions(accessorResource, domainName, domPerm_superUser, domPerm_superUser);
+         fail("checking domain permissions with null domain permission element should have failed");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("duplicate elements"));
       }
    }
 
