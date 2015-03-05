@@ -69,11 +69,11 @@ public class NotAuthorizedException extends AuthorizationException {
    }
 
    public NotAuthorizedException(Resource accessorResource,
-                                 ResourcePermission resourcePermission,
                                  String resourceClassName,
-                                 String domainName) {
+                                 String domainName,
+                                 ResourcePermission... resourcePermissions) {
       super("Resource " + String.valueOf(accessorResource)
-                  + " does not have global permission " + String.valueOf(resourcePermission)
+                  + " does not have global permission(s) " + Arrays.asList(resourcePermissions)
                   + " on resources of class " + resourceClassName
                   + " in domain " + domainName);
    }

@@ -549,6 +549,13 @@ public class TestAccessControl_hasDomainPermissions extends TestAccessControlBas
       catch (NullPointerException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("without null element"));
       }
+      try {
+         accessControlContext.hasDomainPermissions(accessorResource, domainName, domPerm_superUser, null);
+         fail("checking domain permissions with null domain permission element should have failed");
+      }
+      catch (NullPointerException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("without null element"));
+      }
    }
 
    @Test

@@ -235,80 +235,80 @@ public interface AccessControlContext {
                                                  DomainPermission domainPermission);
 
    /**
-    * Checks if the specified accessor resource has the specified global resource permission on
+    * Checks if the specified accessor resource has the specified global resource permissions on
     * the specified resource class in the session resource's domain.
     * This method takes into account any global permissions that the accessor resource may have.
     *
-    * @param accessorResource   the resource on which access is being checked
-    * @param resourceClassName  a string resource class name
-    * @param resourcePermission the permission to be checked
+    * @param accessorResource    the resource on which access is being checked
+    * @param resourceClassName   a string resource class name
+    * @param resourcePermissions the permissions to be checked
     * @throws java.lang.IllegalArgumentException if no resource class of resourceClassName exists, or
-    *                                            if resourcePermission is invalid for the resource class
+    *                                            if any resourcePermission is invalid for the resource class
     * @throws com.acciente.oacc.NotAuthorizedException if the accessor resource <strong>does not</strong> have the
-    *                                                  specified global permission, or
+    *                                                  specified global permissions, or
     *                                                  if the accessor resource does not exist
     */
    public void assertGlobalResourcePermissions(Resource accessorResource,
                                                String resourceClassName,
-                                               ResourcePermission resourcePermission);
+                                               ResourcePermission... resourcePermissions);
 
    /**
-    * Checks if the specified accessor resource has the specified global resource permission on
+    * Checks if the specified accessor resource has the specified global resource permissions on
     * the specified resource class in the specified domain.
     * This method takes into account any global permissions that the accessor resource may have.
     *
-    * @param accessorResource   the resource on which access is being checked
-    * @param resourceClassName  a string resource class name
-    * @param domainName         the domain in which the permission should be checked
-    * @param resourcePermission the permission to be checked
+    * @param accessorResource    the resource on which access is being checked
+    * @param resourceClassName   a string resource class name
+    * @param domainName          the domain in which the permission should be checked
+    * @param resourcePermissions the permissions to be checked
     * @throws java.lang.IllegalArgumentException if no resource class of resourceClassName exists, or
-    *                                            if resourcePermission is invalid for the resource class, or
+    *                                            if any resourcePermission is invalid for the resource class, or
     *                                            if no domain of domainName exists
     * @throws com.acciente.oacc.NotAuthorizedException if the accessor resource <strong>does not</strong> have the
-    *                                                  specified global permission, or
+    *                                                  specified global permissions, or
     *                                                  if the accessor resource does not exist
     */
    public void assertGlobalResourcePermissions(Resource accessorResource,
                                                String resourceClassName,
                                                String domainName,
-                                               ResourcePermission resourcePermission);
+                                               ResourcePermission... resourcePermissions);
 
    /**
-    * Checks if the specified accessor resource has the specified global resource permission on
+    * Checks if the specified accessor resource has the specified global resource permissions on
     * the specified resource class in the session resource's domain.
     * This method takes into account any global permissions that the accessor resource may have.
     *
-    * @param accessorResource   the resource on which access is being checked
-    * @param resourceClassName  a string resource class name
-    * @param resourcePermission the permission to be checked
-    * @return <strong>true</strong> if the accessor resource has the specified global permission,
+    * @param accessorResource    the resource on which access is being checked
+    * @param resourceClassName   a string resource class name
+    * @param resourcePermissions the permissions to be checked
+    * @return <strong>true</strong> if the accessor resource has the specified global permissions,
     *         <strong>false</strong> otherwise, or if the accessor resource does not exist
     * @throws java.lang.IllegalArgumentException if no resource class of resourceClassName exists, or
-    *                                            if resourcePermission is invalid for the resource class
+    *                                            if any resourcePermission is invalid for the resource class
     */
    public boolean hasGlobalResourcePermissions(Resource accessorResource,
                                                String resourceClassName,
-                                               ResourcePermission resourcePermission);
+                                               ResourcePermission... resourcePermissions);
 
    /**
-    * Checks if the specified accessor resource has the specified global resource permission on
+    * Checks if the specified accessor resource has the specified global resource permissions on
     * the specified resource class in the specified domain.
     * This method takes into account any global permissions that the accessor resource may have.
     *
-    * @param accessorResource   the resource on which access is being checked
-    * @param resourceClassName  a string resource class name
-    * @param domainName         the domain in which the permission should be checked
-    * @param resourcePermission the permission to be checked
-    * @return <strong>true</strong> if the accessor resource has the specified global permission,
+    * @param accessorResource    the resource on which access is being checked
+    * @param resourceClassName   a string resource class name
+    * @param domainName          the domain in which the permission should be checked
+    * @param resourcePermissions the permissions to be checked
+    * @return <strong>true</strong> if the accessor resource has the specified global permissions,
     *         <strong>false</strong> otherwise, or if the accessor resource does not exist
     * @throws java.lang.IllegalArgumentException if no resource class of resourceClassName exists, or
-    *                                            if resourcePermission is invalid for the resource class, or
+    *                                            if any resourcePermission is invalid for the resource class, or
     *                                            if no domain of domainName exists
     */
    public boolean hasGlobalResourcePermissions(Resource accessorResource,
                                                String resourceClassName,
                                                String domainName,
-                                               ResourcePermission resourcePermission);
+                                               ResourcePermission... resourcePermissions);
 
    /**
     * Checks if the specified accessor resource has the specified resource permission

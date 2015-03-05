@@ -31,7 +31,7 @@ public class TestAccessControl_hasGlobalResourcePermissions extends TestAccessCo
    public void hasGlobalResourcePermissions_succeedsAsSystemResource() {
       authenticateSystemResource();
       // setup permission without granting it to anything
-      final String resourceClassName = generateResourceClass(false, false);
+      final String resourceClassName = generateResourceClass(true, false);
       final String customPermissionName = generateResourceClassPermission(resourceClassName);
 
       // verify setup
@@ -45,6 +45,12 @@ public class TestAccessControl_hasGlobalResourcePermissions extends TestAccessCo
                                                              ResourcePermissions.getInstance(customPermissionName))) {
          fail("checking implicit global resource permission as system resource should have succeeded");
       }
+      if (!accessControlContext.hasGlobalResourcePermissions(SYS_RESOURCE,
+                                                             resourceClassName,
+                                                             ResourcePermissions.getInstance(ResourcePermissions.IMPERSONATE),
+                                                             ResourcePermissions.getInstance(customPermissionName))) {
+         fail("checking multiple implicit global resource permission as system resource should have succeeded");
+      }
 
       final String domainName = generateDomain();
       final Set<ResourceCreatePermission> allResourceCreatePermissionsForResourceClassAndDomain
@@ -56,6 +62,13 @@ public class TestAccessControl_hasGlobalResourcePermissions extends TestAccessCo
                                                              ResourcePermissions.getInstance(customPermissionName))) {
          fail("checking implicit global resource permission for a specified domain as system resource should have succeeded");
       }
+      if (!accessControlContext.hasGlobalResourcePermissions(SYS_RESOURCE,
+                                                             resourceClassName,
+                                                             domainName,
+                                                             ResourcePermissions.getInstance(ResourcePermissions.IMPERSONATE),
+                                                             ResourcePermissions.getInstance(customPermissionName))) {
+         fail("checking multiple implicit global resource permission for a specified domain as system resource should have succeeded");
+      }
    }
 
    @Test
@@ -63,7 +76,7 @@ public class TestAccessControl_hasGlobalResourcePermissions extends TestAccessCo
       authenticateSystemResource();
 
       // setup permission without granting it to anything
-      final String resourceClassName = generateResourceClass(false, false);
+      final String resourceClassName = generateResourceClass(true, false);
       final String customPermissionName = generateResourceClassPermission(resourceClassName);
       final char[] password = generateUniquePassword();
       final Resource accessorResource = generateAuthenticatableResource(password);
@@ -82,6 +95,12 @@ public class TestAccessControl_hasGlobalResourcePermissions extends TestAccessCo
                                                             ResourcePermissions.getInstance(customPermissionName))) {
          fail("checking global resource permission when none has been granted should not have succeeded for authenticated resource");
       }
+      if (accessControlContext.hasGlobalResourcePermissions(accessorResource,
+                                                            resourceClassName,
+                                                            ResourcePermissions.getInstance(ResourcePermissions.IMPERSONATE),
+                                                            ResourcePermissions.getInstance(customPermissionName))) {
+         fail("checking multiple global resource permission when none has been granted should not have succeeded for authenticated resource");
+      }
 
       final String domainName = generateDomain();
       final Set<ResourceCreatePermission> allResourceCreatePermissionsForResourceClassAndDomain
@@ -92,6 +111,13 @@ public class TestAccessControl_hasGlobalResourcePermissions extends TestAccessCo
                                                             domainName,
                                                             ResourcePermissions.getInstance(customPermissionName))) {
          fail("checking global resource permission for domain when none has been granted should not have succeeded for authenticated resource");
+      }
+      if (accessControlContext.hasGlobalResourcePermissions(accessorResource,
+                                                            resourceClassName,
+                                                            domainName,
+                                                            ResourcePermissions.getInstance(ResourcePermissions.IMPERSONATE),
+                                                            ResourcePermissions.getInstance(customPermissionName))) {
+         fail("checking multiple global resource permission for domain when none has been granted should not have succeeded for authenticated resource");
       }
    }
 
@@ -150,6 +176,122 @@ public class TestAccessControl_hasGlobalResourcePermissions extends TestAccessCo
    }
 
    @Test
+   public void hasGlobalResourcePermissions_partialDirect_shouldFailAsAuthenticatedResource() {
+      authenticateSystemResource();
+
+      final char[] password = generateUniquePassword();
+      final Resource accessorResource = generateAuthenticatableResource(password);
+      final String accessorDomainName = accessControlContext.getDomainNameByResource(accessorResource);
+      final String otherDomainName = generateDomain();
+      final String resourceClassName = generateResourceClass(true, false);
+
+      // setup global permissions
+      final String customPermissionName_accessorDomain = generateResourceClassPermission(resourceClassName);
+      final ResourcePermission customPermission_forAccessorDomain
+            = ResourcePermissions.getInstance(customPermissionName_accessorDomain);
+
+      final String customPermissionName_otherDomain = generateResourceClassPermission(resourceClassName);
+      final ResourcePermission customPermission_forOtherDomain
+            = ResourcePermissions.getInstance(customPermissionName_otherDomain);
+
+      accessControlContext.setGlobalResourcePermissions(accessorResource,
+                                                        resourceClassName,
+                                                        accessorDomainName,
+                                                        setOf(customPermission_forAccessorDomain));
+
+      accessControlContext.setGlobalResourcePermissions(accessorResource,
+                                                        resourceClassName,
+                                                        otherDomainName,
+                                                        setOf(customPermission_forOtherDomain));
+
+      // authenticate accessor resource
+      accessControlContext.authenticate(accessorResource, PasswordCredentials.newInstance(password));
+
+      // verify
+      if (accessControlContext.hasGlobalResourcePermissions(accessorResource,
+                                                             resourceClassName,
+                                                             customPermission_forAccessorDomain,
+                                                             ResourcePermissions.getInstance(ResourcePermissions.IMPERSONATE))) {
+         fail("checking direct and unauthorized global resource permission should have failed for authenticated resource");
+      }
+
+      if (accessControlContext.hasGlobalResourcePermissions(accessorResource,
+                                                             resourceClassName,
+                                                             accessorDomainName,
+                                                             customPermission_forAccessorDomain,
+                                                             ResourcePermissions.getInstance(ResourcePermissions.IMPERSONATE))) {
+         fail("checking direct and unauthorized global resource permission on specified accessor domain should have failed for authenticated resource");
+      }
+
+      if (accessControlContext.hasGlobalResourcePermissions(accessorResource,
+                                                             resourceClassName,
+                                                             otherDomainName,
+                                                             customPermission_forAccessorDomain,
+                                                             ResourcePermissions.getInstance(ResourcePermissions.IMPERSONATE))) {
+         fail("checking direct and unauthorized global resource permission on specified domain should have failed for authenticated resource");
+      }
+   }
+
+   @Test
+   public void hasGlobalResourcePermissions_multipleDirect_succeedsAsAuthenticatedResource() {
+      authenticateSystemResource();
+
+      final char[] password = generateUniquePassword();
+      final Resource accessorResource = generateAuthenticatableResource(password);
+      final String accessorDomainName = accessControlContext.getDomainNameByResource(accessorResource);
+      final String otherDomainName = generateDomain();
+      final String resourceClassName = generateResourceClass(true, false);
+
+      // setup global permissions
+      final String customPermissionName_accessorDomain = generateResourceClassPermission(resourceClassName);
+      final ResourcePermission customPermission_forAccessorDomain
+            = ResourcePermissions.getInstance(customPermissionName_accessorDomain);
+
+      final String customPermissionName_otherDomain = generateResourceClassPermission(resourceClassName);
+      final ResourcePermission customPermission_forOtherDomain
+            = ResourcePermissions.getInstance(customPermissionName_otherDomain);
+
+      accessControlContext.setGlobalResourcePermissions(accessorResource,
+                                                        resourceClassName,
+                                                        accessorDomainName,
+                                                        setOf(customPermission_forAccessorDomain,
+                                                              ResourcePermissions.getInstance(ResourcePermissions.IMPERSONATE)));
+
+      accessControlContext.setGlobalResourcePermissions(accessorResource,
+                                                        resourceClassName,
+                                                        otherDomainName,
+                                                        setOf(customPermission_forOtherDomain,
+                                                              ResourcePermissions.getInstance(ResourcePermissions.IMPERSONATE)));
+
+      // authenticate accessor resource
+      accessControlContext.authenticate(accessorResource, PasswordCredentials.newInstance(password));
+
+      // verify
+      if (!accessControlContext.hasGlobalResourcePermissions(accessorResource,
+                                                             resourceClassName,
+                                                             customPermission_forAccessorDomain,
+                                                             ResourcePermissions.getInstance(ResourcePermissions.IMPERSONATE))) {
+         fail("checking multiple direct global resource permission should have succeeded for authenticated resource");
+      }
+
+      if (!accessControlContext.hasGlobalResourcePermissions(accessorResource,
+                                                             resourceClassName,
+                                                             accessorDomainName,
+                                                             customPermission_forAccessorDomain,
+                                                             ResourcePermissions.getInstance(ResourcePermissions.IMPERSONATE))) {
+         fail("checking multiple direct global resource permission on specified accessor domain should have succeeded for authenticated resource");
+      }
+
+      if (!accessControlContext.hasGlobalResourcePermissions(accessorResource,
+                                                             resourceClassName,
+                                                             otherDomainName,
+                                                             customPermission_forOtherDomain,
+                                                             ResourcePermissions.getInstance(ResourcePermissions.IMPERSONATE))) {
+         fail("checking multiple direct global resource permission on specified domain should have succeeded for authenticated resource");
+      }
+   }
+
+   @Test
    public void hasGlobalResourcePermissions_directWithDifferentGrantingRights_succeedsAsAuthenticatedResource() {
       authenticateSystemResource();
 
@@ -188,11 +330,7 @@ public class TestAccessControl_hasGlobalResourcePermissions extends TestAccessCo
       // verify
       if (!accessControlContext.hasGlobalResourcePermissions(accessorResource,
                                                              resourceClassName,
-                                                             customPermission_forAccessorDomain_withGrant)) {
-         fail("checking global resource permission with grant for a direct global permission with grant should have succeeded for authenticated resource");
-      }
-      if (!accessControlContext.hasGlobalResourcePermissions(accessorResource,
-                                                             resourceClassName,
+                                                             customPermission_forAccessorDomain_withGrant,
                                                              customPermission_forAccessorDomain_withoutGrant)) {
          fail("checking global resource permission without grant for a direct global permission with grant should have succeeded for authenticated resource");
       }
@@ -200,12 +338,7 @@ public class TestAccessControl_hasGlobalResourcePermissions extends TestAccessCo
       if (!accessControlContext.hasGlobalResourcePermissions(accessorResource,
                                                              resourceClassName,
                                                              accessorDomainName,
-                                                             customPermission_forAccessorDomain_withGrant)) {
-         fail("checking global resource permission with grant for a direct global permission (for a domain) with grant should have succeeded for authenticated resource");
-      }
-      if (!accessControlContext.hasGlobalResourcePermissions(accessorResource,
-                                                             resourceClassName,
-                                                             accessorDomainName,
+                                                             customPermission_forAccessorDomain_withGrant,
                                                              customPermission_forAccessorDomain_withoutGrant)) {
          fail("checking global resource permission without grant for a direct global permission (for a domain) with grant should have succeeded for authenticated resource");
       }
@@ -333,12 +466,7 @@ public class TestAccessControl_hasGlobalResourcePermissions extends TestAccessCo
       // verify
       if (!accessControlContext.hasGlobalResourcePermissions(accessorResource,
                                                              resourceClassName,
-                                                             customPermission_forParentDomain)) {
-         fail("checking domain-inherited global resource permission should have succeeded for authenticated resource");
-      }
-
-      if (!accessControlContext.hasGlobalResourcePermissions(accessorResource,
-                                                             resourceClassName,
+                                                             customPermission_forParentDomain,
                                                              customPermission_forAccessorDomain)) {
          fail("checking direct global resource permission in presence of domain-inherited permissions should have succeeded for authenticated resource");
       }
@@ -360,17 +488,10 @@ public class TestAccessControl_hasGlobalResourcePermissions extends TestAccessCo
       if (!accessControlContext.hasGlobalResourcePermissions(accessorResource,
                                                              resourceClassName,
                                                              accessorDomainName,
-                                                             customPermission_forParentDomain)) {
-         fail("checking domain-inherited global resource permission (for child domain) should have succeeded for authenticated resource");
-      }
-
-      if (!accessControlContext.hasGlobalResourcePermissions(accessorResource,
-                                                             resourceClassName,
-                                                             accessorDomainName,
+                                                             customPermission_forParentDomain,
                                                              customPermission_forAccessorDomain)) {
-         fail("checking direct global resource permission in presence of domain-inherited permissions (for child domain) should have succeeded for authenticated resource");
+         fail("checking direct and domain-inherited global resource permission (for child domain) should have succeeded for authenticated resource");
       }
-
       if (!accessControlContext.hasGlobalResourcePermissions(accessorResource,
                                                              resourceClassName,
                                                              otherDomainName,
@@ -383,6 +504,13 @@ public class TestAccessControl_hasGlobalResourcePermissions extends TestAccessCo
                                                              otherDomainName,
                                                              customPermission_forParentDomain)) {
          fail("checking domain-inherited global resource permission (for sibling domain) should have succeeded for authenticated resource");
+      }
+      if (!accessControlContext.hasGlobalResourcePermissions(accessorResource,
+                                                             resourceClassName,
+                                                             otherDomainName,
+                                                             customPermission_forOtherDomain,
+                                                             customPermission_forParentDomain)) {
+         fail("checking direct and domain-inherited global resource permission (for sibling domain) should have succeeded for authenticated resource");
       }
    }
 
@@ -435,15 +563,9 @@ public class TestAccessControl_hasGlobalResourcePermissions extends TestAccessCo
       if (!accessControlContext.hasGlobalResourcePermissions(accessorResource,
                                                              resourceClassName,
                                                              donorDomainName,
-                                                             customPermission_forParentDomain)) {
-         fail("checking inherited domain-inherited global resource permission (on child domain) should have succeeded for authenticated resource");
-      }
-
-      if (!accessControlContext.hasGlobalResourcePermissions(accessorResource,
-                                                             resourceClassName,
-                                                             donorDomainName,
+                                                             customPermission_forParentDomain,
                                                              customPermission_forDonorDomain)) {
-         fail("checking direct global resource permission in presence of inherited domain-inherited permissions (on child domain) should have succeeded for authenticated resource");
+         fail("checking inherited domain-inherited and direct global resource permission (on child domain) should have succeeded for authenticated resource");
       }
    }
 
@@ -484,14 +606,9 @@ public class TestAccessControl_hasGlobalResourcePermissions extends TestAccessCo
       // verify
       if (!accessControlContext.hasGlobalResourcePermissions(accessorResource,
                                                              resourceClassName,
-                                                             customPermission_forParentDomain)) {
-         fail("checking implicit domain-inherited global resource permission when having super-user privileges should have succeeded for authenticated resource");
-      }
-
-      if (!accessControlContext.hasGlobalResourcePermissions(accessorResource,
-                                                             resourceClassName,
+                                                             customPermission_forParentDomain,
                                                              customPermission_forAccessorDomain)) {
-         fail("checking implicit global resource permission when having super-user privileges should have succeeded for authenticated resource");
+         fail("checking implicit and domain-inherited global resource permission when having super-user privileges should have succeeded for authenticated resource");
       }
 
       if (!accessControlContext.hasGlobalResourcePermissions(accessorResource,
@@ -511,29 +628,17 @@ public class TestAccessControl_hasGlobalResourcePermissions extends TestAccessCo
       if (!accessControlContext.hasGlobalResourcePermissions(accessorResource,
                                                              resourceClassName,
                                                              accessorDomainName,
-                                                             customPermission_forParentDomain)) {
-         fail("checking implicit domain-inherited global resource permission (on accessor domain) when having super-user privileges should have succeeded for authenticated resource");
-      }
-
-      if (!accessControlContext.hasGlobalResourcePermissions(accessorResource,
-                                                             resourceClassName,
-                                                             accessorDomainName,
+                                                             customPermission_forParentDomain,
                                                              customPermission_forAccessorDomain)) {
-         fail("checking implicit global resource permission (on accessor domain) when having super-user privileges should have succeeded for authenticated resource");
+         fail("checking implicit and domain-inherited global resource permission (on accessor domain) when having super-user privileges should have succeeded for authenticated resource");
       }
 
       if (!accessControlContext.hasGlobalResourcePermissions(accessorResource,
                                                              resourceClassName,
                                                              otherDomainName,
-                                                             customPermission_forOtherDomain)) {
-         fail("checking implicit global resource permission (on sibling domain) when having super-user privileges should have succeeded for authenticated resource");
-      }
-
-      if (!accessControlContext.hasGlobalResourcePermissions(accessorResource,
-                                                             resourceClassName,
-                                                             otherDomainName,
+                                                             customPermission_forOtherDomain,
                                                              customPermission_forParentDomain)) {
-         fail("checking implicit domain-inherited global resource permission (on sibling domain) when having super-user privileges should have succeeded for authenticated resource");
+         fail("checking implicit and domain-inherited global resource permission (on sibling domain) when having super-user privileges should have succeeded for authenticated resource");
       }
    }
 
@@ -579,14 +684,9 @@ public class TestAccessControl_hasGlobalResourcePermissions extends TestAccessCo
       // verify
       if (!accessControlContext.hasGlobalResourcePermissions(accessorResource,
                                                              resourceClassName,
-                                                             customPermission_forParentDomain)) {
-         fail("checking implicit domain-inherited global resource permission when having inherited super-user privileges should have succeeded for authenticated resource");
-      }
-
-      if (!accessControlContext.hasGlobalResourcePermissions(accessorResource,
-                                                             resourceClassName,
+                                                             customPermission_forParentDomain,
                                                              customPermission_forAccessorDomain)) {
-         fail("checking implicit global resource permission when having inherited super-user privileges should have succeeded for authenticated resource");
+         fail("checking implicit and domain-inherited global resource permission when having inherited super-user privileges should have succeeded for authenticated resource");
       }
 
       if (!accessControlContext.hasGlobalResourcePermissions(accessorResource,
@@ -606,29 +706,17 @@ public class TestAccessControl_hasGlobalResourcePermissions extends TestAccessCo
       if (!accessControlContext.hasGlobalResourcePermissions(accessorResource,
                                                              resourceClassName,
                                                              accessorDomainName,
-                                                             customPermission_forParentDomain)) {
-         fail("checking implicit domain-inherited global resource permission (on accessor domain) when having inherited super-user privileges should have succeeded for authenticated resource");
-      }
-
-      if (!accessControlContext.hasGlobalResourcePermissions(accessorResource,
-                                                             resourceClassName,
-                                                             accessorDomainName,
+                                                             customPermission_forParentDomain,
                                                              customPermission_forAccessorDomain)) {
-         fail("checking implicit global resource permission (on accessor domain) when having inherited super-user privileges should have succeeded for authenticated resource");
+         fail("checking implicit and domain-inherited global resource permission (on accessor domain) when having inherited super-user privileges should have succeeded for authenticated resource");
       }
 
       if (!accessControlContext.hasGlobalResourcePermissions(accessorResource,
                                                              resourceClassName,
                                                              otherDomainName,
-                                                             customPermission_forOtherDomain)) {
-         fail("checking implicit global resource permission (on sibling domain) when having inherited super-user privileges should have succeeded for authenticated resource");
-      }
-
-      if (!accessControlContext.hasGlobalResourcePermissions(accessorResource,
-                                                             resourceClassName,
-                                                             otherDomainName,
+                                                             customPermission_forOtherDomain,
                                                              customPermission_forParentDomain)) {
-         fail("checking implicit domain-inherited global resource permission (on sibling domain) when having inherited super-user privileges should have succeeded for authenticated resource");
+         fail("checking implicit and implicit domain-inherited global resource permission (on sibling domain) when having inherited super-user privileges should have succeeded for authenticated resource");
       }
    }
 
@@ -659,6 +747,17 @@ public class TestAccessControl_hasGlobalResourcePermissions extends TestAccessCo
       catch (IllegalArgumentException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("not valid for unauthenticatable resource class"));
       }
+      try {
+         accessControlContext
+               .hasGlobalResourcePermissions(SYS_RESOURCE,
+                                             resourceClassName,
+                                             ResourcePermissions.getInstance(ResourcePermissions.INHERIT),
+                                             ResourcePermissions.getInstance(ResourcePermissions.IMPERSONATE));
+         fail("checking implicit global resource permission invalid and valid for resource class should have failed for system resource");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("not valid for unauthenticatable resource class"));
+      }
 
       final String domainName = generateDomain();
       try {
@@ -679,6 +778,18 @@ public class TestAccessControl_hasGlobalResourcePermissions extends TestAccessCo
                                              domainName,
                                              ResourcePermissions.getInstance(ResourcePermissions.IMPERSONATE));
          fail("checking implicit global resource permission (for a domain) invalid for resource class should have failed for system resource");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("not valid for unauthenticatable resource class"));
+      }
+      try {
+         accessControlContext
+               .hasGlobalResourcePermissions(SYS_RESOURCE,
+                                             resourceClassName,
+                                             domainName,
+                                             ResourcePermissions.getInstance(ResourcePermissions.INHERIT),
+                                             ResourcePermissions.getInstance(ResourcePermissions.IMPERSONATE));
+         fail("checking implicit global resource permission (for a domain) invalid and valid for resource class should have failed for system resource");
       }
       catch (IllegalArgumentException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("not valid for unauthenticatable resource class"));
@@ -788,10 +899,29 @@ public class TestAccessControl_hasGlobalResourcePermissions extends TestAccessCo
          accessControlContext.hasGlobalResourcePermissions(SYS_RESOURCE,
                                                            resourceClassName,
                                                            null);
-         fail("checking global resource permission for null resource permission reference should have failed for system resource");
+         fail("checking global resource permission for null resource permission should have failed for system resource");
       }
       catch (NullPointerException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("resource permission required"));
+      }
+      try {
+         accessControlContext.hasGlobalResourcePermissions(SYS_RESOURCE,
+                                                           resourceClassName,
+                                                           new ResourcePermission[] {null});
+         fail("checking global resource permission for null resource permission element should have failed for system resource");
+      }
+      catch (NullPointerException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("without null element"));
+      }
+      try {
+         accessControlContext.hasGlobalResourcePermissions(SYS_RESOURCE,
+                                                           resourceClassName,
+                                                           ResourcePermissions.getInstance(customPermissionName),
+                                                           null);
+         fail("checking global resource permission for null resource permission element should have failed for system resource");
+      }
+      catch (NullPointerException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("without null element"));
       }
 
       final String domainName = generateDomain();
@@ -820,7 +950,7 @@ public class TestAccessControl_hasGlobalResourcePermissions extends TestAccessCo
                                                            resourceClassName,
                                                            domainName,
                                                            null);
-         fail("checking global resource permission (by domain) for null resource permission reference should have failed for system resource");
+         fail("checking global resource permission (by domain) for null resource permission should have failed for system resource");
       }
       catch (NullPointerException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("resource permission required"));
@@ -828,12 +958,108 @@ public class TestAccessControl_hasGlobalResourcePermissions extends TestAccessCo
       try {
          accessControlContext.hasGlobalResourcePermissions(SYS_RESOURCE,
                                                            resourceClassName,
-                                                           null,
+                                                           domainName,
+                                                           new ResourcePermission[]{null});
+         fail("checking global resource permission (by domain) for null resource permission element should have failed for system resource");
+      }
+      catch (NullPointerException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("without null element"));
+      }
+      try {
+         accessControlContext.hasGlobalResourcePermissions(SYS_RESOURCE,
+                                                           resourceClassName,
+                                                           domainName,
+                                                           ResourcePermissions.getInstance(customPermissionName),
+                                                           null);
+         fail("checking global resource permission (by domain) for null resource permission element should have failed for system resource");
+      }
+      catch (NullPointerException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("without null element"));
+      }
+      try {
+         accessControlContext.hasGlobalResourcePermissions(SYS_RESOURCE,
+                                                           resourceClassName,
+                                                           (String) null,
                                                            ResourcePermissions.getInstance(customPermissionName));
          fail("checking global resource permission (by domain) for null domain reference should have failed for system resource");
       }
       catch (NullPointerException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("domain required"));
+      }
+   }
+
+   @Test
+   public void hasGlobalResourcePermissions_emptyPermissions_shouldFail() {
+      authenticateSystemResource();
+
+      final String resourceClassName = generateResourceClass(false, false);
+
+      try {
+         accessControlContext.hasGlobalResourcePermissions(SYS_RESOURCE, resourceClassName);
+         fail("checking global resource permission with empty permissions should have failed for system resource");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("non-empty"));
+      }
+      try {
+         accessControlContext.hasGlobalResourcePermissions(SYS_RESOURCE,
+                                                           resourceClassName,
+                                                           new ResourcePermission[] {});
+         fail("checking global resource permission with empty permissions should have failed for system resource");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("non-empty"));
+      }
+
+      final String domainName = generateDomain();
+      try {
+         accessControlContext.hasGlobalResourcePermissions(SYS_RESOURCE, resourceClassName, domainName);
+         fail("checking global resource permission (for domain) with empty permissions should have failed for system resource");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("non-empty"));
+      }
+      try {
+         accessControlContext.hasGlobalResourcePermissions(SYS_RESOURCE,
+                                                           resourceClassName,
+                                                           domainName,
+                                                           new ResourcePermission[] {});
+         fail("checking global resource permission (for domain) with empty permissions should have failed for system resource");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("non-empty"));
+      }
+   }
+
+   @Test
+   public void hasGlobalResourcePermissions_duplicatePermissions_shouldFailAsSystemResource() {
+      authenticateSystemResource();
+      // setup permission without granting it to anything
+      final String resourceClassName = generateResourceClass(true, false);
+
+      // verify
+      try {
+         accessControlContext.hasGlobalResourcePermissions(SYS_RESOURCE,
+                                                           resourceClassName,
+                                                           ResourcePermissions.getInstance(ResourcePermissions.IMPERSONATE),
+                                                           ResourcePermissions.getInstance(ResourcePermissions.IMPERSONATE));
+         fail("checking global resource permission with duplicates should have failed as system resource");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("duplicate"));
+      }
+
+      final String domainName = generateDomain();
+      try {
+         accessControlContext.hasGlobalResourcePermissions(SYS_RESOURCE,
+                                                           resourceClassName,
+                                                           domainName,
+                                                           ResourcePermissions.getInstance(ResourcePermissions.IMPERSONATE),
+                                                           ResourcePermissions.getInstance(ResourcePermissions.IMPERSONATE));
+         fail("checking global resource permission with duplicates should have failed as system resource");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("duplicate"));
       }
    }
 
@@ -884,6 +1110,16 @@ public class TestAccessControl_hasGlobalResourcePermissions extends TestAccessCo
       catch (IllegalArgumentException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("not defined for resource class"));
       }
+      try {
+         accessControlContext.hasGlobalResourcePermissions(SYS_RESOURCE,
+                                                           resourceClassName,
+                                                           ResourcePermissions.getInstance(customPermissionName),
+                                                           ResourcePermissions.getInstance("invalid_permission"));
+         fail("checking global resource permission for valid and invalid resource permission reference should have failed for system resource");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("not defined for resource class"));
+      }
 
       final String domainName = generateDomain();
       try {
@@ -899,6 +1135,16 @@ public class TestAccessControl_hasGlobalResourcePermissions extends TestAccessCo
       try {
          accessControlContext.hasGlobalResourcePermissions(SYS_RESOURCE,
                                                            resourceClassName,
+                                                           "invalid_domain",
+                                                           ResourcePermissions.getInstance(customPermissionName));
+         fail("checking global resource permission (by domain) for invalid domain reference should have failed for system resource");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("could not find domain"));
+      }
+      try {
+         accessControlContext.hasGlobalResourcePermissions(SYS_RESOURCE,
+                                                           resourceClassName,
                                                            domainName,
                                                            ResourcePermissions.getInstance("invalid_permission"));
          fail("checking global resource permission (by domain) for invalid resource permission reference should have failed for system resource");
@@ -909,12 +1155,13 @@ public class TestAccessControl_hasGlobalResourcePermissions extends TestAccessCo
       try {
          accessControlContext.hasGlobalResourcePermissions(SYS_RESOURCE,
                                                            resourceClassName,
-                                                           "invalid_domain",
-                                                           ResourcePermissions.getInstance(customPermissionName));
-         fail("checking global resource permission (by domain) for invalid domain reference should have failed for system resource");
+                                                           domainName,
+                                                           ResourcePermissions.getInstance(customPermissionName),
+                                                           ResourcePermissions.getInstance("invalid_permission"));
+         fail("checking global resource permission (by domain) for valid and invalid resource permission reference should have failed for system resource");
       }
       catch (IllegalArgumentException e) {
-         assertThat(e.getMessage().toLowerCase(), containsString("could not find domain"));
+         assertThat(e.getMessage().toLowerCase(), containsString("not defined for resource class"));
       }
    }
 }

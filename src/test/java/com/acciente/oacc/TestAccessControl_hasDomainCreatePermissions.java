@@ -574,6 +574,13 @@ public class TestAccessControl_hasDomainCreatePermissions extends TestAccessCont
       catch (NullPointerException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("without null element"));
       }
+      try {
+         accessControlContext.hasDomainCreatePermissions(accessorResource, domainCreatePermission, null);
+         fail("checking domain create permission with null permission element should have failed");
+      }
+      catch (NullPointerException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("without null element"));
+      }
    }
 
    @Test
