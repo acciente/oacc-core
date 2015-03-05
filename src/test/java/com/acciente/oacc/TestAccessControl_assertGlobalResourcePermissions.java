@@ -26,9 +26,9 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 
-public class TestAccessControl_assertGlobalResourcePermission extends TestAccessControlBase {
+public class TestAccessControl_assertGlobalResourcePermissions extends TestAccessControlBase {
    @Test
-   public void assertGlobalResourcePermission_succeedsAsSystemResource() {
+   public void assertGlobalResourcePermissions_succeedsAsSystemResource() {
       authenticateSystemResource();
       // setup permission without granting it to anything
       final String resourceClassName = generateResourceClass(false, false);
@@ -55,7 +55,7 @@ public class TestAccessControl_assertGlobalResourcePermission extends TestAccess
    }
 
    @Test
-   public void assertGlobalResourcePermission_noPermissions_shouldFailAsAuthenticated() {
+   public void assertGlobalResourcePermissions_noPermissions_shouldFailAsAuthenticated() {
       authenticateSystemResource();
 
       // setup permission without granting it to anything
@@ -100,7 +100,7 @@ public class TestAccessControl_assertGlobalResourcePermission extends TestAccess
    }
 
    @Test
-   public void assertGlobalResourcePermission_direct_succeedsAsAuthenticatedResource() {
+   public void assertGlobalResourcePermissions_direct_succeedsAsAuthenticatedResource() {
       authenticateSystemResource();
 
       final char[] password = generateUniquePassword();
@@ -148,7 +148,7 @@ public class TestAccessControl_assertGlobalResourcePermission extends TestAccess
    }
 
    @Test
-   public void assertGlobalResourcePermission_directWithDifferentGrantingRights_succeedsAsAuthenticatedResource() {
+   public void assertGlobalResourcePermissions_directWithDifferentGrantingRights_succeedsAsAuthenticatedResource() {
       authenticateSystemResource();
 
       final char[] password = generateUniquePassword();
@@ -217,7 +217,7 @@ public class TestAccessControl_assertGlobalResourcePermission extends TestAccess
    }
 
    @Test
-   public void assertGlobalResourcePermission_resourceInherited_succeedsAsAuthenticatedResource() {
+   public void assertGlobalResourcePermissions_resourceInherited_succeedsAsAuthenticatedResource() {
       authenticateSystemResource();
 
       final char[] password = generateUniquePassword();
@@ -271,7 +271,7 @@ public class TestAccessControl_assertGlobalResourcePermission extends TestAccess
    }
 
    @Test
-   public void assertGlobalResourcePermission_domainInherited_succeedsAsAuthenticatedResource() {
+   public void assertGlobalResourcePermissions_domainInherited_succeedsAsAuthenticatedResource() {
       authenticateSystemResource();
       final String parentDomainName = generateDomain();
       final String intermediaryDomainName = generateUniqueDomainName();
@@ -356,7 +356,7 @@ public class TestAccessControl_assertGlobalResourcePermission extends TestAccess
    }
 
    @Test
-   public void assertGlobalResourcePermission_domainInheritedInherited_succeedsAsAuthenticatedResource() {
+   public void assertGlobalResourcePermissions_domainInheritedInherited_succeedsAsAuthenticatedResource() {
       authenticateSystemResource();
       final String parentDomainName = generateDomain();
       final String donorDomainName = generateUniqueDomainName();
@@ -411,7 +411,7 @@ public class TestAccessControl_assertGlobalResourcePermission extends TestAccess
    }
 
    @Test
-   public void assertGlobalResourcePermission_superUser_succeedsAsAuthenticatedResource() {
+   public void assertGlobalResourcePermissions_superUser_succeedsAsAuthenticatedResource() {
       authenticateSystemResource();
       final String parentDomainName = generateDomain();
       final String intermediaryDomainName = generateUniqueDomainName();
@@ -485,7 +485,7 @@ public class TestAccessControl_assertGlobalResourcePermission extends TestAccess
    }
 
    @Test
-   public void assertGlobalResourcePermission_superUserInherited_succeedsAsAuthenticatedResource() {
+   public void assertGlobalResourcePermissions_superUserInherited_succeedsAsAuthenticatedResource() {
       authenticateSystemResource();
       final String parentDomainName = generateDomain();
       final String intermediaryDomainName = generateUniqueDomainName();
@@ -564,7 +564,7 @@ public class TestAccessControl_assertGlobalResourcePermission extends TestAccess
    }
 
    @Test
-   public void assertGlobalResourcePermission_superUserInvalidPermission_shouldFailAsSystemResource() {
+   public void assertGlobalResourcePermissions_superUserInvalidPermission_shouldFailAsSystemResource() {
       authenticateSystemResource();
       // setup resourceClass without any permissions
       final String resourceClassName = generateResourceClass(false, false);
@@ -617,7 +617,7 @@ public class TestAccessControl_assertGlobalResourcePermission extends TestAccess
    }
 
    @Test
-   public void assertGlobalResourcePermission_whitespaceConsistent() {
+   public void assertGlobalResourcePermissions_whitespaceConsistent() {
       authenticateSystemResource();
       // setup permission without granting it to anything
       final String resourceClassName = generateResourceClass(false, false);
@@ -641,7 +641,7 @@ public class TestAccessControl_assertGlobalResourcePermission extends TestAccess
    }
 
    @Test
-   public void assertGlobalResourcePermission_whitespaceConsistent_asAuthenticatedResource() {
+   public void assertGlobalResourcePermissions_whitespaceConsistent_asAuthenticatedResource() {
       authenticateSystemResource();
 
       final String resourceClassName = generateResourceClass(false, false);
@@ -683,7 +683,7 @@ public class TestAccessControl_assertGlobalResourcePermission extends TestAccess
    }
 
    @Test
-   public void assertGlobalResourcePermission_nulls_shouldFail() {
+   public void assertGlobalResourcePermissions_nulls_shouldFail() {
       authenticateSystemResource();
 
       final String resourceClassName = generateResourceClass(false, false);
@@ -761,7 +761,7 @@ public class TestAccessControl_assertGlobalResourcePermission extends TestAccess
    }
 
    @Test
-   public void assertGlobalResourcePermission_nonExistentReferences_shouldFail() {
+   public void assertGlobalResourcePermissions_nonExistentReferences_shouldFail() {
       authenticateSystemResource();
 
       final String resourceClassName = generateResourceClass(false, false);

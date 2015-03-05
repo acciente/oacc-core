@@ -27,9 +27,9 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 
-public class TestAccessControl_assertDomainCreatePermission extends TestAccessControlBase {
+public class TestAccessControl_assertDomainCreatePermissions extends TestAccessControlBase {
    @Test
-   public void assertDomainCreatePermission_succeedsAsSystemResource() {
+   public void assertDomainCreatePermissions_succeedsAsSystemResource() {
       authenticateSystemResource();
 
       // verify setup
@@ -61,7 +61,7 @@ public class TestAccessControl_assertDomainCreatePermission extends TestAccessCo
    }
 
    @Test
-   public void assertDomainCreatePermission_noPermissions_shouldFailAsAuthenticated() {
+   public void assertDomainCreatePermissions_noPermissions_shouldFailAsAuthenticated() {
       authenticateSystemResource();
 
       // setup permission without granting it to anything
@@ -90,7 +90,7 @@ public class TestAccessControl_assertDomainCreatePermission extends TestAccessCo
    }
 
    @Test
-   public void assertDomainCreatePermission_direct_succeedsAsAuthenticatedResource() {
+   public void assertDomainCreatePermissions_direct_succeedsAsAuthenticatedResource() {
       authenticateSystemResource();
 
       final char[] password = generateUniquePassword();
@@ -111,7 +111,7 @@ public class TestAccessControl_assertDomainCreatePermission extends TestAccessCo
    }
 
    @Test
-   public void assertDomainCreatePermission_directWithDifferentGrantingRights_succeedsAsAuthenticatedResource() {
+   public void assertDomainCreatePermissions_directWithDifferentGrantingRights_succeedsAsAuthenticatedResource() {
       authenticateSystemResource();
 
       final char[] password = generateUniquePassword();
@@ -156,7 +156,7 @@ public class TestAccessControl_assertDomainCreatePermission extends TestAccessCo
    }
 
    @Test
-   public void assertDomainCreatePermission_resourceInherited_succeedsAsAuthenticatedResource() {
+   public void assertDomainCreatePermissions_resourceInherited_succeedsAsAuthenticatedResource() {
       authenticateSystemResource();
 
       final char[] password = generateUniquePassword();
@@ -182,7 +182,7 @@ public class TestAccessControl_assertDomainCreatePermission extends TestAccessCo
    }
 
    @Test
-   public void assertDomainCreatePermission_superUser_succeedsAsAuthenticatedResource() {
+   public void assertDomainCreatePermissions_superUser_succeedsAsAuthenticatedResource() {
       authenticateSystemResource();
 
       final char[] password = generateUniquePassword();
@@ -234,7 +234,7 @@ public class TestAccessControl_assertDomainCreatePermission extends TestAccessCo
    }
 
    @Test
-   public void assertDomainCreatePermission_inheritWithDifferentGrantingRights_shouldSucceedAsAuthorized() {
+   public void assertDomainCreatePermissions_inheritWithDifferentGrantingRights_shouldSucceedAsAuthorized() {
       authenticateSystemResource();
       final String donorPermissionName_createChild = DomainPermissions.CREATE_CHILD_DOMAIN;
       final String accessorPermissionName_createChild = donorPermissionName_createChild;
@@ -277,7 +277,7 @@ public class TestAccessControl_assertDomainCreatePermission extends TestAccessCo
    }
 
    @Test
-   public void assertDomainCreatePermission_inheritFromTwoResourcesWithDifferentGrantingRights_shouldSucceedAsAuthorized() {
+   public void assertDomainCreatePermissions_inheritFromTwoResourcesWithDifferentGrantingRights_shouldSucceedAsAuthorized() {
       authenticateSystemResource();
       final String donorPermissionName_createChild = DomainPermissions.CREATE_CHILD_DOMAIN;
       final char[] password = generateUniquePassword();
@@ -348,7 +348,7 @@ public class TestAccessControl_assertDomainCreatePermission extends TestAccessCo
    }
 
    @Test
-   public void assertDomainCreatePermission_multiLevelInheritance_shouldSucceedAsAuthorized() {
+   public void assertDomainCreatePermissions_multiLevelInheritance_shouldSucceedAsAuthorized() {
       authenticateSystemResource();
       final String donorPermissionName_createChild = DomainPermissions.CREATE_CHILD_DOMAIN;
       final String inheritorPermissionName_createChild = DomainPermissions.CREATE_CHILD_DOMAIN;
@@ -413,7 +413,7 @@ public class TestAccessControl_assertDomainCreatePermission extends TestAccessCo
    }
 
    @Test
-   public void assertDomainCreatePermission_multiLevelInheritanceWithEmptyIntermediaryLevel_shouldSucceedAsAuthorized() {
+   public void assertDomainCreatePermissions_multiLevelInheritanceWithEmptyIntermediaryLevel_shouldSucceedAsAuthorized() {
       authenticateSystemResource();
       final String donorPermissionName_createDomain = DomainPermissions.CREATE_CHILD_DOMAIN;
       final char[] password = generateUniquePassword();
@@ -462,7 +462,7 @@ public class TestAccessControl_assertDomainCreatePermission extends TestAccessCo
    }
 
    @Test
-   public void assertDomainCreatePermission_nulls_shouldFail() {
+   public void assertDomainCreatePermissions_nulls_shouldFail() {
       authenticateSystemResource();
       final Resource accessorResource = generateUnauthenticatableResource();
       final DomainCreatePermission domainCreatePermission = DomainCreatePermissions.getInstance(DomainCreatePermissions.CREATE);
@@ -484,7 +484,7 @@ public class TestAccessControl_assertDomainCreatePermission extends TestAccessCo
    }
 
    @Test
-   public void assertDomainCreatePermission_nonExistentReferences_shouldSucceed() {
+   public void assertDomainCreatePermissions_nonExistentReferences_shouldSucceed() {
       authenticateSystemResource();
 
       final Resource invalidResource = Resources.getInstance(-999L);

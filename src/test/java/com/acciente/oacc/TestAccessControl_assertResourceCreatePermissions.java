@@ -28,9 +28,9 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 
-public class TestAccessControl_assertResourceCreatePermission extends TestAccessControlBase {
+public class TestAccessControl_assertResourceCreatePermissions extends TestAccessControlBase {
    @Test
-   public void assertResourceCreatePermission_succeedsAsSystemResource() {
+   public void assertResourceCreatePermissions_succeedsAsSystemResource() {
       authenticateSystemResource();
       // setup permission without granting it to anything
       final String resourceClassName = generateResourceClass(false, false);
@@ -126,7 +126,7 @@ public class TestAccessControl_assertResourceCreatePermission extends TestAccess
    }
 
    @Test
-   public void assertResourceCreatePermission_noPermissions_shouldFailAsAuthenticated() {
+   public void assertResourceCreatePermissions_noPermissions_shouldFailAsAuthenticated() {
       authenticateSystemResource();
 
       // setup permission without granting it to anything
@@ -177,7 +177,7 @@ public class TestAccessControl_assertResourceCreatePermission extends TestAccess
    }
 
    @Test
-   public void assertResourceCreatePermission_direct_succeedsAsAuthenticatedResource() {
+   public void assertResourceCreatePermissions_direct_succeedsAsAuthenticatedResource() {
       authenticateSystemResource();
 
       final char[] password = generateUniquePassword();
@@ -249,7 +249,7 @@ public class TestAccessControl_assertResourceCreatePermission extends TestAccess
    }
 
    @Test
-   public void assertResourceCreatePermission_directWithDifferentGrantingRights_succeedsAsAuthenticatedResource() {
+   public void assertResourceCreatePermissions_directWithDifferentGrantingRights_succeedsAsAuthenticatedResource() {
       authenticateSystemResource();
 
       final char[] password = generateUniquePassword();
@@ -385,7 +385,7 @@ public class TestAccessControl_assertResourceCreatePermission extends TestAccess
    }
 
    @Test
-   public void assertResourceCreatePermission_resourceInherited_succeedsAsAuthenticatedResource() {
+   public void assertResourceCreatePermissions_resourceInherited_succeedsAsAuthenticatedResource() {
       authenticateSystemResource();
 
       final String resourceClassName = generateResourceClass(false, false);
@@ -450,7 +450,7 @@ public class TestAccessControl_assertResourceCreatePermission extends TestAccess
    }
 
    @Test
-   public void assertResourceCreatePermission_domainInherited_succeedsAsAuthenticatedResource() {
+   public void assertResourceCreatePermissions_domainInherited_succeedsAsAuthenticatedResource() {
       authenticateSystemResource();
 
       final String resourceClassName = generateResourceClass(false, false);
@@ -518,7 +518,7 @@ public class TestAccessControl_assertResourceCreatePermission extends TestAccess
    }
 
    @Test
-   public void assertResourceCreatePermission_domainInheritedInherited_succeedsAsAuthenticatedResource() {
+   public void assertResourceCreatePermissions_domainInheritedInherited_succeedsAsAuthenticatedResource() {
       authenticateSystemResource();
 
       final String resourceClassName = generateResourceClass(false, false);
@@ -595,7 +595,7 @@ public class TestAccessControl_assertResourceCreatePermission extends TestAccess
    }
 
    @Test
-   public void assertResourceCreatePermission_globalOnly_shouldFailAsAuthenticatedResource() {
+   public void assertResourceCreatePermissions_globalOnly_shouldFailAsAuthenticatedResource() {
       // special case where the requested permission hasn't been granted as a create permission
       // but will be available from the granted global permissions on the {resource class, domain}-tuple
       // Note that in this test case there is no *CREATE and no post-create permission, and the test should thus fail
@@ -659,7 +659,7 @@ public class TestAccessControl_assertResourceCreatePermission extends TestAccess
    }
 
    @Test
-   public void assertResourceCreatePermission_superUser_succeedsAsAuthenticatedResource() {
+   public void assertResourceCreatePermissions_superUser_succeedsAsAuthenticatedResource() {
       authenticateSystemResource();
 
       final String resourceClassName = generateResourceClass(false, false);
@@ -703,7 +703,7 @@ public class TestAccessControl_assertResourceCreatePermission extends TestAccess
    }
 
    @Test
-   public void assertResourceCreatePermission_superUserInherited_succeedsAsAuthenticatedResource() {
+   public void assertResourceCreatePermissions_superUserInherited_succeedsAsAuthenticatedResource() {
       authenticateSystemResource();
 
       final String resourceClassName = generateResourceClass(false, false);
@@ -742,7 +742,7 @@ public class TestAccessControl_assertResourceCreatePermission extends TestAccess
    }
 
    @Test
-   public void assertResourceCreatePermission_superUserInvalidPermission_shouldFailAsSystemResource() {
+   public void assertResourceCreatePermissions_superUserInvalidPermission_shouldFailAsSystemResource() {
       authenticateSystemResource();
       // setup resourceClass without any permissions
       final String resourceClassName = generateResourceClass(false, false);
@@ -808,7 +808,7 @@ public class TestAccessControl_assertResourceCreatePermission extends TestAccess
    }
 
    @Test
-   public void assertResourceCreatePermission_whitespaceConsistent() {
+   public void assertResourceCreatePermissions_whitespaceConsistent() {
       authenticateSystemResource();
       // setup permission without granting it to anything
       final String resourceClassName = generateResourceClass(false, false);
@@ -843,7 +843,7 @@ public class TestAccessControl_assertResourceCreatePermission extends TestAccess
    }
 
    @Test
-   public void assertResourceCreatePermission_whitespaceConsistent_asAuthenticatedResource() {
+   public void assertResourceCreatePermissions_whitespaceConsistent_asAuthenticatedResource() {
       authenticateSystemResource();
 
       final String resourceClassName = generateResourceClass(false, false);
@@ -878,7 +878,7 @@ public class TestAccessControl_assertResourceCreatePermission extends TestAccess
    }
 
    @Test
-   public void assertResourceCreatePermission_nulls_shouldFail() {
+   public void assertResourceCreatePermissions_nulls_shouldFail() {
       authenticateSystemResource();
 
       final String resourceClassName = generateResourceClass(false, false);
@@ -966,7 +966,7 @@ public class TestAccessControl_assertResourceCreatePermission extends TestAccess
    }
 
    @Test
-   public void assertResourceCreatePermission_nonExistentReferences_shouldFail() {
+   public void assertResourceCreatePermissions_nonExistentReferences_shouldFail() {
       authenticateSystemResource();
 
       final String resourceClassName = generateResourceClass(false, false);

@@ -26,9 +26,9 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 
-public class TestAccessControl_hasResourcePermission extends TestAccessControlBase {
+public class TestAccessControl_hasResourcePermissions extends TestAccessControlBase {
    @Test
-   public void hasResourcePermission_succeedsAsSystemResource() {
+   public void hasResourcePermissions_succeedsAsSystemResource() {
       authenticateSystemResource();
 
       // setup permission without granting it to anything
@@ -51,7 +51,7 @@ public class TestAccessControl_hasResourcePermission extends TestAccessControlBa
    }
 
    @Test
-   public void hasResourcePermission_noPermissions_shouldFailAsAuthenticated() {
+   public void hasResourcePermissions_noPermissions_shouldFailAsAuthenticated() {
       authenticateSystemResource();
 
       // setup permission without granting it to anything
@@ -80,7 +80,7 @@ public class TestAccessControl_hasResourcePermission extends TestAccessControlBa
    }
 
    @Test
-   public void hasResourcePermission_direct_succeedsAsAuthenticatedResource() {
+   public void hasResourcePermissions_direct_succeedsAsAuthenticatedResource() {
       authenticateSystemResource();
 
       final char[] password = generateUniquePassword();
@@ -106,7 +106,7 @@ public class TestAccessControl_hasResourcePermission extends TestAccessControlBa
    }
 
    @Test
-   public void hasResourcePermission_directWithDifferentGrantingRights_succeedsAsAuthenticatedResource() {
+   public void hasResourcePermissions_directWithDifferentGrantingRights_succeedsAsAuthenticatedResource() {
       authenticateSystemResource();
 
       final char[] password = generateUniquePassword();
@@ -152,7 +152,7 @@ public class TestAccessControl_hasResourcePermission extends TestAccessControlBa
    }
 
    @Test
-   public void hasResourcePermission_resourceInherited_succeedsAsAuthenticatedResource() {
+   public void hasResourcePermissions_resourceInherited_succeedsAsAuthenticatedResource() {
       authenticateSystemResource();
 
       final char[] password = generateUniquePassword();
@@ -184,7 +184,7 @@ public class TestAccessControl_hasResourcePermission extends TestAccessControlBa
    }
 
    @Test
-   public void hasResourcePermission_domainInherited_succeedsAsAuthenticatedResource() {
+   public void hasResourcePermissions_domainInherited_succeedsAsAuthenticatedResource() {
       authenticateSystemResource();
 
       final String parentDomainName = generateDomain();
@@ -217,7 +217,7 @@ public class TestAccessControl_hasResourcePermission extends TestAccessControlBa
    }
 
    @Test
-   public void hasResourcePermission_domainInheritedInherited_succeedsAsAuthenticatedResource() {
+   public void hasResourcePermissions_domainInheritedInherited_succeedsAsAuthenticatedResource() {
       authenticateSystemResource();
 
       final String parentDomainName = generateDomain();
@@ -256,7 +256,7 @@ public class TestAccessControl_hasResourcePermission extends TestAccessControlBa
    }
 
    @Test
-   public void hasResourcePermission_superUser_succeedsAsAuthenticatedResource() {
+   public void hasResourcePermissions_superUser_succeedsAsAuthenticatedResource() {
       authenticateSystemResource();
 
       final String parentDomainName = generateDomain();
@@ -289,7 +289,7 @@ public class TestAccessControl_hasResourcePermission extends TestAccessControlBa
    }
 
    @Test
-   public void hasResourcePermission_superUserInherited_succeedsAsAuthenticatedResource() {
+   public void hasResourcePermissions_superUserInherited_succeedsAsAuthenticatedResource() {
       authenticateSystemResource();
 
       final String parentDomainName = generateDomain();
@@ -328,7 +328,7 @@ public class TestAccessControl_hasResourcePermission extends TestAccessControlBa
    }
 
    @Test
-   public void hasResourcePermission_superUserInvalidPermission_shouldFailAsSystemResource() {
+   public void hasResourcePermissions_superUserInvalidPermission_shouldFailAsSystemResource() {
       authenticateSystemResource();
       // setup unauthenticatable resource without any permissions
       final Resource unauthenticatableResource = generateUnauthenticatableResource();
@@ -355,7 +355,7 @@ public class TestAccessControl_hasResourcePermission extends TestAccessControlBa
    }
 
    @Test
-   public void hasResourcePermission_nulls_shouldFail() {
+   public void hasResourcePermissions_nulls_shouldFail() {
       authenticateSystemResource();
 
       final char[] password = generateUniquePassword();
@@ -396,7 +396,7 @@ public class TestAccessControl_hasResourcePermission extends TestAccessControlBa
    }
 
    @Test
-   public void hasResourcePermission_nonExistentReferences_shouldFail() {
+   public void hasResourcePermissions_nonExistentReferences_shouldFail() {
       authenticateSystemResource();
 
       final char[] password = generateUniquePassword();

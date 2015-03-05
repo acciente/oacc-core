@@ -28,9 +28,9 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 
-public class TestAccessControl_assertDomainPermission extends TestAccessControlBase {
+public class TestAccessControl_assertDomainPermissions extends TestAccessControlBase {
    @Test
-   public void assertDomainPermission_succeedsAsSystemResource() {
+   public void assertDomainPermissions_succeedsAsSystemResource() {
       authenticateSystemResource();
 
       final String domainName = generateDomain();
@@ -77,7 +77,7 @@ public class TestAccessControl_assertDomainPermission extends TestAccessControlB
    }
 
    @Test
-   public void assertDomainPermission_emptyAsAuthenticated() {
+   public void assertDomainPermissions_emptyAsAuthenticated() {
       final Resource accessorResource = generateUnauthenticatableResource();
 
       final String domainName = generateDomain();
@@ -109,7 +109,7 @@ public class TestAccessControl_assertDomainPermission extends TestAccessControlB
    }
 
    @Test
-   public void assertDomainPermission_validAsSystemResource() {
+   public void assertDomainPermissions_validAsSystemResource() {
       authenticateSystemResource();
       final DomainPermission domPerm_superuser
             = DomainPermissions.getInstance(DomainPermissions.SUPER_USER);
@@ -153,7 +153,7 @@ public class TestAccessControl_assertDomainPermission extends TestAccessControlB
    }
 
    @Test
-   public void assertDomainPermission_validWithInheritFromParentDomain() {
+   public void assertDomainPermissions_validWithInheritFromParentDomain() {
       authenticateSystemResource();
       final DomainPermission domPerm_superuser
             = DomainPermissions.getInstance(DomainPermissions.SUPER_USER);
@@ -183,7 +183,7 @@ public class TestAccessControl_assertDomainPermission extends TestAccessControlB
    }
 
    @Test
-   public void assertDomainPermission_validWithInheritFromAncestorDomainWithEmptyIntermediaryAncestors() {
+   public void assertDomainPermissions_validWithInheritFromAncestorDomainWithEmptyIntermediaryAncestors() {
       authenticateSystemResource();
       final DomainPermission domPerm_superuser
             = DomainPermissions.getInstance(DomainPermissions.SUPER_USER);
@@ -225,7 +225,7 @@ public class TestAccessControl_assertDomainPermission extends TestAccessControlB
    }
 
    @Test
-   public void assertDomainPermission_validWithInheritFromResource() {
+   public void assertDomainPermissions_validWithInheritFromResource() {
       authenticateSystemResource();
       final DomainPermission domPerm_superuser
             = DomainPermissions.getInstance(DomainPermissions.SUPER_USER);
@@ -262,7 +262,7 @@ public class TestAccessControl_assertDomainPermission extends TestAccessControlB
    }
 
    @Test
-   public void assertDomainPermission_validWithInheritFromAncestorDomainAndResource() {
+   public void assertDomainPermissions_validWithInheritFromAncestorDomainAndResource() {
       authenticateSystemResource();
       final DomainPermission domPerm_superuser_withGrant
             = DomainPermissions.getInstance(DomainPermissions.SUPER_USER, true);
@@ -299,7 +299,7 @@ public class TestAccessControl_assertDomainPermission extends TestAccessControlB
    }
 
    @Test
-   public void assertDomainPermission_whitespaceConsistent() {
+   public void assertDomainPermissions_whitespaceConsistent() {
       authenticateSystemResource();
       final DomainPermission domCreatePerm_superuser
             = DomainPermissions.getInstance(DomainPermissions.SUPER_USER);
@@ -318,7 +318,7 @@ public class TestAccessControl_assertDomainPermission extends TestAccessControlB
    }
 
    @Test
-   public void assertDomainPermission_nulls_shouldFail() {
+   public void assertDomainPermissions_nulls_shouldFail() {
       authenticateSystemResource();
       final Resource accessorResource = generateUnauthenticatableResource();
       final DomainPermission domPerm_superUser = DomainPermissions.getInstance(DomainPermissions.SUPER_USER);
@@ -350,7 +350,7 @@ public class TestAccessControl_assertDomainPermission extends TestAccessControlB
    }
 
    @Test
-   public void assertDomainPermission_nonExistentReferences_shouldSucceed() {
+   public void assertDomainPermissions_nonExistentReferences_shouldSucceed() {
       authenticateSystemResource();
 
       final DomainPermission domPerm_superUser = DomainPermissions.getInstance(DomainPermissions.SUPER_USER);
@@ -369,7 +369,7 @@ public class TestAccessControl_assertDomainPermission extends TestAccessControlB
    }
 
    @Test
-   public void assertDomainPermission_nonExistentReferences_shouldFail() {
+   public void assertDomainPermissions_nonExistentReferences_shouldFail() {
       authenticateSystemResource();
 
       final Resource accessorResource = generateUnauthenticatableResource();

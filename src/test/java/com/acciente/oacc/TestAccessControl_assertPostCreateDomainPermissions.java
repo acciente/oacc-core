@@ -27,9 +27,9 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 
-public class TestAccessControl_hasDomainCreatePermission extends TestAccessControlBase {
+public class TestAccessControl_assertPostCreateDomainPermissions extends TestAccessControlBase {
    @Test
-   public void hasDomainCreatePermission_succeedsAsSystemResource() {
+   public void assertPostCreateDomainPermissions_succeedsAsSystemResource() {
       authenticateSystemResource();
 
       // verify setup
@@ -38,42 +38,20 @@ public class TestAccessControl_hasDomainCreatePermission extends TestAccessContr
       assertThat(allDomainCreatePermissions.isEmpty(), is(false));
 
       // verify
-      if (!accessControlContext
-            .hasDomainCreatePermissions(SYS_RESOURCE,
-                                        DomainCreatePermissions.getInstance(DomainCreatePermissions.CREATE))) {
-         fail("checking implicit domain create permission should have succeeded for system resource");
-      }
-      if (!accessControlContext
-            .hasDomainCreatePermissions(SYS_RESOURCE,
-                                        DomainCreatePermissions.getInstance(DomainCreatePermissions.CREATE, true))) {
-         fail("checking implicit domain create permission with grant should have succeeded for system resource");
-      }
-      if (!accessControlContext
-            .hasDomainCreatePermissions(SYS_RESOURCE,
-                                        DomainCreatePermissions.getInstance(DomainPermissions.getInstance(DomainPermissions.CREATE_CHILD_DOMAIN)))) {
-         fail("checking implicit domain create permission should have succeeded for system resource");
-      }
-      if (!accessControlContext
-            .hasDomainCreatePermissions(SYS_RESOURCE,
-                                        DomainCreatePermissions.getInstance(DomainPermissions.getInstance(DomainPermissions.CREATE_CHILD_DOMAIN),
-                                                                            true))) {
-         fail("checking implicit domain create permission with grant should have succeeded for system resource");
-      }
-      if (!accessControlContext
-            .hasDomainCreatePermissions(SYS_RESOURCE,
-                                        DomainCreatePermissions.getInstance(DomainPermissions.getInstance(DomainPermissions.SUPER_USER)))) {
-         fail("checking implicit domain create permission should have succeeded for system resource");
-      }
-      if (!accessControlContext
-            .hasDomainCreatePermissions(SYS_RESOURCE,
-                                        DomainCreatePermissions.getInstance(DomainPermissions.getInstance(DomainPermissions.SUPER_USER),
-                                                                            true))) {
-         fail("checking implicit domain create permission with grant should have succeeded for system resource");
-      }
+      accessControlContext.assertPostCreateDomainPermissions(SYS_RESOURCE,
+                                                             DomainPermissions.getInstance(DomainPermissions.CREATE_CHILD_DOMAIN));
+      accessControlContext.assertPostCreateDomainPermissions(SYS_RESOURCE,
+                                                             DomainPermissions.getInstance(DomainPermissions.CREATE_CHILD_DOMAIN,
+                                                                                           true));
+      accessControlContext.assertPostCreateDomainPermissions(SYS_RESOURCE,
+                                                             DomainPermissions.getInstance(DomainPermissions.SUPER_USER));
+      accessControlContext.assertPostCreateDomainPermissions(SYS_RESOURCE,
+                                                             DomainPermissions.getInstance(DomainPermissions.SUPER_USER,
+                                                                                           true));
    }
 
    @Test
-   public void hasDomainCreatePermission_noPermissions_shouldFailAsAuthenticated() {
+   public void assertPostCreateDomainPermissions_noPermissions_shouldFailAsAuthenticated() {
       authenticateSystemResource();
 
       // setup permission without granting it to anything
@@ -89,15 +67,18 @@ public class TestAccessControl_hasDomainCreatePermission extends TestAccessContr
       accessControlContext.authenticate(accessorResource, PasswordCredentials.newInstance(password));
 
       // verify
-      if (accessControlContext.hasDomainCreatePermissions(accessorResource,
-                                                          DomainCreatePermissions
-                                                                .getInstance(DomainCreatePermissions.CREATE))) {
-         fail("checking domain create permission when none has been granted should not have succeeded for authenticated resource");
+      try {
+         accessControlContext.assertPostCreateDomainPermissions(accessorResource,
+                                                                DomainPermissions.getInstance(DomainPermissions.CREATE_CHILD_DOMAIN));
+         fail("asserting post-create domain permission when none has been granted should not have succeeded for authenticated resource");
+      }
+      catch (NotAuthorizedException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("permission after creating a domain"));
       }
    }
 
    @Test
-   public void hasDomainCreatePermission_direct_succeedsAsAuthenticatedResource() {
+   public void assertPostCreateDomainPermissions_direct_succeedsAsAuthenticatedResource() {
       authenticateSystemResource();
 
       final char[] password = generateUniquePassword();
@@ -110,16 +91,12 @@ public class TestAccessControl_hasDomainCreatePermission extends TestAccessContr
       accessControlContext.authenticate(accessorResource, PasswordCredentials.newInstance(password));
 
       // verify
-      if (!accessControlContext
-            .hasDomainCreatePermissions(accessorResource,
-                                        DomainCreatePermissions
-                                              .getInstance(DomainPermissions.getInstance(DomainPermissions.CREATE_CHILD_DOMAIN)))) {
-         fail("checking direct domain create permission should have succeeded for authenticated resource");
-      }
+      accessControlContext.assertPostCreateDomainPermissions(accessorResource,
+                                                             DomainPermissions.getInstance(DomainPermissions.CREATE_CHILD_DOMAIN));
    }
 
    @Test
-   public void hasDomainCreatePermission_directWithDifferentGrantingRights_succeedsAsAuthenticatedResource() {
+   public void assertPostCreateDomainPermissions_directWithDifferentGrantingRights_succeedsAsAuthenticatedResource() {
       authenticateSystemResource();
 
       final char[] password = generateUniquePassword();
@@ -143,22 +120,21 @@ public class TestAccessControl_hasDomainCreatePermission extends TestAccessContr
       accessControlContext.authenticate(accessorResource, PasswordCredentials.newInstance(password));
 
       // verify
-      if (!accessControlContext
-            .hasDomainCreatePermissions(accessorResource,
-                                        DomainCreatePermissions
-                                              .getInstance(DomainPermissions.getInstance(DomainPermissions.CREATE_CHILD_DOMAIN)))) {
-         fail("checking direct domain create permission with same granting rights should have succeeded for authenticated resource");
+      accessControlContext.assertPostCreateDomainPermissions(accessorResource,
+                                                             DomainPermissions.getInstance(DomainPermissions.CREATE_CHILD_DOMAIN));
+      try {
+         accessControlContext.assertPostCreateDomainPermissions(accessorResource,
+                                                                DomainPermissions.getInstance(DomainPermissions.CREATE_CHILD_DOMAIN,
+                                                                                              true));
+         fail("asserting post-create domain permission for a direct create permission with exceeded granting rights should have failed");
       }
-      if (accessControlContext
-            .hasDomainCreatePermissions(accessorResource,
-                                        DomainCreatePermissions.getInstance(DomainPermissions.getInstance(DomainPermissions.CREATE_CHILD_DOMAIN,
-                                                                                                          true)))) {
-         fail("checking direct domain create permission with exceeded granting rights should have failed for authenticated resource");
+      catch (NotAuthorizedException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("permission after creating a domain"));
       }
    }
 
    @Test
-   public void hasDomainCreatePermission_resourceInherited_succeedsAsAuthenticatedResource() {
+   public void assertPostCreateDomainPermissions_resourceInherited_succeedsAsAuthenticatedResource() {
       authenticateSystemResource();
 
       final char[] password = generateUniquePassword();
@@ -176,16 +152,12 @@ public class TestAccessControl_hasDomainCreatePermission extends TestAccessContr
       accessControlContext.authenticate(accessorResource, PasswordCredentials.newInstance(password));
 
       // verify
-      if (!accessControlContext
-            .hasDomainCreatePermissions(accessorResource,
-                                        DomainCreatePermissions
-                                              .getInstance(DomainPermissions.getInstance(DomainPermissions.CREATE_CHILD_DOMAIN)))) {
-         fail("checking inherited domain create permission should have succeeded for authenticated resource");
-      }
+      accessControlContext.assertPostCreateDomainPermissions(accessorResource,
+                                                             DomainPermissions.getInstance(DomainPermissions.CREATE_CHILD_DOMAIN));
    }
 
    @Test
-   public void hasDomainCreatePermission_superUser_succeedsAsAuthenticatedResource() {
+   public void assertPostCreateDomainPermissions_superUser_succeedsAsAuthenticatedResource() {
       authenticateSystemResource();
 
       final char[] password = generateUniquePassword();
@@ -202,29 +174,20 @@ public class TestAccessControl_hasDomainCreatePermission extends TestAccessContr
       accessControlContext.authenticate(accessorResource, PasswordCredentials.newInstance(password));
 
       // verify
-      if (!accessControlContext
-            .hasDomainCreatePermissions(accessorResource,
-                                        DomainCreatePermissions
-                                              .getInstance(DomainPermissions.getInstance(DomainPermissions.SUPER_USER)))) {
-         fail("checking direct super-user domain create permission should have succeeded for authenticated resource");
-      }
-
-      if (accessControlContext
-            .hasDomainCreatePermissions(accessorResource,
-                                        DomainCreatePermissions
-                                              .getInstance(DomainPermissions.getInstance(DomainPermissions.SUPER_USER, true)))) {
-         fail("checking direct super-user /G domain create permission should have failed for authenticated resource");
-      }
-      if (accessControlContext
-            .hasDomainCreatePermissions(accessorResource,
-                                        DomainCreatePermissions
-                                              .getInstance(DomainPermissions.getInstance(DomainPermissions.CREATE_CHILD_DOMAIN)))) {
-         fail("checking create-child-domain domain create permission when only super-user domain create permission is given should have failed for authenticated resource");
-      }
+      accessControlContext.assertPostCreateDomainPermissions(accessorResource,
+                                                             DomainPermissions.getInstance(DomainPermissions.SUPER_USER));
+      accessControlContext.assertPostCreateDomainPermissions(accessorResource,
+                                                             DomainPermissions.getInstance(DomainPermissions.SUPER_USER,
+                                                                                           true));
+      accessControlContext.assertPostCreateDomainPermissions(accessorResource,
+                                                             DomainPermissions.getInstance(DomainPermissions.CREATE_CHILD_DOMAIN));
+      accessControlContext.assertPostCreateDomainPermissions(accessorResource,
+                                                             DomainPermissions.getInstance(DomainPermissions.CREATE_CHILD_DOMAIN,
+                                                                                           true));
    }
 
    @Test
-   public void hasDomainCreatePermission_inheritWithDifferentGrantingRights_shouldSucceedAsAuthorized() {
+   public void assertPostCreateDomainPermissions_inheritWithDifferentGrantingRights_shouldSucceedAsAuthorized() {
       authenticateSystemResource();
       final String donorPermissionName_createChild = DomainPermissions.CREATE_CHILD_DOMAIN;
       final String accessorPermissionName_createChild = donorPermissionName_createChild;
@@ -258,17 +221,13 @@ public class TestAccessControl_hasDomainCreatePermission extends TestAccessContr
       accessControlContext.authenticate(accessorResource, PasswordCredentials.newInstance(password));
 
       // verify
-      if (!accessControlContext
-            .hasDomainCreatePermissions(accessorResource,
-                                        DomainCreatePermissions
-                                              .getInstance(DomainPermissions.getInstance(accessorPermissionName_createChild, true),
-                                                           true))) {
-         fail("checking inherited domain create permission with different granting rights should have succeeded for authenticated resource");
-      }
+      accessControlContext.assertPostCreateDomainPermissions(accessorResource,
+                                                             DomainPermissions.getInstance( accessorPermissionName_createChild,
+                                                                                            true));
    }
 
    @Test
-   public void hasDomainCreatePermission_inheritFromTwoResourcesWithDifferentGrantingRights_shouldSucceedAsAuthorized() {
+   public void assertPostCreateDomainPermissions_inheritFromTwoResourcesWithDifferentGrantingRights_shouldSucceedAsAuthorized() {
       authenticateSystemResource();
       final String donorPermissionName_createChild = DomainPermissions.CREATE_CHILD_DOMAIN;
       final char[] password = generateUniquePassword();
@@ -313,39 +272,13 @@ public class TestAccessControl_hasDomainCreatePermission extends TestAccessContr
       accessControlContext.authenticate(accessorResource, PasswordCredentials.newInstance(password));
 
       // verify
-      if (!accessControlContext
-            .hasDomainCreatePermissions(accessorResource,
-                                        DomainCreatePermissions
-                                              .getInstance(DomainPermissions.getInstance(donorPermissionName_createChild, false),
-                                                           true))) {
-         fail("checking domain create permission inherited from two sources with different granting rights should have succeeded for authenticated resource");
-      }
-      if (!accessControlContext
-            .hasDomainCreatePermissions(accessorResource,
-                                        DomainCreatePermissions
-                                              .getInstance(DomainPermissions.getInstance(donorPermissionName_createChild, true),
-                                                           false))) {
-         fail("checking domain create permission inherited from two sources with different granting rights should have succeeded for authenticated resource");
-      }
-      if (!accessControlContext
-            .hasDomainCreatePermissions(accessorResource,
-                                        DomainCreatePermissions
-                                              .getInstance(DomainPermissions.getInstance(donorPermissionName_createChild, false),
-                                                           false))) {
-         fail("checking domain create permission inherited from two sources with different granting rights should have succeeded for authenticated resource");
-      }
-
-      if (accessControlContext
-            .hasDomainCreatePermissions(accessorResource,
-                                        DomainCreatePermissions
-                                              .getInstance(DomainPermissions.getInstance(donorPermissionName_createChild, true),
-                                                           true))) {
-         fail("checking domain create permission inherited from two sources with different granting rights should have failed for authenticated resource");
-      }
+      accessControlContext.assertPostCreateDomainPermissions(accessorResource,
+                                                             DomainPermissions.getInstance( donorPermissionName_createChild,
+                                                                                            true));
    }
 
    @Test
-   public void hasDomainCreatePermission_multiLevelInheritance_shouldSucceedAsAuthorized() {
+   public void assertPostCreateDomainPermissions_multiLevelInheritance_shouldSucceedAsAuthorized() {
       authenticateSystemResource();
       final String donorPermissionName_createChild = DomainPermissions.CREATE_CHILD_DOMAIN;
       final String inheritorPermissionName_createChild = DomainPermissions.CREATE_CHILD_DOMAIN;
@@ -384,32 +317,12 @@ public class TestAccessControl_hasDomainCreatePermission extends TestAccessContr
       accessControlContext.authenticate(accessorResource, PasswordCredentials.newInstance(password));
 
       // verify
-      if (!accessControlContext
-            .hasDomainCreatePermissions(accessorResource,
-                                        DomainCreatePermissions
-                                              .getInstance(DomainPermissions.getInstance(donorPermissionName_createChild, true),
-                                                           false))) {
-         fail("checking double-inherited domain create permission with different granting rights should have succeeded for authenticated resource");
-      }
-      if (!accessControlContext
-            .hasDomainCreatePermissions(accessorResource,
-                                        DomainCreatePermissions
-                                              .getInstance(DomainPermissions.getInstance(donorPermissionName_createChild, false),
-                                                           true))) {
-         fail("checking double-inherited domain create permission with different granting rights should have succeeded for authenticated resource");
-      }
-
-      if (accessControlContext
-            .hasDomainCreatePermissions(accessorResource,
-                                        DomainCreatePermissions
-                                              .getInstance(DomainPermissions.getInstance(donorPermissionName_createChild, true),
-                                                           true))) {
-         fail("checking double-inherited domain create permission with different granting rights should have failed for authenticated resource");
-      }
+      accessControlContext.assertPostCreateDomainPermissions(accessorResource,
+                                                             DomainPermissions.getInstance( donorPermissionName_createChild, true));
    }
 
    @Test
-   public void hasDomainCreatePermission_multiLevelInheritanceWithEmptyIntermediaryLevel_shouldSucceedAsAuthorized() {
+   public void assertPostCreateDomainPermissions_multiLevelInheritanceWithEmptyIntermediaryLevel_shouldSucceedAsAuthorized() {
       authenticateSystemResource();
       final String donorPermissionName_createDomain = DomainPermissions.CREATE_CHILD_DOMAIN;
       final char[] password = generateUniquePassword();
@@ -451,47 +364,47 @@ public class TestAccessControl_hasDomainCreatePermission extends TestAccessContr
       permissions_expected.add(DomainCreatePermissions.getInstance(DomainCreatePermissions.CREATE));
       permissions_expected.add(DomainCreatePermissions.getInstance(DomainPermissions.getInstance(donorPermissionName_createDomain)));
 
-      if (!accessControlContext
-            .hasDomainCreatePermissions(accessorResource,
-                                        DomainCreatePermissions
-                                              .getInstance(DomainPermissions.getInstance(donorPermissionName_createDomain)))) {
-         fail("checking domain create permission inherited with empty intermediary level should have succeeded for authenticated resource");
-      }
+      accessControlContext.assertPostCreateDomainPermissions(accessorResource,
+                                                             DomainPermissions.getInstance( donorPermissionName_createDomain));
    }
 
    @Test
-   public void hasDomainCreatePermission_nulls_shouldFail() {
+   public void assertPostCreateDomainPermissions_nulls_shouldFail() {
       authenticateSystemResource();
       final Resource accessorResource = generateUnauthenticatableResource();
-      final DomainCreatePermission domainCreatePermission = DomainCreatePermissions.getInstance(DomainCreatePermissions.CREATE);
+      final DomainPermission domainPermission = DomainPermissions.getInstance(DomainPermissions.CREATE_CHILD_DOMAIN);
 
       try {
-         accessControlContext.hasDomainCreatePermissions(null, domainCreatePermission);
-         fail("checking domain create permission with null accessor resource should have failed");
+         accessControlContext.assertPostCreateDomainPermissions(null, domainPermission);
+         fail("asserting post-create domain permission with null accessor resource should have failed");
       }
       catch (NullPointerException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("resource required"));
       }
       try {
-         accessControlContext.hasDomainCreatePermissions(accessorResource, null);
-         fail("checking domain create permission with null permission should have failed");
+         accessControlContext.assertPostCreateDomainPermissions(accessorResource, null);
+         fail("asserting post-create domain permission with null permission should have failed");
       }
       catch (NullPointerException e) {
-         assertThat(e.getMessage().toLowerCase(), containsString("domain create permission required"));
+         assertThat(e.getMessage().toLowerCase(), containsString("permission required"));
       }
    }
 
    @Test
-   public void hasDomainCreatePermission_nonExistentReferences_shouldSucceed() {
+   public void assertPostCreateDomainPermissions_nonExistentReferences_shouldSucceed() {
       authenticateSystemResource();
 
       final Resource invalidResource = Resources.getInstance(-999L);
-      final DomainCreatePermission domainCreatePermission = DomainCreatePermissions.getInstance(DomainCreatePermissions.CREATE);
+      final DomainPermission domainPermission = DomainPermissions.getInstance(DomainPermissions.CREATE_CHILD_DOMAIN);
 
-      if (accessControlContext.hasDomainCreatePermissions(invalidResource, domainCreatePermission)){
-         // the check will "succeed" in the sense that it will fail to assert the permission on the
+      try {
+         // the assert will "succeed" in the sense that it will fail to assert the permission on the
          // invalid resource, since that resource does not have the specified permission
-         fail("checking domain create permission with invalid accessor resource should have failed");
+         accessControlContext.assertPostCreateDomainPermissions(invalidResource, domainPermission);
+         fail("asserting post-create domain permission with invalid accessor resource should have failed");
+      }
+      catch (NotAuthorizedException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("permission after creating a domain"));
       }
    }
 }
