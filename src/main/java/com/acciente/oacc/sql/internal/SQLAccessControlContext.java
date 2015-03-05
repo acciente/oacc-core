@@ -2769,28 +2769,30 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
 
    @Override
    public void assertPostCreateDomainPermissions(Resource accessorResource,
-                                                 DomainPermission domainPermission) {
-      if (!hasPostCreateDomainPermissions(accessorResource, domainPermission)) {
+                                                 DomainPermission... domainPermissions) {
+      if (!hasPostCreateDomainPermissions(accessorResource, domainPermissions)) {
          throw new NotAuthorizedException(accessorResource,
-                                          "receive " + String.valueOf(domainPermission)
-                                                + " permission after creating a domain");
+                                          "receive " + Arrays.asList(domainPermissions)
+                                                + " permission(s) after creating a domain");
       }
    }
 
    @Override
    public boolean hasPostCreateDomainPermissions(Resource accessorResource,
-                                                 DomainPermission domainPermission) {
+                                                 DomainPermission... domainPermissions) {
       SQLConnection connection = null;
 
       __assertAuthenticated();
       __assertResourceSpecified(accessorResource);
-      __assertPermissionSpecified(domainPermission);
+      __assertPermissionSpecified(domainPermissions);
+
+      final Set<DomainPermission> requestedDomainPermissions = notEmptySetOfNotNull(domainPermissions);
 
       try {
          connection = __getConnection();
          return __hasPostCreateDomainPermission(connection,
                                                 accessorResource,
-                                                domainPermission);
+                                                requestedDomainPermissions);
       }
       finally {
          __closeConnection(connection);
@@ -2799,35 +2801,38 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
 
    private boolean __hasPostCreateDomainPermission(SQLConnection connection,
                                                    Resource accessorResource,
-                                                   DomainPermission requestedDomainPermission) {
-      boolean createSysPermissionFound = false;
+                                                   Set<DomainPermission> requestedDomainPermissions) {
+      boolean hasPermission = false;
+      // first check if the accessor even has *CREATE permission for domains
       final Set<DomainCreatePermission> effectiveDomainCreatePermissions
             = __getEffectiveDomainCreatePermissions(connection, accessorResource);
 
       for (DomainCreatePermission domainCreatePermission : effectiveDomainCreatePermissions) {
          if (domainCreatePermission.isSystemPermission()
                && DomainCreatePermissions.CREATE.equals(domainCreatePermission.getPermissionName())) {
-            createSysPermissionFound = true;
+            hasPermission = true;
             break;
          }
       }
 
-      if (createSysPermissionFound) {
-         // check if the requested permission is permissible from the set of effective post-create permissions
+      if (hasPermission) {
+         // check if the requested permissions are permissible from the set of effective post-create permissions
          final Set<DomainPermission> postCreateDomainPermissions
                = __getPostCreateDomainPermissions(effectiveDomainCreatePermissions);
 
-         if (__isPermissible(requestedDomainPermission, postCreateDomainPermissions)) {
-            return true;
+         for (DomainPermission requestedDomainPermission : requestedDomainPermissions) {
+            if (!__isPermissible(requestedDomainPermission, postCreateDomainPermissions)) {
+               hasPermission = false;
+               break;
+            }
          }
 
-         if (postCreateDomainPermissions.contains(DomainPermission_SUPER_USER)
-               || postCreateDomainPermissions.contains(DomainPermission_SUPER_USER_GRANT)) {
-            return true;
+         if (!hasPermission) {
+            hasPermission = postCreateDomainPermissions.contains(DomainPermission_SUPER_USER)
+                  || postCreateDomainPermissions.contains(DomainPermission_SUPER_USER_GRANT);
          }
       }
-
-      return false;
+      return hasPermission;
    }
 
    private boolean __isPermissible(DomainPermission queriedDomainPermission,
@@ -3905,12 +3910,6 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
 
    private void __assertPermissionSpecified(DomainPermission... domainPermissions) {
       if (domainPermissions == null) {
-         throw new NullPointerException("Domain permission required, none specified");
-      }
-   }
-
-   private void __assertPermissionSpecified(DomainPermission domainPermission) {
-      if (domainPermission == null) {
          throw new NullPointerException("Domain permission required, none specified");
       }
    }

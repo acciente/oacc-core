@@ -48,6 +48,13 @@ public class TestAccessControl_assertPostCreateDomainPermissions extends TestAcc
       accessControlContext.assertPostCreateDomainPermissions(SYS_RESOURCE,
                                                              DomainPermissions.getInstance(DomainPermissions.SUPER_USER,
                                                                                            true));
+      accessControlContext.assertPostCreateDomainPermissions(SYS_RESOURCE,
+                                                             DomainPermissions.getInstance(DomainPermissions.CREATE_CHILD_DOMAIN),
+                                                             DomainPermissions.getInstance(DomainPermissions.CREATE_CHILD_DOMAIN,
+                                                                                           true),
+                                                             DomainPermissions.getInstance(DomainPermissions.SUPER_USER),
+                                                             DomainPermissions.getInstance(DomainPermissions.SUPER_USER,
+                                                                                           true));
    }
 
    @Test
@@ -73,7 +80,17 @@ public class TestAccessControl_assertPostCreateDomainPermissions extends TestAcc
          fail("asserting post-create domain permission when none has been granted should not have succeeded for authenticated resource");
       }
       catch (NotAuthorizedException e) {
-         assertThat(e.getMessage().toLowerCase(), containsString("permission after creating a domain"));
+         assertThat(e.getMessage().toLowerCase(), containsString("permission(s) after creating a domain"));
+      }
+      try {
+         accessControlContext.assertPostCreateDomainPermissions(accessorResource,
+                                                                DomainPermissions.getInstance(DomainPermissions.CREATE_CHILD_DOMAIN),
+                                                                DomainPermissions.getInstance(DomainPermissions.CREATE_CHILD_DOMAIN,
+                                                                                              true));
+         fail("asserting multiple post-create domain permission when none has been granted should not have succeeded for authenticated resource");
+      }
+      catch (NotAuthorizedException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("permission(s) after creating a domain"));
       }
    }
 
@@ -93,6 +110,64 @@ public class TestAccessControl_assertPostCreateDomainPermissions extends TestAcc
       // verify
       accessControlContext.assertPostCreateDomainPermissions(accessorResource,
                                                              DomainPermissions.getInstance(DomainPermissions.CREATE_CHILD_DOMAIN));
+   }
+
+   @Test
+   public void assertPostCreateDomainPermissions_partialDirect_shouldFailAsAuthenticatedResource() {
+      authenticateSystemResource();
+
+      final char[] password = generateUniquePassword();
+      final Resource accessorResource = generateAuthenticatableResource(password);
+
+      // setup create permissions
+      grantDomainAndChildCreatePermission(accessorResource);
+
+      // authenticate accessor/creator resource
+      accessControlContext.authenticate(accessorResource, PasswordCredentials.newInstance(password));
+
+      accessControlContext.assertPostCreateDomainPermissions(accessorResource,
+                                                             DomainPermissions
+                                                                   .getInstance(DomainPermissions.CREATE_CHILD_DOMAIN));
+
+      // verify
+      try {
+         accessControlContext.assertPostCreateDomainPermissions(accessorResource,
+                                                                DomainPermissions.getInstance(DomainPermissions.CREATE_CHILD_DOMAIN),
+                                                                DomainPermissions.getInstance(DomainPermissions.CREATE_CHILD_DOMAIN,
+                                                                                              true));
+         fail("asserting direct and unauthorized post-create domain permission should have failed for authenticated resource");
+      }
+      catch (NotAuthorizedException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("permission(s) after creating a domain"));
+      }
+   }
+
+   @Test
+   public void assertPostCreateDomainPermissions_multipleDirect_shouldSucceedAsAuthenticatedResource() {
+      authenticateSystemResource();
+
+      final char[] password = generateUniquePassword();
+      final Resource accessorResource = generateAuthenticatableResource(password);
+
+      // setup create permissions
+      Set<DomainCreatePermission> domainCreatePermissions
+            = setOf(DomainCreatePermissions.getInstance(DomainCreatePermissions.CREATE, false),
+                    DomainCreatePermissions.getInstance(DomainPermissions.getInstance(DomainPermissions.CREATE_CHILD_DOMAIN,
+                                                                                      false)),
+                    DomainCreatePermissions.getInstance(DomainPermissions.getInstance(DomainPermissions.SUPER_USER,
+                                                                                      false)));
+
+      accessControlContext.setDomainCreatePermissions(accessorResource, domainCreatePermissions);
+
+      // authenticate accessor/creator resource
+      accessControlContext.authenticate(accessorResource, PasswordCredentials.newInstance(password));
+
+      // verify
+      accessControlContext.assertPostCreateDomainPermissions(accessorResource,
+                                                             DomainPermissions
+                                                                   .getInstance(DomainPermissions.CREATE_CHILD_DOMAIN),
+                                                             DomainPermissions
+                                                                   .getInstance(DomainPermissions.SUPER_USER));
    }
 
    @Test
@@ -122,6 +197,7 @@ public class TestAccessControl_assertPostCreateDomainPermissions extends TestAcc
       // verify
       accessControlContext.assertPostCreateDomainPermissions(accessorResource,
                                                              DomainPermissions.getInstance(DomainPermissions.CREATE_CHILD_DOMAIN));
+
       try {
          accessControlContext.assertPostCreateDomainPermissions(accessorResource,
                                                                 DomainPermissions.getInstance(DomainPermissions.CREATE_CHILD_DOMAIN,
@@ -129,7 +205,7 @@ public class TestAccessControl_assertPostCreateDomainPermissions extends TestAcc
          fail("asserting post-create domain permission for a direct create permission with exceeded granting rights should have failed");
       }
       catch (NotAuthorizedException e) {
-         assertThat(e.getMessage().toLowerCase(), containsString("permission after creating a domain"));
+         assertThat(e.getMessage().toLowerCase(), containsString("permission(s) after creating a domain"));
       }
    }
 
@@ -222,8 +298,12 @@ public class TestAccessControl_assertPostCreateDomainPermissions extends TestAcc
 
       // verify
       accessControlContext.assertPostCreateDomainPermissions(accessorResource,
-                                                             DomainPermissions.getInstance( accessorPermissionName_createChild,
-                                                                                            true));
+                                                             DomainPermissions.getInstance(accessorPermissionName_createChild,
+                                                                                           true));
+      accessControlContext.assertPostCreateDomainPermissions(accessorResource,
+                                                             DomainPermissions.getInstance(accessorPermissionName_createChild),
+                                                             DomainPermissions.getInstance(accessorPermissionName_createChild,
+                                                                                           true));
    }
 
    @Test
@@ -273,7 +353,11 @@ public class TestAccessControl_assertPostCreateDomainPermissions extends TestAcc
 
       // verify
       accessControlContext.assertPostCreateDomainPermissions(accessorResource,
-                                                             DomainPermissions.getInstance( donorPermissionName_createChild,
+                                                             DomainPermissions.getInstance(donorPermissionName_createChild,
+                                                                                            true));
+      accessControlContext.assertPostCreateDomainPermissions(accessorResource,
+                                                             DomainPermissions.getInstance(donorPermissionName_createChild),
+                                                             DomainPermissions.getInstance(donorPermissionName_createChild,
                                                                                             true));
    }
 
@@ -318,7 +402,10 @@ public class TestAccessControl_assertPostCreateDomainPermissions extends TestAcc
 
       // verify
       accessControlContext.assertPostCreateDomainPermissions(accessorResource,
-                                                             DomainPermissions.getInstance( donorPermissionName_createChild, true));
+                                                             DomainPermissions.getInstance(donorPermissionName_createChild, true));
+      accessControlContext.assertPostCreateDomainPermissions(accessorResource,
+                                                             DomainPermissions.getInstance(donorPermissionName_createChild),
+                                                             DomainPermissions.getInstance(donorPermissionName_createChild, true));
    }
 
    @Test
@@ -365,7 +452,7 @@ public class TestAccessControl_assertPostCreateDomainPermissions extends TestAcc
       permissions_expected.add(DomainCreatePermissions.getInstance(DomainPermissions.getInstance(donorPermissionName_createDomain)));
 
       accessControlContext.assertPostCreateDomainPermissions(accessorResource,
-                                                             DomainPermissions.getInstance( donorPermissionName_createDomain));
+                                                             DomainPermissions.getInstance(donorPermissionName_createDomain));
    }
 
    @Test
@@ -388,6 +475,56 @@ public class TestAccessControl_assertPostCreateDomainPermissions extends TestAcc
       catch (NullPointerException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("permission required"));
       }
+      try {
+         accessControlContext.assertPostCreateDomainPermissions(accessorResource, new DomainPermission[] {null});
+         fail("asserting post-create domain permission with null permission element should have failed");
+      }
+      catch (NullPointerException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("without null element"));
+      }
+      try {
+         accessControlContext.assertPostCreateDomainPermissions(accessorResource, domainPermission, null);
+         fail("asserting post-create domain permission with null permission element should have failed");
+      }
+      catch (NullPointerException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("without null element"));
+      }
+   }
+
+   @Test
+   public void assertPostCreateDomainPermissions_emptyPermissions_shouldFail() {
+      authenticateSystemResource();
+      final Resource accessorResource = generateUnauthenticatableResource();
+
+      try {
+         accessControlContext.assertPostCreateDomainPermissions(accessorResource);
+         fail("asserting post-create domain permission with empty permission sequence should have failed");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("non-empty"));
+      }
+      try {
+         accessControlContext.assertPostCreateDomainPermissions(accessorResource, new DomainPermission[]{});
+         fail("asserting post-create domain permission with empty permission sequence should have failed");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("non-empty"));
+      }
+   }
+
+   @Test
+   public void assertPostCreateDomainPermissions_duplicatePermissions_shouldFail() {
+      authenticateSystemResource();
+      final Resource accessorResource = generateUnauthenticatableResource();
+      final DomainPermission domainPermission = DomainPermissions.getInstance(DomainPermissions.CREATE_CHILD_DOMAIN);
+
+      try {
+         accessControlContext.assertPostCreateDomainPermissions(accessorResource, domainPermission, domainPermission);
+         fail("asserting post-create domain permission with duplicate permission elements should have failed");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("duplicate elements"));
+      }
    }
 
    @Test
@@ -404,7 +541,7 @@ public class TestAccessControl_assertPostCreateDomainPermissions extends TestAcc
          fail("asserting post-create domain permission with invalid accessor resource should have failed");
       }
       catch (NotAuthorizedException e) {
-         assertThat(e.getMessage().toLowerCase(), containsString("permission after creating a domain"));
+         assertThat(e.getMessage().toLowerCase(), containsString("permission(s) after creating a domain"));
       }
    }
 }

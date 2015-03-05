@@ -117,7 +117,7 @@ public class TestAccessControl_hasDomainCreatePermissions extends TestAccessCont
                                                           DomainCreatePermissions
                                                                 .getInstance(DomainPermissions
                                                                                    .getInstance(DomainPermissions.CREATE_CHILD_DOMAIN)))) {
-         fail("checking domain create permissions when none has been granted should not have succeeded for authenticated resource");
+         fail("checking domain create permissions when none have been granted should not have succeeded for authenticated resource");
       }
    }
 
@@ -320,6 +320,13 @@ public class TestAccessControl_hasDomainCreatePermissions extends TestAccessCont
                                               .getInstance(DomainPermissions
                                                                  .getInstance(DomainPermissions.CREATE_CHILD_DOMAIN)))) {
          fail("checking create-child-domain domain create permission when only super-user domain create permission is given should have failed for authenticated resource");
+      }
+      if (accessControlContext
+            .hasDomainCreatePermissions(accessorResource,
+                                        DomainCreatePermissions
+                                              .getInstance(DomainPermissions
+                                                                 .getInstance(DomainPermissions.CREATE_CHILD_DOMAIN, true)))) {
+         fail("checking create-child-domain /G domain create permission when only super-user domain create permission is given should have failed for authenticated resource");
       }
    }
 
@@ -589,6 +596,13 @@ public class TestAccessControl_hasDomainCreatePermissions extends TestAccessCont
       final Resource accessorResource = generateUnauthenticatableResource();
 
       try {
+         accessControlContext.hasDomainCreatePermissions(accessorResource);
+         fail("checking domain create permission with empty permission sequence should have failed");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("non-empty"));
+      }
+      try {
          accessControlContext.hasDomainCreatePermissions(accessorResource, new DomainCreatePermission[]{});
          fail("checking domain create permission with empty permission sequence should have failed");
       }
@@ -598,7 +612,7 @@ public class TestAccessControl_hasDomainCreatePermissions extends TestAccessCont
    }
 
    @Test
-   public void hasDomainCreatePermission_duplicates_shouldFail() {
+   public void hasDomainCreatePermission_duplicatePermissions_shouldFail() {
       authenticateSystemResource();
 
       final Resource accessorResource = generateUnauthenticatableResource();

@@ -210,29 +210,29 @@ public interface AccessControlContext {
                                              DomainCreatePermission... domainCreatePermissions);
 
    /**
-    * Checks if the specified accessor resource would receive the specified domain permission, if the accessor
+    * Checks if the specified accessor resource would receive the specified domain permissions, if the accessor
     * were to create a domain.
     * The method takes into account any direct and inherited domain create permissions the accessor might have.
     *
-    * @param accessorResource the resource requesting the access
-    * @param domainPermission the permission to be checked
+    * @param accessorResource  the resource requesting the access
+    * @param domainPermissions the permissions to be checked
     * @throws com.acciente.oacc.NotAuthorizedException if the accessor resource would <strong>not</strong> receive the
-    *                                                  specified permission after creating a domain, or if an error occurs
+    *                                                  specified permissions after creating a domain
     */
    public void assertPostCreateDomainPermissions(Resource accessorResource,
-                                                 DomainPermission domainPermission);
+                                                 DomainPermission... domainPermissions);
 
    /**
-    * Checks if the specified accessor resource would receive the specified domain permission, if the accessor
+    * Checks if the specified accessor resource would receive the specified domain permissions, if the accessor
     * were to create a domain.
     * The method takes into account any direct and inherited domain create permissions the accessor might have.
     *
-    * @param accessorResource the resource requesting the access
-    * @param domainPermission the permission to be checked
-    * @return <strong>true</strong> if the accessor resource would receive the specified permission after creating a domain
+    * @param accessorResource  the resource requesting the access
+    * @param domainPermissions the permissions to be checked
+    * @return <strong>true</strong> if the accessor resource would receive the specified permissions after creating a domain
     */
    public boolean hasPostCreateDomainPermissions(Resource accessorResource,
-                                                 DomainPermission domainPermission);
+                                                 DomainPermission... domainPermissions);
 
    /**
     * Checks if the specified accessor resource has the specified global resource permissions on
