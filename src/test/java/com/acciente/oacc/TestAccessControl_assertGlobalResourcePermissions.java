@@ -996,35 +996,25 @@ public class TestAccessControl_assertGlobalResourcePermissions extends TestAcces
    }
 
    @Test
-   public void assertGlobalResourcePermissions_duplicatePermissions_shouldFailAsSystemResource() {
+   public void assertGlobalResourcePermissions_duplicatePermissions_shouldSucceedAsSystemResource() {
       authenticateSystemResource();
       // setup permission without granting it to anything
       final String resourceClassName = generateResourceClass(true, false);
 
       // verify
-      try {
-         accessControlContext.assertGlobalResourcePermissions(SYS_RESOURCE,
-                                                              resourceClassName,
-                                                              ResourcePermissions.getInstance(ResourcePermissions.IMPERSONATE),
-                                                              ResourcePermissions.getInstance(ResourcePermissions.IMPERSONATE));
-         fail("asserting global resource permission with duplicates should have failed as system resource");
-      }
-      catch (IllegalArgumentException e) {
-         assertThat(e.getMessage().toLowerCase(), containsString("duplicate"));
-      }
+      accessControlContext.assertGlobalResourcePermissions(SYS_RESOURCE,
+                                                           resourceClassName,
+                                                           ResourcePermissions
+                                                                 .getInstance(ResourcePermissions.IMPERSONATE),
+                                                           ResourcePermissions
+                                                                 .getInstance(ResourcePermissions.IMPERSONATE));
 
       final String domainName = generateDomain();
-      try {
-         accessControlContext.assertGlobalResourcePermissions(SYS_RESOURCE,
-                                                              resourceClassName,
-                                                              domainName,
-                                                              ResourcePermissions.getInstance(ResourcePermissions.IMPERSONATE),
-                                                              ResourcePermissions.getInstance(ResourcePermissions.IMPERSONATE));
-         fail("asserting global resource permission with duplicates should have failed as system resource");
-      }
-      catch (IllegalArgumentException e) {
-         assertThat(e.getMessage().toLowerCase(), containsString("duplicate"));
-      }
+      accessControlContext.assertGlobalResourcePermissions(SYS_RESOURCE,
+                                                           resourceClassName,
+                                                           domainName,
+                                                           ResourcePermissions.getInstance(ResourcePermissions.IMPERSONATE),
+                                                           ResourcePermissions.getInstance(ResourcePermissions.IMPERSONATE));
    }
 
    @Test

@@ -513,18 +513,11 @@ public class TestAccessControl_assertPostCreateDomainPermissions extends TestAcc
    }
 
    @Test
-   public void assertPostCreateDomainPermissions_duplicatePermissions_shouldFail() {
+   public void assertPostCreateDomainPermissions_duplicatePermissions_shouldSucceed() {
       authenticateSystemResource();
-      final Resource accessorResource = generateUnauthenticatableResource();
       final DomainPermission domainPermission = DomainPermissions.getInstance(DomainPermissions.CREATE_CHILD_DOMAIN);
 
-      try {
-         accessControlContext.assertPostCreateDomainPermissions(accessorResource, domainPermission, domainPermission);
-         fail("asserting post-create domain permission with duplicate permission elements should have failed");
-      }
-      catch (IllegalArgumentException e) {
-         assertThat(e.getMessage().toLowerCase(), containsString("duplicate elements"));
-      }
+      accessControlContext.assertPostCreateDomainPermissions(SYS_RESOURCE, domainPermission, domainPermission);
    }
 
    @Test

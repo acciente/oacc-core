@@ -606,19 +606,12 @@ public class TestAccessControl_assertDomainCreatePermissions extends TestAccessC
    }
 
    @Test
-   public void assertDomainCreatePermission_duplicates_shouldFail() {
+   public void assertDomainCreatePermission_duplicates_shouldSucceed() {
       authenticateSystemResource();
 
-      final Resource accessorResource = generateUnauthenticatableResource();
       final DomainCreatePermission domainCreatePermission = DomainCreatePermissions.getInstance(DomainCreatePermissions.CREATE);
 
-      try {
-         accessControlContext.assertDomainCreatePermissions(accessorResource, domainCreatePermission, domainCreatePermission);
-         fail("asserting domain create permission with duplicate permission should have failed");
-      }
-      catch (IllegalArgumentException e) {
-         assertThat(e.getMessage().toLowerCase(), containsString("duplicate elements"));
-      }
+      accessControlContext.assertDomainCreatePermissions(SYS_RESOURCE, domainCreatePermission, domainCreatePermission);
    }
 
    @Test

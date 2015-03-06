@@ -601,19 +601,12 @@ public class TestAccessControl_assertDomainPermissions extends TestAccessControl
    }
 
    @Test
-   public void assertDomainPermissions_duplicatePermissions_shouldFail() {
+   public void assertDomainPermissions_duplicatePermissions_shouldSucceed() {
       authenticateSystemResource();
-      final Resource accessorResource = generateUnauthenticatableResource();
       final DomainPermission domPerm_superUser = DomainPermissions.getInstance(DomainPermissions.SUPER_USER);
       final String domainName = generateDomain();
 
-      try {
-         accessControlContext.assertDomainPermissions(accessorResource, domainName, domPerm_superUser, domPerm_superUser);
-         fail("asserting domain permissions with null domain permission element should have failed");
-      }
-      catch (IllegalArgumentException e) {
-         assertThat(e.getMessage().toLowerCase(), containsString("duplicate elements"));
-      }
+      accessControlContext.assertDomainPermissions(SYS_RESOURCE, domainName, domPerm_superUser, domPerm_superUser);
    }
 
    @Test

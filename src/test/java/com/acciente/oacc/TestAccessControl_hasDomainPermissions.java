@@ -582,19 +582,13 @@ public class TestAccessControl_hasDomainPermissions extends TestAccessControlBas
    }
 
    @Test
-   public void hasDomainPermissions_duplicatePermissions_shouldFail() {
+   public void hasDomainPermissions_duplicatePermissions_shouldSucceed() {
       authenticateSystemResource();
       final Resource accessorResource = generateUnauthenticatableResource();
       final DomainPermission domPerm_superUser = DomainPermissions.getInstance(DomainPermissions.SUPER_USER);
       final String domainName = generateDomain();
 
-      try {
-         accessControlContext.hasDomainPermissions(accessorResource, domainName, domPerm_superUser, domPerm_superUser);
-         fail("checking domain permissions with null domain permission element should have failed");
-      }
-      catch (IllegalArgumentException e) {
-         assertThat(e.getMessage().toLowerCase(), containsString("duplicate elements"));
-      }
+      accessControlContext.hasDomainPermissions(accessorResource, domainName, domPerm_superUser, domPerm_superUser);
    }
 
    @Test

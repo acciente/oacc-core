@@ -1340,35 +1340,23 @@ public class TestAccessControl_hasPostCreateResourcePermissions extends TestAcce
    }
 
    @Test
-   public void hasPostCreateResourcePermissions_duplicatePermissions_shouldFail() {
+   public void hasPostCreateResourcePermissions_duplicatePermissions_shouldSucceed() {
       authenticateSystemResource();
 
       final String resourceClassName = generateResourceClass(false, false);
       final String customPermissionName = generateResourceClassPermission(resourceClassName);
 
-      try {
-         accessControlContext.hasPostCreateResourcePermissions(SYS_RESOURCE,
-                                                               resourceClassName,
-                                                               ResourcePermissions.getInstance(customPermissionName),
-                                                               ResourcePermissions.getInstance(customPermissionName));
-         fail("checking post-create resource permission for duplicate resource permissions should have failed for system resource");
-      }
-      catch (IllegalArgumentException e) {
-         assertThat(e.getMessage().toLowerCase(), containsString("duplicate elements"));
-      }
+      accessControlContext.hasPostCreateResourcePermissions(SYS_RESOURCE,
+                                                            resourceClassName,
+                                                            ResourcePermissions.getInstance(customPermissionName),
+                                                            ResourcePermissions.getInstance(customPermissionName));
 
       final String domainName = generateDomain();
-      try {
-         accessControlContext.hasPostCreateResourcePermissions(SYS_RESOURCE,
-                                                               resourceClassName,
-                                                               domainName,
-                                                               ResourcePermissions.getInstance(customPermissionName),
-                                                               ResourcePermissions.getInstance(customPermissionName));
-         fail("checking post-create resource permission for duplicate resource permissions should have failed for system resource");
-      }
-      catch (IllegalArgumentException e) {
-         assertThat(e.getMessage().toLowerCase(), containsString("duplicate elements"));
-      }
+      accessControlContext.hasPostCreateResourcePermissions(SYS_RESOURCE,
+                                                            resourceClassName,
+                                                            domainName,
+                                                            ResourcePermissions.getInstance(customPermissionName),
+                                                            ResourcePermissions.getInstance(customPermissionName));
    }
 
    @Test

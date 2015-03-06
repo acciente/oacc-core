@@ -612,21 +612,15 @@ public class TestAccessControl_hasDomainCreatePermissions extends TestAccessCont
    }
 
    @Test
-   public void hasDomainCreatePermission_duplicatePermissions_shouldFail() {
+   public void hasDomainCreatePermission_duplicatePermissions_shouldSucceed() {
       authenticateSystemResource();
 
       final Resource accessorResource = generateUnauthenticatableResource();
       final DomainCreatePermission domainCreatePermission = DomainCreatePermissions.getInstance(DomainCreatePermissions.CREATE);
 
-      try {
-         accessControlContext.hasDomainCreatePermissions(accessorResource,
-                                                         domainCreatePermission,
-                                                         domainCreatePermission);
-         fail("checking domain create permission with duplicate permission should have failed");
-      }
-      catch (IllegalArgumentException e) {
-         assertThat(e.getMessage().toLowerCase(), containsString("duplicate elements"));
-      }
+      accessControlContext.hasDomainCreatePermissions(accessorResource,
+                                                      domainCreatePermission,
+                                                      domainCreatePermission);
    }
 
    @Test

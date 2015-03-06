@@ -4044,14 +4044,8 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
                                                  + Arrays.asList(elements));
          }
 
-         final boolean isAdded = resultSet.add(element);
-
-         // no duplicates constraint
-         if (!isAdded) {
-            throw new IllegalArgumentException("A " + elements.getClass().getSimpleName()
-                                                     + " argument (or sequence of varargs) without duplicate elements is required, but contains duplicates of: "
-                                                     + String.valueOf(element));
-         }
+         // duplicate elements get ignored silently
+         resultSet.add(element);
       }
 
       return resultSet;
