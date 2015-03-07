@@ -311,37 +311,37 @@ public interface AccessControlContext {
                                                ResourcePermission... resourcePermissions);
 
    /**
-    * Checks if the specified accessor resource has the specified resource permission
+    * Checks if the specified accessor resource has the specified resource permissions
     * to the specified accessed resource.
     * This method takes into account direct, inherited and global permissions of accessor resource.
     *
-    * @param accessorResource   the resource requesting the access
-    * @param accessedResource   the resource on which access is being requested
-    * @param resourcePermission the permission to be checked
+    * @param accessorResource    the resource requesting the access
+    * @param accessedResource    the resource on which access is being requested
+    * @param resourcePermissions the permissions to be checked
     * @throws java.lang.IllegalArgumentException if the accessorResource or the accessedResource does not exists, or
-    *                                            if resourcePermission is invalid for the resource class of accessedResource
+    *                                            if any resourcePermission is invalid for the resource class of accessedResource
     * @throws com.acciente.oacc.NotAuthorizedException if the accessor resource <strong>does not</strong> have the
-    *                                                  specified permission
+    *                                                  specified permissions
     */
    public void assertResourcePermissions(Resource accessorResource,
                                          Resource accessedResource,
-                                         ResourcePermission resourcePermission);
+                                         ResourcePermission... resourcePermissions);
 
    /**
-    * Checks if the specified accessor resource has the specified resource permission
+    * Checks if the specified accessor resource has the specified resource permissions
     * to the specified accessed resource.
     * This method takes into account direct, inherited and global permissions of accessor resource.
     *
-    * @param accessorResource   the resource requesting the access
-    * @param accessedResource   the resource on which access is being requested
-    * @param resourcePermission the permission to be checked
-    * @return <strong>true</strong> if the accessor resource has the specified permission
+    * @param accessorResource    the resource requesting the access
+    * @param accessedResource    the resource on which access is being requested
+    * @param resourcePermissions the permissions to be checked
+    * @return <strong>true</strong> if the accessor resource has the specified permissions
     * @throws java.lang.IllegalArgumentException if the accessorResource or the accessedResource does not exists, or
-    *                                            if resourcePermission is invalid for the resource class of accessedResource
+    *                                            if any resourcePermission is invalid for the resource class of accessedResource
     */
    public boolean hasResourcePermissions(Resource accessorResource,
                                          Resource accessedResource,
-                                         ResourcePermission resourcePermission);
+                                         ResourcePermission... resourcePermissions);
 
    /**
     * Checks if the specified accessor resource has the specified create permissions on an object of

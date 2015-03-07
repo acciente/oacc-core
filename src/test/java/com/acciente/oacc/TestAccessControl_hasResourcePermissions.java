@@ -46,7 +46,13 @@ public class TestAccessControl_hasResourcePermissions extends TestAccessControlB
       if (!accessControlContext.hasResourcePermissions(SYS_RESOURCE,
                                                        accessedResource,
                                                        ResourcePermissions.getInstance(customPermissionName))) {
-         fail("checking valid resource permission for system resource should have succeeded");
+         fail("checking implicit resource permission for system resource should have succeeded");
+      }
+      if (!accessControlContext.hasResourcePermissions(SYS_RESOURCE,
+                                                       accessedResource,
+                                                       ResourcePermissions.getInstance(customPermissionName),
+                                                       ResourcePermissions.getInstance(ResourcePermissions.INHERIT))) {
+         fail("checking multiple implicit resource permission for system resource should have succeeded");
       }
    }
 
@@ -77,6 +83,12 @@ public class TestAccessControl_hasResourcePermissions extends TestAccessControlB
                                                       ResourcePermissions.getInstance(customPermissionName))) {
          fail("checking resource permission for domain when none has been granted should not have succeeded for authenticated resource");
       }
+      if (accessControlContext.hasResourcePermissions(accessorResource,
+                                                      accessedResource,
+                                                      ResourcePermissions.getInstance(customPermissionName),
+                                                      ResourcePermissions.getInstance(ResourcePermissions.INHERIT))) {
+         fail("checking multiple resource permission for domain when none has been granted should not have succeeded for authenticated resource");
+      }
    }
 
    @Test
@@ -102,6 +114,65 @@ public class TestAccessControl_hasResourcePermissions extends TestAccessControlB
       // verify
       if (!accessControlContext.hasResourcePermissions(accessorResource, accessedResource, customPermission)) {
          fail("checking direct resource permission for authenticated resource should have succeeded");
+      }
+   }
+
+   @Test
+   public void hasResourcePermissions_partialDirect_shouldFailAsAuthenticatedResource() {
+      authenticateSystemResource();
+
+      final char[] password = generateUniquePassword();
+      final Resource accessorResource = generateAuthenticatableResource(password);
+      final Resource accessedResource = generateUnauthenticatableResource();
+      final String accessedResourceClassName
+            = accessControlContext.getResourceClassInfoByResource(accessedResource).getResourceClassName();
+
+      // setup direct permissions
+      final String customPermissionName = generateResourceClassPermission(accessedResourceClassName);
+      final ResourcePermission customPermission = ResourcePermissions.getInstance(customPermissionName);
+      accessControlContext.setResourcePermissions(accessorResource,
+                                                  accessedResource,
+                                                  setOf(customPermission));
+
+      // authenticate accessor resource
+      accessControlContext.authenticate(accessorResource, PasswordCredentials.newInstance(password));
+
+      // verify
+      if (accessControlContext.hasResourcePermissions(accessorResource,
+                                                      accessedResource,
+                                                      customPermission,
+                                                      ResourcePermissions.getInstance(ResourcePermissions.INHERIT))) {
+         fail("checking direct and unauthorized resource permission for authenticated resource should have failed");
+      }
+   }
+
+   @Test
+   public void hasResourcePermissions_multipleDirect_succeedsAsAuthenticatedResource() {
+      authenticateSystemResource();
+
+      final char[] password = generateUniquePassword();
+      final Resource accessorResource = generateAuthenticatableResource(password);
+      final Resource accessedResource = generateUnauthenticatableResource();
+      final String accessedResourceClassName
+            = accessControlContext.getResourceClassInfoByResource(accessedResource).getResourceClassName();
+
+      // setup direct permissions
+      final String customPermissionName = generateResourceClassPermission(accessedResourceClassName);
+      final ResourcePermission customPermission = ResourcePermissions.getInstance(customPermissionName);
+      accessControlContext.setResourcePermissions(accessorResource,
+                                                  accessedResource,
+                                                  setOf(customPermission,
+                                                        ResourcePermissions.getInstance(ResourcePermissions.INHERIT)));
+
+      // authenticate accessor resource
+      accessControlContext.authenticate(accessorResource, PasswordCredentials.newInstance(password));
+
+      // verify
+      if (!accessControlContext.hasResourcePermissions(accessorResource,
+                                                      accessedResource,
+                                                      customPermission,
+                                                      ResourcePermissions.getInstance(ResourcePermissions.INHERIT))) {
+         fail("checking multiple valid direct resource permission for authenticated resource should have succeeded");
       }
    }
 
@@ -136,10 +207,10 @@ public class TestAccessControl_hasResourcePermissions extends TestAccessControlB
       accessControlContext.authenticate(accessorResource, PasswordCredentials.newInstance(password));
 
       // verify
-      if (!accessControlContext.hasResourcePermissions(accessorResource, accessedResource, customPermission1_withoutGrant)) {
-         fail("checking resource permission with different grant than the one granted should have succeeded for authenticated resource");
-      }
-      if (!accessControlContext.hasResourcePermissions(accessorResource, accessedResource, customPermission1_withGrant)) {
+      if (!accessControlContext.hasResourcePermissions(accessorResource,
+                                                       accessedResource,
+                                                       customPermission1_withoutGrant,
+                                                       customPermission1_withGrant)) {
          fail("checking resource permission with different grant than the one granted should have succeeded for authenticated resource");
       }
       if (!accessControlContext.hasResourcePermissions(accessorResource, accessedResource, customPermission2_withoutGrant)) {
@@ -286,6 +357,12 @@ public class TestAccessControl_hasResourcePermissions extends TestAccessControlB
       if (!accessControlContext.hasResourcePermissions(accessorResource, accessedResource, customPermission)) {
          fail("checking resource permission when having super-user privileges should have succeeded for authenticated resource");
       }
+      if (!accessControlContext.hasResourcePermissions(accessorResource,
+                                                       accessedResource,
+                                                       customPermission,
+                                                       ResourcePermissions.getInstance(ResourcePermissions.INHERIT))) {
+         fail("checking multiple resource permission when having super-user privileges should have succeeded for authenticated resource");
+      }
    }
 
    @Test
@@ -325,6 +402,12 @@ public class TestAccessControl_hasResourcePermissions extends TestAccessControlB
       if (!accessControlContext.hasResourcePermissions(accessorResource, accessedResource, customPermission)) {
          fail("checking resource permission when inheriting super-user privileges should have succeeded for authenticated resource");
       }
+      if (!accessControlContext.hasResourcePermissions(accessorResource,
+                                                       accessedResource,
+                                                       customPermission,
+                                                       ResourcePermissions.getInstance(ResourcePermissions.INHERIT))) {
+         fail("checking multiple resource permission when inheriting super-user privileges should have succeeded for authenticated resource");
+      }
    }
 
    @Test
@@ -348,6 +431,16 @@ public class TestAccessControl_hasResourcePermissions extends TestAccessControlB
                                                      unauthenticatableResource,
                                                      ResourcePermissions.getInstance(ResourcePermissions.IMPERSONATE));
          fail("checking implicit global resource permission invalid for resource class should have failed for system resource");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("not valid for unauthenticatable resource class"));
+      }
+      try {
+         accessControlContext.hasResourcePermissions(SYS_RESOURCE,
+                                                     unauthenticatableResource,
+                                                     ResourcePermissions.getInstance(ResourcePermissions.INHERIT),
+                                                     ResourcePermissions.getInstance(ResourcePermissions.IMPERSONATE));
+         fail("checking multiple implicit global resource permission valid and invalid for resource class should have failed for system resource");
       }
       catch (IllegalArgumentException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("not valid for unauthenticatable resource class"));
@@ -393,6 +486,53 @@ public class TestAccessControl_hasResourcePermissions extends TestAccessControlB
       catch (NullPointerException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("resource permission required"));
       }
+      try {
+         accessControlContext.hasResourcePermissions(accessorResource, accessedResource, customPermission, null);
+      }
+      catch (NullPointerException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("without null element"));
+      }
+      try {
+         accessControlContext.hasResourcePermissions(accessorResource, accessedResource, new ResourcePermission[]{null});
+      }
+      catch (NullPointerException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("without null element"));
+      }
+   }
+
+   @Test
+   public void hasResourcePermissions_emptyPermissions_shouldFail() {
+      authenticateSystemResource();
+
+      final char[] password = generateUniquePassword();
+      final Resource accessorResource = generateAuthenticatableResource(password);
+      final Resource accessedResource = generateUnauthenticatableResource();
+      final String accessedResourceClassName
+            = accessControlContext.getResourceClassInfoByResource(accessedResource).getResourceClassName();
+
+      // setup direct permissions
+      final String customPermissionName = generateResourceClassPermission(accessedResourceClassName);
+      final ResourcePermission customPermission = ResourcePermissions.getInstance(customPermissionName);
+      accessControlContext.setResourcePermissions(accessorResource,
+                                                  accessedResource,
+                                                  setOf(customPermission));
+
+      // authenticate accessor resource
+      accessControlContext.authenticate(accessorResource, PasswordCredentials.newInstance(password));
+
+      // verify
+      try {
+         accessControlContext.hasResourcePermissions(accessorResource, accessedResource);
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("non-empty"));
+      }
+      try {
+         accessControlContext.hasResourcePermissions(accessorResource, accessedResource, new ResourcePermission[] {});
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("non-empty"));
+      }
    }
 
    @Test
@@ -433,6 +573,12 @@ public class TestAccessControl_hasResourcePermissions extends TestAccessControlB
       }
       try {
          accessControlContext.hasResourcePermissions(accessorResource, accessedResource, invalidPermission);
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("is not defined for resource class"));
+      }
+      try {
+         accessControlContext.hasResourcePermissions(accessorResource, accessedResource, customPermission, invalidPermission);
       }
       catch (IllegalArgumentException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("is not defined for resource class"));

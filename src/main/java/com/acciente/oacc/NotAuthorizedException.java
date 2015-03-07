@@ -61,10 +61,10 @@ public class NotAuthorizedException extends AuthorizationException {
    }
 
    public NotAuthorizedException(Resource accessorResource,
-                                 ResourcePermission resourcePermission,
-                                 Resource accessedResource) {
+                                 Resource accessedResource,
+                                 ResourcePermission... resourcePermissions) {
       super("Resource " + String.valueOf(accessorResource)
-                  + " does not have permission " + String.valueOf(resourcePermission)
+                  + " does not have permission(s) " + Arrays.asList(resourcePermissions)
                   + " on resource " + String.valueOf(accessedResource));
    }
 
