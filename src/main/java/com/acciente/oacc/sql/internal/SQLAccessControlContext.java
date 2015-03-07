@@ -3298,12 +3298,12 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
    @Override
    public void assertResourceCreatePermissions(Resource accessorResource,
                                                String resourceClassName,
-                                               ResourceCreatePermission resourceCreatePermission) {
+                                               ResourceCreatePermission... resourceCreatePermissions) {
       if (!hasResourceCreatePermissions(accessorResource,
                                         resourceClassName,
                                         sessionResourceDomainName,
-                                        resourceCreatePermission)) {
-         throw new NotAuthorizedException(accessorResource, resourceCreatePermission);
+                                        resourceCreatePermissions)) {
+         throw new NotAuthorizedException(accessorResource, resourceCreatePermissions);
       }
    }
 
@@ -3311,25 +3311,28 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
    public void assertResourceCreatePermissions(Resource accessorResource,
                                                String resourceClassName,
                                                String domainName,
-                                               ResourceCreatePermission resourceCreatePermission) {
+                                               ResourceCreatePermission... resourceCreatePermissions) {
       if (!hasResourceCreatePermissions(accessorResource,
                                         resourceClassName,
                                         domainName,
-                                        resourceCreatePermission)) {
-         throw new NotAuthorizedException(accessorResource, resourceCreatePermission);
+                                        resourceCreatePermissions)) {
+         throw new NotAuthorizedException(accessorResource, resourceCreatePermissions);
       }
    }
 
    @Override
    public boolean hasResourceCreatePermissions(Resource accessorResource,
                                                String resourceClassName,
-                                               ResourceCreatePermission resourceCreatePermission) {
+                                               ResourceCreatePermission... resourceCreatePermissions) {
       SQLConnection connection = null;
 
       __assertAuthenticated();
       __assertResourceSpecified(accessorResource);
       __assertResourceClassSpecified(resourceClassName);
-      __assertPermissionSpecified(resourceCreatePermission);
+      __assertPermissionSpecified(resourceCreatePermissions);
+
+      final Set<ResourceCreatePermission> requestedResourceCreatePermissions
+            = notEmptySetOfNotNull(resourceCreatePermissions);
 
       try {
          connection = __getConnection();
@@ -3340,7 +3343,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
                                               accessorResource,
                                               resourceClassName,
                                               sessionResourceDomainName,
-                                              resourceCreatePermission);
+                                              requestedResourceCreatePermissions);
       }
       finally {
          __closeConnection(connection);
@@ -3351,14 +3354,17 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
    public boolean hasResourceCreatePermissions(Resource accessorResource,
                                                String resourceClassName,
                                                String domainName,
-                                               ResourceCreatePermission resourceCreatePermission) {
+                                               ResourceCreatePermission... resourceCreatePermissions) {
       SQLConnection connection = null;
 
       __assertAuthenticated();
       __assertResourceSpecified(accessorResource);
       __assertResourceClassSpecified(resourceClassName);
-      __assertPermissionSpecified(resourceCreatePermission);
+      __assertPermissionSpecified(resourceCreatePermissions);
       __assertDomainSpecified(domainName);
+
+      final Set<ResourceCreatePermission> requestedResourceCreatePermissions
+            = notEmptySetOfNotNull(resourceCreatePermissions);
 
       try {
          connection = __getConnection();
@@ -3370,7 +3376,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
                                               accessorResource,
                                               resourceClassName,
                                               domainName,
-                                              resourceCreatePermission);
+                                              requestedResourceCreatePermissions);
       }
       finally {
          __closeConnection(connection);
@@ -3381,24 +3387,32 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
                                                  Resource accessorResource,
                                                  String resourceClassName,
                                                  String domainName,
-                                                 ResourceCreatePermission resourceCreatePermission) {
-      if (!resourceCreatePermission.isSystemPermission()) {
-         __assertPermissionValid(connection, resourceClassName, resourceCreatePermission.getPostCreateResourcePermission());
+                                                 Set<ResourceCreatePermission> requestedResourceCreatePermissions) {
+      __assertPermissionsValid(connection,
+                               resourceClassName,
+                               __getPostCreateResourcePermissions(requestedResourceCreatePermissions));
+
+      final Set<ResourceCreatePermission> effectiveResourceCreatePermissions
+            = __getEffectiveResourceCreatePermissions(connection,
+                                                      accessorResource,
+                                                      resourceClassName,
+                                                      domainName);
+      boolean hasPermission = true;
+
+      // first check for effective create permissions
+      for (ResourceCreatePermission resourceCreatePermission : requestedResourceCreatePermissions) {
+         if (!__isPermissible(resourceCreatePermission, effectiveResourceCreatePermissions)) {
+            hasPermission = false;
+            break;
+         }
       }
 
-      if (__isPermissible(resourceCreatePermission,
-                          __getEffectiveResourceCreatePermissions(connection,
-                                                                  accessorResource,
-                                                                  resourceClassName,
-                                                                  domainName))) {
-         return true;
+      // next check super-user permissions to the domain
+      if (!hasPermission) {
+         hasPermission = __isSuperUserOfDomain(connection, accessorResource, domainName);
       }
 
-      if (__isSuperUserOfDomain(connection, accessorResource, domainName)) {
-         return true;
-      }
-
-      return false;
+      return hasPermission;
    }
 
    private boolean __isPermissible(ResourceCreatePermission queriedResourceCreatePermission,
@@ -3912,8 +3926,8 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       }
    }
 
-   private void __assertPermissionSpecified(ResourceCreatePermission resourceCreatePermission) {
-      if (resourceCreatePermission == null) {
+   private void __assertPermissionSpecified(ResourceCreatePermission... resourceCreatePermissions) {
+      if (resourceCreatePermissions == null) {
          throw new NullPointerException("Resource create permission required, none specified");
       }
    }
