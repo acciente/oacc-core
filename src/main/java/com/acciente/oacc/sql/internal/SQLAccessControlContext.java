@@ -2912,6 +2912,11 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
    }
 
    @Override
+   public void assertDomainCreatePermissions(DomainCreatePermission... domainCreatePermissions) {
+      assertDomainCreatePermissions(sessionResource, domainCreatePermissions);
+   }
+
+   @Override
    public boolean hasDomainCreatePermissions(Resource accessorResource,
                                              DomainCreatePermission... domainCreatePermissions) {
       SQLConnection connection = null;
@@ -2930,6 +2935,11 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       finally {
          __closeConnection(connection);
       }
+   }
+
+   @Override
+   public boolean hasDomainCreatePermissions(DomainCreatePermission... domainCreatePermissions) {
+      return hasDomainCreatePermissions(sessionResource, domainCreatePermissions);
    }
 
    private boolean __hasDomainCreatePermission(SQLConnection connection,

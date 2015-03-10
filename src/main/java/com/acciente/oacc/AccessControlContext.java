@@ -197,6 +197,17 @@ public interface AccessControlContext {
                                              DomainCreatePermission... domainCreatePermissions);
 
    /**
+    * Checks if the session resource has the specified domain create permissions on the
+    * specified domain.
+    * This method takes into account any direct and inherited domain create permissions.
+    *
+    * @param domainCreatePermissions the domain create permissions to be checked
+    * @throws com.acciente.oacc.NotAuthorizedException if the session resource <strong>does not</strong> have the
+    *                                                  specified domain create permissions
+    */
+   public void assertDomainCreatePermissions(DomainCreatePermission... domainCreatePermissions);
+
+   /**
     * Checks if the specified accessor resource has the specified domain create permissions on
     * the specified domain.
     * This method takes into account any direct and inherited domain create permissions.
@@ -208,6 +219,17 @@ public interface AccessControlContext {
     */
    public boolean hasDomainCreatePermissions(Resource accessorResource,
                                              DomainCreatePermission... domainCreatePermissions);
+
+   /**
+    * Checks if the session resource has the specified domain create permissions on the
+    * specified domain.
+    * This method takes into account any direct and inherited domain create permissions.
+    *
+    * @param domainCreatePermissions the domain create permission to be checked
+    * @return  <strong>true</strong> if the session resource has the specified domain create permissions,
+    *          <strong>false</strong> otherwise
+    */
+   public boolean hasDomainCreatePermissions(DomainCreatePermission... domainCreatePermissions);
 
    /**
     * Checks if the specified accessor resource would receive the specified domain permissions, if the accessor

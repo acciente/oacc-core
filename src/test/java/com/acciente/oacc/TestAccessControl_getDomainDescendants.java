@@ -61,13 +61,15 @@ public class TestAccessControl_getDomainDescendants extends TestAccessControlBas
 
       final String parentDomain = generateDomain();
       final String childDomain_1 = generateUniqueDomainName();
-      final String childDomain_2 = generateUniqueDomainName();
-      final String grandChildDomain_1 = generateUniqueDomainName();
-      final String grandChildDomain_2 = generateUniqueDomainName();
-
       accessControlContext.createDomain(childDomain_1, parentDomain);
+
+      final String childDomain_2 = generateUniqueDomainName();
       accessControlContext.createDomain(childDomain_2, parentDomain);
+
+      final String grandChildDomain_1 = generateUniqueDomainName();
       accessControlContext.createDomain(grandChildDomain_1, childDomain_2);
+
+      final String grandChildDomain_2 = generateUniqueDomainName();
       accessControlContext.createDomain(grandChildDomain_2, childDomain_2);
 
       // authenticate and verify
