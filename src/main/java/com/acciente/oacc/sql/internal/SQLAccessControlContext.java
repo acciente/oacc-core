@@ -2856,6 +2856,12 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
    }
 
    @Override
+   public void assertDomainPermissions(String domainName,
+                                       DomainPermission... domainPermissions) {
+      assertDomainPermissions(sessionResource, domainName, domainPermissions);
+   }
+
+   @Override
    public boolean hasDomainPermissions(Resource accessorResource,
                                        String domainName,
                                        DomainPermission... domainPermissions) {
@@ -2876,6 +2882,12 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       finally {
          __closeConnection(connection);
       }
+   }
+
+   @Override
+   public boolean hasDomainPermissions(String domainName,
+                                       DomainPermission... domainPermissions) {
+      return hasDomainPermissions(sessionResource, domainName, domainPermissions);
    }
 
    private boolean __hasDomainPermission(SQLConnection connection,
