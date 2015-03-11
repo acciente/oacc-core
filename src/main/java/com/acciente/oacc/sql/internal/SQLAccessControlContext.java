@@ -3147,17 +3147,15 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
    public void assertGlobalResourcePermissions(Resource accessorResource,
                                                String resourceClassName,
                                                ResourcePermission... resourcePermissions) {
-      if (!hasGlobalResourcePermissions(accessorResource,
-                                        resourceClassName,
-                                        sessionResourceDomainName,
-                                        resourcePermissions)) {
-         throw new NotAuthorizedException(accessorResource,
-                                          resourceClassName,
-                                          sessionResourceDomainName,
-                                          resourcePermissions);
-      }
+      assertGlobalResourcePermissions(accessorResource, resourceClassName, sessionResourceDomainName, resourcePermissions);
    }
-   
+
+   @Override
+   public void assertGlobalResourcePermissions(String resourceClassName,
+                                               ResourcePermission... resourcePermissions) {
+      assertGlobalResourcePermissions(sessionResource, resourceClassName, sessionResourceDomainName, resourcePermissions);
+   }
+
    @Override
    public void assertGlobalResourcePermissions(Resource accessorResource,
                                                String resourceClassName,
@@ -3175,31 +3173,29 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
    }
 
    @Override
+   public void assertGlobalResourcePermissions(String resourceClassName,
+                                               String domainName,
+                                               ResourcePermission... resourcePermissions) {
+      assertGlobalResourcePermissions(sessionResource, resourceClassName, domainName, resourcePermissions);
+   }
+
+   @Override
    public boolean hasGlobalResourcePermissions(Resource accessorResource,
                                                String resourceClassName,
                                                ResourcePermission... resourcePermissions) {
-      SQLConnection connection = null;
+      return hasGlobalResourcePermissions(accessorResource,
+                                          resourceClassName,
+                                          sessionResourceDomainName,
+                                          resourcePermissions);
+   }
 
-      __assertAuthenticated();
-      __assertResourceSpecified(accessorResource);
-      __assertResourceClassSpecified(resourceClassName);
-      __assertPermissionsSpecified(resourcePermissions);
-
-      final Set<ResourcePermission> requestedResourcePermissions = notEmptySetOfNotNull(resourcePermissions);
-
-      try {
-         connection = __getConnection();
-         resourceClassName = resourceClassName.trim();
-
-         return __hasGlobalResourcePermission(connection,
-                                              accessorResource,
-                                              resourceClassName,
-                                              sessionResourceDomainName,
-                                              requestedResourcePermissions);
-      }
-      finally {
-         __closeConnection(connection);
-      }
+   @Override
+   public boolean hasGlobalResourcePermissions(String resourceClassName,
+                                               ResourcePermission... resourcePermissions) {
+      return hasGlobalResourcePermissions(sessionResource,
+                                          resourceClassName,
+                                          sessionResourceDomainName,
+                                          resourcePermissions);
    }
 
    @Override
@@ -3231,6 +3227,16 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       finally {
          __closeConnection(connection);
       }
+   }
+
+   @Override
+   public boolean hasGlobalResourcePermissions(String resourceClassName,
+                                               String domainName,
+                                               ResourcePermission... resourcePermissions) {
+      return hasGlobalResourcePermissions(sessionResource,
+                                          resourceClassName,
+                                          domainName,
+                                          resourcePermissions);
    }
 
    private boolean __hasGlobalResourcePermission(SQLConnection connection,

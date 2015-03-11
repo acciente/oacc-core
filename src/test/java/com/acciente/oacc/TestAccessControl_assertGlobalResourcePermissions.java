@@ -47,6 +47,9 @@ public class TestAccessControl_assertGlobalResourcePermissions extends TestAcces
                                                            resourceClassName,
                                                            ResourcePermissions.getInstance(ResourcePermissions.IMPERSONATE),
                                                            ResourcePermissions.getInstance(customPermissionName));
+      accessControlContext.assertGlobalResourcePermissions(resourceClassName,
+                                                           ResourcePermissions.getInstance(ResourcePermissions.IMPERSONATE),
+                                                           ResourcePermissions.getInstance(customPermissionName));
 
       final String domainName = generateDomain();
       final Set<ResourceCreatePermission> allResourceCreatePermissionsForResourceClassAndDomain
@@ -58,6 +61,10 @@ public class TestAccessControl_assertGlobalResourcePermissions extends TestAcces
                                                            ResourcePermissions.getInstance(customPermissionName));
       accessControlContext.assertGlobalResourcePermissions(SYS_RESOURCE,
                                                            resourceClassName,
+                                                           domainName,
+                                                           ResourcePermissions.getInstance(ResourcePermissions.IMPERSONATE),
+                                                           ResourcePermissions.getInstance(customPermissionName));
+      accessControlContext.assertGlobalResourcePermissions(resourceClassName,
                                                            domainName,
                                                            ResourcePermissions.getInstance(ResourcePermissions.IMPERSONATE),
                                                            ResourcePermissions.getInstance(customPermissionName));
@@ -101,6 +108,15 @@ public class TestAccessControl_assertGlobalResourcePermissions extends TestAcces
       catch (NotAuthorizedException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("global permission"));
       }
+      try {
+         accessControlContext.assertGlobalResourcePermissions(resourceClassName,
+                                                              ResourcePermissions.getInstance(ResourcePermissions.IMPERSONATE),
+                                                              ResourcePermissions.getInstance(customPermissionName));
+         fail("asserting multiple global resource permission when none has been granted should not have succeeded for implicit authenticated resource");
+      }
+      catch (NotAuthorizedException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("global permission"));
+      }
 
       final String domainName = generateDomain();
       final Set<ResourceCreatePermission> allResourceCreatePermissionsForResourceClassAndDomain
@@ -123,6 +139,16 @@ public class TestAccessControl_assertGlobalResourcePermissions extends TestAcces
                                                               ResourcePermissions.getInstance(ResourcePermissions.IMPERSONATE),
                                                               ResourcePermissions.getInstance(customPermissionName));
          fail("asserting multiple global resource permission for domain when none has been granted should not have succeeded for authenticated resource");
+      }
+      catch (NotAuthorizedException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("global permission"));
+      }
+      try {
+         accessControlContext.assertGlobalResourcePermissions(resourceClassName,
+                                                              domainName,
+                                                              ResourcePermissions.getInstance(ResourcePermissions.IMPERSONATE),
+                                                              ResourcePermissions.getInstance(customPermissionName));
+         fail("asserting multiple global resource permission for domain when none has been granted should not have succeeded for implicit authenticated resource");
       }
       catch (NotAuthorizedException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("global permission"));
@@ -165,6 +191,8 @@ public class TestAccessControl_assertGlobalResourcePermissions extends TestAcces
       accessControlContext.assertGlobalResourcePermissions(accessorResource,
                                                            resourceClassName,
                                                            customPermission_forAccessorDomain);
+      accessControlContext.assertGlobalResourcePermissions(resourceClassName,
+                                                           customPermission_forAccessorDomain);
 
       accessControlContext.assertGlobalResourcePermissions(accessorResource,
                                                            resourceClassName,
@@ -173,6 +201,9 @@ public class TestAccessControl_assertGlobalResourcePermissions extends TestAcces
 
       accessControlContext.assertGlobalResourcePermissions(accessorResource,
                                                            resourceClassName,
+                                                           otherDomainName,
+                                                           customPermission_forOtherDomain);
+      accessControlContext.assertGlobalResourcePermissions(resourceClassName,
                                                            otherDomainName,
                                                            customPermission_forOtherDomain);
    }
@@ -211,6 +242,17 @@ public class TestAccessControl_assertGlobalResourcePermissions extends TestAcces
 
       // verify
       try {
+         accessControlContext.assertGlobalResourcePermissions(resourceClassName,
+                                                              customPermission_forAccessorDomain,
+                                                              ResourcePermissions
+                                                                    .getInstance(ResourcePermissions.IMPERSONATE));
+         fail("asserting direct and unauthorized global resource permission should have failed for implicit authenticated resource");
+      }
+      catch (NotAuthorizedException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString(String.valueOf(accessorResource).toLowerCase()
+                                                                       + " does not have global permission"));
+      }
+      try {
          accessControlContext.assertGlobalResourcePermissions(accessorResource,
                                                               resourceClassName,
                                                               customPermission_forAccessorDomain,
@@ -245,6 +287,18 @@ public class TestAccessControl_assertGlobalResourcePermissions extends TestAcces
                                                               ResourcePermissions
                                                                     .getInstance(ResourcePermissions.IMPERSONATE));
          fail("asserting direct and unauthorized global resource permission on specified domain should have failed for authenticated resource");
+      }
+      catch (NotAuthorizedException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString(String.valueOf(accessorResource).toLowerCase()
+                                                                       + " does not have global permission"));
+      }
+      try {
+         accessControlContext.assertGlobalResourcePermissions(resourceClassName,
+                                                              otherDomainName,
+                                                              customPermission_forAccessorDomain,
+                                                              ResourcePermissions
+                                                                    .getInstance(ResourcePermissions.IMPERSONATE));
+         fail("asserting direct and unauthorized global resource permission on specified domain should have failed for implicit authenticated resource");
       }
       catch (NotAuthorizedException e) {
          assertThat(e.getMessage().toLowerCase(), containsString(String.valueOf(accessorResource).toLowerCase()
@@ -287,6 +341,10 @@ public class TestAccessControl_assertGlobalResourcePermissions extends TestAcces
       accessControlContext.authenticate(accessorResource, PasswordCredentials.newInstance(password));
 
       // verify
+      accessControlContext.assertGlobalResourcePermissions(resourceClassName,
+                                                           customPermission_forAccessorDomain,
+                                                           ResourcePermissions
+                                                                 .getInstance(ResourcePermissions.IMPERSONATE));
       accessControlContext.assertGlobalResourcePermissions(accessorResource,
                                                            resourceClassName,
                                                            customPermission_forAccessorDomain,
@@ -302,6 +360,11 @@ public class TestAccessControl_assertGlobalResourcePermissions extends TestAcces
 
       accessControlContext.assertGlobalResourcePermissions(accessorResource,
                                                            resourceClassName,
+                                                           otherDomainName,
+                                                           customPermission_forOtherDomain,
+                                                           ResourcePermissions
+                                                                 .getInstance(ResourcePermissions.IMPERSONATE));
+      accessControlContext.assertGlobalResourcePermissions(resourceClassName,
                                                            otherDomainName,
                                                            customPermission_forOtherDomain,
                                                            ResourcePermissions
@@ -345,6 +408,9 @@ public class TestAccessControl_assertGlobalResourcePermissions extends TestAcces
       accessControlContext.authenticate(accessorResource, PasswordCredentials.newInstance(password));
 
       // verify
+      accessControlContext.assertGlobalResourcePermissions(resourceClassName,
+                                                           customPermission_forAccessorDomain_withGrant,
+                                                           customPermission_forAccessorDomain_withoutGrant);
       accessControlContext.assertGlobalResourcePermissions(accessorResource,
                                                            resourceClassName,
                                                            customPermission_forAccessorDomain_withGrant,
@@ -360,6 +426,10 @@ public class TestAccessControl_assertGlobalResourcePermissions extends TestAcces
                                                            resourceClassName,
                                                            otherDomainName,
                                                            customPermission_forOtherDomain_withoutGrant);
+      accessControlContext.assertGlobalResourcePermissions(resourceClassName,
+                                                           otherDomainName,
+                                                           customPermission_forOtherDomain_withoutGrant);
+
       try {
          accessControlContext.assertGlobalResourcePermissions(accessorResource,
                                                               resourceClassName,
@@ -411,6 +481,8 @@ public class TestAccessControl_assertGlobalResourcePermissions extends TestAcces
       accessControlContext.authenticate(accessorResource, PasswordCredentials.newInstance(password));
 
       // verify
+      accessControlContext.assertGlobalResourcePermissions(resourceClassName,
+                                                           customPermission_forAccessorDomain);
       accessControlContext.assertGlobalResourcePermissions(accessorResource,
                                                            resourceClassName,
                                                            customPermission_forAccessorDomain);
@@ -422,6 +494,9 @@ public class TestAccessControl_assertGlobalResourcePermissions extends TestAcces
 
       accessControlContext.assertGlobalResourcePermissions(accessorResource,
                                                            resourceClassName,
+                                                           otherDomainName,
+                                                           customPermission_forOtherDomain);
+      accessControlContext.assertGlobalResourcePermissions(resourceClassName,
                                                            otherDomainName,
                                                            customPermission_forOtherDomain);
    }
@@ -472,6 +547,9 @@ public class TestAccessControl_assertGlobalResourcePermissions extends TestAcces
       accessControlContext.authenticate(accessorResource, PasswordCredentials.newInstance(password));
 
       // verify
+      accessControlContext.assertGlobalResourcePermissions(resourceClassName,
+                                                           customPermission_forParentDomain,
+                                                           customPermission_forAccessorDomain);
       accessControlContext.assertGlobalResourcePermissions(accessorResource,
                                                            resourceClassName,
                                                            customPermission_forParentDomain,
@@ -505,6 +583,10 @@ public class TestAccessControl_assertGlobalResourcePermissions extends TestAcces
 
       accessControlContext.assertGlobalResourcePermissions(accessorResource,
                                                            resourceClassName,
+                                                           otherDomainName,
+                                                           customPermission_forOtherDomain,
+                                                           customPermission_forParentDomain);
+      accessControlContext.assertGlobalResourcePermissions(resourceClassName,
                                                            otherDomainName,
                                                            customPermission_forOtherDomain,
                                                            customPermission_forParentDomain);
@@ -596,6 +678,9 @@ public class TestAccessControl_assertGlobalResourcePermissions extends TestAcces
       accessControlContext.authenticate(accessorResource, PasswordCredentials.newInstance(password));
 
       // verify
+      accessControlContext.assertGlobalResourcePermissions(resourceClassName,
+                                                           customPermission_forParentDomain,
+                                                           customPermission_forAccessorDomain);
       accessControlContext.assertGlobalResourcePermissions(accessorResource,
                                                            resourceClassName,
                                                            customPermission_forParentDomain,
@@ -619,6 +704,10 @@ public class TestAccessControl_assertGlobalResourcePermissions extends TestAcces
 
       accessControlContext.assertGlobalResourcePermissions(accessorResource,
                                                            resourceClassName,
+                                                           otherDomainName,
+                                                           customPermission_forOtherDomain,
+                                                           customPermission_forParentDomain);
+      accessControlContext.assertGlobalResourcePermissions(resourceClassName,
                                                            otherDomainName,
                                                            customPermission_forOtherDomain,
                                                            customPermission_forParentDomain);
@@ -701,6 +790,15 @@ public class TestAccessControl_assertGlobalResourcePermissions extends TestAcces
       // verify
       try {
          accessControlContext
+               .assertGlobalResourcePermissions(resourceClassName,
+                                                ResourcePermissions.getInstance(ResourcePermissions.RESET_CREDENTIALS));
+         fail("asserting implicit global resource permission invalid for resource class should have failed for implicit system resource");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("not valid for unauthenticatable resource class"));
+      }
+      try {
+         accessControlContext
                .assertGlobalResourcePermissions(SYS_RESOURCE,
                                                 resourceClassName,
                                                 ResourcePermissions.getInstance(ResourcePermissions.RESET_CREDENTIALS));
@@ -762,6 +860,17 @@ public class TestAccessControl_assertGlobalResourcePermissions extends TestAcces
                                                 ResourcePermissions.getInstance(ResourcePermissions.INHERIT),
                                                 ResourcePermissions.getInstance(ResourcePermissions.IMPERSONATE));
          fail("asserting implicit global resource permission invalid and valid for resource class should have failed for system resource");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("not valid for unauthenticatable resource class"));
+      }
+      try {
+         accessControlContext
+               .assertGlobalResourcePermissions(resourceClassName,
+                                                domainName,
+                                                ResourcePermissions.getInstance(ResourcePermissions.INHERIT),
+                                                ResourcePermissions.getInstance(ResourcePermissions.IMPERSONATE));
+         fail("asserting implicit global resource permission invalid and valid for resource class should have failed for implicit system resource");
       }
       catch (IllegalArgumentException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("not valid for unauthenticatable resource class"));
@@ -777,6 +886,8 @@ public class TestAccessControl_assertGlobalResourcePermissions extends TestAcces
       final String customPermissionName = generateResourceClassPermission(resourceClassName);
 
       // verify
+      accessControlContext.assertGlobalResourcePermissions(resourceClassName_whitespaced,
+                                                           ResourcePermissions.getInstance(customPermissionName));
       accessControlContext.assertGlobalResourcePermissions(SYS_RESOURCE,
                                                            resourceClassName_whitespaced,
                                                            ResourcePermissions.getInstance(customPermissionName));
@@ -788,6 +899,9 @@ public class TestAccessControl_assertGlobalResourcePermissions extends TestAcces
       assertThat(allResourceCreatePermissionsForResourceClassAndDomain.isEmpty(), is(true));
       accessControlContext.assertGlobalResourcePermissions(SYS_RESOURCE,
                                                            resourceClassName_whitespaced,
+                                                           domainName_whitespaced,
+                                                           ResourcePermissions.getInstance(customPermissionName));
+      accessControlContext.assertGlobalResourcePermissions(resourceClassName_whitespaced,
                                                            domainName_whitespaced,
                                                            ResourcePermissions.getInstance(customPermissionName));
    }
@@ -824,12 +938,17 @@ public class TestAccessControl_assertGlobalResourcePermissions extends TestAcces
       accessControlContext.authenticate(accessorResource, PasswordCredentials.newInstance(password));
 
       // verify
+      accessControlContext.assertGlobalResourcePermissions(resourceClassName_whitespaced,
+                                                           customPermission_forAccessorDomain);
       accessControlContext.assertGlobalResourcePermissions(accessorResource,
                                                            resourceClassName_whitespaced,
                                                            customPermission_forAccessorDomain);
 
       accessControlContext.assertGlobalResourcePermissions(accessorResource,
                                                            resourceClassName_whitespaced,
+                                                           accessedDomainName_whitespaced,
+                                                           customPermission_forAccessedDomain);
+      accessControlContext.assertGlobalResourcePermissions(resourceClassName_whitespaced,
                                                            accessedDomainName_whitespaced,
                                                            customPermission_forAccessedDomain);
    }
@@ -842,13 +961,21 @@ public class TestAccessControl_assertGlobalResourcePermissions extends TestAcces
       final String customPermissionName = generateResourceClassPermission(resourceClassName);
 
       try {
-         accessControlContext.assertGlobalResourcePermissions(null,
+         accessControlContext.assertGlobalResourcePermissions((Resource) null,
                                                               resourceClassName,
                                                               ResourcePermissions.getInstance(customPermissionName));
          fail("asserting global resource permission for null accessor resource reference should have failed for system resource");
       }
       catch (NullPointerException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("resource required"));
+      }
+      try {
+         accessControlContext.assertGlobalResourcePermissions(null,
+                                                              ResourcePermissions.getInstance(customPermissionName));
+         fail("asserting global resource permission for null resource class reference should have failed for implicit system resource");
+      }
+      catch (NullPointerException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("resource class required"));
       }
       try {
          accessControlContext.assertGlobalResourcePermissions(SYS_RESOURCE,
@@ -869,10 +996,26 @@ public class TestAccessControl_assertGlobalResourcePermissions extends TestAcces
          assertThat(e.getMessage().toLowerCase(), containsString("resource permission required"));
       }
       try {
+         accessControlContext.assertGlobalResourcePermissions(resourceClassName,
+                                                              null);
+         fail("asserting global resource permission for null resource permission should have failed for implicit system resource");
+      }
+      catch (NullPointerException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("resource permission required"));
+      }
+      try {
          accessControlContext.assertGlobalResourcePermissions(SYS_RESOURCE,
                                                               resourceClassName,
                                                               new ResourcePermission[]{null});
          fail("asserting global resource permission for null resource permission element should have failed for system resource");
+      }
+      catch (NullPointerException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("without null element"));
+      }
+      try {
+         accessControlContext.assertGlobalResourcePermissions(resourceClassName,
+                                                              new ResourcePermission[]{null});
+         fail("asserting global resource permission for null resource permission element should have failed for implicit system resource");
       }
       catch (NullPointerException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("without null element"));
@@ -883,6 +1026,15 @@ public class TestAccessControl_assertGlobalResourcePermissions extends TestAcces
                                                               ResourcePermissions.getInstance(customPermissionName),
                                                               null);
          fail("asserting global resource permission for null resource permission element should have failed for system resource");
+      }
+      catch (NullPointerException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("without null element"));
+      }
+      try {
+         accessControlContext.assertGlobalResourcePermissions(resourceClassName,
+                                                              ResourcePermissions.getInstance(customPermissionName),
+                                                              null);
+         fail("asserting global resource permission for null resource permission element should have failed for implicit system resource");
       }
       catch (NullPointerException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("without null element"));
@@ -910,6 +1062,15 @@ public class TestAccessControl_assertGlobalResourcePermissions extends TestAcces
          assertThat(e.getMessage().toLowerCase(), containsString("resource class required"));
       }
       try {
+         accessControlContext.assertGlobalResourcePermissions((String) null,
+                                                              domainName,
+                                                              ResourcePermissions.getInstance(customPermissionName));
+         fail("asserting global resource permission (by domain) for null resource class reference should have failed for implicit system resource");
+      }
+      catch (NullPointerException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("resource class required"));
+      }
+      try {
          accessControlContext.assertGlobalResourcePermissions(SYS_RESOURCE,
                                                               resourceClassName,
                                                               domainName,
@@ -920,11 +1081,29 @@ public class TestAccessControl_assertGlobalResourcePermissions extends TestAcces
          assertThat(e.getMessage().toLowerCase(), containsString("resource permission required"));
       }
       try {
+         accessControlContext.assertGlobalResourcePermissions(resourceClassName,
+                                                              domainName,
+                                                              null);
+         fail("asserting global resource permission (by domain) for null resource permission should have failed for implicit system resource");
+      }
+      catch (NullPointerException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("resource permission required"));
+      }
+      try {
          accessControlContext.assertGlobalResourcePermissions(SYS_RESOURCE,
                                                               resourceClassName,
                                                               domainName,
                                                               new ResourcePermission[]{null});
          fail("asserting global resource permission for null resource permission element should have failed for system resource");
+      }
+      catch (NullPointerException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("without null element"));
+      }
+      try {
+         accessControlContext.assertGlobalResourcePermissions(resourceClassName,
+                                                              domainName,
+                                                              new ResourcePermission[]{null});
+         fail("asserting global resource permission for null resource permission element should have failed for implicit system resource");
       }
       catch (NullPointerException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("without null element"));
@@ -941,11 +1120,30 @@ public class TestAccessControl_assertGlobalResourcePermissions extends TestAcces
          assertThat(e.getMessage().toLowerCase(), containsString("without null element"));
       }
       try {
+         accessControlContext.assertGlobalResourcePermissions(resourceClassName,
+                                                              domainName,
+                                                              ResourcePermissions.getInstance(customPermissionName),
+                                                              null);
+         fail("asserting global resource permission for null resource permission element should have failed for implicit system resource");
+      }
+      catch (NullPointerException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("without null element"));
+      }
+      try {
          accessControlContext.assertGlobalResourcePermissions(SYS_RESOURCE,
                                                               resourceClassName,
                                                               (String) null,
                                                               ResourcePermissions.getInstance(customPermissionName));
          fail("asserting global resource permission (by domain) for null domain reference should have failed for system resource");
+      }
+      catch (NullPointerException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("domain required"));
+      }
+      try {
+         accessControlContext.assertGlobalResourcePermissions(resourceClassName,
+                                                              (String) null,
+                                                              ResourcePermissions.getInstance(customPermissionName));
+         fail("asserting global resource permission (by domain) for null domain reference should have failed for implicit system resource");
       }
       catch (NullPointerException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("domain required"));
@@ -958,6 +1156,13 @@ public class TestAccessControl_assertGlobalResourcePermissions extends TestAcces
 
       final String resourceClassName = generateResourceClass(false, false);
 
+      try {
+         accessControlContext.assertGlobalResourcePermissions(resourceClassName);
+         fail("asserting global resource permission with empty permissions should have failed for implicit system resource");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("non-empty"));
+      }
       try {
          accessControlContext.assertGlobalResourcePermissions(SYS_RESOURCE, resourceClassName);
          fail("asserting global resource permission with empty permissions should have failed for system resource");
@@ -974,8 +1179,23 @@ public class TestAccessControl_assertGlobalResourcePermissions extends TestAcces
       catch (IllegalArgumentException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("non-empty"));
       }
+      try {
+         accessControlContext.assertGlobalResourcePermissions(resourceClassName,
+                                                              new ResourcePermission[]{});
+         fail("asserting global resource permission with empty permissions should have failed for implicit system resource");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("non-empty"));
+      }
 
       final String domainName = generateDomain();
+      try {
+         accessControlContext.assertGlobalResourcePermissions(resourceClassName, domainName);
+         fail("asserting global resource permission (for domain) with empty permissions should have failed for implicit system resource");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("non-empty"));
+      }
       try {
          accessControlContext.assertGlobalResourcePermissions(SYS_RESOURCE, resourceClassName, domainName);
          fail("asserting global resource permission (for domain) with empty permissions should have failed for system resource");
@@ -993,6 +1213,15 @@ public class TestAccessControl_assertGlobalResourcePermissions extends TestAcces
       catch (IllegalArgumentException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("non-empty"));
       }
+      try {
+         accessControlContext.assertGlobalResourcePermissions(resourceClassName,
+                                                              domainName,
+                                                              new ResourcePermission[]{});
+         fail("asserting global resource permission (for domain) with empty permissions should have failed for implicit system resource");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("non-empty"));
+      }
    }
 
    @Test
@@ -1002,6 +1231,11 @@ public class TestAccessControl_assertGlobalResourcePermissions extends TestAcces
       final String resourceClassName = generateResourceClass(true, false);
 
       // verify
+      accessControlContext.assertGlobalResourcePermissions(resourceClassName,
+                                                           ResourcePermissions
+                                                                 .getInstance(ResourcePermissions.IMPERSONATE),
+                                                           ResourcePermissions
+                                                                 .getInstance(ResourcePermissions.IMPERSONATE));
       accessControlContext.assertGlobalResourcePermissions(SYS_RESOURCE,
                                                            resourceClassName,
                                                            ResourcePermissions
@@ -1012,6 +1246,10 @@ public class TestAccessControl_assertGlobalResourcePermissions extends TestAcces
       final String domainName = generateDomain();
       accessControlContext.assertGlobalResourcePermissions(SYS_RESOURCE,
                                                            resourceClassName,
+                                                           domainName,
+                                                           ResourcePermissions.getInstance(ResourcePermissions.IMPERSONATE),
+                                                           ResourcePermissions.getInstance(ResourcePermissions.IMPERSONATE));
+      accessControlContext.assertGlobalResourcePermissions(resourceClassName,
                                                            domainName,
                                                            ResourcePermissions.getInstance(ResourcePermissions.IMPERSONATE),
                                                            ResourcePermissions.getInstance(ResourcePermissions.IMPERSONATE));
@@ -1032,6 +1270,14 @@ public class TestAccessControl_assertGlobalResourcePermissions extends TestAcces
       }
       catch (NotAuthorizedException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("global permission"));
+      }
+      try {
+         accessControlContext.assertGlobalResourcePermissions("invalid_resource_class",
+                                                              ResourcePermissions.getInstance(customPermissionName));
+         fail("asserting global resource permission for invalid resource class reference should have failed for implicit system resource");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("not defined for resource class"));
       }
       try {
          accessControlContext.assertGlobalResourcePermissions(SYS_RESOURCE,
@@ -1058,6 +1304,15 @@ public class TestAccessControl_assertGlobalResourcePermissions extends TestAcces
                                                               ResourcePermissions.getInstance(customPermissionName),
                                                               ResourcePermissions.getInstance("invalid_permission"));
          fail("asserting global resource permission for valid and invalid resource permission reference should have failed for system resource");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("not defined for resource class"));
+      }
+      try {
+         accessControlContext.assertGlobalResourcePermissions(resourceClassName,
+                                                              ResourcePermissions.getInstance(customPermissionName),
+                                                              ResourcePermissions.getInstance("invalid_permission"));
+         fail("asserting global resource permission for valid and invalid resource permission reference should have failed for implicit system resource");
       }
       catch (IllegalArgumentException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("not defined for resource class"));
@@ -1111,6 +1366,16 @@ public class TestAccessControl_assertGlobalResourcePermissions extends TestAcces
                                                               ResourcePermissions.getInstance(customPermissionName),
                                                               ResourcePermissions.getInstance("invalid_permission"));
          fail("asserting global resource permission for valid and invalid resource permission reference should have failed for system resource");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("not defined for resource class"));
+      }
+      try {
+         accessControlContext.assertGlobalResourcePermissions(resourceClassName,
+                                                              domainName,
+                                                              ResourcePermissions.getInstance(customPermissionName),
+                                                              ResourcePermissions.getInstance("invalid_permission"));
+         fail("asserting global resource permission for valid and invalid resource permission reference should have failed for implicit system resource");
       }
       catch (IllegalArgumentException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("not defined for resource class"));

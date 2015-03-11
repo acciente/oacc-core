@@ -305,6 +305,21 @@ public interface AccessControlContext {
                                                ResourcePermission... resourcePermissions);
 
    /**
+    * Checks if the session resource has the specified global resource permissions on the specified
+    * resource class in the session resource's domain.
+    * This method takes into account any global permissions that the session resource may have.
+    *
+    * @param resourceClassName   a string resource class name
+    * @param resourcePermissions the permissions to be checked
+    * @throws java.lang.IllegalArgumentException if no resource class of resourceClassName exists, or
+    *                                            if any resourcePermission is invalid for the resource class
+    * @throws com.acciente.oacc.NotAuthorizedException if the session resource <strong>does not</strong> have the
+    *                                                  specified global permissions
+    */
+   public void assertGlobalResourcePermissions(String resourceClassName,
+                                               ResourcePermission... resourcePermissions);
+
+   /**
     * Checks if the specified accessor resource has the specified global resource permissions on
     * the specified resource class in the specified domain.
     * This method takes into account any global permissions that the accessor resource may have.
@@ -326,6 +341,24 @@ public interface AccessControlContext {
                                                ResourcePermission... resourcePermissions);
 
    /**
+    * Checks if the session resource has the specified global resource permissions on the specified
+    * resource class in the specified domain.
+    * This method takes into account any global permissions that the session resource may have.
+    *
+    * @param resourceClassName   a string resource class name
+    * @param domainName          the domain in which the permissions should be checked
+    * @param resourcePermissions the permissions to be checked
+    * @throws java.lang.IllegalArgumentException if no resource class of resourceClassName exists, or
+    *                                            if any resourcePermission is invalid for the resource class, or
+    *                                            if no domain of domainName exists
+    * @throws com.acciente.oacc.NotAuthorizedException if the session resource <strong>does not</strong> have the
+    *                                                  specified global permissions
+    */
+   public void assertGlobalResourcePermissions(String resourceClassName,
+                                               String domainName,
+                                               ResourcePermission... resourcePermissions);
+
+   /**
     * Checks if the specified accessor resource has the specified global resource permissions on
     * the specified resource class in the session resource's domain.
     * This method takes into account any global permissions that the accessor resource may have.
@@ -340,6 +373,21 @@ public interface AccessControlContext {
     */
    public boolean hasGlobalResourcePermissions(Resource accessorResource,
                                                String resourceClassName,
+                                               ResourcePermission... resourcePermissions);
+
+   /**
+    * Checks if the session resource has the specified global resource permissions on the specified
+    * resource class in the session resource's domain.
+    * This method takes into account any global permissions that the session resource may have.
+    *
+    * @param resourceClassName   a string resource class name
+    * @param resourcePermissions the permissions to be checked
+    * @return <strong>true</strong> if the session resource has the specified global permissions,
+    *         <strong>false</strong> otherwise
+    * @throws java.lang.IllegalArgumentException if no resource class of resourceClassName exists, or
+    *                                            if any resourcePermission is invalid for the resource class
+    */
+   public boolean hasGlobalResourcePermissions(String resourceClassName,
                                                ResourcePermission... resourcePermissions);
 
    /**
@@ -359,6 +407,24 @@ public interface AccessControlContext {
     */
    public boolean hasGlobalResourcePermissions(Resource accessorResource,
                                                String resourceClassName,
+                                               String domainName,
+                                               ResourcePermission... resourcePermissions);
+
+   /**
+    * Checks if the session resource has the specified global resource permissions on the specified
+    * resource class in the specified domain.
+    * This method takes into account any global permissions that the session resource may have.
+    *
+    * @param resourceClassName   a string resource class name
+    * @param domainName          the domain in which the permissions should be checked
+    * @param resourcePermissions the permissions to be checked
+    * @return <strong>true</strong> if the session resource has the specified global permissions,
+    *         <strong>false</strong> otherwise
+    * @throws java.lang.IllegalArgumentException if no resource class of resourceClassName exists, or
+    *                                            if any resourcePermission is invalid for the resource class, or
+    *                                            if no domain of domainName exists
+    */
+   public boolean hasGlobalResourcePermissions(String resourceClassName,
                                                String domainName,
                                                ResourcePermission... resourcePermissions);
 
