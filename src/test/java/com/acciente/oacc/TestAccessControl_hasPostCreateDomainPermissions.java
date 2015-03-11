@@ -64,6 +64,14 @@ public class TestAccessControl_hasPostCreateDomainPermissions extends TestAccess
                                                                                              true))) {
          fail("checking all implicit post-create domain permission with grant should have succeeded as system resource");
       }
+      if (!accessControlContext.hasPostCreateDomainPermissions(DomainPermissions.getInstance(DomainPermissions.CREATE_CHILD_DOMAIN),
+                                                               DomainPermissions.getInstance(DomainPermissions.CREATE_CHILD_DOMAIN,
+                                                                                             true),
+                                                               DomainPermissions.getInstance(DomainPermissions.SUPER_USER),
+                                                               DomainPermissions.getInstance(DomainPermissions.SUPER_USER,
+                                                                                             true))) {
+         fail("checking all implicit post-create domain permission with grant should have succeeded as implicit system resource");
+      }
    }
 
    @Test
@@ -83,6 +91,9 @@ public class TestAccessControl_hasPostCreateDomainPermissions extends TestAccess
       accessControlContext.authenticate(accessorResource, PasswordCredentials.newInstance(password));
 
       // verify
+      if (accessControlContext.hasPostCreateDomainPermissions(DomainPermissions.getInstance(DomainPermissions.CREATE_CHILD_DOMAIN))) {
+         fail("checking post-create domain permission when none has been granted should not have succeeded for implicit authenticated resource");
+      }
       if (accessControlContext.hasPostCreateDomainPermissions(accessorResource,
                                                               DomainPermissions.getInstance(DomainPermissions.CREATE_CHILD_DOMAIN))) {
          fail("checking post-create domain permission when none has been granted should not have succeeded for authenticated resource");
@@ -109,6 +120,9 @@ public class TestAccessControl_hasPostCreateDomainPermissions extends TestAccess
       accessControlContext.authenticate(accessorResource, PasswordCredentials.newInstance(password));
 
       // verify
+      if (!accessControlContext.hasPostCreateDomainPermissions(DomainPermissions.getInstance(DomainPermissions.CREATE_CHILD_DOMAIN))) {
+         fail("checking direct post-create domain permission should have succeeded for implicit authenticated resource");
+      }
       if (!accessControlContext.hasPostCreateDomainPermissions(accessorResource,
                                                                DomainPermissions.getInstance(DomainPermissions.CREATE_CHILD_DOMAIN))) {
          fail("checking direct post-create domain permission should have succeeded for authenticated resource");
@@ -134,10 +148,15 @@ public class TestAccessControl_hasPostCreateDomainPermissions extends TestAccess
       }
 
       // verify
+      if (accessControlContext.hasPostCreateDomainPermissions(DomainPermissions.getInstance(DomainPermissions.CREATE_CHILD_DOMAIN),
+                                                              DomainPermissions.getInstance(DomainPermissions.CREATE_CHILD_DOMAIN,
+                                                                                            true))) {
+         fail("checking direct and unauthorized post-create domain permission should have failed for implicit authenticated resource");
+      }
       if (accessControlContext.hasPostCreateDomainPermissions(accessorResource,
-                                                               DomainPermissions.getInstance(DomainPermissions.CREATE_CHILD_DOMAIN),
-                                                               DomainPermissions.getInstance(DomainPermissions.CREATE_CHILD_DOMAIN,
-                                                                                             true))) {
+                                                              DomainPermissions.getInstance(DomainPermissions.CREATE_CHILD_DOMAIN),
+                                                              DomainPermissions.getInstance(DomainPermissions.CREATE_CHILD_DOMAIN,
+                                                                                            true))) {
          fail("checking direct and unauthorized post-create domain permission should have failed for authenticated resource");
       }
    }
@@ -163,6 +182,10 @@ public class TestAccessControl_hasPostCreateDomainPermissions extends TestAccess
       accessControlContext.authenticate(accessorResource, PasswordCredentials.newInstance(password));
 
       // verify
+      if (!accessControlContext.hasPostCreateDomainPermissions(DomainPermissions.getInstance(DomainPermissions.CREATE_CHILD_DOMAIN),
+                                                               DomainPermissions.getInstance(DomainPermissions.SUPER_USER))) {
+         fail("checking multiple direct post-create domain permission should have succeeded for implicit authenticated resource");
+      }
       if (!accessControlContext.hasPostCreateDomainPermissions(accessorResource,
                                                                DomainPermissions.getInstance(DomainPermissions.CREATE_CHILD_DOMAIN),
                                                                DomainPermissions.getInstance(DomainPermissions.SUPER_USER))) {
@@ -195,11 +218,18 @@ public class TestAccessControl_hasPostCreateDomainPermissions extends TestAccess
       accessControlContext.authenticate(accessorResource, PasswordCredentials.newInstance(password));
 
       // verify
+      if (!accessControlContext.hasPostCreateDomainPermissions(DomainPermissions.getInstance(DomainPermissions.CREATE_CHILD_DOMAIN))) {
+         fail("checking direct post-create domain permission without grant should have succeeded for implicit authenticated resource");
+      }
       if (!accessControlContext.hasPostCreateDomainPermissions(accessorResource,
                                                                DomainPermissions.getInstance(DomainPermissions.CREATE_CHILD_DOMAIN))) {
          fail("checking direct post-create domain permission without grant should have succeeded for authenticated resource");
       }
 
+      if (accessControlContext.hasPostCreateDomainPermissions(DomainPermissions.getInstance(DomainPermissions.CREATE_CHILD_DOMAIN,
+                                                                                            true))) {
+         fail("checking direct post-create domain permission for a permission with exceeded granting rights should have failed");
+      }
       if (accessControlContext.hasPostCreateDomainPermissions(accessorResource,
                                                               DomainPermissions.getInstance(DomainPermissions.CREATE_CHILD_DOMAIN,
                                                                                             true))) {
@@ -267,6 +297,14 @@ public class TestAccessControl_hasPostCreateDomainPermissions extends TestAccess
                                                                DomainPermissions.getInstance(DomainPermissions.CREATE_CHILD_DOMAIN,
                                                                                              true))) {
          fail("checking implicit post-create domain permission with grant when having super-user privileges should have succeeded for authenticated resource");
+      }
+      if (!accessControlContext.hasPostCreateDomainPermissions(DomainPermissions.getInstance(DomainPermissions.SUPER_USER),
+                                                               DomainPermissions.getInstance(DomainPermissions.SUPER_USER,
+                                                                                             true),
+                                                               DomainPermissions.getInstance(DomainPermissions.CREATE_CHILD_DOMAIN),
+                                                               DomainPermissions.getInstance(DomainPermissions.CREATE_CHILD_DOMAIN,
+                                                                                             true))) {
+         fail("checking multiple implicit post-create domain permission with grant when having super-user privileges should have succeeded for implicit authenticated resource");
       }
    }
 
@@ -374,6 +412,11 @@ public class TestAccessControl_hasPostCreateDomainPermissions extends TestAccess
                                                                                              true))) {
          fail("checking multiple post-create domain permission inherited from two resources with differing granting rights should have succeeded for authenticated resource");
       }
+      if (!accessControlContext.hasPostCreateDomainPermissions(DomainPermissions.getInstance(donorPermissionName_createChild),
+                                                               DomainPermissions.getInstance(donorPermissionName_createChild,
+                                                                                             true))) {
+         fail("checking multiple post-create domain permission inherited from two resources with differing granting rights should have succeeded for implicit authenticated resource");
+      }
    }
 
    @Test
@@ -479,11 +522,18 @@ public class TestAccessControl_hasPostCreateDomainPermissions extends TestAccess
       final DomainPermission domainPermission = DomainPermissions.getInstance(DomainPermissions.CREATE_CHILD_DOMAIN);
 
       try {
-         accessControlContext.hasPostCreateDomainPermissions(null, domainPermission);
+         accessControlContext.hasPostCreateDomainPermissions((Resource) null, domainPermission);
          fail("checking post-create domain permission with null accessor resource should have failed");
       }
       catch (NullPointerException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("resource required"));
+      }
+      try {
+         accessControlContext.hasPostCreateDomainPermissions(null);
+         fail("checking post-create domain permission with null permission should have failed");
+      }
+      catch (NullPointerException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("permission required"));
       }
       try {
          accessControlContext.hasPostCreateDomainPermissions(accessorResource, null);
@@ -500,7 +550,21 @@ public class TestAccessControl_hasPostCreateDomainPermissions extends TestAccess
          assertThat(e.getMessage().toLowerCase(), containsString("without null element"));
       }
       try {
+         accessControlContext.hasPostCreateDomainPermissions(new DomainPermission[] {null});
+         fail("checking post-create domain permission with null permission element should have failed");
+      }
+      catch (NullPointerException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("without null element"));
+      }
+      try {
          accessControlContext.hasPostCreateDomainPermissions(accessorResource, domainPermission, null);
+         fail("checking post-create domain permission with null permission element should have failed");
+      }
+      catch (NullPointerException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("without null element"));
+      }
+      try {
+         accessControlContext.hasPostCreateDomainPermissions(domainPermission, null);
          fail("checking post-create domain permission with null permission element should have failed");
       }
       catch (NullPointerException e) {
@@ -513,6 +577,13 @@ public class TestAccessControl_hasPostCreateDomainPermissions extends TestAccess
       authenticateSystemResource();
       final Resource accessorResource = generateUnauthenticatableResource();
 
+      try {
+         accessControlContext.hasPostCreateDomainPermissions();
+         fail("checking post-create domain permission with empty permission sequence should have failed");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("non-empty"));
+      }
       try {
          accessControlContext.hasPostCreateDomainPermissions(accessorResource);
          fail("checking post-create domain permission with empty permission sequence should have failed");
@@ -527,6 +598,13 @@ public class TestAccessControl_hasPostCreateDomainPermissions extends TestAccess
       catch (IllegalArgumentException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("non-empty"));
       }
+      try {
+         accessControlContext.hasPostCreateDomainPermissions(new DomainPermission[] {});
+         fail("checking post-create domain permission with empty permission sequence should have failed");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("non-empty"));
+      }
    }
 
    @Test
@@ -535,6 +613,7 @@ public class TestAccessControl_hasPostCreateDomainPermissions extends TestAccess
       final Resource accessorResource = generateUnauthenticatableResource();
       final DomainPermission domainPermission = DomainPermissions.getInstance(DomainPermissions.CREATE_CHILD_DOMAIN);
 
+      accessControlContext.hasPostCreateDomainPermissions(domainPermission, domainPermission);
       accessControlContext.hasPostCreateDomainPermissions(accessorResource, domainPermission, domainPermission);
    }
 
