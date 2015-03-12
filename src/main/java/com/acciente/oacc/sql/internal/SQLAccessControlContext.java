@@ -2994,15 +2994,13 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
    public void assertPostCreateResourcePermissions(Resource accessorResource,
                                                    String resourceClassName,
                                                    ResourcePermission... resourcePermissions) {
-      if (!hasPostCreateResourcePermissions(accessorResource,
-                                            resourceClassName,
-                                            sessionResourceDomainName,
-                                            resourcePermissions)) {
-         throw new NotAuthorizedException(accessorResource,
-                                          "receive " + Arrays.asList(resourcePermissions)
-                                                + " permission(s) after creating a " + resourceClassName
-                                                + " resource in domain " + sessionResourceDomainName);
-      }
+      assertPostCreateResourcePermissions(accessorResource, resourceClassName, sessionResourceDomainName, resourcePermissions);
+   }
+
+   @Override
+   public void assertPostCreateResourcePermissions(String resourceClassName,
+                                                   ResourcePermission... resourcePermissions) {
+      assertPostCreateResourcePermissions(sessionResource, resourceClassName, sessionResourceDomainName, resourcePermissions);
    }
 
    @Override
@@ -3022,31 +3020,29 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
    }
 
    @Override
+   public void assertPostCreateResourcePermissions(String resourceClassName,
+                                                   String domainName,
+                                                   ResourcePermission... resourcePermissions) {
+      assertPostCreateResourcePermissions(sessionResource, resourceClassName, domainName, resourcePermissions);
+   }
+
+   @Override
    public boolean hasPostCreateResourcePermissions(Resource accessorResource,
                                                    String resourceClassName,
                                                    ResourcePermission... resourcePermissions) {
-      SQLConnection connection = null;
+      return hasPostCreateResourcePermissions(accessorResource,
+                                              resourceClassName,
+                                              sessionResourceDomainName,
+                                              resourcePermissions);
+   }
 
-      __assertAuthenticated();
-      __assertResourceSpecified(accessorResource);
-      __assertResourceClassSpecified(resourceClassName);
-      __assertPermissionsSpecified(resourcePermissions);
-
-      final Set<ResourcePermission> requestedResourcePermissions = notEmptySetOfNotNull(resourcePermissions);
-
-      try {
-         connection = __getConnection();
-         resourceClassName = resourceClassName.trim();
-
-         return __hasPostCreateResourcePermission(connection,
-                                                  accessorResource,
-                                                  resourceClassName,
-                                                  sessionResourceDomainName,
-                                                  requestedResourcePermissions);
-      }
-      finally {
-         __closeConnection(connection);
-      }
+   @Override
+   public boolean hasPostCreateResourcePermissions(String resourceClassName,
+                                                   ResourcePermission... resourcePermissions) {
+      return hasPostCreateResourcePermissions(sessionResource,
+                                              resourceClassName,
+                                              sessionResourceDomainName,
+                                              resourcePermissions);
    }
 
    @Override
@@ -3078,6 +3074,16 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       finally {
          __closeConnection(connection);
       }
+   }
+
+   @Override
+   public boolean hasPostCreateResourcePermissions(String resourceClassName,
+                                                   String domainName,
+                                                   ResourcePermission... resourcePermissions) {
+      return hasPostCreateResourcePermissions(sessionResource,
+                                              resourceClassName,
+                                              domainName,
+                                              resourcePermissions);
    }
 
    private boolean __hasPostCreateResourcePermission(SQLConnection connection,

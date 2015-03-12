@@ -240,11 +240,24 @@ public class AccessControlContextProxy implements AccessControlContext {
    }
 
    @Override
+   public void assertPostCreateResourcePermissions(String resourceClassName,
+                                                   ResourcePermission... resourcePermissions) {
+      accessControlContext.assertPostCreateResourcePermissions(resourceClassName, resourcePermissions);
+   }
+
+   @Override
    public void assertPostCreateResourcePermissions(Resource accessorResource,
                                                    String resourceClassName,
                                                    String domainName,
                                                    ResourcePermission... resourcePermissions) {
       accessControlContext.assertPostCreateResourcePermissions(accessorResource, resourceClassName, domainName, resourcePermissions);
+   }
+
+   @Override
+   public void assertPostCreateResourcePermissions(String resourceClassName,
+                                                   String domainName,
+                                                   ResourcePermission... resourcePermissions) {
+      accessControlContext.assertPostCreateResourcePermissions(resourceClassName, domainName, resourcePermissions);
    }
 
    @Override
@@ -255,11 +268,24 @@ public class AccessControlContextProxy implements AccessControlContext {
    }
 
    @Override
+   public boolean hasPostCreateResourcePermissions(String resourceClassName,
+                                                   ResourcePermission... resourcePermissions) {
+      return accessControlContext.hasPostCreateResourcePermissions(resourceClassName, resourcePermissions);
+   }
+
+   @Override
    public boolean hasPostCreateResourcePermissions(Resource accessorResource,
                                                    String resourceClassName,
                                                    String domainName,
                                                    ResourcePermission... resourcePermissions) {
       return accessControlContext.hasPostCreateResourcePermissions(accessorResource, resourceClassName, domainName, resourcePermissions);
+   }
+
+   @Override
+   public boolean hasPostCreateResourcePermissions(String resourceClassName,
+                                                   String domainName,
+                                                   ResourcePermission... resourcePermissions) {
+      return accessControlContext.hasPostCreateResourcePermissions(resourceClassName, domainName, resourcePermissions);
    }
 
    @Override
