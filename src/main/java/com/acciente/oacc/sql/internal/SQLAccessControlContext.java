@@ -3356,12 +3356,13 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
    public void assertResourceCreatePermissions(Resource accessorResource,
                                                String resourceClassName,
                                                ResourceCreatePermission... resourceCreatePermissions) {
-      if (!hasResourceCreatePermissions(accessorResource,
-                                        resourceClassName,
-                                        sessionResourceDomainName,
-                                        resourceCreatePermissions)) {
-         throw new NotAuthorizedException(accessorResource, resourceCreatePermissions);
-      }
+      assertResourceCreatePermissions(accessorResource, resourceClassName, sessionResourceDomainName, resourceCreatePermissions);
+   }
+
+   @Override
+   public void assertResourceCreatePermissions(String resourceClassName,
+                                               ResourceCreatePermission... resourceCreatePermissions) {
+      assertResourceCreatePermissions(sessionResource, resourceClassName, sessionResourceDomainName, resourceCreatePermissions);
    }
 
    @Override
@@ -3378,33 +3379,29 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
    }
 
    @Override
+   public void assertResourceCreatePermissions(String resourceClassName,
+                                               String domainName,
+                                               ResourceCreatePermission... resourceCreatePermissions) {
+      assertResourceCreatePermissions(sessionResource, resourceClassName, domainName, resourceCreatePermissions);
+   }
+
+   @Override
    public boolean hasResourceCreatePermissions(Resource accessorResource,
                                                String resourceClassName,
                                                ResourceCreatePermission... resourceCreatePermissions) {
-      SQLConnection connection = null;
+      return hasResourceCreatePermissions(accessorResource,
+                                          resourceClassName,
+                                          sessionResourceDomainName,
+                                          resourceCreatePermissions);
+   }
 
-      __assertAuthenticated();
-      __assertResourceSpecified(accessorResource);
-      __assertResourceClassSpecified(resourceClassName);
-      __assertPermissionsSpecified(resourceCreatePermissions);
-
-      final Set<ResourceCreatePermission> requestedResourceCreatePermissions
-            = notEmptySetOfNotNull(resourceCreatePermissions);
-
-      try {
-         connection = __getConnection();
-
-         resourceClassName = resourceClassName.trim();
-
-         return __hasResourceCreatePermission(connection,
-                                              accessorResource,
-                                              resourceClassName,
-                                              sessionResourceDomainName,
-                                              requestedResourceCreatePermissions);
-      }
-      finally {
-         __closeConnection(connection);
-      }
+   @Override
+   public boolean hasResourceCreatePermissions(String resourceClassName,
+                                               ResourceCreatePermission... resourceCreatePermissions) {
+      return hasResourceCreatePermissions(sessionResource,
+                                          resourceClassName,
+                                          sessionResourceDomainName,
+                                          resourceCreatePermissions);
    }
 
    @Override
@@ -3438,6 +3435,16 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       finally {
          __closeConnection(connection);
       }
+   }
+
+   @Override
+   public boolean hasResourceCreatePermissions(String resourceClassName,
+                                               String domainName,
+                                               ResourceCreatePermission... resourceCreatePermissions) {
+      return hasResourceCreatePermissions(sessionResource,
+                                          resourceClassName,
+                                          domainName,
+                                          resourceCreatePermissions);
    }
 
    private boolean __hasResourceCreatePermission(SQLConnection connection,
