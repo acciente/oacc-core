@@ -3292,6 +3292,12 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
    }
 
    @Override
+   public void assertResourcePermissions(Resource accessedResource,
+                                         ResourcePermission... resourcePermissions) {
+      assertResourcePermissions(sessionResource, accessedResource, resourcePermissions);
+   }
+
+   @Override
    public boolean hasResourcePermissions(Resource accessorResource,
                                          Resource accessedResource,
                                          ResourcePermission... resourcePermissions) {
@@ -3312,6 +3318,12 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       finally {
          __closeConnection(connection);
       }
+   }
+
+   @Override
+   public boolean hasResourcePermissions(Resource accessedResource,
+                                         ResourcePermission... resourcePermissions) {
+      return hasResourcePermissions(sessionResource, accessedResource, resourcePermissions);
    }
 
    private boolean __hasResourcePermission(SQLConnection connection,

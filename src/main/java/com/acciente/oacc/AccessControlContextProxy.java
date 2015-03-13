@@ -196,10 +196,22 @@ public class AccessControlContextProxy implements AccessControlContext {
    }
 
    @Override
+   public void assertResourcePermissions(Resource accessedResource,
+                                         ResourcePermission... resourcePermissions) {
+      accessControlContext.assertResourcePermissions(accessedResource, resourcePermissions);
+   }
+
+   @Override
    public boolean hasResourcePermissions(Resource accessorResource,
                                          Resource accessedResource,
                                          ResourcePermission... resourcePermissions) {
       return accessControlContext.hasResourcePermissions(accessorResource, accessedResource, resourcePermissions);
+   }
+
+   @Override
+   public boolean hasResourcePermissions(Resource accessedResource,
+                                         ResourcePermission... resourcePermissions) {
+      return accessControlContext.hasResourcePermissions(accessedResource, resourcePermissions);
    }
 
    @Override
