@@ -257,28 +257,31 @@ public class TestAccessControl_unauthenticatedApiCalls extends TestAccessControl
       }
 
       try {
-         accessControlContext.getResourcesByResourcePermission("any_resource_class_name", null);
+         accessControlContext.getResourcesByResourcePermissions("any_resource_class_name", null);
          fail("operation should have failed from unauthenticated context");
       }
       catch (NotAuthenticatedException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("not authenticated"));
       }
       try {
-         accessControlContext.getResourcesByResourcePermission("any_resource_class_name", null, "any_domain_name");
+         accessControlContext.getResourcesByResourcePermissions("any_resource_class_name", "any_domain_name", null);
          fail("operation should have failed from unauthenticated context");
       }
       catch (NotAuthenticatedException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("not authenticated"));
       }
       try {
-         accessControlContext.getResourcesByResourcePermission(null, "any_resource_class_name", null);
+         accessControlContext.getResourcesByResourcePermissions((Resource) null, "any_resource_class_name", null);
          fail("operation should have failed from unauthenticated context");
       }
       catch (NotAuthenticatedException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("not authenticated"));
       }
       try {
-         accessControlContext.getResourcesByResourcePermission(null, "any_resource_class_name", null, "any_domain_name");
+         accessControlContext.getResourcesByResourcePermissions(null,
+                                                                "any_resource_class_name",
+                                                                "any_domain_name",
+                                                                null);
          fail("operation should have failed from unauthenticated context");
       }
       catch (NotAuthenticatedException e) {

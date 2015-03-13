@@ -3528,20 +3528,25 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
    }
 
    @Override
-   public Set<Resource> getResourcesByResourcePermission(String resourceClassName,
-                                                         ResourcePermission resourcePermission) {
+   public Set<Resource> getResourcesByResourcePermissions(String resourceClassName,
+                                                          ResourcePermission... resourcePermissions) {
       SQLConnection connection = null;
 
       __assertAuthenticated();
       __assertResourceClassSpecified(resourceClassName);
-      __assertPermissionSpecified(resourcePermission);
+      __assertPermissionsSpecified(resourcePermissions);
+
+      final Set<ResourcePermission> requestedResourcePermissions = notEmptySetOfNotNull(resourcePermissions);
 
       try {
          connection = __getConnection();
 
          resourceClassName = resourceClassName.trim();
 
-         return __getResourcesByPermission(connection, sessionResource, resourceClassName, resourcePermission);
+         return __getResourcesByPermissions(connection,
+                                            sessionResource,
+                                            resourceClassName,
+                                            requestedResourcePermissions);
       }
       finally {
          __closeConnection(connection);
@@ -3549,15 +3554,17 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
    }
 
    @Override
-   public Set<Resource> getResourcesByResourcePermission(Resource accessorResource,
-                                                         String resourceClassName,
-                                                         ResourcePermission resourcePermission) {
+   public Set<Resource> getResourcesByResourcePermissions(Resource accessorResource,
+                                                          String resourceClassName,
+                                                          ResourcePermission... resourcePermissions) {
       SQLConnection connection = null;
 
       __assertAuthenticated();
       __assertResourceSpecified(accessorResource);
       __assertResourceClassSpecified(resourceClassName);
-      __assertPermissionSpecified(resourcePermission);
+      __assertPermissionsSpecified(resourcePermissions);
+
+      final Set<ResourcePermission> requestedResourcePermissions = notEmptySetOfNotNull(resourcePermissions);
 
       try {
          connection = __getConnection();
@@ -3574,7 +3581,10 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
                                       sessionResource,
                                       accessorResource,
                                       anyRequiredResourcePermissions)) {
-            return __getResourcesByPermission(connection, accessorResource, resourceClassName, resourcePermission);
+            return __getResourcesByPermissions(connection,
+                                               accessorResource,
+                                               resourceClassName,
+                                               requestedResourcePermissions);
          }
          else {
             throw new NotAuthorizedException(sessionResource, "retrieve resources by permission for", accessorResource);
@@ -3585,10 +3595,10 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       }
    }
 
-   private Set<Resource> __getResourcesByPermission(SQLConnection connection,
-                                                    Resource accessorResource,
-                                                    String resourceClassName,
-                                                    ResourcePermission resourcePermission) {
+   private Set<Resource> __getResourcesByPermissions(SQLConnection connection,
+                                                     Resource accessorResource,
+                                                     String resourceClassName,
+                                                     Set<ResourcePermission> requestedResourcePermissions) {
       // first verify that resource class is defined
       Id<ResourceClassId> resourceClassId;
       Id<ResourcePermissionId> permissionId;
@@ -3599,43 +3609,68 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
          throw new IllegalArgumentException("Could not find resource class: " + resourceClassName);
       }
 
+      // verify permissions are valid for resource class
+      __assertPermissionsValid(connection, resourceClassName, requestedResourcePermissions);
+
       Set<Resource> resources = new HashSet<>();
 
-      if (resourcePermission.isSystemPermission()) {
-         // get the list of objects of the specified type that the session has access to via direct permissions
-         resources.addAll(grantResourcePermissionSysPersister.getResourcesByResourceSysPermission(connection,
-                                                                                                  accessorResource,
-                                                                                                  resourceClassId,
-                                                                                                  resourcePermission));
+      for (ResourcePermission resourcePermission : requestedResourcePermissions) {
+         Set<Resource> currentResources = new HashSet<>();
 
-         // get the list of objects of the specified type that the session has access to via global permissions
-         resources.addAll(grantGlobalResourcePermissionSysPersister.getResourcesByGlobalSysPermission(connection,
-                                                                                                      accessorResource,
-                                                                                                      resourceClassId,
-                                                                                                      resourcePermission));
-      }
-      else {
-         // check if the non-system permission name is valid
-         permissionId = resourceClassPermissionPersister.getResourceClassPermissionId(connection, resourceClassId, resourcePermission.getPermissionName());
+         if (resourcePermission.isSystemPermission()) {
+            // get the list of objects of the specified type that the session has access to via direct permissions
+            currentResources.addAll(grantResourcePermissionSysPersister
+                                          .getResourcesByResourceSysPermission(connection,
+                                                                               accessorResource,
+                                                                               resourceClassId,
+                                                                               resourcePermission));
 
-         if (permissionId == null) {
-            throw new IllegalArgumentException("Permission: " + resourcePermission + " is not defined for resource class: " + resourceClassName);
+            // get the list of objects of the specified type that the session has access to via global permissions
+            currentResources.addAll(grantGlobalResourcePermissionSysPersister
+                                          .getResourcesByGlobalSysPermission(connection,
+                                                                             accessorResource,
+                                                                             resourceClassId,
+                                                                             resourcePermission));
          }
+         else {
+            // check if the non-system permission name is valid
+            permissionId = resourceClassPermissionPersister.getResourceClassPermissionId(connection,
+                                                                                         resourceClassId,
+                                                                                         resourcePermission
+                                                                                               .getPermissionName());
 
-         // get the list of objects of the specified type that the session has access to via direct permissions
-         resources.addAll(grantResourcePermissionPersister.getResourcesByResourcePermission(connection,
-                                                                                            accessorResource,
-                                                                                            resourceClassId,
-                                                                                            resourcePermission,
-                                                                                            permissionId));
+            if (permissionId == null) {
+               throw new IllegalArgumentException("Permission: " + resourcePermission + " is not defined for resource class: " + resourceClassName);
+            }
 
-         // get the list of objects of the specified type that the session has access to via global permissions
-         resources.addAll(grantGlobalResourcePermissionPersister
-                                .getResourcesByGlobalResourcePermission(connection,
-                                                                        accessorResource,
-                                                                        resourceClassId,
-                                                                        resourcePermission,
-                                                                        permissionId));
+            // get the list of objects of the specified type that the session has access to via direct permissions
+            currentResources.addAll(grantResourcePermissionPersister
+                                          .getResourcesByResourcePermission(connection,
+                                                                            accessorResource,
+                                                                            resourceClassId,
+                                                                            resourcePermission,
+                                                                            permissionId));
+
+            // get the list of objects of the specified type that the session has access to via global permissions
+            currentResources.addAll(grantGlobalResourcePermissionPersister
+                                          .getResourcesByGlobalResourcePermission(connection,
+                                                                                  accessorResource,
+                                                                                  resourceClassId,
+                                                                                  resourcePermission,
+                                                                                  permissionId));
+         }
+         if (resources.isEmpty() && !currentResources.isEmpty()) {
+            // first iteration: just use the resources found by the current permission
+            resources = currentResources;
+         }
+         else {
+            // n-th iteration: compute the intersection of previous iterations and the current resources
+            resources.retainAll(currentResources);
+            if (resources.isEmpty()) {
+               // if intersection with previous results is empty, then all future intersections will be empty, as well
+               break;
+            }
+         }
       }
 
       // finally get the list of objects of the specified type that the session has access to via super user permissions
@@ -3646,26 +3681,28 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
    }
 
    @Override
-   public Set<Resource> getResourcesByResourcePermission(String resourceClassName,
-                                                         ResourcePermission resourcePermission,
-                                                         String domainName) {
+   public Set<Resource> getResourcesByResourcePermissions(String resourceClassName,
+                                                          String domainName,
+                                                          ResourcePermission... resourcePermissions) {
       SQLConnection connection = null;
 
       __assertAuthenticated();
       __assertResourceClassSpecified(resourceClassName);
-      __assertPermissionSpecified(resourcePermission);
+      __assertPermissionsSpecified(resourcePermissions);
       __assertDomainSpecified(domainName);
+
+      final Set<ResourcePermission> requestedResourcePermissions = notEmptySetOfNotNull(resourcePermissions);
 
       try {
          connection = __getConnection();
 
          resourceClassName = resourceClassName.trim();
 
-         return __getResourcesByPermission(connection,
-                                           sessionResource,
-                                           resourceClassName,
-                                           resourcePermission,
-                                           domainName);
+         return __getResourcesByPermissions(connection,
+                                            sessionResource,
+                                            resourceClassName,
+                                            domainName,
+                                            requestedResourcePermissions);
       }
       finally {
          __closeConnection(connection);
@@ -3673,17 +3710,19 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
    }
 
    @Override
-   public Set<Resource> getResourcesByResourcePermission(Resource accessorResource,
-                                                         String resourceClassName,
-                                                         ResourcePermission resourcePermission,
-                                                         String domainName) {
+   public Set<Resource> getResourcesByResourcePermissions(Resource accessorResource,
+                                                          String resourceClassName,
+                                                          String domainName,
+                                                          ResourcePermission... resourcePermissions) {
       SQLConnection connection = null;
 
       __assertAuthenticated();
       __assertResourceSpecified(accessorResource);
       __assertResourceClassSpecified(resourceClassName);
-      __assertPermissionSpecified(resourcePermission);
+      __assertPermissionsSpecified(resourcePermissions);
       __assertDomainSpecified(domainName);
+
+      final Set<ResourcePermission> requestedResourcePermissions = notEmptySetOfNotNull(resourcePermissions);
 
       try {
          connection = __getConnection();
@@ -3699,12 +3738,11 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
                                       sessionResource,
                                       accessorResource,
                                       anyRequiredResourcePermissions)) {
-            return __getResourcesByPermission(connection,
-                                              accessorResource,
-                                              resourceClassName,
-                                              resourcePermission,
-                                              domainName
-            );
+            return __getResourcesByPermissions(connection,
+                                               accessorResource,
+                                               resourceClassName,
+                                               domainName,
+                                               requestedResourcePermissions);
          }
          else {
             throw new NotAuthorizedException(sessionResource, "retrieve resources by permission for", accessorResource);
@@ -3715,11 +3753,11 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       }
    }
 
-   private Set<Resource> __getResourcesByPermission(SQLConnection connection,
-                                                    Resource accessorResource,
-                                                    String resourceClassName,
-                                                    ResourcePermission resourcePermission,
-                                                    String domainName) {
+   private Set<Resource> __getResourcesByPermissions(SQLConnection connection,
+                                                     Resource accessorResource,
+                                                     String resourceClassName,
+                                                     String domainName,
+                                                     Set<ResourcePermission> requestedResourcePermissions) {
       // first verify that resource class and domain is defined
       Id<ResourceClassId> resourceClassId;
       Id<DomainId> domainId;
@@ -3737,50 +3775,72 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
          throw new IllegalArgumentException("Could not find domain: " + domainName);
       }
 
+      // verify permissions are valid for resource class
+      __assertPermissionsValid(connection, resourceClassName, requestedResourcePermissions);
 
       Set<Resource> resources = new HashSet<>();
 
-      if (resourcePermission.isSystemPermission()) {
-         // get the list of objects of the specified type that the session has access to via direct permissions
-         resources.addAll(grantResourcePermissionSysPersister.getResourcesByResourceSysPermission(connection,
-                                                                                                  accessorResource,
-                                                                                                  resourceClassId,
-                                                                                                  domainId,
-                                                                                                  resourcePermission));
+      for (ResourcePermission resourcePermission : requestedResourcePermissions) {
+         Set<Resource> currentResources = new HashSet<>();
 
-         // get the list of objects of the specified type that the session has access to via global permissions
-         resources.addAll(grantGlobalResourcePermissionSysPersister.getResourcesByGlobalSysPermission(connection,
-                                                                                                      accessorResource,
-                                                                                                      resourceClassId,
-                                                                                                      domainId,
-                                                                                                      resourcePermission));
-      }
-      else {
-         // check if the non-system permission name is valid
-         permissionId = resourceClassPermissionPersister.getResourceClassPermissionId(connection,
-                                                                                      resourceClassId,
-                                                                                      resourcePermission.getPermissionName());
+         if (resourcePermission.isSystemPermission()) {
+            // get the list of objects of the specified type that the session has access to via direct permissions
+            currentResources.addAll(grantResourcePermissionSysPersister
+                                          .getResourcesByResourceSysPermission(connection,
+                                                                               accessorResource,
+                                                                               resourceClassId,
+                                                                               domainId,
+                                                                               resourcePermission));
 
-         if (permissionId == null) {
-            throw new IllegalArgumentException("Permission: " + resourcePermission + " is not defined for resource class: " + resourceClassName);
+            // get the list of objects of the specified type that the session has access to via global permissions
+            currentResources.addAll(grantGlobalResourcePermissionSysPersister
+                                          .getResourcesByGlobalSysPermission(connection,
+                                                                             accessorResource,
+                                                                             resourceClassId,
+                                                                             domainId,
+                                                                             resourcePermission));
          }
+         else {
+            // check if the non-system permission name is valid
+            permissionId = resourceClassPermissionPersister.getResourceClassPermissionId(connection,
+                                                                                         resourceClassId,
+                                                                                         resourcePermission
+                                                                                               .getPermissionName());
 
-         // get the list of objects of the specified type that the session has access to via direct permissions
-         resources.addAll(grantResourcePermissionPersister.getResourcesByResourcePermission(connection,
-                                                                                            accessorResource,
-                                                                                            resourceClassId,
-                                                                                            domainId,
-                                                                                            resourcePermission,
-                                                                                            permissionId));
+            if (permissionId == null) {
+               throw new IllegalArgumentException("Permission: " + resourcePermission + " is not defined for resource class: " + resourceClassName);
+            }
 
-         // get the list of objects of the specified type that the session has access to via global permissions
-         resources.addAll(grantGlobalResourcePermissionPersister
-                                .getResourcesByGlobalResourcePermission(connection,
-                                                                        accessorResource,
-                                                                        resourceClassId,
-                                                                        domainId,
-                                                                        resourcePermission,
-                                                                        permissionId));
+            // get the list of objects of the specified type that the session has access to via direct permissions
+            currentResources.addAll(grantResourcePermissionPersister
+                                          .getResourcesByResourcePermission(connection,
+                                                                            accessorResource,
+                                                                            resourceClassId,
+                                                                            domainId,
+                                                                            resourcePermission,
+                                                                            permissionId));
+
+            // get the list of objects of the specified type that the session has access to via global permissions
+            currentResources.addAll(grantGlobalResourcePermissionPersister
+                                          .getResourcesByGlobalResourcePermission(connection,
+                                                                                  accessorResource,
+                                                                                  resourceClassId,
+                                                                                  domainId,
+                                                                                  resourcePermission,
+                                                                                  permissionId));
+         }
+         if (resources.isEmpty() && !currentResources.isEmpty()) {
+            // first iteration: just use the resources found by the current permission
+            resources = currentResources;
+         }
+         else {
+            // n-th iteration: compute the intersection of previous iterations and the current resources
+            resources.retainAll(currentResources);
+            if (resources.isEmpty()) {
+               // if intersection with previous results is empty, then all future intersections will be empty, as well
+               break;
+            }
+         }
       }
 
       // finally get the list of objects of the specified type that the session has access to via super user permissions
@@ -4021,12 +4081,6 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
 
    private void __assertPermissionsSpecified(ResourcePermission... resourcePermissions) {
       if (resourcePermissions == null) {
-         throw new NullPointerException("Resource permission required, none specified");
-      }
-   }
-
-   private void __assertPermissionSpecified(ResourcePermission resourcePermission) {
-      if (resourcePermission == null) {
          throw new NullPointerException("Resource permission required, none specified");
       }
    }

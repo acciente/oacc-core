@@ -57,7 +57,7 @@ public class TestAccessControlSuite  {
       suite.addTest(new JUnit4TestAdapter(TestAccessControl_getResourceCreatePermissions.class));
       suite.addTest(new JUnit4TestAdapter(TestAccessControl_getResourcePermissionNames.class));
       suite.addTest(new JUnit4TestAdapter(TestAccessControl_getResourcePermissions.class));
-      suite.addTest(new JUnit4TestAdapter(TestAccessControl_getResourcesByResourcePermission.class));
+      suite.addTest(new JUnit4TestAdapter(TestAccessControl_getResourcesByResourcePermissions.class));
       suite.addTest(new JUnit4TestAdapter(TestAccessControl_getSessionResource.class));
       suite.addTest(new JUnit4TestAdapter(TestAccessControl_hasDomainCreatePermissions.class));
       suite.addTest(new JUnit4TestAdapter(TestAccessControl_hasDomainPermissions.class));

@@ -347,31 +347,33 @@ public class AccessControlContextProxy implements AccessControlContext {
    }
 
    @Override
-   public Set<Resource> getResourcesByResourcePermission(String resourceClassName,
-                                                         ResourcePermission resourcePermission) {
-      return accessControlContext.getResourcesByResourcePermission(resourceClassName, resourcePermission);
+   public Set<Resource> getResourcesByResourcePermissions(String resourceClassName,
+                                                          ResourcePermission... resourcePermissions) {
+      return accessControlContext.getResourcesByResourcePermissions(resourceClassName, resourcePermissions);
    }
 
    @Override
-   public Set<Resource> getResourcesByResourcePermission(Resource accessorResource,
-                                                         String resourceClassName,
-                                                         ResourcePermission resourcePermission) {
-      return accessControlContext.getResourcesByResourcePermission(accessorResource, resourceClassName, resourcePermission);
+   public Set<Resource> getResourcesByResourcePermissions(Resource accessorResource,
+                                                          String resourceClassName,
+                                                          ResourcePermission... resourcePermissions) {
+      return accessControlContext.getResourcesByResourcePermissions(accessorResource,
+                                                                    resourceClassName,
+                                                                    resourcePermissions);
    }
 
    @Override
-   public Set<Resource> getResourcesByResourcePermission(String resourceClassName,
-                                                         ResourcePermission resourcePermission,
-                                                         String domainName) {
-      return accessControlContext.getResourcesByResourcePermission(resourceClassName, resourcePermission, domainName);
+   public Set<Resource> getResourcesByResourcePermissions(String resourceClassName,
+                                                          String domainName,
+                                                          ResourcePermission... resourcePermissions) {
+      return accessControlContext.getResourcesByResourcePermissions(resourceClassName, domainName);
    }
 
    @Override
-   public Set<Resource> getResourcesByResourcePermission(Resource accessorResource,
-                                                         String resourceClassName,
-                                                         ResourcePermission resourcePermission,
-                                                         String domainName) {
-      return accessControlContext.getResourcesByResourcePermission(accessorResource, resourceClassName, resourcePermission, domainName);
+   public Set<Resource> getResourcesByResourcePermissions(Resource accessorResource,
+                                                          String resourceClassName,
+                                                          String domainName,
+                                                          ResourcePermission... resourcePermissions) {
+      return accessControlContext.getResourcesByResourcePermissions(accessorResource, resourceClassName, domainName, resourcePermissions);
    }
 
    @Override

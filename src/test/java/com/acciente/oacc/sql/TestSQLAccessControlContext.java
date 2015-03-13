@@ -839,7 +839,7 @@ public class TestSQLAccessControlContext extends TestSQLAccessControlContextBase
       setupName("getResourcesByPermissions( BLOG, " + filterPermission + " )");
       Set<Resource> newUser_1_ResourceList;
       try {
-         newUser_1_ResourceList = accessControlContext.getResourcesByResourcePermission("BLOG", filterPermission);
+         newUser_1_ResourceList = accessControlContext.getResourcesByResourcePermissions("BLOG", filterPermission);
          System.out.print(newUser_1_ResourceList);
          setupOK();
       }
@@ -861,7 +861,7 @@ public class TestSQLAccessControlContext extends TestSQLAccessControlContextBase
 
       setupName("getResourcesByPermissions( BLOG, " + filterPermission + " )");
       try {
-         System.out.print(accessControlContext.getResourcesByResourcePermission("BLOG", filterPermission));
+         System.out.print(accessControlContext.getResourcesByResourcePermissions("BLOG", filterPermission));
          setupOK();
       }
       catch (OaccException e) {
@@ -898,7 +898,7 @@ public class TestSQLAccessControlContext extends TestSQLAccessControlContextBase
       setupName("getResourcesByResourcePermission( BLOG, " + filterPermission + " )");
       Set<Resource> newUser_2_ResourceList;
       try {
-         newUser_2_ResourceList = accessControlContext.getResourcesByResourcePermission("BLOG", filterPermission);
+         newUser_2_ResourceList = accessControlContext.getResourcesByResourcePermissions("BLOG", filterPermission);
          System.out.print(newUser_2_ResourceList);
          setupOK();
       }
