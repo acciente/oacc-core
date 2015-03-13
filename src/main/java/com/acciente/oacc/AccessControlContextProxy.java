@@ -375,10 +375,10 @@ public class AccessControlContextProxy implements AccessControlContext {
    }
 
    @Override
-   public Set<Resource> getAccessorResourcesByResourcePermission(Resource accessedResource,
-                                                                 String resourceClassName,
-                                                                 ResourcePermission resourcePermission) {
-      return accessControlContext.getAccessorResourcesByResourcePermission(accessedResource, resourceClassName, resourcePermission);
+   public Set<Resource> getAccessorResourcesByResourcePermissions(Resource accessedResource,
+                                                                  String resourceClassName,
+                                                                  ResourcePermission... resourcePermissions) {
+      return accessControlContext.getAccessorResourcesByResourcePermissions(accessedResource, resourceClassName, resourcePermissions);
    }
 
    @Override

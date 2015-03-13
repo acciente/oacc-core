@@ -955,23 +955,23 @@ public interface AccessControlContext {
                                                          String domainName);
 
    /**
-    * Returns a set of resources that have the specified permission to the specified accessed resource.
+    * Returns a set of resources that have the specified permissions to the specified accessed resource.
     * <p/>
     * This method works in the reverse direction of the {@link #getResourcesByResourcePermission} method, but
     * unlike <code>getResourcesByResourcePermission</code> it only takes into account direct permissions.
     * In other words, this method ignores accessors that can reach the specified accessed resource
     * via inherited permissions, global permissions and SUPER-USER privileges.
     *
-    * @param accessedResource   the resource relative to which accessor resources are sought
-    * @param resourceClassName  a string resource class name
-    * @param resourcePermission the permission to check
+    * @param accessedResource    the resource relative to which accessor resources are sought
+    * @param resourceClassName   a string resource class name
+    * @param resourcePermissions the permissions to check
     * @return a set of accessor resources to the accessedResource, or an empty set if accessedResource does not exist
     * @throws java.lang.IllegalArgumentException if no resource class of resourceClassName exists, or
-    *                                            if resourcePermission is invalid for the specified resource class
+    *                                            if any resourcePermission is invalid for the specified resource class
     */
-   public Set<Resource> getAccessorResourcesByResourcePermission(Resource accessedResource,
-                                                                 String resourceClassName,
-                                                                 ResourcePermission resourcePermission);
+   public Set<Resource> getAccessorResourcesByResourcePermissions(Resource accessedResource,
+                                                                  String resourceClassName,
+                                                                  ResourcePermission... resourcePermissions);
 
    /**
     * Returns the resource that is currently authenticated in this session.

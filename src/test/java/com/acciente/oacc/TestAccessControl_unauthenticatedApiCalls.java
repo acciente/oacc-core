@@ -286,7 +286,7 @@ public class TestAccessControl_unauthenticatedApiCalls extends TestAccessControl
       }
 
       try {
-         accessControlContext.getAccessorResourcesByResourcePermission(null, "any_resource_class_name", null);
+         accessControlContext.getAccessorResourcesByResourcePermissions(null, "any_resource_class_name", null);
          fail("operation should have failed from unauthenticated context");
       }
       catch (NotAuthenticatedException e) {

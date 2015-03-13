@@ -48,10 +48,10 @@ public class TestAccessControl_getAccessorResourcesByResourcePermission extends 
 
       // verify
       Set<Resource> accessorsByPermission
-            = accessControlContext.getAccessorResourcesByResourcePermission(accessedResource,
-                                                                            accessedResourceClassName,
-                                                                            ResourcePermissions
-                                                                                  .getInstance(queriedPermissionName));
+            = accessControlContext.getAccessorResourcesByResourcePermissions(accessedResource,
+                                                                             accessedResourceClassName,
+                                                                             ResourcePermissions
+                                                                                   .getInstance(queriedPermissionName));
       assertThat(accessorsByPermission.isEmpty(), is(true));
    }
 
@@ -80,10 +80,10 @@ public class TestAccessControl_getAccessorResourcesByResourcePermission extends 
       Set<Resource> expectedAccessors = setOf(accessorResource);
 
       Set<Resource> accessorsByPermission
-            = accessControlContext.getAccessorResourcesByResourcePermission(accessedResource,
-                                                                            accessedResourceClassName,
-                                                                            ResourcePermissions
-                                                                                  .getInstance(queriedPermissionName));
+            = accessControlContext.getAccessorResourcesByResourcePermissions(accessedResource,
+                                                                             accessedResourceClassName,
+                                                                             ResourcePermissions
+                                                                                   .getInstance(queriedPermissionName));
       assertThat(accessorsByPermission, is(expectedAccessors));
    }
 
@@ -115,10 +115,166 @@ public class TestAccessControl_getAccessorResourcesByResourcePermission extends 
       Set<Resource> expectedAccessors = setOf(accessorResource);
 
       Set<Resource> accessorsByPermission
-            = accessControlContext.getAccessorResourcesByResourcePermission(accessedResource,
-                                                                            accessedResourceClassName,
-                                                                            ResourcePermissions
-                                                                                  .getInstance(queriedPermissionName));
+            = accessControlContext.getAccessorResourcesByResourcePermissions(accessedResource,
+                                                                             accessedResourceClassName,
+                                                                             ResourcePermissions
+                                                                                   .getInstance(queriedPermissionName));
+      assertThat(accessorsByPermission, is(expectedAccessors));
+   }
+
+   @Test
+   public void getAccessorResourcesByResourcePermission_partialDirect_validAsSystemResource() {
+      authenticateSystemResource();
+
+      final Resource accessorResource = generateUnauthenticatableResource();
+      final Resource accessedResource = generateUnauthenticatableResource();
+      final String accessedResourceClassName
+            = accessControlContext.getResourceClassInfoByResource(accessedResource).getResourceClassName();
+      final String queriedPermissionName = generateResourceClassPermission(accessedResourceClassName);
+      final Set<ResourcePermission> resourcePermissions
+            = setOf(ResourcePermissions.getInstance(queriedPermissionName));
+
+      final String unqueriedPermissionName = generateResourceClassPermission(accessedResourceClassName);
+      final ResourcePermission unqueriedResourcePermission = ResourcePermissions.getInstance(unqueriedPermissionName);
+
+      final Resource unqueriedAccessedResource = accessControlContext.createResource(accessedResourceClassName);
+      final Resource unqueriedAccessorResource = generateUnauthenticatableResource();
+
+      // set permission between accessor and queried accessed
+      accessControlContext.setResourcePermissions(accessorResource, accessedResource, resourcePermissions);
+
+      // set permission between unqueried accessor and accessed
+      accessControlContext.setResourcePermissions(unqueriedAccessorResource, unqueriedAccessedResource, resourcePermissions);
+
+      // verify
+      Set<Resource> expectedAccessors = setOf(accessorResource);
+
+      Set<Resource> accessorsByPermission
+            = accessControlContext.getAccessorResourcesByResourcePermissions(accessedResource,
+                                                                             accessedResourceClassName,
+                                                                             ResourcePermissions
+                                                                                   .getInstance(queriedPermissionName),
+                                                                             unqueriedResourcePermission);
+      assertThat(accessorsByPermission, is(expectedAccessors));
+   }
+
+   @Test
+   public void getAccessorResourcesByResourcePermission_partialDirect_validAsAuthorized() {
+      authenticateSystemResource();
+
+      final char[] password = generateUniquePassword();
+      final Resource authenticatedResource = generateAuthenticatableResource(password);
+      final Resource accessorResource = generateUnauthenticatableResource();
+      final Resource accessedResource = generateUnauthenticatableResource();
+      final String accessedResourceClassName
+            = accessControlContext.getResourceClassInfoByResource(accessedResource).getResourceClassName();
+      final String queriedPermissionName = generateResourceClassPermission(accessedResourceClassName);
+      final Set<ResourcePermission> resourcePermissions
+            = setOf(ResourcePermissions.getInstance(queriedPermissionName));
+
+      final String unqueriedPermissionName = generateResourceClassPermission(accessedResourceClassName);
+      final ResourcePermission unqueriedResourcePermission = ResourcePermissions.getInstance(unqueriedPermissionName);
+
+      final Resource unqueriedAccessedResource = accessControlContext.createResource(accessedResourceClassName);
+      final Resource unqueriedAccessorResource = generateUnauthenticatableResource();
+
+      // set permission between accessor and queried accessed
+      accessControlContext.setResourcePermissions(accessorResource, accessedResource, resourcePermissions);
+
+      // set permission between unqueried accessor and accessed
+      accessControlContext.setResourcePermissions(unqueriedAccessorResource, unqueriedAccessedResource, resourcePermissions);
+
+      // authenticate and verify
+      accessControlContext.authenticate(authenticatedResource, PasswordCredentials.newInstance(password));
+      Set<Resource> expectedAccessors = setOf(accessorResource);
+
+      Set<Resource> accessorsByPermission
+            = accessControlContext.getAccessorResourcesByResourcePermissions(accessedResource,
+                                                                             accessedResourceClassName,
+                                                                             unqueriedResourcePermission,
+                                                                             ResourcePermissions
+                                                                                   .getInstance(queriedPermissionName));
+      assertThat(accessorsByPermission, is(expectedAccessors));
+   }
+
+   @Test
+   public void getAccessorResourcesByResourcePermission_multipleDirect_validAsSystemResource() {
+      authenticateSystemResource();
+
+      final Resource accessorResource = generateUnauthenticatableResource();
+      final Resource accessedResource = generateUnauthenticatableResource();
+      final String accessedResourceClassName
+            = accessControlContext.getResourceClassInfoByResource(accessedResource).getResourceClassName();
+      final String queriedPermissionName1 = generateResourceClassPermission(accessedResourceClassName);
+      final String queriedPermissionName2 = generateResourceClassPermission(accessedResourceClassName);
+      final Set<ResourcePermission> resourcePermissions
+            = setOf(ResourcePermissions.getInstance(queriedPermissionName1),
+                    ResourcePermissions.getInstance(queriedPermissionName2));
+
+      final String unqueriedPermissionName = generateResourceClassPermission(accessedResourceClassName);
+      final ResourcePermission unqueriedResourcePermission = ResourcePermissions.getInstance(unqueriedPermissionName);
+
+      final Resource unqueriedAccessedResource = accessControlContext.createResource(accessedResourceClassName);
+      final Resource unqueriedAccessorResource = generateUnauthenticatableResource();
+
+      // set permission between accessor and queried accessed
+      accessControlContext.setResourcePermissions(accessorResource, accessedResource, resourcePermissions);
+
+      // set permission between unqueried accessor and accessed
+      accessControlContext.setResourcePermissions(unqueriedAccessorResource, unqueriedAccessedResource, resourcePermissions);
+
+      // verify
+      Set<Resource> expectedAccessors = setOf(accessorResource);
+
+      Set<Resource> accessorsByPermission
+            = accessControlContext.getAccessorResourcesByResourcePermissions(accessedResource,
+                                                                             accessedResourceClassName,
+                                                                             ResourcePermissions
+                                                                                   .getInstance(queriedPermissionName2),
+                                                                             ResourcePermissions
+                                                                                   .getInstance(queriedPermissionName1));
+      assertThat(accessorsByPermission, is(expectedAccessors));
+   }
+
+   @Test
+   public void getAccessorResourcesByResourcePermission_multipleDirect_validAsAuthorized() {
+      authenticateSystemResource();
+
+      final char[] password = generateUniquePassword();
+      final Resource authenticatedResource = generateAuthenticatableResource(password);
+      final Resource accessorResource = generateUnauthenticatableResource();
+      final Resource accessedResource = generateUnauthenticatableResource();
+      final String accessedResourceClassName
+            = accessControlContext.getResourceClassInfoByResource(accessedResource).getResourceClassName();
+      final String queriedPermissionName1 = generateResourceClassPermission(accessedResourceClassName);
+      final String queriedPermissionName2 = generateResourceClassPermission(accessedResourceClassName);
+      final Set<ResourcePermission> resourcePermissions
+            = setOf(ResourcePermissions.getInstance(queriedPermissionName1),
+                    ResourcePermissions.getInstance(queriedPermissionName2));
+
+      final String unqueriedPermissionName = generateResourceClassPermission(accessedResourceClassName);
+      final ResourcePermission unqueriedResourcePermission = ResourcePermissions.getInstance(unqueriedPermissionName);
+
+      final Resource unqueriedAccessedResource = accessControlContext.createResource(accessedResourceClassName);
+      final Resource unqueriedAccessorResource = generateUnauthenticatableResource();
+
+      // set permission between accessor and queried accessed
+      accessControlContext.setResourcePermissions(accessorResource, accessedResource, resourcePermissions);
+
+      // set permission between unqueried accessor and accessed
+      accessControlContext.setResourcePermissions(unqueriedAccessorResource, unqueriedAccessedResource, resourcePermissions);
+
+      // authenticate and verify
+      accessControlContext.authenticate(authenticatedResource, PasswordCredentials.newInstance(password));
+      Set<Resource> expectedAccessors = setOf(accessorResource);
+
+      Set<Resource> accessorsByPermission
+            = accessControlContext.getAccessorResourcesByResourcePermissions(accessedResource,
+                                                                             accessedResourceClassName,
+                                                                             ResourcePermissions
+                                                                                   .getInstance(queriedPermissionName1),
+                                                                             ResourcePermissions
+                                                                                   .getInstance(queriedPermissionName2));
       assertThat(accessorsByPermission, is(expectedAccessors));
    }
 
@@ -133,7 +289,8 @@ public class TestAccessControl_getAccessorResourcesByResourcePermission extends 
       final String accessedResourceClassName
             = accessControlContext.getResourceClassInfoByResource(accessedResource).getResourceClassName();
       final String queriedPermissionName = generateResourceClassPermission(accessedResourceClassName);
-      final ResourcePermission queriedPermission_withGrant = ResourcePermissions.getInstance(queriedPermissionName, true);
+      final ResourcePermission queriedPermission_withGrant = ResourcePermissions.getInstance(queriedPermissionName,
+                                                                                             true);
       final ResourcePermission queriedPermission_withoutGrant = ResourcePermissions.getInstance(queriedPermissionName);
       final Set<ResourcePermission> resourcePermissions_withoutGrant = setOf(queriedPermission_withoutGrant);
 
@@ -152,17 +309,23 @@ public class TestAccessControl_getAccessorResourcesByResourcePermission extends 
       accessControlContext.authenticate(authenticatedResource, PasswordCredentials.newInstance(password));
 
       Set<Resource> accessorsByPermission_withGrant
-            = accessControlContext.getAccessorResourcesByResourcePermission(accessedResource,
-                                                                            accessedResourceClassName,
-                                                                            queriedPermission_withGrant);
+            = accessControlContext.getAccessorResourcesByResourcePermissions(accessedResource,
+                                                                             accessedResourceClassName,
+                                                                             queriedPermission_withGrant);
       assertThat(accessorsByPermission_withGrant.isEmpty(), is(true));
 
       Set<Resource> expectedAccessors = setOf(accessorResource);
       Set<Resource> accessorsByPermission_withoutGrant
-            = accessControlContext.getAccessorResourcesByResourcePermission(accessedResource,
-                                                                            accessedResourceClassName,
-                                                                            queriedPermission_withoutGrant);
+            = accessControlContext.getAccessorResourcesByResourcePermissions(accessedResource,
+                                                                             accessedResourceClassName,
+                                                                             queriedPermission_withoutGrant);
       assertThat(accessorsByPermission_withoutGrant, is(expectedAccessors));
+      Set<Resource> accessorsByPermission_withAndWithoutGrant
+            = accessControlContext.getAccessorResourcesByResourcePermissions(accessedResource,
+                                                                             accessedResourceClassName,
+                                                                             queriedPermission_withGrant,
+                                                                             queriedPermission_withoutGrant);
+      assertThat(accessorsByPermission_withAndWithoutGrant, is(expectedAccessors));
    }
 
    @Test
@@ -190,10 +353,10 @@ public class TestAccessControl_getAccessorResourcesByResourcePermission extends 
       Set<Resource> expectedAccessors = setOf(donorResource);
 
       Set<Resource> accessorsByPermission
-            = accessControlContext.getAccessorResourcesByResourcePermission(accessedResource,
-                                                                            accessedResourceClassName,
-                                                                            ResourcePermissions
-                                                                                  .getInstance(queriedPermissionName));
+            = accessControlContext.getAccessorResourcesByResourcePermissions(accessedResource,
+                                                                             accessedResourceClassName,
+                                                                             ResourcePermissions
+                                                                                   .getInstance(queriedPermissionName));
       assertThat(accessorsByPermission, is(expectedAccessors));
    }
 
@@ -218,10 +381,10 @@ public class TestAccessControl_getAccessorResourcesByResourcePermission extends 
 
       // verify
       Set<Resource> accessorsByPermission
-            = accessControlContext.getAccessorResourcesByResourcePermission(accessedResource,
-                                                                            accessedResourceClassName,
-                                                                            ResourcePermissions
-                                                                                  .getInstance(queriedPermissionName));
+            = accessControlContext.getAccessorResourcesByResourcePermissions(accessedResource,
+                                                                             accessedResourceClassName,
+                                                                             ResourcePermissions
+                                                                                   .getInstance(queriedPermissionName));
       assertThat(accessorsByPermission.isEmpty(), is(true));
    }
 
@@ -243,10 +406,10 @@ public class TestAccessControl_getAccessorResourcesByResourcePermission extends 
 
       // verify
       Set<Resource> accessorsByPermission
-            = accessControlContext.getAccessorResourcesByResourcePermission(accessedResource,
-                                                                            accessedResourceClassName,
-                                                                            ResourcePermissions
-                                                                                  .getInstance(queriedPermissionName));
+            = accessControlContext.getAccessorResourcesByResourcePermissions(accessedResource,
+                                                                             accessedResourceClassName,
+                                                                             ResourcePermissions
+                                                                                   .getInstance(queriedPermissionName));
       assertThat(accessorsByPermission.isEmpty(), is(true));
    }
 
@@ -270,10 +433,10 @@ public class TestAccessControl_getAccessorResourcesByResourcePermission extends 
       Set<Resource> expectedAccessors = setOf(accessorResource);
 
       Set<Resource> accessorsByPermission
-            = accessControlContext.getAccessorResourcesByResourcePermission(accessedResource,
-                                                                            accessedResourceClassName_whitespaced,
-                                                                            ResourcePermissions
-                                                                                  .getInstance(queriedPermissionName));
+            = accessControlContext.getAccessorResourcesByResourcePermissions(accessedResource,
+                                                                             accessedResourceClassName_whitespaced,
+                                                                             ResourcePermissions
+                                                                                   .getInstance(queriedPermissionName));
       assertThat(accessorsByPermission, is(expectedAccessors));
    }
 
@@ -294,10 +457,10 @@ public class TestAccessControl_getAccessorResourcesByResourcePermission extends 
 
       // verify
       try {
-         accessControlContext.getAccessorResourcesByResourcePermission(null,
-                                                                       accessedResourceClassName,
-                                                                       ResourcePermissions
-                                                                             .getInstance(queriedPermissionName));
+         accessControlContext.getAccessorResourcesByResourcePermissions(null,
+                                                                        accessedResourceClassName,
+                                                                        ResourcePermissions
+                                                                              .getInstance(queriedPermissionName));
          fail("getting accessor resources by resource permission with null accessed resource should have failed");
       }
       catch (NullPointerException e) {
@@ -305,10 +468,10 @@ public class TestAccessControl_getAccessorResourcesByResourcePermission extends 
       }
 
       try {
-         accessControlContext.getAccessorResourcesByResourcePermission(accessedResource,
-                                                                       null,
-                                                                       ResourcePermissions
-                                                                             .getInstance(queriedPermissionName));
+         accessControlContext.getAccessorResourcesByResourcePermissions(accessedResource,
+                                                                        null,
+                                                                        ResourcePermissions
+                                                                              .getInstance(queriedPermissionName));
          fail("getting accessor resources by resource permission with null resource class name should have failed");
       }
       catch (NullPointerException e) {
@@ -316,13 +479,68 @@ public class TestAccessControl_getAccessorResourcesByResourcePermission extends 
       }
 
       try {
-         accessControlContext.getAccessorResourcesByResourcePermission(accessedResource,
-                                                                       accessedResourceClassName,
-                                                                       null);
+         accessControlContext.getAccessorResourcesByResourcePermissions(accessedResource,
+                                                                        accessedResourceClassName,
+                                                                        null);
          fail("getting accessor resources by resource permission with null permission should have failed");
       }
       catch (NullPointerException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("resource permission required"));
+      }
+
+      try {
+         accessControlContext.getAccessorResourcesByResourcePermissions(accessedResource,
+                                                                        accessedResourceClassName,
+                                                                        new ResourcePermission[] {null});
+         fail("getting accessor resources by resource permission with null permission element should have failed");
+      }
+      catch (NullPointerException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("without null element"));
+      }
+      try {
+         accessControlContext.getAccessorResourcesByResourcePermissions(accessedResource,
+                                                                        accessedResourceClassName,
+                                                                        ResourcePermissions.getInstance(queriedPermissionName),
+                                                                        null);
+         fail("getting accessor resources by resource permission with null permission element should have failed");
+      }
+      catch (NullPointerException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("without null element"));
+      }
+   }
+
+   @Test
+   public void getAccessorResourcesByResourcePermission_emptyPermissions_shouldFail() {
+      authenticateSystemResource();
+
+      final Resource accessorResource = generateUnauthenticatableResource();
+      final Resource accessedResource = generateUnauthenticatableResource();
+      final String accessedResourceClassName
+            = accessControlContext.getResourceClassInfoByResource(accessedResource).getResourceClassName();
+      final String queriedPermissionName = generateResourceClassPermission(accessedResourceClassName);
+      final Set<ResourcePermission> resourcePermissions
+            = setOf(ResourcePermissions.getInstance(queriedPermissionName));
+
+      // set permission between accessor and queried accessed
+      accessControlContext.setResourcePermissions(accessorResource, accessedResource, resourcePermissions);
+
+      // verify
+      try {
+         accessControlContext.getAccessorResourcesByResourcePermissions(accessedResource,
+                                                                        accessedResourceClassName);
+         fail("getting accessor resources by resource permission without permission sequence should have failed");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("non-empty"));
+      }
+      try {
+         accessControlContext.getAccessorResourcesByResourcePermissions(accessedResource,
+                                                                        accessedResourceClassName,
+                                                                        new ResourcePermission[] {});
+         fail("getting accessor resources by resource permission with null permission element should have failed");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("non-empty"));
       }
    }
 
@@ -343,10 +561,10 @@ public class TestAccessControl_getAccessorResourcesByResourcePermission extends 
 
       // verify
       try {
-         accessControlContext.getAccessorResourcesByResourcePermission(accessedResource,
-                                                                       "does_not_exist",
-                                                                       ResourcePermissions
-                                                                             .getInstance(queriedPermissionName));
+         accessControlContext.getAccessorResourcesByResourcePermissions(accessedResource,
+                                                                        "does_not_exist",
+                                                                        ResourcePermissions
+                                                                              .getInstance(queriedPermissionName));
          fail("getting accessor resources by resource permission with non-existent resource class name should have failed");
       }
       catch (IllegalArgumentException e) {
@@ -354,11 +572,24 @@ public class TestAccessControl_getAccessorResourcesByResourcePermission extends 
       }
 
       try {
-         accessControlContext.getAccessorResourcesByResourcePermission(accessedResource,
-                                                                       accessedResourceClassName,
-                                                                       ResourcePermissions
-                                                                             .getInstance("does_not_exist"));
+         accessControlContext.getAccessorResourcesByResourcePermissions(accessedResource,
+                                                                        accessedResourceClassName,
+                                                                        ResourcePermissions
+                                                                              .getInstance("does_not_exist"));
          fail("getting accessor resources by resource permission with non-existent permission should have failed");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("is not defined for resource class"));
+      }
+
+      try {
+         accessControlContext.getAccessorResourcesByResourcePermissions(accessedResource,
+                                                                        accessedResourceClassName,
+                                                                        ResourcePermissions
+                                                                              .getInstance(queriedPermissionName),
+                                                                        ResourcePermissions
+                                                                              .getInstance("does_not_exist"));
+         fail("getting accessor resources by resource permission with valid and non-existent permission should have failed");
       }
       catch (IllegalArgumentException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("is not defined for resource class"));
@@ -382,10 +613,10 @@ public class TestAccessControl_getAccessorResourcesByResourcePermission extends 
 
       // verify
       Set<Resource> accessors_nonExistentAccessedResource
-            = accessControlContext.getAccessorResourcesByResourcePermission(Resources.getInstance(-999L),
-                                                                            accessedResourceClassName,
-                                                                            ResourcePermissions
-                                                                                  .getInstance(queriedPermissionName));
+            = accessControlContext.getAccessorResourcesByResourcePermissions(Resources.getInstance(-999L),
+                                                                             accessedResourceClassName,
+                                                                             ResourcePermissions
+                                                                                   .getInstance(queriedPermissionName));
       assertThat(accessors_nonExistentAccessedResource.isEmpty(), is(true));
    }
 }

@@ -3792,21 +3792,26 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
    }
 
    @Override
-   public Set<Resource> getAccessorResourcesByResourcePermission(Resource accessedResource,
-                                                                 String resourceClassName,
-                                                                 ResourcePermission resourcePermission) {
+   public Set<Resource> getAccessorResourcesByResourcePermissions(Resource accessedResource,
+                                                                  String resourceClassName,
+                                                                  ResourcePermission... resourcePermissions) {
       SQLConnection connection = null;
 
       __assertAuthenticated();
       __assertResourceSpecified(accessedResource);
       __assertResourceClassSpecified(resourceClassName);
-      __assertPermissionSpecified(resourcePermission);
+      __assertPermissionsSpecified(resourcePermissions);
+
+      final Set<ResourcePermission> requestedResourcePermissions = notEmptySetOfNotNull(resourcePermissions);
 
       try {
          connection = __getConnection();
          resourceClassName = resourceClassName.trim();
 
-         return __getAccessorResourcesByResourcePermission(connection, accessedResource, resourceClassName, resourcePermission);
+         return __getAccessorResourcesByResourcePermission(connection,
+                                                           accessedResource,
+                                                           resourceClassName,
+                                                           requestedResourcePermissions);
       }
       finally {
          __closeConnection(connection);
@@ -3816,7 +3821,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
    private Set<Resource> __getAccessorResourcesByResourcePermission(SQLConnection connection,
                                                                     Resource accessedResource,
                                                                     String resourceClassName,
-                                                                    ResourcePermission resourcePermission) {
+                                                                    Set<ResourcePermission> requestedRresourcePermissions) {
       // first verify that resource class is defined
       Id<ResourceClassId> resourceClassId;
       Id<ResourcePermissionId> permissionId;
@@ -3827,29 +3832,34 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
          throw new IllegalArgumentException("Could not find resource class: " + resourceClassName);
       }
 
+      // verify permissions are valid for the resource class
+      __assertPermissionsValid(connection, resourceClassName, requestedRresourcePermissions);
+
       Set<Resource> resources = new HashSet<>();
 
-      if (resourcePermission.isSystemPermission()) {
-         // get the list of objects of the specified type that the session has access to via direct permissions
-         resources.addAll(grantResourcePermissionSysPersister.getAccessorResourcesByResourceSysPermission(connection,
-                                                                                                          accessedResource,
-                                                                                                          resourceClassId,
-                                                                                                          resourcePermission));
-      }
-      else {
-         // check if the non-system permission name is valid
-         permissionId = resourceClassPermissionPersister.getResourceClassPermissionId(connection, resourceClassId, resourcePermission.getPermissionName());
-
-         if (permissionId == null) {
-            throw new IllegalArgumentException("Permission: " + resourcePermission + " is not defined for resource class: " + resourceClassName);
+      for (ResourcePermission resourcePermission : requestedRresourcePermissions) {
+         if (resourcePermission.isSystemPermission()) {
+            // get the list of objects of the specified type that the session has access to via direct permissions
+            resources.addAll(grantResourcePermissionSysPersister.getAccessorResourcesByResourceSysPermission(connection,
+                                                                                                             accessedResource,
+                                                                                                             resourceClassId,
+                                                                                                             resourcePermission));
          }
+         else {
+            // check if the non-system permission name is valid
+            permissionId = resourceClassPermissionPersister.getResourceClassPermissionId(connection, resourceClassId, resourcePermission.getPermissionName());
 
-         // get the list of objects of the specified type that the session has access to via direct permissions
-         resources.addAll(grantResourcePermissionPersister.getAccessorResourcesByResourcePermission(connection,
-                                                                                                    accessedResource,
-                                                                                                    resourceClassId,
-                                                                                                    resourcePermission,
-                                                                                                    permissionId));
+            if (permissionId == null) {
+               throw new IllegalArgumentException("Permission: " + resourcePermission + " is not defined for resource class: " + resourceClassName);
+            }
+
+            // get the list of objects of the specified type that the session has access to via direct permissions
+            resources.addAll(grantResourcePermissionPersister.getAccessorResourcesByResourcePermission(connection,
+                                                                                                       accessedResource,
+                                                                                                       resourceClassId,
+                                                                                                       resourcePermission,
+                                                                                                       permissionId));
+         }
       }
 
       return resources;
