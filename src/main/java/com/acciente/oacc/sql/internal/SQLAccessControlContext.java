@@ -3808,20 +3808,20 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
          connection = __getConnection();
          resourceClassName = resourceClassName.trim();
 
-         return __getAccessorResourcesByResourcePermission(connection,
-                                                           accessedResource,
-                                                           resourceClassName,
-                                                           requestedResourcePermissions);
+         return __getAccessorResourcesByResourcePermissions(connection,
+                                                            accessedResource,
+                                                            resourceClassName,
+                                                            requestedResourcePermissions);
       }
       finally {
          __closeConnection(connection);
       }
    }
 
-   private Set<Resource> __getAccessorResourcesByResourcePermission(SQLConnection connection,
-                                                                    Resource accessedResource,
-                                                                    String resourceClassName,
-                                                                    Set<ResourcePermission> requestedRresourcePermissions) {
+   private Set<Resource> __getAccessorResourcesByResourcePermissions(SQLConnection connection,
+                                                                     Resource accessedResource,
+                                                                     String resourceClassName,
+                                                                     Set<ResourcePermission> requestedRresourcePermissions) {
       // first verify that resource class is defined
       Id<ResourceClassId> resourceClassId;
       Id<ResourcePermissionId> permissionId;
@@ -3838,27 +3838,46 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       Set<Resource> resources = new HashSet<>();
 
       for (ResourcePermission resourcePermission : requestedRresourcePermissions) {
+         Set<Resource> currentResources = new HashSet<>();
+
          if (resourcePermission.isSystemPermission()) {
             // get the list of objects of the specified type that the session has access to via direct permissions
-            resources.addAll(grantResourcePermissionSysPersister.getAccessorResourcesByResourceSysPermission(connection,
-                                                                                                             accessedResource,
-                                                                                                             resourceClassId,
-                                                                                                             resourcePermission));
+            currentResources.addAll(grantResourcePermissionSysPersister
+                                          .getAccessorResourcesByResourceSysPermission(connection,
+                                                                                       accessedResource,
+                                                                                       resourceClassId,
+                                                                                       resourcePermission));
          }
          else {
             // check if the non-system permission name is valid
-            permissionId = resourceClassPermissionPersister.getResourceClassPermissionId(connection, resourceClassId, resourcePermission.getPermissionName());
+            permissionId = resourceClassPermissionPersister.getResourceClassPermissionId(connection,
+                                                                                         resourceClassId,
+                                                                                         resourcePermission
+                                                                                               .getPermissionName());
 
             if (permissionId == null) {
                throw new IllegalArgumentException("Permission: " + resourcePermission + " is not defined for resource class: " + resourceClassName);
             }
 
             // get the list of objects of the specified type that the session has access to via direct permissions
-            resources.addAll(grantResourcePermissionPersister.getAccessorResourcesByResourcePermission(connection,
-                                                                                                       accessedResource,
-                                                                                                       resourceClassId,
-                                                                                                       resourcePermission,
-                                                                                                       permissionId));
+            currentResources.addAll(grantResourcePermissionPersister
+                                          .getAccessorResourcesByResourcePermission(connection,
+                                                                                    accessedResource,
+                                                                                    resourceClassId,
+                                                                                    resourcePermission,
+                                                                                    permissionId));
+         }
+         if (resources.isEmpty() && !currentResources.isEmpty()) {
+            // first iteration: just use the resources found by the current permission
+            resources = currentResources;
+         }
+         else {
+            // n-th iteration: compute the intersection of previous iterations and the current resources
+            resources.retainAll(currentResources);
+            if (resources.isEmpty()) {
+               // if intersection with previous results is empty, then all future intersections will be empty, as well
+               break;
+            }
          }
       }
 
