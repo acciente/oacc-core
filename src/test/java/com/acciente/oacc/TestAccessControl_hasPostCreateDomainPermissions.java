@@ -613,8 +613,19 @@ public class TestAccessControl_hasPostCreateDomainPermissions extends TestAccess
       final Resource accessorResource = generateUnauthenticatableResource();
       final DomainPermission domainPermission = DomainPermissions.getInstance(DomainPermissions.CREATE_CHILD_DOMAIN);
 
-      accessControlContext.hasPostCreateDomainPermissions(domainPermission, domainPermission);
-      accessControlContext.hasPostCreateDomainPermissions(accessorResource, domainPermission, domainPermission);
+      // setup permission for accessor
+      accessControlContext.setDomainCreatePermissions(accessorResource,
+                                                      setOf(DomainCreatePermissions
+                                                                  .getInstance(DomainCreatePermissions.CREATE),
+                                                            DomainCreatePermissions.getInstance(domainPermission)));
+
+      // verify
+      if (!accessControlContext.hasPostCreateDomainPermissions(domainPermission, domainPermission)) {
+         fail("checking post create domain permission with duplicate permissions should have succeeded");
+      }
+      if(!accessControlContext.hasPostCreateDomainPermissions(accessorResource, domainPermission, domainPermission)) {
+         fail("checking post create domain permission with duplicate permissions should have succeeded");
+      }
    }
 
    @Test

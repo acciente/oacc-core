@@ -619,6 +619,32 @@ public class TestAccessControl_assertResourcePermissions extends TestAccessContr
    }
 
    @Test
+   public void assertResourcePermissions_duplicatePermissions_succeedsAsAuthenticatedResource() {
+      authenticateSystemResource();
+
+      final char[] password = generateUniquePassword();
+      final Resource accessorResource = generateAuthenticatableResource(password);
+      final Resource accessedResource = generateUnauthenticatableResource();
+
+      // setup direct permissions
+      accessControlContext.setResourcePermissions(accessorResource,
+                                                  accessedResource,
+                                                  setOf(ResourcePermissions.getInstance(ResourcePermissions.INHERIT)));
+
+      // authenticate accessor resource
+      accessControlContext.authenticate(accessorResource, PasswordCredentials.newInstance(password));
+
+      // verify
+      accessControlContext.assertResourcePermissions(accessedResource,
+                                                     ResourcePermissions.getInstance(ResourcePermissions.INHERIT),
+                                                     ResourcePermissions.getInstance(ResourcePermissions.INHERIT));
+      accessControlContext.hasResourcePermissions(accessorResource,
+                                                  accessedResource,
+                                                  ResourcePermissions.getInstance(ResourcePermissions.INHERIT),
+                                                  ResourcePermissions.getInstance(ResourcePermissions.INHERIT));
+   }
+
+   @Test
    public void assertResourcePermissions_nonExistentReferences_shouldFail() {
       authenticateSystemResource();
 

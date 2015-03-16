@@ -1626,24 +1626,36 @@ public class TestAccessControl_hasPostCreateResourcePermissions extends TestAcce
       final String resourceClassName = generateResourceClass(false, false);
       final String customPermissionName = generateResourceClassPermission(resourceClassName);
 
-      accessControlContext.hasPostCreateResourcePermissions(resourceClassName,
-                                                            ResourcePermissions.getInstance(customPermissionName),
-                                                            ResourcePermissions.getInstance(customPermissionName));
-      accessControlContext.hasPostCreateResourcePermissions(SYS_RESOURCE,
-                                                            resourceClassName,
-                                                            ResourcePermissions.getInstance(customPermissionName),
-                                                            ResourcePermissions.getInstance(customPermissionName));
+      if (!accessControlContext.hasPostCreateResourcePermissions(resourceClassName,
+                                                                 ResourcePermissions.getInstance(customPermissionName),
+                                                                 ResourcePermissions
+                                                                       .getInstance(customPermissionName))) {
+         fail("checking post create resource permission with duplicate permissions should have succeeded");
+      }
+      if (!accessControlContext.hasPostCreateResourcePermissions(SYS_RESOURCE,
+                                                                 resourceClassName,
+                                                                 ResourcePermissions.getInstance(customPermissionName),
+                                                                 ResourcePermissions
+                                                                       .getInstance(customPermissionName))) {
+         fail("checking post create resource permission with duplicate permissions should have succeeded");
+      }
 
       final String domainName = generateDomain();
-      accessControlContext.hasPostCreateResourcePermissions(SYS_RESOURCE,
-                                                            resourceClassName,
-                                                            domainName,
-                                                            ResourcePermissions.getInstance(customPermissionName),
-                                                            ResourcePermissions.getInstance(customPermissionName));
-      accessControlContext.hasPostCreateResourcePermissions(resourceClassName,
-                                                            domainName,
-                                                            ResourcePermissions.getInstance(customPermissionName),
-                                                            ResourcePermissions.getInstance(customPermissionName));
+      if (!accessControlContext.hasPostCreateResourcePermissions(resourceClassName,
+                                                                 domainName,
+                                                                 ResourcePermissions.getInstance(customPermissionName),
+                                                                 ResourcePermissions
+                                                                       .getInstance(customPermissionName))) {
+         fail("checking post create resource permission with duplicate permissions should have succeeded");
+      }
+      if (!accessControlContext.hasPostCreateResourcePermissions(SYS_RESOURCE,
+                                                                 resourceClassName,
+                                                                 domainName,
+                                                                 ResourcePermissions.getInstance(customPermissionName),
+                                                                 ResourcePermissions
+                                                                       .getInstance(customPermissionName))) {
+         fail("checking post create resource permission with duplicate permissions should have succeeded");
+      }
    }
 
    @Test

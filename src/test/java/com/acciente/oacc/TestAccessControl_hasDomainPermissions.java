@@ -679,8 +679,21 @@ public class TestAccessControl_hasDomainPermissions extends TestAccessControlBas
       final DomainPermission domPerm_superUser = DomainPermissions.getInstance(DomainPermissions.SUPER_USER);
       final String domainName = generateDomain();
 
-      accessControlContext.hasDomainPermissions(accessorResource, domainName, domPerm_superUser, domPerm_superUser);
-      accessControlContext.hasDomainPermissions(domainName, domPerm_superUser, domPerm_superUser);
+      // setup permission
+      accessControlContext.setDomainPermissions(accessorResource, domainName, setOf(domPerm_superUser));
+
+      // verify
+      if (!accessControlContext.hasDomainPermissions(accessorResource,
+                                                     domainName,
+                                                     domPerm_superUser,
+                                                     domPerm_superUser)) {
+         fail("checking domain permission with duplicate permissions should have succeeded");
+      }
+      if (!accessControlContext.hasDomainPermissions(domainName,
+                                                     domPerm_superUser,
+                                                     domPerm_superUser)) {
+         fail("checking domain permission with duplicate permissions should have succeeded");
+      }
    }
 
    @Test
