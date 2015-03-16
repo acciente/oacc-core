@@ -2795,9 +2795,9 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
 
       try {
          connection = __getConnection();
-         return __hasPostCreateDomainPermission(connection,
-                                                accessorResource,
-                                                requestedDomainPermissions);
+         return __hasPostCreateDomainPermissions(connection,
+                                                 accessorResource,
+                                                 requestedDomainPermissions);
       }
       finally {
          __closeConnection(connection);
@@ -2809,9 +2809,9 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       return hasPostCreateDomainPermissions(sessionResource, domainPermissions);
    }
 
-   private boolean __hasPostCreateDomainPermission(SQLConnection connection,
-                                                   Resource accessorResource,
-                                                   Set<DomainPermission> requestedDomainPermissions) {
+   private boolean __hasPostCreateDomainPermissions(SQLConnection connection,
+                                                    Resource accessorResource,
+                                                    Set<DomainPermission> requestedDomainPermissions) {
       boolean hasPermission = false;
       // first check if the accessor even has *CREATE permission for domains
       final Set<DomainCreatePermission> effectiveDomainCreatePermissions
@@ -2887,7 +2887,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       try {
          connection = __getConnection();
 
-         return __hasDomainPermission(connection, accessorResource, domainName, requestedDomainPermissions);
+         return __hasDomainPermissions(connection, accessorResource, domainName, requestedDomainPermissions);
       }
       finally {
          __closeConnection(connection);
@@ -2900,10 +2900,10 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       return hasDomainPermissions(sessionResource, domainName, domainPermissions);
    }
 
-   private boolean __hasDomainPermission(SQLConnection connection,
-                                         Resource accessorResource,
-                                         String domainName,
-                                         Set<DomainPermission> requestedDomainPermissions) {
+   private boolean __hasDomainPermissions(SQLConnection connection,
+                                          Resource accessorResource,
+                                          String domainName,
+                                          Set<DomainPermission> requestedDomainPermissions) {
       // first check for effective permissions
       final Set<DomainPermission> effectiveDomainPermissions = __getEffectiveDomainPermissions(connection,
                                                                                                accessorResource,
@@ -2952,7 +2952,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       try {
          connection = __getConnection();
 
-         return __hasDomainCreatePermission(connection, accessorResource, requestedDomainCreatePermissions);
+         return __hasDomainCreatePermissions(connection, accessorResource, requestedDomainCreatePermissions);
       }
       finally {
          __closeConnection(connection);
@@ -2964,9 +2964,9 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       return hasDomainCreatePermissions(sessionResource, domainCreatePermissions);
    }
 
-   private boolean __hasDomainCreatePermission(SQLConnection connection,
-                                               Resource accessorResource,
-                                               Set<DomainCreatePermission> queriedDomainCreatePermissions) {
+   private boolean __hasDomainCreatePermissions(SQLConnection connection,
+                                                Resource accessorResource,
+                                                Set<DomainCreatePermission> queriedDomainCreatePermissions) {
       final Set<DomainCreatePermission> effectiveDomainCreatePermissions
             = __getEffectiveDomainCreatePermissions(connection, accessorResource);
 
@@ -3065,11 +3065,11 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
          resourceClassName = resourceClassName.trim();
          domainName = domainName.trim();
 
-         return __hasPostCreateResourcePermission(connection,
-                                                  accessorResource,
-                                                  resourceClassName,
-                                                  domainName,
-                                                  requestedResourcePermissions);
+         return __hasPostCreateResourcePermissions(connection,
+                                                   accessorResource,
+                                                   resourceClassName,
+                                                   domainName,
+                                                   requestedResourcePermissions);
       }
       finally {
          __closeConnection(connection);
@@ -3086,11 +3086,11 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
                                               resourcePermissions);
    }
 
-   private boolean __hasPostCreateResourcePermission(SQLConnection connection,
-                                                     Resource accessorResource,
-                                                     String resourceClassName,
-                                                     String domainName,
-                                                     Set<ResourcePermission> requestedResourcePermissions) {
+   private boolean __hasPostCreateResourcePermissions(SQLConnection connection,
+                                                      Resource accessorResource,
+                                                      String resourceClassName,
+                                                      String domainName,
+                                                      Set<ResourcePermission> requestedResourcePermissions) {
       __assertPermissionsValid(connection, resourceClassName, requestedResourcePermissions);
 
       boolean hasPermission = false;
@@ -3234,11 +3234,11 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
          resourceClassName = resourceClassName.trim();
          domainName = domainName.trim();
 
-         return __hasGlobalResourcePermission(connection,
-                                              accessorResource,
-                                              resourceClassName,
-                                              domainName,
-                                              requestedResourcePermissions);
+         return __hasGlobalResourcePermissions(connection,
+                                               accessorResource,
+                                               resourceClassName,
+                                               domainName,
+                                               requestedResourcePermissions);
       }
       finally {
          __closeConnection(connection);
@@ -3255,11 +3255,11 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
                                           resourcePermissions);
    }
 
-   private boolean __hasGlobalResourcePermission(SQLConnection connection,
-                                                 Resource accessorResource,
-                                                 String resourceClassName,
-                                                 String domainName,
-                                                 Set<ResourcePermission> requestedResourcePermissions) {
+   private boolean __hasGlobalResourcePermissions(SQLConnection connection,
+                                                  Resource accessorResource,
+                                                  String resourceClassName,
+                                                  String domainName,
+                                                  Set<ResourcePermission> requestedResourcePermissions) {
       __assertPermissionsValid(connection, resourceClassName, requestedResourcePermissions);
 
       final Set<ResourcePermission>
@@ -3313,7 +3313,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       try {
          connection = __getConnection();
 
-         return __hasResourcePermission(connection, accessorResource, accessedResource, requestedResourcePermissions);
+         return __hasResourcePermissions(connection, accessorResource, accessedResource, requestedResourcePermissions);
       }
       finally {
          __closeConnection(connection);
@@ -3326,10 +3326,10 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       return hasResourcePermissions(sessionResource, accessedResource, resourcePermissions);
    }
 
-   private boolean __hasResourcePermission(SQLConnection connection,
-                                           Resource accessorResource,
-                                           Resource accessedResource,
-                                           Set<ResourcePermission> requestedResourcePermissions) {
+   private boolean __hasResourcePermissions(SQLConnection connection,
+                                            Resource accessorResource,
+                                            Resource accessedResource,
+                                            Set<ResourcePermission> requestedResourcePermissions) {
       resourcePersister.verifyResourceExists(connection, accessorResource);
 
       final ResourceClassInternalInfo resourceClassInternalInfo
@@ -3438,11 +3438,11 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
          resourceClassName = resourceClassName.trim();
          domainName = domainName.trim();
 
-         return __hasResourceCreatePermission(connection,
-                                              accessorResource,
-                                              resourceClassName,
-                                              domainName,
-                                              requestedResourceCreatePermissions);
+         return __hasResourceCreatePermissions(connection,
+                                               accessorResource,
+                                               resourceClassName,
+                                               domainName,
+                                               requestedResourceCreatePermissions);
       }
       finally {
          __closeConnection(connection);
@@ -3459,11 +3459,11 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
                                           resourceCreatePermissions);
    }
 
-   private boolean __hasResourceCreatePermission(SQLConnection connection,
-                                                 Resource accessorResource,
-                                                 String resourceClassName,
-                                                 String domainName,
-                                                 Set<ResourceCreatePermission> requestedResourceCreatePermissions) {
+   private boolean __hasResourceCreatePermissions(SQLConnection connection,
+                                                  Resource accessorResource,
+                                                  String resourceClassName,
+                                                  String domainName,
+                                                  Set<ResourceCreatePermission> requestedResourceCreatePermissions) {
       __assertPermissionsValid(connection,
                                resourceClassName,
                                __getPostCreateResourcePermissions(requestedResourceCreatePermissions));
