@@ -3659,16 +3659,24 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
                                                                                   resourcePermission,
                                                                                   permissionId));
          }
-         if (resources.isEmpty() && !currentResources.isEmpty()) {
-            // first iteration: just use the resources found by the current permission
+
+         if (currentResources.isEmpty()) {
+            // we got an empty set for a permission, we are done since this and all future intersects will be empty
             resources = currentResources;
+            break;
          }
          else {
-            // n-th iteration: compute the intersection of previous iterations and the current resources
-            resources.retainAll(currentResources);
+            // the only way resources will be empty below is if we never entered this else clause before
             if (resources.isEmpty()) {
-               // if intersection with previous results is empty, then all future intersections will be empty, as well
-               break;
+               resources = currentResources;
+            }
+            else {
+               // compute the intersection of previous iterations and the current resources
+               resources.retainAll(currentResources);
+               if (resources.isEmpty()) {
+                  // if intersection with previous results is empty, then all future intersections will be empty, as well
+                  break;
+               }
             }
          }
       }
@@ -3829,16 +3837,23 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
                                                                                   resourcePermission,
                                                                                   permissionId));
          }
-         if (resources.isEmpty() && !currentResources.isEmpty()) {
-            // first iteration: just use the resources found by the current permission
+         if (currentResources.isEmpty()) {
+            // we got an empty set for a permission, we are done since this and all future intersects will be empty
             resources = currentResources;
+            break;
          }
          else {
-            // n-th iteration: compute the intersection of previous iterations and the current resources
-            resources.retainAll(currentResources);
+            // the only way resources will be empty below is if we never entered this else clause before
             if (resources.isEmpty()) {
-               // if intersection with previous results is empty, then all future intersections will be empty, as well
-               break;
+               resources = currentResources;
+            }
+            else {
+               // compute the intersection of previous iterations and the current resources
+               resources.retainAll(currentResources);
+               if (resources.isEmpty()) {
+                  // if intersection with previous results is empty, then all future intersections will be empty, as well
+                  break;
+               }
             }
          }
       }
@@ -3927,16 +3942,23 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
                                                                                     resourcePermission,
                                                                                     permissionId));
          }
-         if (resources.isEmpty() && !currentResources.isEmpty()) {
-            // first iteration: just use the resources found by the current permission
+         if (currentResources.isEmpty()) {
+            // we got an empty set for a permission, we are done since this and all future intersects will be empty
             resources = currentResources;
+            break;
          }
          else {
-            // n-th iteration: compute the intersection of previous iterations and the current resources
-            resources.retainAll(currentResources);
+            // the only way resources will be empty below is if we never entered this else clause before
             if (resources.isEmpty()) {
-               // if intersection with previous results is empty, then all future intersections will be empty, as well
-               break;
+               resources = currentResources;
+            }
+            else {
+               // compute the intersection of previous iterations and the current resources
+               resources.retainAll(currentResources);
+               if (resources.isEmpty()) {
+                  // if intersection with previous results is empty, then all future intersections will be empty, as well
+                  break;
+               }
             }
          }
       }
