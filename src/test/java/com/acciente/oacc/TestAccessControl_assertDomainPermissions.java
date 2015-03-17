@@ -587,6 +587,7 @@ public class TestAccessControl_assertDomainPermissions extends TestAccessControl
       authenticateSystemResource();
       final Resource accessorResource = generateUnauthenticatableResource();
       final DomainPermission domPerm_superUser = DomainPermissions.getInstance(DomainPermissions.SUPER_USER);
+      final DomainPermission domPerm_createChild = DomainPermissions.getInstance(DomainPermissions.CREATE_CHILD_DOMAIN);
       final String domainName = generateDomain();
 
       try {
@@ -628,28 +629,50 @@ public class TestAccessControl_assertDomainPermissions extends TestAccessControl
       }
 
       try {
-         accessControlContext.assertDomainPermissions(accessorResource, domainName, new DomainPermission[] {null});
-         fail("asserting domain permissions with null domain permission element should have failed");
-      }
-      catch (NullPointerException e) {
-         assertThat(e.getMessage().toLowerCase(), containsString("without null element"));
-      }
-      try {
-         accessControlContext.assertDomainPermissions(domainName, new DomainPermission[] {null});
-         fail("asserting domain permissions with null domain permission element should have failed");
-      }
-      catch (NullPointerException e) {
-         assertThat(e.getMessage().toLowerCase(), containsString("without null element"));
-      }
-      try {
          accessControlContext.assertDomainPermissions(accessorResource, domainName, domPerm_superUser, null);
-         fail("asserting domain permissions with null domain permission element should have failed");
+         fail("asserting domain permissions with null domain permission reference should have failed");
       }
       catch (NullPointerException e) {
-         assertThat(e.getMessage().toLowerCase(), containsString("without null element"));
+         assertThat(e.getMessage().toLowerCase(), containsString("array or a sequence"));
       }
       try {
          accessControlContext.assertDomainPermissions(domainName, domPerm_superUser, null);
+         fail("asserting domain permissions with null domain permission reference should have failed");
+      }
+      catch (NullPointerException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("array or a sequence"));
+      }
+
+      try {
+         accessControlContext.assertDomainPermissions(accessorResource,
+                                                      domainName,
+                                                      domPerm_superUser,
+                                                      new DomainPermission[] {null});
+         fail("asserting domain permissions with null domain permission element should have failed");
+      }
+      catch (NullPointerException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("without null element"));
+      }
+      try {
+         accessControlContext.assertDomainPermissions(domainName, domPerm_superUser, new DomainPermission[] {null});
+         fail("asserting domain permissions with null domain permission element should have failed");
+      }
+      catch (NullPointerException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("without null element"));
+      }
+      try {
+         accessControlContext.assertDomainPermissions(accessorResource,
+                                                      domainName,
+                                                      domPerm_superUser,
+                                                      domPerm_createChild,
+                                                      null);
+         fail("asserting domain permissions with null domain permission element should have failed");
+      }
+      catch (NullPointerException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("without null element"));
+      }
+      try {
+         accessControlContext.assertDomainPermissions(domainName, domPerm_superUser, domPerm_createChild, null);
          fail("asserting domain permissions with null domain permission element should have failed");
       }
       catch (NullPointerException e) {
@@ -658,40 +681,15 @@ public class TestAccessControl_assertDomainPermissions extends TestAccessControl
    }
 
    @Test
-   public void assertDomainPermissions_emptyPermissions_shouldFail() {
+   public void assertDomainPermissions_emptyPermissions_shouldSucceed() {
       authenticateSystemResource();
-      final Resource accessorResource = generateUnauthenticatableResource();
+      final DomainPermission domPerm_superUser = DomainPermissions.getInstance(DomainPermissions.SUPER_USER);
       final String domainName = generateDomain();
 
-      try {
-         accessControlContext.assertDomainPermissions(accessorResource, domainName);
-         fail("asserting domain permissions with null domain permission element should have failed");
-      }
-      catch (IllegalArgumentException e) {
-         assertThat(e.getMessage().toLowerCase(), containsString("non-empty"));
-      }
-      try {
-         accessControlContext.assertDomainPermissions(domainName);
-         fail("asserting domain permissions with null domain permission element should have failed");
-      }
-      catch (IllegalArgumentException e) {
-         assertThat(e.getMessage().toLowerCase(), containsString("non-empty"));
-      }
-
-      try {
-         accessControlContext.assertDomainPermissions(accessorResource, domainName, new DomainPermission[] {});
-         fail("asserting domain permissions with null domain permission element should have failed");
-      }
-      catch (IllegalArgumentException e) {
-         assertThat(e.getMessage().toLowerCase(), containsString("non-empty"));
-      }
-      try {
-         accessControlContext.assertDomainPermissions(domainName, new DomainPermission[] {});
-         fail("asserting domain permissions with null domain permission element should have failed");
-      }
-      catch (IllegalArgumentException e) {
-         assertThat(e.getMessage().toLowerCase(), containsString("non-empty"));
-      }
+      accessControlContext.assertDomainPermissions(SYS_RESOURCE, domainName, domPerm_superUser);
+      accessControlContext.assertDomainPermissions(domainName, domPerm_superUser);
+      accessControlContext.assertDomainPermissions(SYS_RESOURCE, domainName, domPerm_superUser, new DomainPermission[]{});
+      accessControlContext.assertDomainPermissions(domainName, domPerm_superUser, new DomainPermission[]{});
    }
 
    @Test

@@ -2859,30 +2859,34 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
    @Override
    public void assertDomainPermissions(Resource accessorResource,
                                        String domainName,
+                                       DomainPermission domainPermission,
                                        DomainPermission... domainPermissions) {
-      if (!hasDomainPermissions(accessorResource, domainName, domainPermissions)) {
+      if (!hasDomainPermissions(accessorResource, domainName, domainPermission, domainPermissions)) {
          throw new NotAuthorizedException(accessorResource, domainName, domainPermissions);
       }
    }
 
    @Override
    public void assertDomainPermissions(String domainName,
+                                       DomainPermission domainPermission,
                                        DomainPermission... domainPermissions) {
-      assertDomainPermissions(sessionResource, domainName, domainPermissions);
+      assertDomainPermissions(sessionResource, domainName, domainPermission, domainPermissions);
    }
 
    @Override
    public boolean hasDomainPermissions(Resource accessorResource,
                                        String domainName,
+                                       DomainPermission domainPermission,
                                        DomainPermission... domainPermissions) {
       SQLConnection connection = null;
 
       __assertAuthenticated();
       __assertResourceSpecified(accessorResource);
-      __assertPermissionsSpecified(domainPermissions);
+      __assertPermissionSpecified(domainPermission);
+      __assertPermissionsNotNull(domainPermissions);
       __assertDomainSpecified(domainName);
 
-      final Set<DomainPermission> requestedDomainPermissions = notEmptySetOfNotNull(domainPermissions);
+      final Set<DomainPermission> requestedDomainPermissions = getSetOfNotNull(domainPermission, domainPermissions);
 
       try {
          connection = __getConnection();
@@ -2896,8 +2900,9 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
 
    @Override
    public boolean hasDomainPermissions(String domainName,
+                                       DomainPermission domainPermission,
                                        DomainPermission... domainPermissions) {
-      return hasDomainPermissions(sessionResource, domainName, domainPermissions);
+      return hasDomainPermissions(sessionResource, domainName, domainPermission, domainPermissions);
    }
 
    private boolean __hasDomainPermissions(SQLConnection connection,
@@ -4134,6 +4139,18 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
    private void __assertPermissionsSpecified(DomainPermission... domainPermissions) {
       if (domainPermissions == null) {
          throw new NullPointerException("Domain permission required, none specified");
+      }
+   }
+
+   private void __assertPermissionSpecified(DomainPermission domainPermissions) {
+      if (domainPermissions == null) {
+         throw new NullPointerException("Domain permission required, none specified");
+      }
+   }
+
+   private void __assertPermissionsNotNull(DomainPermission... domainPermissions) {
+      if (domainPermissions == null) {
+         throw new NullPointerException("An array or a sequence of domain permissions are required, but the null value was specified");
       }
    }
 

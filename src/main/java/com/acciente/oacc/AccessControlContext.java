@@ -154,7 +154,8 @@ public interface AccessControlContext {
     *
     * @param accessorResource  the resource on which access is being checked
     * @param domainName        the domain for which the permission should be checked
-    * @param domainPermissions the permissions to be checked
+    * @param domainPermission  the permission to be checked
+    * @param domainPermissions the other (optional) permissions to be checked
     * @throws java.lang.IllegalArgumentException       if no domain of domainName exists
     * @throws com.acciente.oacc.NotAuthorizedException if the accessor resource <strong>does not</strong> have the
     *                                                  specified domain permissions, or
@@ -162,6 +163,7 @@ public interface AccessControlContext {
     */
    public void assertDomainPermissions(Resource accessorResource,
                                        String domainName,
+                                       DomainPermission domainPermission,
                                        DomainPermission... domainPermissions);
 
    /**
@@ -171,12 +173,14 @@ public interface AccessControlContext {
     * as any super-user privileges.
     *
     * @param domainName        the domain for which the permission should be checked
-    * @param domainPermissions the permissions to be checked
+    * @param domainPermission  the permission to be checked
+    * @param domainPermissions the other (optional) permissions to be checked
     * @throws java.lang.IllegalArgumentException       if no domain of domainName exists
     * @throws com.acciente.oacc.NotAuthorizedException if the session resource <strong>does not</strong> have the
     *                                                  specified domain permissions
     */
    public void assertDomainPermissions(String domainName,
+                                       DomainPermission domainPermission,
                                        DomainPermission... domainPermissions);
 
    /**
@@ -188,13 +192,15 @@ public interface AccessControlContext {
     *
     * @param accessorResource  the resource on which access is being checked
     * @param domainName        the domain for which the permission should be checked
-    * @param domainPermissions the permissions to be checked
+    * @param domainPermission  the permission to be checked
+    * @param domainPermissions the other (optional) permissions to be checked
     * @return  <strong>true</strong> if the accessor resource has the specified domain permissions,
     *          <strong>false</strong> otherwise or if the accessor resource does not exist
     * @throws java.lang.IllegalArgumentException  if no domain of domainName exists
     */
    public boolean hasDomainPermissions(Resource accessorResource,
                                        String domainName,
+                                       DomainPermission domainPermission,
                                        DomainPermission... domainPermissions);
 
    /**
@@ -204,12 +210,14 @@ public interface AccessControlContext {
     * as any super-user privileges.
     *
     * @param domainName        the domain for which the permission should be checked
-    * @param domainPermissions the permissions to be checked
+    * @param domainPermission  the permission to be checked
+    * @param domainPermissions the other (optional) permissions to be checked
     * @return  <strong>true</strong> if the session resource has the specified domain permissions,
     *          <strong>false</strong> otherwise
     * @throws java.lang.IllegalArgumentException  if no domain of domainName exists
     */
    public boolean hasDomainPermissions(String domainName,
+                                       DomainPermission domainPermission,
                                        DomainPermission... domainPermissions);
 
    /**

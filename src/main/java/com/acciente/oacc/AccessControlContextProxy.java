@@ -65,27 +65,31 @@ public class AccessControlContextProxy implements AccessControlContext {
    @Override
    public void assertDomainPermissions(Resource accessorResource,
                                        String domainName,
+                                       DomainPermission domainPermission,
                                        DomainPermission... domainPermissions) {
-      accessControlContext.assertDomainPermissions(accessorResource, domainName, domainPermissions);
+      accessControlContext.assertDomainPermissions(accessorResource, domainName, domainPermission, domainPermissions);
    }
 
    @Override
    public void assertDomainPermissions(String domainName,
+                                       DomainPermission domainPermission,
                                        DomainPermission... domainPermissions) {
-      accessControlContext.assertDomainPermissions(domainName, domainPermissions);
+      accessControlContext.assertDomainPermissions(domainName, domainPermission, domainPermissions);
    }
 
    @Override
    public boolean hasDomainPermissions(Resource accessorResource,
                                        String domainName,
+                                       DomainPermission domainPermission,
                                        DomainPermission... domainPermissions) {
-      return accessControlContext.hasDomainPermissions(accessorResource, domainName, domainPermissions);
+      return accessControlContext.hasDomainPermissions(accessorResource, domainName, domainPermission, domainPermissions);
    }
 
    @Override
    public boolean hasDomainPermissions(String domainName,
+                                       DomainPermission domainPermission,
                                        DomainPermission... domainPermissions) {
-      return accessControlContext.hasDomainPermissions(domainName, domainPermissions);
+      return accessControlContext.hasDomainPermissions(domainName, domainPermission, domainPermissions);
    }
 
    @Override

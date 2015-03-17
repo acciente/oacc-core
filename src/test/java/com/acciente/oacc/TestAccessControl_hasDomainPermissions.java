@@ -565,6 +565,7 @@ public class TestAccessControl_hasDomainPermissions extends TestAccessControlBas
       authenticateSystemResource();
       final Resource accessorResource = generateUnauthenticatableResource();
       final DomainPermission domPerm_superUser = DomainPermissions.getInstance(DomainPermissions.SUPER_USER);
+      final DomainPermission domPerm_createChild = DomainPermissions.getInstance(DomainPermissions.CREATE_CHILD_DOMAIN);
       final String domainName = generateDomain();
 
       try {
@@ -606,28 +607,46 @@ public class TestAccessControl_hasDomainPermissions extends TestAccessControlBas
       }
 
       try {
-         accessControlContext.hasDomainPermissions(accessorResource, domainName, new DomainPermission[] {null});
-         fail("checking domain permissions with null domain permission element should have failed");
-      }
-      catch (NullPointerException e) {
-         assertThat(e.getMessage().toLowerCase(), containsString("without null element"));
-      }
-      try {
-         accessControlContext.hasDomainPermissions(domainName, new DomainPermission[] {null});
-         fail("checking domain permissions with null domain permission element should have failed");
-      }
-      catch (NullPointerException e) {
-         assertThat(e.getMessage().toLowerCase(), containsString("without null element"));
-      }
-      try {
          accessControlContext.hasDomainPermissions(accessorResource, domainName, domPerm_superUser, null);
-         fail("checking domain permissions with null domain permission element should have failed");
+         fail("checking domain permissions with null domain permission sequence should have failed");
       }
       catch (NullPointerException e) {
-         assertThat(e.getMessage().toLowerCase(), containsString("without null element"));
+         assertThat(e.getMessage().toLowerCase(), containsString("array or a sequence"));
       }
       try {
          accessControlContext.hasDomainPermissions(domainName, domPerm_superUser, null);
+         fail("checking domain permissions with null domain permission sequence should have failed");
+      }
+      catch (NullPointerException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("array or a sequence"));
+      }
+
+      try {
+         accessControlContext.hasDomainPermissions(accessorResource,
+                                                   domainName,
+                                                   domPerm_superUser,
+                                                   new DomainPermission[] {null});
+         fail("checking domain permissions with null domain permission element should have failed");
+      }
+      catch (NullPointerException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("without null element"));
+      }
+      try {
+         accessControlContext.hasDomainPermissions(domainName, domPerm_superUser, new DomainPermission[] {null});
+         fail("checking domain permissions with null domain permission element should have failed");
+      }
+      catch (NullPointerException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("without null element"));
+      }
+      try {
+         accessControlContext.hasDomainPermissions(accessorResource, domainName, domPerm_superUser, domPerm_createChild, null);
+         fail("checking domain permissions with null domain permission element should have failed");
+      }
+      catch (NullPointerException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("without null element"));
+      }
+      try {
+         accessControlContext.hasDomainPermissions(domainName, domPerm_superUser, domPerm_createChild, null);
          fail("checking domain permissions with null domain permission element should have failed");
       }
       catch (NullPointerException e) {
@@ -636,39 +655,36 @@ public class TestAccessControl_hasDomainPermissions extends TestAccessControlBas
    }
 
    @Test
-   public void hasDomainPermissions_emptyPermissions_shouldFail() {
+   public void hasDomainPermissions_emptyPermissions_shouldSucceed() {
       authenticateSystemResource();
       final Resource accessorResource = generateUnauthenticatableResource();
+      final DomainPermission domPerm_superUser = DomainPermissions.getInstance(DomainPermissions.SUPER_USER);
       final String domainName = generateDomain();
 
-      try {
-         accessControlContext.hasDomainPermissions(accessorResource, domainName);
-         fail("checking domain permissions with null domain permission element should have failed");
+      // setup permission
+      accessControlContext.setDomainPermissions(accessorResource, domainName, setOf(domPerm_superUser));
+
+      // verify
+      if (!accessControlContext.hasDomainPermissions(accessorResource,
+                                                     domainName,
+                                                     domPerm_superUser)) {
+         fail("checking domain permission without vararg permission sequence should have succeeded");
       }
-      catch (IllegalArgumentException e) {
-         assertThat(e.getMessage().toLowerCase(), containsString("non-empty"));
-      }
-      try {
-         accessControlContext.hasDomainPermissions(domainName);
-         fail("checking domain permissions with null domain permission element should have failed");
-      }
-      catch (IllegalArgumentException e) {
-         assertThat(e.getMessage().toLowerCase(), containsString("non-empty"));
+      if (!accessControlContext.hasDomainPermissions(domainName,
+                                                     domPerm_superUser)) {
+         fail("checking domain permission without vararg permission sequence should have succeeded");
       }
 
-      try {
-         accessControlContext.hasDomainPermissions(accessorResource, domainName, new DomainPermission[] {});
-         fail("checking domain permissions with null domain permission element should have failed");
+      if (!accessControlContext.hasDomainPermissions(accessorResource,
+                                                     domainName,
+                                                     domPerm_superUser,
+                                                     new DomainPermission[] {})) {
+         fail("checking domain permission with empty vararg permission sequence should have succeeded");
       }
-      catch (IllegalArgumentException e) {
-         assertThat(e.getMessage().toLowerCase(), containsString("non-empty"));
-      }
-      try {
-         accessControlContext.hasDomainPermissions(domainName, new DomainPermission[] {});
-         fail("checking domain permissions with null domain permission element should have failed");
-      }
-      catch (IllegalArgumentException e) {
-         assertThat(e.getMessage().toLowerCase(), containsString("non-empty"));
+      if (!accessControlContext.hasDomainPermissions(domainName,
+                                                     domPerm_superUser,
+                                                     new DomainPermission[] {})) {
+         fail("checking domain permission with empty vararg permission sequence should have succeeded");
       }
    }
 
