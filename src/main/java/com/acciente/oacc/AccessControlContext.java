@@ -330,7 +330,8 @@ public interface AccessControlContext {
     *
     * @param accessorResource    the resource on which access is being checked
     * @param resourceClassName   a string resource class name
-    * @param resourcePermissions the permissions to be checked
+    * @param resourcePermission  the permission to be checked
+    * @param resourcePermissions the other (optional) permissions to be checked
     * @throws java.lang.IllegalArgumentException if no resource class of resourceClassName exists, or
     *                                            if any resourcePermission is invalid for the resource class
     * @throws com.acciente.oacc.NotAuthorizedException if the accessor resource <strong>does not</strong> have the
@@ -339,6 +340,7 @@ public interface AccessControlContext {
     */
    public void assertGlobalResourcePermissions(Resource accessorResource,
                                                String resourceClassName,
+                                               ResourcePermission resourcePermission,
                                                ResourcePermission... resourcePermissions);
 
    /**
@@ -347,13 +349,15 @@ public interface AccessControlContext {
     * This method takes into account any global permissions that the session resource may have.
     *
     * @param resourceClassName   a string resource class name
-    * @param resourcePermissions the permissions to be checked
+    * @param resourcePermission  the permission to be checked
+    * @param resourcePermissions the other (optional) permissions to be checked
     * @throws java.lang.IllegalArgumentException if no resource class of resourceClassName exists, or
     *                                            if any resourcePermission is invalid for the resource class
     * @throws com.acciente.oacc.NotAuthorizedException if the session resource <strong>does not</strong> have the
     *                                                  specified global permissions
     */
    public void assertGlobalResourcePermissions(String resourceClassName,
+                                               ResourcePermission resourcePermission,
                                                ResourcePermission... resourcePermissions);
 
    /**
@@ -364,7 +368,8 @@ public interface AccessControlContext {
     * @param accessorResource    the resource on which access is being checked
     * @param resourceClassName   a string resource class name
     * @param domainName          the domain in which the permissions should be checked
-    * @param resourcePermissions the permissions to be checked
+    * @param resourcePermission  the permission to be checked
+    * @param resourcePermissions the other (optional) permissions to be checked
     * @throws java.lang.IllegalArgumentException if no resource class of resourceClassName exists, or
     *                                            if any resourcePermission is invalid for the resource class, or
     *                                            if no domain of domainName exists
@@ -375,6 +380,7 @@ public interface AccessControlContext {
    public void assertGlobalResourcePermissions(Resource accessorResource,
                                                String resourceClassName,
                                                String domainName,
+                                               ResourcePermission resourcePermission,
                                                ResourcePermission... resourcePermissions);
 
    /**
@@ -384,7 +390,8 @@ public interface AccessControlContext {
     *
     * @param resourceClassName   a string resource class name
     * @param domainName          the domain in which the permissions should be checked
-    * @param resourcePermissions the permissions to be checked
+    * @param resourcePermission  the permission to be checked
+    * @param resourcePermissions the other (optional) permissions to be checked
     * @throws java.lang.IllegalArgumentException if no resource class of resourceClassName exists, or
     *                                            if any resourcePermission is invalid for the resource class, or
     *                                            if no domain of domainName exists
@@ -393,6 +400,7 @@ public interface AccessControlContext {
     */
    public void assertGlobalResourcePermissions(String resourceClassName,
                                                String domainName,
+                                               ResourcePermission resourcePermission,
                                                ResourcePermission... resourcePermissions);
 
    /**
@@ -402,7 +410,8 @@ public interface AccessControlContext {
     *
     * @param accessorResource    the resource on which access is being checked
     * @param resourceClassName   a string resource class name
-    * @param resourcePermissions the permissions to be checked
+    * @param resourcePermission  the permission to be checked
+    * @param resourcePermissions the other (optional) permissions to be checked
     * @return <strong>true</strong> if the accessor resource has the specified global permissions,
     *         <strong>false</strong> otherwise, or if the accessor resource does not exist
     * @throws java.lang.IllegalArgumentException if no resource class of resourceClassName exists, or
@@ -410,6 +419,7 @@ public interface AccessControlContext {
     */
    public boolean hasGlobalResourcePermissions(Resource accessorResource,
                                                String resourceClassName,
+                                               ResourcePermission resourcePermission,
                                                ResourcePermission... resourcePermissions);
 
    /**
@@ -418,13 +428,15 @@ public interface AccessControlContext {
     * This method takes into account any global permissions that the session resource may have.
     *
     * @param resourceClassName   a string resource class name
-    * @param resourcePermissions the permissions to be checked
+    * @param resourcePermission  the permission to be checked
+    * @param resourcePermissions the other (optional) permissions to be checked
     * @return <strong>true</strong> if the session resource has the specified global permissions,
     *         <strong>false</strong> otherwise
     * @throws java.lang.IllegalArgumentException if no resource class of resourceClassName exists, or
     *                                            if any resourcePermission is invalid for the resource class
     */
    public boolean hasGlobalResourcePermissions(String resourceClassName,
+                                               ResourcePermission resourcePermission,
                                                ResourcePermission... resourcePermissions);
 
    /**
@@ -435,7 +447,8 @@ public interface AccessControlContext {
     * @param accessorResource    the resource on which access is being checked
     * @param resourceClassName   a string resource class name
     * @param domainName          the domain in which the permissions should be checked
-    * @param resourcePermissions the permissions to be checked
+    * @param resourcePermission  the permission to be checked
+    * @param resourcePermissions the other (optional) permissions to be checked
     * @return <strong>true</strong> if the accessor resource has the specified global permissions,
     *         <strong>false</strong> otherwise, or if the accessor resource does not exist
     * @throws java.lang.IllegalArgumentException if no resource class of resourceClassName exists, or
@@ -445,6 +458,7 @@ public interface AccessControlContext {
    public boolean hasGlobalResourcePermissions(Resource accessorResource,
                                                String resourceClassName,
                                                String domainName,
+                                               ResourcePermission resourcePermission,
                                                ResourcePermission... resourcePermissions);
 
    /**
@@ -454,7 +468,8 @@ public interface AccessControlContext {
     *
     * @param resourceClassName   a string resource class name
     * @param domainName          the domain in which the permissions should be checked
-    * @param resourcePermissions the permissions to be checked
+    * @param resourcePermission  the permission to be checked
+    * @param resourcePermissions the other (optional) permissions to be checked
     * @return <strong>true</strong> if the session resource has the specified global permissions,
     *         <strong>false</strong> otherwise
     * @throws java.lang.IllegalArgumentException if no resource class of resourceClassName exists, or
@@ -463,6 +478,7 @@ public interface AccessControlContext {
     */
    public boolean hasGlobalResourcePermissions(String resourceClassName,
                                                String domainName,
+                                               ResourcePermission resourcePermission,
                                                ResourcePermission... resourcePermissions);
 
    /**

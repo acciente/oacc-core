@@ -1007,6 +1007,7 @@ public class TestAccessControl_hasGlobalResourcePermissions extends TestAccessCo
 
       final String resourceClassName = generateResourceClass(false, false);
       final String customPermissionName = generateResourceClassPermission(resourceClassName);
+      final String customPermissionName2 = generateResourceClassPermission(resourceClassName);
 
       try {
          accessControlContext.hasGlobalResourcePermissions((Resource) null,
@@ -1054,6 +1055,26 @@ public class TestAccessControl_hasGlobalResourcePermissions extends TestAccessCo
       try {
          accessControlContext.hasGlobalResourcePermissions(SYS_RESOURCE,
                                                            resourceClassName,
+                                                           ResourcePermissions.getInstance(customPermissionName),
+                                                           null);
+         fail("checking global resource permission for null resource permission sequence should have failed for system resource");
+      }
+      catch (NullPointerException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("array or a sequence"));
+      }
+      try {
+         accessControlContext.hasGlobalResourcePermissions(resourceClassName,
+                                                           ResourcePermissions.getInstance(customPermissionName),
+                                                           null);
+         fail("checking global resource permission for null resource permission sequence should have failed for implicit system resource");
+      }
+      catch (NullPointerException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("array or a sequence"));
+      }
+      try {
+         accessControlContext.hasGlobalResourcePermissions(SYS_RESOURCE,
+                                                           resourceClassName,
+                                                           ResourcePermissions.getInstance(customPermissionName),
                                                            new ResourcePermission[] {null});
          fail("checking global resource permission for null resource permission element should have failed for system resource");
       }
@@ -1062,6 +1083,7 @@ public class TestAccessControl_hasGlobalResourcePermissions extends TestAccessCo
       }
       try {
          accessControlContext.hasGlobalResourcePermissions(resourceClassName,
+                                                           ResourcePermissions.getInstance(customPermissionName),
                                                            new ResourcePermission[] {null});
          fail("checking global resource permission for null resource permission element should have failed for implicit system resource");
       }
@@ -1072,6 +1094,7 @@ public class TestAccessControl_hasGlobalResourcePermissions extends TestAccessCo
          accessControlContext.hasGlobalResourcePermissions(SYS_RESOURCE,
                                                            resourceClassName,
                                                            ResourcePermissions.getInstance(customPermissionName),
+                                                           ResourcePermissions.getInstance(customPermissionName2),
                                                            null);
          fail("checking global resource permission for null resource permission element should have failed for system resource");
       }
@@ -1081,6 +1104,7 @@ public class TestAccessControl_hasGlobalResourcePermissions extends TestAccessCo
       try {
          accessControlContext.hasGlobalResourcePermissions(resourceClassName,
                                                            ResourcePermissions.getInstance(customPermissionName),
+                                                           ResourcePermissions.getInstance(customPermissionName2),
                                                            null);
          fail("checking global resource permission for null resource permission element should have failed for implicit system resource");
       }
@@ -1141,6 +1165,28 @@ public class TestAccessControl_hasGlobalResourcePermissions extends TestAccessCo
          accessControlContext.hasGlobalResourcePermissions(SYS_RESOURCE,
                                                            resourceClassName,
                                                            domainName,
+                                                           ResourcePermissions.getInstance(customPermissionName),
+                                                           null);
+         fail("checking global resource permission (by domain) for null resource permission sequence should have failed for system resource");
+      }
+      catch (NullPointerException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("array or a sequence"));
+      }
+      try {
+         accessControlContext.hasGlobalResourcePermissions(resourceClassName,
+                                                           domainName,
+                                                           ResourcePermissions.getInstance(customPermissionName),
+                                                           null);
+         fail("checking global resource permission (by domain) for null resource permission sequence should have failed for implicit system resource");
+      }
+      catch (NullPointerException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("array or a sequence"));
+      }
+      try {
+         accessControlContext.hasGlobalResourcePermissions(SYS_RESOURCE,
+                                                           resourceClassName,
+                                                           domainName,
+                                                           ResourcePermissions.getInstance(customPermissionName),
                                                            new ResourcePermission[]{null});
          fail("checking global resource permission (by domain) for null resource permission element should have failed for system resource");
       }
@@ -1150,6 +1196,7 @@ public class TestAccessControl_hasGlobalResourcePermissions extends TestAccessCo
       try {
          accessControlContext.hasGlobalResourcePermissions(resourceClassName,
                                                            domainName,
+                                                           ResourcePermissions.getInstance(customPermissionName),
                                                            new ResourcePermission[]{null});
          fail("checking global resource permission (by domain) for null resource permission element should have failed for implicit system resource");
       }
@@ -1161,6 +1208,7 @@ public class TestAccessControl_hasGlobalResourcePermissions extends TestAccessCo
                                                            resourceClassName,
                                                            domainName,
                                                            ResourcePermissions.getInstance(customPermissionName),
+                                                           ResourcePermissions.getInstance(customPermissionName2),
                                                            null);
          fail("checking global resource permission (by domain) for null resource permission element should have failed for system resource");
       }
@@ -1171,6 +1219,7 @@ public class TestAccessControl_hasGlobalResourcePermissions extends TestAccessCo
          accessControlContext.hasGlobalResourcePermissions(resourceClassName,
                                                            domainName,
                                                            ResourcePermissions.getInstance(customPermissionName),
+                                                           ResourcePermissions.getInstance(customPermissionName2),
                                                            null);
          fail("checking global resource permission (by domain) for null resource permission element should have failed for implicit system resource");
       }
@@ -1199,76 +1248,64 @@ public class TestAccessControl_hasGlobalResourcePermissions extends TestAccessCo
    }
 
    @Test
-   public void hasGlobalResourcePermissions_emptyPermissions_shouldFail() {
+   public void hasGlobalResourcePermissions_emptyPermissions_shouldSucceed() {
       authenticateSystemResource();
 
-      final String resourceClassName = generateResourceClass(false, false);
+      final String resourceClassName = generateResourceClass(true, false);
 
-      try {
-         accessControlContext.hasGlobalResourcePermissions(resourceClassName);
-         fail("checking global resource permission with empty permissions should have failed for implicit system resource");
+      if (!accessControlContext.hasGlobalResourcePermissions(resourceClassName,
+                                                             ResourcePermissions
+                                                                   .getInstance(ResourcePermissions.IMPERSONATE))) {
+         fail("checking global resource permission with empty permission sequence should have succeeded");
       }
-      catch (IllegalArgumentException e) {
-         assertThat(e.getMessage().toLowerCase(), containsString("non-empty"));
+      if (!accessControlContext.hasGlobalResourcePermissions(SYS_RESOURCE,
+                                                             resourceClassName,
+                                                             ResourcePermissions
+                                                                   .getInstance(ResourcePermissions.IMPERSONATE))) {
+         fail("checking global resource permission with empty permission sequence should have succeeded");
       }
-      try {
-         accessControlContext.hasGlobalResourcePermissions(SYS_RESOURCE, resourceClassName);
-         fail("checking global resource permission with empty permissions should have failed for system resource");
+      if (!accessControlContext.hasGlobalResourcePermissions(resourceClassName,
+                                                             ResourcePermissions
+                                                                   .getInstance(ResourcePermissions.IMPERSONATE),
+                                                             new ResourcePermission[] {})) {
+         fail("checking global resource permission with empty permission sequence should have succeeded");
       }
-      catch (IllegalArgumentException e) {
-         assertThat(e.getMessage().toLowerCase(), containsString("non-empty"));
-      }
-      try {
-         accessControlContext.hasGlobalResourcePermissions(SYS_RESOURCE,
-                                                           resourceClassName,
-                                                           new ResourcePermission[] {});
-         fail("checking global resource permission with empty permissions should have failed for system resource");
-      }
-      catch (IllegalArgumentException e) {
-         assertThat(e.getMessage().toLowerCase(), containsString("non-empty"));
-      }
-      try {
-         accessControlContext.hasGlobalResourcePermissions(resourceClassName,
-                                                           new ResourcePermission[] {});
-         fail("checking global resource permission with empty permissions should have failed for implicit system resource");
-      }
-      catch (IllegalArgumentException e) {
-         assertThat(e.getMessage().toLowerCase(), containsString("non-empty"));
+      if (!accessControlContext.hasGlobalResourcePermissions(SYS_RESOURCE,
+                                                             resourceClassName,
+                                                             ResourcePermissions
+                                                                   .getInstance(ResourcePermissions.IMPERSONATE),
+                                                             new ResourcePermission[] {})) {
+         fail("checking global resource permission with empty permission sequence should have succeeded");
       }
 
       final String domainName = generateDomain();
-      try {
-         accessControlContext.hasGlobalResourcePermissions(SYS_RESOURCE, resourceClassName, domainName);
-         fail("checking global resource permission (for domain) with empty permissions should have failed for system resource");
+      if (!accessControlContext.hasGlobalResourcePermissions(resourceClassName,
+                                                             domainName,
+                                                             ResourcePermissions
+                                                                   .getInstance(ResourcePermissions.IMPERSONATE))) {
+         fail("checking global resource permission (for domain) with empty permission sequence should have succeeded");
       }
-      catch (IllegalArgumentException e) {
-         assertThat(e.getMessage().toLowerCase(), containsString("non-empty"));
+      if (!accessControlContext.hasGlobalResourcePermissions(SYS_RESOURCE,
+                                                             resourceClassName,
+                                                             domainName,
+                                                             ResourcePermissions
+                                                                   .getInstance(ResourcePermissions.IMPERSONATE))) {
+         fail("checking global resource permission (for domain) with empty permission sequence should have succeeded");
       }
-      try {
-         accessControlContext.hasGlobalResourcePermissions(resourceClassName, domainName);
-         fail("checking global resource permission (for domain) with empty permissions should have failed for implicit system resource");
+      if (!accessControlContext.hasGlobalResourcePermissions(resourceClassName,
+                                                             domainName,
+                                                             ResourcePermissions
+                                                                   .getInstance(ResourcePermissions.IMPERSONATE),
+                                                             new ResourcePermission[] {})) {
+         fail("checking global resource permission (for domain) with empty permission sequence should have succeeded");
       }
-      catch (IllegalArgumentException e) {
-         assertThat(e.getMessage().toLowerCase(), containsString("non-empty"));
-      }
-      try {
-         accessControlContext.hasGlobalResourcePermissions(SYS_RESOURCE,
-                                                           resourceClassName,
-                                                           domainName,
-                                                           new ResourcePermission[] {});
-         fail("checking global resource permission (for domain) with empty permissions should have failed for system resource");
-      }
-      catch (IllegalArgumentException e) {
-         assertThat(e.getMessage().toLowerCase(), containsString("non-empty"));
-      }
-      try {
-         accessControlContext.hasGlobalResourcePermissions(resourceClassName,
-                                                           domainName,
-                                                           new ResourcePermission[] {});
-         fail("checking global resource permission (for domain) with empty permissions should have failed for implicit system resource");
-      }
-      catch (IllegalArgumentException e) {
-         assertThat(e.getMessage().toLowerCase(), containsString("non-empty"));
+      if (!accessControlContext.hasGlobalResourcePermissions(SYS_RESOURCE,
+                                                             resourceClassName,
+                                                             domainName,
+                                                             ResourcePermissions
+                                                                   .getInstance(ResourcePermissions.IMPERSONATE),
+                                                             new ResourcePermission[] {})) {
+         fail("checking global resource permission (for domain) with empty permission sequence should have succeeded");
       }
    }
 

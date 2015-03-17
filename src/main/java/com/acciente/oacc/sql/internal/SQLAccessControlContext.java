@@ -3173,24 +3173,36 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
    @Override
    public void assertGlobalResourcePermissions(Resource accessorResource,
                                                String resourceClassName,
+                                               ResourcePermission resourcePermission,
                                                ResourcePermission... resourcePermissions) {
-      assertGlobalResourcePermissions(accessorResource, resourceClassName, sessionResourceDomainName, resourcePermissions);
+      assertGlobalResourcePermissions(accessorResource,
+                                      resourceClassName,
+                                      sessionResourceDomainName,
+                                      resourcePermission,
+                                      resourcePermissions);
    }
 
    @Override
    public void assertGlobalResourcePermissions(String resourceClassName,
+                                               ResourcePermission resourcePermission,
                                                ResourcePermission... resourcePermissions) {
-      assertGlobalResourcePermissions(sessionResource, resourceClassName, sessionResourceDomainName, resourcePermissions);
+      assertGlobalResourcePermissions(sessionResource,
+                                      resourceClassName,
+                                      sessionResourceDomainName,
+                                      resourcePermission,
+                                      resourcePermissions);
    }
 
    @Override
    public void assertGlobalResourcePermissions(Resource accessorResource,
                                                String resourceClassName,
                                                String domainName,
+                                               ResourcePermission resourcePermission,
                                                ResourcePermission... resourcePermissions) {
       if (!hasGlobalResourcePermissions(accessorResource,
                                         resourceClassName,
                                         domainName,
+                                        resourcePermission,
                                         resourcePermissions)) {
          throw new NotAuthorizedException(accessorResource,
                                           resourceClassName,
@@ -3202,26 +3214,35 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
    @Override
    public void assertGlobalResourcePermissions(String resourceClassName,
                                                String domainName,
+                                               ResourcePermission resourcePermission,
                                                ResourcePermission... resourcePermissions) {
-      assertGlobalResourcePermissions(sessionResource, resourceClassName, domainName, resourcePermissions);
+      assertGlobalResourcePermissions(sessionResource,
+                                      resourceClassName,
+                                      domainName,
+                                      resourcePermission,
+                                      resourcePermissions);
    }
 
    @Override
    public boolean hasGlobalResourcePermissions(Resource accessorResource,
                                                String resourceClassName,
+                                               ResourcePermission resourcePermission,
                                                ResourcePermission... resourcePermissions) {
       return hasGlobalResourcePermissions(accessorResource,
                                           resourceClassName,
                                           sessionResourceDomainName,
+                                          resourcePermission,
                                           resourcePermissions);
    }
 
    @Override
    public boolean hasGlobalResourcePermissions(String resourceClassName,
+                                               ResourcePermission resourcePermission,
                                                ResourcePermission... resourcePermissions) {
       return hasGlobalResourcePermissions(sessionResource,
                                           resourceClassName,
                                           sessionResourceDomainName,
+                                          resourcePermission,
                                           resourcePermissions);
    }
 
@@ -3229,16 +3250,19 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
    public boolean hasGlobalResourcePermissions(Resource accessorResource,
                                                String resourceClassName,
                                                String domainName,
+                                               ResourcePermission resourcePermission,
                                                ResourcePermission... resourcePermissions) {
       SQLConnection connection = null;
 
       __assertAuthenticated();
       __assertResourceSpecified(accessorResource);
       __assertResourceClassSpecified(resourceClassName);
-      __assertPermissionsSpecified(resourcePermissions);
+      __assertPermissionSpecified(resourcePermission);
+      __assertPermissionsNotNull(resourcePermissions);
       __assertDomainSpecified(domainName);
 
-      final Set<ResourcePermission> requestedResourcePermissions = notEmptySetOfNotNull(resourcePermissions);
+      final Set<ResourcePermission> requestedResourcePermissions
+            = getSetOfNotNull(resourcePermission, resourcePermissions);
 
       try {
          connection = __getConnection();
@@ -3259,10 +3283,12 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
    @Override
    public boolean hasGlobalResourcePermissions(String resourceClassName,
                                                String domainName,
+                                               ResourcePermission resourcePermission,
                                                ResourcePermission... resourcePermissions) {
       return hasGlobalResourcePermissions(sessionResource,
                                           resourceClassName,
                                           domainName,
+                                          resourcePermission,
                                           resourcePermissions);
    }
 
@@ -4118,6 +4144,18 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       }
    }
 
+   private void __assertPermissionSpecified(ResourcePermission resourcePermission) {
+      if (resourcePermission == null) {
+         throw new NullPointerException("Resource permission required, none specified");
+      }
+   }
+
+   private void __assertPermissionsNotNull(ResourcePermission... resourcePermissions) {
+      if (resourcePermissions == null) {
+         throw new NullPointerException("An array or a sequence of resource permissions are required, but the null value was specified");
+      }
+   }
+
    private void __assertPermissionsSpecified(ResourceCreatePermission... resourceCreatePermissions) {
       if (resourceCreatePermissions == null) {
          throw new NullPointerException("Resource create permission required, none specified");
@@ -4130,8 +4168,8 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       }
    }
 
-   private void __assertPermissionsNotNull(DomainCreatePermission... domainCreatePermission) {
-      if (domainCreatePermission == null) {
+   private void __assertPermissionsNotNull(DomainCreatePermission... domainCreatePermissions) {
+      if (domainCreatePermissions == null) {
          throw new NullPointerException("An array or a sequence of domain create permissions are required, but the null value was specified");
       }
    }
@@ -4142,8 +4180,8 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       }
    }
 
-   private void __assertPermissionSpecified(DomainPermission domainPermissions) {
-      if (domainPermissions == null) {
+   private void __assertPermissionSpecified(DomainPermission domainPermission) {
+      if (domainPermission == null) {
          throw new NullPointerException("Domain permission required, none specified");
       }
    }

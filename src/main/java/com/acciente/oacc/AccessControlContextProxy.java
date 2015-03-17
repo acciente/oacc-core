@@ -143,57 +143,65 @@ public class AccessControlContextProxy implements AccessControlContext {
    @Override
    public void assertGlobalResourcePermissions(Resource accessorResource,
                                                String resourceClassName,
+                                               ResourcePermission resourcePermission,
                                                ResourcePermission... resourcePermissions) {
-      accessControlContext.assertGlobalResourcePermissions(accessorResource, resourceClassName, resourcePermissions);
+      accessControlContext.assertGlobalResourcePermissions(accessorResource, resourceClassName, resourcePermission, resourcePermissions);
    }
 
    @Override
    public void assertGlobalResourcePermissions(String resourceClassName,
+                                               ResourcePermission resourcePermission,
                                                ResourcePermission... resourcePermissions) {
-      accessControlContext.assertGlobalResourcePermissions(resourceClassName, resourcePermissions);
+      accessControlContext.assertGlobalResourcePermissions(resourceClassName, resourcePermission, resourcePermissions);
    }
 
    @Override
    public void assertGlobalResourcePermissions(Resource accessorResource,
                                                String resourceClassName,
                                                String domainName,
+                                               ResourcePermission resourcePermission,
                                                ResourcePermission... resourcePermissions) {
-      accessControlContext.assertGlobalResourcePermissions(accessorResource, resourceClassName, domainName, resourcePermissions);
+      accessControlContext.assertGlobalResourcePermissions(accessorResource, resourceClassName, domainName, resourcePermission, resourcePermissions);
    }
 
    @Override
    public void assertGlobalResourcePermissions(String resourceClassName,
                                                String domainName,
+                                               ResourcePermission resourcePermission,
                                                ResourcePermission... resourcePermissions) {
-      accessControlContext.assertGlobalResourcePermissions(resourceClassName, domainName, resourcePermissions);
+      accessControlContext.assertGlobalResourcePermissions(resourceClassName, domainName, resourcePermission, resourcePermissions);
    }
 
    @Override
    public boolean hasGlobalResourcePermissions(Resource accessorResource,
                                                String resourceClassName,
+                                               ResourcePermission resourcePermission,
                                                ResourcePermission... resourcePermissions) {
-      return accessControlContext.hasGlobalResourcePermissions(accessorResource, resourceClassName, resourcePermissions);
+      return accessControlContext.hasGlobalResourcePermissions(accessorResource, resourceClassName, resourcePermission, resourcePermissions);
    }
 
    @Override
    public boolean hasGlobalResourcePermissions(String resourceClassName,
+                                               ResourcePermission resourcePermission,
                                                ResourcePermission... resourcePermissions) {
-      return accessControlContext.hasGlobalResourcePermissions(resourceClassName, resourcePermissions);
+      return accessControlContext.hasGlobalResourcePermissions(resourceClassName, resourcePermission, resourcePermissions);
    }
 
    @Override
    public boolean hasGlobalResourcePermissions(Resource accessorResource,
                                                String resourceClassName,
                                                String domainName,
+                                               ResourcePermission resourcePermission,
                                                ResourcePermission... resourcePermissions) {
-      return accessControlContext.hasGlobalResourcePermissions(accessorResource, resourceClassName, domainName, resourcePermissions);
+      return accessControlContext.hasGlobalResourcePermissions(accessorResource, resourceClassName, domainName, resourcePermission, resourcePermissions);
    }
 
    @Override
    public boolean hasGlobalResourcePermissions(String resourceClassName,
                                                String domainName,
+                                               ResourcePermission resourcePermission,
                                                ResourcePermission... resourcePermissions) {
-      return accessControlContext.hasGlobalResourcePermissions(resourceClassName, domainName, resourcePermissions);
+      return accessControlContext.hasGlobalResourcePermissions(resourceClassName, domainName, resourcePermission, resourcePermissions);
    }
 
    @Override
