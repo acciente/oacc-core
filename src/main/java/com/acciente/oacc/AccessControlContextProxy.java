@@ -120,24 +120,28 @@ public class AccessControlContextProxy implements AccessControlContext {
 
    @Override
    public void assertPostCreateDomainPermissions(Resource accessorResource,
+                                                 DomainPermission domainPermission,
                                                  DomainPermission... domainPermissions) {
-      accessControlContext.assertPostCreateDomainPermissions(accessorResource, domainPermissions);
+      accessControlContext.assertPostCreateDomainPermissions(accessorResource, domainPermission, domainPermissions);
    }
 
    @Override
-   public void assertPostCreateDomainPermissions(DomainPermission... domainPermissions) {
-      accessControlContext.assertPostCreateDomainPermissions(domainPermissions);
+   public void assertPostCreateDomainPermissions(DomainPermission domainPermission,
+                                                 DomainPermission... domainPermissions) {
+      accessControlContext.assertPostCreateDomainPermissions(domainPermission, domainPermissions);
    }
 
    @Override
    public boolean hasPostCreateDomainPermissions(Resource accessorResource,
+                                                 DomainPermission domainPermission,
                                                  DomainPermission... domainPermissions) {
-      return accessControlContext.hasPostCreateDomainPermissions(accessorResource, domainPermissions);
+      return accessControlContext.hasPostCreateDomainPermissions(accessorResource, domainPermission, domainPermissions);
    }
 
    @Override
-   public boolean hasPostCreateDomainPermissions(DomainPermission... domainPermissions) {
-      return accessControlContext.hasPostCreateDomainPermissions(domainPermissions);
+   public boolean hasPostCreateDomainPermissions(DomainPermission domainPermission,
+                                                 DomainPermission... domainPermissions) {
+      return accessControlContext.hasPostCreateDomainPermissions(domainPermission, domainPermissions);
    }
 
    @Override

@@ -505,6 +505,7 @@ public class TestAccessControl_assertPostCreateDomainPermissions extends TestAcc
       authenticateSystemResource();
       final Resource accessorResource = generateUnauthenticatableResource();
       final DomainPermission domainPermission = DomainPermissions.getInstance(DomainPermissions.CREATE_CHILD_DOMAIN);
+      final DomainPermission domainPermission2 = DomainPermissions.getInstance(DomainPermissions.SUPER_USER);
 
       try {
          accessControlContext.assertPostCreateDomainPermissions((Resource) null, domainPermission);
@@ -528,28 +529,45 @@ public class TestAccessControl_assertPostCreateDomainPermissions extends TestAcc
          assertThat(e.getMessage().toLowerCase(), containsString("permission required"));
       }
       try {
-         accessControlContext.assertPostCreateDomainPermissions(accessorResource, new DomainPermission[] {null});
-         fail("asserting post-create domain permission with null permission element should have failed");
+         accessControlContext.assertPostCreateDomainPermissions(domainPermission, null);
+         fail("asserting post-create domain permission with null permission sequence should have failed");
       }
       catch (NullPointerException e) {
-         assertThat(e.getMessage().toLowerCase(), containsString("without null element"));
-      }
-      try {
-         accessControlContext.assertPostCreateDomainPermissions(new DomainPermission[] {null});
-         fail("asserting post-create domain permission with null permission element should have failed");
-      }
-      catch (NullPointerException e) {
-         assertThat(e.getMessage().toLowerCase(), containsString("without null element"));
+         assertThat(e.getMessage().toLowerCase(), containsString("array or a sequence"));
       }
       try {
          accessControlContext.assertPostCreateDomainPermissions(accessorResource, domainPermission, null);
+         fail("asserting post-create domain permission with null permission sequence should have failed");
+      }
+      catch (NullPointerException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("array or a sequence"));
+      }
+      try {
+         accessControlContext.assertPostCreateDomainPermissions(accessorResource, domainPermission, new DomainPermission[] {null});
          fail("asserting post-create domain permission with null permission element should have failed");
       }
       catch (NullPointerException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("without null element"));
       }
       try {
-         accessControlContext.assertPostCreateDomainPermissions(domainPermission, null);
+         accessControlContext.assertPostCreateDomainPermissions(domainPermission, new DomainPermission[] {null});
+         fail("asserting post-create domain permission with null permission element should have failed");
+      }
+      catch (NullPointerException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("without null element"));
+      }
+      try {
+         accessControlContext.assertPostCreateDomainPermissions(accessorResource,
+                                                                domainPermission,
+                                                                domainPermission2,
+                                                                null);
+         fail("asserting post-create domain permission with null permission element should have failed");
+      }
+      catch (NullPointerException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("without null element"));
+      }
+      try {
+         accessControlContext.assertPostCreateDomainPermissions(domainPermission, domainPermission2, null);
          fail("asserting post-create domain permission with null permission element should have failed");
       }
       catch (NullPointerException e) {
@@ -558,38 +576,24 @@ public class TestAccessControl_assertPostCreateDomainPermissions extends TestAcc
    }
 
    @Test
-   public void assertPostCreateDomainPermissions_emptyPermissions_shouldFail() {
+   public void assertPostCreateDomainPermissions_emptyPermissions_shouldSucceed() {
       authenticateSystemResource();
       final Resource accessorResource = generateUnauthenticatableResource();
+      final DomainPermission domainPermission = DomainPermissions.getInstance(DomainPermissions.CREATE_CHILD_DOMAIN);
 
-      try {
-         accessControlContext.assertPostCreateDomainPermissions();
-         fail("asserting post-create domain permission with empty permission sequence should have failed");
-      }
-      catch (IllegalArgumentException e) {
-         assertThat(e.getMessage().toLowerCase(), containsString("non-empty"));
-      }
-      try {
-         accessControlContext.assertPostCreateDomainPermissions(accessorResource);
-         fail("asserting post-create domain permission with empty permission sequence should have failed");
-      }
-      catch (IllegalArgumentException e) {
-         assertThat(e.getMessage().toLowerCase(), containsString("non-empty"));
-      }
-      try {
-         accessControlContext.assertPostCreateDomainPermissions(accessorResource, new DomainPermission[]{});
-         fail("asserting post-create domain permission with empty permission sequence should have failed");
-      }
-      catch (IllegalArgumentException e) {
-         assertThat(e.getMessage().toLowerCase(), containsString("non-empty"));
-      }
-      try {
-         accessControlContext.assertPostCreateDomainPermissions(new DomainPermission[]{});
-         fail("asserting post-create domain permission with empty permission sequence should have failed");
-      }
-      catch (IllegalArgumentException e) {
-         assertThat(e.getMessage().toLowerCase(), containsString("non-empty"));
-      }
+      // setup permission for accessor
+      accessControlContext.setDomainCreatePermissions(accessorResource,
+                                                      setOf(DomainCreatePermissions
+                                                                  .getInstance(DomainCreatePermissions.CREATE),
+                                                            DomainCreatePermissions.getInstance(domainPermission)));
+
+      // verify
+      accessControlContext.assertPostCreateDomainPermissions(domainPermission);
+      accessControlContext.assertPostCreateDomainPermissions(accessorResource, domainPermission);
+      accessControlContext.assertPostCreateDomainPermissions(accessorResource,
+                                                             domainPermission,
+                                                             new DomainPermission[]{});
+      accessControlContext.assertPostCreateDomainPermissions(domainPermission, new DomainPermission[]{});
    }
 
    @Test
@@ -611,7 +615,7 @@ public class TestAccessControl_assertPostCreateDomainPermissions extends TestAcc
       try {
          // the assert will "succeed" in the sense that it will fail to assert the permission on the
          // invalid resource, since that resource does not have the specified permission
-         accessControlContext.assertPostCreateDomainPermissions(invalidResource, domainPermission);
+         accessControlContext.assertPostCreateDomainPermissions(invalidResource, domainPermission, domainPermission);
          fail("asserting post-create domain permission with invalid accessor resource should have failed");
       }
       catch (NotAuthorizedException e) {

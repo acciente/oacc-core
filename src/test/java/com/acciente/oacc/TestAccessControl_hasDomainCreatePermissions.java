@@ -718,7 +718,7 @@ public class TestAccessControl_hasDomainCreatePermissions extends TestAccessCont
    }
 
    @Test
-   public void hasDomainCreatePermission_emptyPermissions_shouldSucceed() {
+   public void hasDomainCreatePermissions_emptyPermissions_shouldSucceed() {
       authenticateSystemResource();
       final Resource accessorResource = generateUnauthenticatableResource();
       final DomainCreatePermission domainCreatePermission = DomainCreatePermissions.getInstance(DomainCreatePermissions.CREATE);
@@ -729,23 +729,23 @@ public class TestAccessControl_hasDomainCreatePermissions extends TestAccessCont
       //verify
       if (!accessControlContext.hasDomainCreatePermissions(accessorResource,
                                                            domainCreatePermission)) {
-         fail("checking domain create permission with empty permission sequence should have failed");
+         fail("checking domain create permission with empty permission sequence should have succeeded");
       }
       if (!accessControlContext.hasDomainCreatePermissions(domainCreatePermission)) {
-         fail("checking domain create permission with empty permission sequence should have failed");
+         fail("checking domain create permission with empty permission sequence should have succeeded");
       }
       if (!accessControlContext.hasDomainCreatePermissions(accessorResource,
                                                            domainCreatePermission,
                                                            new DomainCreatePermission[]{})) {
-         fail("checking domain create permission with empty permission sequence should have failed");
+         fail("checking domain create permission with empty permission sequence should have suceeded");
       }
       if (!accessControlContext.hasDomainCreatePermissions(domainCreatePermission, new DomainCreatePermission[]{})) {
-         fail("checking domain create permission with empty permission sequence should have failed");
+         fail("checking domain create permission with empty permission sequence should have succeeded");
       }
    }
 
    @Test
-   public void hasDomainCreatePermission_duplicatePermissions_shouldSucceed() {
+   public void hasDomainCreatePermissions_duplicatePermissions_shouldSucceed() {
       authenticateSystemResource();
 
       final Resource accessorResource = generateUnauthenticatableResource();

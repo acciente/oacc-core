@@ -2769,8 +2769,9 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
 
    @Override
    public void assertPostCreateDomainPermissions(Resource accessorResource,
+                                                 DomainPermission domainPermission,
                                                  DomainPermission... domainPermissions) {
-      if (!hasPostCreateDomainPermissions(accessorResource, domainPermissions)) {
+      if (!hasPostCreateDomainPermissions(accessorResource, domainPermission, domainPermissions)) {
          throw new NotAuthorizedException(accessorResource,
                                           "receive " + Arrays.asList(domainPermissions)
                                                 + " permission(s) after creating a domain");
@@ -2778,20 +2779,23 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
    }
 
    @Override
-   public void assertPostCreateDomainPermissions(DomainPermission... domainPermissions) {
-      assertPostCreateDomainPermissions(sessionResource, domainPermissions);
+   public void assertPostCreateDomainPermissions(DomainPermission domainPermission,
+                                                 DomainPermission... domainPermissions) {
+      assertPostCreateDomainPermissions(sessionResource, domainPermission, domainPermissions);
    }
 
    @Override
    public boolean hasPostCreateDomainPermissions(Resource accessorResource,
+                                                 DomainPermission domainPermission,
                                                  DomainPermission... domainPermissions) {
       SQLConnection connection = null;
 
       __assertAuthenticated();
       __assertResourceSpecified(accessorResource);
-      __assertPermissionsSpecified(domainPermissions);
+      __assertPermissionSpecified(domainPermission);
+      __assertPermissionsNotNull(domainPermissions);
 
-      final Set<DomainPermission> requestedDomainPermissions = notEmptySetOfNotNull(domainPermissions);
+      final Set<DomainPermission> requestedDomainPermissions = getSetOfNotNull(domainPermission, domainPermissions);
 
       try {
          connection = __getConnection();
@@ -2805,8 +2809,9 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
    }
 
    @Override
-   public boolean hasPostCreateDomainPermissions(DomainPermission... domainPermissions) {
-      return hasPostCreateDomainPermissions(sessionResource, domainPermissions);
+   public boolean hasPostCreateDomainPermissions(DomainPermission domainPermission,
+                                                 DomainPermission... domainPermissions) {
+      return hasPostCreateDomainPermissions(sessionResource, domainPermission, domainPermissions);
    }
 
    private boolean __hasPostCreateDomainPermissions(SQLConnection connection,
