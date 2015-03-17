@@ -90,24 +90,28 @@ public class AccessControlContextProxy implements AccessControlContext {
 
    @Override
    public void assertDomainCreatePermissions(Resource accessorResource,
+                                             DomainCreatePermission domainCreatePermission,
                                              DomainCreatePermission... domainCreatePermissions) {
-      accessControlContext.assertDomainCreatePermissions(accessorResource, domainCreatePermissions);
+      accessControlContext.assertDomainCreatePermissions(accessorResource, domainCreatePermission, domainCreatePermissions);
    }
 
    @Override
-   public void assertDomainCreatePermissions(DomainCreatePermission... domainCreatePermissions) {
-      accessControlContext.assertDomainCreatePermissions(domainCreatePermissions);
+   public void assertDomainCreatePermissions(DomainCreatePermission domainCreatePermission,
+                                             DomainCreatePermission... domainCreatePermissions) {
+      accessControlContext.assertDomainCreatePermissions(domainCreatePermission, domainCreatePermissions);
    }
 
    @Override
    public boolean hasDomainCreatePermissions(Resource accessorResource,
+                                             DomainCreatePermission domainCreatePermission,
                                              DomainCreatePermission... domainCreatePermissions) {
-      return accessControlContext.hasDomainCreatePermissions(accessorResource, domainCreatePermissions);
+      return accessControlContext.hasDomainCreatePermissions(accessorResource, domainCreatePermission, domainCreatePermissions);
    }
 
    @Override
-   public boolean hasDomainCreatePermissions(DomainCreatePermission... domainCreatePermissions) {
-      return accessControlContext.hasDomainCreatePermissions(domainCreatePermissions);
+   public boolean hasDomainCreatePermissions(DomainCreatePermission domainCreatePermission,
+                                             DomainCreatePermission... domainCreatePermissions) {
+      return accessControlContext.hasDomainCreatePermissions(domainCreatePermission, domainCreatePermissions);
    }
 
    @Override

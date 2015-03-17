@@ -218,12 +218,14 @@ public interface AccessControlContext {
     * This method takes into account any direct and inherited domain create permissions.
     *
     * @param accessorResource        the resource on which access is being checked
-    * @param domainCreatePermissions the domain create permissions to be checked
+    * @param domainCreatePermission  the domain create permission to be checked
+    * @param domainCreatePermissions the other (optional) domain create permissions to be checked
     * @throws com.acciente.oacc.NotAuthorizedException if the accessor resource <strong>does not</strong> have the
     *                                                  specified domain create permissions, or
     *                                                  if the accessor resource does not exist
     */
    public void assertDomainCreatePermissions(Resource accessorResource,
+                                             DomainCreatePermission domainCreatePermission,
                                              DomainCreatePermission... domainCreatePermissions);
 
    /**
@@ -231,11 +233,14 @@ public interface AccessControlContext {
     * specified domain.
     * This method takes into account any direct and inherited domain create permissions.
     *
-    * @param domainCreatePermissions the domain create permissions to be checked
+    *
+    * @param domainCreatePermission  the domain create permission to be checked
+    * @param domainCreatePermissions the other (optional) domain create permissions to be checked
     * @throws com.acciente.oacc.NotAuthorizedException if the session resource <strong>does not</strong> have the
     *                                                  specified domain create permissions
     */
-   public void assertDomainCreatePermissions(DomainCreatePermission... domainCreatePermissions);
+   public void assertDomainCreatePermissions(DomainCreatePermission domainCreatePermission,
+                                             DomainCreatePermission... domainCreatePermissions);
 
    /**
     * Checks if the specified accessor resource has the specified domain create permissions on
@@ -243,11 +248,13 @@ public interface AccessControlContext {
     * This method takes into account any direct and inherited domain create permissions.
     *
     * @param accessorResource        the resource on which access is being checked
-    * @param domainCreatePermissions the domain create permission to be checked
+    * @param domainCreatePermission  the domain create permission to be checked
+    * @param domainCreatePermissions the other (optional) domain create permissions to be checked
     * @return  <strong>true</strong> if the accessor resource has the specified domain create permissions,
     *          <strong>false</strong> otherwise or if the accessor resource does not exist
     */
    public boolean hasDomainCreatePermissions(Resource accessorResource,
+                                             DomainCreatePermission domainCreatePermission,
                                              DomainCreatePermission... domainCreatePermissions);
 
    /**
@@ -255,11 +262,14 @@ public interface AccessControlContext {
     * specified domain.
     * This method takes into account any direct and inherited domain create permissions.
     *
-    * @param domainCreatePermissions the domain create permission to be checked
+    *
+    * @param domainCreatePermission  the domain create permission to be checked
+    * @param domainCreatePermissions the other (optional) domain create permissions to be checked
     * @return  <strong>true</strong> if the session resource has the specified domain create permissions,
     *          <strong>false</strong> otherwise
     */
-   public boolean hasDomainCreatePermissions(DomainCreatePermission... domainCreatePermissions);
+   public boolean hasDomainCreatePermissions(DomainCreatePermission domainCreatePermission,
+                                             DomainCreatePermission... domainCreatePermissions);
 
    /**
     * Checks if the specified accessor resource would receive the specified domain permissions, if the accessor

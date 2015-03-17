@@ -120,7 +120,7 @@ public class TestAccessControl_hasDomainCreatePermissions extends TestAccessCont
                                                                 .getInstance(DomainCreatePermissions.CREATE))) {
          fail("checking domain create permission when none has been granted should not have succeeded for authenticated resource");
       }
-      if (accessControlContext.hasDomainCreatePermissions(DomainCreatePermissions
+      if (accessControlContext.hasDomainCreatePermissions( DomainCreatePermissions
                                                                 .getInstance(DomainCreatePermissions.CREATE))) {
          fail("checking domain create permission when none has been granted should not have succeeded for implicit authenticated resource");
       }
@@ -128,8 +128,8 @@ public class TestAccessControl_hasDomainCreatePermissions extends TestAccessCont
                                                           DomainCreatePermissions
                                                                 .getInstance(DomainCreatePermissions.CREATE),
                                                           DomainCreatePermissions
-                                                                .getInstance(DomainPermissions
-                                                                                   .getInstance(DomainPermissions.CREATE_CHILD_DOMAIN)))) {
+                                                          .getInstance(DomainPermissions
+                                                                             .getInstance(DomainPermissions.CREATE_CHILD_DOMAIN)))) {
          fail("checking domain create permissions when none have been granted should not have succeeded for authenticated resource");
       }
    }
@@ -192,17 +192,18 @@ public class TestAccessControl_hasDomainCreatePermissions extends TestAccessCont
                                                  .getInstance(DomainPermissions
                                                                     .getInstance(DomainPermissions.CREATE_CHILD_DOMAIN)),
                                            DomainCreatePermissions
-                                                 .getInstance(DomainPermissions
-                                                                    .getInstance(DomainPermissions.SUPER_USER)))) {
+                        .getInstance(DomainPermissions
+                                           .getInstance(DomainPermissions.SUPER_USER)))) {
          fail("checking direct domain create permissions with partial authorization should have failed for authenticated resource");
       }
       if (accessControlContext
-               .hasDomainCreatePermissions(DomainCreatePermissions
-                                                 .getInstance(DomainPermissions
-                                                                    .getInstance(DomainPermissions.CREATE_CHILD_DOMAIN)),
-                                           DomainCreatePermissions
-                                                 .getInstance(DomainPermissions
-                                                                    .getInstance(DomainPermissions.SUPER_USER)))) {
+               .hasDomainCreatePermissions(
+                     DomainCreatePermissions
+                                                       .getInstance(DomainPermissions
+                                                                          .getInstance(DomainPermissions.CREATE_CHILD_DOMAIN)),
+                     DomainCreatePermissions
+  .getInstance(DomainPermissions
+                     .getInstance(DomainPermissions.SUPER_USER)))) {
          fail("checking direct domain create permissions with partial authorization should have failed for implicit authenticated resource");
       }
    }
@@ -242,14 +243,14 @@ public class TestAccessControl_hasDomainCreatePermissions extends TestAccessCont
          fail("checking direct domain create permissions with all permissions should have succeeded for authenticated resource");
       }
       if (!accessControlContext
-            .hasDomainCreatePermissions(DomainCreatePermissions
-                                              .getInstance(DomainPermissions
-                                                                 .getInstance(DomainPermissions.SUPER_USER)),
-                                        DomainCreatePermissions.getInstance(DomainCreatePermissions.CREATE),
-                                        DomainCreatePermissions
-                                              .getInstance(DomainPermissions
-                                                                 .getInstance(
-                                                                       DomainPermissions.CREATE_CHILD_DOMAIN)))) {
+            .hasDomainCreatePermissions(
+                  DomainCreatePermissions
+                                                    .getInstance(DomainPermissions
+                                                                       .getInstance(DomainPermissions.SUPER_USER)),
+                  DomainCreatePermissions.getInstance(DomainCreatePermissions.CREATE), DomainCreatePermissions
+                        .getInstance(DomainPermissions
+                                           .getInstance(
+                                                 DomainPermissions.CREATE_CHILD_DOMAIN)))) {
          fail("checking direct domain create permissions with all permissions should have succeeded for implicit authenticated resource");
       }
    }
@@ -286,7 +287,7 @@ public class TestAccessControl_hasDomainCreatePermissions extends TestAccessCont
          fail("checking direct domain create permission with same granting rights should have succeeded for authenticated resource");
       }
       if (!accessControlContext
-            .hasDomainCreatePermissions(DomainCreatePermissions
+            .hasDomainCreatePermissions( DomainCreatePermissions
                                               .getInstance(DomainPermissions.getInstance(DomainPermissions.CREATE_CHILD_DOMAIN)))) {
          fail("checking direct domain create permission with same granting rights should have succeeded for implicit authenticated resource");
       }
@@ -298,7 +299,7 @@ public class TestAccessControl_hasDomainCreatePermissions extends TestAccessCont
          fail("checking direct domain create permission with exceeded granting rights should have failed for authenticated resource");
       }
       if (accessControlContext
-            .hasDomainCreatePermissions(DomainCreatePermissions.getInstance(DomainPermissions.getInstance(
+            .hasDomainCreatePermissions( DomainCreatePermissions.getInstance(DomainPermissions.getInstance(
                                               DomainPermissions.CREATE_CHILD_DOMAIN,
                                               true)))) {
          fail("checking direct domain create permission with exceeded granting rights should have failed for implicit authenticated resource");
@@ -358,7 +359,7 @@ public class TestAccessControl_hasDomainCreatePermissions extends TestAccessCont
          fail("checking direct super-user domain create permission should have succeeded for authenticated resource");
       }
       if (!accessControlContext
-            .hasDomainCreatePermissions(DomainCreatePermissions
+            .hasDomainCreatePermissions( DomainCreatePermissions
                                               .getInstance(DomainPermissions.getInstance(DomainPermissions.SUPER_USER)))) {
          fail("checking direct super-user domain create permission should have succeeded for implicit authenticated resource");
       }
@@ -370,7 +371,7 @@ public class TestAccessControl_hasDomainCreatePermissions extends TestAccessCont
          fail("checking direct super-user /G domain create permission should have failed for authenticated resource");
       }
       if (accessControlContext
-            .hasDomainCreatePermissions(DomainCreatePermissions
+            .hasDomainCreatePermissions( DomainCreatePermissions
                                               .getInstance(DomainPermissions.getInstance(DomainPermissions.SUPER_USER, true)))) {
          fail("checking direct super-user /G domain create permission should have failed for implicit authenticated resource");
       }
@@ -382,7 +383,7 @@ public class TestAccessControl_hasDomainCreatePermissions extends TestAccessCont
          fail("checking create-child-domain domain create permission when only super-user domain create permission is given should have failed for authenticated resource");
       }
       if (accessControlContext
-            .hasDomainCreatePermissions(DomainCreatePermissions
+            .hasDomainCreatePermissions( DomainCreatePermissions
                                               .getInstance(DomainPermissions
                                                                  .getInstance(DomainPermissions.CREATE_CHILD_DOMAIN)))) {
          fail("checking create-child-domain domain create permission when only super-user domain create permission is given should have failed for implicit authenticated resource");
@@ -439,7 +440,7 @@ public class TestAccessControl_hasDomainCreatePermissions extends TestAccessCont
          fail("checking inherited domain create permission with different granting rights should have succeeded for authenticated resource");
       }
       if (!accessControlContext
-            .hasDomainCreatePermissions(DomainCreatePermissions
+            .hasDomainCreatePermissions( DomainCreatePermissions
                                               .getInstance(DomainPermissions.getInstance(accessorPermissionName_createChild, true),
                                                            true))) {
          fail("checking inherited domain create permission with different granting rights should have succeeded for implicit authenticated resource");
@@ -526,7 +527,7 @@ public class TestAccessControl_hasDomainCreatePermissions extends TestAccessCont
          fail("checking domain create permission inherited from two sources with different granting rights should have failed for authenticated resource");
       }
       if (accessControlContext
-            .hasDomainCreatePermissions(DomainCreatePermissions
+            .hasDomainCreatePermissions( DomainCreatePermissions
                                               .getInstance(DomainPermissions.getInstance(donorPermissionName_createChild, true),
                                                            true))) {
          fail("checking domain create permission inherited from two sources with different granting rights should have failed for implicit authenticated resource");
@@ -577,8 +578,7 @@ public class TestAccessControl_hasDomainCreatePermissions extends TestAccessCont
             .hasDomainCreatePermissions(accessorResource,
                                         DomainCreatePermissions
                                               .getInstance(DomainPermissions.getInstance(donorPermissionName_createChild, true),
-                                                           false),
-                                        DomainCreatePermissions
+                                                           false), DomainCreatePermissions
                                               .getInstance(DomainPermissions.getInstance(donorPermissionName_createChild, false),
                                                            true))) {
          fail("checking double-inherited domain create permission with different granting rights should have succeeded for authenticated resource");
@@ -672,14 +672,30 @@ public class TestAccessControl_hasDomainCreatePermissions extends TestAccessCont
          assertThat(e.getMessage().toLowerCase(), containsString("domain create permission required"));
       }
       try {
-         accessControlContext.hasDomainCreatePermissions(accessorResource, new DomainCreatePermission[] {null});
+         accessControlContext.hasDomainCreatePermissions(accessorResource, null, domainCreatePermission);
+         fail("checking domain create permission with null permission element should have failed");
+      }
+      catch (NullPointerException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("domain create permission required"));
+      }
+      try {
+         accessControlContext.hasDomainCreatePermissions((DomainCreatePermission) null, domainCreatePermission);
+         fail("checking domain create permission with null permission element should have failed");
+      }
+      catch (NullPointerException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("domain create permission required"));
+      }
+      try {
+         accessControlContext.hasDomainCreatePermissions(accessorResource,
+                                                         domainCreatePermission,
+                                                         new DomainCreatePermission[] {null});
          fail("checking domain create permission with null permission element should have failed");
       }
       catch (NullPointerException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("without null element"));
       }
       try {
-         accessControlContext.hasDomainCreatePermissions(new DomainCreatePermission[] {null});
+         accessControlContext.hasDomainCreatePermissions(domainCreatePermission, new DomainCreatePermission[] {null});
          fail("checking domain create permission with null permission element should have failed");
       }
       catch (NullPointerException e) {
@@ -690,49 +706,41 @@ public class TestAccessControl_hasDomainCreatePermissions extends TestAccessCont
          fail("checking domain create permission with null permission element should have failed");
       }
       catch (NullPointerException e) {
-         assertThat(e.getMessage().toLowerCase(), containsString("without null element"));
+         assertThat(e.getMessage().toLowerCase(), containsString("array or a sequence of"));
       }
       try {
          accessControlContext.hasDomainCreatePermissions(domainCreatePermission, null);
          fail("checking domain create permission with null permission element should have failed");
       }
       catch (NullPointerException e) {
-         assertThat(e.getMessage().toLowerCase(), containsString("without null element"));
+         assertThat(e.getMessage().toLowerCase(), containsString("array or a sequence of"));
       }
    }
 
    @Test
-   public void hasDomainCreatePermission_emptyPermissions_shouldFail() {
+   public void hasDomainCreatePermission_emptyPermissions_shouldSucceed() {
       authenticateSystemResource();
       final Resource accessorResource = generateUnauthenticatableResource();
+      final DomainCreatePermission domainCreatePermission = DomainCreatePermissions.getInstance(DomainCreatePermissions.CREATE);
 
-      try {
-         accessControlContext.hasDomainCreatePermissions(accessorResource);
+      //setup
+      grantDomainCreatePermission(accessorResource);
+
+      //verify
+      if (!accessControlContext.hasDomainCreatePermissions(accessorResource,
+                                                           domainCreatePermission)) {
          fail("checking domain create permission with empty permission sequence should have failed");
       }
-      catch (IllegalArgumentException e) {
-         assertThat(e.getMessage().toLowerCase(), containsString("non-empty"));
-      }
-      try {
-         accessControlContext.hasDomainCreatePermissions();
+      if (!accessControlContext.hasDomainCreatePermissions(domainCreatePermission)) {
          fail("checking domain create permission with empty permission sequence should have failed");
       }
-      catch (IllegalArgumentException e) {
-         assertThat(e.getMessage().toLowerCase(), containsString("non-empty"));
-      }
-      try {
-         accessControlContext.hasDomainCreatePermissions(accessorResource, new DomainCreatePermission[]{});
+      if (!accessControlContext.hasDomainCreatePermissions(accessorResource,
+                                                           domainCreatePermission,
+                                                           new DomainCreatePermission[]{})) {
          fail("checking domain create permission with empty permission sequence should have failed");
       }
-      catch (IllegalArgumentException e) {
-         assertThat(e.getMessage().toLowerCase(), containsString("non-empty"));
-      }
-      try {
-         accessControlContext.hasDomainCreatePermissions(new DomainCreatePermission[]{});
+      if (!accessControlContext.hasDomainCreatePermissions(domainCreatePermission, new DomainCreatePermission[]{})) {
          fail("checking domain create permission with empty permission sequence should have failed");
-      }
-      catch (IllegalArgumentException e) {
-         assertThat(e.getMessage().toLowerCase(), containsString("non-empty"));
       }
    }
 
@@ -752,8 +760,7 @@ public class TestAccessControl_hasDomainCreatePermissions extends TestAccessCont
                                                            domainCreatePermission)) {
          fail("checking domain create permission with duplicate permissions should have succeeded");
       }
-      if (!accessControlContext.hasDomainCreatePermissions(domainCreatePermission,
-                                                           domainCreatePermission)) {
+      if (!accessControlContext.hasDomainCreatePermissions(domainCreatePermission, domainCreatePermission)) {
          fail("checking domain create permission with duplicate permissions should have succeeded");
       }
    }

@@ -115,8 +115,8 @@ public class TestAccessControl_assertDomainCreatePermissions extends TestAccessC
                                                             DomainCreatePermissions
                                                                   .getInstance(DomainCreatePermissions.CREATE),
                                                             DomainCreatePermissions
-                                                                  .getInstance(DomainPermissions
-                                                                                     .getInstance(DomainPermissions.CREATE_CHILD_DOMAIN)));
+                                                            .getInstance(DomainPermissions
+                                                                               .getInstance(DomainPermissions.CREATE_CHILD_DOMAIN)));
          fail("asserting domain create permissions when none has been granted should not have succeeded for authenticated resource");
       }
       catch (NotAuthorizedException e) {
@@ -178,8 +178,8 @@ public class TestAccessControl_assertDomainCreatePermissions extends TestAccessC
                                                     .getInstance(DomainPermissions
                                                                        .getInstance(DomainPermissions.CREATE_CHILD_DOMAIN)),
                                               DomainCreatePermissions
-                                                    .getInstance(DomainPermissions
-                                                                       .getInstance(DomainPermissions.SUPER_USER)));
+                           .getInstance(DomainPermissions
+                                              .getInstance(DomainPermissions.SUPER_USER)));
          fail("asserting direct domain create permissions with partial authorization should have failed for authenticated resource");
       }
       catch (NotAuthorizedException e) {
@@ -188,12 +188,13 @@ public class TestAccessControl_assertDomainCreatePermissions extends TestAccessC
       }
       try {
          accessControlContext
-               .assertDomainCreatePermissions(DomainCreatePermissions
-                                                    .getInstance(DomainPermissions
-                                                                       .getInstance(DomainPermissions.CREATE_CHILD_DOMAIN)),
-                                              DomainCreatePermissions
-                                                    .getInstance(DomainPermissions
-                                                                       .getInstance(DomainPermissions.SUPER_USER)));
+               .assertDomainCreatePermissions(
+                     DomainCreatePermissions
+                                                          .getInstance(DomainPermissions
+                                                                             .getInstance(DomainPermissions.CREATE_CHILD_DOMAIN)),
+                     DomainCreatePermissions
+  .getInstance(DomainPermissions
+                     .getInstance(DomainPermissions.SUPER_USER)));
          fail("asserting direct domain create permissions with partial authorization should have failed for implicit authenticated resource");
       }
       catch (NotAuthorizedException e) {
@@ -235,14 +236,14 @@ public class TestAccessControl_assertDomainCreatePermissions extends TestAccessC
                                                                     .getInstance(
                                                                           DomainPermissions.CREATE_CHILD_DOMAIN)));
       accessControlContext
-            .assertDomainCreatePermissions(DomainCreatePermissions
-                                                 .getInstance(DomainPermissions
-                                                                    .getInstance(DomainPermissions.SUPER_USER)),
-                                           DomainCreatePermissions.getInstance(DomainCreatePermissions.CREATE),
-                                           DomainCreatePermissions
-                                                 .getInstance(DomainPermissions
-                                                                    .getInstance(
-                                                                          DomainPermissions.CREATE_CHILD_DOMAIN)));
+            .assertDomainCreatePermissions(
+                  DomainCreatePermissions
+                                                       .getInstance(DomainPermissions
+                                                                          .getInstance(DomainPermissions.SUPER_USER)),
+                  DomainCreatePermissions.getInstance(DomainCreatePermissions.CREATE), DomainCreatePermissions
+                        .getInstance(DomainPermissions
+                                           .getInstance(
+                                                 DomainPermissions.CREATE_CHILD_DOMAIN)));
    }
 
    @Test
@@ -511,20 +512,25 @@ public class TestAccessControl_assertDomainCreatePermissions extends TestAccessC
                                                  .getInstance(DomainPermissions.getInstance(donorPermissionName_createChild, false),
                                                               true),
                                            DomainCreatePermissions
-                                                 .getInstance(DomainPermissions.getInstance(donorPermissionName_createChild, true),
-                                                              false),
-                                           DomainCreatePermissions
-                                                 .getInstance(DomainPermissions.getInstance(donorPermissionName_createChild, false),
-                                                              false));
+                              .getInstance(DomainPermissions.getInstance(donorPermissionName_createChild, true),
+                                           false), DomainCreatePermissions
+                              .getInstance(DomainPermissions.getInstance(donorPermissionName_createChild, false),
+                                           false));
       accessControlContext
             .assertDomainCreatePermissions(DomainCreatePermissions
-                                                 .getInstance(DomainPermissions.getInstance(donorPermissionName_createChild, false),
+                                                 .getInstance(DomainPermissions.getInstance(
+                                                       donorPermissionName_createChild,
+                                                       false),
                                                               true),
                                            DomainCreatePermissions
-                                                 .getInstance(DomainPermissions.getInstance(donorPermissionName_createChild, true),
+                                                 .getInstance(DomainPermissions.getInstance(
+                                                       donorPermissionName_createChild,
+                                                       true),
                                                               false),
                                            DomainCreatePermissions
-                                                 .getInstance(DomainPermissions.getInstance(donorPermissionName_createChild, false),
+                                                 .getInstance(DomainPermissions.getInstance(
+                                                       donorPermissionName_createChild,
+                                                       false),
                                                               false));
 
       try {
@@ -692,14 +698,31 @@ public class TestAccessControl_assertDomainCreatePermissions extends TestAccessC
          assertThat(e.getMessage().toLowerCase(), containsString("domain create permission required"));
       }
       try {
-         accessControlContext.assertDomainCreatePermissions(accessorResource, new DomainCreatePermission[] {null});
+         accessControlContext.assertDomainCreatePermissions(accessorResource, null, domainCreatePermission);
+         fail("asserting domain create permission with null permissions should have failed");
+      }
+      catch (NullPointerException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("domain create permission required"));
+      }
+      try {
+         accessControlContext.assertDomainCreatePermissions((DomainCreatePermission) null, domainCreatePermission);
+         fail("asserting domain create permission with null permissions should have failed");
+      }
+      catch (NullPointerException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("domain create permission required"));
+      }
+      try {
+         accessControlContext.assertDomainCreatePermissions(accessorResource,
+                                                            domainCreatePermission,
+                                                            new DomainCreatePermission[] {null});
          fail("asserting domain create permission with null permission element should have failed");
       }
       catch (NullPointerException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("without null element"));
       }
       try {
-         accessControlContext.assertDomainCreatePermissions(new  DomainCreatePermission[] {null});
+         accessControlContext.assertDomainCreatePermissions(domainCreatePermission,
+                                                            new  DomainCreatePermission[] {null});
          fail("asserting domain create permission with null permission element should have failed");
       }
       catch (NullPointerException e) {
@@ -710,50 +733,27 @@ public class TestAccessControl_assertDomainCreatePermissions extends TestAccessC
          fail("asserting domain create permission with null permission element should have failed");
       }
       catch (NullPointerException e) {
-         assertThat(e.getMessage().toLowerCase(), containsString("without null element"));
+         assertThat(e.getMessage().toLowerCase(), containsString("array or a sequence of"));
       }
       try {
          accessControlContext.assertDomainCreatePermissions(domainCreatePermission, null);
          fail("asserting domain create permission with null permission element should have failed");
       }
       catch (NullPointerException e) {
-         assertThat(e.getMessage().toLowerCase(), containsString("without null element"));
+         assertThat(e.getMessage().toLowerCase(), containsString("array or a sequence of"));
       }
    }
 
    @Test
-   public void assertDomainCreatePermission_emptyPermissions_shouldFail() {
+   public void assertDomainCreatePermission_emptyPermissions_shouldSucceed() {
       authenticateSystemResource();
-      final Resource accessorResource = generateUnauthenticatableResource();
 
-      try {
-         accessControlContext.assertDomainCreatePermissions();
-         fail("asserting domain create permission with empty permission sequence should have failed");
-      }
-      catch (IllegalArgumentException e) {
-         assertThat(e.getMessage().toLowerCase(), containsString("non-empty"));
-      }
-      try {
-         accessControlContext.assertDomainCreatePermissions(accessorResource);
-         fail("asserting domain create permission with empty permission sequence should have failed");
-      }
-      catch (IllegalArgumentException e) {
-         assertThat(e.getMessage().toLowerCase(), containsString("non-empty"));
-      }
-      try {
-         accessControlContext.assertDomainCreatePermissions(accessorResource, new DomainCreatePermission[] {});
-         fail("asserting domain create permission with empty permission sequence should have failed");
-      }
-      catch (IllegalArgumentException e) {
-         assertThat(e.getMessage().toLowerCase(), containsString("non-empty"));
-      }
-      try {
-         accessControlContext.assertDomainCreatePermissions(new DomainCreatePermission[] {});
-         fail("asserting domain create permission with empty permission sequence should have failed");
-      }
-      catch (IllegalArgumentException e) {
-         assertThat(e.getMessage().toLowerCase(), containsString("non-empty"));
-      }
+      final DomainCreatePermission domainCreatePermission = DomainCreatePermissions.getInstance(DomainCreatePermissions.CREATE);
+
+      accessControlContext.assertDomainCreatePermissions(SYS_RESOURCE, domainCreatePermission);
+      accessControlContext.assertDomainCreatePermissions(domainCreatePermission);
+      accessControlContext.assertDomainCreatePermissions(SYS_RESOURCE, domainCreatePermission, new DomainCreatePermission[] {});
+      accessControlContext.assertDomainCreatePermissions(domainCreatePermission, new DomainCreatePermission[] {});
    }
 
    @Test

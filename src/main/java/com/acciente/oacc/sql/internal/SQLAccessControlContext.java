@@ -2927,27 +2927,32 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
 
    @Override
    public void assertDomainCreatePermissions(Resource accessorResource,
+                                             DomainCreatePermission domainCreatePermission,
                                              DomainCreatePermission... domainCreatePermissions) {
-      if (!hasDomainCreatePermissions(accessorResource, domainCreatePermissions)) {
+      if (!hasDomainCreatePermissions(accessorResource, domainCreatePermission, domainCreatePermissions)) {
          throw new NotAuthorizedException(accessorResource, domainCreatePermissions);
       }
    }
 
    @Override
-   public void assertDomainCreatePermissions(DomainCreatePermission... domainCreatePermissions) {
-      assertDomainCreatePermissions(sessionResource, domainCreatePermissions);
+   public void assertDomainCreatePermissions(DomainCreatePermission domainCreatePermission,
+                                             DomainCreatePermission... domainCreatePermissions) {
+      assertDomainCreatePermissions(sessionResource, domainCreatePermission, domainCreatePermissions);
    }
 
    @Override
    public boolean hasDomainCreatePermissions(Resource accessorResource,
+                                             DomainCreatePermission domainCreatePermission,
                                              DomainCreatePermission... domainCreatePermissions) {
       SQLConnection connection = null;
 
       __assertAuthenticated();
       __assertResourceSpecified(accessorResource);
-      __assertPermissionsSpecified(domainCreatePermissions);
+      __assertPermissionSpecified(domainCreatePermission);
+      __assertPermissionsNotNull(domainCreatePermissions);
 
-      final Set<DomainCreatePermission> requestedDomainCreatePermissions = notEmptySetOfNotNull(domainCreatePermissions);
+      final Set<DomainCreatePermission> requestedDomainCreatePermissions
+            = getSetOfNotNull(domainCreatePermission, domainCreatePermissions);
 
       try {
          connection = __getConnection();
@@ -2960,8 +2965,9 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
    }
 
    @Override
-   public boolean hasDomainCreatePermissions(DomainCreatePermission... domainCreatePermissions) {
-      return hasDomainCreatePermissions(sessionResource, domainCreatePermissions);
+   public boolean hasDomainCreatePermissions(DomainCreatePermission domainCreatePermission,
+                                             DomainCreatePermission... domainCreatePermissions) {
+      return hasDomainCreatePermissions(sessionResource, domainCreatePermission, domainCreatePermissions);
    }
 
    private boolean __hasDomainCreatePermissions(SQLConnection connection,
@@ -4113,9 +4119,15 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       }
    }
 
-   private void __assertPermissionsSpecified(DomainCreatePermission... domainCreatePermissions) {
-      if (domainCreatePermissions == null) {
+   private void __assertPermissionSpecified(DomainCreatePermission domainCreatePermission) {
+      if (domainCreatePermission == null) {
          throw new NullPointerException("Domain create permission required, none specified");
+      }
+   }
+
+   private void __assertPermissionsNotNull(DomainCreatePermission... domainCreatePermission) {
+      if (domainCreatePermission == null) {
+         throw new NullPointerException("An array or a sequence of domain create permissions are required, but the null value was specified");
       }
    }
 
@@ -4191,6 +4203,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       }
    }
 
+   @SafeVarargs
    protected static <T> Set<T> notEmptySetOfNotNull(T... elements) {
       // not null constraint
       if (elements == null) {
@@ -4204,6 +4217,31 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       }
 
       final HashSet<T> resultSet = new HashSet<>(elements.length);
+
+      for (T element : elements) {
+         // non-null elements constraint
+         if (element == null) {
+            throw new NullPointerException("A " + elements.getClass().getSimpleName()
+                                                 + " argument (or sequence of varargs) without null elements is required, but received: "
+                                                 + Arrays.asList(elements));
+         }
+
+         // duplicate elements get ignored silently
+         resultSet.add(element);
+      }
+
+      return resultSet;
+   }
+
+   @SafeVarargs
+   protected static <T> Set<T> getSetOfNotNull(T firstElement, T... elements) {
+      // not null constraint
+      if (elements == null) {
+         throw new NullPointerException("An array or a sequence of arguments are required, but none were specified");
+      }
+
+      final HashSet<T> resultSet = new HashSet<>(elements.length + 1);
+      resultSet.add(firstElement);
 
       for (T element : elements) {
          // non-null elements constraint
