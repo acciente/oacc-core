@@ -3349,30 +3349,35 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
    @Override
    public void assertResourcePermissions(Resource accessorResource,
                                          Resource accessedResource,
-                                         ResourcePermission... requestedResourcePermission) {
-      if (!hasResourcePermissions(accessorResource, accessedResource, requestedResourcePermission)) {
-         throw new NotAuthorizedException(accessorResource, accessedResource, requestedResourcePermission);
+                                         ResourcePermission resourcePermission,
+                                         ResourcePermission... resourcePermissions) {
+      if (!hasResourcePermissions(accessorResource, accessedResource, resourcePermission, resourcePermissions)) {
+         throw new NotAuthorizedException(accessorResource, accessedResource, resourcePermissions);
       }
    }
 
    @Override
    public void assertResourcePermissions(Resource accessedResource,
+                                         ResourcePermission resourcePermission,
                                          ResourcePermission... resourcePermissions) {
-      assertResourcePermissions(sessionResource, accessedResource, resourcePermissions);
+      assertResourcePermissions(sessionResource, accessedResource, resourcePermission, resourcePermissions);
    }
 
    @Override
    public boolean hasResourcePermissions(Resource accessorResource,
                                          Resource accessedResource,
+                                         ResourcePermission resourcePermission,
                                          ResourcePermission... resourcePermissions) {
       SQLConnection connection = null;
 
       __assertAuthenticated();
       __assertResourceSpecified(accessorResource);
       __assertResourceSpecified(accessedResource);
-      __assertPermissionsSpecified(resourcePermissions);
+      __assertPermissionSpecified(resourcePermission);
+      __assertPermissionsNotNull(resourcePermissions);
 
-      final Set<ResourcePermission> requestedResourcePermissions = notEmptySetOfNotNull(resourcePermissions);
+      final Set<ResourcePermission> requestedResourcePermissions
+            = getSetOfNotNull(resourcePermission, resourcePermissions);
 
       try {
          connection = __getConnection();
@@ -3386,8 +3391,9 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
 
    @Override
    public boolean hasResourcePermissions(Resource accessedResource,
+                                         ResourcePermission resourcePermission,
                                          ResourcePermission... resourcePermissions) {
-      return hasResourcePermissions(sessionResource, accessedResource, resourcePermissions);
+      return hasResourcePermissions(sessionResource, accessedResource, resourcePermission, resourcePermissions);
    }
 
    private boolean __hasResourcePermissions(SQLConnection connection,

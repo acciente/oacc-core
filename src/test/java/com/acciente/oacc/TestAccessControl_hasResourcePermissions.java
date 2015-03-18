@@ -526,6 +526,8 @@ public class TestAccessControl_hasResourcePermissions extends TestAccessControlB
       // setup direct permissions
       final String customPermissionName = generateResourceClassPermission(accessedResourceClassName);
       final ResourcePermission customPermission = ResourcePermissions.getInstance(customPermissionName);
+      final String customPermissionName2 = generateResourceClassPermission(accessedResourceClassName);
+      final ResourcePermission customPermission2 = ResourcePermissions.getInstance(customPermissionName2);
       accessControlContext.setResourcePermissions(accessorResource,
                                                   accessedResource,
                                                   setOf(customPermission));
@@ -571,27 +573,48 @@ public class TestAccessControl_hasResourcePermissions extends TestAccessControlB
       }
       try {
          accessControlContext.hasResourcePermissions(accessorResource, accessedResource, customPermission, null);
-         fail("checking resource permission for null permission element should have failed");
+         fail("checking resource permission for null permission sequence should have failed");
       }
       catch (NullPointerException e) {
-         assertThat(e.getMessage().toLowerCase(), containsString("without null element"));
+         assertThat(e.getMessage().toLowerCase(), containsString("array or a sequence"));
       }
       try {
          accessControlContext.hasResourcePermissions(accessedResource, customPermission, null);
+         fail("checking resource permission for null permission sequence should have failed");
+      }
+      catch (NullPointerException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("array or a sequence"));
+      }
+      try {
+         accessControlContext.hasResourcePermissions(accessorResource,
+                                                     accessedResource,
+                                                     customPermission,
+                                                     customPermission2,
+                                                     null);
          fail("checking resource permission for null permission element should have failed");
       }
       catch (NullPointerException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("without null element"));
       }
       try {
-         accessControlContext.hasResourcePermissions(accessorResource, accessedResource, new ResourcePermission[]{null});
+         accessControlContext.hasResourcePermissions(accessedResource,
+                                                     customPermission,
+                                                     customPermission2,
+                                                     null);
          fail("checking resource permission for null permission element should have failed");
       }
       catch (NullPointerException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("without null element"));
       }
       try {
-         accessControlContext.hasResourcePermissions(accessedResource, new ResourcePermission[]{null});
+         accessControlContext.hasResourcePermissions(accessorResource, accessedResource, customPermission, new ResourcePermission[]{null});
+         fail("checking resource permission for null permission element should have failed");
+      }
+      catch (NullPointerException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("without null element"));
+      }
+      try {
+         accessControlContext.hasResourcePermissions(accessedResource, customPermission, new ResourcePermission[]{null});
          fail("checking resource permission for null permission element should have failed");
       }
       catch (NullPointerException e) {
@@ -600,7 +623,7 @@ public class TestAccessControl_hasResourcePermissions extends TestAccessControlB
    }
 
    @Test
-   public void hasResourcePermissions_emptyPermissions_shouldFail() {
+   public void hasResourcePermissions_emptyPermissions_shouldSucceed() {
       authenticateSystemResource();
 
       final char[] password = generateUniquePassword();
@@ -620,33 +643,18 @@ public class TestAccessControl_hasResourcePermissions extends TestAccessControlB
       accessControlContext.authenticate(accessorResource, PasswordCredentials.newInstance(password));
 
       // verify
-      try {
-         accessControlContext.hasResourcePermissions(accessedResource);
-         fail("checking resource permission for empty permission sequence should have failed");
+      if (!accessControlContext.hasResourcePermissions(accessedResource, customPermission)) {
+         fail("checking resource permission for empty permission sequence should have succeeded");
       }
-      catch (IllegalArgumentException e) {
-         assertThat(e.getMessage().toLowerCase(), containsString("non-empty"));
+      if (!accessControlContext.hasResourcePermissions(accessorResource, accessedResource, customPermission)) {
+         fail("checking resource permission for empty permission sequence should have succeeded");
       }
-      try {
-         accessControlContext.hasResourcePermissions(accessorResource, accessedResource);
-         fail("checking resource permission for empty permission sequence should have failed");
+
+      if (!accessControlContext.hasResourcePermissions(accessedResource, customPermission, new ResourcePermission[] {})) {
+         fail("checking resource permission for empty permission sequence should have succeeded");
       }
-      catch (IllegalArgumentException e) {
-         assertThat(e.getMessage().toLowerCase(), containsString("non-empty"));
-      }
-      try {
-         accessControlContext.hasResourcePermissions(accessorResource, accessedResource, new ResourcePermission[] {});
-         fail("checking resource permission for empty permission sequence should have failed");
-      }
-      catch (IllegalArgumentException e) {
-         assertThat(e.getMessage().toLowerCase(), containsString("non-empty"));
-      }
-      try {
-         accessControlContext.hasResourcePermissions(accessedResource, new ResourcePermission[] {});
-         fail("checking resource permission for empty permission sequence should have failed");
-      }
-      catch (IllegalArgumentException e) {
-         assertThat(e.getMessage().toLowerCase(), containsString("non-empty"));
+      if (!accessControlContext.hasResourcePermissions(accessorResource, accessedResource, customPermission, new ResourcePermission[] {})) {
+         fail("checking resource permission for empty permission sequence should have succeeded");
       }
    }
 

@@ -496,7 +496,8 @@ public interface AccessControlContext {
     *
     * @param accessorResource    the resource requesting the access
     * @param accessedResource    the resource on which access is being requested
-    * @param resourcePermissions the permissions to be checked
+    * @param resourcePermission  the permission to be checked
+    * @param resourcePermissions the other (optional) permissions to be checked
     * @throws java.lang.IllegalArgumentException if the accessorResource or the accessedResource does not exists, or
     *                                            if any resourcePermission is invalid for the resource class of accessedResource
     * @throws com.acciente.oacc.NotAuthorizedException if the accessor resource <strong>does not</strong> have the
@@ -504,6 +505,7 @@ public interface AccessControlContext {
     */
    public void assertResourcePermissions(Resource accessorResource,
                                          Resource accessedResource,
+                                         ResourcePermission resourcePermission,
                                          ResourcePermission... resourcePermissions);
 
    /**
@@ -511,13 +513,15 @@ public interface AccessControlContext {
     * This method takes into account direct, inherited and global permissions of the session resource.
     *
     * @param accessedResource    the resource on which access is being requested
-    * @param resourcePermissions the permissions to be checked
+    * @param resourcePermission  the permission to be checked
+    * @param resourcePermissions the other (optional) permissions to be checked
     * @throws java.lang.IllegalArgumentException if the accessedResource does not exists, or
     *                                            if any resourcePermission is invalid for the resource class of accessedResource
     * @throws com.acciente.oacc.NotAuthorizedException if the session resource <strong>does not</strong> have the
     *                                                  specified permissions
     */
    public void assertResourcePermissions(Resource accessedResource,
+                                         ResourcePermission resourcePermission,
                                          ResourcePermission... resourcePermissions);
 
    /**
@@ -527,13 +531,15 @@ public interface AccessControlContext {
     *
     * @param accessorResource    the resource requesting the access
     * @param accessedResource    the resource on which access is being requested
-    * @param resourcePermissions the permissions to be checked
+    * @param resourcePermission  the permission to be checked
+    * @param resourcePermissions the other (optional) permissions to be checked
     * @return <strong>true</strong> if the accessor resource has the specified permissions
     * @throws java.lang.IllegalArgumentException if the accessorResource or the accessedResource does not exists, or
     *                                            if any resourcePermission is invalid for the resource class of accessedResource
     */
    public boolean hasResourcePermissions(Resource accessorResource,
                                          Resource accessedResource,
+                                         ResourcePermission resourcePermission,
                                          ResourcePermission... resourcePermissions);
 
    /**
@@ -541,12 +547,14 @@ public interface AccessControlContext {
     * This method takes into account direct, inherited and global permissions of the session resource.
     *
     * @param accessedResource    the resource on which access is being requested
-    * @param resourcePermissions the permissions to be checked
+    * @param resourcePermission  the permission to be checked
+    * @param resourcePermissions the other (optional) permissions to be checked
     * @return <strong>true</strong> if the session resource has the specified permissions
     * @throws java.lang.IllegalArgumentException if the accessedResource does not exists, or
     *                                            if any resourcePermission is invalid for the resource class of accessedResource
     */
    public boolean hasResourcePermissions(Resource accessedResource,
+                                         ResourcePermission resourcePermission,
                                          ResourcePermission... resourcePermissions);
 
    /**

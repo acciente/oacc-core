@@ -507,6 +507,8 @@ public class TestAccessControl_assertResourcePermissions extends TestAccessContr
       // setup direct permissions
       final String customPermissionName = generateResourceClassPermission(accessedResourceClassName);
       final ResourcePermission customPermission = ResourcePermissions.getInstance(customPermissionName);
+      final String customPermissionName2 = generateResourceClassPermission(accessedResourceClassName);
+      final ResourcePermission customPermission2 = ResourcePermissions.getInstance(customPermissionName2);
       accessControlContext.setResourcePermissions(accessorResource,
                                                   accessedResource,
                                                   setOf(customPermission));
@@ -546,25 +548,41 @@ public class TestAccessControl_assertResourcePermissions extends TestAccessContr
          assertThat(e.getMessage().toLowerCase(), containsString("resource permission required"));
       }
       try {
-         accessControlContext.assertResourcePermissions(accessorResource, accessedResource, new ResourcePermission[] {null});
-      }
-      catch (NullPointerException e) {
-         assertThat(e.getMessage().toLowerCase(), containsString("without null element"));
-      }
-      try {
-         accessControlContext.assertResourcePermissions(accessedResource, new ResourcePermission[] {null});
-      }
-      catch (NullPointerException e) {
-         assertThat(e.getMessage().toLowerCase(), containsString("without null element"));
-      }
-      try {
          accessControlContext.assertResourcePermissions(accessorResource, accessedResource, customPermission, null);
       }
       catch (NullPointerException e) {
-         assertThat(e.getMessage().toLowerCase(), containsString("without null element"));
+         assertThat(e.getMessage().toLowerCase(), containsString("array or a sequence"));
       }
       try {
          accessControlContext.assertResourcePermissions(accessedResource, customPermission, null);
+      }
+      catch (NullPointerException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("array or a sequence"));
+      }
+      try {
+         accessControlContext.assertResourcePermissions(accessorResource, accessedResource, customPermission, new ResourcePermission[] {null});
+      }
+      catch (NullPointerException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("without null element"));
+      }
+      try {
+         accessControlContext.assertResourcePermissions(accessedResource, customPermission, new ResourcePermission[] {null});
+      }
+      catch (NullPointerException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("without null element"));
+      }
+      try {
+         accessControlContext.assertResourcePermissions(accessorResource,
+                                                        accessedResource,
+                                                        customPermission,
+                                                        customPermission2,
+                                                        null);
+      }
+      catch (NullPointerException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("without null element"));
+      }
+      try {
+         accessControlContext.assertResourcePermissions(accessedResource, customPermission, customPermission2, null);
       }
       catch (NullPointerException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("without null element"));
@@ -572,7 +590,7 @@ public class TestAccessControl_assertResourcePermissions extends TestAccessContr
    }
 
    @Test
-   public void assertResourcePermissions_emptyPermissions_shouldFail() {
+   public void assertResourcePermissions_emptyPermissions_shouldSucceed() {
       authenticateSystemResource();
 
       final char[] password = generateUniquePassword();
@@ -592,30 +610,11 @@ public class TestAccessControl_assertResourcePermissions extends TestAccessContr
       accessControlContext.authenticate(accessorResource, PasswordCredentials.newInstance(password));
 
       // verify
-      try {
-         accessControlContext.assertResourcePermissions(accessedResource);
-      }
-      catch (IllegalArgumentException e) {
-         assertThat(e.getMessage().toLowerCase(), containsString("non-empty"));
-      }
-      try {
-         accessControlContext.assertResourcePermissions(accessorResource, accessedResource);
-      }
-      catch (IllegalArgumentException e) {
-         assertThat(e.getMessage().toLowerCase(), containsString("non-empty"));
-      }
-      try {
-         accessControlContext.assertResourcePermissions(accessedResource, new ResourcePermission[]{});
-      }
-      catch (IllegalArgumentException e) {
-         assertThat(e.getMessage().toLowerCase(), containsString("non-empty"));
-      }
-      try {
-         accessControlContext.assertResourcePermissions(accessorResource, accessedResource, new ResourcePermission[]{});
-      }
-      catch (IllegalArgumentException e) {
-         assertThat(e.getMessage().toLowerCase(), containsString("non-empty"));
-      }
+      accessControlContext.assertResourcePermissions(accessedResource, customPermission);
+      accessControlContext.assertResourcePermissions(accessorResource, accessedResource, customPermission);
+
+      accessControlContext.assertResourcePermissions(accessedResource, customPermission, new ResourcePermission[] {});
+      accessControlContext.assertResourcePermissions(accessorResource, accessedResource, customPermission, new ResourcePermission[] {});
    }
 
    @Test
