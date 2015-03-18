@@ -3963,15 +3963,18 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
    @Override
    public Set<Resource> getAccessorResourcesByResourcePermissions(Resource accessedResource,
                                                                   String resourceClassName,
+                                                                  ResourcePermission resourcePermission,
                                                                   ResourcePermission... resourcePermissions) {
       SQLConnection connection = null;
 
       __assertAuthenticated();
       __assertResourceSpecified(accessedResource);
       __assertResourceClassSpecified(resourceClassName);
-      __assertPermissionsSpecified(resourcePermissions);
+      __assertPermissionSpecified(resourcePermission);
+      __assertPermissionsNotNull(resourcePermissions);
 
-      final Set<ResourcePermission> requestedResourcePermissions = notEmptySetOfNotNull(resourcePermissions);
+      final Set<ResourcePermission> requestedResourcePermissions
+            = getSetOfNotNull(resourcePermission, resourcePermissions);
 
       try {
          connection = __getConnection();
@@ -3990,7 +3993,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
    private Set<Resource> __getAccessorResourcesByResourcePermissions(SQLConnection connection,
                                                                      Resource accessedResource,
                                                                      String resourceClassName,
-                                                                     Set<ResourcePermission> requestedRresourcePermissions) {
+                                                                     Set<ResourcePermission> requestedResourcePermissions) {
       // first verify that resource class is defined
       Id<ResourceClassId> resourceClassId;
       Id<ResourcePermissionId> permissionId;
@@ -4002,11 +4005,11 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       }
 
       // verify permissions are valid for the resource class
-      __assertPermissionsValid(connection, resourceClassName, requestedRresourcePermissions);
+      __assertPermissionsValid(connection, resourceClassName, requestedResourcePermissions);
 
       Set<Resource> resources = new HashSet<>();
 
-      for (ResourcePermission resourcePermission : requestedRresourcePermissions) {
+      for (ResourcePermission resourcePermission : requestedResourcePermissions) {
          Set<Resource> currentResources = new HashSet<>();
 
          if (resourcePermission.isSystemPermission()) {

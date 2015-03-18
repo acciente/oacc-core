@@ -1046,13 +1046,15 @@ public interface AccessControlContext {
     *
     * @param accessedResource    the resource relative to which accessor resources are sought
     * @param resourceClassName   a string resource class name
-    * @param resourcePermissions the permissions to check
+    * @param resourcePermission  the permission to check
+    * @param resourcePermissions the other (optional) permissions to check
     * @return a set of accessor resources to the accessedResource, or an empty set if accessedResource does not exist
     * @throws java.lang.IllegalArgumentException if no resource class of resourceClassName exists, or
     *                                            if any resourcePermission is invalid for the specified resource class
     */
    public Set<Resource> getAccessorResourcesByResourcePermissions(Resource accessedResource,
                                                                   String resourceClassName,
+                                                                  ResourcePermission resourcePermission,
                                                                   ResourcePermission... resourcePermissions);
 
    /**
