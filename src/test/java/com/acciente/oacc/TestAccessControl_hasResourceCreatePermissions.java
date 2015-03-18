@@ -1326,6 +1326,7 @@ public class TestAccessControl_hasResourceCreatePermissions extends TestAccessCo
 
       final String resourceClassName = generateResourceClass(false, false);
       final String customPermissionName = generateResourceClassPermission(resourceClassName);
+      final String customPermissionName2 = generateResourceClassPermission(resourceClassName);
 
       try {
          accessControlContext
@@ -1379,6 +1380,29 @@ public class TestAccessControl_hasResourceCreatePermissions extends TestAccessCo
       try {
          accessControlContext.hasResourceCreatePermissions(SYS_RESOURCE,
                                                            resourceClassName,
+                                                           ResourceCreatePermissions
+                                                                 .getInstance(ResourcePermissions.getInstance(customPermissionName)),
+                                                           null);
+         fail("checking resource create permission for null resource permission sequence should have failed for system resource");
+      }
+      catch (NullPointerException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("array or a sequence"));
+      }
+      try {
+         accessControlContext.hasResourceCreatePermissions(resourceClassName,
+                                                           ResourceCreatePermissions
+                                                                 .getInstance(ResourcePermissions.getInstance(customPermissionName)),
+                                                           null);
+         fail("checking resource create permission for null resource permission sequence should have failed for implicit system resource");
+      }
+      catch (NullPointerException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("array or a sequence"));
+      }
+      try {
+         accessControlContext.hasResourceCreatePermissions(SYS_RESOURCE,
+                                                           resourceClassName,
+                                                           ResourceCreatePermissions
+                                                                 .getInstance(ResourcePermissions.getInstance(customPermissionName)),
                                                            new ResourceCreatePermission[] {null});
          fail("checking resource create permission for null resource permissions should have failed for system resource");
       }
@@ -1387,6 +1411,8 @@ public class TestAccessControl_hasResourceCreatePermissions extends TestAccessCo
       }
       try {
          accessControlContext.hasResourceCreatePermissions(resourceClassName,
+                                                           ResourceCreatePermissions
+                                                                 .getInstance(ResourcePermissions.getInstance(customPermissionName)),
                                                            new ResourceCreatePermission[] {null});
          fail("checking resource create permission for null resource permissions should have failed for implicit system resource");
       }
@@ -1398,6 +1424,8 @@ public class TestAccessControl_hasResourceCreatePermissions extends TestAccessCo
                                                            resourceClassName,
                                                            ResourceCreatePermissions
                                                                  .getInstance(ResourcePermissions.getInstance(customPermissionName)),
+                                                           ResourceCreatePermissions
+                                                                 .getInstance(ResourcePermissions.getInstance(customPermissionName2)),
                                                            null);
          fail("checking resource create permission for null resource permissions should have failed for system resource");
       }
@@ -1408,6 +1436,8 @@ public class TestAccessControl_hasResourceCreatePermissions extends TestAccessCo
          accessControlContext.hasResourceCreatePermissions(resourceClassName,
                                                            ResourceCreatePermissions
                                                                  .getInstance(ResourcePermissions.getInstance(customPermissionName)),
+                                                           ResourceCreatePermissions
+                                                                 .getInstance(ResourcePermissions.getInstance(customPermissionName2)),
                                                            null);
          fail("checking resource create permission for null resource permissions should have failed for implicit system resource");
       }
@@ -1497,6 +1527,31 @@ public class TestAccessControl_hasResourceCreatePermissions extends TestAccessCo
          accessControlContext.hasResourceCreatePermissions(SYS_RESOURCE,
                                                            resourceClassName,
                                                            domainName,
+                                                           ResourceCreatePermissions
+                                                                 .getInstance(ResourcePermissions.getInstance(customPermissionName)),
+                                                           null);
+         fail("checking resource create permission (by domain) for null resource permission sequence should have failed for system resource");
+      }
+      catch (NullPointerException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("array or a sequence"));
+      }
+      try {
+         accessControlContext.hasResourceCreatePermissions(resourceClassName,
+                                                           domainName,
+                                                           ResourceCreatePermissions
+                                                                 .getInstance(ResourcePermissions.getInstance(customPermissionName)),
+                                                           null);
+         fail("checking resource create permission (by domain) for null resource permission sequence should have failed for implicit system resource");
+      }
+      catch (NullPointerException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("array or a sequence"));
+      }
+      try {
+         accessControlContext.hasResourceCreatePermissions(SYS_RESOURCE,
+                                                           resourceClassName,
+                                                           domainName,
+                                                           ResourceCreatePermissions
+                                                                 .getInstance(ResourcePermissions.getInstance(customPermissionName)),
                                                            new ResourceCreatePermission[]{null});
          fail("checking resource create permission for null resource permissions should have failed for system resource");
       }
@@ -1506,6 +1561,8 @@ public class TestAccessControl_hasResourceCreatePermissions extends TestAccessCo
       try {
          accessControlContext.hasResourceCreatePermissions(resourceClassName,
                                                            domainName,
+                                                           ResourceCreatePermissions
+                                                                 .getInstance(ResourcePermissions.getInstance(customPermissionName)),
                                                            new ResourceCreatePermission[]{null});
          fail("checking resource create permission for null resource permissions should have failed for implicit system resource");
       }
@@ -1518,6 +1575,8 @@ public class TestAccessControl_hasResourceCreatePermissions extends TestAccessCo
                                                            domainName,
                                                            ResourceCreatePermissions
                                                                  .getInstance(ResourcePermissions.getInstance(customPermissionName)),
+                                                           ResourceCreatePermissions
+                                                                 .getInstance(ResourcePermissions.getInstance(customPermissionName2)),
                                                            null);
          fail("checking resource create permission for null resource permissions should have failed for system resource");
       }
@@ -1529,6 +1588,8 @@ public class TestAccessControl_hasResourceCreatePermissions extends TestAccessCo
                                                            domainName,
                                                            ResourceCreatePermissions
                                                                  .getInstance(ResourcePermissions.getInstance(customPermissionName)),
+                                                           ResourceCreatePermissions
+                                                                 .getInstance(ResourcePermissions.getInstance(customPermissionName2)),
                                                            null);
          fail("checking resource create permission for null resource permissions should have failed for implicit system resource");
       }
@@ -1538,80 +1599,72 @@ public class TestAccessControl_hasResourceCreatePermissions extends TestAccessCo
    }
 
    @Test
-   public void hasResourceCreatePermissions_emptyPermissions_shouldFail() {
+   public void hasResourceCreatePermissions_emptyPermissions_shouldSucceed() {
       authenticateSystemResource();
 
       final String resourceClassName = generateResourceClass(false, false);
 
-      try {
-         accessControlContext.hasResourceCreatePermissions(resourceClassName);
-         fail("checking resource create permission for empty resource permission sequence should have failed for implicit system resource");
+      if (!accessControlContext
+            .hasResourceCreatePermissions(resourceClassName,
+                                          ResourceCreatePermissions
+                                                .getInstance(ResourceCreatePermissions.CREATE))) {
+         fail("checking resource create permission for empty resource permission sequence should have succeeded for implicit system resource");
       }
-      catch (IllegalArgumentException e) {
-         assertThat(e.getMessage().toLowerCase(), containsString("non-empty"));
+      if (!accessControlContext
+            .hasResourceCreatePermissions(SYS_RESOURCE,
+                                          resourceClassName,
+                                          ResourceCreatePermissions
+                                                .getInstance(ResourceCreatePermissions.CREATE))) {
+         fail("checking resource create permission for empty resource permission sequence should have succeeded for system resource");
       }
-      try {
-         accessControlContext.hasResourceCreatePermissions(SYS_RESOURCE,
-                                                           resourceClassName);
-         fail("checking resource create permission for empty resource permission sequence should have failed for system resource");
+      if (!accessControlContext
+            .hasResourceCreatePermissions(resourceClassName,
+                                          ResourceCreatePermissions
+                                                .getInstance(ResourceCreatePermissions.CREATE),
+                                          new ResourceCreatePermission[] {})) {
+         fail("checking resource create permission for empty resource permission sequence should have succeeded for implicit system resource");
       }
-      catch (IllegalArgumentException e) {
-         assertThat(e.getMessage().toLowerCase(), containsString("non-empty"));
-      }
-      try {
-         accessControlContext.hasResourceCreatePermissions(SYS_RESOURCE,
-                                                           resourceClassName,
-                                                           new ResourceCreatePermission[]{});
-         fail("checking resource create permission for empty resource permission sequence should have failed for system resource");
-      }
-      catch (IllegalArgumentException e) {
-         assertThat(e.getMessage().toLowerCase(), containsString("non-empty"));
-      }
-      try {
-         accessControlContext.hasResourceCreatePermissions(resourceClassName,
-                                                           new ResourceCreatePermission[]{});
-         fail("checking resource create permission for empty resource permission sequence should have failed for implicit system resource");
-      }
-      catch (IllegalArgumentException e) {
-         assertThat(e.getMessage().toLowerCase(), containsString("non-empty"));
+      if (!accessControlContext
+            .hasResourceCreatePermissions(SYS_RESOURCE,
+                                          resourceClassName,
+                                          ResourceCreatePermissions
+                                                .getInstance(ResourceCreatePermissions.CREATE),
+                                          new ResourceCreatePermission[] {})) {
+         fail("checking resource create permission for empty resource permission sequence should have succeeded for system resource");
       }
 
       final String domainName = generateDomain();
-      try {
-         accessControlContext.hasResourceCreatePermissions(resourceClassName,
-                                                           domainName);
-         fail("checking resource create permission (by domain) for empty resource permission sequence should have failed for implicit system resource");
+      if (!accessControlContext
+            .hasResourceCreatePermissions(resourceClassName,
+                                          domainName,
+                                          ResourceCreatePermissions
+                                                .getInstance(ResourceCreatePermissions.CREATE))) {
+         fail("checking resource create permission (by domain) for empty resource permission sequence should have succeeded for implicit system resource");
       }
-      catch (IllegalArgumentException e) {
-         assertThat(e.getMessage().toLowerCase(), containsString("non-empty"));
-      }
-      try {
-         accessControlContext.hasResourceCreatePermissions(SYS_RESOURCE,
-                                                           resourceClassName,
-                                                           domainName);
+      if (!accessControlContext
+            .hasResourceCreatePermissions(SYS_RESOURCE,
+                                          resourceClassName,
+                                          domainName,
+                                          ResourceCreatePermissions
+                                                .getInstance(ResourceCreatePermissions.CREATE))) {
          fail("checking resource create permission (by domain) for empty resource permission sequence should have failed for system resource");
       }
-      catch (IllegalArgumentException e) {
-         assertThat(e.getMessage().toLowerCase(), containsString("non-empty"));
-      }
-      try {
-         accessControlContext.hasResourceCreatePermissions(SYS_RESOURCE,
-                                                           resourceClassName,
-                                                           domainName,
-                                                           new ResourceCreatePermission[] {});
-         fail("checking resource create permission (by domain) for empty resource permission sequence should have failed for system resource");
-      }
-      catch (IllegalArgumentException e) {
-         assertThat(e.getMessage().toLowerCase(), containsString("non-empty"));
-      }
-      try {
-         accessControlContext.hasResourceCreatePermissions(resourceClassName,
-                                                           domainName,
-                                                           new ResourceCreatePermission[] {});
+      if (!accessControlContext
+            .hasResourceCreatePermissions(resourceClassName,
+                                          domainName,
+                                          ResourceCreatePermissions
+                                                .getInstance(ResourceCreatePermissions.CREATE),
+                                          new ResourceCreatePermission[] {})) {
          fail("checking resource create permission (by domain) for empty resource permission sequence should have failed for implicit system resource");
       }
-      catch (IllegalArgumentException e) {
-         assertThat(e.getMessage().toLowerCase(), containsString("non-empty"));
+      if (!accessControlContext
+            .hasResourceCreatePermissions(SYS_RESOURCE,
+                                          resourceClassName,
+                                          domainName,
+                                          ResourceCreatePermissions
+                                                .getInstance(ResourceCreatePermissions.CREATE),
+                                          new ResourceCreatePermission[] {})) {
+         fail("checking resource create permission (by domain) for empty resource permission sequence should have failed for system resource");
       }
    }
 
@@ -1708,6 +1761,7 @@ public class TestAccessControl_hasResourceCreatePermissions extends TestAccessCo
          accessControlContext
                .hasResourceCreatePermissions(SYS_RESOURCE,
                                              resourceClassName,
+
                                              ResourceCreatePermissions.getInstance(ResourcePermissions.getInstance(customPermissionName)),
                                              ResourceCreatePermissions.getInstance(ResourcePermissions.getInstance("invalid_permission")));
          fail("checking resource create permission for valid and invalid resource permission reference should have failed for system resource");
@@ -1718,6 +1772,7 @@ public class TestAccessControl_hasResourceCreatePermissions extends TestAccessCo
       try {
          accessControlContext
                .hasResourceCreatePermissions(resourceClassName,
+
                                              ResourceCreatePermissions.getInstance(ResourcePermissions.getInstance(customPermissionName)),
                                              ResourceCreatePermissions.getInstance(ResourcePermissions.getInstance("invalid_permission")));
          fail("checking resource create permission for valid and invalid resource permission reference should have failed for implicit system resource");
@@ -1793,6 +1848,7 @@ public class TestAccessControl_hasResourceCreatePermissions extends TestAccessCo
                .hasResourceCreatePermissions(SYS_RESOURCE,
                                              resourceClassName,
                                              domainName,
+
                                              ResourceCreatePermissions.getInstance(ResourcePermissions.getInstance(customPermissionName)),
                                              ResourceCreatePermissions.getInstance(ResourcePermissions.getInstance("invalid_permission")));
          fail("checking resource create permission (by domain) for valid and invalid resource permission reference should have failed for system resource");
@@ -1804,6 +1860,7 @@ public class TestAccessControl_hasResourceCreatePermissions extends TestAccessCo
          accessControlContext
                .hasResourceCreatePermissions(resourceClassName,
                                              domainName,
+
                                              ResourceCreatePermissions.getInstance(ResourcePermissions.getInstance(customPermissionName)),
                                              ResourceCreatePermissions.getInstance(ResourcePermissions.getInstance("invalid_permission")));
          fail("checking resource create permission (by domain) for valid and invalid resource permission reference should have failed for implicit system resource");
