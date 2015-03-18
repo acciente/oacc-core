@@ -2867,7 +2867,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
                                        DomainPermission domainPermission,
                                        DomainPermission... domainPermissions) {
       if (!hasDomainPermissions(accessorResource, domainName, domainPermission, domainPermissions)) {
-         throw new NotAuthorizedException(accessorResource, domainName, domainPermissions);
+         throw new NotAuthorizedException(accessorResource, domainName, domainPermission, domainPermissions);
       }
    }
 
@@ -2940,7 +2940,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
                                              DomainCreatePermission domainCreatePermission,
                                              DomainCreatePermission... domainCreatePermissions) {
       if (!hasDomainCreatePermissions(accessorResource, domainCreatePermission, domainCreatePermissions)) {
-         throw new NotAuthorizedException(accessorResource, domainCreatePermissions);
+         throw new NotAuthorizedException(accessorResource, domainCreatePermission, domainCreatePermissions);
       }
    }
 
@@ -3234,7 +3234,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
          throw new NotAuthorizedException(accessorResource,
                                           resourceClassName,
                                           domainName,
-                                          resourcePermissions);
+                                          resourcePermission, resourcePermissions);
       }
    }
 
@@ -3352,7 +3352,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
                                          ResourcePermission resourcePermission,
                                          ResourcePermission... resourcePermissions) {
       if (!hasResourcePermissions(accessorResource, accessedResource, resourcePermission, resourcePermissions)) {
-         throw new NotAuthorizedException(accessorResource, accessedResource, resourcePermissions);
+         throw new NotAuthorizedException(accessorResource, accessedResource, resourcePermission, resourcePermissions);
       }
    }
 
@@ -3468,7 +3468,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
                                         domainName,
                                         resourceCreatePermission,
                                         resourceCreatePermissions)) {
-         throw new NotAuthorizedException(accessorResource, resourceCreatePermissions);
+         throw new NotAuthorizedException(accessorResource, resourceCreatePermission, resourceCreatePermissions);
       }
    }
 

@@ -17,7 +17,9 @@
  */
 package com.acciente.oacc;
 
-import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 public class NotAuthorizedException extends AuthorizationException {
    public NotAuthorizedException(String message) {
@@ -44,37 +46,80 @@ public class NotAuthorizedException extends AuthorizationException {
                   + " resource " + String.valueOf(accessedResource));
    }
 
-   public NotAuthorizedException(Resource accessorResource, DomainCreatePermission... domainCreatePermissions) {
+   public NotAuthorizedException(Resource accessorResource,
+                                 DomainCreatePermission domainCreatePermission,
+                                 DomainCreatePermission... domainCreatePermissions) {
       super("Resource " + String.valueOf(accessorResource)
-                  + " does not have domain create permission(s) " + Arrays.asList(domainCreatePermissions));
+                  + " does not have domain create permission(s) " + toString(domainCreatePermission,
+                                                                             domainCreatePermissions));
    }
 
-   public NotAuthorizedException(Resource accessorResource, String domainName, DomainPermission... domainPermissions) {
+   public NotAuthorizedException(Resource accessorResource,
+                                 String domainName,
+                                 DomainPermission domainPermission,
+                                 DomainPermission... domainPermissions) {
       super("Resource " + String.valueOf(accessorResource)
-                  + " does not have domain permission(s) " + Arrays.asList(domainPermissions)
+                  + " does not have domain permission(s) " + toString(domainPermission, domainPermissions)
                   + " on domain " + domainName);
    }
 
-   public NotAuthorizedException(Resource accessorResource, ResourceCreatePermission... resourceCreatePermissions) {
+   public NotAuthorizedException(Resource accessorResource,
+                                 ResourceCreatePermission resourceCreatePermission,
+                                 ResourceCreatePermission... resourceCreatePermissions) {
       super("Resource " + String.valueOf(accessorResource)
-                  + " does not have resource create permission(s) " + Arrays.asList(resourceCreatePermissions));
+                  + " does not have resource create permission(s) " + toString(resourceCreatePermission,
+                                                                               resourceCreatePermissions));
    }
 
    public NotAuthorizedException(Resource accessorResource,
                                  Resource accessedResource,
+                                 ResourcePermission resourcePermission,
                                  ResourcePermission... resourcePermissions) {
       super("Resource " + String.valueOf(accessorResource)
-                  + " does not have permission(s) " + Arrays.asList(resourcePermissions)
+                  + " does not have permission(s) " + toString(resourcePermission, resourcePermissions)
                   + " on resource " + String.valueOf(accessedResource));
    }
 
    public NotAuthorizedException(Resource accessorResource,
                                  String resourceClassName,
                                  String domainName,
+                                 ResourcePermission resourcePermission,
                                  ResourcePermission... resourcePermissions) {
       super("Resource " + String.valueOf(accessorResource)
-                  + " does not have global permission(s) " + Arrays.asList(resourcePermissions)
+                  + " does not have global permission(s) " + toString(resourcePermission, resourcePermissions)
                   + " on resources of class " + resourceClassName
                   + " in domain " + domainName);
+   }
+
+   /**
+    * Returns a String representation of the specified vararg sequence with a mandatory first element.
+    *
+    * <pre><code>
+    *    first | others    | result*
+    *   -------|-----------|--------
+    *    null  | []        | [null]
+    *    null  | null      | [null, null]
+    *    a     | []        | [a]
+    *    a     | null      | [a, null]
+    *    a     | [b, a]    | [a, b, a]
+    *    a     | [b, null] | [a, b, null]
+    * </code></pre>
+    * (*) the returned String representation will not guarantee any order of elements and will not de-duplicate
+    */
+   private static <T> String toString(T first, T... others) {
+      List<T> resultList;
+
+      if (others == null) {
+         resultList = new ArrayList<T>(2);
+         resultList.add(null);
+      }
+      else {
+         resultList = new ArrayList<T>(others.length + 1);
+         Collections.addAll(resultList, others);
+      }
+
+      resultList.add(first);
+
+      return resultList.toString();
    }
 }
