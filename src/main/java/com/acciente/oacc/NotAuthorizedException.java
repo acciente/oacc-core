@@ -64,6 +64,14 @@ public class NotAuthorizedException extends AuthorizationException {
    }
 
    public NotAuthorizedException(Resource accessorResource,
+                                 DomainPermission domainPermission,
+                                 DomainPermission... domainPermissions) {
+      super("Resource " + String.valueOf(accessorResource)
+                  + " is not authorized to receive domain permission(s) " + toString(domainPermission, domainPermissions)
+                  + " after creating a domain");
+   }
+
+   public NotAuthorizedException(Resource accessorResource,
                                  ResourceCreatePermission resourceCreatePermission,
                                  ResourceCreatePermission... resourceCreatePermissions) {
       super("Resource " + String.valueOf(accessorResource)
@@ -106,15 +114,16 @@ public class NotAuthorizedException extends AuthorizationException {
     * </code></pre>
     * (*) the returned String representation will not guarantee any order of elements and will not de-duplicate
     */
-   private static <T> String toString(T first, T... others) {
+   @SafeVarargs
+   public static <T> String toString(T first, T... others) {
       List<T> resultList;
 
       if (others == null) {
-         resultList = new ArrayList<T>(2);
+         resultList = new ArrayList<>(2);
          resultList.add(null);
       }
       else {
-         resultList = new ArrayList<T>(others.length + 1);
+         resultList = new ArrayList<>(others.length + 1);
          Collections.addAll(resultList, others);
       }
 
