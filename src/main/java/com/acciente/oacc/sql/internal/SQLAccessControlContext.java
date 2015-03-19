@@ -1306,8 +1306,8 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       __assertAuthenticated();
       __assertResourceSpecified(accessorResource);
       __assertResourceClassSpecified(resourceClassName);
-      __assertPermissionsSpecified(resourceCreatePermissions);
       __assertDomainSpecified(domainName);
+      __assertPermissionsSpecified(resourceCreatePermissions);
 
       try {
          connection = __getConnection();
@@ -2793,9 +2793,9 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       __assertAuthenticated();
       __assertResourceSpecified(accessorResource);
       __assertPermissionSpecified(domainPermission);
-      __assertPermissionsNotNull(domainPermissions);
+      __assertVarargPermissionsSpecified(domainPermissions);
 
-      final Set<DomainPermission> requestedDomainPermissions = getSetOfNotNull(domainPermission, domainPermissions);
+      final Set<DomainPermission> requestedDomainPermissions = getSetWithoutNulls(domainPermission, domainPermissions);
 
       try {
          connection = __getConnection();
@@ -2887,11 +2887,11 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
 
       __assertAuthenticated();
       __assertResourceSpecified(accessorResource);
-      __assertPermissionSpecified(domainPermission);
-      __assertPermissionsNotNull(domainPermissions);
       __assertDomainSpecified(domainName);
+      __assertPermissionSpecified(domainPermission);
+      __assertVarargPermissionsSpecified(domainPermissions);
 
-      final Set<DomainPermission> requestedDomainPermissions = getSetOfNotNull(domainPermission, domainPermissions);
+      final Set<DomainPermission> requestedDomainPermissions = getSetWithoutNulls(domainPermission, domainPermissions);
 
       try {
          connection = __getConnection();
@@ -2959,10 +2959,10 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       __assertAuthenticated();
       __assertResourceSpecified(accessorResource);
       __assertPermissionSpecified(domainCreatePermission);
-      __assertPermissionsNotNull(domainCreatePermissions);
+      __assertVarargPermissionsSpecified(domainCreatePermissions);
 
       final Set<DomainCreatePermission> requestedDomainCreatePermissions
-            = getSetOfNotNull(domainCreatePermission, domainCreatePermissions);
+            = getSetWithoutNulls(domainCreatePermission, domainCreatePermissions);
 
       try {
          connection = __getConnection();
@@ -3090,12 +3090,12 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       __assertAuthenticated();
       __assertResourceSpecified(accessorResource);
       __assertResourceClassSpecified(resourceClassName);
-      __assertPermissionSpecified(resourcePermission);
-      __assertPermissionsNotNull(resourcePermissions);
       __assertDomainSpecified(domainName);
+      __assertPermissionSpecified(resourcePermission);
+      __assertVarargPermissionsSpecified(resourcePermissions);
 
       final Set<ResourcePermission> requestedResourcePermissions
-            = getSetOfNotNull(resourcePermission, resourcePermissions);
+            = getSetWithoutNulls(resourcePermission, resourcePermissions);
 
       try {
          connection = __getConnection();
@@ -3284,12 +3284,12 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       __assertAuthenticated();
       __assertResourceSpecified(accessorResource);
       __assertResourceClassSpecified(resourceClassName);
-      __assertPermissionSpecified(resourcePermission);
-      __assertPermissionsNotNull(resourcePermissions);
       __assertDomainSpecified(domainName);
+      __assertPermissionSpecified(resourcePermission);
+      __assertVarargPermissionsSpecified(resourcePermissions);
 
       final Set<ResourcePermission> requestedResourcePermissions
-            = getSetOfNotNull(resourcePermission, resourcePermissions);
+            = getSetWithoutNulls(resourcePermission, resourcePermissions);
 
       try {
          connection = __getConnection();
@@ -3374,10 +3374,10 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       __assertResourceSpecified(accessorResource);
       __assertResourceSpecified(accessedResource);
       __assertPermissionSpecified(resourcePermission);
-      __assertPermissionsNotNull(resourcePermissions);
+      __assertVarargPermissionsSpecified(resourcePermissions);
 
       final Set<ResourcePermission> requestedResourcePermissions
-            = getSetOfNotNull(resourcePermission, resourcePermissions);
+            = getSetWithoutNulls(resourcePermission, resourcePermissions);
 
       try {
          connection = __getConnection();
@@ -3518,12 +3518,12 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       __assertAuthenticated();
       __assertResourceSpecified(accessorResource);
       __assertResourceClassSpecified(resourceClassName);
-      __assertPermissionSpecified(resourceCreatePermission);
-      __assertPermissionsNotNull(resourceCreatePermissions);
       __assertDomainSpecified(domainName);
+      __assertPermissionSpecified(resourceCreatePermission);
+      __assertVarargPermissionsSpecified(resourceCreatePermissions);
 
       final Set<ResourceCreatePermission> requestedResourceCreatePermissions
-            = getSetOfNotNull(resourceCreatePermission, resourceCreatePermissions);
+            = getSetWithoutNulls(resourceCreatePermission, resourceCreatePermissions);
 
       try {
          connection = __getConnection();
@@ -3630,10 +3630,10 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       __assertAuthenticated();
       __assertResourceClassSpecified(resourceClassName);
       __assertPermissionSpecified(resourcePermission);
-      __assertPermissionsNotNull(resourcePermissions);
+      __assertVarargPermissionsSpecified(resourcePermissions);
 
       final Set<ResourcePermission> requestedResourcePermissions
-            = getSetOfNotNull(resourcePermission, resourcePermissions);
+            = getSetWithoutNulls(resourcePermission, resourcePermissions);
 
       try {
          connection = __getConnection();
@@ -3661,10 +3661,10 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       __assertResourceSpecified(accessorResource);
       __assertResourceClassSpecified(resourceClassName);
       __assertPermissionSpecified(resourcePermission);
-      __assertPermissionsNotNull(resourcePermissions);
+      __assertVarargPermissionsSpecified(resourcePermissions);
 
       final Set<ResourcePermission> requestedResourcePermissions
-            = getSetOfNotNull(resourcePermission, resourcePermissions);
+            = getSetWithoutNulls(resourcePermission, resourcePermissions);
 
       try {
          connection = __getConnection();
@@ -3797,12 +3797,12 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
 
       __assertAuthenticated();
       __assertResourceClassSpecified(resourceClassName);
-      __assertPermissionSpecified(resourcePermission);
-      __assertPermissionsNotNull(resourcePermissions);
       __assertDomainSpecified(domainName);
+      __assertPermissionSpecified(resourcePermission);
+      __assertVarargPermissionsSpecified(resourcePermissions);
 
       final Set<ResourcePermission> requestedResourcePermissions
-            = getSetOfNotNull(resourcePermission, resourcePermissions);
+            = getSetWithoutNulls(resourcePermission, resourcePermissions);
 
       try {
          connection = __getConnection();
@@ -3831,12 +3831,12 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       __assertAuthenticated();
       __assertResourceSpecified(accessorResource);
       __assertResourceClassSpecified(resourceClassName);
-      __assertPermissionSpecified(resourcePermission);
-      __assertPermissionsNotNull(resourcePermissions);
       __assertDomainSpecified(domainName);
+      __assertPermissionSpecified(resourcePermission);
+      __assertVarargPermissionsSpecified(resourcePermissions);
 
       final Set<ResourcePermission> requestedResourcePermissions
-            = getSetOfNotNull(resourcePermission, resourcePermissions);
+            = getSetWithoutNulls(resourcePermission, resourcePermissions);
 
       try {
          connection = __getConnection();
@@ -3983,10 +3983,10 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       __assertResourceSpecified(accessedResource);
       __assertResourceClassSpecified(resourceClassName);
       __assertPermissionSpecified(resourcePermission);
-      __assertPermissionsNotNull(resourcePermissions);
+      __assertVarargPermissionsSpecified(resourcePermissions);
 
       final Set<ResourcePermission> requestedResourcePermissions
-            = getSetOfNotNull(resourcePermission, resourcePermissions);
+            = getSetWithoutNulls(resourcePermission, resourcePermissions);
 
       try {
          connection = __getConnection();
@@ -4216,7 +4216,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       }
    }
 
-   private void __assertPermissionsNotNull(ResourcePermission... resourcePermissions) {
+   private void __assertVarargPermissionsSpecified(ResourcePermission... resourcePermissions) {
       if (resourcePermissions == null) {
          throw new NullPointerException("An array or a sequence of resource permissions are required, but the null value was specified");
       }
@@ -4228,7 +4228,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       }
    }
 
-   private void __assertPermissionsNotNull(ResourceCreatePermission... resourceCreatePermissions) {
+   private void __assertVarargPermissionsSpecified(ResourceCreatePermission... resourceCreatePermissions) {
       if (resourceCreatePermissions == null) {
          throw new NullPointerException("An array or a sequence of resource create permissions are required, but the null value was specified");
       }
@@ -4240,7 +4240,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       }
    }
 
-   private void __assertPermissionsNotNull(DomainCreatePermission... domainCreatePermissions) {
+   private void __assertVarargPermissionsSpecified(DomainCreatePermission... domainCreatePermissions) {
       if (domainCreatePermissions == null) {
          throw new NullPointerException("An array or a sequence of domain create permissions are required, but the null value was specified");
       }
@@ -4252,7 +4252,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       }
    }
 
-   private void __assertPermissionsNotNull(DomainPermission... domainPermissions) {
+   private void __assertVarargPermissionsSpecified(DomainPermission... domainPermissions) {
       if (domainPermissions == null) {
          throw new NullPointerException("An array or a sequence of domain permissions are required, but the null value was specified");
       }
@@ -4325,7 +4325,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
    }
 
    @SafeVarargs
-   protected static <T> Set<T> getSetOfNotNull(T firstElement, T... elements) {
+   protected static <T> Set<T> getSetWithoutNulls(T firstElement, T... elements) {
       // not null constraint
       if (elements == null) {
          throw new NullPointerException("An array or a sequence of arguments are required, but none were specified");
