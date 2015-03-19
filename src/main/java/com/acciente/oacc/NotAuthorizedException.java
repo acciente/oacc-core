@@ -34,70 +34,107 @@ public class NotAuthorizedException extends AuthorizationException {
       super(cause);
    }
 
-   // custom constructors to help craft uniform error messages
-   public NotAuthorizedException(Resource accessorResource, String action) {
-      super("Resource " + String.valueOf(accessorResource)
-                  + " is not authorized to " + action);
+   // custom static factory methods to help craft uniform error messages
+   public static NotAuthorizedException newInstanceForAction(Resource accessorResource,
+                                                             String action) {
+      return new NotAuthorizedException("Resource "
+                                              + String.valueOf(accessorResource)
+                                              + " is not authorized to "
+                                              + action);
    }
 
-   public NotAuthorizedException(Resource accessorResource, String action, Resource accessedResource) {
-      super("Resource " + String.valueOf(accessorResource)
-                  + " is not authorized to " + action
-                  + " resource " + String.valueOf(accessedResource));
+   public static NotAuthorizedException newInstanceForActionOnResource(Resource accessorResource,
+                                                                       String action,
+                                                                       Resource accessedResource) {
+      return new NotAuthorizedException("Resource "
+                                              + String.valueOf(accessorResource)
+                                              + " is not authorized to "
+                                              + action
+                                              + " resource "
+                                              + String.valueOf(accessedResource));
    }
 
-   public NotAuthorizedException(Resource accessorResource,
-                                 DomainCreatePermission domainCreatePermission,
-                                 DomainCreatePermission... domainCreatePermissions) {
-      super("Resource " + String.valueOf(accessorResource)
-                  + " does not have domain create permission(s) " + toString(domainCreatePermission,
-                                                                             domainCreatePermissions));
+   public static NotAuthorizedException newInstanceForDomainCreatePermissions(Resource accessorResource,
+                                                                              DomainCreatePermission domainCreatePermission,
+                                                                              DomainCreatePermission... domainCreatePermissions) {
+      return new NotAuthorizedException("Resource "
+                                              + String.valueOf(accessorResource)
+                                              + " does not have domain create permission(s) "
+                                              + toString(domainCreatePermission, domainCreatePermissions));
    }
 
-   public NotAuthorizedException(Resource accessorResource,
-                                 String domainName,
-                                 DomainPermission domainPermission,
-                                 DomainPermission... domainPermissions) {
-      super("Resource " + String.valueOf(accessorResource)
-                  + " does not have domain permission(s) " + toString(domainPermission, domainPermissions)
-                  + " on domain " + domainName);
+   public static NotAuthorizedException newInstanceForDomainPermissions(Resource accessorResource,
+                                                                        String domainName,
+                                                                        DomainPermission domainPermission,
+                                                                        DomainPermission... domainPermissions) {
+      return new NotAuthorizedException("Resource "
+                                              + String.valueOf(accessorResource)
+                                              + " does not have domain permission(s) "
+                                              + toString(domainPermission, domainPermissions)
+                                              + " on domain "
+                                              + domainName);
    }
 
-   public NotAuthorizedException(Resource accessorResource,
-                                 DomainPermission domainPermission,
-                                 DomainPermission... domainPermissions) {
-      super("Resource " + String.valueOf(accessorResource)
-                  + " is not authorized to receive domain permission(s) " + toString(domainPermission, domainPermissions)
-                  + " after creating a domain");
+   public static NotAuthorizedException newInstanceForPostCreateDomainPermissions(Resource accessorResource,
+                                                                                  DomainPermission domainPermission,
+                                                                                  DomainPermission... domainPermissions) {
+      return new NotAuthorizedException("Resource "
+                                              + String.valueOf(accessorResource)
+                                              + " is not authorized to receive "
+                                              + toString(domainPermission, domainPermissions)
+                                              + " domain permission(s) after creating a domain");
    }
 
-   public NotAuthorizedException(Resource accessorResource,
-                                 ResourceCreatePermission resourceCreatePermission,
-                                 ResourceCreatePermission... resourceCreatePermissions) {
-      super("Resource " + String.valueOf(accessorResource)
-                  + " does not have resource create permission(s) " + toString(resourceCreatePermission,
-                                                                               resourceCreatePermissions));
+   public static NotAuthorizedException newInstanceForResourceCreatePermissions(Resource accessorResource,
+                                                                                ResourceCreatePermission resourceCreatePermission,
+                                                                                ResourceCreatePermission... resourceCreatePermissions) {
+      return new NotAuthorizedException("Resource "
+                                              + String.valueOf(accessorResource)
+                                              + " does not have resource create permission(s) "
+                                              + toString(resourceCreatePermission, resourceCreatePermissions));
    }
 
-   public NotAuthorizedException(Resource accessorResource,
-                                 Resource accessedResource,
-                                 ResourcePermission resourcePermission,
-                                 ResourcePermission... resourcePermissions) {
-      super("Resource " + String.valueOf(accessorResource)
-                  + " does not have permission(s) " + toString(resourcePermission, resourcePermissions)
-                  + " on resource " + String.valueOf(accessedResource));
+   public static NotAuthorizedException newInstanceForResourcePermissions(Resource accessorResource,
+                                                                          Resource accessedResource,
+                                                                          ResourcePermission resourcePermission,
+                                                                          ResourcePermission... resourcePermissions) {
+      return new NotAuthorizedException("Resource "
+                                              + String.valueOf(accessorResource)
+                                              + " does not have permission(s) "
+                                              + toString(resourcePermission, resourcePermissions)
+                                              + " on resource "
+                                              + String.valueOf(accessedResource));
    }
 
-   public NotAuthorizedException(Resource accessorResource,
-                                 String resourceClassName,
-                                 String domainName,
-                                 ResourcePermission resourcePermission,
-                                 ResourcePermission... resourcePermissions) {
-      super("Resource " + String.valueOf(accessorResource)
-                  + " does not have global permission(s) " + toString(resourcePermission, resourcePermissions)
-                  + " on resources of class " + resourceClassName
-                  + " in domain " + domainName);
+   public static NotAuthorizedException newInstanceForGlobalResourcePermissions(Resource accessorResource,
+                                                                                String resourceClassName,
+                                                                                String domainName,
+                                                                                ResourcePermission resourcePermission,
+                                                                                ResourcePermission... resourcePermissions) {
+      return new NotAuthorizedException("Resource "
+                                              + String.valueOf(accessorResource)
+                                              + " does not have global permission(s) "
+                                              + toString(resourcePermission, resourcePermissions)
+                                              + " on resources of class "
+                                              + resourceClassName
+                                              + " in domain "
+                                              + domainName);
    }
+
+   public static NotAuthorizedException newInstanceForPostCreateResourcePermissions(Resource accessorResource,
+                                                                                    String resourceClassName,
+                                                                                    String domainName,
+                                                                                    ResourcePermission resourcePermission,
+                                                                                    ResourcePermission... resourcePermissions) {
+      return new NotAuthorizedException(accessorResource
+                                              + "receive "
+                                              + toString(resourcePermission, resourcePermissions)
+                                              + " permission(s) after creating a "
+                                              + resourceClassName
+                                              + " resource in domain "
+                                              + domainName);
+   }
+
 
    /**
     * Returns a String representation of the specified vararg sequence with a mandatory first element.
@@ -115,7 +152,7 @@ public class NotAuthorizedException extends AuthorizationException {
     * (*) the returned String representation will not guarantee any order of elements and will not de-duplicate
     */
    @SafeVarargs
-   public static <T> String toString(T first, T... others) {
+   private static <T> String toString(T first, T... others) {
       List<T> resultList;
 
       if (others == null) {

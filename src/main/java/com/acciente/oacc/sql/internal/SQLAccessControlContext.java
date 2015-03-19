@@ -408,7 +408,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       }
 
       if (!impersonatePermissionOK) {
-         throw new NotAuthorizedException(authenticatedResource, "impersonate", resource);
+         throw NotAuthorizedException.newInstanceForActionOnResource(authenticatedResource, "impersonate", resource);
       }
    }
 
@@ -500,7 +500,9 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       }
 
       if (!hasResetCredentialsPermission) {
-         throw new NotAuthorizedException(authenticatedResource, "reset credentials", resource);
+         throw NotAuthorizedException.newInstanceForActionOnResource(authenticatedResource,
+                                                                     "reset credentials",
+                                                                     resource);
       }
    }
 
@@ -618,7 +620,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
 
       // if there is at least one permission, then it implies that this resource is allowed to create domains
       if (domainCreatePermissions.isEmpty()) {
-         throw new NotAuthorizedException(sessionResource, "create domain");
+         throw NotAuthorizedException.newInstanceForAction(sessionResource, "create domain");
       }
 
       // determine the post create permissions on the new domain
@@ -652,7 +654,8 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
                && !parentDomainPermissions.contains(DomainPermission_CREATE_CHILD_DOMAIN_GRANT)
                && !parentDomainPermissions.contains(DomainPermission_SUPER_USER)
                && !parentDomainPermissions.contains(DomainPermission_SUPER_USER_GRANT)) {
-            throw new NotAuthorizedException(sessionResource, "create child domain in domain: " + parentDomainName);
+            throw NotAuthorizedException.newInstanceForAction(sessionResource,
+                                                              "create child domain in domain: " + parentDomainName);
          }
 
          // create the new child domain
@@ -811,7 +814,8 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
          }
 
          if (!createPermissionOK) {
-            throw new NotAuthorizedException(sessionResource, "create resource of resource class " + resourceClassName);
+            throw NotAuthorizedException.newInstanceForAction(sessionResource,
+                                                              "create resource of resource class " + resourceClassName);
          }
       }
 
@@ -924,8 +928,8 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
                      = __subtractDomainPermissionsIfGrantableFrom(requestedAddPermissions, grantorPermissions);
 
                if (unauthorizedAddPermissions.size() > 0) {
-                  throw new NotAuthorizedException(sessionResource,
-                                                   "add the following domain permission(s): " + unauthorizedAddPermissions);
+                  throw NotAuthorizedException.newInstanceForAction(sessionResource,
+                                                                    "add the following domain permission(s): " + unauthorizedAddPermissions);
                }
             }
 
@@ -939,8 +943,8 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
                      = __subtractDomainPermissionsIfGrantableFrom(requestedRemovePermissions, grantorPermissions);
 
                if (unauthorizedRemovePermissions.size() > 0) {
-                  throw new NotAuthorizedException(sessionResource,
-                                                   "remove the following domain permission(s): " + unauthorizedRemovePermissions);
+                  throw NotAuthorizedException.newInstanceForAction(sessionResource,
+                                                                    "remove the following domain permission(s): " + unauthorizedRemovePermissions);
                }
             }
          }
@@ -1147,8 +1151,8 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
                = __subtractDomainCreatePermissionsIfGrantableFrom(requestedAddPermissions, grantorPermissions);
 
          if (unauthorizedAddPermissions.size() > 0) {
-            throw new NotAuthorizedException(sessionResource,
-                                             "add the following domain create permission(s): " + unauthorizedAddPermissions);
+            throw NotAuthorizedException.newInstanceForAction(sessionResource,
+                                                              "add the following domain create permission(s): " + unauthorizedAddPermissions);
          }
       }
 
@@ -1162,8 +1166,8 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
                = __subtractDomainCreatePermissionsIfGrantableFrom(requestedRemovePermissions, grantorPermissions);
 
          if (unauthorizedRemovePermissions.size() > 0) {
-            throw new NotAuthorizedException(sessionResource,
-                                             "remove the following domain create permission(s): " + unauthorizedRemovePermissions);
+            throw NotAuthorizedException.newInstanceForAction(sessionResource,
+                                                              "remove the following domain create permission(s): " + unauthorizedRemovePermissions);
          }
       }
 
@@ -1404,8 +1408,8 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
                   = __subtractResourceCreatePermissionsIfGrantableFrom(requestedAddPermissions, grantorPermissions);
 
             if (unauthorizedAddPermissions.size() > 0) {
-               throw new NotAuthorizedException(sessionResource,
-                                                "add the following permission(s): " + unauthorizedAddPermissions);
+               throw NotAuthorizedException.newInstanceForAction(sessionResource,
+                                                                 "add the following permission(s): " + unauthorizedAddPermissions);
             }
          }
 
@@ -1419,8 +1423,8 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
                   = __subtractResourceCreatePermissionsIfGrantableFrom(requestedRemovePermissions, grantorPermissions);
 
             if (unauthorizedRemovePermissions.size() > 0) {
-               throw new NotAuthorizedException(sessionResource,
-                                                "remove the following permission(s): " + unauthorizedRemovePermissions);
+               throw NotAuthorizedException.newInstanceForAction(sessionResource,
+                                                                 "remove the following permission(s): " + unauthorizedRemovePermissions);
             }
          }
       }
@@ -1963,8 +1967,8 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
                      = __subtractResourcePermissionsIfGrantableFrom(requestedAddPermissions, grantorResourcePermissions);
 
                if (unauthorizedAddPermissions.size() > 0) {
-                  throw new NotAuthorizedException(grantorResource,
-                                                   "add the following permission(s): " + unauthorizedAddPermissions);
+                  throw NotAuthorizedException.newInstanceForAction(grantorResource,
+                                                                    "add the following permission(s): " + unauthorizedAddPermissions);
                }
             }
 
@@ -1978,8 +1982,8 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
                      = __subtractResourcePermissionsIfGrantableFrom(requestedRemovePermissions, grantorResourcePermissions);
 
                if (unauthorizedRemovePermissions.size() > 0) {
-                  throw new NotAuthorizedException(grantorResource,
-                                                   "remove the following permission(s): " + unauthorizedRemovePermissions);
+                  throw NotAuthorizedException.newInstanceForAction(grantorResource,
+                                                                    "remove the following permission(s): " + unauthorizedRemovePermissions);
                }
             }
          }
@@ -2281,8 +2285,8 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
                   = __subtractResourcePermissionsIfGrantableFrom(requestedAddPermissions, grantorPermissions);
 
             if (unauthorizedAddPermissions.size() > 0) {
-               throw new NotAuthorizedException(sessionResource,
-                                                "add the following global permission(s): " + unauthorizedAddPermissions);
+               throw NotAuthorizedException.newInstanceForAction(sessionResource,
+                                                                 "add the following global permission(s): " + unauthorizedAddPermissions);
             }
          }
 
@@ -2296,8 +2300,8 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
                   = __subtractResourcePermissionsIfGrantableFrom(requestedRemovePermissions, grantorPermissions);
 
             if (unauthorizedRemovePermissions.size() > 0) {
-               throw new NotAuthorizedException(sessionResource,
-                                                "remove the following global permission(s): " + unauthorizedRemovePermissions);
+               throw NotAuthorizedException.newInstanceForAction(sessionResource,
+                                                                 "remove the following global permission(s): " + unauthorizedRemovePermissions);
             }
          }
       }
@@ -2772,9 +2776,9 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
                                                  DomainPermission domainPermission,
                                                  DomainPermission... domainPermissions) {
       if (!hasPostCreateDomainPermissions(accessorResource, domainPermission, domainPermissions)) {
-         throw new NotAuthorizedException(accessorResource,
-                                          "receive " + NotAuthorizedException.toString(domainPermission, domainPermissions)
-                                                + " permission(s) after creating a domain");
+         throw NotAuthorizedException.newInstanceForPostCreateDomainPermissions(accessorResource,
+                                                                                domainPermission,
+                                                                                domainPermissions);
       }
    }
 
@@ -2867,7 +2871,10 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
                                        DomainPermission domainPermission,
                                        DomainPermission... domainPermissions) {
       if (!hasDomainPermissions(accessorResource, domainName, domainPermission, domainPermissions)) {
-         throw new NotAuthorizedException(accessorResource, domainName, domainPermission, domainPermissions);
+         throw NotAuthorizedException.newInstanceForDomainPermissions(accessorResource,
+                                                                      domainName,
+                                                                      domainPermission,
+                                                                      domainPermissions);
       }
    }
 
@@ -2940,7 +2947,9 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
                                              DomainCreatePermission domainCreatePermission,
                                              DomainCreatePermission... domainCreatePermissions) {
       if (!hasDomainCreatePermissions(accessorResource, domainCreatePermission, domainCreatePermissions)) {
-         throw new NotAuthorizedException(accessorResource, domainCreatePermission, domainCreatePermissions);
+         throw NotAuthorizedException.newInstanceForDomainCreatePermissions(accessorResource,
+                                                                            domainCreatePermission,
+                                                                            domainCreatePermissions);
       }
    }
 
@@ -3040,11 +3049,11 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
                                             domainName,
                                             resourcePermission,
                                             resourcePermissions)) {
-         throw new NotAuthorizedException(accessorResource,
-                                          "receive " + NotAuthorizedException.toString(resourcePermission,
-                                                                                       resourcePermissions)
-                                                + " permission(s) after creating a " + resourceClassName
-                                                + " resource in domain " + domainName);
+         throw NotAuthorizedException.newInstanceForPostCreateResourcePermissions(accessorResource,
+                                                                                  resourceClassName,
+                                                                                  domainName,
+                                                                                  resourcePermission,
+                                                                                  resourcePermissions );
       }
    }
 
@@ -3236,11 +3245,11 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
                                         domainName,
                                         resourcePermission,
                                         resourcePermissions)) {
-         throw new NotAuthorizedException(accessorResource,
-                                          resourceClassName,
-                                          domainName,
-                                          resourcePermission,
-                                          resourcePermissions);
+         throw NotAuthorizedException.newInstanceForGlobalResourcePermissions(accessorResource,
+                                                                              resourceClassName,
+                                                                              domainName,
+                                                                              resourcePermission,
+                                                                              resourcePermissions);
       }
    }
 
@@ -3358,7 +3367,10 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
                                          ResourcePermission resourcePermission,
                                          ResourcePermission... resourcePermissions) {
       if (!hasResourcePermissions(accessorResource, accessedResource, resourcePermission, resourcePermissions)) {
-         throw new NotAuthorizedException(accessorResource, accessedResource, resourcePermission, resourcePermissions);
+         throw NotAuthorizedException.newInstanceForResourcePermissions(accessorResource,
+                                                                        accessedResource,
+                                                                        resourcePermission,
+                                                                        resourcePermissions);
       }
    }
 
@@ -3474,7 +3486,9 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
                                         domainName,
                                         resourceCreatePermission,
                                         resourceCreatePermissions)) {
-         throw new NotAuthorizedException(accessorResource, resourceCreatePermission, resourceCreatePermissions);
+         throw NotAuthorizedException.newInstanceForResourceCreatePermissions(accessorResource,
+                                                                              resourceCreatePermission,
+                                                                              resourceCreatePermissions);
       }
    }
 
@@ -3693,7 +3707,9 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
                                                requestedResourcePermissions);
          }
          else {
-            throw new NotAuthorizedException(sessionResource, "retrieve resources by permission for", accessorResource);
+            throw NotAuthorizedException.newInstanceForActionOnResource(sessionResource,
+                                                                        "retrieve resources by permission for",
+                                                                        accessorResource);
          }
       }
       finally {
@@ -3865,7 +3881,9 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
                                                         requestedResourcePermissions);
          }
          else {
-            throw new NotAuthorizedException(sessionResource, "retrieve resources by permission for", accessorResource);
+            throw NotAuthorizedException.newInstanceForActionOnResource(sessionResource,
+                                                                        "retrieve resources by permission for",
+                                                                        accessorResource);
          }
       }
       finally {
@@ -4197,7 +4215,8 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
 
    private void __assertAuthenticatedAsSystemResource() {
       if (sessionResource == null || sessionResource.getId() != SYSTEM_RESOURCE_ID) {
-         throw new NotAuthorizedException(sessionResource, "perform operation reserved for the system resource");
+         throw NotAuthorizedException.newInstanceForAction(sessionResource,
+                                                           "perform operation reserved for the system resource");
       }
    }
 
