@@ -950,12 +950,14 @@ public interface AccessControlContext {
     * resources that are reachable as a result of SUPER-USER permissions.
     *
     * @param resourceClassName   a string resource class name
+    * @param resourcePermission  the permission to check
     * @param resourcePermissions the permissions to check
     * @return a set of resources
     * @throws java.lang.IllegalArgumentException if no resource class of resourceClassName exists, or
     *                                            if any resourcePermission is invalid for the specified resource class
     */
    public Set<Resource> getResourcesByResourcePermissions(String resourceClassName,
+                                                          ResourcePermission resourcePermission,
                                                           ResourcePermission... resourcePermissions);
 
    /**
@@ -972,6 +974,7 @@ public interface AccessControlContext {
     *
     * @param accessorResource    the resource relative to which the set of accessible resources is computed
     * @param resourceClassName   a string resource class name
+    * @param resourcePermission  the permission to check
     * @param resourcePermissions the permissions to check
     * @return a set of resources
     * @throws java.lang.IllegalArgumentException if accessorResource does not exist, or
@@ -983,6 +986,7 @@ public interface AccessControlContext {
     */
    public Set<Resource> getResourcesByResourcePermissions(Resource accessorResource,
                                                           String resourceClassName,
+                                                          ResourcePermission resourcePermission,
                                                           ResourcePermission... resourcePermissions);
 
    /**
@@ -995,6 +999,7 @@ public interface AccessControlContext {
     *
     * @param resourceClassName   a string resource class name
     * @param domainName          a domain name
+    * @param resourcePermission  the permission to check
     * @param resourcePermissions the permissions to check
     * @return a set of resources
     * @throws java.lang.IllegalArgumentException if no resource class of resourceClassName exists, or
@@ -1003,6 +1008,7 @@ public interface AccessControlContext {
     */
    public Set<Resource> getResourcesByResourcePermissions(String resourceClassName,
                                                           String domainName,
+                                                          ResourcePermission resourcePermission,
                                                           ResourcePermission... resourcePermissions);
 
    /**
@@ -1021,6 +1027,7 @@ public interface AccessControlContext {
     * @param accessorResource    the resource relative to which the set of accessible resources is computed
     * @param resourceClassName   a string resource class name
     * @param domainName          a domain name
+    * @param resourcePermission  the permission to check
     * @param resourcePermissions the permissions to check
     * @return a set of resources
     * @throws java.lang.IllegalArgumentException if accessorResource does not exist, or
@@ -1034,6 +1041,7 @@ public interface AccessControlContext {
    public Set<Resource> getResourcesByResourcePermissions(Resource accessorResource,
                                                           String resourceClassName,
                                                           String domainName,
+                                                          ResourcePermission resourcePermission,
                                                           ResourcePermission... resourcePermissions);
 
    /**

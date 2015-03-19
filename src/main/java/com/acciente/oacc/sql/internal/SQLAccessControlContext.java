@@ -3623,14 +3623,17 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
 
    @Override
    public Set<Resource> getResourcesByResourcePermissions(String resourceClassName,
+                                                          ResourcePermission resourcePermission,
                                                           ResourcePermission... resourcePermissions) {
       SQLConnection connection = null;
 
       __assertAuthenticated();
       __assertResourceClassSpecified(resourceClassName);
-      __assertPermissionsSpecified(resourcePermissions);
+      __assertPermissionSpecified(resourcePermission);
+      __assertPermissionsNotNull(resourcePermissions);
 
-      final Set<ResourcePermission> requestedResourcePermissions = notEmptySetOfNotNull(resourcePermissions);
+      final Set<ResourcePermission> requestedResourcePermissions
+            = getSetOfNotNull(resourcePermission, resourcePermissions);
 
       try {
          connection = __getConnection();
@@ -3650,15 +3653,18 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
    @Override
    public Set<Resource> getResourcesByResourcePermissions(Resource accessorResource,
                                                           String resourceClassName,
+                                                          ResourcePermission resourcePermission,
                                                           ResourcePermission... resourcePermissions) {
       SQLConnection connection = null;
 
       __assertAuthenticated();
       __assertResourceSpecified(accessorResource);
       __assertResourceClassSpecified(resourceClassName);
-      __assertPermissionsSpecified(resourcePermissions);
+      __assertPermissionSpecified(resourcePermission);
+      __assertPermissionsNotNull(resourcePermissions);
 
-      final Set<ResourcePermission> requestedResourcePermissions = notEmptySetOfNotNull(resourcePermissions);
+      final Set<ResourcePermission> requestedResourcePermissions
+            = getSetOfNotNull(resourcePermission, resourcePermissions);
 
       try {
          connection = __getConnection();
@@ -3785,15 +3791,18 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
    @Override
    public Set<Resource> getResourcesByResourcePermissions(String resourceClassName,
                                                           String domainName,
+                                                          ResourcePermission resourcePermission,
                                                           ResourcePermission... resourcePermissions) {
       SQLConnection connection = null;
 
       __assertAuthenticated();
       __assertResourceClassSpecified(resourceClassName);
-      __assertPermissionsSpecified(resourcePermissions);
+      __assertPermissionSpecified(resourcePermission);
+      __assertPermissionsNotNull(resourcePermissions);
       __assertDomainSpecified(domainName);
 
-      final Set<ResourcePermission> requestedResourcePermissions = notEmptySetOfNotNull(resourcePermissions);
+      final Set<ResourcePermission> requestedResourcePermissions
+            = getSetOfNotNull(resourcePermission, resourcePermissions);
 
       try {
          connection = __getConnection();
@@ -3815,16 +3824,19 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
    public Set<Resource> getResourcesByResourcePermissions(Resource accessorResource,
                                                           String resourceClassName,
                                                           String domainName,
+                                                          ResourcePermission resourcePermission,
                                                           ResourcePermission... resourcePermissions) {
       SQLConnection connection = null;
 
       __assertAuthenticated();
       __assertResourceSpecified(accessorResource);
       __assertResourceClassSpecified(resourceClassName);
-      __assertPermissionsSpecified(resourcePermissions);
+      __assertPermissionSpecified(resourcePermission);
+      __assertPermissionsNotNull(resourcePermissions);
       __assertDomainSpecified(domainName);
 
-      final Set<ResourcePermission> requestedResourcePermissions = notEmptySetOfNotNull(resourcePermissions);
+      final Set<ResourcePermission> requestedResourcePermissions
+            = getSetOfNotNull(resourcePermission, resourcePermissions);
 
       try {
          connection = __getConnection();
@@ -4198,12 +4210,6 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       }
    }
 
-   private void __assertPermissionsSpecified(ResourcePermission... resourcePermissions) {
-      if (resourcePermissions == null) {
-         throw new NullPointerException("Resource permission required, none specified");
-      }
-   }
-
    private void __assertPermissionSpecified(ResourcePermission resourcePermission) {
       if (resourcePermission == null) {
          throw new NullPointerException("Resource permission required, none specified");
@@ -4316,36 +4322,6 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
             }
          }
       }
-   }
-
-   @SafeVarargs
-   protected static <T> Set<T> notEmptySetOfNotNull(T... elements) {
-      // not null constraint
-      if (elements == null) {
-         throw new NullPointerException("An array or a sequence of arguments are required, but none were specified");
-      }
-
-      // not empty constraint
-      if (elements.length == 0) {
-         throw new IllegalArgumentException("A non-empty " + elements.getClass().getSimpleName()
-                                                  + " argument (or sequence of varargs) is required");
-      }
-
-      final HashSet<T> resultSet = new HashSet<>(elements.length);
-
-      for (T element : elements) {
-         // non-null elements constraint
-         if (element == null) {
-            throw new NullPointerException("A " + elements.getClass().getSimpleName()
-                                                 + " argument (or sequence of varargs) without null elements is required, but received: "
-                                                 + Arrays.asList(elements));
-         }
-
-         // duplicate elements get ignored silently
-         resultSet.add(element);
-      }
-
-      return resultSet;
    }
 
    @SafeVarargs
