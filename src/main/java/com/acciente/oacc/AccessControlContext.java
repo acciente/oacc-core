@@ -1006,10 +1006,10 @@ public interface AccessControlContext {
     *                                            if any resourcePermission is invalid for the specified resource class, or
     *                                            if no domain of domainName exists
     */
-   public Set<Resource> getResourcesByResourcePermissions(String resourceClassName,
-                                                          String domainName,
-                                                          ResourcePermission resourcePermission,
-                                                          ResourcePermission... resourcePermissions);
+   public Set<Resource> getResourcesByResourcePermissionsAndDomain(String resourceClassName,
+                                                                   String domainName,
+                                                                   ResourcePermission resourcePermission,
+                                                                   ResourcePermission... resourcePermissions);
 
    /**
     * Returns a set of resources (of the specified resource class) on which
@@ -1038,11 +1038,11 @@ public interface AccessControlContext {
     *                                                  the session resource does not have either IMPERSONATE, INHERIT
     *                                                  or RESET-CREDENTIALS permissions on the accessor resource
     */
-   public Set<Resource> getResourcesByResourcePermissions(Resource accessorResource,
-                                                          String resourceClassName,
-                                                          String domainName,
-                                                          ResourcePermission resourcePermission,
-                                                          ResourcePermission... resourcePermissions);
+   public Set<Resource> getResourcesByResourcePermissionsAndDomain(Resource accessorResource,
+                                                                   String resourceClassName,
+                                                                   String domainName,
+                                                                   ResourcePermission resourcePermission,
+                                                                   ResourcePermission... resourcePermissions);
 
    /**
     * Returns a set of resources that have the specified permissions to the specified accessed resource.

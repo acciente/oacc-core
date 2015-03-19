@@ -3795,10 +3795,10 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
    }
 
    @Override
-   public Set<Resource> getResourcesByResourcePermissions(String resourceClassName,
-                                                          String domainName,
-                                                          ResourcePermission resourcePermission,
-                                                          ResourcePermission... resourcePermissions) {
+   public Set<Resource> getResourcesByResourcePermissionsAndDomain(String resourceClassName,
+                                                                   String domainName,
+                                                                   ResourcePermission resourcePermission,
+                                                                   ResourcePermission... resourcePermissions) {
       SQLConnection connection = null;
 
       __assertAuthenticated();
@@ -3815,11 +3815,11 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
 
          resourceClassName = resourceClassName.trim();
 
-         return __getResourcesByPermissions(connection,
-                                            sessionResource,
-                                            resourceClassName,
-                                            domainName,
-                                            requestedResourcePermissions);
+         return __getResourcesByPermissionsAndDomain(connection,
+                                                     sessionResource,
+                                                     resourceClassName,
+                                                     domainName,
+                                                     requestedResourcePermissions);
       }
       finally {
          __closeConnection(connection);
@@ -3827,11 +3827,11 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
    }
 
    @Override
-   public Set<Resource> getResourcesByResourcePermissions(Resource accessorResource,
-                                                          String resourceClassName,
-                                                          String domainName,
-                                                          ResourcePermission resourcePermission,
-                                                          ResourcePermission... resourcePermissions) {
+   public Set<Resource> getResourcesByResourcePermissionsAndDomain(Resource accessorResource,
+                                                                   String resourceClassName,
+                                                                   String domainName,
+                                                                   ResourcePermission resourcePermission,
+                                                                   ResourcePermission... resourcePermissions) {
       SQLConnection connection = null;
 
       __assertAuthenticated();
@@ -3858,11 +3858,11 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
                                       sessionResource,
                                       accessorResource,
                                       anyRequiredResourcePermissions)) {
-            return __getResourcesByPermissions(connection,
-                                               accessorResource,
-                                               resourceClassName,
-                                               domainName,
-                                               requestedResourcePermissions);
+            return __getResourcesByPermissionsAndDomain(connection,
+                                                        accessorResource,
+                                                        resourceClassName,
+                                                        domainName,
+                                                        requestedResourcePermissions);
          }
          else {
             throw new NotAuthorizedException(sessionResource, "retrieve resources by permission for", accessorResource);
@@ -3873,11 +3873,11 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       }
    }
 
-   private Set<Resource> __getResourcesByPermissions(SQLConnection connection,
-                                                     Resource accessorResource,
-                                                     String resourceClassName,
-                                                     String domainName,
-                                                     Set<ResourcePermission> requestedResourcePermissions) {
+   private Set<Resource> __getResourcesByPermissionsAndDomain(SQLConnection connection,
+                                                              Resource accessorResource,
+                                                              String resourceClassName,
+                                                              String domainName,
+                                                              Set<ResourcePermission> requestedResourcePermissions) {
       // first verify that resource class and domain is defined
       Id<ResourceClassId> resourceClassId;
       Id<DomainId> domainId;
