@@ -25,6 +25,7 @@ import java.util.Set;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.fail;
 
 public class TestAccessControl_getEffectiveDomainCreatePermissions extends TestAccessControlBase {
    @Test
@@ -354,11 +355,16 @@ public class TestAccessControl_getEffectiveDomainCreatePermissions extends TestA
    }
 
    @Test
-   public void getEffectiveDomainCreatePermissions_nonExistentReferences_shouldSucceed() {
+   public void getEffectiveDomainCreatePermissions_nonExistentReferences_shouldFail() {
       authenticateSystemResource();
 
       final Resource invalidResource = Resources.getInstance(-999L);
-      final Set<DomainCreatePermission> domainCreatePermissions = accessControlContext.getEffectiveDomainCreatePermissions(invalidResource);
-      assertThat(domainCreatePermissions.isEmpty(), is(true));
+      try {
+         accessControlContext.getEffectiveDomainCreatePermissions(invalidResource);
+         fail("getting effective domain create permissions with invalid resource reference should have failed");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString(String.valueOf(invalidResource).toLowerCase() + " not found"));
+      }
    }
 }

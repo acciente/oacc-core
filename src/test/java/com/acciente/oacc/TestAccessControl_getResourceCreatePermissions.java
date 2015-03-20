@@ -479,28 +479,28 @@ public class TestAccessControl_getResourceCreatePermissions extends TestAccessCo
    }
 
    @Test
-   public void getResourceCreatePermissions_notExistentReferences_shouldSucceed() {
-      authenticateSystemResource();
-
-      final String resourceClassName = generateResourceClass(false, false);
-      final String domainName = generateDomain();
-      final Resource invalidResource = Resources.getInstance(-999L);
-
-      final Set<ResourceCreatePermission> resourceCreatePermissions1
-            = accessControlContext.getResourceCreatePermissions(invalidResource, resourceClassName);
-      assertThat(resourceCreatePermissions1.isEmpty(), is(true));
-
-      final Set<ResourceCreatePermission> resourceCreatePermissions2
-            = accessControlContext.getResourceCreatePermissions(invalidResource, resourceClassName, domainName);
-      assertThat(resourceCreatePermissions2.isEmpty(), is(true));
-   }
-
-   @Test
    public void getResourceCreatePermissions_notExistentReferences_shouldFail() {
       authenticateSystemResource();
 
       final Resource accessorResource = generateUnauthenticatableResource();
+      final String resourceClassName = generateResourceClass(false, false);
       final String domainName = generateDomain();
+      final Resource invalidResource = Resources.getInstance(-999L);
+
+      try {
+         accessControlContext.getResourceCreatePermissions(invalidResource, resourceClassName);
+         fail("getting create-permissions with reference to non-existent accessor resource should have failed");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString(String.valueOf(invalidResource).toLowerCase() + " not found"));
+      }
+      try {
+         accessControlContext.getResourceCreatePermissions(invalidResource, resourceClassName, domainName);
+         fail("getting create-permissions with reference to non-existent accessor resource should have failed");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString(String.valueOf(invalidResource).toLowerCase() + " not found"));
+      }
 
       try {
          accessControlContext.getResourceCreatePermissions(accessorResource, "invalid_resource_class");
@@ -518,7 +518,6 @@ public class TestAccessControl_getResourceCreatePermissions extends TestAccessCo
          assertThat(e.getMessage().toLowerCase(), containsString("could not find resource class"));
       }
 
-      final String resourceClassName = generateResourceClass(false, false);
       try {
          accessControlContext.getResourceCreatePermissions(accessorResource, resourceClassName, "invalid_resource_domain");
          fail("getting create-permissions with reference to non-existent domain name should have failed");

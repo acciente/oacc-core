@@ -220,25 +220,20 @@ public class TestAccessControl_getDomainPermissions extends TestAccessControlBas
    }
 
    @Test
-   public void getDomainPermissions_nonExistentReferences_shouldSucceed() {
-      authenticateSystemResource();
-
-      final String domainName = generateDomain();
-      final Resource invalidResource = Resources.getInstance(-999L);
-
-      final Set<DomainPermission> domainPermissions = accessControlContext.getDomainPermissions(invalidResource, domainName);
-      assertThat(domainPermissions.isEmpty(), is(true));
-
-      final Map<String, Set<DomainPermission>> domainPermissionsMap
-            = accessControlContext.getDomainPermissionsMap(invalidResource);
-      assertThat(domainPermissionsMap.isEmpty(), is(true));
-   }
-
-   @Test
    public void getDomainPermissions_nonExistentReferences_shouldFail() {
       authenticateSystemResource();
 
       final Resource accessorResource = generateUnauthenticatableResource();
+      final String domainName = generateDomain();
+      final Resource invalidResource = Resources.getInstance(-999L);
+
+      try {
+         accessControlContext.getDomainPermissions(invalidResource, domainName);
+         fail("getting effective domain permissions with invalid resource reference should have failed");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString(String.valueOf(invalidResource).toLowerCase() + " not found"));
+      }
 
       try {
          accessControlContext.getDomainPermissions(accessorResource, "invalid_domain");
@@ -246,6 +241,14 @@ public class TestAccessControl_getDomainPermissions extends TestAccessControlBas
       }
       catch (IllegalArgumentException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("could not find domain"));
+      }
+
+      try {
+         accessControlContext.getDomainPermissionsMap(invalidResource);
+         fail("getting effective domain permissions with invalid resource reference should have failed");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString(String.valueOf(invalidResource).toLowerCase() + " not found"));
       }
    }
 }

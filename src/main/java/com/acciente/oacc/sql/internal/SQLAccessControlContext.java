@@ -995,6 +995,8 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       try {
          connection = __getConnection();
 
+         __assertResourceExists(connection, accessorResource);
+
          Id<DomainId> domainId = domainPersister.getResourceDomainId(connection, domainName);
 
          if (domainId == null) {
@@ -1018,6 +1020,8 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       try {
          connection = __getConnection();
 
+         __assertResourceExists(connection, accessorResource);
+
          return __collapseDomainPermissions(grantDomainPermissionSysPersister.getDomainSysPermissions(connection,
                                                                                                       accessorResource));
       }
@@ -1038,6 +1042,8 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
 
       try {
          connection = __getConnection();
+
+         __assertResourceExists(connection, accessorResource);
 
          return __getEffectiveDomainPermissions(connection, accessorResource, domainName);
       }
@@ -1086,6 +1092,8 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
 
       try {
          connection = __getConnection();
+
+         __assertResourceExists(connection, accessorResource);
 
          return __collapseDomainPermissions(grantDomainPermissionSysPersister
                                                   .getDomainSysPermissionsIncludeInherited(connection, accessorResource));
@@ -1246,6 +1254,8 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       try {
          connection = __getConnection();
 
+         __assertResourceExists(connection, accessorResource);
+
          return __getDirectDomainCreatePermissions(connection, accessorResource);
       }
       finally {
@@ -1262,6 +1272,8 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
 
       try {
          connection = __getConnection();
+
+         __assertResourceExists(connection, accessorResource);
 
          return __getEffectiveDomainCreatePermissions(connection, accessorResource);
       }
@@ -1599,6 +1611,9 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
 
       try {
          connection = __getConnection();
+
+         __assertResourceExists(connection, accessorResource);
+
          resourceClassName = resourceClassName.trim();
          domainName = domainName.trim();
 
@@ -1647,6 +1662,9 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
 
       try {
          connection = __getConnection();
+
+         __assertResourceExists(connection, accessorResource);
+
          resourceClassName = resourceClassName.trim();
 
          return __getDirectResourceCreatePermissions(connection,
@@ -1668,6 +1686,8 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
 
       try {
          connection = __getConnection();
+
+         __assertResourceExists(connection, accessorResource);
 
          return __getDirectResourceCreatePermissionsMap(connection, accessorResource);
       }
@@ -1713,6 +1733,9 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
 
       try {
          connection = __getConnection();
+
+         __assertResourceExists(connection, accessorResource);
+
          resourceClassName = resourceClassName.trim();
          domainName = domainName.trim();
 
@@ -1737,6 +1760,9 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
 
       try {
          connection = __getConnection();
+
+         __assertResourceExists(connection, accessorResource);
+
          resourceClassName = resourceClassName.trim();
 
          return __getEffectiveResourceCreatePermissions(connection,
@@ -1819,6 +1845,8 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
 
       try {
          connection = __getConnection();
+
+         __assertResourceExists(connection, accessorResource);
 
          return __getEffectiveResourceCreatePermissionsMap(connection,
                                                            accessorResource);
@@ -2096,6 +2124,9 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       try {
          connection = __getConnection();
 
+         __assertResourceExists(connection, accessorResource);
+         __assertResourceExists(connection, accessedResource);
+
          return __getDirectResourcePermissions(connection, accessorResource, accessedResource);
       }
       finally {
@@ -2131,6 +2162,8 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
 
       try {
          connection = __getConnection();
+
+         __assertResourceExists(connection, accessorResource);
 
          return __getEffectiveResourcePermissions(connection, accessorResource, accessedResource);
       }
@@ -2404,6 +2437,9 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
 
       try {
          connection = __getConnection();
+
+         __assertResourceExists(connection, accessorResource);
+
          resourceClassName = resourceClassName.trim();
          domainName = domainName.trim();
 
@@ -2452,6 +2488,9 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
 
       try {
          connection = __getConnection();
+
+         __assertResourceExists(connection, accessorResource);
+
          resourceClassName = resourceClassName.trim();
 
          return __getDirectGlobalResourcePermissions(connection,
@@ -2477,6 +2516,9 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
 
       try {
          connection = __getConnection();
+
+         __assertResourceExists(connection, accessorResource);
+
          resourceClassName = resourceClassName.trim();
          domainName = domainName.trim();
 
@@ -2501,6 +2543,9 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
 
       try {
          connection = __getConnection();
+
+         __assertResourceExists(connection, accessorResource);
+
          resourceClassName = resourceClassName.trim();
 
          return __getEffectiveGlobalResourcePermissions(connection,
@@ -2574,6 +2619,8 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       try {
          connection = __getConnection();
 
+         __assertResourceExists(connection, accessorResource);
+
          return __getDirectGlobalResourcePermissionsMap(connection, accessorResource);
       }
       finally {
@@ -2606,6 +2653,8 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
 
       try {
          connection = __getConnection();
+
+         __assertResourceExists(connection, accessorResource);
 
          return __getEffectiveGlobalResourcePermissionsMap(connection, accessorResource);
       }
@@ -4022,6 +4071,9 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
 
       try {
          connection = __getConnection();
+
+         __assertResourceExists(connection, accessedResource);
+
          resourceClassName = resourceClassName.trim();
 
          return __getAccessorResourcesByResourcePermissions(connection,

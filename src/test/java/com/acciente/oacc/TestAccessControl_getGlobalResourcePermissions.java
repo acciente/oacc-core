@@ -355,29 +355,28 @@ public class TestAccessControl_getGlobalResourcePermissions extends TestAccessCo
    }
 
    @Test
-   public void getGlobalResourcePermissions_nonExistentReferences_shouldSucceed() {
-      authenticateSystemResource();
-
-      final Resource invalidResource = Resources.getInstance(-999L);
-      final String domainName = generateDomain();
-      final String resourceClassName = generateResourceClass(false, false);
-
-      final Set<ResourcePermission> resourcePermissions1
-            = accessControlContext.getGlobalResourcePermissions(invalidResource, resourceClassName);
-      assertThat(resourcePermissions1.isEmpty(), is(true));
-
-      final Set<ResourcePermission> resourcePermissions2
-            = accessControlContext.getGlobalResourcePermissions(invalidResource, resourceClassName, domainName);
-      assertThat(resourcePermissions2.isEmpty(), is(true));
-   }
-
-   @Test
    public void getGlobalResourcePermissions_nonExistentReferences_shouldFail() {
       authenticateSystemResource();
 
       final Resource validResource = generateUnauthenticatableResource();
       final String domainName = generateDomain();
       final String resourceClassName = generateResourceClass(false, false);
+      final Resource invalidResource = Resources.getInstance(-999L);
+
+      try {
+         accessControlContext.getGlobalResourcePermissions(invalidResource, resourceClassName);
+         fail("getting direct global resource permissions with invalid accessor resource reference should have failed");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString(String.valueOf(invalidResource).toLowerCase() + " not found"));
+      }
+      try {
+         accessControlContext.getGlobalResourcePermissions(invalidResource, resourceClassName, domainName);
+         fail("getting direct global resource permissions with invalid accessor resource reference should have failed");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString(String.valueOf(invalidResource).toLowerCase() + " not found"));
+      }
 
       try {
          accessControlContext.getGlobalResourcePermissions(validResource, "invalid_resourceClassName");

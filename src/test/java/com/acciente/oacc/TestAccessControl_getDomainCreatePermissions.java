@@ -168,11 +168,16 @@ public class TestAccessControl_getDomainCreatePermissions extends TestAccessCont
    }
 
    @Test
-   public void getDomainCreatePermissions_nonExistentReferences_shouldSucceed() {
+   public void getDomainCreatePermissions_nonExistentReferences_shouldFail() {
       authenticateSystemResource();
 
       final Resource invalidResource = Resources.getInstance(-999L);
-      final Set<DomainCreatePermission> domainCreatePermissions = accessControlContext.getDomainCreatePermissions(invalidResource);
-      assertThat(domainCreatePermissions.isEmpty(), is(true));
+      try {
+         accessControlContext.getDomainCreatePermissions(invalidResource);
+         fail("getting domain create permissions with invalid resource reference should have failed");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString(String.valueOf(invalidResource).toLowerCase() + " not found"));
+      }
    }
 }

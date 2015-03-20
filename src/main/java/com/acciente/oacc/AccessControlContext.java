@@ -263,7 +263,7 @@ public interface AccessControlContext {
     * @param domainCreatePermissions the other (optional) domain create permissions to be checked
     * @throws IllegalArgumentException if the accessorResource does not exist
     * @return  <strong>true</strong> if the accessor resource has the specified domain create permissions,
-    *          <strong>false</strong> otherwise or if the accessor resource does not exist
+    *          <strong>false</strong> otherwise
     */
    public boolean hasDomainCreatePermissions(Resource accessorResource,
                                              DomainCreatePermission domainCreatePermission,
@@ -430,7 +430,7 @@ public interface AccessControlContext {
     * @param resourcePermission  the permission to be checked
     * @param resourcePermissions the other (optional) permissions to be checked
     * @return <strong>true</strong> if the accessor resource has the specified global permissions,
-    *         <strong>false</strong> otherwise, or if the accessor resource does not exist
+    *         <strong>false</strong> otherwise
     * @throws java.lang.IllegalArgumentException if the accessorResource does not exist, or
     *                                            if no resource class of resourceClassName exists, or
     *                                            if any resourcePermission is invalid for the resource class
@@ -468,7 +468,7 @@ public interface AccessControlContext {
     * @param resourcePermission  the permission to be checked
     * @param resourcePermissions the other (optional) permissions to be checked
     * @return <strong>true</strong> if the accessor resource has the specified global permissions,
-    *         <strong>false</strong> otherwise, or if the accessor resource does not exist
+    *         <strong>false</strong> otherwise
     * @throws java.lang.IllegalArgumentException if the accessorResource does not exist, or
     *                                            if no resource class of resourceClassName exists, or
     *                                            if any resourcePermission is invalid for the resource class, or
@@ -670,7 +670,7 @@ public interface AccessControlContext {
     * @param resourceCreatePermissions the other (optional) create permissions to be checked
     * @return <strong>true</strong> if the accessor resource has the specified resource create permissions for the
     *         specified resource class in the current session domain,
-    *         <strong>false</strong> otherwise, or if the accessor resource does not exist
+    *         <strong>false</strong> otherwise
     * @throws java.lang.IllegalArgumentException  if the accessorResource does not exist, or
     *                                             if no resource class of resourceClassName exists, or
     *                                             if any resourceCreatePermission is invalid for the resource class
@@ -712,7 +712,7 @@ public interface AccessControlContext {
     * @param resourceCreatePermissions the other (optional) create permissions to be checked
     * @return <strong>true</strong> if the accessor resource has the specified resource create permissions for the
     *         specified resource class in the specified domain,
-    *         <strong>false</strong> otherwise, or if the accessor resource does not exist
+    *         <strong>false</strong> otherwise
     * @throws java.lang.IllegalArgumentException if the accessorResource does not exist, or
     *                                            if no resource class of resourceClassName exists, or
     *                                            if any resourceCreatePermission is invalid for the resource class, or
@@ -848,7 +848,7 @@ public interface AccessControlContext {
     * @param resourcePermissions the other (optional) permissions to be checked
     * @return <strong>true</strong> if the accessor resource would receive the specified permissions after creating a
     *         resource of the specified class in the current session domain,
-    *         <strong>false</strong> otherwise, or if the accessor resource does not exist
+    *         <strong>false</strong> otherwise
     * @throws java.lang.IllegalArgumentException if the accessorResource does not exist, or
     *                                            if no resource class of resourceClassName exists, or
     *                                            if any resourcePermission is invalid for the resource class
@@ -890,7 +890,7 @@ public interface AccessControlContext {
     * @param resourcePermissions the other (optional) permissions to be checked
     * @return <strong>true</strong> if the accessor resource would receive the specified permissions after creating a
     *         resource of the specified class in the specified domain,
-    *         <strong>false</strong> otherwise, or if the accessor resource does not exist
+    *         <strong>false</strong> otherwise
     * @throws java.lang.IllegalArgumentException if the accessorResource does not exist, or
     *                                            if no resource class of resourceClassName exists, or
     *                                            if no domain of domainName exists, or
@@ -1075,8 +1075,9 @@ public interface AccessControlContext {
     * @param resourceClassName   a string resource class name
     * @param resourcePermission  the permission to check
     * @param resourcePermissions the other (optional) permissions to check
-    * @return a set of accessor resources to the accessedResource, or an empty set if accessedResource does not exist
-    * @throws java.lang.IllegalArgumentException if no resource class of resourceClassName exists, or
+    * @return a set of accessor resources to the accessedResource
+    * @throws java.lang.IllegalArgumentException if accessorResource does not exist, or
+    *                                            if no resource class of resourceClassName exists, or
     *                                            if any resourcePermission is invalid for the specified resource class
     */
    public Set<Resource> getAccessorResourcesByResourcePermissions(Resource accessedResource,
@@ -1240,7 +1241,7 @@ public interface AccessControlContext {
     * @param accessorResource        the resource to which the privilege should be granted
     * @param domainCreatePermissions the permissions to be granted to the specified domain
     * @throws java.lang.IllegalArgumentException if domainCreatePermissions does not contain the *CREATE permission, or
-    *                                            if accessorResource reference is invalid
+    *                                            if accessorResource reference does not exist
     * @throws com.acciente.oacc.NotAuthorizedException if the session resource is not authorized to set
     *                                                  domain create permissions on the specified accessor resource
     */
@@ -1254,8 +1255,8 @@ public interface AccessControlContext {
     * domain create permissions the specified accessor resource inherits from another resource.
     *
     * @param accessorResource the accessor resource relative which permissions should be returned
-    * @return a set of direct domain create permission the accessor resource has, or
-    *         an empty set if accessorResource does not exist
+    * @return a set of direct domain create permission the accessor resource has
+    * @throws java.lang.IllegalArgumentException if accessorResource reference does not exist
     */
    public Set<DomainCreatePermission> getDomainCreatePermissions(Resource accessorResource);
 
@@ -1264,8 +1265,8 @@ public interface AccessControlContext {
     * and inherited (from other resources).
     *
     * @param accessorResource the accessor resource relative which permissions should be returned
-    * @return a set of effective domain create permission the accessor resource has, or
-    *         an empty set if accessorResource does not exist
+    * @return a set of effective domain create permission the accessor resource has
+    * @throws java.lang.IllegalArgumentException if accessorResource reference does not exist
     */
    public Set<DomainCreatePermission> getEffectiveDomainCreatePermissions(Resource accessorResource);
 
@@ -1281,7 +1282,7 @@ public interface AccessControlContext {
     * @param accessorResource  the resource to which the privilege should be granted
     * @param domainName        a string domain name
     * @param domainPermissions the permissions to be granted on the specified domain
-    * @throws java.lang.IllegalArgumentException       if accessorResource reference is invalid, or
+    * @throws java.lang.IllegalArgumentException       if accessorResource reference does not exist, or
     *                                                  if no domain of domainName exists
     * @throws com.acciente.oacc.NotAuthorizedException if the session resource is not authorized to set
     *                                                  domain permissions on the specified domain
@@ -1299,9 +1300,9 @@ public interface AccessControlContext {
     *
     * @param accessorResource the accessor resource relative which permissions should be returned
     * @param domainName       a string domain name
-    * @return the set of all direct domain permission the accessor resource has to the domain, or
-    *         an empty set if accessorResource does not exist
-    * @throws java.lang.IllegalArgumentException if no domain of domainName exists
+    * @return the set of all direct domain permission the accessor resource has to the domain
+    * @throws java.lang.IllegalArgumentException if accessorResource reference does not exist, or
+    *                                            if no domain of domainName exists
     */
    public Set<DomainPermission> getDomainPermissions(Resource accessorResource,
                                                      String domainName);
@@ -1315,8 +1316,8 @@ public interface AccessControlContext {
     * set of direct permissions for the domain name of the key.
     *
     * @param accessorResource the accessor resource relative which permissions should be returned
-    * @return the sets of direct domain permission the accessor resource has to any domain, mapped by domain name, or
-    *         an empty map if accessorResource does not exist
+    * @return the sets of direct domain permission the accessor resource has to any domain, mapped by domain name
+    * @throws java.lang.IllegalArgumentException if accessorResource reference does not exist
     */
    public Map<String, Set<DomainPermission>> getDomainPermissionsMap(Resource accessorResource);
 
@@ -1331,9 +1332,9 @@ public interface AccessControlContext {
     *
     * @param accessorResource the accessor resource relative which permissions should be returned
     * @param domainName       a string domain name
-    * @return the set of all effective domain permission the accessor resource has to the domain, or
-    *         an empty set if accessorResource does not exist
-    * @throws java.lang.IllegalArgumentException if no domain of domainName exists
+    * @return the set of all effective domain permission the accessor resource has to the domain
+    * @throws java.lang.IllegalArgumentException if accessorResource reference does not exist, or
+    *                                            if no domain of domainName exists
     */
    public Set<DomainPermission> getEffectiveDomainPermissions(Resource accessorResource,
                                                               String domainName);
@@ -1347,8 +1348,8 @@ public interface AccessControlContext {
     * set of permissions for the domain name of the key.
     *
     * @param accessorResource the accessor resource relative which permissions should be returned
-    * @return the sets of effective domain permission the accessor resource has to any domain, mapped by domain name, or
-    *         an empty map if accessorResource does not exist
+    * @return the sets of effective domain permission the accessor resource has to any domain, mapped by domain name
+    * @throws java.lang.IllegalArgumentException if accessorResource reference does not exist
     */
    public Map<String, Set<DomainPermission>> getEffectiveDomainPermissionsMap(Resource accessorResource);
 
@@ -1404,9 +1405,9 @@ public interface AccessControlContext {
     * @param accessorResource  the accessor resource relative which permissions should be returned
     * @param resourceClassName a string resource class name
     * @param domainName        a string representing a valid domain name
-    * @return a set of direct resource create permissions, or
-    *         an empty set if accessorResource does not exist
-    * @throws java.lang.IllegalArgumentException if no resource class of resourceClassName exists, or
+    * @return a set of direct resource create permissions
+    * @throws java.lang.IllegalArgumentException if accessorResource reference does not exist, or
+    *                                            if no resource class of resourceClassName exists, or
     *                                            if no domain of domainName exists
     */
    public Set<ResourceCreatePermission> getResourceCreatePermissions(Resource accessorResource,
@@ -1426,9 +1427,9 @@ public interface AccessControlContext {
     * @param accessorResource  the accessor resource relative which permissions should be returned
     * @param resourceClassName a string resource class name
     * @param domainName        a string representing a valid domain name
-    * @return a set of effective resource create permissions, or
-    *         an empty set if accessorResource does not exist
-    * @throws java.lang.IllegalArgumentException if no resource class of resourceClassName exists, or
+    * @return a set of effective resource create permissions
+    * @throws java.lang.IllegalArgumentException if accessorResource reference does not exist, or
+    *                                            if no resource class of resourceClassName exists, or
     *                                            if no domain of domainName exists
     */
    public Set<ResourceCreatePermission> getEffectiveResourceCreatePermissions(Resource accessorResource,
@@ -1483,9 +1484,9 @@ public interface AccessControlContext {
     *
     * @param accessorResource  the accessor resource relative which permissions should be returned
     * @param resourceClassName a string resource class name
-    * @return a set of direct resource create permissions, or
-    *         an empty set if accessorResource does not exist
-    * @throws java.lang.IllegalArgumentException if no resource class of resourceClassName exists
+    * @return a set of direct resource create permissions
+    * @throws java.lang.IllegalArgumentException if accessorResource reference does not exist, or
+    *                                            if no resource class of resourceClassName exists
     */
    public Set<ResourceCreatePermission> getResourceCreatePermissions(Resource accessorResource,
                                                                      String resourceClassName);
@@ -1502,9 +1503,9 @@ public interface AccessControlContext {
     *
     * @param accessorResource  the accessor resource relative which permissions should be returned
     * @param resourceClassName a string resource class name
-    * @return a set of effective resource create permissions, or
-    *         an empty set if accessorResource does not exist
-    * @throws java.lang.IllegalArgumentException if no resource class of resourceClassName exists
+    * @return a set of effective resource create permissions
+    * @throws java.lang.IllegalArgumentException if accessorResource reference does not exist, or
+    *                                            if no resource class of resourceClassName exists
     */
    public Set<ResourceCreatePermission> getEffectiveResourceCreatePermissions(Resource accessorResource,
                                                                               String resourceClassName);
@@ -1525,8 +1526,8 @@ public interface AccessControlContext {
     * for the resource class and domain name of the respective keys.
     *
     * @param accessorResource the accessor resource relative which permissions should be returned
-    * @return a map of maps of direct resource create permissions, keyed by domain name and resource class name, or
-    *         an empty map if accessorResource does not exist
+    * @return a map of maps of direct resource create permissions, keyed by domain name and resource class name
+    * @throws java.lang.IllegalArgumentException if accessorResource reference does not exist
     */
    public Map<String, Map<String, Set<ResourceCreatePermission>>> getResourceCreatePermissionsMap(Resource accessorResource);
 
@@ -1546,8 +1547,8 @@ public interface AccessControlContext {
     * for the resource class and domain name of the respective keys.
     *
     * @param accessorResource the accessor resource relative which permissions should be returned
-    * @return a map of maps of effective resource create permissions, keyed by domain name and resource class name, or
-    *         an empty map if accessorResource does not exist
+    * @return a map of maps of effective resource create permissions, keyed by domain name and resource class name
+    * @throws java.lang.IllegalArgumentException if accessorResource reference does not exist
     */
    public Map<String, Map<String, Set<ResourceCreatePermission>>> getEffectiveResourceCreatePermissionsMap(Resource accessorResource);
 
@@ -1562,7 +1563,7 @@ public interface AccessControlContext {
     * @param accessorResource    the resource to which the privilege should be granted
     * @param accessedResource    the resource on which the privilege is granted
     * @param resourcePermissions a set of resource permissions to be granted
-    * @throws java.lang.IllegalArgumentException if accessorResource or accessedResource reference is invalid, or
+    * @throws java.lang.IllegalArgumentException if accessorResource or accessedResource reference does not exist, or
     *                                            if resourcePermissions contains permissions invalid for resource class
     *                                            of the accessedResource(incl. RESET-CREDENTIALS or IMPERSONATE for
     *                                            unauthenticatable resource classes), or
@@ -1587,8 +1588,8 @@ public interface AccessControlContext {
     *
     * @param accessorResource the resource relative to which the permissions should be returned
     * @param accessedResource the resource on which the privileges were granted
-    * @return a set of direct resource permissions, or
-    *         an empty set if accessorResource or accessedResource does not exist
+    * @return a set of direct resource permissions
+    * @throws java.lang.IllegalArgumentException if accessorResource or accessedResource does not exist
     */
    public Set<ResourcePermission> getResourcePermissions(Resource accessorResource,
                                                          Resource accessedResource);
@@ -1601,9 +1602,8 @@ public interface AccessControlContext {
     *
     * @param accessorResource the resource relative to which the permissions should be returned
     * @param accessedResource the resource on which the privileges were granted
-    * @return a set of effective resource permissions, or
-    *         an empty set if accessorResource does not exist
-    * @throws java.lang.IllegalArgumentException if accessedResource does not exists
+    * @return a set of effective resource permissions
+    * @throws java.lang.IllegalArgumentException if accessorResource or accessedResource does not exist
     */
    public Set<ResourcePermission> getEffectiveResourcePermissions(Resource accessorResource,
                                                                   Resource accessedResource);
@@ -1660,9 +1660,9 @@ public interface AccessControlContext {
     * @param resourceClassName a string resource class name
     * @param domainName        a string domain name
     * @return a set of direct global resource permissions the accessor resource has to resources in the
-    *         specified resource class and domain, or
-    *         an empty set if accessorResource does not exist
-    * @throws java.lang.IllegalArgumentException if no resource class of resourceClassName exists, or
+    *         specified resource class and domain
+    * @throws java.lang.IllegalArgumentException if accessorResource reference does not exist, or
+    *                                            if no resource class of resourceClassName exists, or
     *                                            if no domain of domainName exists
     */
    public Set<ResourcePermission> getGlobalResourcePermissions(Resource accessorResource,
@@ -1681,8 +1681,9 @@ public interface AccessControlContext {
     * @param resourceClassName a string resource class name
     * @param domainName        a string domain name
     * @return a set of effective global resource permissions the accessor resource has to resources in the
-    *         specified resource class and domain, or an empty set if accessorResource does not exist
-    * @throws java.lang.IllegalArgumentException if no resource class of resourceClassName exists, or
+    *         specified resource class and domain
+    * @throws java.lang.IllegalArgumentException if accessorResource reference does not exist, or
+    *                                            if no resource class of resourceClassName exists, or
     *                                            if no domain of domainName exists
     */
    public Set<ResourcePermission> getEffectiveGlobalResourcePermissions(Resource accessorResource,
@@ -1711,7 +1712,7 @@ public interface AccessControlContext {
     * @param resourceClassName   a string resource class name
     * @param resourcePermissions the set of resource permissions to be granted globally to the
     *                            specified resource class and session resource's domain
-    * @throws java.lang.IllegalArgumentException if accessorResource reference is invalid, or
+    * @throws java.lang.IllegalArgumentException if accessorResource reference does not exist, or
     *                                            if no resource class of resourceClassName exists, or
     *                                            if resourcePermissions contains INHERIT permission, or
     *                                            if resourcePermissions contains permissions invalid for the specified
@@ -1737,9 +1738,9 @@ public interface AccessControlContext {
     * @param accessorResource  the resource relative to which the permissions should be returned
     * @param resourceClassName a string resource class name
     * @return the set of direct global resource permissions the accessor resource has to resources of
-    *         the specified resource class in the current session resource's domain, or
-    *         an empty set if accessorResource does not exist
-    * @throws java.lang.IllegalArgumentException if no resource class of resourceClassName exists
+    *         the specified resource class in the current session resource's domain
+    * @throws java.lang.IllegalArgumentException if accessorResource reference does not exist, or
+    *                                            if no resource class of resourceClassName exists
     */
    public Set<ResourcePermission> getGlobalResourcePermissions(Resource accessorResource,
                                                                String resourceClassName);
@@ -1755,9 +1756,9 @@ public interface AccessControlContext {
     * @param accessorResource  the resource relative to which the permissions should be returned
     * @param resourceClassName a string resource class name
     * @return the set of effective global resource permissions the accessor resource has to resources of
-    *         the specified resource class in the current session resource's domain, or
-    *         an empty map if accessorResource does not exist
-    * @throws java.lang.IllegalArgumentException if no resource class of resourceClassName exists
+    *         the specified resource class in the current session resource's domain
+    * @throws java.lang.IllegalArgumentException if accessorResource reference does not exist, or
+    *                                            if no resource class of resourceClassName exists
     */
    public Set<ResourcePermission> getEffectiveGlobalResourcePermissions(Resource accessorResource,
                                                                         String resourceClassName);
@@ -1776,7 +1777,8 @@ public interface AccessControlContext {
     *
     * @param accessorResource the resource relative to which the permissions should be returned
     * @return a map of maps of all direct global resource permissions the accessor resource has, keyed
-    *         by domain name and resource class name, or an empty map if accessorResource does not exist
+    *         by domain name and resource class name
+    * @throws java.lang.IllegalArgumentException if accessorResource reference does not exist
     */
    public Map<String, Map<String, Set<ResourcePermission>>> getGlobalResourcePermissionsMap(Resource accessorResource);
 
@@ -1794,7 +1796,8 @@ public interface AccessControlContext {
     *
     * @param accessorResource the resource relative to which the permissions should be returned
     * @return a map of maps of all effective global resource permissions the accessor resource has, keyed
-    *         by domain name and resource class name, or an empty map if accessorResource does not exist
+    *         by domain name and resource class name
+    * @throws java.lang.IllegalArgumentException if accessorResource reference does not exist
     */
    public Map<String, Map<String, Set<ResourcePermission>>> getEffectiveGlobalResourcePermissionsMap(Resource accessorResource);
 

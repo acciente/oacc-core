@@ -278,18 +278,25 @@ public class TestAccessControl_getResourcePermissions extends TestAccessControlB
    }
 
    @Test
-   public void getResourcePermissions_nonExistentReferences_shouldSucceed() {
+   public void getResourcePermissions_nonExistentReferences_shouldFail() {
       authenticateSystemResource();
 
       final Resource validResource = generateUnauthenticatableResource();
       final Resource invalidResource = Resources.getInstance(-999L);
 
-      final Set<ResourcePermission> resourcePermissions1
-            = accessControlContext.getResourcePermissions(invalidResource, validResource);
-      assertThat(resourcePermissions1.isEmpty(), is(true));
-
-      final Set<ResourcePermission> resourcePermissions2
-            = accessControlContext.getResourcePermissions(validResource, invalidResource);
-      assertThat(resourcePermissions2.isEmpty(), is(true));
+      try {
+         accessControlContext.getResourcePermissions(invalidResource, validResource);
+         fail("getting resource permissions with invalid accessor resource reference should have failed");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString(String.valueOf(invalidResource).toLowerCase() + " not found"));
+      }
+      try {
+         accessControlContext.getResourcePermissions(validResource, invalidResource);
+         fail("getting resource permissions with invalid accessed resource reference should have failed");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString(String.valueOf(invalidResource).toLowerCase() + " not found"));
+      }
    }
 }

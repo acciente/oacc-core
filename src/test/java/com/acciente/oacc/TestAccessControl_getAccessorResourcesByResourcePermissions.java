@@ -641,11 +641,23 @@ public class TestAccessControl_getAccessorResourcesByResourcePermissions extends
       final String queriedPermissionName = generateResourceClassPermission(accessedResourceClassName);
       final Set<ResourcePermission> resourcePermissions
             = setOf(ResourcePermissions.getInstance(queriedPermissionName));
+      final Resource invalidResource = Resources.getInstance(-999L);
 
       // set permission between accessor and queried accessed
       accessControlContext.setResourcePermissions(accessorResource, accessedResource, resourcePermissions);
 
       // verify
+      try {
+         accessControlContext.getAccessorResourcesByResourcePermissions(invalidResource,
+                                                                        accessedResourceClassName,
+                                                                        ResourcePermissions
+                                                                              .getInstance(queriedPermissionName));
+         fail("getting accessor resources by resource permission with non-existent accessor resource should have failed");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString(String.valueOf(invalidResource).toLowerCase() + " not found"));
+      }
+
       try {
          accessControlContext.getAccessorResourcesByResourcePermissions(accessedResource,
                                                                         "does_not_exist",
@@ -680,29 +692,5 @@ public class TestAccessControl_getAccessorResourcesByResourcePermissions extends
       catch (IllegalArgumentException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("is not defined for resource class"));
       }
-   }
-
-   @Test
-   public void getAccessorResourcesByResourcePermissions_nonExistentReferences_shouldSucceed() {
-      authenticateSystemResource();
-
-      final Resource accessorResource = generateUnauthenticatableResource();
-      final Resource accessedResource = generateUnauthenticatableResource();
-      final String accessedResourceClassName
-            = accessControlContext.getResourceClassInfoByResource(accessedResource).getResourceClassName();
-      final String queriedPermissionName = generateResourceClassPermission(accessedResourceClassName);
-      final Set<ResourcePermission> resourcePermissions
-            = setOf(ResourcePermissions.getInstance(queriedPermissionName));
-
-      // set permission between accessor and queried accessed
-      accessControlContext.setResourcePermissions(accessorResource, accessedResource, resourcePermissions);
-
-      // verify
-      Set<Resource> accessors_nonExistentAccessedResource
-            = accessControlContext.getAccessorResourcesByResourcePermissions(Resources.getInstance(-999L),
-                                                                             accessedResourceClassName,
-                                                                             ResourcePermissions
-                                                                                   .getInstance(queriedPermissionName));
-      assertThat(accessors_nonExistentAccessedResource.isEmpty(), is(true));
    }
 }
