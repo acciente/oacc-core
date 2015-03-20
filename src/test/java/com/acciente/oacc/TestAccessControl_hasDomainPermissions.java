@@ -713,26 +713,21 @@ public class TestAccessControl_hasDomainPermissions extends TestAccessControlBas
    }
 
    @Test
-   public void hasDomainPermissions_nonExistentReferences_shouldSucceed() {
-      authenticateSystemResource();
-
-      final DomainPermission domPerm_superUser = DomainPermissions.getInstance(DomainPermissions.SUPER_USER);
-      final String domainName = generateDomain();
-      final Resource invalidResource = Resources.getInstance(-999L);
-
-      if (accessControlContext.hasDomainPermissions(invalidResource, domainName, domPerm_superUser)) {
-         // the check will "succeed" in the sense that it will fail to assert the permission on the
-         // invalid resource, since that resource does not have the specified permission
-         fail("checking domain permissions for invalid accessor resource should have failed");
-      }
-   }
-
-   @Test
    public void hasDomainPermissions_nonExistentReferences_shouldFail() {
       authenticateSystemResource();
 
       final Resource accessorResource = generateUnauthenticatableResource();
+      final String domainName = generateDomain();
       final DomainPermission domPerm_superUser = DomainPermissions.getInstance(DomainPermissions.SUPER_USER);
+      final Resource invalidResource = Resources.getInstance(-999L);
+
+      try {
+         accessControlContext.hasDomainPermissions(invalidResource, domainName, domPerm_superUser);
+         fail("checking domain permissions with invalid domain name should have failed");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString(String.valueOf(invalidResource).toLowerCase() + " not found"));
+      }
 
       try {
          accessControlContext.hasDomainPermissions(accessorResource, "invalid_domain", domPerm_superUser);

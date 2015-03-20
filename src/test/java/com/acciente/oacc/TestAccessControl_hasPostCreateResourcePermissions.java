@@ -1684,35 +1684,22 @@ public class TestAccessControl_hasPostCreateResourcePermissions extends TestAcce
    }
 
    @Test
-   public void hasPostCreateResourcePermissions_nonExistentReferences_shouldSucceed() {
-      // these checks "succeed" in the sense that the has-permission method
-      // returns false, as opposed to throwing an exception
-      authenticateSystemResource();
-
-      final String resourceClassName = generateResourceClass(false, false);
-      final String customPermissionName = generateResourceClassPermission(resourceClassName);
-
-      if (accessControlContext.hasPostCreateResourcePermissions(Resources.getInstance(-999L),
-                                                                resourceClassName,
-                                                                ResourcePermissions.getInstance(customPermissionName))) {
-         fail("checking post-create resource permission for invalid accessor resource reference should have failed for system resource");
-      }
-
-      final String domainName = generateDomain();
-      if (accessControlContext.hasPostCreateResourcePermissions(Resources.getInstance(-999L),
-                                                                resourceClassName,
-                                                                domainName,
-                                                                ResourcePermissions.getInstance(customPermissionName))) {
-         fail("checking post-create resource permission (by domain) for invalid accessor resource reference should have failed for system resource");
-      }
-   }
-
-   @Test
    public void hasPostCreateResourcePermissions_nonExistentReferences_shouldFail() {
       authenticateSystemResource();
 
       final String resourceClassName = generateResourceClass(false, false);
       final String customPermissionName = generateResourceClassPermission(resourceClassName);
+      final Resource invalidResource = Resources.getInstance(-999L);
+
+      try {
+         accessControlContext.hasPostCreateResourcePermissions(invalidResource,
+                                                               resourceClassName,
+                                                               ResourcePermissions.getInstance(customPermissionName));
+         fail("checking post-create resource permission for invalid accessor resource reference should have failed for system resource");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString(String.valueOf(invalidResource).toLowerCase() + " not found"));
+      }
 
       try {
          accessControlContext.hasPostCreateResourcePermissions("invalid_resource_class",
@@ -1761,6 +1748,16 @@ public class TestAccessControl_hasPostCreateResourcePermissions extends TestAcce
       }
 
       final String domainName = generateDomain();
+      try {
+         accessControlContext.hasPostCreateResourcePermissions(invalidResource,
+                                                               resourceClassName,
+                                                               domainName,
+                                                               ResourcePermissions.getInstance(customPermissionName));
+         fail("checking post-create resource permission (by domain) for invalid accessor resource reference should have failed for system resource");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString(String.valueOf(invalidResource).toLowerCase() + " not found"));
+      }
       try {
          accessControlContext.hasPostCreateResourcePermissions("invalid_resource_class",
                                                                domainName,

@@ -1736,9 +1736,8 @@ public class TestAccessControl_assertResourceCreatePermissions extends TestAcces
                                                 ResourceCreatePermissions.getInstance(ResourcePermissions.getInstance(customPermissionName)));
          fail("asserting resource create permission for invalid accessor resource reference should have failed for system resource");
       }
-      catch (NotAuthorizedException e) {
-         assertThat(e.getMessage().toLowerCase(), containsString(String.valueOf(invalidResource).toLowerCase()
-                                                                       + " does not have resource create permission"));
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString(String.valueOf(invalidResource).toLowerCase() + " not found"));
       }
 
       try {
@@ -1805,9 +1804,8 @@ public class TestAccessControl_assertResourceCreatePermissions extends TestAcces
                                                 ResourceCreatePermissions.getInstance(ResourcePermissions.getInstance(customPermissionName)));
          fail("asserting resource create permission (by domain) for invalid accessor resource reference should have failed for system resource");
       }
-      catch (NotAuthorizedException e) {
-         assertThat(e.getMessage().toLowerCase(), containsString(String.valueOf(invalidResource).toLowerCase()
-                                                                       + " does not have resource create permission"));
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString(String.valueOf(invalidResource).toLowerCase() + " not found"));
       }
 
       try {

@@ -637,16 +637,18 @@ public class TestAccessControl_hasPostCreateDomainPermissions extends TestAccess
    }
 
    @Test
-   public void hasPostCreateDomainPermissions_nonExistentReferences_shouldSucceed() {
+   public void hasPostCreateDomainPermissions_nonExistentReferences_shouldFail() {
       authenticateSystemResource();
 
       final Resource invalidResource = Resources.getInstance(-999L);
       final DomainPermission domainPermission = DomainPermissions.getInstance(DomainPermissions.CREATE_CHILD_DOMAIN);
 
-      if (accessControlContext.hasPostCreateDomainPermissions(invalidResource, domainPermission)) {
-         // the check will "succeed" in the sense that it will fail to assert the permission on the
-         // invalid resource, since that resource does not have the specified permission
+      try {
+         accessControlContext.hasPostCreateDomainPermissions(invalidResource, domainPermission);
          fail("checking post-create domain permission with invalid accessor resource should have failed");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString(String.valueOf(invalidResource).toLowerCase() + " not found"));
       }
    }
 }

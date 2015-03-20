@@ -156,7 +156,8 @@ public interface AccessControlContext {
     * @param domainName        the domain for which the permission should be checked
     * @param domainPermission  the permission to be checked
     * @param domainPermissions the other (optional) permissions to be checked
-    * @throws java.lang.IllegalArgumentException       if no domain of domainName exists
+    * @throws java.lang.IllegalArgumentException       if the accessorResource does not exist, or
+    *                                                  if no domain of domainName exists
     * @throws com.acciente.oacc.NotAuthorizedException if the accessor resource <strong>does not</strong> have the
     *                                                  specified domain permissions, or
     *                                                  if the accessor resource does not exist
@@ -196,7 +197,8 @@ public interface AccessControlContext {
     * @param domainPermissions the other (optional) permissions to be checked
     * @return  <strong>true</strong> if the accessor resource has the specified domain permissions,
     *          <strong>false</strong> otherwise or if the accessor resource does not exist
-    * @throws java.lang.IllegalArgumentException  if no domain of domainName exists
+    * @throws java.lang.IllegalArgumentException if the accessorResource does not exist, or
+    *                                            if no domain of domainName exists
     */
    public boolean hasDomainPermissions(Resource accessorResource,
                                        String domainName,
@@ -228,6 +230,7 @@ public interface AccessControlContext {
     * @param accessorResource        the resource on which access is being checked
     * @param domainCreatePermission  the domain create permission to be checked
     * @param domainCreatePermissions the other (optional) domain create permissions to be checked
+    * @throws IllegalArgumentException                 if the accessorResource does not exist
     * @throws com.acciente.oacc.NotAuthorizedException if the accessor resource <strong>does not</strong> have the
     *                                                  specified domain create permissions, or
     *                                                  if the accessor resource does not exist
@@ -258,6 +261,7 @@ public interface AccessControlContext {
     * @param accessorResource        the resource on which access is being checked
     * @param domainCreatePermission  the domain create permission to be checked
     * @param domainCreatePermissions the other (optional) domain create permissions to be checked
+    * @throws IllegalArgumentException if the accessorResource does not exist
     * @return  <strong>true</strong> if the accessor resource has the specified domain create permissions,
     *          <strong>false</strong> otherwise or if the accessor resource does not exist
     */
@@ -287,6 +291,7 @@ public interface AccessControlContext {
     * @param accessorResource  the resource requesting the access
     * @param domainPermission  the permission to be checked
     * @param domainPermissions the other (optional) permissions to be checked
+    * @throws IllegalArgumentException                 if the accessorResource does not exist
     * @throws com.acciente.oacc.NotAuthorizedException if the accessor resource would <strong>not</strong> receive the
     *                                                  specified permissions after creating a domain
     */
@@ -314,6 +319,7 @@ public interface AccessControlContext {
     * @param accessorResource  the resource requesting the access
     * @param domainPermission  the permission to be checked
     * @param domainPermissions the other (optional) permissions to be checked
+    * @throws IllegalArgumentException if the accessorResource does not exist
     * @return <strong>true</strong> if the accessor resource would receive the specified permissions after creating a domain
     */
    public boolean hasPostCreateDomainPermissions(Resource accessorResource,
@@ -340,7 +346,8 @@ public interface AccessControlContext {
     * @param resourceClassName   a string resource class name
     * @param resourcePermission  the permission to be checked
     * @param resourcePermissions the other (optional) permissions to be checked
-    * @throws java.lang.IllegalArgumentException if no resource class of resourceClassName exists, or
+    * @throws java.lang.IllegalArgumentException if the accessorResource does not exist, or
+    *                                            if no resource class of resourceClassName exists, or
     *                                            if any resourcePermission is invalid for the resource class
     * @throws com.acciente.oacc.NotAuthorizedException if the accessor resource <strong>does not</strong> have the
     *                                                  specified global permissions, or
@@ -378,7 +385,8 @@ public interface AccessControlContext {
     * @param domainName          the domain in which the permissions should be checked
     * @param resourcePermission  the permission to be checked
     * @param resourcePermissions the other (optional) permissions to be checked
-    * @throws java.lang.IllegalArgumentException if no resource class of resourceClassName exists, or
+    * @throws java.lang.IllegalArgumentException if the accessorResource does not exist, or
+    *                                            if no resource class of resourceClassName exists, or
     *                                            if any resourcePermission is invalid for the resource class, or
     *                                            if no domain of domainName exists
     * @throws com.acciente.oacc.NotAuthorizedException if the accessor resource <strong>does not</strong> have the
@@ -400,7 +408,8 @@ public interface AccessControlContext {
     * @param domainName          the domain in which the permissions should be checked
     * @param resourcePermission  the permission to be checked
     * @param resourcePermissions the other (optional) permissions to be checked
-    * @throws java.lang.IllegalArgumentException if no resource class of resourceClassName exists, or
+    * @throws java.lang.IllegalArgumentException if the accessorResource does not exist, or
+    *                                            if no resource class of resourceClassName exists, or
     *                                            if any resourcePermission is invalid for the resource class, or
     *                                            if no domain of domainName exists
     * @throws com.acciente.oacc.NotAuthorizedException if the session resource <strong>does not</strong> have the
@@ -422,7 +431,8 @@ public interface AccessControlContext {
     * @param resourcePermissions the other (optional) permissions to be checked
     * @return <strong>true</strong> if the accessor resource has the specified global permissions,
     *         <strong>false</strong> otherwise, or if the accessor resource does not exist
-    * @throws java.lang.IllegalArgumentException if no resource class of resourceClassName exists, or
+    * @throws java.lang.IllegalArgumentException if the accessorResource does not exist, or
+    *                                            if no resource class of resourceClassName exists, or
     *                                            if any resourcePermission is invalid for the resource class
     */
    public boolean hasGlobalResourcePermissions(Resource accessorResource,
@@ -459,7 +469,8 @@ public interface AccessControlContext {
     * @param resourcePermissions the other (optional) permissions to be checked
     * @return <strong>true</strong> if the accessor resource has the specified global permissions,
     *         <strong>false</strong> otherwise, or if the accessor resource does not exist
-    * @throws java.lang.IllegalArgumentException if no resource class of resourceClassName exists, or
+    * @throws java.lang.IllegalArgumentException if the accessorResource does not exist, or
+    *                                            if no resource class of resourceClassName exists, or
     *                                            if any resourcePermission is invalid for the resource class, or
     *                                            if no domain of domainName exists
     */
@@ -498,7 +509,7 @@ public interface AccessControlContext {
     * @param accessedResource    the resource on which access is being requested
     * @param resourcePermission  the permission to be checked
     * @param resourcePermissions the other (optional) permissions to be checked
-    * @throws java.lang.IllegalArgumentException if the accessorResource or the accessedResource does not exists, or
+    * @throws java.lang.IllegalArgumentException if the accessorResource or the accessedResource does not exist, or
     *                                            if any resourcePermission is invalid for the resource class of accessedResource
     * @throws com.acciente.oacc.NotAuthorizedException if the accessor resource <strong>does not</strong> have the
     *                                                  specified permissions
@@ -534,7 +545,7 @@ public interface AccessControlContext {
     * @param resourcePermission  the permission to be checked
     * @param resourcePermissions the other (optional) permissions to be checked
     * @return <strong>true</strong> if the accessor resource has the specified permissions
-    * @throws java.lang.IllegalArgumentException if the accessorResource or the accessedResource does not exists, or
+    * @throws java.lang.IllegalArgumentException if the accessorResource or the accessedResource does not exist, or
     *                                            if any resourcePermission is invalid for the resource class of accessedResource
     */
    public boolean hasResourcePermissions(Resource accessorResource,
@@ -567,7 +578,8 @@ public interface AccessControlContext {
     * @param resourceClassName         a string resource class name
     * @param resourceCreatePermission  the create permissions to be checked
     * @param resourceCreatePermissions the other (optional) create permissions to be checked
-    * @throws java.lang.IllegalArgumentException       if no resource class of resourceClassName exists, or
+    * @throws java.lang.IllegalArgumentException       if the accessorResource does not exist, or
+    *                                                  if no resource class of resourceClassName exists, or
     *                                                  if any resourceCreatePermission is invalid for the resource class
     * @throws com.acciente.oacc.NotAuthorizedException if the accessor resource does <strong>not</strong> have the
     *                                                  specified resource create permissions for the specified class
@@ -609,7 +621,8 @@ public interface AccessControlContext {
     * @param domainName                the domain in which the permissions should be checked
     * @param resourceCreatePermission  the create permissions to be checked
     * @param resourceCreatePermissions the other (optional) create permissions to be checked
-    * @throws java.lang.IllegalArgumentException       if no resource class of resourceClassName exists, or
+    * @throws java.lang.IllegalArgumentException       if the accessorResource does not exist, or
+    *                                                  if no resource class of resourceClassName exists, or
     *                                                  if any resourceCreatePermission is invalid for the resource class, or
     *                                                  if no domain of domainName exists
     * @throws com.acciente.oacc.NotAuthorizedException if the accessor resource does <strong>not</strong> have the
@@ -658,7 +671,8 @@ public interface AccessControlContext {
     * @return <strong>true</strong> if the accessor resource has the specified resource create permissions for the
     *         specified resource class in the current session domain,
     *         <strong>false</strong> otherwise, or if the accessor resource does not exist
-    * @throws java.lang.IllegalArgumentException  if no resource class of resourceClassName exists, or
+    * @throws java.lang.IllegalArgumentException  if the accessorResource does not exist, or
+    *                                             if no resource class of resourceClassName exists, or
     *                                             if any resourceCreatePermission is invalid for the resource class
     */
    public boolean hasResourceCreatePermissions(Resource accessorResource,
@@ -699,7 +713,8 @@ public interface AccessControlContext {
     * @return <strong>true</strong> if the accessor resource has the specified resource create permissions for the
     *         specified resource class in the specified domain,
     *         <strong>false</strong> otherwise, or if the accessor resource does not exist
-    * @throws java.lang.IllegalArgumentException if no resource class of resourceClassName exists, or
+    * @throws java.lang.IllegalArgumentException if the accessorResource does not exist, or
+    *                                            if no resource class of resourceClassName exists, or
     *                                            if any resourceCreatePermission is invalid for the resource class, or
     *                                            if no domain of domainName exists
     */
@@ -741,7 +756,8 @@ public interface AccessControlContext {
     * @param resourceClassName   a string resource class name
     * @param resourcePermission  the permission to be checked
     * @param resourcePermissions the other (optional) permissions to be checked
-    * @throws java.lang.IllegalArgumentException       if no resource class of resourceClassName exists, or
+    * @throws java.lang.IllegalArgumentException       if the accessorResource does not exist, or
+    *                                                  if no resource class of resourceClassName exists, or
     *                                                  if any resourcePermission is invalid for the resource class
     * @throws com.acciente.oacc.NotAuthorizedException if the accessor resource would <strong>not</strong> receive the
     *                                                  specified permissions after creating a resource of the specified class
@@ -783,7 +799,8 @@ public interface AccessControlContext {
     * @param domainName          the domain in which the permissions should be checked
     * @param resourcePermission  the permission to be checked
     * @param resourcePermissions the other (optional) permissions to be checked
-    * @throws java.lang.IllegalArgumentException       if no resource class of resourceClassName exists, or
+    * @throws java.lang.IllegalArgumentException       if the accessorResource does not exist, or
+    *                                                  if no resource class of resourceClassName exists, or
     *                                                  if no domain of domainName exists, or
     *                                                  if any resourcePermission is invalid for the resource class
     * @throws com.acciente.oacc.NotAuthorizedException if the accessor resource would <strong>not</strong> receive the
@@ -832,7 +849,8 @@ public interface AccessControlContext {
     * @return <strong>true</strong> if the accessor resource would receive the specified permissions after creating a
     *         resource of the specified class in the current session domain,
     *         <strong>false</strong> otherwise, or if the accessor resource does not exist
-    * @throws java.lang.IllegalArgumentException if no resource class of resourceClassName exists, or
+    * @throws java.lang.IllegalArgumentException if the accessorResource does not exist, or
+    *                                            if no resource class of resourceClassName exists, or
     *                                            if any resourcePermission is invalid for the resource class
     */
    public boolean hasPostCreateResourcePermissions(Resource accessorResource,
@@ -873,7 +891,8 @@ public interface AccessControlContext {
     * @return <strong>true</strong> if the accessor resource would receive the specified permissions after creating a
     *         resource of the specified class in the specified domain,
     *         <strong>false</strong> otherwise, or if the accessor resource does not exist
-    * @throws java.lang.IllegalArgumentException if no resource class of resourceClassName exists, or
+    * @throws java.lang.IllegalArgumentException if the accessorResource does not exist, or
+    *                                            if no resource class of resourceClassName exists, or
     *                                            if no domain of domainName exists, or
     *                                            if any resourcePermission is invalid for the resource class
     */

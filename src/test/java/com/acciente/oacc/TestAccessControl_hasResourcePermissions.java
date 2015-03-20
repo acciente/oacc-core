@@ -717,7 +717,7 @@ public class TestAccessControl_hasResourcePermissions extends TestAccessControlB
          fail("checking resource permission for invalid accessor resource reference should have failed");
       }
       catch (IllegalArgumentException e) {
-         assertThat(e.getMessage().toLowerCase(), containsString("not found"));
+         assertThat(e.getMessage().toLowerCase(), containsString(String.valueOf(invalidResource).toLowerCase() + " not found"));
       }
       try {
          accessControlContext.hasResourcePermissions(invalidResource, customPermission);

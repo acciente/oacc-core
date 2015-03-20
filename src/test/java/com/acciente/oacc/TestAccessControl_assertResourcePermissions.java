@@ -671,7 +671,7 @@ public class TestAccessControl_assertResourcePermissions extends TestAccessContr
          accessControlContext.assertResourcePermissions(invalidResource, accessedResource, customPermission);
       }
       catch (IllegalArgumentException e) {
-         assertThat(e.getMessage().toLowerCase(), containsString("not found"));
+         assertThat(e.getMessage().toLowerCase(), containsString(String.valueOf(invalidResource).toLowerCase() + " not found"));
       }
       try {
          accessControlContext.assertResourcePermissions(invalidResource, customPermission);

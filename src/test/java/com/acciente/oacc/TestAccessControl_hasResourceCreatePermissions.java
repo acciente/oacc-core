@@ -1720,12 +1720,17 @@ public class TestAccessControl_hasResourceCreatePermissions extends TestAccessCo
 
       final String resourceClassName = generateResourceClass(false, false);
       final String customPermissionName = generateResourceClassPermission(resourceClassName);
+      final Resource invalidResource = Resources.getInstance(-999L);
 
-      if (accessControlContext
-            .hasResourceCreatePermissions(Resources.getInstance(-999L),
-                                          resourceClassName,
-                                          ResourceCreatePermissions.getInstance(ResourcePermissions.getInstance(customPermissionName)))) {
+      try {
+         accessControlContext
+               .hasResourceCreatePermissions(invalidResource,
+                                             resourceClassName,
+                                             ResourceCreatePermissions.getInstance(ResourcePermissions.getInstance(customPermissionName)));
          fail("checking resource create permission for invalid accessor resource reference should have failed for system resource");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString(String.valueOf(invalidResource).toLowerCase() + " not found"));
       }
 
       try {
@@ -1782,12 +1787,16 @@ public class TestAccessControl_hasResourceCreatePermissions extends TestAccessCo
       }
 
       final String domainName = generateDomain();
-      if (accessControlContext
-            .hasResourceCreatePermissions(Resources.getInstance(-999L),
-                                          resourceClassName,
-                                          domainName,
-                                          ResourceCreatePermissions.getInstance(ResourcePermissions.getInstance(customPermissionName)))) {
+      try {
+         accessControlContext
+               .hasResourceCreatePermissions(invalidResource,
+                                             resourceClassName,
+                                             domainName,
+                                             ResourceCreatePermissions.getInstance(ResourcePermissions.getInstance(customPermissionName)));
          fail("checking resource create permission (by domain) for invalid accessor resource reference should have failed for system resource");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString(String.valueOf(invalidResource).toLowerCase() + " not found"));
       }
 
       try {

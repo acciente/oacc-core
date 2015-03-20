@@ -1278,15 +1278,16 @@ public class TestAccessControl_assertGlobalResourcePermissions extends TestAcces
 
       final String resourceClassName = generateResourceClass(false, false);
       final String customPermissionName = generateResourceClassPermission(resourceClassName);
+      final Resource invalidResource = Resources.getInstance(-999L);
 
       try {
-         accessControlContext.assertGlobalResourcePermissions(Resources.getInstance(-999L),
+         accessControlContext.assertGlobalResourcePermissions(invalidResource,
                                                               resourceClassName,
                                                               ResourcePermissions.getInstance(customPermissionName));
          fail("asserting global resource permission for invalid accessor resource reference should have failed for system resource");
       }
-      catch (NotAuthorizedException e) {
-         assertThat(e.getMessage().toLowerCase(), containsString("global permission"));
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString(String.valueOf(invalidResource).toLowerCase() + " not found"));
       }
       try {
          accessControlContext.assertGlobalResourcePermissions("invalid_resource_class",
@@ -1337,14 +1338,14 @@ public class TestAccessControl_assertGlobalResourcePermissions extends TestAcces
 
       final String domainName = generateDomain();
       try {
-         accessControlContext.assertGlobalResourcePermissions(Resources.getInstance(-999L),
+         accessControlContext.assertGlobalResourcePermissions(invalidResource,
                                                               resourceClassName,
                                                               domainName,
                                                               ResourcePermissions.getInstance(customPermissionName));
          fail("asserting global resource permission (by domain) for invalid resource reference should have failed for system resource");
       }
-      catch (NotAuthorizedException e) {
-         assertThat(e.getMessage().toLowerCase(), containsString("global permission"));
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString(String.valueOf(invalidResource).toLowerCase() + " not found"));
       }
       try {
          accessControlContext.assertGlobalResourcePermissions(SYS_RESOURCE,

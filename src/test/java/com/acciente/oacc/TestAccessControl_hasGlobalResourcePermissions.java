@@ -1354,33 +1354,22 @@ public class TestAccessControl_hasGlobalResourcePermissions extends TestAccessCo
    }
 
    @Test
-   public void hasGlobalResourcePermissions_nonExistentReferences_shouldSucceed() {
-      authenticateSystemResource();
-
-      final String resourceClassName = generateResourceClass(false, false);
-      final String customPermissionName = generateResourceClassPermission(resourceClassName);
-
-      if (accessControlContext.hasGlobalResourcePermissions(Resources.getInstance(-999L),
-                                                            resourceClassName,
-                                                            ResourcePermissions.getInstance(customPermissionName))) {
-         fail("checking global resource permission for invalid accessor resource reference should have failed for system resource");
-      }
-
-      final String domainName = generateDomain();
-      if (accessControlContext.hasGlobalResourcePermissions(Resources.getInstance(-999L),
-                                                            resourceClassName,
-                                                            domainName,
-                                                            ResourcePermissions.getInstance(customPermissionName))) {
-         fail("checking global resource permission (by domain) for invalid resource reference should have failed for system resource");
-      }
-   }
-
-   @Test
    public void hasGlobalResourcePermissions_nonExistentReferences_shouldFail() {
       authenticateSystemResource();
 
       final String resourceClassName = generateResourceClass(false, false);
       final String customPermissionName = generateResourceClassPermission(resourceClassName);
+      final Resource invalidResource = Resources.getInstance(-999L);
+
+      try {
+         accessControlContext.hasGlobalResourcePermissions(invalidResource,
+                                                           resourceClassName,
+                                                           ResourcePermissions.getInstance(customPermissionName));
+         fail("checking global resource permission for invalid resource reference should have failed for system resource");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString(String.valueOf(invalidResource).toLowerCase() + " not found"));
+      }
 
       try {
          accessControlContext.hasGlobalResourcePermissions("invalid_resource_class",
@@ -1429,6 +1418,17 @@ public class TestAccessControl_hasGlobalResourcePermissions extends TestAccessCo
       }
 
       final String domainName = generateDomain();
+      try {
+         accessControlContext.hasGlobalResourcePermissions(invalidResource,
+                                                           resourceClassName,
+                                                           domainName,
+                                                           ResourcePermissions.getInstance(customPermissionName));
+         fail("checking global resource permission (by domain) for invalid resource reference should have failed for system resource");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString(String.valueOf(invalidResource).toLowerCase() + " not found"));
+      }
+
       try {
          accessControlContext.hasGlobalResourcePermissions(SYS_RESOURCE,
                                                            "invalid_resource_class",
