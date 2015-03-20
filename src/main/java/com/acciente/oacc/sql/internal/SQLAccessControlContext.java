@@ -360,8 +360,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
    }
 
    private void __assertImpersonatePermission(SQLConnection connection, Resource resource) {
-      // this call will throw an exception if the resource is not found
-      resourcePersister.verifyResourceExists(connection, resource);
+      __assertResourceExists(connection, resource);
 
       final ResourceClassInternalInfo resourceClassInternalInfo
             = resourceClassPersister.getResourceClassInfoByResourceId(connection, resource);
@@ -901,7 +900,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       }
 
       if (!newDomainMode) {
-         resourcePersister.verifyResourceExists(connection, accessorResource);
+         __assertResourceExists(connection, accessorResource);
 
          // check if the grantor (=session resource) has permissions to grant the requested permissions
          final Set<DomainPermission>
@@ -1129,8 +1128,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
                                                    Resource accessorResource,
                                                    Set<DomainCreatePermission> requestedDomainCreatePermissions) {
       __assertSetContainsDomainCreateSystemPermission(requestedDomainCreatePermissions);
-
-      resourcePersister.verifyResourceExists(connection, accessorResource);
+      __assertResourceExists(connection, accessorResource);
 
       // check if grantor (=session resource) is authorized to add/remove requested permissions
       final Set<DomainCreatePermission>
@@ -1357,7 +1355,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
                                                      String resourceClassName,
                                                      String domainName,
                                                      Set<ResourceCreatePermission> requestedResourceCreatePermissions) {
-      resourcePersister.verifyResourceExists(connection, accessorResource);
+      __assertResourceExists(connection, accessorResource);
 
       // verify that resource class is defined and get its metadata
       final ResourceClassInternalInfo resourceClassInfo
@@ -1941,7 +1939,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       // if this method is being called to set the post create permissions on a newly created resource
       // we do not perform the security checks below, since it would be incorrect
       if (!newResourceMode) {
-         resourcePersister.verifyResourceExists(connection, accessorResource);
+         __assertResourceExists(connection, accessorResource);
 
          if (!__isSuperUserOfResource(connection, grantorResource, accessedResource)) {
             // next check if the grantor (i.e. session resource) has permissions to grant the requested permissions
@@ -2239,7 +2237,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
                                              String resourceClassName,
                                              String domainName,
                                              Set<ResourcePermission> requestedResourcePermissions) {
-      resourcePersister.verifyResourceExists(connection, accessorResource);
+      __assertResourceExists(connection, accessorResource);
 
       // verify that resource class is defined
       final Id<ResourceClassId> resourceClassId = resourceClassPersister.getResourceClassId(connection, resourceClassName);
@@ -4361,7 +4359,9 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
 
    private void __assertResourceExists(SQLConnection connection,
                                        Resource accessorResource) {
-      if (!sessionResource.equals(accessorResource)) {
+      // look up accessor resource, but only if it's not the session or authenticated resource (which are already known to exist)
+      if (!sessionResource.equals(accessorResource) && !authenticatedResource.equals(accessorResource)) {
+         // the persister method will throw an IllegalArgumentException if the lookup fails
          resourcePersister.verifyResourceExists(connection, accessorResource);
       }
    }
