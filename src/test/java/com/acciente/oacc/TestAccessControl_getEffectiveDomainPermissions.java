@@ -156,12 +156,12 @@ public class TestAccessControl_getEffectiveDomainPermissions extends TestAccessC
 
       final String parentDomain = generateDomain();
       final String childDomain = generateUniqueDomainName();
-      final String grandChildDomain = generateUniqueDomainName();
-      final String greatGrandChildDomain = generateUniqueDomainName();
-      final String greatGreatGrandChildDomain = generateUniqueDomainName();
       accessControlContext.createDomain(childDomain, parentDomain);
+      final String grandChildDomain = generateUniqueDomainName();
       accessControlContext.createDomain(grandChildDomain, childDomain);
+      final String greatGrandChildDomain = generateUniqueDomainName();
       accessControlContext.createDomain(greatGrandChildDomain, grandChildDomain);
+      final String greatGreatGrandChildDomain = generateUniqueDomainName();
       accessControlContext.createDomain(greatGreatGrandChildDomain, greatGrandChildDomain);
 
       // set parent domain create permissions

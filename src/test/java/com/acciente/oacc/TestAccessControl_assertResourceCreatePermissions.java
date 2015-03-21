@@ -778,8 +778,8 @@ public class TestAccessControl_assertResourceCreatePermissions extends TestAcces
       final Resource accessorResource = generateAuthenticatableResource(password);
       final String accessorDomainName = accessControlContext.getDomainNameByResource(accessorResource);
       final String intermediaryDomainName = generateUniqueDomainName();
-      final String accessedDomainName = generateUniqueDomainName();
       accessControlContext.createDomain(intermediaryDomainName, accessorDomainName);
+      final String accessedDomainName = generateUniqueDomainName();
       accessControlContext.createDomain(accessedDomainName, intermediaryDomainName);
 
       // setup create permissions
@@ -855,8 +855,8 @@ public class TestAccessControl_assertResourceCreatePermissions extends TestAcces
       final Resource donorResource = accessControlContext.createResource(generateResourceClass(false, false),
                                                                          accessorDomainName);
       final String intermediaryDomainName = generateUniqueDomainName();
-      final String accessedDomainName = generateUniqueDomainName();
       accessControlContext.createDomain(intermediaryDomainName, accessorDomainName);
+      final String accessedDomainName = generateUniqueDomainName();
       accessControlContext.createDomain(accessedDomainName, intermediaryDomainName);
 
       // setup create permissions

@@ -33,8 +33,9 @@ public class TestAccessControl_createDomain extends TestAccessControlBase {
 
       // because we don't have a getter for *all* domains, I'm creating unique test domains for each test run
       final String domainName_one = generateUniqueDomainName();
-      final String domainName_two = generateUniqueDomainName();
       assertThat(accessControlContext.getDomainDescendants(domainName_one).isEmpty(), is(true));
+
+      final String domainName_two = generateUniqueDomainName();
       assertThat(accessControlContext.getDomainDescendants(domainName_two).isEmpty(), is(true));
 
       accessControlContext.createDomain(domainName_one);

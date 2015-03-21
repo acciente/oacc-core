@@ -293,8 +293,8 @@ public class TestAccessControl_hasResourcePermissions extends TestAccessControlB
 
       final String parentDomainName = generateDomain();
       final String intermediaryDomainName = generateUniqueDomainName();
-      final String accessedDomainName = generateUniqueDomainName();
       accessControlContext.createDomain(intermediaryDomainName, parentDomainName);
+      final String accessedDomainName = generateUniqueDomainName();
       accessControlContext.createDomain(accessedDomainName, intermediaryDomainName);
 
       final char[] password = generateUniquePassword();
@@ -329,8 +329,8 @@ public class TestAccessControl_hasResourcePermissions extends TestAccessControlB
 
       final String parentDomainName = generateDomain();
       final String intermediaryDomainName = generateUniqueDomainName();
-      final String accessedDomainName = generateUniqueDomainName();
       accessControlContext.createDomain(intermediaryDomainName, parentDomainName);
+      final String accessedDomainName = generateUniqueDomainName();
       accessControlContext.createDomain(accessedDomainName, intermediaryDomainName);
 
       final char[] password = generateUniquePassword();
@@ -368,8 +368,8 @@ public class TestAccessControl_hasResourcePermissions extends TestAccessControlB
 
       final String parentDomainName = generateDomain();
       final String intermediaryDomainName = generateUniqueDomainName();
-      final String accessedDomainName = generateUniqueDomainName();
       accessControlContext.createDomain(intermediaryDomainName, parentDomainName);
+      final String accessedDomainName = generateUniqueDomainName();
       accessControlContext.createDomain(accessedDomainName, intermediaryDomainName);
 
       final char[] password = generateUniquePassword();
@@ -412,8 +412,8 @@ public class TestAccessControl_hasResourcePermissions extends TestAccessControlB
 
       final String parentDomainName = generateDomain();
       final String intermediaryDomainName = generateUniqueDomainName();
-      final String accessedDomainName = generateUniqueDomainName();
       accessControlContext.createDomain(intermediaryDomainName, parentDomainName);
+      final String accessedDomainName = generateUniqueDomainName();
       accessControlContext.createDomain(accessedDomainName, intermediaryDomainName);
 
       final char[] password = generateUniquePassword();

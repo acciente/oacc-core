@@ -494,10 +494,10 @@ public class TestAccessControl_hasGlobalResourcePermissions extends TestAccessCo
       authenticateSystemResource();
       final String parentDomainName = generateDomain();
       final String intermediaryDomainName = generateUniqueDomainName();
-      final String accessorDomainName = generateUniqueDomainName();
-      final String otherDomainName = generateUniqueDomainName();
       accessControlContext.createDomain(intermediaryDomainName, parentDomainName);
+      final String accessorDomainName = generateUniqueDomainName();
       accessControlContext.createDomain(accessorDomainName, intermediaryDomainName);
+      final String otherDomainName = generateUniqueDomainName();
       accessControlContext.createDomain(otherDomainName, intermediaryDomainName);
       final char[] password = generateUniquePassword();
       final Resource accessorResource = generateAuthenticatableResource(password, accessorDomainName);
@@ -740,10 +740,10 @@ public class TestAccessControl_hasGlobalResourcePermissions extends TestAccessCo
       authenticateSystemResource();
       final String parentDomainName = generateDomain();
       final String intermediaryDomainName = generateUniqueDomainName();
-      final String accessorDomainName = generateUniqueDomainName();
-      final String otherDomainName = generateUniqueDomainName();
       accessControlContext.createDomain(intermediaryDomainName, parentDomainName);
+      final String accessorDomainName = generateUniqueDomainName();
       accessControlContext.createDomain(accessorDomainName, intermediaryDomainName);
+      final String otherDomainName = generateUniqueDomainName();
       accessControlContext.createDomain(otherDomainName, intermediaryDomainName);
       final char[] password = generateUniquePassword();
       final Resource accessorResource = generateAuthenticatableResource(password, accessorDomainName);
