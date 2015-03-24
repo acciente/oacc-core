@@ -223,8 +223,7 @@ public interface AccessControlContext {
                                        DomainPermission... domainPermissions);
 
    /**
-    * Checks if the specified accessor resource has the specified domain create permissions on
-    * the specified domain.
+    * Checks if the specified accessor resource has the specified domain create permissions.
     * This method takes into account any direct and inherited domain create permissions.
     *
     * @param accessorResource        the resource on which access is being checked
@@ -240,8 +239,7 @@ public interface AccessControlContext {
                                              DomainCreatePermission... domainCreatePermissions);
 
    /**
-    * Checks if the session resource has the specified domain create permissions on the
-    * specified domain.
+    * Checks if the session resource has the specified domain create permissions.
     * This method takes into account any direct and inherited domain create permissions.
     *
     *
@@ -254,8 +252,7 @@ public interface AccessControlContext {
                                              DomainCreatePermission... domainCreatePermissions);
 
    /**
-    * Checks if the specified accessor resource has the specified domain create permissions on
-    * the specified domain.
+    * Checks if the specified accessor resource has the specified domain create permissions.
     * This method takes into account any direct and inherited domain create permissions.
     *
     * @param accessorResource        the resource on which access is being checked
@@ -270,8 +267,7 @@ public interface AccessControlContext {
                                              DomainCreatePermission... domainCreatePermissions);
 
    /**
-    * Checks if the session resource has the specified domain create permissions on the
-    * specified domain.
+    * Checks if the session resource has the specified domain create permissions.
     * This method takes into account any direct and inherited domain create permissions.
     *
     *
