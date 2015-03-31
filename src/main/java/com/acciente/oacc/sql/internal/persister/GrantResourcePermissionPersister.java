@@ -244,6 +244,37 @@ public class GrantResourcePermissionPersister extends Persister {
       }
    }
 
+   public void updateResourcePermissions(SQLConnection connection,
+                                         Resource accessorResource,
+                                         Resource accessedResource,
+                                         Id<ResourceClassId> accessedResourceClassId,
+                                         Set<ResourcePermission> requestedResourcePermissions,
+                                         Resource grantorResource) {
+      SQLStatement statement = null;
+      try {
+         statement = connection.prepareStatement(sqlStrings.SQL_updateInGrantResourcePermission_SET_GrantorID_IsWithGrant_BY_AccessorID_AccessedID_ResourceClassID_PermissionName);
+         for (ResourcePermission resourcePermission : requestedResourcePermissions) {
+            if (!resourcePermission.isSystemPermission()) {
+               statement.setResourceId(1, grantorResource);
+               statement.setBoolean(2, resourcePermission.isWithGrant());
+               statement.setResourceId(3, accessorResource);
+               statement.setResourceId(4, accessedResource);
+               statement.setResourceClassId(5, accessedResourceClassId);
+               statement.setResourceClassId(6, accessedResourceClassId);
+               statement.setString(7, resourcePermission.getPermissionName());
+
+               assertOneRowUpdated(statement.executeUpdate());
+            }
+         }
+      }
+      catch (SQLException e) {
+         throw new RuntimeException(e);
+      }
+      finally {
+         closeStatement(statement);
+      }
+   }
+
    public void removeResourcePermissions(SQLConnection connection,
                                          Resource accessorResource,
                                          Resource accessedResource) {

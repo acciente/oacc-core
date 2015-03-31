@@ -2113,6 +2113,152 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
    }
 
    @Override
+   public void grantResourcePermissions(Resource accessorResource,
+                                        Resource accessedResource,
+                                        ResourcePermission resourcePermission,
+                                        ResourcePermission... resourcePermissions) {
+      SQLConnection connection = null;
+
+      __assertAuthenticated();
+      __assertResourceSpecified(accessorResource);
+      __assertResourceSpecified(accessedResource);
+      __assertPermissionSpecified(resourcePermission);
+      __assertVarargPermissionsSpecified(resourcePermissions);
+
+      final Set<ResourcePermission> requestedResourcePermissions
+            = getSetWithoutNulls(resourcePermission, resourcePermissions);
+
+      try {
+         connection = __getConnection();
+
+         __grantDirectResourcePermissions(connection, accessorResource, accessedResource, requestedResourcePermissions);
+      }
+      finally {
+         __closeConnection(connection);
+      }
+   }
+
+   private void __grantDirectResourcePermissions(SQLConnection connection,
+                                                 Resource accessorResource,
+                                                 Resource accessedResource,
+                                                 Set<ResourcePermission> requestedResourcePermissions) {
+      __assertResourceExists(connection, accessorResource);
+
+      final ResourceClassInternalInfo accessedResourceClassInternalInfo
+            = resourceClassPersister.getResourceClassInfoByResourceId(connection, accessedResource);
+
+      // next ensure that the requested permissions are all in the correct resource class
+      __assertUniqueResourcePermissionsNamesForResourceClass(connection,
+                                                             requestedResourcePermissions,
+                                                             accessedResourceClassInternalInfo);
+
+      // check for authorization
+      if (!__isSuperUserOfResource(connection, sessionResource, accessedResource)) {
+         final Set<ResourcePermission>
+               grantorResourcePermissions
+               = __getEffectiveResourcePermissions(connection, sessionResource, accessedResource);
+
+         final Set<ResourcePermission>
+               unauthorizedPermissions
+               = __subtractResourcePermissionsIfGrantableFrom(requestedResourcePermissions, grantorResourcePermissions);
+
+         if (unauthorizedPermissions.size() > 0) {
+            throw NotAuthorizedException.newInstanceForAction(sessionResource,
+                                                              "grant the following permission(s): " + unauthorizedPermissions);
+         }
+      }
+
+      final Set<ResourcePermission> directAccessorResourcePermissions
+            = __getDirectResourcePermissions(connection, accessorResource, accessedResource);
+
+      final Set<ResourcePermission> addPermissions = new HashSet<>(requestedResourcePermissions.size());
+      final Set<ResourcePermission> updatePermissions = new HashSet<>(requestedResourcePermissions.size());
+
+      for (ResourcePermission requestedPermission : requestedResourcePermissions) {
+         boolean existingPermission = false;
+
+         for (ResourcePermission existingDirectPermission : directAccessorResourcePermissions) {
+            if (requestedPermission.equals(existingDirectPermission)) {
+               // requested permission is identical to already existing direct permission, so no need to add/update it
+               existingPermission = true;
+               break;
+            }
+            if (requestedPermission.isGrantableFrom(existingDirectPermission)) {
+               // requested permission has lesser granting rights than already existing direct permission, so no need to update
+               existingPermission = true;
+               break;
+            }
+            if (requestedPermission.equalsIgnoreGrant(existingDirectPermission)) {
+               // requested permission has same name and based on above evaluations has higher granting rights than
+               // the already existing direct permission, so we need to update it
+               updatePermissions.add(requestedPermission);
+               existingPermission = true;
+               break;
+            }
+         }
+
+         if (!existingPermission) {
+            // couldn't find requested permission in set of already existing direct permissions, by name, so we need to add it
+            addPermissions.add(requestedPermission);
+         }
+      }
+
+      // if inherit permissions are about to be granted, first check for cycles
+      if (addPermissions.contains(ResourcePermission_INHERIT)
+            || addPermissions.contains(ResourcePermission_INHERIT_GRANT)) {
+         Set<ResourcePermission> reversePathResourcePermissions = __getEffectiveResourcePermissions(connection,
+                                                                                                    accessedResource,
+                                                                                                    accessorResource);
+
+         if (reversePathResourcePermissions.contains(ResourcePermission_INHERIT)
+               || reversePathResourcePermissions.contains(ResourcePermission_INHERIT_GRANT)
+               || accessorResource.equals(accessedResource)) {
+            throw new OaccException("Granting the requested permission(s): "
+                                          + requestedResourcePermissions
+                                          + " will cause a cycle between: "
+                                          + accessorResource
+                                          + " and: "
+                                          + accessedResource);
+         }
+      }
+
+      // update any necessary direct system permissions between the accessor and the accessed resource
+      grantResourcePermissionSysPersister.updateResourceSysPermissions(connection,
+                                                                       accessorResource,
+                                                                       accessedResource,
+                                                                       Id.<ResourceClassId>from(
+                                                                             accessedResourceClassInternalInfo.getResourceClassId()),
+                                                                       updatePermissions,
+                                                                       sessionResource);
+
+      // update any necessary direct non-system permissions between the accessor and the accessed resource
+      grantResourcePermissionPersister.updateResourcePermissions(connection,
+                                                                 accessorResource,
+                                                                 accessedResource,
+                                                                 Id.<ResourceClassId>from(
+                                                                       accessedResourceClassInternalInfo.getResourceClassId()),
+                                                                 updatePermissions,
+                                                                 sessionResource);
+
+      // add the new direct system permissions
+      grantResourcePermissionSysPersister.addResourceSysPermissions(connection,
+                                                                    accessorResource,
+                                                                    accessedResource,
+                                                                    Id.<ResourceClassId>from(
+                                                                          accessedResourceClassInternalInfo.getResourceClassId()),
+                                                                    addPermissions,
+                                                                    sessionResource);
+
+      // add the new direct non-system permissions
+      grantResourcePermissionPersister.addResourcePermissions(connection,
+                                                              accessorResource,
+                                                              accessedResource,
+                                                              Id.<ResourceClassId>from(accessedResourceClassInternalInfo.getResourceClassId()),
+                                                              addPermissions,
+                                                              sessionResource);
+   }
+
+   @Override
    public Set<ResourcePermission> getResourcePermissions(Resource accessorResource,
                                                          Resource accessedResource) {
       SQLConnection connection = null;

@@ -162,7 +162,7 @@ public class GrantResourcePermissionSysPersister extends Persister {
 
          while (resultSet.next()) {
             resourcePermissions.add(ResourcePermissions.getInstance(resultSet.getResourceSysPermissionName(
-                  "SysPermissionId"),
+                                                                          "SysPermissionId"),
                                                                     resultSet.getBoolean("IsWithGrant"),
                                                                     resultSet.getInteger("InheritLevel"),
                                                                     0 /* zero since domain level does not apply in context of direct permissions */));
@@ -233,6 +233,37 @@ public class GrantResourcePermissionSysPersister extends Persister {
                statement.setResourceSystemPermissionId(6, resourcePermission.getSystemPermissionId());
 
                assertOneRowInserted(statement.executeUpdate());
+            }
+         }
+      }
+      catch (SQLException e) {
+         throw new RuntimeException(e);
+      }
+      finally {
+         closeStatement(statement);
+      }
+   }
+
+   public void updateResourceSysPermissions(SQLConnection connection,
+                                            Resource accessorResource,
+                                            Resource accessedResource,
+                                            Id<ResourceClassId> accessedResourceClassId,
+                                            Set<ResourcePermission> requestedResourcePermissions,
+                                            Resource grantorResource) {
+      SQLStatement statement = null;
+      try {
+         // add the new system permissions
+         statement = connection.prepareStatement(sqlStrings.SQL_updateInGrantResourcePermissionSys_SET_GrantorID_IsWithGrant_BY_AccessorID_AccessedID_ResourceClassID_SysPermissionName);
+         for (ResourcePermission resourcePermission : requestedResourcePermissions) {
+            if (resourcePermission.isSystemPermission()) {
+               statement.setResourceId(1, grantorResource);
+               statement.setBoolean(2, resourcePermission.isWithGrant());
+               statement.setResourceId(3, accessorResource);
+               statement.setResourceId(4, accessedResource);
+               statement.setResourceClassId(5, accessedResourceClassId);
+               statement.setResourceSystemPermissionId(6, resourcePermission.getSystemPermissionId());
+
+               assertOneRowUpdated(statement.executeUpdate());
             }
          }
       }

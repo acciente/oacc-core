@@ -121,11 +121,13 @@ public class SQLStrings implements Serializable {
    public final String SQL_findInGrantResourcePermissionSys_ResourceClassName_SysPermissionID_IsWithGrant_InheritLevel_BY_AccessorID_AccessedID;
    public final String SQL_findInGrantResourcePermissionSys_withoutInheritance_ResourceClassName_SysPermissionID_IsWithGrant_BY_AccessorID_AccessedID;
    public final String SQL_createInGrantResourcePermissionSys_WITH_AccessorID_GrantorID_AccessedID_IsWithGrant_ResourceClassID_SysPermissionID;
+   public final String SQL_updateInGrantResourcePermissionSys_SET_GrantorID_IsWithGrant_BY_AccessorID_AccessedID_ResourceClassID_SysPermissionName;;
    public final String SQL_removeInGrantResourcePermissionSys_BY_AccessorID_AccessedID;
    // GrantResourcePermission
    public final String SQL_findInGrantResourcePermission_ResourceClassName_PermissionName_IsWithGrant_InheritLevel_BY_AccessorID_AccessedID;
    public final String SQL_findInGrantResourcePermission_withoutInheritance_ResourceClassName_PermissionName_IsWithGrant_BY_AccessorID_AccessedID;
    public final String SQL_createInGrantResourcePermission_WITH_AccessorID_GrantorID_AccessedID_IsWithGrant_ResourceClassID_PermissionName;
+   public final String SQL_updateInGrantResourcePermission_SET_GrantorID_IsWithGrant_BY_AccessorID_AccessedID_ResourceClassID_PermissionName;
    public final String SQL_removeInGrantResourcePermission_BY_AccessorID_AccessedID;
 
    // GrantGlobalResourcePermissionSys
@@ -151,11 +153,13 @@ public class SQLStrings implements Serializable {
          ResourcePermissions.INHERIT,
          false);
 
-   public static SQLStrings getSQLStrings(String schemaName, SQLDialect sqlDialect) {
+   public static SQLStrings getSQLStrings(String schemaName,
+                                          SQLDialect sqlDialect) {
       return new SQLStrings(schemaName, DialectSpecificSQLGenerator.getInstance(sqlDialect));
    }
 
-   private SQLStrings(String schemaName, DialectSpecificSQLGenerator dialectSpecificSQLGenerator) {
+   private SQLStrings(String schemaName,
+                      DialectSpecificSQLGenerator dialectSpecificSQLGenerator) {
       final String withClause = dialectSpecificSQLGenerator.getWithClause();
       final String unionClause = dialectSpecificSQLGenerator.getUnionClause();
       final String schemaNameAndTablePrefix = schemaName != null ? schemaName + ".OAC_" : "OAC_";
@@ -779,6 +783,12 @@ public class SQLStrings implements Serializable {
             + "Grant_ResPerm_Sys ( AccessorResourceId, GrantorResourceId, AccessedResourceId, IsWithGrant, ResourceClassId, SysPermissionId ) "
             + "VALUES ( ?, ?, ?, ?, ?, ? )";
 
+      SQL_updateInGrantResourcePermissionSys_SET_GrantorID_IsWithGrant_BY_AccessorID_AccessedID_ResourceClassID_SysPermissionName
+            = "UPDATE "
+            + schemaNameAndTablePrefix
+            + "Grant_ResPerm_Sys SET GrantorResourceId = ?, IsWithGrant = ? "
+            + "WHERE AccessorResourceId = ? AND AccessedResourceId = ? AND ResourceClassId = ? AND SysPermissionId = ?";
+
       SQL_removeInGrantResourcePermissionSys_BY_AccessorID_AccessedID
             = "DELETE FROM "
             + schemaNameAndTablePrefix
@@ -814,6 +824,15 @@ public class SQLStrings implements Serializable {
             + "SELECT ?, ?, ?, ?, A.ResourceClassId, A.PermissionId FROM "
             + schemaNameAndTablePrefix
             + "ResourceClassPermission A WHERE A.ResourceClassId = ? AND A.PermissionName = ?";
+
+      SQL_updateInGrantResourcePermission_SET_GrantorID_IsWithGrant_BY_AccessorID_AccessedID_ResourceClassID_PermissionName
+            = "UPDATE "
+            + schemaNameAndTablePrefix
+            + "Grant_ResPerm SET GrantorResourceId = ?, IsWithGrant = ? "
+            + "WHERE AccessorResourceId = ? AND AccessedResourceId = ? AND ResourceClassId = ? AND PermissionId = ( "
+            + "SELECT A.PermissionId FROM "
+            + schemaNameAndTablePrefix
+            + "ResourceClassPermission A WHERE A.ResourceClassId = ? AND A.PermissionName = ? )";
 
       SQL_removeInGrantResourcePermission_BY_AccessorID_AccessedID
             = "DELETE FROM "
