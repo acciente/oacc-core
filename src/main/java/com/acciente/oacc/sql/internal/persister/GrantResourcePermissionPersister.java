@@ -260,8 +260,7 @@ public class GrantResourcePermissionPersister extends Persister {
                statement.setResourceId(3, accessorResource);
                statement.setResourceId(4, accessedResource);
                statement.setResourceClassId(5, accessedResourceClassId);
-               statement.setResourceClassId(6, accessedResourceClassId);
-               statement.setString(7, resourcePermission.getPermissionName());
+               statement.setString(6, resourcePermission.getPermissionName());
 
                assertOneRowUpdated(statement.executeUpdate());
             }
@@ -284,6 +283,33 @@ public class GrantResourcePermissionPersister extends Persister {
          statement.setResourceId(1, accessorResource);
          statement.setResourceId(2, accessedResource);
          statement.executeUpdate();
+      }
+      catch (SQLException e) {
+         throw new RuntimeException(e);
+      }
+      finally {
+         closeStatement(statement);
+      }
+   }
+
+   public void removeResourcePermissions(SQLConnection connection,
+                                         Resource accessorResource,
+                                         Resource accessedResource,
+                                         Id<ResourceClassId> accessedResourceClassId,
+                                         Set<ResourcePermission> requestedResourcePermissions) {
+      SQLStatement statement = null;
+      try {
+         statement = connection.prepareStatement(sqlStrings.SQL_removeInGrantResourcePermission_BY_AccessorID_AccessedID_ResourceClassID_PermissionName);
+         for (ResourcePermission resourcePermission : requestedResourcePermissions) {
+            if (!resourcePermission.isSystemPermission()) {
+               statement.setResourceId(1, accessorResource);
+               statement.setResourceId(2, accessedResource);
+               statement.setResourceClassId(3, accessedResourceClassId);
+               statement.setString(4, resourcePermission.getPermissionName());
+
+               assertOneRowUpdated(statement.executeUpdate());
+            }
+         }
       }
       catch (SQLException e) {
          throw new RuntimeException(e);

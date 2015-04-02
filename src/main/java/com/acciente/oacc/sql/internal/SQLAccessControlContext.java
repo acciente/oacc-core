@@ -2259,6 +2259,108 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
    }
 
    @Override
+   public void revokeResourcePermissions(Resource accessorResource,
+                                         Resource accessedResource,
+                                         ResourcePermission resourcePermission,
+                                         ResourcePermission... resourcePermissions) {
+      SQLConnection connection = null;
+
+      __assertAuthenticated();
+      __assertResourceSpecified(accessorResource);
+      __assertResourceSpecified(accessedResource);
+      __assertPermissionSpecified(resourcePermission);
+      __assertVarargPermissionsSpecified(resourcePermissions);
+
+      final Set<ResourcePermission> obsoleteResourcePermissions
+            = getSetWithoutNulls(resourcePermission, resourcePermissions);
+
+      try {
+         connection = __getConnection();
+
+         __revokeDirectResourcePermissions(connection, accessorResource, accessedResource, obsoleteResourcePermissions);
+      }
+      finally {
+         __closeConnection(connection);
+      }
+   }
+
+   private void __revokeDirectResourcePermissions(SQLConnection connection,
+                                                  Resource accessorResource,
+                                                  Resource accessedResource,
+                                                  Set<ResourcePermission> obsoleteResourcePermissions) {
+      __assertResourceExists(connection, accessorResource);
+
+      final ResourceClassInternalInfo accessedResourceClassInternalInfo
+            = resourceClassPersister.getResourceClassInfoByResourceId(connection, accessedResource);
+
+      // next ensure that the requested permissions are unique in name
+      __assertUniqueResourcePermissionsNames(connection, obsoleteResourcePermissions);
+
+      // check for authorization
+      if (!__isSuperUserOfResource(connection, sessionResource, accessedResource)) {
+         final Set<ResourcePermission>
+               grantorResourcePermissions
+               = __getEffectiveResourcePermissions(connection, sessionResource, accessedResource);
+
+         final Set<ResourcePermission>
+               unauthorizedPermissions
+               = __subtractResourcePermissionsIfGrantableFrom(obsoleteResourcePermissions, grantorResourcePermissions);
+
+         if (unauthorizedPermissions.size() > 0) {
+            throw NotAuthorizedException.newInstanceForAction(sessionResource,
+                                                              "revoke the following permission(s): " + unauthorizedPermissions);
+         }
+      }
+
+      final Set<ResourcePermission> directAccessorResourcePermissions
+            = __getDirectResourcePermissions(connection, accessorResource, accessedResource);
+
+      final Set<ResourcePermission> removePermissions = new HashSet<>(obsoleteResourcePermissions.size());
+
+      for (ResourcePermission requestedPermission : obsoleteResourcePermissions) {
+         for (ResourcePermission existingDirectPermission : directAccessorResourcePermissions) {
+            if (requestedPermission.equalsIgnoreGrant(existingDirectPermission)) {
+               // requested permission has same name and regardless of granting rights we need to remove it
+               removePermissions.add(requestedPermission);
+               break;
+            }
+         }
+      }
+
+      // update any necessary direct system permissions between the accessor and the accessed resource
+      grantResourcePermissionSysPersister.removeResourceSysPermissions(connection,
+                                                                       accessorResource,
+                                                                       accessedResource,
+                                                                       Id.<ResourceClassId>from(
+                                                                             accessedResourceClassInternalInfo
+                                                                                   .getResourceClassId()),
+                                                                       removePermissions);
+
+      // update any necessary direct non-system permissions between the accessor and the accessed resource
+      grantResourcePermissionPersister.removeResourcePermissions(connection,
+                                                                 accessorResource,
+                                                                 accessedResource,
+                                                                 Id.<ResourceClassId>from(
+                                                                       accessedResourceClassInternalInfo.getResourceClassId()),
+                                                                 removePermissions);
+   }
+
+   private void __assertUniqueResourcePermissionsNames(SQLConnection connection,
+                                                       Set<ResourcePermission> resourcePermissions) {
+      final Set<String> uniquePermissionNames = new HashSet<>(resourcePermissions.size());
+
+      for (final ResourcePermission resourcePermission : resourcePermissions) {
+         if (uniquePermissionNames.contains(resourcePermission.getPermissionName())) {
+            throw new IllegalArgumentException("Duplicate permission: " + resourcePermission.getPermissionName()
+                                                     + " that only differs in 'withGrant' option");
+         }
+         else {
+            uniquePermissionNames.add(resourcePermission.getPermissionName());
+         }
+      }
+   }
+
+   @Override
    public Set<ResourcePermission> getResourcePermissions(Resource accessorResource,
                                                          Resource accessedResource) {
       SQLConnection connection = null;

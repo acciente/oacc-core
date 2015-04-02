@@ -1582,7 +1582,7 @@ public interface AccessControlContext {
     * This method does <em>not</em> replace any direct resource permissions previously granted, but
     * can only add to the set. Furthermore, removing the 'withGrant' option from an existing permission is not
     * possible - revoke the permission first, then re-grant without the 'withGrant' option,
-    * or use {@link #setResourcePermissions}
+    * or use {@link #setResourcePermissions} to specify all direct permissions
     *
     * @param accessorResource    the resource to which the privilege should be granted
     * @param accessedResource    the resource on which the privilege is granted
@@ -1595,7 +1595,7 @@ public interface AccessControlContext {
     *                                            if resourcePermissions contains multiple instances of the same
     *                                            permission that only differ in the 'withGrant' attribute
     * @throws com.acciente.oacc.NotAuthorizedException if the accessorResource is not authorized to grant the
-    *                                                  specified permissions permissions on the specified accessed resource
+    *                                                  specified permissions on the specified accessed resource
     * @throws com.acciente.oacc.OaccException          if granting the specified permissions would introduce a cycle
     *                                                  between accessor and accessed resource via permission inheritance
     */
@@ -1603,6 +1603,30 @@ public interface AccessControlContext {
                                         Resource accessedResource,
                                         ResourcePermission resourcePermission,
                                         ResourcePermission... resourcePermissions);
+
+   /**
+    * Revokes the specified resource permissions from the set of permissions that the specified accessor resource
+    * has to the specified accessed resource directly, that is not via inheritance or globally.
+    * <p/>
+    * Note that this method revokes the specified permission regardless of any specified granting right and regardless
+    * of the granting right the accessor has on the accessed resource!
+    * This method is idempotent, that is, when a specified permission is no longer granted, repeated calls to
+    * this method will have no effect.
+    *
+    * @param accessorResource    the resource from which the privilege should be revoked
+    * @param accessedResource    the resource on which the privilege was originally granted
+    * @param resourcePermission  the resource permission to be revoked
+    * @param resourcePermissions  the other (optional) resource permissions to be revoked
+    * @throws java.lang.IllegalArgumentException if accessorResource or accessedResource reference does not exist, or
+    *                                            if resourcePermissions contains multiple instances of the same
+    *                                            permission that only differ in the 'withGrant' attribute
+    * @throws com.acciente.oacc.NotAuthorizedException if the accessorResource is not authorized to grant (or in this case
+    *                                                  revoke) the specified permissions on the specified accessed resource
+    */
+   public void revokeResourcePermissions(Resource accessorResource,
+                                         Resource accessedResource,
+                                         ResourcePermission resourcePermission,
+                                         ResourcePermission... resourcePermissions);
 
    /**
     * Gets the resource permissions that the specified accessor resource has directly to the

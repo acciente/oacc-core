@@ -336,7 +336,7 @@ public class TestAccessControl_grantResourcePermissions extends TestAccessContro
    }
 
    @Test
-   public void grantResourcePermissions_addPermission_withUnauthorizedPermissionsGrantedElsewhere_shouldSucceedAsAuthorized() {
+   public void grantResourcePermissions_addPermission_withUnauthorizedPermissionsGrantedElsewhere_shouldFailAsAuthorized() {
       authenticateSystemResource();
       final String resourceClassName = generateResourceClass(false, false);
       final String grantedPermissionName = generateResourceClassPermission(resourceClassName);
@@ -724,8 +724,8 @@ public class TestAccessControl_grantResourcePermissions extends TestAccessContro
       assertThat(accessControlContext.getEffectiveResourcePermissions(accessorResource, accessedResource).isEmpty(), is(true));
 
       final String permissionName = generateResourceClassPermission(resourceClassName);
-      // attempt to grant permissions with duplicate permission names
 
+      // attempt to grant permissions with duplicate permission names
       try {
          accessControlContext.grantResourcePermissions(accessorResource,
                                                        accessedResource,
@@ -868,40 +868,6 @@ public class TestAccessControl_grantResourcePermissions extends TestAccessContro
       }
       catch (IllegalArgumentException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("does not exist for the specified resource class"));
-      }
-   }
-
-   @Test
-   public void grantResourcePermissions_notAuthorized_shouldFail() {
-      authenticateSystemResource();
-      final String resourceClassName = generateResourceClass(false, false);
-      final String customPermissionName = generateResourceClassPermission(resourceClassName);
-      final char[] password = generateUniquePassword();
-      final Resource grantorResource = generateAuthenticatableResource(password);
-      final Resource accessorResource = generateUnauthenticatableResource();
-      final Resource accessedResource = accessControlContext.createResource(resourceClassName, generateDomain());
-      assertThat(accessControlContext.getEffectiveResourcePermissions(accessorResource, accessedResource).isEmpty(), is(true));
-
-      Set<ResourcePermission> permissions_pre = new HashSet<>();
-      permissions_pre.add(ResourcePermissions.getInstance(ResourcePermissions.INHERIT));
-      permissions_pre.add(ResourcePermissions.getInstance(customPermissionName));
-
-      // authenticate grantor resource
-      accessControlContext.authenticate(grantorResource, PasswordCredentials.newInstance(password));
-      assertThat(accessControlContext.getEffectiveResourcePermissions(grantorResource, accessedResource).isEmpty(), is(true));
-
-      // attempt to grant permissions as grantor without authorization
-      try {
-         accessControlContext.grantResourcePermissions(accessorResource,
-                                                       accessedResource,
-                                                       ResourcePermissions.getInstance(ResourcePermissions.INHERIT),
-                                                       ResourcePermissions.getInstance(customPermissionName));
-         fail("granting permissions as grantor without authorization should have failed");
-      }
-      catch (NotAuthorizedException e) {
-         assertThat(e.getMessage().toLowerCase(), containsString(String.valueOf(grantorResource).toLowerCase()
-                                                                       + " is not authorized"));
-         assertThat(e.getMessage().toLowerCase(), containsString("following permission"));
       }
    }
 }

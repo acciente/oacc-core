@@ -253,7 +253,7 @@ public class GrantResourcePermissionSysPersister extends Persister {
       SQLStatement statement = null;
       try {
          // add the new system permissions
-         statement = connection.prepareStatement(sqlStrings.SQL_updateInGrantResourcePermissionSys_SET_GrantorID_IsWithGrant_BY_AccessorID_AccessedID_ResourceClassID_SysPermissionName);
+         statement = connection.prepareStatement(sqlStrings.SQL_updateInGrantResourcePermissionSys_SET_GrantorID_IsWithGrant_BY_AccessorID_AccessedID_ResourceClassID_SysPermissionID);
          for (ResourcePermission resourcePermission : requestedResourcePermissions) {
             if (resourcePermission.isSystemPermission()) {
                statement.setResourceId(1, grantorResource);
@@ -284,6 +284,33 @@ public class GrantResourcePermissionSysPersister extends Persister {
          statement.setResourceId(1, accessorResource);
          statement.setResourceId(2, accessedResource);
          statement.executeUpdate();
+      }
+      catch (SQLException e) {
+         throw new RuntimeException(e);
+      }
+      finally {
+         closeStatement(statement);
+      }
+   }
+
+   public void removeResourceSysPermissions(SQLConnection connection,
+                                            Resource accessorResource,
+                                            Resource accessedResource,
+                                            Id<ResourceClassId> accessedResourceClassId,
+                                            Set<ResourcePermission> requestedResourcePermissions) {
+      SQLStatement statement = null;
+      try {
+         statement = connection.prepareStatement(sqlStrings.SQL_removeInGrantResourcePermissionSys_BY_AccessorID_AccessedID_ResourceClassID_SysPermissionID);
+         for (ResourcePermission resourcePermission : requestedResourcePermissions) {
+            if (resourcePermission.isSystemPermission()) {
+               statement.setResourceId(1, accessorResource);
+               statement.setResourceId(2, accessedResource);
+               statement.setResourceClassId(3, accessedResourceClassId);
+               statement.setResourceSystemPermissionId(4, resourcePermission.getSystemPermissionId());
+
+               assertOneRowUpdated(statement.executeUpdate());
+            }
+         }
       }
       catch (SQLException e) {
          throw new RuntimeException(e);
