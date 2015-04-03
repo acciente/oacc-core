@@ -2673,6 +2673,163 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
    }
 
    @Override
+   public void grantGlobalResourcePermissions(Resource accessorResource,
+                                              String resourceClassName,
+                                              ResourcePermission resourcePermission,
+                                              ResourcePermission... resourcePermissions) {
+      grantGlobalResourcePermissions(accessorResource,
+                                     resourceClassName,
+                                     sessionResourceDomainName,
+                                     resourcePermission,
+                                     resourcePermissions);
+   }
+
+   @Override
+   public void grantGlobalResourcePermissions(Resource accessorResource,
+                                              String resourceClassName,
+                                              String domainName,
+                                              ResourcePermission resourcePermission,
+                                              ResourcePermission... resourcePermissions) {
+      SQLConnection connection = null;
+
+      __assertAuthenticated();
+      __assertResourceSpecified(accessorResource);
+      __assertResourceClassSpecified(resourceClassName);
+      __assertDomainSpecified(domainName);
+      __assertPermissionSpecified(resourcePermission);
+      __assertVarargPermissionsSpecified(resourcePermissions);
+
+      final Set<ResourcePermission> requestedResourcePermissions
+            = getSetWithoutNulls(resourcePermission, resourcePermissions);
+
+      try {
+         connection = __getConnection();
+         resourceClassName = resourceClassName.trim();
+         domainName = domainName.trim();
+
+         __grantDirectGlobalPermissions(connection,
+                                        accessorResource,
+                                        resourceClassName,
+                                        domainName,
+                                        requestedResourcePermissions);
+      }
+      finally {
+         __closeConnection(connection);
+      }
+   }
+
+   private void __grantDirectGlobalPermissions(SQLConnection connection,
+                                               Resource accessorResource,
+                                               String resourceClassName,
+                                               String domainName,
+                                               Set<ResourcePermission> requestedResourcePermissions) {
+      __assertResourceExists(connection, accessorResource);
+
+      // verify that resource class is defined
+      final Id<ResourceClassId> resourceClassId = resourceClassPersister.getResourceClassId(connection, resourceClassName);
+
+      if (resourceClassId == null) {
+         throw new IllegalArgumentException("Could not find resource class: " + resourceClassName);
+      }
+
+      final ResourceClassInternalInfo resourceClassInternalInfo
+            = resourceClassPersister.getResourceClassInfo(connection, resourceClassName);
+
+      // verify the domain
+      final Id<DomainId> domainId = domainPersister.getResourceDomainId(connection, domainName);
+
+      if (domainId == null) {
+         throw new IllegalArgumentException("Could not find domain: " + domainName);
+      }
+
+      // next ensure that the requested permissions are all in the correct resource class
+      __assertUniqueGlobalResourcePermissionNamesForResourceClass(connection, requestedResourcePermissions, resourceClassInternalInfo);
+
+
+
+      // check for authorization
+      if (!__isSuperUserOfDomain(connection, sessionResource, domainName)) {
+         final Set<ResourcePermission> grantorPermissions
+               = __getEffectiveGlobalResourcePermissions(connection, sessionResource, resourceClassName, domainName);
+
+         final Set<ResourcePermission> unauthorizedPermissions
+               = __subtractResourcePermissionsIfGrantableFrom(requestedResourcePermissions, grantorPermissions);
+
+         if (unauthorizedPermissions.size() > 0) {
+            throw NotAuthorizedException.newInstanceForAction(sessionResource,
+                                                              "grant the following global permission(s): " + unauthorizedPermissions);
+         }
+      }
+
+      final Set<ResourcePermission> directAccessorPermissions
+            = __getDirectGlobalResourcePermissions(connection, accessorResource, resourceClassId, domainId);
+
+      final Set<ResourcePermission> addPermissions = new HashSet<>(requestedResourcePermissions.size());
+      final Set<ResourcePermission> updatePermissions = new HashSet<>(requestedResourcePermissions.size());
+
+      for (ResourcePermission requestedPermission : requestedResourcePermissions) {
+         boolean existingPermission = false;
+
+         for (ResourcePermission existingDirectPermission : directAccessorPermissions) {
+            if (requestedPermission.equals(existingDirectPermission)) {
+               // requested permission is identical to already existing direct permission, so no need to add/update it
+               existingPermission = true;
+               break;
+            }
+            if (requestedPermission.isGrantableFrom(existingDirectPermission)) {
+               // requested permission has lesser granting rights than already existing direct permission, so no need to update
+               existingPermission = true;
+               break;
+            }
+            if (requestedPermission.equalsIgnoreGrant(existingDirectPermission)) {
+               // requested permission has same name and based on above evaluations has higher granting rights than
+               // the already existing direct permission, so we need to update it
+               updatePermissions.add(requestedPermission);
+               existingPermission = true;
+               break;
+            }
+         }
+
+         if (!existingPermission) {
+            // couldn't find requested permission in set of already existing direct permissions, by name, so we need to add it
+            addPermissions.add(requestedPermission);
+         }
+      }
+
+      // update any necessary direct system permissions between the accessor and the accessed resource
+      grantGlobalResourcePermissionSysPersister.updateGlobalSysPermissions(connection,
+                                                                           accessorResource,
+                                                                           resourceClassId,
+                                                                           domainId,
+                                                                           updatePermissions,
+                                                                           sessionResource);
+
+      // update any necessary direct non-system permissions between the accessor and the accessed resource
+      grantGlobalResourcePermissionPersister.updateGlobalResourcePermissions(connection,
+                                                                             accessorResource,
+                                                                             resourceClassId,
+                                                                             domainId,
+                                                                             updatePermissions,
+                                                                             sessionResource);
+
+      // add the new system permissions
+      grantGlobalResourcePermissionSysPersister.addGlobalSysPermissions(connection,
+                                                                        accessorResource,
+                                                                        resourceClassId,
+                                                                        domainId,
+                                                                        addPermissions,
+                                                                        sessionResource);
+
+      // add the new non-system permissions
+      grantGlobalResourcePermissionPersister.addGlobalResourcePermissions(connection,
+                                                                          accessorResource,
+                                                                          resourceClassId,
+                                                                          domainId,
+                                                                          addPermissions,
+                                                                          sessionResource);
+   }
+
+   @Override
    public Set<ResourcePermission> getGlobalResourcePermissions(Resource accessorResource,
                                                                String resourceClassName,
                                                                String domainName) {

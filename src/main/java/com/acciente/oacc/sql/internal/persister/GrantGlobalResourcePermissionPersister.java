@@ -315,6 +315,37 @@ public class GrantGlobalResourcePermissionPersister extends Persister {
       }
    }
 
+   public void updateGlobalResourcePermissions(SQLConnection connection,
+                                               Resource accessorResource,
+                                               Id<ResourceClassId> accessedResourceClassId,
+                                               Id<DomainId> accessedResourceDomainId,
+                                               Set<ResourcePermission> requestedResourcePermissions,
+                                               Resource grantorResource) {
+      SQLStatement statement = null;
+      try {
+         // add the new non-system permissions
+         statement = connection.prepareStatement(sqlStrings.SQL_updateInGrantGlobalResourcePermission_SET_GrantorID_IsWithGrant_BY_AccessorID_AccessedDomainID_ResourceClassID_PermissionName);
+         for (ResourcePermission resourcePermission : requestedResourcePermissions) {
+            if (!resourcePermission.isSystemPermission()) {
+               statement.setResourceId(1, grantorResource);
+               statement.setBoolean(2, resourcePermission.isWithGrant());
+               statement.setResourceId(3, accessorResource);
+               statement.setResourceDomainId(4, accessedResourceDomainId);
+               statement.setResourceClassId(5, accessedResourceClassId);
+               statement.setString(6, resourcePermission.getPermissionName());
+
+               assertOneRowInserted(statement.executeUpdate());
+            }
+         }
+      }
+      catch (SQLException e) {
+         throw new RuntimeException(e);
+      }
+      finally {
+         closeStatement(statement);
+      }
+   }
+
    public void removeGlobalResourcePermissions(SQLConnection connection,
                                                Resource accessorResource,
                                                Id<ResourceClassId> accessedResourceClassId,
