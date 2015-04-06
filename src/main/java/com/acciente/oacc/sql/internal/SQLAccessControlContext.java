@@ -1703,7 +1703,8 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
 
       // read the *CREATE system permissions and add to allResourceCreatePermissionsMap
       allResourceCreatePermissionsMap
-            .putAll(grantResourceCreatePermissionSysPersister.getResourceCreateSysPermissions(connection, accessorResource));
+            .putAll(grantResourceCreatePermissionSysPersister.getResourceCreateSysPermissions(connection,
+                                                                                              accessorResource));
 
       // read the post create system permissions and add to allResourceCreatePermissionsMap
       __mergeSourceCreatePermissionsMapIntoTargetCreatePermissionsMap(
@@ -2290,11 +2291,11 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
                                                   Set<ResourcePermission> obsoleteResourcePermissions) {
       __assertResourceExists(connection, accessorResource);
 
-      final ResourceClassInternalInfo accessedResourceClassInternalInfo
-            = resourceClassPersister.getResourceClassInfoByResourceId(connection, accessedResource);
-
       // next ensure that the requested permissions are unique in name
       __assertUniqueResourcePermissionsNames(connection, obsoleteResourcePermissions);
+
+      final ResourceClassInternalInfo accessedResourceClassInternalInfo
+            = resourceClassPersister.getResourceClassInfoByResourceId(connection, accessedResource);
 
       // check for authorization
       if (!__isSuperUserOfResource(connection, sessionResource, accessedResource)) {
@@ -2341,7 +2342,8 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
                                                                  accessorResource,
                                                                  accessedResource,
                                                                  Id.<ResourceClassId>from(
-                                                                       accessedResourceClassInternalInfo.getResourceClassId()),
+                                                                       accessedResourceClassInternalInfo
+                                                                             .getResourceClassId()),
                                                                  removePermissions);
    }
 
@@ -2745,8 +2747,6 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       // next ensure that the requested permissions are all in the correct resource class
       __assertUniqueGlobalResourcePermissionNamesForResourceClass(connection, requestedResourcePermissions, resourceClassInternalInfo);
 
-
-
       // check for authorization
       if (!__isSuperUserOfDomain(connection, sessionResource, domainName)) {
          final Set<ResourcePermission> grantorPermissions
@@ -2827,6 +2827,120 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
                                                                           domainId,
                                                                           addPermissions,
                                                                           sessionResource);
+   }
+
+   @Override
+   public void revokeGlobalResourcePermissions(Resource accessorResource,
+                                               String resourceClassName,
+                                               ResourcePermission resourcePermission,
+                                               ResourcePermission... resourcePermissions) {
+      revokeGlobalResourcePermissions(accessorResource,
+                                      resourceClassName,
+                                      sessionResourceDomainName,
+                                      resourcePermission,
+                                      resourcePermissions);
+   }
+
+   @Override
+   public void revokeGlobalResourcePermissions(Resource accessorResource,
+                                               String resourceClassName,
+                                               String domainName,
+                                               ResourcePermission resourcePermission,
+                                               ResourcePermission... resourcePermissions) {
+      SQLConnection connection = null;
+
+      __assertAuthenticated();
+      __assertResourceSpecified(accessorResource);
+      __assertResourceClassSpecified(resourceClassName);
+      __assertDomainSpecified(domainName);
+      __assertPermissionSpecified(resourcePermission);
+      __assertVarargPermissionsSpecified(resourcePermissions);
+
+      final Set<ResourcePermission> requestedResourcePermissions
+            = getSetWithoutNulls(resourcePermission, resourcePermissions);
+
+      try {
+         connection = __getConnection();
+         resourceClassName = resourceClassName.trim();
+         domainName = domainName.trim();
+
+         __revokeDirectGlobalPermissions(connection,
+                                         accessorResource,
+                                         resourceClassName,
+                                         domainName,
+                                         requestedResourcePermissions);
+      }
+      finally {
+         __closeConnection(connection);
+      }
+   }
+
+   private void __revokeDirectGlobalPermissions(SQLConnection connection,
+                                                Resource accessorResource,
+                                                String resourceClassName,
+                                                String domainName,
+                                                Set<ResourcePermission> requestedResourcePermissions) {
+      __assertResourceExists(connection, accessorResource);
+
+      // next ensure that the requested permissions are unique in name
+      __assertUniqueResourcePermissionsNames(connection, requestedResourcePermissions);
+
+      // verify that resource class is defined
+      final Id<ResourceClassId> resourceClassId = resourceClassPersister.getResourceClassId(connection, resourceClassName);
+
+      if (resourceClassId == null) {
+         throw new IllegalArgumentException("Could not find resource class: " + resourceClassName);
+      }
+
+      // verify the domain
+      final Id<DomainId> domainId = domainPersister.getResourceDomainId(connection, domainName);
+
+      if (domainId == null) {
+         throw new IllegalArgumentException("Could not find domain: " + domainName);
+      }
+
+      // check for authorization
+      if (!__isSuperUserOfDomain(connection, sessionResource, domainName)) {
+         final Set<ResourcePermission> grantorPermissions
+               = __getEffectiveGlobalResourcePermissions(connection, sessionResource, resourceClassName, domainName);
+
+         final Set<ResourcePermission> unauthorizedPermissions
+               = __subtractResourcePermissionsIfGrantableFrom(requestedResourcePermissions, grantorPermissions);
+
+         if (unauthorizedPermissions.size() > 0) {
+            throw NotAuthorizedException.newInstanceForAction(sessionResource,
+                                                              "revoke the following global permission(s): " + unauthorizedPermissions);
+         }
+      }
+
+      final Set<ResourcePermission> directAccessorPermissions
+            = __getDirectGlobalResourcePermissions(connection, accessorResource, resourceClassId, domainId);
+
+      final Set<ResourcePermission> removePermissions = new HashSet<>(requestedResourcePermissions.size());
+
+      for (ResourcePermission requestedPermission : requestedResourcePermissions) {
+         for (ResourcePermission existingDirectPermission : directAccessorPermissions) {
+            if (requestedPermission.equalsIgnoreGrant(existingDirectPermission)) {
+               // requested permission has same name and regardless of granting rights we need to remove it
+               removePermissions.add(requestedPermission);
+               break;
+            }
+         }
+      }
+
+      // remove any necessary direct system permissions
+      grantGlobalResourcePermissionSysPersister.removeGlobalSysPermissions(connection,
+                                                                           accessorResource,
+                                                                           resourceClassId,
+                                                                           domainId,
+                                                                           removePermissions);
+
+      // remove any necessary direct non-system permissions
+      grantGlobalResourcePermissionPersister.removeGlobalResourcePermissions(connection,
+                                                                             accessorResource,
+                                                                             resourceClassId,
+                                                                             domainId,
+                                                                             removePermissions);
    }
 
    @Override

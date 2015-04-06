@@ -629,6 +629,19 @@ public class AccessControlContextProxy implements AccessControlContext {
    }
 
    @Override
+   public void revokeGlobalResourcePermissions(Resource accessorResource,
+                                               String resourceClassName,
+                                               String domainName,
+                                               ResourcePermission resourcePermission,
+                                               ResourcePermission... resourcePermissions) {
+      accessControlContext.revokeGlobalResourcePermissions(accessorResource,
+                                                           resourceClassName,
+                                                           domainName,
+                                                           resourcePermission,
+                                                           resourcePermissions);
+   }
+
+   @Override
    public Set<ResourcePermission> getGlobalResourcePermissions(Resource accessorResource,
                                                                String resourceClassName,
                                                                String domainName) {
@@ -655,6 +668,14 @@ public class AccessControlContextProxy implements AccessControlContext {
                                               ResourcePermission resourcePermission,
                                               ResourcePermission... resourcePermissions) {
       accessControlContext.grantGlobalResourcePermissions(accessorResource, resourceClassName, resourcePermission, resourcePermissions);
+   }
+
+   @Override
+   public void revokeGlobalResourcePermissions(Resource accessorResource,
+                                               String resourceClassName,
+                                               ResourcePermission resourcePermission,
+                                               ResourcePermission... resourcePermissions) {
+      accessControlContext.revokeGlobalResourcePermissions(accessorResource, resourceClassName, resourcePermission, resourcePermissions);
    }
 
    @Override

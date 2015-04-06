@@ -334,7 +334,7 @@ public class GrantGlobalResourcePermissionPersister extends Persister {
                statement.setResourceClassId(5, accessedResourceClassId);
                statement.setString(6, resourcePermission.getPermissionName());
 
-               assertOneRowInserted(statement.executeUpdate());
+               assertOneRowUpdated(statement.executeUpdate());
             }
          }
       }
@@ -359,6 +359,34 @@ public class GrantGlobalResourcePermissionPersister extends Persister {
          statement.setResourceDomainId(2, accessedResourceDomainId);
          statement.setResourceClassId(3, accessedResourceClassId);
          statement.executeUpdate();
+      }
+      catch (SQLException e) {
+         throw new RuntimeException(e);
+      }
+      finally {
+         closeStatement(statement);
+      }
+   }
+
+   public void removeGlobalResourcePermissions(SQLConnection connection,
+                                               Resource accessorResource,
+                                               Id<ResourceClassId> accessedResourceClassId,
+                                               Id<DomainId> accessedResourceDomainId,
+                                               Set<ResourcePermission> requestedResourcePermissions) {
+      SQLStatement statement = null;
+      try {
+         // remove the specified non-system permissions
+         statement = connection.prepareStatement(sqlStrings.SQL_removeInGrantGlobalResourcePermission_BY_AccessorID_AccessedDomainID_ResourceClassID_PermissionName);
+         for (ResourcePermission resourcePermission : requestedResourcePermissions) {
+            if (!resourcePermission.isSystemPermission()) {
+               statement.setResourceId(1, accessorResource);
+               statement.setResourceDomainId(2, accessedResourceDomainId);
+               statement.setResourceClassId(3, accessedResourceClassId);
+               statement.setString(4, resourcePermission.getPermissionName());
+
+               assertOneRowUpdated(statement.executeUpdate());
+            }
+         }
       }
       catch (SQLException e) {
          throw new RuntimeException(e);
