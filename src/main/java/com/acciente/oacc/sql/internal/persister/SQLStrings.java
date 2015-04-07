@@ -61,6 +61,7 @@ public class SQLStrings implements Serializable {
    public final String SQL_findInGrantDomainPermissionSys_ResourceDomainName_SysPermissionID_IsWithGrant_InheritLevel_DomainLevel_BY_AccessorID;
    public final String SQL_findInGrantDomainPermissionSys_withoutInheritance_ResourceDomainName_SysPermissionID_IsWithGrant_BY_AccessorID;
    public final String SQL_createInGrantDomainPermissionSys_WITH_AccessorID_GrantorID_AccessedDomainID_IsWithGrant_SysPermissionID;
+   public final String SQL_updateInGrantDomainPermissionSys_SET_GrantorID_IsWithGrant_BY_AccessorID_AccessedDomainID_SysPermissionID;
    public final String SQL_removeInGrantDomainPermissionSys_BY_AccessorID_AccessedDomainID;
 
    // GrantResourcePermissionSys
@@ -387,6 +388,12 @@ public class SQLStrings implements Serializable {
             = "INSERT INTO "
             + schemaNameAndTablePrefix
             + "Grant_DomPerm_Sys ( AccessorResourceId, GrantorResourceId, AccessedDomainId, IsWithGrant, SysPermissionId ) VALUES ( ?, ?, ?, ?, ? )";
+
+      SQL_updateInGrantDomainPermissionSys_SET_GrantorID_IsWithGrant_BY_AccessorID_AccessedDomainID_SysPermissionID
+            = "UPDATE "
+            + schemaNameAndTablePrefix
+            + "Grant_DomPerm_Sys SET GrantorResourceId = ?, IsWithGrant = ?"
+            + "wHERE AccessorResourceId = ? AND AccessedDomainId = ? AND SysPermissionId = ?";
 
       SQL_removeInGrantDomainPermissionSys_BY_AccessorID_AccessedDomainID
             = "DELETE FROM "

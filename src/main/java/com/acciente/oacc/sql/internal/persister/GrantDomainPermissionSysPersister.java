@@ -278,6 +278,34 @@ public class GrantDomainPermissionSysPersister extends Persister {
       }
    }
 
+   public void updateDomainSysPermissions(SQLConnection connection,
+                                          Resource accessorResource,
+                                          Resource grantorResource,
+                                          Id<DomainId> resourceDomainId,
+                                          Set<DomainPermission> requestedDomainPermissions) {
+      SQLStatement statement = null;
+
+      try {
+         statement = connection.prepareStatement(sqlStrings.SQL_updateInGrantDomainPermissionSys_SET_GrantorID_IsWithGrant_BY_AccessorID_AccessedDomainID_SysPermissionID);
+
+         for (DomainPermission domainPermission : requestedDomainPermissions) {
+            statement.setResourceId(1, grantorResource);
+            statement.setBoolean(2, domainPermission.isWithGrant());
+            statement.setResourceId(3, accessorResource);
+            statement.setResourceDomainId(4, resourceDomainId);
+            statement.setDomainSystemPermissionId(5, domainPermission.getSystemPermissionId());
+
+            assertOneRowUpdated(statement.executeUpdate());
+         }
+      }
+      catch (SQLException e) {
+         throw new RuntimeException(e);
+      }
+      finally {
+         closeStatement(statement);
+      }
+   }
+
    public void removeDomainSysPermissions(SQLConnection connection,
                                           Resource accessorResource,
                                           Id<DomainId> resourceDomainId) {

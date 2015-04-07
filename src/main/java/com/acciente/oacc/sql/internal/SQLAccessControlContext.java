@@ -984,6 +984,135 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
    }
 
    @Override
+   public void grantDomainPermissions(Resource accessorResource,
+                                      String domainName,
+                                      DomainPermission domainPermission,
+                                      DomainPermission... domainPermissions) {
+      SQLConnection connection = null;
+
+      __assertAuthenticated();
+      __assertResourceSpecified(accessorResource);
+      __assertDomainSpecified(domainName);
+      __assertPermissionSpecified(domainPermission);
+      __assertVarargPermissionsSpecified(domainPermissions);
+
+      final Set<DomainPermission> requestedDomainPermissions = getSetWithoutNulls(domainPermission, domainPermissions);
+
+      try {
+         connection = __getConnection();
+
+         __grantDirectDomainPermissions(connection, accessorResource, domainName, requestedDomainPermissions);
+      }
+      finally {
+         __closeConnection(connection);
+      }
+   }
+
+   private void __grantDirectDomainPermissions(SQLConnection connection,
+                                               Resource accessorResource,
+                                               String domainName,
+                                               Set<DomainPermission> requestedDomainPermissions) {
+      __assertUniqueDomainPermissionsNames(requestedDomainPermissions);
+
+      // determine the domain ID of the domain, for use in the grant below
+      Id<DomainId> domainId = domainPersister.getResourceDomainId(connection, domainName);
+
+      if (domainId == null) {
+         throw new IllegalArgumentException("Could not find domain: " + domainName);
+      }
+
+      // validate requested set is not null; empty set is valid and would remove any direct domain permissions
+      if (requestedDomainPermissions == null) {
+         throw new IllegalArgumentException("Set of requested domain permissions may not be null");
+      }
+
+      __assertResourceExists(connection, accessorResource);
+
+      // check if the grantor (=session resource) has permissions to grant the requested permissions
+      final Set<DomainPermission>
+            grantorPermissions
+            = __getEffectiveDomainPermissions(connection,
+                                              sessionResource,
+                                              domainName);
+
+      // check if the grantor (=session resource) has super user permissions to the target domain
+      if (!grantorPermissions.contains(DomainPermission_SUPER_USER)
+            && !grantorPermissions.contains(DomainPermission_SUPER_USER_GRANT)) {
+
+         final Set<DomainPermission> unauthorizedPermissions
+               = __subtractDomainPermissionsIfGrantableFrom(requestedDomainPermissions, grantorPermissions);
+
+         if (unauthorizedPermissions.size() > 0) {
+            throw NotAuthorizedException.newInstanceForAction(sessionResource,
+                                                              "grant the following domain permission(s): " + unauthorizedPermissions);
+         }
+      }
+
+      final Set<DomainPermission> directAccessorPermissions
+            = __getDirectDomainPermissions(connection, accessorResource, domainId);
+
+      final Set<DomainPermission> addPermissions = new HashSet<>(requestedDomainPermissions.size());
+      final Set<DomainPermission> updatePermissions = new HashSet<>(requestedDomainPermissions.size());
+
+      for (DomainPermission requestedPermission : requestedDomainPermissions) {
+         boolean existingPermission = false;
+
+         for (DomainPermission existingDirectPermission : directAccessorPermissions) {
+            if (requestedPermission.equals(existingDirectPermission)) {
+               // requested permission is identical to already existing direct permission, so no need to add/update it
+               existingPermission = true;
+               break;
+            }
+            if (requestedPermission.isGrantableFrom(existingDirectPermission)) {
+               // requested permission has lesser granting rights than already existing direct permission, so no need to update
+               existingPermission = true;
+               break;
+            }
+            if (requestedPermission.equalsIgnoreGrant(existingDirectPermission)) {
+               // requested permission has same name and based on above evaluations has higher granting rights than
+               // the already existing direct permission, so we need to update it
+               updatePermissions.add(requestedPermission);
+               existingPermission = true;
+               break;
+            }
+         }
+
+         if (!existingPermission) {
+            // couldn't find requested permission in set of already existing direct permissions, by name, so we need to add it
+            addPermissions.add(requestedPermission);
+         }
+      }
+
+      // update any existing permissions that accessor to has to this domain directly
+      grantDomainPermissionSysPersister.updateDomainSysPermissions(connection,
+                                                                   accessorResource,
+                                                                   sessionResource,
+                                                                   domainId,
+                                                                   updatePermissions);
+
+      // add the new permissions
+      grantDomainPermissionSysPersister.addDomainSysPermissions(connection,
+                                                                accessorResource,
+                                                                sessionResource,
+                                                                domainId,
+                                                                addPermissions);
+   }
+
+   private void __assertUniqueDomainPermissionsNames(Set<DomainPermission> domainPermissions) {
+      final Set<String> uniquePermissionNames = new HashSet<>(domainPermissions.size());
+
+      for (final DomainPermission domainPermissionPermission : domainPermissions) {
+         if (uniquePermissionNames.contains(domainPermissionPermission.getPermissionName())) {
+            throw new IllegalArgumentException("Duplicate permission: " + domainPermissionPermission.getPermissionName()
+                                                     + " that only differs in 'withGrant' option");
+         }
+         else {
+            uniquePermissionNames.add(domainPermissionPermission.getPermissionName());
+         }
+      }
+   }
+
+   @Override
    public Set<DomainPermission> getDomainPermissions(Resource accessorResource,
                                                      String domainName) {
       SQLConnection connection = null;
@@ -2292,7 +2421,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       __assertResourceExists(connection, accessorResource);
 
       // next ensure that the requested permissions are unique in name
-      __assertUniqueResourcePermissionsNames(connection, obsoleteResourcePermissions);
+      __assertUniqueResourcePermissionsNames(obsoleteResourcePermissions);
 
       final ResourceClassInternalInfo accessedResourceClassInternalInfo
             = resourceClassPersister.getResourceClassInfoByResourceId(connection, accessedResource);
@@ -2347,8 +2476,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
                                                                  removePermissions);
    }
 
-   private void __assertUniqueResourcePermissionsNames(SQLConnection connection,
-                                                       Set<ResourcePermission> resourcePermissions) {
+   private void __assertUniqueResourcePermissionsNames(Set<ResourcePermission> resourcePermissions) {
       final Set<String> uniquePermissionNames = new HashSet<>(resourcePermissions.size());
 
       for (final ResourcePermission resourcePermission : resourcePermissions) {
@@ -2883,7 +3011,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       __assertResourceExists(connection, accessorResource);
 
       // next ensure that the requested permissions are unique in name
-      __assertUniqueResourcePermissionsNames(connection, requestedResourcePermissions);
+      __assertUniqueResourcePermissionsNames(requestedResourcePermissions);
 
       // verify that resource class is defined
       final Id<ResourceClassId> resourceClassId = resourceClassPersister.getResourceClassId(connection, resourceClassName);
