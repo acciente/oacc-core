@@ -1113,6 +1113,94 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
    }
 
    @Override
+   public void revokeDomainPermissions(Resource accessorResource,
+                                       String domainName,
+                                       DomainPermission domainPermission,
+                                       DomainPermission... domainPermissions) {
+      SQLConnection connection = null;
+
+      __assertAuthenticated();
+      __assertResourceSpecified(accessorResource);
+      __assertDomainSpecified(domainName);
+      __assertPermissionSpecified(domainPermission);
+      __assertVarargPermissionsSpecified(domainPermissions);
+
+      final Set<DomainPermission> requestedDomainPermissions = getSetWithoutNulls(domainPermission, domainPermissions);
+
+      try {
+         connection = __getConnection();
+
+         __revokeDirectDomainPermissions(connection, accessorResource, domainName, requestedDomainPermissions);
+      }
+      finally {
+         __closeConnection(connection);
+      }
+
+   }
+
+   private void __revokeDirectDomainPermissions(SQLConnection connection,
+                                                Resource accessorResource,
+                                                String domainName,
+                                                Set<DomainPermission> requestedDomainPermissions) {
+      __assertUniqueDomainPermissionsNames(requestedDomainPermissions);
+
+      // determine the domain ID of the domain, for use in the revocation below
+      Id<DomainId> domainId = domainPersister.getResourceDomainId(connection, domainName);
+
+      if (domainId == null) {
+         throw new IllegalArgumentException("Could not find domain: " + domainName);
+      }
+
+      // validate requested set is not null
+      if (requestedDomainPermissions == null) {
+         throw new IllegalArgumentException("Set of requested domain permissions to be revoked may not be null");
+      }
+
+      __assertResourceExists(connection, accessorResource);
+
+      final Set<DomainPermission>
+            grantorPermissions
+            = __getEffectiveDomainPermissions(connection,
+                                              sessionResource,
+                                              domainName);
+
+      // check if the grantor (=session resource) has super user permissions to the target domain or
+      // has permissions to grant the requested permissions
+      if (!grantorPermissions.contains(DomainPermission_SUPER_USER)
+            && !grantorPermissions.contains(DomainPermission_SUPER_USER_GRANT)) {
+
+         final Set<DomainPermission> unauthorizedPermissions
+               = __subtractDomainPermissionsIfGrantableFrom(requestedDomainPermissions, grantorPermissions);
+
+         if (unauthorizedPermissions.size() > 0) {
+            throw NotAuthorizedException.newInstanceForAction(sessionResource,
+                                                              "revoke the following domain permission(s): " + unauthorizedPermissions);
+         }
+      }
+
+      final Set<DomainPermission> directAccessorPermissions
+            = __getDirectDomainPermissions(connection, accessorResource, domainId);
+
+      final Set<DomainPermission> removePermissions = new HashSet<>(requestedDomainPermissions.size());
+
+      for (DomainPermission requestedPermission : requestedDomainPermissions) {
+         for (DomainPermission existingDirectPermission : directAccessorPermissions) {
+            if (requestedPermission.equalsIgnoreGrant(existingDirectPermission)) {
+               // requested permission has same name and regardless of granting rights we need to remove it
+               removePermissions.add(requestedPermission);
+               break;
+            }
+         }
+      }
+
+      // remove any existing permissions that accessor has to this domain directly
+      grantDomainPermissionSysPersister.removeDomainSysPermissions(connection,
+                                                                   accessorResource,
+                                                                   domainId,
+                                                                   removePermissions);
+   }
+
+   @Override
    public Set<DomainPermission> getDomainPermissions(Resource accessorResource,
                                                      String domainName) {
       SQLConnection connection = null;
