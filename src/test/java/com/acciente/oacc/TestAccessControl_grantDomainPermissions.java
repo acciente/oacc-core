@@ -231,30 +231,25 @@ public class TestAccessControl_grantDomainPermissions extends TestAccessControlB
       final Resource accessorResource = generateUnauthenticatableResource();
       assertThat(accessControlContext.getEffectiveDomainPermissions(accessorResource, domainName).isEmpty(), is(true));
 
-      Set<DomainPermission> domainPermissions_pre = setOf(domainPermission_superUser, domainPermission_child_withGrant);
+      Set<DomainPermission> domainPermissions_expected
+            = setOf(domainPermission_superUser, domainPermission_child_withGrant);
 
       // initialize domain permissions and verify
-      accessControlContext.setDomainPermissions(accessorResource, domainName, domainPermissions_pre);
+      accessControlContext.grantDomainPermissions(accessorResource,
+                                                  domainName,
+                                                  domainPermission_superUser,
+                                                  domainPermission_child_withGrant);
 
       final Set<DomainPermission> domainPermissions_post
             = accessControlContext.getEffectiveDomainPermissions(accessorResource, domainName);
-      assertThat(domainPermissions_post, is(domainPermissions_pre));
+      assertThat(domainPermissions_post, is(domainPermissions_expected));
 
-      // reset domain permissions and verify that only the latest set of permissions applies
-      Set<DomainPermission> domainPermissions_pre2 = setOf(domainPermission_child);
-
-      accessControlContext.setDomainPermissions(accessorResource, domainName, domainPermissions_pre2);
+      // regrant domain permissions and verify that nothing changed
+      accessControlContext.grantDomainPermissions(accessorResource, domainName, domainPermission_child);
 
       final Set<DomainPermission> domainPermissions_post2
             = accessControlContext.getEffectiveDomainPermissions(accessorResource, domainName);
-      assertThat(domainPermissions_post2, is(domainPermissions_pre2));
-
-      // reset domain permissions to empty set (i.e. remove all) and verify
-      accessControlContext.setDomainPermissions(accessorResource, domainName, Collections.<DomainPermission>emptySet());
-
-      final Set<DomainPermission> domainPermissions_post3
-            = accessControlContext.getEffectiveDomainPermissions(accessorResource, domainName);
-      assertThat(domainPermissions_post3.isEmpty(), is(true));
+      assertThat(domainPermissions_post2, is(domainPermissions_expected));
    }
 
    @Test
