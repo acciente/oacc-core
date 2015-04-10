@@ -154,7 +154,7 @@ public class TestAccessControl_setDomainCreatePermissions extends TestAccessCont
    }
 
    @Test
-   public void setDomainCreatePermission_addPermission_withUnauthorizedPermissionsGrantedElsewhere_shouldSucceedAsAuthorized() {
+   public void setDomainCreatePermissions_addPermission_withUnauthorizedPermissionsGrantedElsewhere_shouldSucceedAsAuthorized() {
       authenticateSystemResource();
       final String grantedPermissionName = DomainPermissions.CREATE_CHILD_DOMAIN;
       final String ungrantedPermissionName = DomainPermissions.SUPER_USER;
@@ -204,7 +204,7 @@ public class TestAccessControl_setDomainCreatePermissions extends TestAccessCont
       assertThat(permissions_post, is(permissions_expected));
    }
    @Test
-   public void setDomainCreatePermission_removePermission_withUnauthorizedPermissionsGrantedElsewhere_shouldSucceedAsAuthorized() {
+   public void setDomainCreatePermissions_removePermission_withUnauthorizedPermissionsGrantedElsewhere_shouldSucceedAsAuthorized() {
       authenticateSystemResource();
       final String grantedPermissionName = DomainPermissions.CREATE_CHILD_DOMAIN;
       final String ungrantedPermissionName = DomainPermissions.SUPER_USER;
@@ -254,7 +254,7 @@ public class TestAccessControl_setDomainCreatePermissions extends TestAccessCont
    }
 
    @Test
-   public void setDomainCreatePermission_downgradeGrantingRights_shouldSucceedAsAuthorized() {
+   public void setDomainCreatePermissions_downgradeGrantingRights_shouldSucceedAsAuthorized() {
       authenticateSystemResource();
       final String grantedPermissionName = DomainPermissions.CREATE_CHILD_DOMAIN;
       final char[] password = generateUniquePassword();
@@ -265,8 +265,7 @@ public class TestAccessControl_setDomainCreatePermissions extends TestAccessCont
       // setup accessor permissions
       Set<DomainCreatePermission> accessorPermissions_pre = new HashSet<>();
       accessorPermissions_pre.add(DomainCreatePermissions.getInstance(DomainCreatePermissions.CREATE));
-      accessorPermissions_pre.add(DomainCreatePermissions.getInstance(DomainPermissions.getInstance(
-            grantedPermissionName),
+      accessorPermissions_pre.add(DomainCreatePermissions.getInstance(DomainPermissions.getInstance(grantedPermissionName),
                                                                       true));
 
       accessControlContext.setDomainCreatePermissions(accessorResource, accessorPermissions_pre);
@@ -301,7 +300,7 @@ public class TestAccessControl_setDomainCreatePermissions extends TestAccessCont
    }
 
    @Test
-   public void setDomainCreatePermission_downgradeGrantingRights_forUnauthorizedPermissionGrantedElsewhere_shouldFail() {
+   public void setDomainCreatePermissions_downgradeGrantingRights_forUnauthorizedPermissionGrantedElsewhere_shouldFail() {
       authenticateSystemResource();
       final String grantedPermissionName = DomainPermissions.CREATE_CHILD_DOMAIN;
       final String ungrantedPermissionName = DomainPermissions.SUPER_USER;
@@ -348,7 +347,7 @@ public class TestAccessControl_setDomainCreatePermissions extends TestAccessCont
    }
 
    @Test
-   public void setDomainCreatePermission_upgradeGrantingRightsAndPostCreateGrantingRights_shouldSucceedAsAuthorized() {
+   public void setDomainCreatePermissions_upgradeGrantingRightsAndPostCreateGrantingRights_shouldSucceedAsAuthorized() {
       authenticateSystemResource();
       final String grantedPermissionName = DomainPermissions.CREATE_CHILD_DOMAIN;
       final char[] password = generateUniquePassword();
@@ -396,7 +395,7 @@ public class TestAccessControl_setDomainCreatePermissions extends TestAccessCont
    }
 
    @Test
-   public void setDomainCreatePermission_upgradeGrantingRights_forUnauthorizedPermissionGrantedElsewhere_shouldFail() {
+   public void setDomainCreatePermissions_upgradeGrantingRights_forUnauthorizedPermissionGrantedElsewhere_shouldFail() {
       authenticateSystemResource();
       final String grantedPermissionName = DomainPermissions.CREATE_CHILD_DOMAIN;
       final String ungrantedPermissionName = DomainPermissions.SUPER_USER;

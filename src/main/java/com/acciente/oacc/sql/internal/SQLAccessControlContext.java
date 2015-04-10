@@ -1462,6 +1462,178 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
    }
 
    @Override
+   public void grantDomainCreatePermissions(Resource accessorResource,
+                                            DomainCreatePermission domainCreatePermission,
+                                            DomainCreatePermission... domainCreatePermissions) {
+      SQLConnection connection = null;
+
+      __assertAuthenticated();
+      __assertResourceSpecified(accessorResource);
+      __assertPermissionSpecified(domainCreatePermission);
+      __assertVarargPermissionsSpecified(domainCreatePermissions);
+
+      final Set<DomainCreatePermission> requestedDomainCreatePermissions
+            = getSetWithoutNulls(domainCreatePermission, domainCreatePermissions);
+
+      try {
+         connection = __getConnection();
+
+         __grantDirectDomainCreatePermissions(connection, accessorResource, requestedDomainCreatePermissions);
+      }
+      finally {
+         __closeConnection(connection);
+      }
+   }
+
+   private void __grantDirectDomainCreatePermissions(SQLConnection connection,
+                                                     Resource accessorResource,
+                                                     Set<DomainCreatePermission> requestedDomainCreatePermissions) {
+      __assertUniquePostCreatePermissionsNames(requestedDomainCreatePermissions);
+      __assertResourceExists(connection, accessorResource);
+
+      // check if grantor (=session resource) is authorized to add requested permissions
+      final Set<DomainCreatePermission>
+            grantorPermissions
+            = __getEffectiveDomainCreatePermissions(connection, sessionResource);
+
+      final Set<DomainCreatePermission>
+            unauthorizedPermissions
+            = __subtractDomainCreatePermissionsIfGrantableFrom(requestedDomainCreatePermissions, grantorPermissions);
+
+      if (unauthorizedPermissions.size() > 0) {
+         throw NotAuthorizedException.newInstanceForAction(sessionResource,
+                                                           "grant the following domain create permission(s): " + unauthorizedPermissions);
+      }
+
+      final Set<DomainCreatePermission> directAccessorPermissions
+            = __getDirectDomainCreatePermissions(connection, accessorResource);
+
+      if (directAccessorPermissions.isEmpty()) {
+         // our invariant is that a resource's direct create permissions must include the *CREATE system permission;
+         // if there are no direct create permissions, then the requested permissions to be granted need to include *CREATE
+         __assertSetContainsDomainCreateSystemPermission(requestedDomainCreatePermissions);
+      }
+
+      final Set<DomainCreatePermission> addPermissions = new HashSet<>(requestedDomainCreatePermissions.size());
+      final Set<DomainCreatePermission> updatePermissions = new HashSet<>(requestedDomainCreatePermissions.size());
+
+      for (DomainCreatePermission requestedPermission : requestedDomainCreatePermissions) {
+         boolean existingPermission = false;
+
+         if (requestedPermission.isSystemPermission()) {
+            for (DomainCreatePermission existingDirectPermission : directAccessorPermissions) {
+               if (requestedPermission.equals(existingDirectPermission) ||
+                     requestedPermission.isGrantableFrom(existingDirectPermission)) {
+                  // requested permission is identical to already existing direct permission, OR
+                  // requested permission has lesser granting rights than already existing direct permission,
+                  // so no need to update
+                  existingPermission = true;
+                  break;
+               }
+               if (existingDirectPermission.isSystemPermission() &&
+                     requestedPermission.getSystemPermissionId() == existingDirectPermission.getSystemPermissionId()) {
+                  // requested permission has same system Id and based on above evaluations has higher granting rights than
+                  // the already existing direct permission, so we need to update it
+                  updatePermissions.add(requestedPermission);
+                  existingPermission = true;
+                  break;
+               }
+            }
+         }
+         else {
+            final DomainPermission requestedPostCreateDomainPermission = requestedPermission.getPostCreateDomainPermission();
+            for (DomainCreatePermission existingDirectPermission : directAccessorPermissions) {
+               if (requestedPermission.equals(existingDirectPermission) ||
+                     requestedPermission.isGrantableFrom(existingDirectPermission)) {
+                  // requested permission is identical to already existing direct permission, OR
+                  // requested permission has lesser granting rights than already existing direct permission,
+                  // so no need to update
+                  existingPermission = true;
+                  break;
+               }
+               if (!existingDirectPermission.isSystemPermission()) {
+                  // now let's look at the post-create permissions
+                  final DomainPermission existingPostCreateDomainPermission
+                        = existingDirectPermission.getPostCreateDomainPermission();
+                  if (requestedPostCreateDomainPermission.isGrantableFrom(existingPostCreateDomainPermission)) {
+                     // requested post-create permission has lesser granting rights than already existing direct permission,
+                     // so no need to update
+                     existingPermission = true;
+                     break;
+                  }
+                  if (requestedPostCreateDomainPermission.equalsIgnoreGrant(existingPostCreateDomainPermission)) {
+                     // requested post-create permission has same name and based on above evaluations has higher
+                     // granting rights than the already existing direct permission, so we need to update it
+                     updatePermissions.add(requestedPermission);
+                     existingPermission = true;
+                     break;
+                  }
+               }
+            }
+         }
+
+         if (!existingPermission) {
+            // couldn't find requested permission in set of already existing direct permissions, by name, so we need to add it
+            addPermissions.add(requestedPermission);
+         }
+      }
+
+      // update the domain system permissions (*CREATE), if necessary
+      grantDomainCreatePermissionSysPersister.updateDomainCreateSysPermissions(connection,
+                                                                               accessorResource,
+                                                                               sessionResource,
+                                                                               updatePermissions);
+      // update the domain post create system permissions, if necessary
+      grantDomainCreatePermissionPostCreateSysPersister
+            .updateDomainCreatePostCreateSysPermissions(connection,
+                                                        accessorResource,
+                                                        sessionResource,
+                                                        updatePermissions);
+
+      // add any new domain system permissions (*CREATE)
+      grantDomainCreatePermissionSysPersister.addDomainCreateSysPermissions(connection,
+                                                                            accessorResource,
+                                                                            sessionResource,
+                                                                            addPermissions);
+      // add any new domain post create system permissions
+      grantDomainCreatePermissionPostCreateSysPersister
+            .addDomainCreatePostCreateSysPermissions(connection,
+                                                     accessorResource,
+                                                     sessionResource,
+                                                     addPermissions);
+   }
+
+   private void __assertUniquePostCreatePermissionsNames(Set<DomainCreatePermission> domainCreatePermissions) {
+      final Set<String> uniqueSystemPermissionNames = new HashSet<>(domainCreatePermissions.size());
+      final Set<String> uniquePostCreatePermissionNames = new HashSet<>(domainCreatePermissions.size());
+
+      for (final DomainCreatePermission domainCreatePermission : domainCreatePermissions) {
+         if (domainCreatePermission.isSystemPermission()) {
+            if (uniqueSystemPermissionNames.contains(domainCreatePermission.getPermissionName())) {
+               throw new IllegalArgumentException("Duplicate permission: "
+                                                        + domainCreatePermission.getPermissionName()
+                                                        + " that only differs in 'withGrant' option");
+            }
+            else {
+               uniqueSystemPermissionNames.add(domainCreatePermission.getPermissionName());
+            }
+         }
+         else {
+            final DomainPermission postCreateDomainPermission = domainCreatePermission.getPostCreateDomainPermission();
+
+            if (uniquePostCreatePermissionNames.contains(postCreateDomainPermission.getPermissionName())) {
+               throw new IllegalArgumentException("Duplicate permission: "
+                                                        + postCreateDomainPermission.getPermissionName()
+                                                        + " that only differs in 'withGrant' option");
+            }
+            else {
+               uniquePostCreatePermissionNames.add(postCreateDomainPermission.getPermissionName());
+            }
+         }
+      }
+   }
+
+   @Override
    public Set<DomainCreatePermission> getDomainCreatePermissions(Resource accessorResource) {
       SQLConnection connection = null;
 

@@ -142,4 +142,33 @@ public class GrantDomainCreatePermissionPostCreateSysPersister extends Persister
          closeStatement(statement);
       }
    }
+
+   public void updateDomainCreatePostCreateSysPermissions(SQLConnection connection,
+                                                          Resource accessorResource,
+                                                          Resource grantorResource,
+                                                          Set<DomainCreatePermission> domainCreatePermissions) {
+      SQLStatement statement = null;
+
+      try {
+         statement = connection.prepareStatement(sqlStrings.SQL_updateInGrantDomainCreatePermissionPostCreateSys_SET_GrantorID_IsWithGrant_PostCreateIsWithGrant_BY_AccessorID_PostCreateSysPermissionID);
+         for (DomainCreatePermission domainCreatePermission : domainCreatePermissions) {
+            if (!domainCreatePermission.isSystemPermission()
+                  && domainCreatePermission.getPostCreateDomainPermission().isSystemPermission()) {
+               statement.setResourceId(1, grantorResource);
+               statement.setBoolean(2, domainCreatePermission.isWithGrant());
+               statement.setBoolean(3, domainCreatePermission.getPostCreateDomainPermission().isWithGrant());
+               statement.setResourceId(4, accessorResource);
+               statement.setDomainSystemPermissionId(5, domainCreatePermission.getPostCreateDomainPermission().getSystemPermissionId());
+
+               assertOneRowUpdated(statement.executeUpdate());
+            }
+         }
+      }
+      catch (SQLException e) {
+         throw new RuntimeException(e);
+      }
+      finally {
+         closeStatement(statement);
+      }
+   }
 }

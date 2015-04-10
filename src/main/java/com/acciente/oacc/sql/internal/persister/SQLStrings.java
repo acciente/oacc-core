@@ -49,11 +49,13 @@ public class SQLStrings implements Serializable {
    public final String SQL_findInGrantDomainCreatePermissionSys_withoutInheritance_SysPermissionID_BY_AccessorID;
    public final String SQL_removeInGrantDomainCreatePermissionSys_BY_AccessorID;
    public final String SQL_createInGrantDomainCreatePermissionSys_WITH_AccessorID_GrantorID_IsWithGrant_SysPermissionID;
+   public final String SQL_updateInGrantDomainCreatePermissionSys_SET_GrantorID_IsWithGrant_BY_AccessorID_SysPermissionID;
    // GrantDomainCreatePermissionPostCreateSys
    public final String SQL_findInGrantDomainCreatePermissionPostCreateSys_PostCreateSysPermissionID_PostCreateIsWithGrant_IsWithGrant_InheritLevel_BY_AccessorID;
    public final String SQL_findInGrantDomainCreatePermissionPostCreateSys_withoutInheritance_PostCreateSysPermissionID_PostCreateIsWithGrant_IsWithGrant_BY_AccessorID;
    public final String SQL_removeInGrantDomainCreatePermissionPostCreateSys_BY_AccessorID;
    public final String SQL_createInGrantDomainCreatePermissionPostCreateSys_WITH_AccessorID_GrantorID_IsWithGrant_PostCreateIsWithGrant_PostCreateSysPermissionID;
+   public final String SQL_updateInGrantDomainCreatePermissionPostCreateSys_SET_GrantorID_IsWithGrant_PostCreateIsWithGrant_BY_AccessorID_PostCreateSysPermissionID;
 
    // GrantDomainPermissionSys
    public final String SQL_findInGrantDomainPermissionSys_SysPermissionID_IsWithGrant_InheritLevel_DomainLevel_BY_AccessorID_DomainID;
@@ -315,6 +317,12 @@ public class SQLStrings implements Serializable {
             + "Grant_DomCrPerm_Sys ( AccessorResourceId, GrantorResourceId, IsWithGrant, SysPermissionId ) "
             + "VALUES( ?, ?, ?, ? )";
 
+      SQL_updateInGrantDomainCreatePermissionSys_SET_GrantorID_IsWithGrant_BY_AccessorID_SysPermissionID
+            = "UPDATE "
+            + schemaNameAndTablePrefix
+            + "Grant_DomCrPerm_Sys SET GrantorResourceId = ?, IsWithGrant = ? "
+            + "WHERE AccessorResourceId = ? AND SysPermissionId = ?";
+
       SQL_removeInGrantDomainCreatePermissionSys_BY_AccessorID
             = "DELETE FROM "
             + schemaNameAndTablePrefix
@@ -339,6 +347,12 @@ public class SQLStrings implements Serializable {
             + schemaNameAndTablePrefix
             + "Grant_DomCrPerm_PostCr_Sys ( AccessorResourceId, GrantorResourceId, IsWithGrant, PostCreateIsWithGrant, PostCreateSysPermissionId ) "
             + "VALUES( ?, ?, ?, ?, ? )";
+
+      SQL_updateInGrantDomainCreatePermissionPostCreateSys_SET_GrantorID_IsWithGrant_PostCreateIsWithGrant_BY_AccessorID_PostCreateSysPermissionID
+            = "UPDATE "
+            + schemaNameAndTablePrefix
+            + "Grant_DomCrPerm_PostCr_Sys SET GrantorResourceId = ?, IsWithGrant = ?, PostCreateIsWithGrant = ? "
+            + "WHERE AccessorResourceId = ? AND PostCreateSysPermissionId  = ?";
 
       SQL_removeInGrantDomainCreatePermissionPostCreateSys_BY_AccessorID
             = "DELETE FROM "
