@@ -539,6 +539,64 @@ public class TestAccessControl_setDomainCreatePermissions extends TestAccessCont
    }
 
    @Test
+   public void setDomainCreatePermissions_duplicatePermissions_shouldFail() {
+      authenticateSystemResource();
+      final String grantedPermissionName = DomainPermissions.CREATE_CHILD_DOMAIN;
+      final char[] password = generateUniquePassword();
+      final Resource grantorResource = generateAuthenticatableResource(password);
+      final Resource accessorResource = generateUnauthenticatableResource();
+
+      // setup grantor permissions
+      Set<DomainCreatePermission> grantorPermissions
+            = setOf(DomainCreatePermissions.getInstance(DomainCreatePermissions.CREATE, true),
+                    DomainCreatePermissions.getInstance(DomainPermissions.getInstance(grantedPermissionName), true));
+
+      accessControlContext.setDomainCreatePermissions(grantorResource, grantorPermissions);
+      assertThat(accessControlContext.getEffectiveDomainCreatePermissions(grantorResource), is(grantorPermissions));
+
+      // authenticate grantor resource
+      accessControlContext.authenticate(grantorResource, PasswordCredentials.newInstance(password));
+
+      // attempt to grant duplicate permissions and verify
+      try {
+         accessControlContext
+               .setDomainCreatePermissions(accessorResource,
+                                           setOf(DomainCreatePermissions.getInstance(DomainCreatePermissions.CREATE),
+                                                 DomainCreatePermissions
+                                                       .getInstance(DomainPermissions.getInstance(grantedPermissionName)),
+                                                 DomainCreatePermissions
+                                                       .getInstance(DomainPermissions.getInstance(grantedPermissionName), true)));
+         fail("setting create permissions that include the same permission - by name - but with different grant-options, should have failed");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("duplicate permission"));
+      }
+      try {
+         accessControlContext
+               .setDomainCreatePermissions(accessorResource,
+                                           setOf(DomainCreatePermissions.getInstance(DomainCreatePermissions.CREATE),
+                                                 DomainCreatePermissions
+                                                       .getInstance(DomainPermissions.getInstance(grantedPermissionName)),
+                                                 DomainCreatePermissions
+                                                       .getInstance(DomainPermissions.getInstance(grantedPermissionName, true))));
+         fail("setting create permissions that include the same permission - by name - but with different grant-options, should have failed");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("duplicate permission"));
+      }
+      try {
+         accessControlContext
+               .setDomainCreatePermissions(accessorResource,
+                                           setOf(DomainCreatePermissions.getInstance(DomainCreatePermissions.CREATE),
+                                                 DomainCreatePermissions.getInstance(DomainCreatePermissions.CREATE, true)));
+         fail("setting create permissions that include the same permission - by name - but with different grant-options, should have failed");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("duplicate permission"));
+      }
+   }
+
+   @Test
    public void setDomainCreatePermissions_nonExistentReferences_shouldFail() {
       authenticateSystemResource();
       final DomainCreatePermission domCreatePerm_create_withGrant

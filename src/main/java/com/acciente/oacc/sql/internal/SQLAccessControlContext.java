@@ -1351,6 +1351,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
                                                    Resource accessorResource,
                                                    Set<DomainCreatePermission> requestedDomainCreatePermissions) {
       __assertSetContainsDomainCreateSystemPermission(requestedDomainCreatePermissions);
+      __assertUniqueSystemOrPostCreateDomainPermissionNames(requestedDomainCreatePermissions);
       __assertResourceExists(connection, accessorResource);
 
       // check if grantor (=session resource) is authorized to add/remove requested permissions
@@ -1488,7 +1489,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
    private void __grantDirectDomainCreatePermissions(SQLConnection connection,
                                                      Resource accessorResource,
                                                      Set<DomainCreatePermission> requestedDomainCreatePermissions) {
-      __assertUniquePostCreateDomainPermissionNames(requestedDomainCreatePermissions);
+      __assertUniqueSystemOrPostCreateDomainPermissionNames(requestedDomainCreatePermissions);
       __assertResourceExists(connection, accessorResource);
 
       // check if grantor (=session resource) is authorized to add requested permissions
@@ -1606,7 +1607,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
                                                      addPermissions);
    }
 
-   private void __assertUniquePostCreateDomainPermissionNames(Set<DomainCreatePermission> domainCreatePermissions) {
+   private void __assertUniqueSystemOrPostCreateDomainPermissionNames(Set<DomainCreatePermission> domainCreatePermissions) {
       final Set<String> uniqueSystemPermissionNames = new HashSet<>(domainCreatePermissions.size());
       final Set<String> uniquePostCreatePermissionNames = new HashSet<>(domainCreatePermissions.size());
 
@@ -1663,7 +1664,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
    private void __revokeDirectDomainCreatePermissions(SQLConnection connection,
                                                       Resource accessorResource,
                                                       Set<DomainCreatePermission> requestedDomainCreatePermissions) {
-      __assertUniquePostCreateDomainPermissionNames(requestedDomainCreatePermissions);
+      __assertUniqueSystemOrPostCreateDomainPermissionNames(requestedDomainCreatePermissions);
       __assertResourceExists(connection, accessorResource);
 
       // check if grantor (=session resource) is authorized to revoke requested permissions
@@ -2301,11 +2302,11 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
 
       // update any post create non-system permissions, if necessary
       grantResourceCreatePermissionPostCreatePersister.updateResourceCreatePostCreatePermissions(connection,
-                                                                                              accessorResource,
-                                                                                              resourceClassId,
-                                                                                              domainId,
-                                                                                              updatePermissions,
-                                                                                              sessionResource);
+                                                                                                 accessorResource,
+                                                                                                 resourceClassId,
+                                                                                                 domainId,
+                                                                                                 updatePermissions,
+                                                                                                 sessionResource);
       // grant the *CREATE system permissions, if necessary
       grantResourceCreatePermissionSysPersister.addResourceCreateSysPermissions(connection,
                                                                                 accessorResource,
@@ -2996,7 +2997,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
                   && (ResourcePermissions.IMPERSONATE.equals(resourcePermission.getPermissionName())
                   || ResourcePermissions.RESET_CREDENTIALS.equals(resourcePermission.getPermissionName()))) {
                throw new IllegalArgumentException("Permission: " + resourcePermission
-                                                      + ", not valid for unauthenticatable resource");
+                                                        + ", not valid for unauthenticatable resource");
             }
          }
          else {
@@ -3009,7 +3010,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
          }
          if (uniquePermissionNames.contains(resourcePermission.getPermissionName())) {
             throw new IllegalArgumentException("Duplicate permission: " + resourcePermission.getPermissionName()
-                                                   + " that only differs in 'withGrant' option");
+                                                     + " that only differs in 'withGrant' option");
          }
          else {
             uniquePermissionNames.add(resourcePermission.getPermissionName());
@@ -3568,7 +3569,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
          }
          if (uniquePermissionNames.contains(resourcePermission.getPermissionName())) {
             throw new IllegalArgumentException("Duplicate permission: "
-                                             + resourcePermission.getPermissionName() + " that only differs in 'withGrant' option");
+                                                     + resourcePermission.getPermissionName() + " that only differs in 'withGrant' option");
          }
          else {
             uniquePermissionNames.add(resourcePermission.getPermissionName());
