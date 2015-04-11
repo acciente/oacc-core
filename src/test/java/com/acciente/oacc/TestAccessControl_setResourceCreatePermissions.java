@@ -924,9 +924,10 @@ public class TestAccessControl_setResourceCreatePermissions extends TestAccessCo
    @Test
    public void setResourceCreatePermissions_duplicatePermissionNames_shouldFail() {
       authenticateSystemResource();
-      final ResourceCreatePermission createPerm_create_withGrant = ResourceCreatePermissions.getInstance(
-            ResourceCreatePermissions.CREATE,
-            true);
+      final ResourceCreatePermission createPerm_create
+            = ResourceCreatePermissions.getInstance(ResourceCreatePermissions.CREATE);
+      final ResourceCreatePermission createPerm_create_withGrant
+            = ResourceCreatePermissions.getInstance(ResourceCreatePermissions.CREATE, true);
       final ResourceCreatePermission createPerm_inherit
             = ResourceCreatePermissions.getInstance(ResourcePermissions.getInstance(ResourcePermissions.INHERIT, true));
       final ResourceCreatePermission createPerm_inherit_withGrant
@@ -949,6 +950,17 @@ public class TestAccessControl_setResourceCreatePermissions extends TestAccessCo
                                                            resourceClassName,
                                                            domainName,
                                                            resourceCreatePermissions_pre);
+         fail("setting create-permissions that include the same permission, but with different grant-options, should have failed");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("duplicate permission"));
+      }
+      try {
+         accessControlContext.setResourceCreatePermissions(accessorResource,
+                                                           resourceClassName,
+                                                           domainName,
+                                                           setOf(createPerm_create,
+                                                                 createPerm_create_withGrant));
          fail("setting create-permissions that include the same permission, but with different grant-options, should have failed");
       }
       catch (IllegalArgumentException e) {

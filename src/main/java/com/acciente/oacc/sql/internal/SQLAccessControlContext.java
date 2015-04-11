@@ -1991,39 +1991,50 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
                                                                          ResourceClassInternalInfo resourceClassInternalInfo) {
       final List<String> validPermissionNames
             = resourceClassPermissionPersister.getPermissionNames(connection, resourceClassInternalInfo.getResourceClassName());
-      final Set<String> uniquePermissionNames = new HashSet<>(resourceCreatePermissions.size());
+      final Set<String> uniqueSystemPermissionNames = new HashSet<>(resourceCreatePermissions.size());
+      final Set<String> uniquePostCreatePermissionNames = new HashSet<>(resourceCreatePermissions.size());
 
       for (final ResourceCreatePermission resourceCreatePermission : resourceCreatePermissions) {
-         if (resourceCreatePermission.isSystemPermission()
-               && ResourceCreatePermissions.CREATE.equals(resourceCreatePermission.getPermissionName())) {
-            continue;
-         }
-
-         final ResourcePermission postCreateResourcePermission = resourceCreatePermission.getPostCreateResourcePermission();
-
-         if (postCreateResourcePermission.isSystemPermission()) {
-            // we allow impersonate and reset_credentials system permissions only for authenticatable resource classes
-            if (!resourceClassInternalInfo.isAuthenticatable()
-                  && (ResourcePermissions.IMPERSONATE.equals(postCreateResourcePermission.getPermissionName())
-                  || ResourcePermissions.RESET_CREDENTIALS.equals(postCreateResourcePermission.getPermissionName()))) {
-               throw new IllegalArgumentException("Permission: " + postCreateResourcePermission
-                                                      + ", not valid for unauthenticatable resource");
+         if (resourceCreatePermission.isSystemPermission()) {
+            if (uniqueSystemPermissionNames.contains(resourceCreatePermission.getPermissionName())) {
+               throw new IllegalArgumentException("Duplicate permission: "
+                                                        + resourceCreatePermission.getPermissionName()
+                                                        + " that only differs in 'withGrant' option");
+            }
+            else {
+               uniqueSystemPermissionNames.add(resourceCreatePermission.getPermissionName());
             }
          }
          else {
-            // every non-system permission must be defined for the resource class specified
-            if (!validPermissionNames.contains(postCreateResourcePermission.getPermissionName())) {
-               throw new IllegalArgumentException("Permission: " + postCreateResourcePermission.getPermissionName()
-                                                      + " is not defined for resource class: "
-                                                      + resourceClassInternalInfo.getResourceClassName());
+            final ResourcePermission postCreateResourcePermission = resourceCreatePermission.getPostCreateResourcePermission();
+
+            if (postCreateResourcePermission.isSystemPermission()) {
+               // we allow impersonate and reset_credentials system permissions only for authenticatable resource classes
+               if (!resourceClassInternalInfo.isAuthenticatable()
+                     && (ResourcePermissions.IMPERSONATE.equals(postCreateResourcePermission.getPermissionName())
+                     || ResourcePermissions.RESET_CREDENTIALS.equals(postCreateResourcePermission.getPermissionName()))) {
+                  throw new IllegalArgumentException("Permission: "
+                                                           + postCreateResourcePermission
+                                                           + ", not valid for unauthenticatable resource");
+               }
             }
-         }
-         if (uniquePermissionNames.contains(postCreateResourcePermission.getPermissionName())) {
-            throw new IllegalArgumentException("Duplicate permission: " + postCreateResourcePermission.getPermissionName()
-                                                   + " that only differs in 'withGrant' option");
-         }
-         else {
-            uniquePermissionNames.add(postCreateResourcePermission.getPermissionName());
+            else {
+               // every non-system permission must be defined for the resource class specified
+               if (!validPermissionNames.contains(postCreateResourcePermission.getPermissionName())) {
+                  throw new IllegalArgumentException("Permission: "
+                                                           + postCreateResourcePermission.getPermissionName()
+                                                           + " is not defined for resource class: "
+                                                           + resourceClassInternalInfo.getResourceClassName());
+               }
+            }
+            if (uniquePostCreatePermissionNames.contains(postCreateResourcePermission.getPermissionName())) {
+               throw new IllegalArgumentException("Duplicate permission: "
+                                                        + postCreateResourcePermission.getPermissionName()
+                                                        + " that only differs in 'withGrant' option");
+            }
+            else {
+               uniquePostCreatePermissionNames.add(postCreateResourcePermission.getPermissionName());
+            }
          }
       }
    }
