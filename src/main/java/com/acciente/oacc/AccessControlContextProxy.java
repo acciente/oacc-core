@@ -494,6 +494,13 @@ public class AccessControlContextProxy implements AccessControlContext {
    }
 
    @Override
+   public void revokeDomainCreatePermissions(Resource accessorResource,
+                                             DomainCreatePermission domainCreatePermission,
+                                             DomainCreatePermission... domainCreatePermissions) {
+      accessControlContext.revokeDomainCreatePermissions(accessorResource, domainCreatePermission, domainCreatePermissions);
+   }
+
+   @Override
    public Set<DomainCreatePermission> getDomainCreatePermissions(Resource accessorResource) {
       return accessControlContext.getDomainCreatePermissions(accessorResource);
    }

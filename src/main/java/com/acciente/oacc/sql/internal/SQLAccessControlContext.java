@@ -1417,19 +1417,21 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
 
    private void __assertSetContainsDomainCreateSystemPermission(Set<DomainCreatePermission> domainCreatePermissions) {
       if (!domainCreatePermissions.isEmpty()) {
-         boolean createSysPermissionFound = false;
-         for (final DomainCreatePermission domainCreatePermission : domainCreatePermissions) {
-            if (domainCreatePermission.isSystemPermission()
-                  && DomainCreatePermissions.CREATE.equals(domainCreatePermission.getPermissionName())) {
-               createSysPermissionFound = true;
-               break;
-            }
-         }
          // if at least one permission is specified, then there must be a *CREATE permission in the set
-         if (!createSysPermissionFound) {
+         if (!setContainsDomainCreateSystemPermission(domainCreatePermissions)) {
             throw new IllegalArgumentException("Domain create permission *CREATE must be specified");
          }
       }
+   }
+
+   private boolean setContainsDomainCreateSystemPermission(Set<DomainCreatePermission> domainCreatePermissions) {
+      for (final DomainCreatePermission domainCreatePermission : domainCreatePermissions) {
+         if (domainCreatePermission.isSystemPermission()
+               && DomainCreatePermissions.CREATE.equals(domainCreatePermission.getPermissionName())) {
+            return true;
+         }
+      }
+      return false;
    }
 
    private Set<DomainCreatePermission> __getDirectDomainCreatePermissions(SQLConnection connection,
@@ -1631,6 +1633,100 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
             }
          }
       }
+   }
+
+   @Override
+   public void revokeDomainCreatePermissions(Resource accessorResource,
+                                             DomainCreatePermission domainCreatePermission,
+                                             DomainCreatePermission... domainCreatePermissions) {
+      SQLConnection connection = null;
+
+      __assertAuthenticated();
+      __assertResourceSpecified(accessorResource);
+      __assertPermissionSpecified(domainCreatePermission);
+      __assertVarargPermissionsSpecified(domainCreatePermissions);
+
+      final Set<DomainCreatePermission> requestedDomainCreatePermissions
+            = getSetWithoutNulls(domainCreatePermission, domainCreatePermissions);
+
+      try {
+         connection = __getConnection();
+
+         __revokeDirectDomainCreatePermissions(connection, accessorResource, requestedDomainCreatePermissions);
+      }
+      finally {
+         __closeConnection(connection);
+      }
+   }
+
+   private void __revokeDirectDomainCreatePermissions(SQLConnection connection,
+                                                      Resource accessorResource,
+                                                      Set<DomainCreatePermission> requestedDomainCreatePermissions) {
+      __assertUniquePostCreatePermissionsNames(requestedDomainCreatePermissions);
+      __assertResourceExists(connection, accessorResource);
+
+      // check if grantor (=session resource) is authorized to revoke requested permissions
+      final Set<DomainCreatePermission>
+            grantorPermissions
+            = __getEffectiveDomainCreatePermissions(connection, sessionResource);
+
+      final Set<DomainCreatePermission>
+            unauthorizedPermissions
+            = __subtractDomainCreatePermissionsIfGrantableFrom(requestedDomainCreatePermissions, grantorPermissions);
+
+      if (unauthorizedPermissions.size() > 0) {
+         throw NotAuthorizedException.newInstanceForAction(sessionResource,
+                                                           "revoke the following domain create permission(s): " + unauthorizedPermissions);
+      }
+
+      final Set<DomainCreatePermission> directAccessorPermissions
+            = __getDirectDomainCreatePermissions(connection, accessorResource);
+
+      if ((directAccessorPermissions.size() > requestedDomainCreatePermissions.size()) &&
+            setContainsDomainCreateSystemPermission(requestedDomainCreatePermissions)) {
+         // our invariant is that a resource's direct create permissions must include the *CREATE system permission;
+         // if after revoking the requested permissions, the remaining set wouldn't include the *CREATE, we'd have a problem
+         throw new IllegalArgumentException(
+               "Attempt to revoke a subset of domain create permissions that includes the *CREATE system permission: "
+                     + requestedDomainCreatePermissions);
+      }
+
+      final Set<DomainCreatePermission> removePermissions = new HashSet<>(requestedDomainCreatePermissions.size());
+
+      for (DomainCreatePermission requestedPermission : requestedDomainCreatePermissions) {
+         if (requestedPermission.isSystemPermission()) {
+            for (DomainCreatePermission existingDirectPermission : directAccessorPermissions) {
+               if (existingDirectPermission.isSystemPermission() &&
+                     requestedPermission.getSystemPermissionId() == existingDirectPermission.getSystemPermissionId()) {
+                  // requested permission has same system Id as an already existing direct permission, so remove it
+                  removePermissions.add(requestedPermission);
+                  break;
+               }
+            }
+         }
+         else {
+            final DomainPermission requestedPostCreateDomainPermission = requestedPermission.getPostCreateDomainPermission();
+            for (DomainCreatePermission existingDirectPermission : directAccessorPermissions) {
+               if (!existingDirectPermission.isSystemPermission()) {
+                  // now let's look at the post-create permissions
+                  if (requestedPostCreateDomainPermission.equalsIgnoreGrant(existingDirectPermission.getPostCreateDomainPermission())) {
+                     // requested post-create permission has same name as an already existing direct permission, so remove it
+                     removePermissions.add(requestedPermission);
+                     break;
+                  }
+               }
+            }
+         }
+      }
+
+      // remove the domain system permissions (*CREATE), if necessary
+      grantDomainCreatePermissionSysPersister.removeDomainCreateSysPermissions(connection,
+                                                                               accessorResource,
+                                                                               removePermissions);
+      // remove the domain post create system permissions, if necessary
+      grantDomainCreatePermissionPostCreateSysPersister.removeDomainCreatePostCreateSysPermissions(connection,
+                                                                                                   accessorResource,
+                                                                                                   removePermissions);
    }
 
    @Override

@@ -114,6 +114,31 @@ public class GrantDomainCreatePermissionPostCreateSysPersister extends Persister
       }
    }
 
+   public void removeDomainCreatePostCreateSysPermissions(SQLConnection connection,
+                                                          Resource accessorResource,
+                                                          Set<DomainCreatePermission> domainCreatePermissions) {
+      SQLStatement statement = null;
+
+      try {
+         statement = connection.prepareStatement(sqlStrings.SQL_removeInGrantDomainCreatePermissionPostCreateSys_BY_AccessorID_PostCreateSysPermissionID);
+         for (DomainCreatePermission domainCreatePermission : domainCreatePermissions) {
+            if (!domainCreatePermission.isSystemPermission()
+                  && domainCreatePermission.getPostCreateDomainPermission().isSystemPermission()) {
+               statement.setResourceId(1, accessorResource);
+               statement.setDomainSystemPermissionId(2, domainCreatePermission.getPostCreateDomainPermission().getSystemPermissionId());
+
+               assertOneRowUpdated(statement.executeUpdate());
+            }
+         }
+      }
+      catch (SQLException e) {
+         throw new RuntimeException(e);
+      }
+      finally {
+         closeStatement(statement);
+      }
+   }
+
    public void addDomainCreatePostCreateSysPermissions(SQLConnection connection,
                                                        Resource accessorResource,
                                                        Resource grantorResource,

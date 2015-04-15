@@ -1269,6 +1269,37 @@ public interface AccessControlContext {
                                             DomainCreatePermission... domainCreatePermissions);
 
    /**
+    * Revokes the specified direct domain permissions from set the specified accessor resource will receive if it
+    * created a domain.
+    * <p/>
+    * This call does not change <em>inherited</em> domain create permissions the specified accessor resource currently is
+    * privileged to.
+    * Note that this method revokes the specified permission regardless of any specified granting right and regardless
+    * of the granting right the accessor has for the permission currently!
+    * <p/>
+    * Also note that after revoking the specified permissions, the remaining set of direct permissions <em>must</em> still
+    * contain the *CREATE system permission. Attempting to revoke a proper subset of the current direct permissions that
+    * includes the *CREATE permission will result in an IllegalArgumentException.
+    * <p/>
+    * This method is idempotent, that is, when a specified permission is no longer granted, repeated calls to
+    * this method will have no effect.
+    *
+    * @param accessorResource        the resource from which the privilege should be revoked
+    * @param domainCreatePermission  the create permission to be revoked
+    * @param domainCreatePermissions the other (optional) create permissions to be revoked
+    * @throws java.lang.IllegalArgumentException if accessorResource reference does not exist, or
+    *                                            if domainCreatePermissions contains multiple instances of the same
+    *                                            system or post-create permission that only differ in the 'withGrant' attribute, or
+    *                                            if domainCreatePermissions contains *CREATE system permission and is a
+    *                                            proper subset of
+    * @throws com.acciente.oacc.NotAuthorizedException if the session resource is not authorized to grant (in this case
+    *                                                  revoke) domain create permissions on the specified accessor resource
+    */
+   public void revokeDomainCreatePermissions(Resource accessorResource,
+                                             DomainCreatePermission domainCreatePermission,
+                                             DomainCreatePermission... domainCreatePermissions);
+
+   /**
     * Gets all direct domain create permissions the specified accessor resource has.
     * <p/>
     * This method only takes into account direct domain create permissions and does not return the
