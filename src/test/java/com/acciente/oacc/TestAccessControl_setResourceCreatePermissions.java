@@ -823,7 +823,7 @@ public class TestAccessControl_setResourceCreatePermissions extends TestAccessCo
    }
 
    @Test
-   public void setResourceCreatePermission_upgradePostCreateGrantingRights_shouldFsil() {
+   public void setResourceCreatePermission_upgradePostCreateGrantingRights_shouldFail() {
       authenticateSystemResource();
       final String resourceClassName = generateResourceClass(false, false);
       final String grantedPermissionName = generateResourceClassPermission(resourceClassName);
@@ -872,7 +872,7 @@ public class TestAccessControl_setResourceCreatePermissions extends TestAccessCo
    }
 
    @Test
-   public void setResourceCreatePermission_downgradePostCreateGrantingRights_shouldFsil() {
+   public void setResourceCreatePermission_downgradePostCreateGrantingRights_shouldFail() {
       authenticateSystemResource();
       final String resourceClassName = generateResourceClass(false, false);
       final String grantedPermissionName = generateResourceClassPermission(resourceClassName);

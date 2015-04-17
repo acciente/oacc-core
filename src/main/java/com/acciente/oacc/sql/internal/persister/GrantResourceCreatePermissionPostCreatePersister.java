@@ -266,6 +266,39 @@ public class GrantResourceCreatePermissionPostCreatePersister extends Persister 
       }
    }
 
+   public void updateResourceCreatePostCreatePermissions(SQLConnection connection,
+                                                         Resource accessorResource,
+                                                         Id<ResourceClassId> accessedResourceClassId,
+                                                         Id<DomainId> accessedResourceDomainId,
+                                                         Set<ResourceCreatePermission> requestedResourceCreatePermissions,
+                                                         Resource grantorResource) {
+      SQLStatement statement = null;
+      try {
+         // add the new create non-system permissions
+         statement = connection.prepareStatement(sqlStrings.SQL_updateInGrantResourceCreatePermissionPostCreate_SET_GrantorID_IsWithGrant_PostCreateIsWithGrant_BY_AccessorID_AccessedDomainID_ResourceClassID_PostCreatePermissionName);
+         for (ResourceCreatePermission resourceCreatePermission : requestedResourceCreatePermissions) {
+            if (!(resourceCreatePermission.isSystemPermission()
+                  || resourceCreatePermission.getPostCreateResourcePermission().isSystemPermission())) {
+               statement.setResourceId(1, grantorResource);
+               statement.setBoolean(2, resourceCreatePermission.isWithGrant());
+               statement.setBoolean(3, resourceCreatePermission.getPostCreateResourcePermission().isWithGrant());
+               statement.setResourceId(4, accessorResource);
+               statement.setResourceDomainId(5, accessedResourceDomainId);
+               statement.setResourceClassId(6, accessedResourceClassId);
+               statement.setString(7, resourceCreatePermission.getPostCreateResourcePermission().getPermissionName());
+
+               assertOneRowUpdated(statement.executeUpdate());
+            }
+         }
+      }
+      catch (SQLException e) {
+         throw new RuntimeException(e);
+      }
+      finally {
+         closeStatement(statement);
+      }
+   }
+
    public void removeResourceCreatePostCreatePermissions(SQLConnection connection,
                                                          Resource accessorResource,
                                                          Id<ResourceClassId> accessedResourceClassId,

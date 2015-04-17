@@ -237,6 +237,37 @@ public class GrantResourceCreatePermissionSysPersister extends Persister {
       }
    }
 
+   public void updateResourceCreateSysPermissions(SQLConnection connection,
+                                                  Resource accessorResource,
+                                                  Id<ResourceClassId> accessedResourceClassId,
+                                                  Id<DomainId> accessedResourceDomainId,
+                                                  Set<ResourceCreatePermission> requestedResourceCreatePermissions,
+                                                  Resource grantorResource) {
+      SQLStatement statement = null;
+      try {
+         // add the new create system permissions
+         statement = connection.prepareStatement(sqlStrings.SQL_updateInGrantResourceCreatePermissionSys_SET_GrantorID_IsWithGrant_BY__AccessorID_AccessedDomainID_ResourceClassID_SysPermissionId);
+         for (ResourceCreatePermission resourceCreatePermission : requestedResourceCreatePermissions) {
+            if (resourceCreatePermission.isSystemPermission()) {
+               statement.setResourceId(1, grantorResource);
+               statement.setBoolean(2, resourceCreatePermission.isWithGrant());
+               statement.setResourceId(3, accessorResource);
+               statement.setResourceDomainId(4, accessedResourceDomainId);
+               statement.setResourceClassId(5, accessedResourceClassId);
+               statement.setResourceCreateSystemPermissionId(6, resourceCreatePermission.getSystemPermissionId());
+
+               assertOneRowUpdated(statement.executeUpdate());
+            }
+         }
+      }
+      catch (SQLException e) {
+         throw new RuntimeException(e);
+      }
+      finally {
+         closeStatement(statement);
+      }
+   }
+
    public void removeResourceCreateSysPermissions(SQLConnection connection,
                                                   Resource accessorResource,
                                                   Id<ResourceClassId> accessedResourceClassId,

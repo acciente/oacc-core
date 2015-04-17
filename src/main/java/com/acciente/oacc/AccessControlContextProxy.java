@@ -564,6 +564,15 @@ public class AccessControlContextProxy implements AccessControlContext {
    }
 
    @Override
+   public void grantResourceCreatePermissions(Resource accessorResource,
+                                              String resourceClassName,
+                                              String domainName,
+                                              ResourceCreatePermission resourceCreatePermission,
+                                              ResourceCreatePermission... resourceCreatePermissions) {
+      accessControlContext.grantResourceCreatePermissions(accessorResource, resourceClassName, domainName, resourceCreatePermission, resourceCreatePermissions);
+   }
+
+   @Override
    public Set<ResourceCreatePermission> getResourceCreatePermissions(Resource accessorResource,
                                                                      String resourceClassName,
                                                                      String domainName) {
@@ -582,6 +591,14 @@ public class AccessControlContextProxy implements AccessControlContext {
                                             String resourceClassName,
                                             Set<ResourceCreatePermission> resourceCreatePermissions) {
       accessControlContext.setResourceCreatePermissions(accessorResource, resourceClassName, resourceCreatePermissions);
+   }
+
+   @Override
+   public void grantResourceCreatePermissions(Resource accessorResource,
+                                              String resourceClassName,
+                                              ResourceCreatePermission resourceCreatePermission,
+                                              ResourceCreatePermission... resourceCreatePermissions) {
+      accessControlContext.grantResourceCreatePermissions(accessorResource, resourceClassName, resourceCreatePermission, resourceCreatePermissions);
    }
 
    @Override

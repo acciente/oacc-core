@@ -2084,6 +2084,233 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
    }
 
    @Override
+   public void grantResourceCreatePermissions(Resource accessorResource,
+                                              String resourceClassName,
+                                              String domainName,
+                                              ResourceCreatePermission resourceCreatePermission,
+                                              ResourceCreatePermission... resourceCreatePermissions) {
+      SQLConnection connection = null;
+
+      __assertAuthenticated();
+      __assertResourceSpecified(accessorResource);
+      __assertResourceClassSpecified(resourceClassName);
+      __assertDomainSpecified(domainName);
+      __assertPermissionSpecified(resourceCreatePermission);
+      __assertVarargPermissionsSpecified(resourceCreatePermissions);
+
+      final Set<ResourceCreatePermission> requestedResourceCreatePermissions
+            = getSetWithoutNulls(resourceCreatePermission, resourceCreatePermissions);
+
+      try {
+         connection = __getConnection();
+
+         __grantDirectResourceCreatePermissions(connection,
+                                                accessorResource,
+                                                resourceClassName,
+                                                domainName,
+                                                requestedResourceCreatePermissions);
+      }
+      finally {
+         __closeConnection(connection);
+      }
+
+   }
+
+   @Override
+   public void grantResourceCreatePermissions(Resource accessorResource,
+                                              String resourceClassName,
+                                              ResourceCreatePermission resourceCreatePermission,
+                                              ResourceCreatePermission... resourceCreatePermissions) {
+      SQLConnection connection = null;
+
+      __assertAuthenticated();
+      __assertResourceSpecified(accessorResource);
+      __assertResourceClassSpecified(resourceClassName);
+      __assertPermissionSpecified(resourceCreatePermission);
+      __assertVarargPermissionsSpecified(resourceCreatePermissions);
+
+      final Set<ResourceCreatePermission> requestedResourceCreatePermissions
+            = getSetWithoutNulls(resourceCreatePermission, resourceCreatePermissions);
+
+      try {
+         connection = __getConnection();
+
+         __grantDirectResourceCreatePermissions(connection,
+                                                accessorResource,
+                                                resourceClassName,
+                                                sessionResourceDomainName,
+                                                requestedResourceCreatePermissions);
+      }
+      finally {
+         __closeConnection(connection);
+      }
+   }
+
+   private void __grantDirectResourceCreatePermissions(SQLConnection connection,
+                                                       Resource accessorResource,
+                                                       String resourceClassName,
+                                                       String domainName,
+                                                       Set<ResourceCreatePermission> requestedResourceCreatePermissions) {
+      __assertResourceExists(connection, accessorResource);
+
+      // verify that resource class is defined and get its metadata
+      final ResourceClassInternalInfo resourceClassInfo
+            = resourceClassPersister.getResourceClassInfo(connection, resourceClassName);
+
+      if (resourceClassInfo == null) {
+         throw new IllegalArgumentException("Could not find resource class: " + resourceClassName);
+      }
+
+      final Id<ResourceClassId> resourceClassId = Id.from(resourceClassInfo.getResourceClassId());
+
+      // verify that domain is defined
+      final Id<DomainId> domainId = domainPersister.getResourceDomainId(connection, domainName);
+
+      if (domainId == null) {
+         throw new IllegalArgumentException("Could not find domain: " + domainName);
+      }
+
+      // ensure that the post create permissions are all in the correct resource class
+      __assertUniquePostCreatePermissionsNamesForResourceClass(connection, requestedResourceCreatePermissions, resourceClassInfo);
+
+      // check if the grantor (=session resource) is authorized to grant the requested permissions
+      if (!__isSuperUserOfDomain(connection, sessionResource, domainName)) {
+         final Set<ResourceCreatePermission> grantorPermissions
+               = __getEffectiveResourceCreatePermissions(connection,
+                                                         sessionResource,
+                                                         resourceClassName,
+                                                         domainName);
+
+         final Set<ResourceCreatePermission> unauthorizedAddPermissions
+               = __subtractResourceCreatePermissionsIfGrantableFrom(requestedResourceCreatePermissions, grantorPermissions);
+
+         if (unauthorizedAddPermissions.size() > 0) {
+            throw NotAuthorizedException.newInstanceForAction(sessionResource,
+                                                              "grant the following permission(s): " + unauthorizedAddPermissions);
+         }
+      }
+
+      // ensure that the *CREATE system permissions was specified
+      final Set<ResourceCreatePermission>
+            directAccessorPermissions
+            = __getDirectResourceCreatePermissions(connection,
+                                                   accessorResource,
+                                                   resourceClassId,
+                                                   domainId);
+
+      if (directAccessorPermissions.isEmpty()) {
+         // our invariant is that a resource's direct create permissions must include the *CREATE system permission;
+         // if there are no direct create permissions, then the requested permissions to be granted need to include *CREATE
+         __assertSetContainsResourceCreateSystemPermission(requestedResourceCreatePermissions);
+      }
+
+      final Set<ResourceCreatePermission> addPermissions = new HashSet<>(requestedResourceCreatePermissions.size());
+      final Set<ResourceCreatePermission> updatePermissions = new HashSet<>(requestedResourceCreatePermissions.size());
+
+      for (ResourceCreatePermission requestedPermission : requestedResourceCreatePermissions) {
+         boolean existingPermission = false;
+
+         if (requestedPermission.isSystemPermission()) {
+            for (ResourceCreatePermission existingDirectPermission : directAccessorPermissions) {
+               if (requestedPermission.equals(existingDirectPermission) ||
+                     requestedPermission.isGrantableFrom(existingDirectPermission)) {
+                  // requested permission is identical to already existing direct permission, OR
+                  // requested permission has lesser granting rights than already existing direct permission,
+                  // so no need to update
+                  existingPermission = true;
+                  break;
+               }
+               if (existingDirectPermission.isSystemPermission() &&
+                     requestedPermission.getSystemPermissionId() == existingDirectPermission.getSystemPermissionId()) {
+                  // requested permission has same system Id and based on above evaluations has higher granting rights than
+                  // the already existing direct permission, so we need to update it
+                  updatePermissions.add(requestedPermission);
+                  existingPermission = true;
+                  break;
+               }
+            }
+         }
+         else {
+            final ResourcePermission requestedPostCreateResourcePermission
+                  = requestedPermission.getPostCreateResourcePermission();
+            for (ResourceCreatePermission existingDirectPermission : directAccessorPermissions) {
+               if (!existingDirectPermission.isSystemPermission()) {
+                  final ResourcePermission existingPostCreateResourcePermission
+                        = existingDirectPermission.getPostCreateResourcePermission();
+
+                  if (requestedPostCreateResourcePermission.equalsIgnoreGrant(existingPostCreateResourcePermission)) {
+                     // found a match in name - now let's see if we need to update existing or leave it unchanged
+                     if (!requestedPermission.equals(existingDirectPermission)
+                           && ((requestedPermission.isWithGrant() && requestedPostCreateResourcePermission.isWithGrant())
+                           || (!existingDirectPermission.isWithGrant() && !existingPostCreateResourcePermission.isWithGrant()))) {
+                        // the two permissions match in name, but the requested has higher granting rights,
+                        // so we need to update
+                        updatePermissions.add(requestedPermission);
+                     }
+                     // because we found a match in name, we can skip comparing requested against other existing permissions
+                     existingPermission = true;
+                     break;
+                  }
+               }
+
+            }
+         }
+
+         if (!existingPermission) {
+            // couldn't find requested permission in set of already existing direct permissions, by name, so we need to add it
+            addPermissions.add(requestedPermission);
+         }
+      }
+
+      // update *CREATE system permission, if necessary
+      grantResourceCreatePermissionSysPersister.updateResourceCreateSysPermissions(connection,
+                                                                                   accessorResource,
+                                                                                   resourceClassId,
+                                                                                   domainId,
+                                                                                   updatePermissions,
+                                                                                   sessionResource);
+
+      // update any post create system permissions, if necessary
+      grantResourceCreatePermissionPostCreateSysPersister.updateResourceCreatePostCreateSysPermissions(connection,
+                                                                                                       accessorResource,
+                                                                                                       resourceClassId,
+                                                                                                       domainId,
+                                                                                                       updatePermissions,
+                                                                                                       sessionResource);
+
+      // update any post create non-system permissions, if necessary
+      grantResourceCreatePermissionPostCreatePersister.updateResourceCreatePostCreatePermissions(connection,
+                                                                                              accessorResource,
+                                                                                              resourceClassId,
+                                                                                              domainId,
+                                                                                              updatePermissions,
+                                                                                              sessionResource);
+      // grant the *CREATE system permissions, if necessary
+      grantResourceCreatePermissionSysPersister.addResourceCreateSysPermissions(connection,
+                                                                                accessorResource,
+                                                                                resourceClassId,
+                                                                                domainId,
+                                                                                addPermissions,
+                                                                                sessionResource);
+
+      // grant any post create system permissions, if necessary
+      grantResourceCreatePermissionPostCreateSysPersister.addResourceCreatePostCreateSysPermissions(connection,
+                                                                                                    accessorResource,
+                                                                                                    resourceClassId,
+                                                                                                    domainId,
+                                                                                                    addPermissions,
+                                                                                                    sessionResource);
+
+      // grant any post create non-system permissions, if necessary
+      grantResourceCreatePermissionPostCreatePersister.addResourceCreatePostCreatePermissions(connection,
+                                                                                              accessorResource,
+                                                                                              resourceClassId,
+                                                                                              domainId,
+                                                                                              addPermissions,
+                                                                                              sessionResource);
+   }
+
+   @Override
    public Set<ResourceCreatePermission> getResourceCreatePermissions(Resource accessorResource,
                                                                      String resourceClassName,
                                                                      String domainName) {

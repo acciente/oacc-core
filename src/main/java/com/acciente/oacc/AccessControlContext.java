@@ -1498,6 +1498,49 @@ public interface AccessControlContext {
                                             Set<ResourceCreatePermission> resourceCreatePermissions);
 
    /**
+    * Adds to the set of resource permissions the specified accessor resource will receive directly, if it
+    * created a resource of the specified resource class in the specified domain.
+    * <p/>
+    * Note that the system-defined CREATE permission must be included in the specified set of
+    * resource create permissions, <em>unless</em> the accessor has already been directly granted that privilege beforehand.
+    * <p/>
+    * Granting the CREATE permission allows the accessor resource to create resources of the
+    * specified resource class and domain. But if the CREATE permission is the <em>only</em> directly granted one,
+    * then the accessor would not receive <em>any</em> direct permissions on the newly created resource.
+    * This is appropriate, for example, if the accessor would already obtain privileges to
+    * the newly created resource via global resource permissions, or if indeed the accessor
+    * should not receive any direct access to the newly created resource.
+    * <p/>
+    * This method does <em>not</em> replace any resource create permissions previously granted, but can only add to the
+    * set, or upgrade an existing permission's granting rights. Furthermore, removing the 'withGrant' option from an
+    * existing permission is not possible with this method alone - revoke the permission first, then re-grant without
+    * the 'withGrant' option, or use {@link #setResourceCreatePermissions} to specify all direct create permissions
+    *
+    * @param accessorResource          the resource to which the privilege should be granted
+    * @param resourceClassName         a string resource class name
+    * @param domainName                a string representing a valid domain name
+    * @param resourceCreatePermission  the resource create permission to be granted
+    * @param resourceCreatePermissions the other (optional) resource create permissions to be granted
+    * @throws java.lang.IllegalArgumentException if accessorResource reference is invalid, or
+    *                                            if no domain of domainName exists, or
+    *                                            if no resource class of resourceClassName exists, or
+    *                                            if resourceCreatePermissions does not contain *CREATE permission when
+    *                                            the accessor resource does not have direct *CREATE permission already, or
+    *                                            if resourceCreatePermissions contains post-create permissions invalid for
+    *                                            the specified resource class (incl. RESET-CREDENTIALS or IMPERSONATE for
+    *                                            unauthenticatable resource classes), or
+    *                                            if resourceCreatePermissions contains multiple instances of the same
+    *                                            post-create permission that only differ in the 'withGrant' attribute
+    * @throws com.acciente.oacc.NotAuthorizedException if the session resource is not authorized to set
+    *                                                  resource create permissions on the specified accessor resource
+    */
+   public void grantResourceCreatePermissions(Resource accessorResource,
+                                              String resourceClassName,
+                                              String domainName,
+                                              ResourceCreatePermission resourceCreatePermission,
+                                              ResourceCreatePermission... resourceCreatePermissions);
+
+   /**
     * Gets all direct resource create permissions the accessor resource has to the specified
     * resource class in the specified domain (which define a subset of the resource permissions
     * the accessor resource would receive directly, if it created a resource of the specified
@@ -1577,6 +1620,45 @@ public interface AccessControlContext {
                                             String resourceClassName,
                                             Set<ResourceCreatePermission> resourceCreatePermissions);
 
+   /**
+    * Adds to the set of resource permissions the specified accessor resource will receive directly, if it
+    * created a resource of the specified resource class in the current session resource's domain.
+    * <p/>
+    * Note that the system-defined CREATE permission must be included in the specified set of
+    * resource create permissions, <em>unless</em> the accessor has already been directly granted that privilege beforehand.
+    * <p/>
+    * Granting the CREATE permission allows the accessor resource to create resources of the
+    * specified resource class and domain. But if the CREATE permission is the <em>only</em> directly granted one,
+    * then the accessor would not receive <em>any</em> direct permissions on the newly created resource.
+    * This is appropriate, for example, if the accessor would already obtain privileges to
+    * the newly created resource via global resource permissions, or if indeed the accessor
+    * should not receive any direct access to the newly created resource.
+    * <p/>
+    * This method does <em>not</em> replace any resource create permissions previously granted, but can only add to the
+    * set, or upgrade an existing permission's granting rights. Furthermore, removing the 'withGrant' option from an
+    * existing permission is not possible with this method alone - revoke the permission first, then re-grant without
+    * the 'withGrant' option, or use {@link #setResourceCreatePermissions} to specify all direct create permissions
+    *
+    * @param accessorResource          the resource to which the privilege should be granted
+    * @param resourceClassName         a string resource class name
+    * @param resourceCreatePermission  the resource create permission to be granted
+    * @param resourceCreatePermissions the other (optional) resource create permissions to be granted
+    * @throws java.lang.IllegalArgumentException if accessorResource reference is invalid, or
+    *                                            if no resource class of resourceClassName exists, or
+    *                                            if resourceCreatePermissions does not contain *CREATE permission when
+    *                                            the accessor resource does not have direct *CREATE permission already, or
+    *                                            if resourceCreatePermissions contains post-create permissions invalid for
+    *                                            the specified resource class (incl. RESET-CREDENTIALS or IMPERSONATE for
+    *                                            unauthenticatable resource classes), or
+    *                                            if resourceCreatePermissions contains multiple instances of the same
+    *                                            post-create permission that only differ in the 'withGrant' attribute
+    * @throws com.acciente.oacc.NotAuthorizedException if the session resource is not authorized to set
+    *                                                  resource create permissions on the specified accessor resource
+    */
+   public void grantResourceCreatePermissions(Resource accessorResource,
+                                              String resourceClassName,
+                                              ResourceCreatePermission resourceCreatePermission,
+                                              ResourceCreatePermission... resourceCreatePermissions);
    /**
     * Gets all direct resource create permissions the accessor resource has to the specified
     * resource class in the the current session resource's domain (which define a subset of
