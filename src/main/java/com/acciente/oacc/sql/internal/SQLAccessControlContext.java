@@ -1545,28 +1545,20 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
          else {
             final DomainPermission requestedPostCreateDomainPermission = requestedPermission.getPostCreateDomainPermission();
             for (DomainCreatePermission existingDirectPermission : directAccessorPermissions) {
-               if (requestedPermission.equals(existingDirectPermission) ||
-                     requestedPermission.isGrantableFrom(existingDirectPermission)) {
-                  // requested permission is identical to already existing direct permission, OR
-                  // requested permission has lesser granting rights than already existing direct permission,
-                  // so no need to update
-                  existingPermission = true;
-                  break;
-               }
                if (!existingDirectPermission.isSystemPermission()) {
-                  // now let's look at the post-create permissions
                   final DomainPermission existingPostCreateDomainPermission
                         = existingDirectPermission.getPostCreateDomainPermission();
-                  if (requestedPostCreateDomainPermission.isGrantableFrom(existingPostCreateDomainPermission)) {
-                     // requested post-create permission has lesser granting rights than already existing direct permission,
-                     // so no need to update
-                     existingPermission = true;
-                     break;
-                  }
+
                   if (requestedPostCreateDomainPermission.equalsIgnoreGrant(existingPostCreateDomainPermission)) {
-                     // requested post-create permission has same name and based on above evaluations has higher
-                     // granting rights than the already existing direct permission, so we need to update it
-                     updatePermissions.add(requestedPermission);
+                     // found a match in name - now let's see if we need to update existing or leave it unchanged
+                     if (!requestedPermission.equals(existingDirectPermission)
+                           && ((requestedPermission.isWithGrant() && requestedPostCreateDomainPermission.isWithGrant())
+                           || (!existingDirectPermission.isWithGrant() && !existingPostCreateDomainPermission.isWithGrant()))) {
+                        // the two permissions match in name, but the requested has higher granting rights,
+                        // so we need to update
+                        updatePermissions.add(requestedPermission);
+                     }
+                     // because we found a match in name, we can skip comparing requested against other existing permissions
                      existingPermission = true;
                      break;
                   }
@@ -2252,7 +2244,6 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
                      break;
                   }
                }
-
             }
          }
 
