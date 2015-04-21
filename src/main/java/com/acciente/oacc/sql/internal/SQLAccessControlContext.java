@@ -525,7 +525,10 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
             throw new IllegalArgumentException("Duplicate resource class: " + resourceClassName);
          }
 
-         resourceClassPersister.addResourceClass(connection, resourceClassName, authenticatable, unauthenticatedCreateAllowed);
+         resourceClassPersister.addResourceClass(connection,
+                                                 resourceClassName,
+                                                 authenticatable,
+                                                 unauthenticatedCreateAllowed);
       }
       finally {
          __closeConnection(connection);
@@ -1418,13 +1421,13 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
    private void __assertSetContainsDomainCreateSystemPermission(Set<DomainCreatePermission> domainCreatePermissions) {
       if (!domainCreatePermissions.isEmpty()) {
          // if at least one permission is specified, then there must be a *CREATE permission in the set
-         if (!setContainsDomainCreateSystemPermission(domainCreatePermissions)) {
+         if (!__setContainsDomainCreateSystemPermission(domainCreatePermissions)) {
             throw new IllegalArgumentException("Domain create permission *CREATE must be specified");
          }
       }
    }
 
-   private boolean setContainsDomainCreateSystemPermission(Set<DomainCreatePermission> domainCreatePermissions) {
+   private boolean __setContainsDomainCreateSystemPermission(Set<DomainCreatePermission> domainCreatePermissions) {
       for (final DomainCreatePermission domainCreatePermission : domainCreatePermissions) {
          if (domainCreatePermission.isSystemPermission()
                && DomainCreatePermissions.CREATE.equals(domainCreatePermission.getPermissionName())) {
@@ -1490,7 +1493,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
    private void __grantDirectDomainCreatePermissions(SQLConnection connection,
                                                      Resource accessorResource,
                                                      Set<DomainCreatePermission> requestedDomainCreatePermissions) {
-      __assertUniquePostCreatePermissionsNames(requestedDomainCreatePermissions);
+      __assertUniquePostCreateDomainPermissionNames(requestedDomainCreatePermissions);
       __assertResourceExists(connection, accessorResource);
 
       // check if grantor (=session resource) is authorized to add requested permissions
@@ -1597,7 +1600,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
                                                      addPermissions);
    }
 
-   private void __assertUniquePostCreatePermissionsNames(Set<DomainCreatePermission> domainCreatePermissions) {
+   private void __assertUniquePostCreateDomainPermissionNames(Set<DomainCreatePermission> domainCreatePermissions) {
       final Set<String> uniqueSystemPermissionNames = new HashSet<>(domainCreatePermissions.size());
       final Set<String> uniquePostCreatePermissionNames = new HashSet<>(domainCreatePermissions.size());
 
@@ -1654,7 +1657,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
    private void __revokeDirectDomainCreatePermissions(SQLConnection connection,
                                                       Resource accessorResource,
                                                       Set<DomainCreatePermission> requestedDomainCreatePermissions) {
-      __assertUniquePostCreatePermissionsNames(requestedDomainCreatePermissions);
+      __assertUniquePostCreateDomainPermissionNames(requestedDomainCreatePermissions);
       __assertResourceExists(connection, accessorResource);
 
       // check if grantor (=session resource) is authorized to revoke requested permissions
@@ -1675,7 +1678,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
             = __getDirectDomainCreatePermissions(connection, accessorResource);
 
       if ((directAccessorPermissions.size() > requestedDomainCreatePermissions.size()) &&
-            setContainsDomainCreateSystemPermission(requestedDomainCreatePermissions)) {
+            __setContainsDomainCreateSystemPermission(requestedDomainCreatePermissions)) {
          // our invariant is that a resource's direct create permissions must include the *CREATE system permission;
          // if after revoking the requested permissions, the remaining set wouldn't include the *CREATE, we'd have a problem
          throw new IllegalArgumentException(
@@ -2105,7 +2108,6 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       finally {
          __closeConnection(connection);
       }
-
    }
 
    @Override
@@ -2192,7 +2194,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
 
       if (directAccessorPermissions.isEmpty()) {
          // our invariant is that a resource's direct create permissions must include the *CREATE system permission;
-         // if there are no direct create permissions, then the requested permissions to be granted need to include *CREATE
+         // if there are no direct create permissions, then the requested permissions to be granted needs to include *CREATE
          __assertSetContainsResourceCreateSystemPermission(requestedResourceCreatePermissions);
       }
 
@@ -2299,6 +2301,220 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
                                                                                               domainId,
                                                                                               addPermissions,
                                                                                               sessionResource);
+   }
+
+   @Override
+   public void revokeResourceCreatePermissions(Resource accessorResource,
+                                               String resourceClassName,
+                                               String domainName,
+                                               ResourceCreatePermission resourceCreatePermission,
+                                               ResourceCreatePermission... resourceCreatePermissions) {
+      SQLConnection connection = null;
+
+      __assertAuthenticated();
+      __assertResourceSpecified(accessorResource);
+      __assertResourceClassSpecified(resourceClassName);
+      __assertDomainSpecified(domainName);
+      __assertPermissionSpecified(resourceCreatePermission);
+      __assertVarargPermissionsSpecified(resourceCreatePermissions);
+
+      final Set<ResourceCreatePermission> requestedResourceCreatePermissions
+            = getSetWithoutNulls(resourceCreatePermission, resourceCreatePermissions);
+
+      try {
+         connection = __getConnection();
+
+         __revokeDirectResourceCreatePermissions(connection,
+                                                 accessorResource,
+                                                 resourceClassName,
+                                                 domainName,
+                                                 requestedResourceCreatePermissions);
+      }
+      finally {
+         __closeConnection(connection);
+      }
+   }
+
+   @Override
+   public void revokeResourceCreatePermissions(Resource accessorResource,
+                                               String resourceClassName,
+                                               ResourceCreatePermission resourceCreatePermission,
+                                               ResourceCreatePermission... resourceCreatePermissions) {
+      SQLConnection connection = null;
+
+      __assertAuthenticated();
+      __assertResourceSpecified(accessorResource);
+      __assertResourceClassSpecified(resourceClassName);
+      __assertPermissionSpecified(resourceCreatePermission);
+      __assertVarargPermissionsSpecified(resourceCreatePermissions);
+
+      final Set<ResourceCreatePermission> requestedResourceCreatePermissions
+            = getSetWithoutNulls(resourceCreatePermission, resourceCreatePermissions);
+
+      try {
+         connection = __getConnection();
+
+         __revokeDirectResourceCreatePermissions(connection,
+                                                 accessorResource,
+                                                 resourceClassName,
+                                                 sessionResourceDomainName,
+                                                 requestedResourceCreatePermissions);
+      }
+      finally {
+         __closeConnection(connection);
+      }
+   }
+
+   private void __revokeDirectResourceCreatePermissions(SQLConnection connection,
+                                                        Resource accessorResource,
+                                                        String resourceClassName,
+                                                        String domainName,
+                                                        Set<ResourceCreatePermission> requestedResourceCreatePermissions) {
+      __assertUniquePostCreateResourcePermissionNames(requestedResourceCreatePermissions);
+      __assertResourceExists(connection, accessorResource);
+
+      // verify that resource class is defined and get its metadata
+      final ResourceClassInternalInfo resourceClassInfo
+            = resourceClassPersister.getResourceClassInfo(connection, resourceClassName);
+
+      if (resourceClassInfo == null) {
+         throw new IllegalArgumentException("Could not find resource class: " + resourceClassName);
+      }
+
+      final Id<ResourceClassId> resourceClassId = Id.from(resourceClassInfo.getResourceClassId());
+
+      // verify that domain is defined
+      final Id<DomainId> domainId = domainPersister.getResourceDomainId(connection, domainName);
+
+      if (domainId == null) {
+         throw new IllegalArgumentException("Could not find domain: " + domainName);
+      }
+
+      // check if the grantor (=session resource) is authorized to grant the requested permissions
+      if (!__isSuperUserOfDomain(connection, sessionResource, domainName)) {
+         final Set<ResourceCreatePermission> grantorPermissions
+               = __getEffectiveResourceCreatePermissions(connection,
+                                                         sessionResource,
+                                                         resourceClassName,
+                                                         domainName);
+
+         final Set<ResourceCreatePermission> unauthorizedPermissions
+               = __subtractResourceCreatePermissionsIfGrantableFrom(requestedResourceCreatePermissions,
+                                                                    grantorPermissions);
+
+         if (unauthorizedPermissions.size() > 0) {
+            throw NotAuthorizedException.newInstanceForAction(sessionResource,
+                                                              "revoke the following permission(s): " + unauthorizedPermissions);
+         }
+      }
+
+      // ensure that the *CREATE system permissions will remain if not all are cleared
+      final Set<ResourceCreatePermission>
+            directAccessorPermissions
+            = __getDirectResourceCreatePermissions(connection,
+                                                   accessorResource,
+                                                   resourceClassId,
+                                                   domainId);
+
+      if ((directAccessorPermissions.size() > requestedResourceCreatePermissions.size()) &&
+            __setContainsResourceCreateSystemPermission(requestedResourceCreatePermissions)) {
+         // our invariant is that a resource's direct create permissions must include the *CREATE system permission;
+         // if after revoking the requested permissions, the remaining set wouldn't include the *CREATE, we'd have a problem
+         throw new IllegalArgumentException(
+               "Attempt to revoke a subset of resource create permissions that includes the *CREATE system permission: "
+                     + requestedResourceCreatePermissions);
+      }
+
+      final Set<ResourceCreatePermission> removePermissions = new HashSet<>(requestedResourceCreatePermissions.size());
+
+      for (ResourceCreatePermission requestedPermission : requestedResourceCreatePermissions) {
+         if (requestedPermission.isSystemPermission()) {
+            for (ResourceCreatePermission existingDirectPermission : directAccessorPermissions) {
+               if (existingDirectPermission.isSystemPermission() &&
+                     requestedPermission.getSystemPermissionId() == existingDirectPermission.getSystemPermissionId()) {
+                  // requested permission has same system Id as an already existing direct permission, so remove it
+                  removePermissions.add(requestedPermission);
+                  break;
+               }
+            }
+         }
+         else {
+            final ResourcePermission requestedPostCreateResourcePermission
+                  = requestedPermission.getPostCreateResourcePermission();
+            for (ResourceCreatePermission existingDirectPermission : directAccessorPermissions) {
+               if (!existingDirectPermission.isSystemPermission()) {
+                  // now let's look at the post-create permissions
+                  if (requestedPostCreateResourcePermission
+                        .equalsIgnoreGrant(existingDirectPermission.getPostCreateResourcePermission())) {
+                     // requested post-create permission has same name as an already existing direct permission, so remove it
+                     removePermissions.add(requestedPermission);
+                     break;
+                  }
+               }
+            }
+         }
+      }
+
+      // remove *CREATE system permission, if necessary
+      grantResourceCreatePermissionSysPersister.removeResourceCreateSysPermissions(connection,
+                                                                                   accessorResource,
+                                                                                   resourceClassId,
+                                                                                   domainId,
+                                                                                   removePermissions);
+
+      // remove any post create system permissions, if necessary
+      grantResourceCreatePermissionPostCreateSysPersister.removeResourceCreatePostCreateSysPermissions(connection,
+                                                                                                       accessorResource,
+                                                                                                       resourceClassId,
+                                                                                                       domainId,
+                                                                                                       removePermissions);
+
+      // remove any post create non-system permissions, if necessary
+      grantResourceCreatePermissionPostCreatePersister.removeResourceCreatePostCreatePermissions(connection,
+                                                                                                 accessorResource,
+                                                                                                 resourceClassId,
+                                                                                                 domainId,
+                                                                                                 removePermissions);
+   }
+
+   private void __assertUniquePostCreateResourcePermissionNames(Set<ResourceCreatePermission> resourceCreatePermissions) {
+      final Set<String> uniqueSystemPermissionNames = new HashSet<>(resourceCreatePermissions.size());
+      final Set<String> uniquePostCreatePermissionNames = new HashSet<>(resourceCreatePermissions.size());
+
+      for (final ResourceCreatePermission resourceCreatePermission : resourceCreatePermissions) {
+         if (resourceCreatePermission.isSystemPermission()) {
+            if (uniqueSystemPermissionNames.contains(resourceCreatePermission.getPermissionName())) {
+               throw new IllegalArgumentException("Duplicate permission: "
+                                                        + resourceCreatePermission.getPermissionName()
+                                                        + " that only differs in 'withGrant' option");
+            }
+            else {
+               uniqueSystemPermissionNames.add(resourceCreatePermission.getPermissionName());
+            }
+         }
+         else {
+            final ResourcePermission postCreateResourcePermission = resourceCreatePermission.getPostCreateResourcePermission();
+
+            if (uniquePostCreatePermissionNames.contains(postCreateResourcePermission.getPermissionName())) {
+               throw new IllegalArgumentException("Duplicate permission: "
+                                                        + postCreateResourcePermission.getPermissionName()
+                                                        + " that only differs in 'withGrant' option");
+            }
+            else {
+               uniquePostCreatePermissionNames.add(postCreateResourcePermission.getPermissionName());
+            }
+         }
+      }
+   }
+
+   private boolean __setContainsResourceCreateSystemPermission(Set<ResourceCreatePermission> resourceCreatePermissions) {
+      for (final ResourceCreatePermission resourceCreatePermission : resourceCreatePermissions) {
+         if (resourceCreatePermission.isSystemPermission()
+               && ResourceCreatePermissions.CREATE.equals(resourceCreatePermission.getPermissionName())) {
+            return true;
+         }
+      }
+      return false;
    }
 
    @Override

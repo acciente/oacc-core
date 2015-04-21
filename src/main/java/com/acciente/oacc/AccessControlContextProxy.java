@@ -573,6 +573,15 @@ public class AccessControlContextProxy implements AccessControlContext {
    }
 
    @Override
+   public void revokeResourceCreatePermissions(Resource accessorResource,
+                                               String resourceClassName,
+                                               String domainName,
+                                               ResourceCreatePermission resourceCreatePermission,
+                                               ResourceCreatePermission... resourceCreatePermissions) {
+      accessControlContext.revokeResourceCreatePermissions(accessorResource, resourceClassName, domainName, resourceCreatePermission, resourceCreatePermissions);
+   }
+
+   @Override
    public Set<ResourceCreatePermission> getResourceCreatePermissions(Resource accessorResource,
                                                                      String resourceClassName,
                                                                      String domainName) {
@@ -599,6 +608,14 @@ public class AccessControlContextProxy implements AccessControlContext {
                                               ResourceCreatePermission resourceCreatePermission,
                                               ResourceCreatePermission... resourceCreatePermissions) {
       accessControlContext.grantResourceCreatePermissions(accessorResource, resourceClassName, resourceCreatePermission, resourceCreatePermissions);
+   }
+
+   @Override
+   public void revokeResourceCreatePermissions(Resource accessorResource,
+                                               String resourceClassName,
+                                               ResourceCreatePermission resourceCreatePermission,
+                                               ResourceCreatePermission... resourceCreatePermissions) {
+      accessControlContext.revokeResourceCreatePermissions(accessorResource, resourceClassName, resourceCreatePermission, resourceCreatePermissions);
    }
 
    @Override
@@ -681,11 +698,7 @@ public class AccessControlContextProxy implements AccessControlContext {
                                                String domainName,
                                                ResourcePermission resourcePermission,
                                                ResourcePermission... resourcePermissions) {
-      accessControlContext.revokeGlobalResourcePermissions(accessorResource,
-                                                           resourceClassName,
-                                                           domainName,
-                                                           resourcePermission,
-                                                           resourcePermissions);
+      accessControlContext.revokeGlobalResourcePermissions(accessorResource, resourceClassName, domainName, resourcePermission, resourcePermissions);
    }
 
    @Override

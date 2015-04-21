@@ -74,6 +74,7 @@ public class TestAccessControlSuite  {
       suite.addTest(new JUnit4TestAdapter(TestAccessControl_impersonate.class));
       suite.addTest(new JUnit4TestAdapter(TestAccessControl_revokeDomainCreatePermissions.class));
       suite.addTest(new JUnit4TestAdapter(TestAccessControl_revokeDomainPermissions.class));
+      suite.addTest(new JUnit4TestAdapter(TestAccessControl_revokeResourceCreatePermissions.class));
       suite.addTest(new JUnit4TestAdapter(TestAccessControl_revokeResourcePermissions.class));
       suite.addTest(new JUnit4TestAdapter(TestAccessControl_revokeGlobalResourcePermissions.class));
       suite.addTest(new JUnit4TestAdapter(TestAccessControl_serialize.class));

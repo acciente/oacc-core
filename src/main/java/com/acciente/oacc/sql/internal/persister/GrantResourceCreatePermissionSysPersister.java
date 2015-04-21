@@ -288,4 +288,32 @@ public class GrantResourceCreatePermissionSysPersister extends Persister {
          closeStatement(statement);
       }
    }
+
+   public void removeResourceCreateSysPermissions(SQLConnection connection,
+                                                  Resource accessorResource,
+                                                  Id<ResourceClassId> accessedResourceClassId,
+                                                  Id<DomainId> accessedResourceDomainId,
+                                                  Set<ResourceCreatePermission> requestedResourceCreatePermissions) {
+      SQLStatement statement = null;
+      try {
+         // revoke the create system permissions
+         statement = connection.prepareStatement(sqlStrings.SQL_removeInGrantResourceCreatePermissionSys_BY_AccessorID_AccessedDomainID_ResourceClassID_SysPermissionID);
+         for (ResourceCreatePermission resourceCreatePermission : requestedResourceCreatePermissions) {
+            if (resourceCreatePermission.isSystemPermission()) {
+               statement.setResourceId(1, accessorResource);
+               statement.setResourceDomainId(2, accessedResourceDomainId);
+               statement.setResourceClassId(3, accessedResourceClassId);
+               statement.setResourceCreateSystemPermissionId(4, resourceCreatePermission.getSystemPermissionId());
+
+               assertOneRowUpdated(statement.executeUpdate());
+            }
+         }
+      }
+      catch (SQLException e) {
+         throw new RuntimeException(e);
+      }
+      finally {
+         closeStatement(statement);
+      }
+   }
 }

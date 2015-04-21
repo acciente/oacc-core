@@ -1427,15 +1427,6 @@ public class TestAccessControl_grantResourceCreatePermissions extends TestAccess
 
       assertThat(accessControlContext.getEffectiveResourceCreatePermissionsMap(accessorResource).isEmpty(), is(true));
 
-      // define a valid set of create permissions
-      Set<ResourceCreatePermission> resourceCreatePermissions_valid = new HashSet<>();
-      resourceCreatePermissions_valid.add(createPerm_create_withGrant);
-
-      // define a set of create permissions that includes an invalid permission reference
-      Set<ResourceCreatePermission> resourceCreatePermissions_invalid = new HashSet<>();
-      resourceCreatePermissions_invalid.add(createPerm_create_withGrant);
-      resourceCreatePermissions_invalid.add(createPerm_invalid);
-
       // attempt to grant create permissions with invalid references
       try {
          accessControlContext.grantResourceCreatePermissions(Resources.getInstance(-999L),

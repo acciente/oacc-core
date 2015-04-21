@@ -235,7 +235,7 @@ public class GrantResourceCreatePermissionPostCreateSysPersister extends Persist
                                                          Resource grantorResource) {
       SQLStatement statement = null;
       try {
-         // add the new create system permissions
+         // add the new post-create system permissions
          statement = connection.prepareStatement(sqlStrings.SQL_createInGrantResourceCreatePermissionPostCreateSys_WITH_AccessorID_GrantorID_AccessedDomainID_IsWithGrant_PostCreateIsWithGrant_ResourceClassID_PostCreateSysPermissionID);
          for (ResourceCreatePermission resourceCreatePermission : requestedResourceCreatePermissions) {
             if (!resourceCreatePermission.isSystemPermission()
@@ -268,7 +268,7 @@ public class GrantResourceCreatePermissionPostCreateSysPersister extends Persist
                                                             Resource grantorResource) {
       SQLStatement statement = null;
       try {
-         // add the new create system permissions
+         // add the new post-create system permissions
          statement = connection.prepareStatement(sqlStrings.SQL_updateInGrantResourceCreatePermissionPostCreateSys_SET_GrantorID_IsWithGrant_PostCreateIsWithGrant_BY_AccessorID_AccessedDomainID_ResourceClassID_PostCreateSysPermissionID);
          for (ResourceCreatePermission resourceCreatePermission : requestedResourceCreatePermissions) {
             if (!resourceCreatePermission.isSystemPermission()
@@ -299,12 +299,41 @@ public class GrantResourceCreatePermissionPostCreateSysPersister extends Persist
                                                             Id<DomainId> accessedResourceDomainId) {
       SQLStatement statement = null;
       try {
-         // revoke any existing create system permissions this accessor has to this domain + resource class
+         // revoke any existing post-create system permissions this accessor has to this domain + resource class
          statement = connection.prepareStatement(sqlStrings.SQL_removeInGrantResourceCreatePermissionPostCreateSys_BY_AccessorID_AccessedDomainID_ResourceClassID);
          statement.setResourceId(1, accessorResource);
          statement.setResourceDomainId(2, accessedResourceDomainId);
          statement.setResourceClassId(3, accessedResourceClassId);
          statement.executeUpdate();
+      }
+      catch (SQLException e) {
+         throw new RuntimeException(e);
+      }
+      finally {
+         closeStatement(statement);
+      }
+   }
+
+   public void removeResourceCreatePostCreateSysPermissions(SQLConnection connection,
+                                                            Resource accessorResource,
+                                                            Id<ResourceClassId> accessedResourceClassId,
+                                                            Id<DomainId> accessedResourceDomainId,
+                                                            Set<ResourceCreatePermission> requestedResourceCreatePermissions) {
+      SQLStatement statement = null;
+      try {
+         // revoke the post-create system permissions
+         statement = connection.prepareStatement(sqlStrings.SQL_removeInGrantResourceCreatePermissionPostCreateSys_BY_AccessorID_AccessedDomainID_ResourceClassID_PostCreateSysPermissionID);
+         for (ResourceCreatePermission resourceCreatePermission : requestedResourceCreatePermissions) {
+            if (!resourceCreatePermission.isSystemPermission()
+                  && resourceCreatePermission.getPostCreateResourcePermission().isSystemPermission()) {
+               statement.setResourceId(1, accessorResource);
+               statement.setResourceDomainId(2, accessedResourceDomainId);
+               statement.setResourceClassId(3, accessedResourceClassId);
+               statement.setResourceSystemPermissionId(4, resourceCreatePermission.getPostCreateResourcePermission().getSystemPermissionId());
+
+               assertOneRowUpdated(statement.executeUpdate());
+            }
+         }
       }
       catch (SQLException e) {
          throw new RuntimeException(e);
