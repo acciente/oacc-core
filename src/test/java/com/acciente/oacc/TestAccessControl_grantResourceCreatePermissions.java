@@ -1320,9 +1320,10 @@ public class TestAccessControl_grantResourceCreatePermissions extends TestAccess
    @Test
    public void grantResourceCreatePermissions_duplicatePermissionNames_shouldFail() {
       authenticateSystemResource();
-      final ResourceCreatePermission createPerm_create_withGrant = ResourceCreatePermissions.getInstance(
-            ResourceCreatePermissions.CREATE,
-            true);
+      final ResourceCreatePermission createPerm_create
+            = ResourceCreatePermissions.getInstance(ResourceCreatePermissions.CREATE);
+      final ResourceCreatePermission createPerm_create_withGrant
+            = ResourceCreatePermissions.getInstance(ResourceCreatePermissions.CREATE, true);
       final ResourceCreatePermission createPerm_inherit
             = ResourceCreatePermissions.getInstance(ResourcePermissions.getInstance(ResourcePermissions.INHERIT, true));
       final ResourceCreatePermission createPerm_inherit_withGrant
@@ -1335,10 +1336,8 @@ public class TestAccessControl_grantResourceCreatePermissions extends TestAccess
       assertThat(accessControlContext.getEffectiveResourceCreatePermissionsMap(accessorResource).isEmpty(), is(true));
 
       // define a set of create permissions that contains the same permission twice, but with different grant-options
-      Set<ResourceCreatePermission> resourceCreatePermissions_pre = new HashSet<>();
-      resourceCreatePermissions_pre.add(createPerm_create_withGrant);
-      resourceCreatePermissions_pre.add(createPerm_inherit_withGrant);
-      resourceCreatePermissions_pre.add(createPerm_inherit);
+      Set<ResourceCreatePermission> resourceCreatePermissions_pre
+            = setOf(createPerm_create, createPerm_create_withGrant, createPerm_inherit_withGrant, createPerm_inherit);
 
       // attempt to grant create permissions with "near" duplicates
       try {
@@ -1360,6 +1359,17 @@ public class TestAccessControl_grantResourceCreatePermissions extends TestAccess
                                                              createPerm_create_withGrant,
                                                              createPerm_inherit_withGrant,
                                                              createPerm_inherit);
+         fail("granting create-permissions that include the same permission, but with different grant-options, should have failed");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("duplicate permission"));
+      }
+
+      try {
+         accessControlContext.grantResourceCreatePermissions(accessorResource,
+                                                             resourceClassName,
+                                                             createPerm_create_withGrant,
+                                                             createPerm_create);
          fail("granting create-permissions that include the same permission, but with different grant-options, should have failed");
       }
       catch (IllegalArgumentException e) {
