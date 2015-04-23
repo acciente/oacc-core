@@ -712,7 +712,7 @@ public class TestAccessControl_setGlobalResourcePermissions extends TestAccessCo
          fail("setting global permissions with mismatched resource class and permission should have failed");
       }
       catch (IllegalArgumentException e) {
-         assertThat(e.getMessage().toLowerCase(), containsString("does not exist for the specified resource class"));
+         assertThat(e.getMessage().toLowerCase(), containsString("is not defined for resource class"));
       }
    }
 
@@ -773,7 +773,7 @@ public class TestAccessControl_setGlobalResourcePermissions extends TestAccessCo
          fail("setting permissions with non-existent permission name should have failed");
       }
       catch (IllegalArgumentException e) {
-         assertThat(e.getMessage().toLowerCase(), containsString("does not exist for the specified resource class"));
+         assertThat(e.getMessage().toLowerCase(), containsString("is not defined for resource class"));
       }
    }
 

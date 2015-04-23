@@ -754,7 +754,7 @@ public class TestAccessControl_grantGlobalResourcePermissions extends TestAccess
          fail("granting global permissions with mismatched resource class and permission should have failed");
       }
       catch (IllegalArgumentException e) {
-         assertThat(e.getMessage().toLowerCase(), containsString("does not exist for the specified resource class"));
+         assertThat(e.getMessage().toLowerCase(), containsString("is not defined for resource class"));
       }
       try {
          accessControlContext.grantGlobalResourcePermissions(accessorResource,
@@ -763,7 +763,7 @@ public class TestAccessControl_grantGlobalResourcePermissions extends TestAccess
          fail("granting global permissions with mismatched resource class and permission should have failed");
       }
       catch (IllegalArgumentException e) {
-         assertThat(e.getMessage().toLowerCase(), containsString("does not exist for the specified resource class"));
+         assertThat(e.getMessage().toLowerCase(), containsString("is not defined for resource class"));
       }
    }
 
@@ -839,7 +839,7 @@ public class TestAccessControl_grantGlobalResourcePermissions extends TestAccess
          fail("granting permissions with non-existent permission name should have failed");
       }
       catch (IllegalArgumentException e) {
-         assertThat(e.getMessage().toLowerCase(), containsString("does not exist for the specified resource class"));
+         assertThat(e.getMessage().toLowerCase(), containsString("is not defined for resource class"));
       }
       try {
          accessControlContext.grantGlobalResourcePermissions(accessorResource,
@@ -848,7 +848,7 @@ public class TestAccessControl_grantGlobalResourcePermissions extends TestAccess
          fail("granting permissions with non-existent permission name should have failed");
       }
       catch (IllegalArgumentException e) {
-         assertThat(e.getMessage().toLowerCase(), containsString("does not exist for the specified resource class"));
+         assertThat(e.getMessage().toLowerCase(), containsString("is not defined for resource class"));
       }
    }
 }

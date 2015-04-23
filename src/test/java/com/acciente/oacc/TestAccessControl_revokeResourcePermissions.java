@@ -112,31 +112,43 @@ public class TestAccessControl_revokeResourcePermissions extends TestAccessContr
    }
 
    @Test
-   public void revokeResourcePermissions_ungrantedResetCredentialsPermissionOnUnauthenticatables_shouldSucceed() {
+   public void revokeResourcePermissions_ungrantedResetCredentialsPermissionOnUnauthenticatables_shouldFail() {
       authenticateSystemResource();
       final Resource accessorResource = generateAuthenticatableResource(generateUniquePassword());
       final Resource accessedResource = generateUnauthenticatableResource();
       assertThat(accessControlContext.getEffectiveResourcePermissions(accessorResource, accessedResource).isEmpty(), is(true));
 
       // attempt to revoke *RESET_CREDENTIALS system permission
-      accessControlContext.revokeResourcePermissions(accessorResource,
-                                                     accessedResource,
-                                                     ResourcePermissions
-                                                           .getInstance(ResourcePermissions.RESET_CREDENTIALS));
+      try {
+         accessControlContext.revokeResourcePermissions(accessorResource,
+                                                        accessedResource,
+                                                        ResourcePermissions
+                                                              .getInstance(ResourcePermissions.RESET_CREDENTIALS));
+         fail("revoking reset-credentials permission for unauthenticatable resource should have failed");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("not valid for unauthenticatable resource"));
+      }
    }
 
    @Test
-   public void revokeResourcePermissions_ungrantedImpersonatePermissionOnUnauthenticatables_shouldSucceed() {
+   public void revokeResourcePermissions_ungrantedImpersonatePermissionOnUnauthenticatables_shouldFail() {
       authenticateSystemResource();
       final Resource accessorResource = generateAuthenticatableResource(generateUniquePassword());
       final Resource accessedResource = generateUnauthenticatableResource();
       assertThat(accessControlContext.getEffectiveResourcePermissions(accessorResource, accessedResource).isEmpty(), is(true));
 
       // attempt to revoke *RESET_CREDENTIALS system permission
-      accessControlContext.revokeResourcePermissions(accessorResource,
-                                                     accessedResource,
-                                                     ResourcePermissions
-                                                           .getInstance(ResourcePermissions.IMPERSONATE));
+      try {
+         accessControlContext.revokeResourcePermissions(accessorResource,
+                                                        accessedResource,
+                                                        ResourcePermissions
+                                                              .getInstance(ResourcePermissions.IMPERSONATE));
+         fail("revoking impersonate permission for unauthenticatable resource should have failed");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("not valid for unauthenticatable resource"));
+      }
    }
 
    @Test
@@ -543,13 +555,13 @@ public class TestAccessControl_revokeResourcePermissions extends TestAccessContr
       final Resource accessedResource = accessControlContext.createResource(resourceClassName, generateDomain());
       assertThat(accessControlContext.getEffectiveResourcePermissions(accessorResource, accessedResource).isEmpty(), is(true));
 
-      Set<ResourcePermission> grantorPermissions
+      Set<ResourcePermission> accessorPermissions
             = setOf(ResourcePermissions.getInstance(ResourcePermissions.INHERIT, true),
                     ResourcePermissions.getInstance(customPermissionName, true));
 
       // setup grantor permissions
-      accessControlContext.setResourcePermissions(accessorResource, accessedResource, grantorPermissions);
-      assertThat(accessControlContext.getEffectiveResourcePermissions(accessorResource, accessedResource), is(grantorPermissions));
+      accessControlContext.setResourcePermissions(accessorResource, accessedResource, accessorPermissions);
+      assertThat(accessControlContext.getEffectiveResourcePermissions(accessorResource, accessedResource), is(accessorPermissions));
 
       // attempt to revoke permissions with non-existent references
       try {
@@ -573,40 +585,47 @@ public class TestAccessControl_revokeResourcePermissions extends TestAccessContr
       catch (IllegalArgumentException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("could not determine resource class for resource"));
       }
+
+      try {
+         accessControlContext.revokeResourcePermissions(accessorResource,
+                                                        accessedResource,
+                                                        ResourcePermissions.getInstance("invalid_permission"));
+         fail("revoking permissions with non-existent permission reference should have failed");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("not defined for resource class"));
+      }
    }
 
    @Test
-   public void revokeResourcePermissions_nonExistentReferences_shouldSucceed() {
+   public void revokeResourcePermissions_mismatchedResourceClass_shouldFail() {
       authenticateSystemResource();
       final String resourceClassName = generateResourceClass(false, false);
-      final String customPermissionName = generateResourceClassPermission(resourceClassName);
+      final ResourcePermission permission_valid
+            = ResourcePermissions.getInstance(generateResourceClassPermission(resourceClassName), true);
+      final ResourcePermission permission_invalid
+            = ResourcePermissions.getInstance(generateResourceClassPermission(generateResourceClass(false, false)));
       final Resource accessorResource = generateUnauthenticatableResource();
       final Resource accessedResource = accessControlContext.createResource(resourceClassName, generateDomain());
       assertThat(accessControlContext.getEffectiveResourcePermissions(accessorResource, accessedResource).isEmpty(), is(true));
 
-      Set<ResourcePermission> grantorPermissions
-            = setOf(ResourcePermissions.getInstance(ResourcePermissions.INHERIT, true),
-                    ResourcePermissions.getInstance(customPermissionName, true));
+      Set<ResourcePermission> accessorPermissions
+            = setOf(ResourcePermissions.getInstance(ResourcePermissions.INHERIT, true), permission_valid);
 
       // setup grantor permissions
-      accessControlContext.setResourcePermissions(accessorResource, accessedResource, grantorPermissions);
-      assertThat(accessControlContext.getEffectiveResourcePermissions(accessorResource, accessedResource), is(grantorPermissions));
+      accessControlContext.setResourcePermissions(accessorResource, accessedResource, accessorPermissions);
+      assertThat(accessControlContext.getEffectiveResourcePermissions(accessorResource, accessedResource), is(accessorPermissions));
 
       // attempt to revoke permissions with non-existent references
-      accessControlContext.revokeResourcePermissions(accessorResource,
-                                                     accessedResource,
-                                                     ResourcePermissions
-                                                           .getInstance(generateResourceClassPermission(
-                                                                 generateResourceClass(false, false))));
-
-      final Set<ResourcePermission> permissions_post = accessControlContext.getEffectiveResourcePermissions(accessorResource, accessedResource);
-      assertThat(permissions_post, is(grantorPermissions));
-
-      accessControlContext.revokeResourcePermissions(accessorResource,
-                                                     accessedResource,
-                                                     ResourcePermissions.getInstance("invalid_permission"));
-
-      final Set<ResourcePermission> permissions_post2 = accessControlContext.getEffectiveResourcePermissions(accessorResource, accessedResource);
-      assertThat(permissions_post2, is(grantorPermissions));
+      try {
+         accessControlContext.revokeResourcePermissions(accessorResource,
+                                                        accessedResource,
+                                                        permission_valid,
+                                                        permission_invalid);
+         fail("revoking permissions with mismatched resource class and permission should have failed");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("not defined for resource class"));
+      }
    }
 }

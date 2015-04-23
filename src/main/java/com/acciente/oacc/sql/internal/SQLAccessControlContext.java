@@ -2008,7 +2008,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
             // every non-system permission must be defined for the resource class specified
             if (!validPermissionNames.contains(postCreateResourcePermission.getPermissionName())) {
                throw new IllegalArgumentException("Permission: " + postCreateResourcePermission.getPermissionName()
-                                                      + " does not exist for the specified resource class: "
+                                                      + " is not defined for resource class: "
                                                       + resourceClassInternalInfo.getResourceClassName());
             }
          }
@@ -2370,7 +2370,6 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
                                                         String resourceClassName,
                                                         String domainName,
                                                         Set<ResourceCreatePermission> requestedResourceCreatePermissions) {
-      __assertUniquePostCreateResourcePermissionNames(requestedResourceCreatePermissions);
       __assertResourceExists(connection, accessorResource);
 
       // verify that resource class is defined and get its metadata
@@ -2389,6 +2388,10 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       if (domainId == null) {
          throw new IllegalArgumentException("Could not find domain: " + domainName);
       }
+
+      __assertUniquePostCreatePermissionsNamesForResourceClass(connection,
+                                                               requestedResourceCreatePermissions,
+                                                               resourceClassInfo);
 
       // check if the grantor (=session resource) is authorized to grant the requested permissions
       if (!__isSuperUserOfDomain(connection, sessionResource, domainName)) {
@@ -2475,36 +2478,6 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
                                                                                                  resourceClassId,
                                                                                                  domainId,
                                                                                                  removePermissions);
-   }
-
-   private void __assertUniquePostCreateResourcePermissionNames(Set<ResourceCreatePermission> resourceCreatePermissions) {
-      final Set<String> uniqueSystemPermissionNames = new HashSet<>(resourceCreatePermissions.size());
-      final Set<String> uniquePostCreatePermissionNames = new HashSet<>(resourceCreatePermissions.size());
-
-      for (final ResourceCreatePermission resourceCreatePermission : resourceCreatePermissions) {
-         if (resourceCreatePermission.isSystemPermission()) {
-            if (uniqueSystemPermissionNames.contains(resourceCreatePermission.getPermissionName())) {
-               throw new IllegalArgumentException("Duplicate permission: "
-                                                        + resourceCreatePermission.getPermissionName()
-                                                        + " that only differs in 'withGrant' option");
-            }
-            else {
-               uniqueSystemPermissionNames.add(resourceCreatePermission.getPermissionName());
-            }
-         }
-         else {
-            final ResourcePermission postCreateResourcePermission = resourceCreatePermission.getPostCreateResourcePermission();
-
-            if (uniquePostCreatePermissionNames.contains(postCreateResourcePermission.getPermissionName())) {
-               throw new IllegalArgumentException("Duplicate permission: "
-                                                        + postCreateResourcePermission.getPermissionName()
-                                                        + " that only differs in 'withGrant' option");
-            }
-            else {
-               uniquePostCreatePermissionNames.add(postCreateResourcePermission.getPermissionName());
-            }
-         }
-      }
    }
 
    private boolean __setContainsResourceCreateSystemPermission(Set<ResourceCreatePermission> resourceCreatePermissions) {
@@ -3002,7 +2975,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
             // every non-system permission must be defined for the resource class specified
             if (!validPermissionNames.contains(resourcePermission.getPermissionName())) {
                throw new IllegalArgumentException("Permission: " + resourcePermission.getPermissionName()
-                                                      + " does not exist for the specified resource class: "
+                                                      + " is not defined for resource class: "
                                                       + resourceClassInternalInfo.getResourceClassName());
             }
          }
@@ -3210,11 +3183,13 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
                                                   Set<ResourcePermission> obsoleteResourcePermissions) {
       __assertResourceExists(connection, accessorResource);
 
-      // next ensure that the requested permissions are unique in name
-      __assertUniqueResourcePermissionsNames(obsoleteResourcePermissions);
-
       final ResourceClassInternalInfo accessedResourceClassInternalInfo
             = resourceClassPersister.getResourceClassInfoByResourceId(connection, accessedResource);
+
+      // next ensure that the requested permissions are unique in name
+      __assertUniqueResourcePermissionsNamesForResourceClass(connection,
+                                                             obsoleteResourcePermissions,
+                                                             accessedResourceClassInternalInfo);
 
       // check for authorization
       if (!__isSuperUserOfResource(connection, sessionResource, accessedResource)) {
@@ -3264,20 +3239,6 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
                                                                        accessedResourceClassInternalInfo
                                                                              .getResourceClassId()),
                                                                  removePermissions);
-   }
-
-   private void __assertUniqueResourcePermissionsNames(Set<ResourcePermission> resourcePermissions) {
-      final Set<String> uniquePermissionNames = new HashSet<>(resourcePermissions.size());
-
-      for (final ResourcePermission resourcePermission : resourcePermissions) {
-         if (uniquePermissionNames.contains(resourcePermission.getPermissionName())) {
-            throw new IllegalArgumentException("Duplicate permission: " + resourcePermission.getPermissionName()
-                                                     + " that only differs in 'withGrant' option");
-         }
-         else {
-            uniquePermissionNames.add(resourcePermission.getPermissionName());
-         }
-      }
    }
 
    @Override
@@ -3578,7 +3539,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
             // every non-system permission must be defined for the resource class specified
             if (!validPermissionNames.contains(resourcePermission.getPermissionName())) {
                throw new IllegalArgumentException("Permission: " + resourcePermission.getPermissionName()
-                                                + " does not exist for the specified resource class: "
+                                                + " is not defined for resource class: "
                                                 + resourceClassInternalInfo.getResourceClassName());
             }
          }
@@ -3800,15 +3761,20 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
                                                 Set<ResourcePermission> requestedResourcePermissions) {
       __assertResourceExists(connection, accessorResource);
 
-      // next ensure that the requested permissions are unique in name
-      __assertUniqueResourcePermissionsNames(requestedResourcePermissions);
-
       // verify that resource class is defined
-      final Id<ResourceClassId> resourceClassId = resourceClassPersister.getResourceClassId(connection, resourceClassName);
+      final ResourceClassInternalInfo resourceClassInfo = resourceClassPersister.getResourceClassInfo(connection,
+                                                                                                      resourceClassName);
 
-      if (resourceClassId == null) {
+      if (resourceClassInfo == null) {
          throw new IllegalArgumentException("Could not find resource class: " + resourceClassName);
       }
+
+      final Id<ResourceClassId> resourceClassId = resourceClassPersister.getResourceClassId(connection, resourceClassName);
+
+      // next ensure that the requested permissions are valid and unique in name
+      __assertUniqueResourcePermissionsNamesForResourceClass(connection,
+                                                             requestedResourcePermissions,
+                                                             resourceClassInfo);
 
       // verify the domain
       final Id<DomainId> domainId = domainPersister.getResourceDomainId(connection, domainName);

@@ -203,7 +203,7 @@ public class TestAccessControl_revokeGlobalResourcePermissions extends TestAcces
    }
 
    @Test
-   public void revokeGlobalResourcePermissions_ungrantedResetCredentialsPermissionOnUnauthenticatables_shouldSucceed() {
+   public void revokeGlobalResourcePermissions_ungrantedResetCredentialsPermissionOnUnauthenticatables_shouldFail() {
       authenticateSystemResource();
       final String resourceClassName = generateResourceClass(false, false);
       final Resource accessorResource = generateAuthenticatableResource(generateUniquePassword());
@@ -211,19 +211,31 @@ public class TestAccessControl_revokeGlobalResourcePermissions extends TestAcces
       assertThat(accessControlContext.getEffectiveGlobalResourcePermissionsMap(accessorResource).isEmpty(), is(true));
 
       // attempt to revoke *RESET_CREDENTIALS system permission
-      accessControlContext.revokeGlobalResourcePermissions(accessorResource,
-                                                           resourceClassName,
-                                                           domainName,
-                                                           ResourcePermissions
-                                                                 .getInstance(ResourcePermissions.RESET_CREDENTIALS));
-      accessControlContext.revokeGlobalResourcePermissions(accessorResource,
-                                                           resourceClassName,
-                                                           ResourcePermissions
-                                                                 .getInstance(ResourcePermissions.RESET_CREDENTIALS));
+      try {
+         accessControlContext.revokeGlobalResourcePermissions(accessorResource,
+                                                              resourceClassName,
+                                                              domainName,
+                                                              ResourcePermissions
+                                                                    .getInstance(ResourcePermissions.RESET_CREDENTIALS));
+         fail("revoking reset-credentials permission for unauthenticatable resource should have failed");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("not valid for unauthenticatable resource"));
+      }
+      try {
+         accessControlContext.revokeGlobalResourcePermissions(accessorResource,
+                                                              resourceClassName,
+                                                              ResourcePermissions
+                                                                    .getInstance(ResourcePermissions.RESET_CREDENTIALS));
+         fail("revoking reset-credentials permission for unauthenticatable resource should have failed");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("not valid for unauthenticatable resource"));
+      }
    }
 
    @Test
-   public void revokeGlobalResourcePermissions_ungrantedImpersonatePermissionOnUnauthenticatables_shouldSucceed() {
+   public void revokeGlobalResourcePermissions_ungrantedImpersonatePermissionOnUnauthenticatables_shouldFail() {
       authenticateSystemResource();
       final String resourceClassName = generateResourceClass(false, false);
       final Resource accessorResource = generateAuthenticatableResource(generateUniquePassword());
@@ -231,15 +243,27 @@ public class TestAccessControl_revokeGlobalResourcePermissions extends TestAcces
       assertThat(accessControlContext.getEffectiveGlobalResourcePermissionsMap(accessorResource).isEmpty(), is(true));
 
       // attempt to revoke *IMPERSONATE system permission
-      accessControlContext.revokeGlobalResourcePermissions(accessorResource,
-                                                           resourceClassName,
-                                                           domainName,
-                                                           ResourcePermissions
-                                                                 .getInstance(ResourcePermissions.IMPERSONATE));
-      accessControlContext.revokeGlobalResourcePermissions(accessorResource,
-                                                           resourceClassName,
-                                                           ResourcePermissions
-                                                                 .getInstance(ResourcePermissions.IMPERSONATE));
+      try {
+         accessControlContext.revokeGlobalResourcePermissions(accessorResource,
+                                                              resourceClassName,
+                                                              domainName,
+                                                              ResourcePermissions
+                                                                    .getInstance(ResourcePermissions.IMPERSONATE));
+         fail("revoking impersonate permission for unauthenticatable resource should have failed");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("not valid for unauthenticatable resource"));
+      }
+      try {
+         accessControlContext.revokeGlobalResourcePermissions(accessorResource,
+                                                              resourceClassName,
+                                                              ResourcePermissions
+                                                                    .getInstance(ResourcePermissions.IMPERSONATE));
+         fail("revoking impersonate permission for unauthenticatable resource should have failed");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("not valid for unauthenticatable resource"));
+      }
    }
 
    @Test
@@ -992,22 +1016,39 @@ public class TestAccessControl_revokeGlobalResourcePermissions extends TestAcces
    }
 
    @Test
-   public void revokeGlobalResourcePermissions_nonExistentReferences_shouldSucceed() {
+   public void revokeGlobalResourcePermissions_mismatchedResourceClass_shouldFail() {
       authenticateSystemResource();
       final String resourceClassName = generateResourceClass(true, false);
       final Resource accessorResource = generateUnauthenticatableResource();
       final String domainName = accessControlContext.getDomainNameByResource(accessorResource);
       assertThat(accessControlContext.getEffectiveGlobalResourcePermissionsMap(accessorResource).isEmpty(), is(true));
 
-      final ResourcePermission invalid_permission = ResourcePermissions.getInstance("invalid_permission");
+      final ResourcePermission permission_valid
+            = ResourcePermissions.getInstance(generateResourceClassPermission(resourceClassName));
+      final ResourcePermission permission_invalid
+            = ResourcePermissions.getInstance(generateResourceClassPermission(generateResourceClass(false, false)));
 
-      // attempt to revoke permissions with non-existent references
-      accessControlContext.revokeGlobalResourcePermissions(accessorResource,
-                                                           resourceClassName,
-                                                           domainName,
-                                                           invalid_permission);
-      accessControlContext.revokeGlobalResourcePermissions(accessorResource,
-                                                           resourceClassName,
-                                                           invalid_permission);
+      // attempt to revoke permissions with mismatched resource class and permission
+      try {
+         accessControlContext.revokeGlobalResourcePermissions(accessorResource,
+                                                              resourceClassName,
+                                                              domainName,
+                                                              permission_valid,
+                                                              permission_invalid);
+         fail("revoking permissions with mismatched resource class and permission should have failed");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("not defined for resource class"));
+      }
+      try {
+         accessControlContext.revokeGlobalResourcePermissions(accessorResource,
+                                                              resourceClassName,
+                                                              permission_valid,
+                                                              permission_invalid);
+         fail("revoking permissions with mismatched resource class and permission should have failed");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("not defined for resource class"));
+      }
    }
 }

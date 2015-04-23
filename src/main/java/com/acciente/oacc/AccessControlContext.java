@@ -1566,6 +1566,9 @@ public interface AccessControlContext {
     *                                            if no resource class of resourceClassName exists, or
     *                                            if resourceCreatePermissions contains *CREATE system permission and is a
     *                                            proper subset of the currently granted direct resource create permissions, or
+    *                                            if resourcePermissions contains permissions invalid for the specified
+    *                                            resource class (incl. RESET-CREDENTIALS or IMPERSONATE for
+    *                                            unauthenticatable resource classes), or
     *                                            if resourceCreatePermissions contains multiple instances of the same
     *                                            post-create permission that only differ in the 'withGrant' attribute
     * @throws com.acciente.oacc.NotAuthorizedException if the session resource is not authorized to grant (or in this case
@@ -1720,6 +1723,9 @@ public interface AccessControlContext {
     *                                            if no resource class of resourceClassName exists, or
     *                                            if resourceCreatePermissions contains *CREATE system permission and is a
     *                                            proper subset of the currently granted direct resource create permissions, or
+    *                                            if resourcePermissions contains permissions invalid for the specified
+    *                                            resource class (incl. RESET-CREDENTIALS or IMPERSONATE for
+    *                                            unauthenticatable resource classes), or
     *                                            if resourceCreatePermissions contains multiple instances of the same
     *                                            post-create permission that only differ in the 'withGrant' attribute
     * @throws com.acciente.oacc.NotAuthorizedException if the session resource is not authorized to grant (or in this case
@@ -1880,6 +1886,9 @@ public interface AccessControlContext {
     * @param resourcePermission  the resource permission to be revoked
     * @param resourcePermissions  the other (optional) resource permissions to be revoked
     * @throws java.lang.IllegalArgumentException if accessorResource or accessedResource reference does not exist, or
+    *                                            if resourcePermissions contains permissions invalid for resource class
+    *                                            of the accessedResource(incl. RESET-CREDENTIALS or IMPERSONATE for
+    *                                            unauthenticatable resource classes), or
     *                                            if resourcePermissions contains multiple instances of the same
     *                                            permission that only differ in the 'withGrant' attribute
     * @throws com.acciente.oacc.NotAuthorizedException if the session resource is not authorized to grant (or in this case
@@ -2020,6 +2029,9 @@ public interface AccessControlContext {
     * @throws java.lang.IllegalArgumentException if accessorResource reference does not exist, or
     *                                            if no resource class of resourceClassName exists, or
     *                                            if no domain of domainName exists, or
+    *                                            if resourcePermissions contains permissions invalid for the specified
+    *                                            resource class (incl. RESET-CREDENTIALS or IMPERSONATE for
+    *                                            unauthenticatable resource classes), or
     *                                            if resourcePermissions contains multiple instances of the same
     *                                            permission that only differ in the 'withGrant' attribute
     * @throws com.acciente.oacc.NotAuthorizedException if the session resource is not authorized to grant (or in this case
@@ -2166,6 +2178,9 @@ public interface AccessControlContext {
     * @param resourcePermissions the other (optional) resource permissions to be revoked globally
     * @throws java.lang.IllegalArgumentException if accessorResource reference does not exist, or
     *                                            if no resource class of resourceClassName exists, or
+    *                                            if resourcePermissions contains permissions invalid for the specified
+    *                                            resource class (incl. RESET-CREDENTIALS or IMPERSONATE for
+    *                                            unauthenticatable resource classes), or
     *                                            if resourcePermissions contains multiple instances of the same
     *                                            permission that only differ in the 'withGrant' attribute
     * @throws com.acciente.oacc.NotAuthorizedException if the session resource is not authorized to grant (or in this case

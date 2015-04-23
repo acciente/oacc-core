@@ -857,7 +857,7 @@ public class TestAccessControl_grantResourcePermissions extends TestAccessContro
          fail("granting permissions with mismatched resource class should have failed");
       }
       catch (IllegalArgumentException e) {
-         assertThat(e.getMessage().toLowerCase(), containsString("does not exist for the specified resource class"));
+         assertThat(e.getMessage().toLowerCase(), containsString("is not defined for resource class"));
       }
 
       try {
@@ -867,7 +867,7 @@ public class TestAccessControl_grantResourcePermissions extends TestAccessContro
          fail("granting permissions with non-existent permission name should have failed");
       }
       catch (IllegalArgumentException e) {
-         assertThat(e.getMessage().toLowerCase(), containsString("does not exist for the specified resource class"));
+         assertThat(e.getMessage().toLowerCase(), containsString("is not defined for resource class"));
       }
    }
 }
