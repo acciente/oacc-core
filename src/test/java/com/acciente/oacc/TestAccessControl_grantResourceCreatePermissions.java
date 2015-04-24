@@ -879,6 +879,72 @@ public class TestAccessControl_grantResourceCreatePermissions extends TestAccess
    }
 
    @Test
+   public void grantResourceCreatePermissions_incompatibleExistingPermission_shouldFail() {
+      authenticateSystemResource();
+      final String resourceClassName = generateResourceClass(false, false);
+      final String permissionName1 = generateResourceClassPermission(resourceClassName);
+      final String permissionName2 = ResourcePermissions.INHERIT;
+      final char[] password = generateUniquePassword();
+      final Resource grantorResource = generateAuthenticatableResource(password);
+      final Resource accessorResource = generateUnauthenticatableResource();
+      final String domainName = generateDomain();
+
+      // setup accessor permissions
+      Set<ResourceCreatePermission> accessorPermissions_pre
+            = setOf(ResourceCreatePermissions.getInstance(ResourceCreatePermissions.CREATE),
+                    ResourceCreatePermissions.getInstance(ResourcePermissions.getInstance(permissionName1, true)),
+                    ResourceCreatePermissions.getInstance(ResourcePermissions.getInstance(permissionName2), true));
+
+      accessControlContext.setResourceCreatePermissions(accessorResource, resourceClassName, domainName, accessorPermissions_pre);
+      assertThat(accessControlContext.getEffectiveResourceCreatePermissions(accessorResource,
+                                                                            resourceClassName,
+                                                                            domainName),
+                 is(accessorPermissions_pre));
+
+      // setup grantor permissions
+      Set<ResourceCreatePermission> grantorPermissions
+            = setOf(ResourceCreatePermissions.getInstance(ResourceCreatePermissions.CREATE),
+                    ResourceCreatePermissions.getInstance(ResourcePermissions.getInstance(permissionName1, true), true),
+                    ResourceCreatePermissions.getInstance(ResourcePermissions.getInstance(permissionName2, true), true));
+
+      accessControlContext.setResourceCreatePermissions(grantorResource,
+                                                        resourceClassName,
+                                                        domainName,
+                                                        grantorPermissions);
+      assertThat(accessControlContext.getEffectiveResourceCreatePermissions(grantorResource, resourceClassName, domainName),
+                 is(grantorPermissions));
+
+      // authenticate grantor resource
+      accessControlContext.authenticate(grantorResource, PasswordCredentials.newInstance(password));
+
+      // grant permissions as grantor and verify
+      try {
+         accessControlContext
+               .grantResourceCreatePermissions(accessorResource,
+                                               resourceClassName,
+                                               domainName,
+                                               ResourceCreatePermissions
+                                                     .getInstance(ResourcePermissions.getInstance(permissionName1), true));
+         fail("granting resource create-permission that is incompatible with existing permission should have failed");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("incompatible with existing create permission"));
+      }
+      try {
+         accessControlContext
+               .grantResourceCreatePermissions(accessorResource,
+                                               resourceClassName,
+                                               domainName,
+                                               ResourceCreatePermissions
+                                                     .getInstance(ResourcePermissions.getInstance(permissionName2, true)));
+         fail("granting resource create-permission that is incompatible with existing permission should have failed");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("incompatible with existing create permission"));
+      }
+   }
+
+   @Test
    public void grantResourceCreatePermissions_withoutCreate_shouldFail() {
       authenticateSystemResource();
       final ResourceCreatePermission createPerm_inherit

@@ -1527,19 +1527,17 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
 
          if (requestedPermission.isSystemPermission()) {
             for (DomainCreatePermission existingDirectPermission : directAccessorPermissions) {
-               if (requestedPermission.equals(existingDirectPermission) ||
-                     requestedPermission.isGrantableFrom(existingDirectPermission)) {
-                  // requested permission is identical to already existing direct permission, OR
-                  // requested permission has lesser granting rights than already existing direct permission,
-                  // so no need to update
-                  existingPermission = true;
-                  break;
-               }
+
                if (existingDirectPermission.isSystemPermission() &&
                      requestedPermission.getSystemPermissionId() == existingDirectPermission.getSystemPermissionId()) {
-                  // requested permission has same system Id and based on above evaluations has higher granting rights than
-                  // the already existing direct permission, so we need to update it
-                  updatePermissions.add(requestedPermission);
+                  // we found a match by sysId - now let's see if we need to update existing or leave it unchanged
+                  if (!requestedPermission.equals(existingDirectPermission) &&
+                        !requestedPermission.isGrantableFrom(existingDirectPermission)) {
+                     // requested permission has higher granting rights than
+                     // the already existing direct permission, so we need to update it
+                     updatePermissions.add(requestedPermission);
+                  }
+
                   existingPermission = true;
                   break;
                }
@@ -1553,7 +1551,20 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
                         = existingDirectPermission.getPostCreateDomainPermission();
 
                   if (requestedPostCreateDomainPermission.equalsIgnoreGrant(existingPostCreateDomainPermission)) {
-                     // found a match in name - now let's see if we need to update existing or leave it unchanged
+                     // found a match in name - let's check compatibility first
+                     if (requestedPermission.isWithGrant() != requestedPostCreateDomainPermission.isWithGrant()
+                           && existingDirectPermission.isWithGrant() != existingPostCreateDomainPermission.isWithGrant()
+                           && requestedPermission.isWithGrant() != existingDirectPermission.isWithGrant()) {
+                        // the requested permission is incompatible to the existing permission because we can't
+                        // perform grant operations (a)/G -> (a/G) or (a/G) -> (a)/G without removing either the
+                        // create or post-create granting option
+                        throw new IllegalArgumentException("Requested create permissions "
+                                                                 + requestedDomainCreatePermissions
+                                                                 + " are incompatible with existing create permissions "
+                                                                 + directAccessorPermissions);
+                     }
+
+                     // now let's see if we need to update existing permission or leave it unchanged
                      if (!requestedPermission.equals(existingDirectPermission)
                            && ((requestedPermission.isWithGrant() && requestedPostCreateDomainPermission.isWithGrant())
                            || (!existingDirectPermission.isWithGrant() && !existingPostCreateDomainPermission.isWithGrant()))) {
@@ -2206,19 +2217,16 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
 
          if (requestedPermission.isSystemPermission()) {
             for (ResourceCreatePermission existingDirectPermission : directAccessorPermissions) {
-               if (requestedPermission.equals(existingDirectPermission) ||
-                     requestedPermission.isGrantableFrom(existingDirectPermission)) {
-                  // requested permission is identical to already existing direct permission, OR
-                  // requested permission has lesser granting rights than already existing direct permission,
-                  // so no need to update
-                  existingPermission = true;
-                  break;
-               }
                if (existingDirectPermission.isSystemPermission() &&
                      requestedPermission.getSystemPermissionId() == existingDirectPermission.getSystemPermissionId()) {
-                  // requested permission has same system Id and based on above evaluations has higher granting rights than
-                  // the already existing direct permission, so we need to update it
-                  updatePermissions.add(requestedPermission);
+                  // we found a match by sysId - now let's see if we need to update existing or leave it unchanged
+                  if (!requestedPermission.equals(existingDirectPermission) &&
+                        !requestedPermission.isGrantableFrom(existingDirectPermission)) {
+                     // requested permission has higher granting rights than
+                     // the already existing direct permission, so we need to update it
+                     updatePermissions.add(requestedPermission);
+                  }
+
                   existingPermission = true;
                   break;
                }
@@ -2233,7 +2241,20 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
                         = existingDirectPermission.getPostCreateResourcePermission();
 
                   if (requestedPostCreateResourcePermission.equalsIgnoreGrant(existingPostCreateResourcePermission)) {
-                     // found a match in name - now let's see if we need to update existing or leave it unchanged
+                     // found a match in name - let's check compatibility first
+                     if (requestedPermission.isWithGrant() != requestedPostCreateResourcePermission.isWithGrant()
+                           && existingDirectPermission.isWithGrant() != existingPostCreateResourcePermission.isWithGrant()
+                           && requestedPermission.isWithGrant() != existingDirectPermission.isWithGrant()) {
+                        // the requested permission is incompatible to the existing permission because we can't
+                        // perform grant operations (a)/G -> (a/G) or (a/G) -> (a)/G without removing either the
+                        // create or post-create granting option
+                        throw new IllegalArgumentException("Requested create permissions "
+                                                                 + requestedResourceCreatePermissions
+                                                                 + " are incompatible with existing create permissions "
+                                                                 + directAccessorPermissions);
+                     }
+
+                     // now let's see if we need to update existing permission or leave it unchanged
                      if (!requestedPermission.equals(existingDirectPermission)
                            && ((requestedPermission.isWithGrant() && requestedPostCreateResourcePermission.isWithGrant())
                            || (!existingDirectPermission.isWithGrant() && !existingPostCreateResourcePermission.isWithGrant()))) {
@@ -2241,6 +2262,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
                         // so we need to update
                         updatePermissions.add(requestedPermission);
                      }
+
                      // because we found a match in name, we can skip comparing requested against other existing permissions
                      existingPermission = true;
                      break;

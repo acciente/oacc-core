@@ -1251,7 +1251,13 @@ public interface AccessControlContext {
     * This method does <em>not</em> replace any domain create permissions previously granted, but can only add to the
     * set, or upgrade an existing permission's granting rights. Furthermore, removing the 'withGrant' option from an
     * existing permission is not possible with this method alone - revoke the permission first, then re-grant without
-    * the 'withGrant' option, or use {@link #setDomainCreatePermissions} to specify all direct create permissions
+    * the 'withGrant' option, or use {@link #setDomainCreatePermissions} to specify all direct create permissions.
+    * <p/>
+    * If the accessor resource already has privileges that exceed the requested permission, the requested grant has
+    * no effect on the existing permission. If the accessor resource has an existing permission that is <em>incompatible</em>
+    * with the requested permission - a request for an ungrantable create permission with grantable post-create "(perm /G)"
+    * when accessor already has grantable create permission with ungrantable post-create "(perm) /G", or vice versa - this
+    * method will throw an IllegalArgumentException.
     *
     * @param accessorResource        the resource to which the privilege should be granted
     * @param domainCreatePermission  the permission to be granted to the specified domain
@@ -1260,7 +1266,9 @@ public interface AccessControlContext {
     *                                            the accessor resource does not have direct *CREATE permission already, or
     *                                            if accessorResource reference does not exist, or
     *                                            if domainCreatePermissions contains multiple instances of the same
-    *                                            system or post-create permission that only differ in the 'withGrant' attribute
+    *                                            system or post-create permission that only differ in the 'withGrant' attribute, or
+    *                                            if a requested domain create permission is incompatible with an already
+    *                                            existing permission as described above
     * @throws com.acciente.oacc.NotAuthorizedException if the session resource is not authorized to set
     *                                                  domain create permissions on the specified accessor resource
     */
@@ -1515,6 +1523,12 @@ public interface AccessControlContext {
     * set, or upgrade an existing permission's granting rights. Furthermore, removing the 'withGrant' option from an
     * existing permission is not possible with this method alone - revoke the permission first, then re-grant without
     * the 'withGrant' option, or use {@link #setResourceCreatePermissions} to specify all direct create permissions
+    * <p/>
+    * If the accessor resource already has privileges that exceed the requested permission, the requested grant has
+    * no effect on the existing permission. If the accessor resource has an existing permission that is <em>incompatible</em>
+    * with the requested permission - a request for an ungrantable create permission with grantable post-create "(perm /G)"
+    * when accessor already has grantable create permission with ungrantable post-create "(perm) /G", or vice versa - this
+    * method will throw an IllegalArgumentException.
     *
     * @param accessorResource          the resource to which the privilege should be granted
     * @param resourceClassName         a string resource class name
@@ -1530,7 +1544,9 @@ public interface AccessControlContext {
     *                                            the specified resource class (incl. RESET-CREDENTIALS or IMPERSONATE for
     *                                            unauthenticatable resource classes), or
     *                                            if resourceCreatePermissions contains multiple instances of the same
-    *                                            post-create permission that only differ in the 'withGrant' attribute
+    *                                            post-create permission that only differ in the 'withGrant' attribute, or
+    *                                            if a requested resource create permission is incompatible with an already
+    *                                            existing permission as described above
     * @throws com.acciente.oacc.NotAuthorizedException if the session resource is not authorized to set
     *                                                  resource create permissions on the specified accessor resource
     */
@@ -1678,6 +1694,12 @@ public interface AccessControlContext {
     * set, or upgrade an existing permission's granting rights. Furthermore, removing the 'withGrant' option from an
     * existing permission is not possible with this method alone - revoke the permission first, then re-grant without
     * the 'withGrant' option, or use {@link #setResourceCreatePermissions} to specify all direct create permissions
+    * <p/>
+    * If the accessor resource already has privileges that exceed the requested permission, the requested grant has
+    * no effect on the existing permission. If the accessor resource has an existing permission that is <em>incompatible</em>
+    * with the requested permission - a request for an ungrantable create permission with grantable post-create "(perm /G)"
+    * when accessor already has grantable create permission with ungrantable post-create "(perm) /G", or vice versa - this
+    * method will throw an IllegalArgumentException.
     *
     * @param accessorResource          the resource to which the privilege should be granted
     * @param resourceClassName         a string resource class name
@@ -1691,7 +1713,9 @@ public interface AccessControlContext {
     *                                            the specified resource class (incl. RESET-CREDENTIALS or IMPERSONATE for
     *                                            unauthenticatable resource classes), or
     *                                            if resourceCreatePermissions contains multiple instances of the same
-    *                                            post-create permission that only differ in the 'withGrant' attribute
+    *                                            post-create permission that only differ in the 'withGrant' attribute, or
+    *                                            if a requested resource create permission is incompatible with an already
+    *                                            existing permission as described above
     * @throws com.acciente.oacc.NotAuthorizedException if the session resource is not authorized to set
     *                                                  resource create permissions on the specified accessor resource
     */

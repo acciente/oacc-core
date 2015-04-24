@@ -631,6 +631,59 @@ public class TestAccessControl_grantDomainCreatePermissions extends TestAccessCo
    }
 
    @Test
+   public void grantDomainCreatePermissions_incompatibleExistingPermission_shouldFail() {
+      authenticateSystemResource();
+      final String permissionName1 = DomainPermissions.CREATE_CHILD_DOMAIN;
+      final String permissionName2 = DomainPermissions.SUPER_USER;
+      final char[] password = generateUniquePassword();
+      final Resource grantorResource = generateAuthenticatableResource(password);
+      final Resource accessorResource = generateUnauthenticatableResource();
+
+      // setup accessor permissions
+      Set<DomainCreatePermission> accessorPermissions_pre
+            = setOf(DomainCreatePermissions.getInstance(DomainCreatePermissions.CREATE),
+                    DomainCreatePermissions.getInstance(DomainPermissions.getInstance(permissionName1, true)),
+                    DomainCreatePermissions.getInstance(DomainPermissions.getInstance(permissionName2), true));
+
+      accessControlContext.setDomainCreatePermissions(accessorResource, accessorPermissions_pre);
+      assertThat(accessControlContext.getEffectiveDomainCreatePermissions(accessorResource), is(accessorPermissions_pre));
+
+      // setup grantor permissions
+      Set<DomainCreatePermission> grantorPermissions
+            = setOf(DomainCreatePermissions.getInstance(DomainCreatePermissions.CREATE, true),
+                    DomainCreatePermissions.getInstance(DomainPermissions.getInstance(permissionName1, true), true),
+                    DomainCreatePermissions.getInstance(DomainPermissions.getInstance(permissionName2, true), true));
+
+      accessControlContext.setDomainCreatePermissions(grantorResource, grantorPermissions);
+      assertThat(accessControlContext.getEffectiveDomainCreatePermissions(grantorResource), is(grantorPermissions));
+
+      // authenticate grantor resource
+      accessControlContext.authenticate(grantorResource, PasswordCredentials.newInstance(password));
+
+      // grant permissions as grantor and verify
+      try {
+         accessControlContext
+               .grantDomainCreatePermissions(accessorResource,
+                                             DomainCreatePermissions
+                                                   .getInstance(DomainPermissions.getInstance(permissionName1), true));
+         fail("granting domain create-permission that is incompatible with existing permission should have failed");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("incompatible with existing create permission"));
+      }
+      try {
+         accessControlContext
+               .grantDomainCreatePermissions(accessorResource,
+                                             DomainCreatePermissions
+                                                   .getInstance(DomainPermissions.getInstance(permissionName2, true)));
+         fail("granting domain create-permission that is incompatible with existing permission should have failed");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("incompatible with existing create permission"));
+      }
+   }
+
+   @Test
    public void grantDomainCreatePermissions_withoutCreatePermission_shouldFail() {
       authenticateSystemResource();
       final DomainCreatePermission domCreatePerm_superuser
