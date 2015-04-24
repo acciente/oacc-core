@@ -1061,20 +1061,15 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
          boolean existingPermission = false;
 
          for (DomainPermission existingDirectPermission : directAccessorPermissions) {
-            if (requestedPermission.equals(existingDirectPermission)) {
-               // requested permission is identical to already existing direct permission, so no need to add/update it
-               existingPermission = true;
-               break;
-            }
-            if (requestedPermission.isGrantableFrom(existingDirectPermission)) {
-               // requested permission has lesser granting rights than already existing direct permission, so no need to update
-               existingPermission = true;
-               break;
-            }
             if (requestedPermission.equalsIgnoreGrant(existingDirectPermission)) {
-               // requested permission has same name and based on above evaluations has higher granting rights than
-               // the already existing direct permission, so we need to update it
-               updatePermissions.add(requestedPermission);
+               // we found a match by permission name - now let's see if we need to update existing or leave it unchanged
+               if (!requestedPermission.equals(existingDirectPermission) &&
+                     !requestedPermission.isGrantableFrom(existingDirectPermission)) {
+                  // requested permission has higher granting rights than the already existing direct permission,
+                  // so we need to update it
+                  updatePermissions.add(requestedPermission);
+               }
+
                existingPermission = true;
                break;
             }
@@ -3093,20 +3088,15 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
          boolean existingPermission = false;
 
          for (ResourcePermission existingDirectPermission : directAccessorResourcePermissions) {
-            if (requestedPermission.equals(existingDirectPermission)) {
-               // requested permission is identical to already existing direct permission, so no need to add/update it
-               existingPermission = true;
-               break;
-            }
-            if (requestedPermission.isGrantableFrom(existingDirectPermission)) {
-               // requested permission has lesser granting rights than already existing direct permission, so no need to update
-               existingPermission = true;
-               break;
-            }
             if (requestedPermission.equalsIgnoreGrant(existingDirectPermission)) {
-               // requested permission has same name and based on above evaluations has higher granting rights than
-               // the already existing direct permission, so we need to update it
-               updatePermissions.add(requestedPermission);
+               // found a match by name - now let's see if we need to update existing or leave it unchanged
+               if (!requestedPermission.equals(existingDirectPermission) &&
+                     !requestedPermission.isGrantableFrom(existingDirectPermission)) {
+                  // requested permission has higher granting rights than the already existing direct permission,
+                  // so we need to update it
+                  updatePermissions.add(requestedPermission);
+               }
+
                existingPermission = true;
                break;
             }
@@ -3672,20 +3662,15 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
          boolean existingPermission = false;
 
          for (ResourcePermission existingDirectPermission : directAccessorPermissions) {
-            if (requestedPermission.equals(existingDirectPermission)) {
-               // requested permission is identical to already existing direct permission, so no need to add/update it
-               existingPermission = true;
-               break;
-            }
-            if (requestedPermission.isGrantableFrom(existingDirectPermission)) {
-               // requested permission has lesser granting rights than already existing direct permission, so no need to update
-               existingPermission = true;
-               break;
-            }
             if (requestedPermission.equalsIgnoreGrant(existingDirectPermission)) {
-               // requested permission has same name and based on above evaluations has higher granting rights than
-               // the already existing direct permission, so we need to update it
-               updatePermissions.add(requestedPermission);
+               // found a match by name - now let's check if we need to update existing or leave it unchanged
+               if (!requestedPermission.equals(existingDirectPermission) &&
+                     !requestedPermission.isGrantableFrom(existingDirectPermission)) {
+                  // requested permission has higher granting rights than the already existing direct permission,
+                  // so we need to update it
+                  updatePermissions.add(requestedPermission);
+               }
+
                existingPermission = true;
                break;
             }
