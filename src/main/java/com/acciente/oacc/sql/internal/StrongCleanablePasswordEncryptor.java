@@ -41,6 +41,10 @@ public final class StrongCleanablePasswordEncryptor implements CleanablePassword
 
    @Override
    public String encryptPassword(final char[] password) {
+      if (password == null) {
+         return null;
+      }
+
       final byte[] digest = this.digester.digest(getCleanedBytes(password));
 
       return new String(this.base64.encode(digest), StandardCharsets.US_ASCII);
@@ -49,6 +53,13 @@ public final class StrongCleanablePasswordEncryptor implements CleanablePassword
    @Override
    public boolean checkPassword(final char[] plainPassword,
                                 final String encryptedPassword) {
+      if (plainPassword == null) {
+         return (encryptedPassword == null);
+      }
+      else if (encryptedPassword == null) {
+         return false;
+      }
+
       return this.digester.matches(getCleanedBytes(plainPassword),
                                    this.base64.decode(encryptedPassword.getBytes(StandardCharsets.US_ASCII)));
    }

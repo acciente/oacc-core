@@ -35,9 +35,13 @@ public class Test_OACC_Resource {
       final char[] plaintext = "abc".toCharArray();
       final String digest_01 = passwordEncryptor.encryptPassword(plaintext);
       final String digest_02 = passwordEncryptor.encryptPassword(plaintext);
+      final String digest_null = passwordEncryptor.encryptPassword(null);
       assertThat(digest_01, is(not(digest_02)));
       assertThat(passwordEncryptor.checkPassword(plaintext, digest_01), is(true));
       assertThat(passwordEncryptor.checkPassword(plaintext, digest_02), is(true));
+      assertThat(passwordEncryptor.checkPassword(null, digest_null), is(true));
+      assertThat(passwordEncryptor.checkPassword(null, digest_01), is(false));
+      assertThat(passwordEncryptor.checkPassword(plaintext, digest_null), is(false));
    }
 
    @Test
