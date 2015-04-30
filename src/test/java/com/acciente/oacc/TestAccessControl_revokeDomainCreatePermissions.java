@@ -17,17 +17,14 @@
  */
 package com.acciente.oacc;
 
-import org.hamcrest.Matcher;
 import org.junit.Test;
 
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.Set;
 
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 
@@ -43,10 +40,10 @@ public class TestAccessControl_revokeDomainCreatePermissions extends TestAccessC
             = DomainCreatePermissions.getInstance(DomainPermissions.getInstance(DomainPermissions.CREATE_CHILD_DOMAIN),
                                                   false);
 
+      // set accessor permissions
       Resource accessorResource = generateUnauthenticatableResource();
       assertThat(accessControlContext.getEffectiveDomainCreatePermissions(accessorResource).isEmpty(), is(true));
 
-      // set accessor permissions
       accessControlContext.setDomainCreatePermissions(accessorResource,
                                                       setOf(domCreatePerm_superuser,
                                                             domCreatePerm_create_withGrant,
@@ -54,7 +51,8 @@ public class TestAccessControl_revokeDomainCreatePermissions extends TestAccessC
 
       Set<DomainCreatePermission> domainCreatePermissions_expected
             = setOf(domCreatePerm_superuser, domCreatePerm_create_withGrant, domCreatePerm_child);
-      final Set<DomainCreatePermission> domainCreatePermissions_post = accessControlContext.getEffectiveDomainCreatePermissions(accessorResource);
+      final Set<DomainCreatePermission> domainCreatePermissions_post = accessControlContext.getEffectiveDomainCreatePermissions(
+            accessorResource);
       assertThat(domainCreatePermissions_post, is(domainCreatePermissions_expected));
 
       // revoke domain create permissions and verify
@@ -64,6 +62,24 @@ public class TestAccessControl_revokeDomainCreatePermissions extends TestAccessC
                                                          domCreatePerm_child);
 
       assertThat(accessControlContext.getEffectiveDomainCreatePermissions(accessorResource).isEmpty(), is(true));
+
+      // test set-based version
+      Resource accessorResource2 = generateUnauthenticatableResource();
+      assertThat(accessControlContext.getEffectiveDomainCreatePermissions(accessorResource).isEmpty(), is(true));
+
+      accessControlContext.setDomainCreatePermissions(accessorResource2,
+                                                      setOf(domCreatePerm_superuser,
+                                                            domCreatePerm_create_withGrant,
+                                                            domCreatePerm_child));
+      assertThat(accessControlContext.getEffectiveDomainCreatePermissions(accessorResource2),
+                 is(domainCreatePermissions_expected));
+
+      accessControlContext.revokeDomainCreatePermissions(accessorResource2,
+                                                         setOf(domCreatePerm_superuser,
+                                                               domCreatePerm_create_withGrant,
+                                                               domCreatePerm_child));
+
+      assertThat(accessControlContext.getEffectiveDomainCreatePermissions(accessorResource2).isEmpty(), is(true));
    }
 
    @Test
@@ -105,7 +121,7 @@ public class TestAccessControl_revokeDomainCreatePermissions extends TestAccessC
       assertThat(accessControlContext.getEffectiveDomainCreatePermissions(accessorResource),
                  is(domainCreatePermissions_pre));
 
-      // revoke the domain create permissions as grantor
+      // revoke the domain create permissions as grantor and verify
       accessControlContext.authenticate(grantorResource, PasswordCredentials.newInstance(password));
       accessControlContext.revokeDomainCreatePermissions(accessorResource,
                                                          domCreatePerm_superuser,
@@ -115,6 +131,23 @@ public class TestAccessControl_revokeDomainCreatePermissions extends TestAccessC
       final Set<DomainCreatePermission> domainCreatePermissions_post
             = accessControlContext.getEffectiveDomainCreatePermissions(accessorResource);
       assertThat(domainCreatePermissions_post.isEmpty(), is(true));
+
+      // test set-based version
+      Resource accessorResource2 = generateUnauthenticatableResource();
+      accessControlContext.setDomainCreatePermissions(accessorResource2,
+                                                      domainCreatePermissions_pre);
+
+      assertThat(accessControlContext.getEffectiveDomainCreatePermissions(accessorResource2),
+                 is(domainCreatePermissions_pre));
+
+      // revoke and verify
+      accessControlContext.authenticate(grantorResource, PasswordCredentials.newInstance(password));
+      accessControlContext.revokeDomainCreatePermissions(accessorResource,
+                                                         setOf(domCreatePerm_superuser,
+                                                               domCreatePerm_create_withGrant,
+                                                               domCreatePerm_child));
+
+      assertThat(accessControlContext.getEffectiveDomainCreatePermissions(accessorResource).isEmpty(), is(true));
    }
 
    @Test
@@ -160,6 +193,14 @@ public class TestAccessControl_revokeDomainCreatePermissions extends TestAccessC
       final Set<DomainCreatePermission> domainCreatePermissions_post
             = accessControlContext.getEffectiveDomainCreatePermissions(accessorResource);
       assertThat(domainCreatePermissions_post.isEmpty(), is(true));
+
+      // test set-based version
+      accessControlContext.revokeDomainCreatePermissions(accessorResource,
+                                                         setOf(domCreatePerm_superuser,
+                                                               domCreatePerm_create_withGrant,
+                                                               domCreatePerm_child));
+
+      assertThat(accessControlContext.getEffectiveDomainCreatePermissions(accessorResource).isEmpty(), is(true));
    }
 
    @Test
@@ -207,6 +248,18 @@ public class TestAccessControl_revokeDomainCreatePermissions extends TestAccessC
          assertThat(e.getMessage().toLowerCase(), not(containsString(domCreatePerm_child.toString().toLowerCase())));
          assertThat(e.getMessage().toLowerCase(), not(containsString(domCreatePerm_create_withGrant.toString().toLowerCase())));
       }
+      try {
+         accessControlContext.revokeDomainCreatePermissions(accessorResource,
+                                                            setOf(domCreatePerm_superuser,
+                                                                  domCreatePerm_create_withGrant,
+                                                                  domCreatePerm_child));
+         fail("revoking permissions without grant-authorization should have failed");
+      }
+      catch (NotAuthorizedException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString(domCreatePerm_superuser.toString().toLowerCase()));
+         assertThat(e.getMessage().toLowerCase(), not(containsString(domCreatePerm_child.toString().toLowerCase())));
+         assertThat(e.getMessage().toLowerCase(), not(containsString(domCreatePerm_create_withGrant.toString().toLowerCase())));
+      }
    }
 
    @Test
@@ -246,6 +299,14 @@ public class TestAccessControl_revokeDomainCreatePermissions extends TestAccessC
                                                          domCreatePerm_child_withGrant);
 
       assertThat(accessControlContext.getEffectiveDomainCreatePermissions(accessorResource).isEmpty(), is(true));
+
+      // test set-based version
+      accessControlContext.revokeDomainCreatePermissions(accessorResource,
+                                                         setOf(domCreatePerm_superuser,
+                                                               domCreatePerm_create,
+                                                               domCreatePerm_child_withGrant));
+
+      assertThat(accessControlContext.getEffectiveDomainCreatePermissions(accessorResource).isEmpty(), is(true));
    }
 
    @Test
@@ -278,10 +339,13 @@ public class TestAccessControl_revokeDomainCreatePermissions extends TestAccessC
                  is(domainCreatePermissions_granter));
 
       // now create a new resource and set its domainCreatePermissions
-      Resource accessorResource = generateUnauthenticatableResource();
       Set<DomainCreatePermission> domainCreatePermissions_pre
             = setOf(domCreatePerm_superuser, domCreatePerm_create_withGrant, domCreatePerm_child);
+      Resource accessorResource = generateUnauthenticatableResource();
       accessControlContext.setDomainCreatePermissions(accessorResource,
+                                                      domainCreatePermissions_pre);
+      Resource accessorResource2 = generateUnauthenticatableResource();
+      accessControlContext.setDomainCreatePermissions(accessorResource2,
                                                       domainCreatePermissions_pre);
 
       assertThat(accessControlContext.getEffectiveDomainCreatePermissions(accessorResource),
@@ -296,6 +360,16 @@ public class TestAccessControl_revokeDomainCreatePermissions extends TestAccessC
       final Set<DomainCreatePermission> domainCreatePermissions_post
             = accessControlContext.getEffectiveDomainCreatePermissions(accessorResource);
       assertThat(domainCreatePermissions_post, is(setOf(domCreatePerm_create_withGrant)));
+
+      // test set-based version
+      assertThat(accessControlContext.getEffectiveDomainCreatePermissions(accessorResource2),
+                 is(domainCreatePermissions_pre));
+      accessControlContext.revokeDomainCreatePermissions(accessorResource2,
+                                                         setOf(domCreatePerm_superuser,
+                                                               domCreatePerm_child));
+
+      assertThat(accessControlContext.getEffectiveDomainCreatePermissions(accessorResource2),
+                 is(setOf(domCreatePerm_create_withGrant)));
    }
 
    @Test
@@ -348,6 +422,15 @@ public class TestAccessControl_revokeDomainCreatePermissions extends TestAccessC
       catch (IllegalArgumentException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("subset of domain create permissions that includes the *create"));
       }
+      try {
+         accessControlContext.revokeDomainCreatePermissions(accessorResource,
+                                                            setOf(domCreatePerm_child,
+                                                                  domCreatePerm_create_withGrant));
+         fail("revoking subset of permissions including *CREATE should have failed");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("subset of domain create permissions that includes the *create"));
+      }
    }
 
    @Test
@@ -393,6 +476,20 @@ public class TestAccessControl_revokeDomainCreatePermissions extends TestAccessC
          assertThat(e.getMessage().toLowerCase(), containsString(ungrantablePermissionName.toLowerCase()));
          assertThat(e.getMessage().toLowerCase(), not(containsString(grantablePermissionName)));
       }
+      try {
+         accessControlContext.revokeDomainCreatePermissions(accessorResource,
+                                                            setOf(DomainCreatePermissions
+                                                                        .getInstance(DomainPermissions.getInstance(
+                                                                              grantablePermissionName)),
+                                                                  DomainCreatePermissions
+                                                                        .getInstance(DomainPermissions.getInstance(
+                                                                              ungrantablePermissionName))));
+         fail("revoking existing domain create permission granted elsewhere without authorization should have failed");
+      }
+      catch (NotAuthorizedException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString(ungrantablePermissionName.toLowerCase()));
+         assertThat(e.getMessage().toLowerCase(), not(containsString(grantablePermissionName)));
+      }
    }
 
 
@@ -425,9 +522,9 @@ public class TestAccessControl_revokeDomainCreatePermissions extends TestAccessC
                  is(domainCreatePermissions_granter));
 
       // now create a new resource and set its domainCreatePermissions
-      Resource accessorResource = generateUnauthenticatableResource();
       Set<DomainCreatePermission> domainCreatePermissions_pre
             = setOf(domCreatePerm_superuser, domCreatePerm_create, domCreatePerm_child_withGrant);
+      Resource accessorResource = generateUnauthenticatableResource();
       accessControlContext.setDomainCreatePermissions(accessorResource,
                                                       domainCreatePermissions_pre);
 
@@ -444,6 +541,20 @@ public class TestAccessControl_revokeDomainCreatePermissions extends TestAccessC
       final Set<DomainCreatePermission> domainCreatePermissions_post
             = accessControlContext.getEffectiveDomainCreatePermissions(accessorResource);
       assertThat(domainCreatePermissions_post.isEmpty(), is(true));
+
+      // test set-based version
+      Resource accessorResource2 = generateUnauthenticatableResource();
+      accessControlContext.setDomainCreatePermissions(accessorResource2,
+                                                      domainCreatePermissions_pre);
+
+      assertThat(accessControlContext.getEffectiveDomainCreatePermissions(accessorResource2),
+                 is(domainCreatePermissions_pre));
+      accessControlContext.revokeDomainCreatePermissions(accessorResource2,
+                                                         setOf(domCreatePerm_superuser,
+                                                               domCreatePerm_create,
+                                                               domCreatePerm_child_withGrant));
+
+      assertThat(accessControlContext.getEffectiveDomainCreatePermissions(accessorResource2).isEmpty(), is(true));
    }
 
    @Test
@@ -478,9 +589,9 @@ public class TestAccessControl_revokeDomainCreatePermissions extends TestAccessC
                  is(domainCreatePermissions_granter));
 
       // now create a new resource and set its domainCreatePermissions
-      Resource accessorResource = generateUnauthenticatableResource();
       Set<DomainCreatePermission> domainCreatePermissions_pre
             = setOf(domCreatePerm_superuser, domCreatePerm_create, domCreatePerm_child);
+      Resource accessorResource = generateUnauthenticatableResource();
       accessControlContext.setDomainCreatePermissions(accessorResource,
                                                       domainCreatePermissions_pre);
 
@@ -497,6 +608,21 @@ public class TestAccessControl_revokeDomainCreatePermissions extends TestAccessC
       final Set<DomainCreatePermission> domainCreatePermissions_post
             = accessControlContext.getEffectiveDomainCreatePermissions(accessorResource);
       assertThat(domainCreatePermissions_post.isEmpty(), is(true));
+
+      // test set-based version
+      Resource accessorResource2 = generateUnauthenticatableResource();
+      accessControlContext.setDomainCreatePermissions(accessorResource2,
+                                                      domainCreatePermissions_pre);
+
+      assertThat(accessControlContext.getEffectiveDomainCreatePermissions(accessorResource2),
+                 is(domainCreatePermissions_pre));
+
+      accessControlContext.revokeDomainCreatePermissions(accessorResource2,
+                                                         setOf(domCreatePerm_superuser_withGrant,
+                                                            domCreatePerm_create_withGrant,
+                                                            domCreatePerm_child_withGrant));
+
+      assertThat(accessControlContext.getEffectiveDomainCreatePermissions(accessorResource2).isEmpty(), is(true));
    }
 
    @Test
@@ -531,9 +657,9 @@ public class TestAccessControl_revokeDomainCreatePermissions extends TestAccessC
                  is(domainCreatePermissions_granter));
 
       // now create a new resource and set its domainCreatePermissions
-      Resource accessorResource = generateUnauthenticatableResource();
       Set<DomainCreatePermission> domainCreatePermissions_pre
             = setOf(domCreatePerm_superuser_withGrant, domCreatePerm_create_withGrant, domCreatePerm_child_withGrant);
+      Resource accessorResource = generateUnauthenticatableResource();
       accessControlContext.setDomainCreatePermissions(accessorResource,
                                                       domainCreatePermissions_pre);
 
@@ -550,6 +676,21 @@ public class TestAccessControl_revokeDomainCreatePermissions extends TestAccessC
       final Set<DomainCreatePermission> domainCreatePermissions_post
             = accessControlContext.getEffectiveDomainCreatePermissions(accessorResource);
       assertThat(domainCreatePermissions_post.isEmpty(), is(true));
+
+      // test set-based version
+      Resource accessorResource2 = generateUnauthenticatableResource();
+      accessControlContext.setDomainCreatePermissions(accessorResource2,
+                                                      domainCreatePermissions_pre);
+
+      assertThat(accessControlContext.getEffectiveDomainCreatePermissions(accessorResource2),
+                 is(domainCreatePermissions_pre));
+
+      accessControlContext.revokeDomainCreatePermissions(accessorResource2,
+                                                         setOf(domCreatePerm_superuser,
+                                                               domCreatePerm_create,
+                                                               domCreatePerm_child));
+
+      assertThat(accessControlContext.getEffectiveDomainCreatePermissions(accessorResource2).isEmpty(), is(true));
    }
 
    @Test
@@ -563,14 +704,15 @@ public class TestAccessControl_revokeDomainCreatePermissions extends TestAccessC
 
       // todo: arguably, system permissions should match in name exactly, but the API uses Strings, not Enums, and is otherwise whitespace-consistent
       //       this could pose some complications depending on if the system permission name is persisted from the passed string or derived from an authoritative source
-      Resource accessorResource = generateUnauthenticatableResource();
       // set accessor permissions
       Set<DomainCreatePermission> domainCreatePermissions_pre
             = setOf(DomainCreatePermissions.getInstance(DomainCreatePermissions.CREATE, true),
                     DomainCreatePermissions.getInstance(DomainPermissions.getInstance(DomainPermissions.SUPER_USER)));
+      Resource accessorResource = generateUnauthenticatableResource();
       accessControlContext.setDomainCreatePermissions(accessorResource,
                                                       domainCreatePermissions_pre);
-      assertThat(accessControlContext.getEffectiveDomainCreatePermissions(accessorResource), is(domainCreatePermissions_pre));
+      assertThat(accessControlContext.getEffectiveDomainCreatePermissions(accessorResource), is(
+            domainCreatePermissions_pre));
 
       // revoke domain create permissions and verify
       accessControlContext.revokeDomainCreatePermissions(accessorResource,
@@ -578,6 +720,18 @@ public class TestAccessControl_revokeDomainCreatePermissions extends TestAccessC
                                                          domCreatePerm_create_withGrant);
 
       assertThat(accessControlContext.getEffectiveDomainCreatePermissions(accessorResource).isEmpty(), is(true));
+
+      // test set-based version
+      Resource accessorResource2 = generateUnauthenticatableResource();
+      accessControlContext.setDomainCreatePermissions(accessorResource2,
+                                                      domainCreatePermissions_pre);
+      assertThat(accessControlContext.getEffectiveDomainCreatePermissions(accessorResource2), is(domainCreatePermissions_pre));
+
+      accessControlContext.revokeDomainCreatePermissions(accessorResource2,
+                                                         setOf(domCreatePerm_superuser_trailingspaces,
+                                                               domCreatePerm_create_withGrant));
+
+      assertThat(accessControlContext.getEffectiveDomainCreatePermissions(accessorResource2).isEmpty(), is(true));
    }
 
    @Test
@@ -598,7 +752,7 @@ public class TestAccessControl_revokeDomainCreatePermissions extends TestAccessC
       }
 
       try {
-         accessControlContext.revokeDomainCreatePermissions(accessorResource, null);
+         accessControlContext.revokeDomainCreatePermissions(accessorResource, (DomainCreatePermission) null);
          fail("revoking domain create permissions with null domain permission set should have failed");
       }
       catch (NullPointerException e) {
@@ -611,6 +765,48 @@ public class TestAccessControl_revokeDomainCreatePermissions extends TestAccessC
       }
       catch (NullPointerException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("an array or a sequence"));
+      }
+
+      try {
+         accessControlContext.revokeDomainCreatePermissions(null, setOf(domCreatePerm_create_withGrant));
+         fail("revoking domain create permissions with null accessor resource should have failed");
+      }
+      catch (NullPointerException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("resource required"));
+      }
+
+      try {
+         accessControlContext.revokeDomainCreatePermissions(accessorResource, (Set<DomainCreatePermission>) null);
+         fail("revoking domain create permissions with null domain permission set should have failed");
+      }
+      catch (NullPointerException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("permissions required"));
+      }
+
+      try {
+         accessControlContext.revokeDomainCreatePermissions(accessorResource, setOf(domCreatePerm_create_withGrant, null));
+         fail("revoking domain create permissions with null element in domain permission set should have failed");
+      }
+      catch (NullPointerException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("contains null element"));
+      }
+   }
+
+   @Test
+   public void revokeDomainCreatePermissions_emptyPermissionSet_shouldFail() {
+      authenticateSystemResource();
+      final DomainCreatePermission domCreatePerm_create_withGrant
+            = DomainCreatePermissions.getInstance(DomainCreatePermissions.CREATE, true);
+
+      Resource accessorResource = generateUnauthenticatableResource();
+
+      // attempt to revoke domain create permissions with nulls
+      try {
+         accessControlContext.revokeDomainCreatePermissions(accessorResource, Collections.<DomainCreatePermission>emptySet());
+         fail("revoking domain create permissions with null domain permission set should have failed");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("permissions required"));
       }
    }
 
@@ -714,6 +910,50 @@ public class TestAccessControl_revokeDomainCreatePermissions extends TestAccessC
       catch (IllegalArgumentException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("duplicate permission"));
       }
+
+      try {
+         accessControlContext
+               .revokeDomainCreatePermissions(accessorResource,
+                                              setOf(DomainCreatePermissions.getInstance(DomainCreatePermissions.CREATE),
+                                                    DomainCreatePermissions
+                                                          .getInstance(DomainPermissions.getInstance(
+                                                                grantedPermissionName)),
+                                                    DomainCreatePermissions
+                                                          .getInstance(DomainPermissions.getInstance(
+                                                                grantedPermissionName),
+                                                                       true)));
+         fail("revoking create permissions that include the same permission - by name - but with different grant-options, should have failed");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("duplicate permission"));
+      }
+      try {
+         accessControlContext
+               .revokeDomainCreatePermissions(accessorResource,
+                                              setOf(DomainCreatePermissions.getInstance(DomainCreatePermissions.CREATE),
+                                                    DomainCreatePermissions
+                                                          .getInstance(DomainPermissions.getInstance(
+                                                                grantedPermissionName)),
+                                                    DomainCreatePermissions
+                                                          .getInstance(DomainPermissions.getInstance(
+                                                                grantedPermissionName,
+                                                                true))));
+         fail("revoking create permissions that include the same permission - by name - but with different grant-options, should have failed");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("duplicate permission"));
+      }
+      try {
+         accessControlContext
+               .revokeDomainCreatePermissions(accessorResource,
+                                              setOf(DomainCreatePermissions.getInstance(DomainCreatePermissions.CREATE),
+                                                    DomainCreatePermissions.getInstance(DomainCreatePermissions.CREATE,
+                                                                                        true)));
+         fail("revoking create permissions that include the same permission - by name - but with different grant-options, should have failed");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("duplicate permission"));
+      }
    }
 
    @Test
@@ -725,6 +965,14 @@ public class TestAccessControl_revokeDomainCreatePermissions extends TestAccessC
       // attempt to revoke domain create permissions with non-existent references
       try {
          accessControlContext.revokeDomainCreatePermissions(Resources.getInstance(-999L), domCreatePerm_create_withGrant);
+         fail("revoking domain create permissions with non-existent accessor resource reference should have failed");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("not found"));
+      }
+      try {
+         accessControlContext.revokeDomainCreatePermissions(Resources.getInstance(-999L),
+                                                            setOf(domCreatePerm_create_withGrant));
          fail("revoking domain create permissions with non-existent accessor resource reference should have failed");
       }
       catch (IllegalArgumentException e) {

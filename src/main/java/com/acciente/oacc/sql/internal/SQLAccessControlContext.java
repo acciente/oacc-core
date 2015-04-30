@@ -1661,6 +1661,26 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
 
    @Override
    public void revokeDomainCreatePermissions(Resource accessorResource,
+                                             Set<DomainCreatePermission> domainCreatePermissions) {
+      SQLConnection connection = null;
+
+      __assertAuthenticated();
+      __assertResourceSpecified(accessorResource);
+      __assertPermissionsSpecified(domainCreatePermissions);
+      __assertPermissionsSetNotEmpty(domainCreatePermissions);
+
+      try {
+         connection = __getConnection();
+
+         __revokeDirectDomainCreatePermissions(connection, accessorResource, domainCreatePermissions);
+      }
+      finally {
+         __closeConnection(connection);
+      }
+   }
+
+   @Override
+   public void revokeDomainCreatePermissions(Resource accessorResource,
                                              DomainCreatePermission domainCreatePermission,
                                              DomainCreatePermission... domainCreatePermissions) {
       SQLConnection connection = null;
@@ -5802,7 +5822,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
 
    private void __assertPermissionsSetNotEmpty(Set permissionSet) {
       if (permissionSet.isEmpty()) {
-         throw new NullPointerException("Set of permissions required, empty set specified");
+         throw new IllegalArgumentException("Set of permissions required, empty set specified");
       }
    }
 
