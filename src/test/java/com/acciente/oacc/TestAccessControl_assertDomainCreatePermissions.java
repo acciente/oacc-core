@@ -343,7 +343,8 @@ public class TestAccessControl_assertDomainCreatePermissions extends TestAccessC
       // setup super-user domain create permission
       Set<DomainCreatePermission> domainCreatePermissions
             = setOf(DomainCreatePermissions.getInstance(DomainCreatePermissions.CREATE, false),
-                    DomainCreatePermissions.getInstance(DomainPermissions.getInstance(DomainPermissions.SUPER_USER, false)));
+                    DomainCreatePermissions.getInstance(DomainPermissions.getInstance(DomainPermissions.SUPER_USER,
+                                                                                      false)));
 
       accessControlContext.setDomainCreatePermissions(accessorResource, domainCreatePermissions);
 
@@ -662,7 +663,8 @@ public class TestAccessControl_assertDomainCreatePermissions extends TestAccessC
 
       Set<DomainCreatePermission> permissions_expected = new HashSet<>();
       permissions_expected.add(DomainCreatePermissions.getInstance(DomainCreatePermissions.CREATE));
-      permissions_expected.add(DomainCreatePermissions.getInstance(DomainPermissions.getInstance(donorPermissionName_createDomain)));
+      permissions_expected.add(DomainCreatePermissions.getInstance(DomainPermissions.getInstance(
+            donorPermissionName_createDomain)));
 
       accessControlContext
             .assertDomainCreatePermissions(accessorResource,
@@ -757,13 +759,38 @@ public class TestAccessControl_assertDomainCreatePermissions extends TestAccessC
    }
 
    @Test
-   public void assertDomainCreatePermission_duplicates_shouldSucceed() {
+   public void assertDomainCreatePermission_duplicates_shouldFail() {
       authenticateSystemResource();
 
       final DomainCreatePermission domainCreatePermission = DomainCreatePermissions.getInstance(DomainCreatePermissions.CREATE);
 
-      accessControlContext.assertDomainCreatePermissions(SYS_RESOURCE, domainCreatePermission, domainCreatePermission);
-      accessControlContext.assertDomainCreatePermissions(domainCreatePermission, domainCreatePermission);
+      try {
+         accessControlContext.assertDomainCreatePermissions(SYS_RESOURCE, domainCreatePermission, domainCreatePermission);
+         fail("asserting domain create permission for duplicate (identical) permissions should have failed");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("duplicate element"));
+      }
+      try {
+         accessControlContext.assertDomainCreatePermissions(domainCreatePermission, domainCreatePermission);
+         fail("asserting domain create permission for duplicate (identical) permissions should have failed");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("duplicate element"));
+      }
+   }
+
+   @Test
+   public void assertDomainCreatePermission_duplicates_shouldSucceed() {
+      authenticateSystemResource();
+
+      final DomainCreatePermission domainCreatePermission
+            = DomainCreatePermissions.getInstance(DomainCreatePermissions.CREATE);
+      final DomainCreatePermission domainCreatePermission_grantable
+            = DomainCreatePermissions.getInstance(DomainCreatePermissions.CREATE, true);
+
+      accessControlContext.assertDomainCreatePermissions(SYS_RESOURCE, domainCreatePermission, domainCreatePermission_grantable);
+      accessControlContext.assertDomainCreatePermissions(domainCreatePermission, domainCreatePermission_grantable);
    }
 
    @Test

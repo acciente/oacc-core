@@ -689,7 +689,7 @@ public class TestAccessControl_hasDomainPermissions extends TestAccessControlBas
    }
 
    @Test
-   public void hasDomainPermissions_duplicatePermissions_shouldSucceed() {
+   public void hasDomainPermissions_duplicatePermissions_shouldFail() {
       authenticateSystemResource();
       final Resource accessorResource = generateUnauthenticatableResource();
       final DomainPermission domPerm_superUser = DomainPermissions.getInstance(DomainPermissions.SUPER_USER);
@@ -699,16 +699,51 @@ public class TestAccessControl_hasDomainPermissions extends TestAccessControlBas
       accessControlContext.setDomainPermissions(accessorResource, domainName, setOf(domPerm_superUser));
 
       // verify
+      try {
+         accessControlContext.hasDomainPermissions(accessorResource,
+                                                   domainName,
+                                                   domPerm_superUser,
+                                                   domPerm_superUser);
+         fail("checking domain permission for duplicate (identical) permissions should have failed");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("duplicate element"));
+      }
+      try {
+         accessControlContext.hasDomainPermissions(domainName,
+                                                   domPerm_superUser,
+                                                   domPerm_superUser);
+         fail("checking domain permission for duplicate (identical) permissions should have failed");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("duplicate element"));
+      }
+   }
+
+   @Test
+   public void hasDomainPermissions_duplicatePermissions_shouldSucceed() {
+      authenticateSystemResource();
+      final Resource accessorResource = generateUnauthenticatableResource();
+      final DomainPermission domPerm_superUser
+            = DomainPermissions.getInstance(DomainPermissions.SUPER_USER);
+      final DomainPermission domPerm_superUser_grantable
+            = DomainPermissions.getInstance(DomainPermissions.SUPER_USER, true);
+      final String domainName = generateDomain();
+
+      // setup permission
+      accessControlContext.setDomainPermissions(accessorResource, domainName, setOf(domPerm_superUser_grantable));
+
+      // verify
       if (!accessControlContext.hasDomainPermissions(accessorResource,
                                                      domainName,
                                                      domPerm_superUser,
-                                                     domPerm_superUser)) {
-         fail("checking domain permission with duplicate permissions should have succeeded");
+                                                     domPerm_superUser_grantable)) {
+         fail("checking domain permission with duplicate permissions (with different grant options) should have succeeded");
       }
       if (!accessControlContext.hasDomainPermissions(domainName,
                                                      domPerm_superUser,
-                                                     domPerm_superUser)) {
-         fail("checking domain permission with duplicate permissions should have succeeded");
+                                                     domPerm_superUser_grantable)) {
+         fail("checking domain permission with duplicate permissions (with different grant options) should have succeeded");
       }
    }
 

@@ -761,7 +761,7 @@ public class TestAccessControl_revokeGlobalResourcePermissions extends TestAcces
    }
 
    @Test
-   public void revokeGlobalResourcePermissions_duplicatePermissionNames_shouldSucceed() {
+   public void revokeGlobalResourcePermissions_duplicateIdenticalPermissions_shouldSucceed() {
       authenticateSystemResource();
       final String resourceClassName = generateResourceClass(true, false);
       final char[] password = generateUniquePassword();
@@ -787,16 +787,28 @@ public class TestAccessControl_revokeGlobalResourcePermissions extends TestAcces
       accessControlContext.authenticate(grantorResource, PasswordCredentials.newInstance(password));
 
       // attempt to revoke permissions with duplicate permission names
-      accessControlContext.revokeGlobalResourcePermissions(accessorResource,
-                                                           resourceClassName,
-                                                           domainName,
-                                                           ResourcePermissions.getInstance(permissionName),
-                                                           ResourcePermissions.getInstance(permissionName));
+      try {
+         accessControlContext.revokeGlobalResourcePermissions(accessorResource,
+                                                              resourceClassName,
+                                                              domainName,
+                                                              ResourcePermissions.getInstance(permissionName),
+                                                              ResourcePermissions.getInstance(permissionName));
+         fail("revoking global resource permissions for duplicate (identical) permissions, should have failed");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("duplicate element"));
+      }
 
-      accessControlContext.revokeGlobalResourcePermissions(accessorResource,
-                                                           resourceClassName,
-                                                           ResourcePermissions.getInstance(permissionName),
-                                                           ResourcePermissions.getInstance(permissionName));
+      try {
+         accessControlContext.revokeGlobalResourcePermissions(accessorResource,
+                                                              resourceClassName,
+                                                              ResourcePermissions.getInstance(permissionName),
+                                                              ResourcePermissions.getInstance(permissionName));
+         fail("revoking global resource permissions for duplicate (identical) permissions, should have failed");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("duplicate element"));
+      }
    }
 
    @Test

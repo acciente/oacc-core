@@ -1257,7 +1257,7 @@ public class TestAccessControl_grantResourceCreatePermissions extends TestAccess
    }
 
    @Test
-   public void grantResourceCreatePermissions_duplicatePermissions_shouldSucceed() {
+   public void grantResourceCreatePermissions_duplicateIdenticalPermissions_shouldFail() {
       final ResourcePermission resourcePermission_inherit
             = ResourcePermissions.getInstance(ResourcePermissions.INHERIT);
       final ResourcePermission resourcePermission_inherit_withGrant
@@ -1292,29 +1292,32 @@ public class TestAccessControl_grantResourceCreatePermissions extends TestAccess
       final Resource accessorResource = generateUnauthenticatableResource();
 
       // grant create permissions and verify
-      accessControlContext.grantResourceCreatePermissions(accessorResource,
-                                                          resourceClassName,
-                                                          domainName,
-                                                          ResourceCreatePermissions
-                                                                .getInstance(ResourceCreatePermissions.CREATE, false),
-                                                          createPerm_inherit,
-                                                          createPerm_inherit);
-
-      Set<ResourceCreatePermission> resourceCreatePermissions_expected
-            = setOf(ResourceCreatePermissions.getInstance(ResourceCreatePermissions.CREATE, false),
-                    createPerm_inherit);
-      assertThat(accessControlContext.getEffectiveResourceCreatePermissions(accessorResource, resourceClassName, domainName),
-                 is(resourceCreatePermissions_expected));
+      try {
+         accessControlContext.grantResourceCreatePermissions(accessorResource,
+                                                             resourceClassName,
+                                                             domainName,
+                                                             ResourceCreatePermissions
+                                                                   .getInstance(ResourceCreatePermissions.CREATE,
+                                                                                false),
+                                                             createPerm_inherit,
+                                                             createPerm_inherit);
+         fail("granting resource create permissions with duplicate (identical) permissions should have failed");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("duplicate element"));
+      }
 
       // grant duplicate create permissions for implicit domain
-      accessControlContext.grantResourceCreatePermissions(accessorResource,
-                                                          resourceClassName,
-                                                          createPerm_inherit_withGrant,
-                                                          createPerm_inherit_withGrant);
-
-      assertThat(accessControlContext.getEffectiveResourceCreatePermissions(accessorResource, resourceClassName, domainName),
-                 is(setOf(ResourceCreatePermissions.getInstance(ResourceCreatePermissions.CREATE, false),
-                          createPerm_inherit_withGrant)));
+      try {
+         accessControlContext.grantResourceCreatePermissions(accessorResource,
+                                                             resourceClassName,
+                                                             createPerm_inherit_withGrant,
+                                                             createPerm_inherit_withGrant);
+         fail("granting resource create permissions with duplicate (identical) permissions should have failed");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("duplicate element"));
+      }
    }
 
    @Test

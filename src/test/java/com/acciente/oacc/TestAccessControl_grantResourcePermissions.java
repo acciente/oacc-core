@@ -740,7 +740,7 @@ public class TestAccessControl_grantResourcePermissions extends TestAccessContro
    }
 
    @Test
-   public void grantResourcePermissions_duplicatePermissionNames_shouldSucceed() {
+   public void grantResourcePermissions_duplicateIdenticalPermissions_shouldSucceed() {
       authenticateSystemResource();
       final String resourceClassName = generateResourceClass(false, false);
       final Resource accessorResource = generateUnauthenticatableResource();
@@ -750,13 +750,16 @@ public class TestAccessControl_grantResourcePermissions extends TestAccessContro
       final String permissionName = generateResourceClassPermission(resourceClassName);
 
       // attempt to grant permissions with duplicate permission names
-      accessControlContext.grantResourcePermissions(accessorResource,
-                                                    accessedResource,
-                                                    ResourcePermissions.getInstance(permissionName),
-                                                    ResourcePermissions.getInstance(permissionName));
-
-      final Set<ResourcePermission> permissions_post = accessControlContext.getEffectiveResourcePermissions(accessorResource, accessedResource);
-      assertThat(permissions_post, is(setOf(ResourcePermissions.getInstance(permissionName))));
+      try {
+         accessControlContext.grantResourcePermissions(accessorResource,
+                                                       accessedResource,
+                                                       ResourcePermissions.getInstance(permissionName),
+                                                       ResourcePermissions.getInstance(permissionName));
+         fail("granting resource permissions with duplicate (identical) permissions should have failed");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("duplicate element"));
+      }
    }
 
    @Test

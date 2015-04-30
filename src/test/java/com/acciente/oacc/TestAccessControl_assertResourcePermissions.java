@@ -618,7 +618,7 @@ public class TestAccessControl_assertResourcePermissions extends TestAccessContr
    }
 
    @Test
-   public void assertResourcePermissions_duplicatePermissions_succeedsAsAuthenticatedResource() {
+   public void assertResourcePermissions_duplicatePermissions_shouldFailAsAuthenticatedResource() {
       authenticateSystemResource();
 
       final char[] password = generateUniquePassword();
@@ -634,13 +634,51 @@ public class TestAccessControl_assertResourcePermissions extends TestAccessContr
       accessControlContext.authenticate(accessorResource, PasswordCredentials.newInstance(password));
 
       // verify
+      try {
+         accessControlContext.assertResourcePermissions(accessedResource,
+                                                        ResourcePermissions.getInstance(ResourcePermissions.INHERIT),
+                                                        ResourcePermissions.getInstance(ResourcePermissions.INHERIT));
+         fail("asserting resource permission for duplicate (identical) permissions should have failed");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("duplicate element"));
+      }
+      try {
+         accessControlContext.assertResourcePermissions(accessorResource,
+                                                        accessedResource,
+                                                        ResourcePermissions.getInstance(ResourcePermissions.INHERIT),
+                                                        ResourcePermissions.getInstance(ResourcePermissions.INHERIT));
+         fail("asserting resource permission for duplicate (identical) permissions should have failed");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("duplicate element"));
+      }
+   }
+
+   @Test
+   public void assertResourcePermissions_duplicatePermissions_succeedsAsAuthenticatedResource() {
+      authenticateSystemResource();
+
+      final char[] password = generateUniquePassword();
+      final Resource accessorResource = generateAuthenticatableResource(password);
+      final Resource accessedResource = generateUnauthenticatableResource();
+
+      // setup direct permissions
+      accessControlContext.setResourcePermissions(accessorResource,
+                                                  accessedResource,
+                                                  setOf(ResourcePermissions.getInstance(ResourcePermissions.INHERIT, true)));
+
+      // authenticate accessor resource
+      accessControlContext.authenticate(accessorResource, PasswordCredentials.newInstance(password));
+
+      // verify
       accessControlContext.assertResourcePermissions(accessedResource,
                                                      ResourcePermissions.getInstance(ResourcePermissions.INHERIT),
-                                                     ResourcePermissions.getInstance(ResourcePermissions.INHERIT));
-      accessControlContext.hasResourcePermissions(accessorResource,
-                                                  accessedResource,
-                                                  ResourcePermissions.getInstance(ResourcePermissions.INHERIT),
-                                                  ResourcePermissions.getInstance(ResourcePermissions.INHERIT));
+                                                     ResourcePermissions.getInstance(ResourcePermissions.INHERIT, true));
+      accessControlContext.assertResourcePermissions(accessorResource,
+                                                     accessedResource,
+                                                     ResourcePermissions.getInstance(ResourcePermissions.INHERIT),
+                                                     ResourcePermissions.getInstance(ResourcePermissions.INHERIT, true));
    }
 
    @Test

@@ -1242,6 +1242,61 @@ public class TestAccessControl_assertGlobalResourcePermissions extends TestAcces
    }
 
    @Test
+   public void assertGlobalResourcePermissions_duplicatePermissions_shouldFailAsSystemResource() {
+      authenticateSystemResource();
+      // setup permission without granting it to anything
+      final String resourceClassName = generateResourceClass(true, false);
+
+      // verify
+      try {
+         accessControlContext.assertGlobalResourcePermissions(resourceClassName,
+                                                              ResourcePermissions
+                                                                    .getInstance(ResourcePermissions.IMPERSONATE),
+                                                              ResourcePermissions
+                                                                    .getInstance(ResourcePermissions.IMPERSONATE));
+         fail("asserting global resource permission for duplicate (identical) permissions should have failed");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("duplicate element"));
+      }
+      try {
+         accessControlContext.assertGlobalResourcePermissions(SYS_RESOURCE,
+                                                              resourceClassName,
+                                                              ResourcePermissions
+                                                                    .getInstance(ResourcePermissions.IMPERSONATE),
+                                                              ResourcePermissions
+                                                                    .getInstance(ResourcePermissions.IMPERSONATE));
+         fail("asserting global resource permission for duplicate (identical) permissions should have failed");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("duplicate element"));
+      }
+
+      final String domainName = generateDomain();
+      try {
+         accessControlContext.assertGlobalResourcePermissions(SYS_RESOURCE,
+                                                              resourceClassName,
+                                                              domainName,
+                                                              ResourcePermissions.getInstance(ResourcePermissions.IMPERSONATE),
+                                                              ResourcePermissions.getInstance(ResourcePermissions.IMPERSONATE));
+         fail("asserting global resource permission for duplicate (identical) permissions should have failed");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("duplicate element"));
+      }
+      try {
+         accessControlContext.assertGlobalResourcePermissions(resourceClassName,
+                                                              domainName,
+                                                              ResourcePermissions.getInstance(ResourcePermissions.IMPERSONATE),
+                                                              ResourcePermissions.getInstance(ResourcePermissions.IMPERSONATE));
+         fail("asserting global resource permission for duplicate (identical) permissions should have failed");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("duplicate element"));
+      }
+   }
+
+   @Test
    public void assertGlobalResourcePermissions_duplicatePermissions_shouldSucceedAsSystemResource() {
       authenticateSystemResource();
       // setup permission without granting it to anything
@@ -1252,24 +1307,28 @@ public class TestAccessControl_assertGlobalResourcePermissions extends TestAcces
                                                            ResourcePermissions
                                                                  .getInstance(ResourcePermissions.IMPERSONATE),
                                                            ResourcePermissions
-                                                                 .getInstance(ResourcePermissions.IMPERSONATE));
+                                                                 .getInstance(ResourcePermissions.IMPERSONATE, true));
       accessControlContext.assertGlobalResourcePermissions(SYS_RESOURCE,
                                                            resourceClassName,
                                                            ResourcePermissions
                                                                  .getInstance(ResourcePermissions.IMPERSONATE),
                                                            ResourcePermissions
-                                                                 .getInstance(ResourcePermissions.IMPERSONATE));
+                                                                 .getInstance(ResourcePermissions.IMPERSONATE, true));
 
       final String domainName = generateDomain();
       accessControlContext.assertGlobalResourcePermissions(SYS_RESOURCE,
                                                            resourceClassName,
                                                            domainName,
-                                                           ResourcePermissions.getInstance(ResourcePermissions.IMPERSONATE),
-                                                           ResourcePermissions.getInstance(ResourcePermissions.IMPERSONATE));
+                                                           ResourcePermissions
+                                                                 .getInstance(ResourcePermissions.IMPERSONATE),
+                                                           ResourcePermissions
+                                                                 .getInstance(ResourcePermissions.IMPERSONATE, true));
       accessControlContext.assertGlobalResourcePermissions(resourceClassName,
                                                            domainName,
-                                                           ResourcePermissions.getInstance(ResourcePermissions.IMPERSONATE),
-                                                           ResourcePermissions.getInstance(ResourcePermissions.IMPERSONATE));
+                                                           ResourcePermissions
+                                                                 .getInstance(ResourcePermissions.IMPERSONATE),
+                                                           ResourcePermissions
+                                                                 .getInstance(ResourcePermissions.IMPERSONATE, true));
    }
 
    @Test

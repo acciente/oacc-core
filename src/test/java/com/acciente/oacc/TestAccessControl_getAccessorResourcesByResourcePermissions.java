@@ -144,7 +144,9 @@ public class TestAccessControl_getAccessorResourcesByResourcePermissions extends
       accessControlContext.setResourcePermissions(accessorResource, accessedResource, resourcePermissions);
 
       // set permission between unqueried accessor and accessed
-      accessControlContext.setResourcePermissions(unqueriedAccessorResource, unqueriedAccessedResource, resourcePermissions);
+      accessControlContext.setResourcePermissions(unqueriedAccessorResource,
+                                                  unqueriedAccessedResource,
+                                                  resourcePermissions);
 
       // verify
       Set<Resource> accessorsByPermission
@@ -603,7 +605,7 @@ public class TestAccessControl_getAccessorResourcesByResourcePermissions extends
    }
 
    @Test
-   public void getAccessorResourcesByResourcePermissions_duplicates_shouldSucceed() {
+   public void getAccessorResourcesByResourcePermissions_duplicates_shouldFail() {
       authenticateSystemResource();
 
       final Resource accessorResource = generateUnauthenticatableResource();
@@ -618,6 +620,36 @@ public class TestAccessControl_getAccessorResourcesByResourcePermissions extends
       accessControlContext.setResourcePermissions(accessorResource, accessedResource, resourcePermissions);
 
       // verify
+      try {
+         accessControlContext.getAccessorResourcesByResourcePermissions(accessedResource,
+                                                                        accessedResourceClassName,
+                                                                        ResourcePermissions
+                                                                              .getInstance(queriedPermissionName),
+                                                                        ResourcePermissions
+                                                                              .getInstance(queriedPermissionName));
+         fail("getting accessor resource by resource permission for duplicate (identical) permissions should have failed");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("duplicate element"));
+      }
+   }
+
+   @Test
+   public void getAccessorResourcesByResourcePermissions_duplicates_shouldSucceed() {
+      authenticateSystemResource();
+
+      final Resource accessorResource = generateUnauthenticatableResource();
+      final Resource accessedResource = generateUnauthenticatableResource();
+      final String accessedResourceClassName
+            = accessControlContext.getResourceClassInfoByResource(accessedResource).getResourceClassName();
+      final String queriedPermissionName = generateResourceClassPermission(accessedResourceClassName);
+      final Set<ResourcePermission> resourcePermissions
+            = setOf(ResourcePermissions.getInstance(queriedPermissionName, true));
+
+      // set permission between accessor and queried accessed
+      accessControlContext.setResourcePermissions(accessorResource, accessedResource, resourcePermissions);
+
+      // verify
       Set<Resource> expectedAccessors = setOf(accessorResource);
 
       Set<Resource> accessorsByPermission
@@ -626,7 +658,7 @@ public class TestAccessControl_getAccessorResourcesByResourcePermissions extends
                                                                              ResourcePermissions
                                                                                    .getInstance(queriedPermissionName),
                                                                              ResourcePermissions
-                                                                                   .getInstance(queriedPermissionName));
+                                                                                   .getInstance(queriedPermissionName, true));
       assertThat(accessorsByPermission, is(expectedAccessors));
    }
 

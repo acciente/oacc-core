@@ -197,13 +197,12 @@ public class TestAccessControl_hasDomainCreatePermissions extends TestAccessCont
          fail("checking direct domain create permissions with partial authorization should have failed for authenticated resource");
       }
       if (accessControlContext
-               .hasDomainCreatePermissions(
-                     DomainCreatePermissions
-                                                       .getInstance(DomainPermissions
-                                                                          .getInstance(DomainPermissions.CREATE_CHILD_DOMAIN)),
-                     DomainCreatePermissions
-  .getInstance(DomainPermissions
-                     .getInstance(DomainPermissions.SUPER_USER)))) {
+            .hasDomainCreatePermissions(DomainCreatePermissions
+                                              .getInstance(DomainPermissions
+                                                                 .getInstance(DomainPermissions.CREATE_CHILD_DOMAIN)),
+                                        DomainCreatePermissions
+                                              .getInstance(DomainPermissions
+                                                                 .getInstance(DomainPermissions.SUPER_USER)))) {
          fail("checking direct domain create permissions with partial authorization should have failed for implicit authenticated resource");
       }
    }
@@ -745,7 +744,7 @@ public class TestAccessControl_hasDomainCreatePermissions extends TestAccessCont
    }
 
    @Test
-   public void hasDomainCreatePermissions_duplicatePermissions_shouldSucceed() {
+   public void hasDomainCreatePermissions_duplicatePermissions_shouldFail() {
       authenticateSystemResource();
 
       final Resource accessorResource = generateUnauthenticatableResource();
@@ -755,13 +754,46 @@ public class TestAccessControl_hasDomainCreatePermissions extends TestAccessCont
       grantDomainCreatePermission(accessorResource);
 
       //verify
+      try {
+         accessControlContext.hasDomainCreatePermissions(accessorResource,
+                                                              domainCreatePermission,
+                                                              domainCreatePermission);
+         fail("checking domain create permission for duplicate (identical) permissions should have failed");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("duplicate element"));
+      }
+      try {
+         accessControlContext.hasDomainCreatePermissions(domainCreatePermission, domainCreatePermission);
+         fail("checking domain create permission for duplicate (identical) permissions should have failed");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("duplicate element"));
+      }
+   }
+
+   @Test
+   public void hasDomainCreatePermissions_duplicatePermissions_shouldSucceed() {
+      authenticateSystemResource();
+
+      final Resource accessorResource = generateUnauthenticatableResource();
+      final DomainCreatePermission domainCreatePermission
+            = DomainCreatePermissions.getInstance(DomainCreatePermissions.CREATE);
+      final DomainCreatePermission domainCreatePermission_grantable
+            = DomainCreatePermissions.getInstance(DomainCreatePermissions.CREATE, true);
+
+      //setup
+      systemAccessControlContext.setDomainCreatePermissions(accessorResource,
+                                                            setOf(domainCreatePermission_grantable));
+
+      //verify
       if (!accessControlContext.hasDomainCreatePermissions(accessorResource,
                                                            domainCreatePermission,
-                                                           domainCreatePermission)) {
-         fail("checking domain create permission with duplicate permissions should have succeeded");
+                                                           domainCreatePermission_grantable)) {
+         fail("checking domain create permission with duplicate permissions (with different grant options) should have succeeded");
       }
-      if (!accessControlContext.hasDomainCreatePermissions(domainCreatePermission, domainCreatePermission)) {
-         fail("checking domain create permission with duplicate permissions should have succeeded");
+      if (!accessControlContext.hasDomainCreatePermissions(domainCreatePermission, domainCreatePermission_grantable)) {
+         fail("checking domain create permission with duplicate permissions (with different grant options) should have succeeded");
       }
    }
 

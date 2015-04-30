@@ -999,7 +999,8 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       __assertPermissionSpecified(domainPermission);
       __assertVarargPermissionsSpecified(domainPermissions);
 
-      final Set<DomainPermission> requestedDomainPermissions = getSetWithoutNulls(domainPermission, domainPermissions);
+      final Set<DomainPermission> requestedDomainPermissions = __getSetWithoutNullsOrDuplicates(domainPermission,
+                                                                                                domainPermissions);
 
       try {
          connection = __getConnection();
@@ -1123,7 +1124,8 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       __assertPermissionSpecified(domainPermission);
       __assertVarargPermissionsSpecified(domainPermissions);
 
-      final Set<DomainPermission> requestedDomainPermissions = getSetWithoutNulls(domainPermission, domainPermissions);
+      final Set<DomainPermission> requestedDomainPermissions = __getSetWithoutNullsOrDuplicates(domainPermission,
+                                                                                                domainPermissions);
 
       try {
          connection = __getConnection();
@@ -1474,7 +1476,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       __assertVarargPermissionsSpecified(domainCreatePermissions);
 
       final Set<DomainCreatePermission> requestedDomainCreatePermissions
-            = getSetWithoutNulls(domainCreatePermission, domainCreatePermissions);
+            = __getSetWithoutNullsOrDuplicates(domainCreatePermission, domainCreatePermissions);
 
       try {
          connection = __getConnection();
@@ -1649,7 +1651,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       __assertVarargPermissionsSpecified(domainCreatePermissions);
 
       final Set<DomainCreatePermission> requestedDomainCreatePermissions
-            = getSetWithoutNulls(domainCreatePermission, domainCreatePermissions);
+            = __getSetWithoutNullsOrDuplicates(domainCreatePermission, domainCreatePermissions);
 
       try {
          connection = __getConnection();
@@ -2112,7 +2114,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       __assertVarargPermissionsSpecified(resourceCreatePermissions);
 
       final Set<ResourceCreatePermission> requestedResourceCreatePermissions
-            = getSetWithoutNulls(resourceCreatePermission, resourceCreatePermissions);
+            = __getSetWithoutNullsOrDuplicates(resourceCreatePermission, resourceCreatePermissions);
 
       try {
          connection = __getConnection();
@@ -2142,7 +2144,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       __assertVarargPermissionsSpecified(resourceCreatePermissions);
 
       final Set<ResourceCreatePermission> requestedResourceCreatePermissions
-            = getSetWithoutNulls(resourceCreatePermission, resourceCreatePermissions);
+            = __getSetWithoutNullsOrDuplicates(resourceCreatePermission, resourceCreatePermissions);
 
       try {
          connection = __getConnection();
@@ -2348,7 +2350,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       __assertVarargPermissionsSpecified(resourceCreatePermissions);
 
       final Set<ResourceCreatePermission> requestedResourceCreatePermissions
-            = getSetWithoutNulls(resourceCreatePermission, resourceCreatePermissions);
+            = __getSetWithoutNullsOrDuplicates(resourceCreatePermission, resourceCreatePermissions);
 
       try {
          connection = __getConnection();
@@ -2378,7 +2380,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       __assertVarargPermissionsSpecified(resourceCreatePermissions);
 
       final Set<ResourceCreatePermission> requestedResourceCreatePermissions
-            = getSetWithoutNulls(resourceCreatePermission, resourceCreatePermissions);
+            = __getSetWithoutNullsOrDuplicates(resourceCreatePermission, resourceCreatePermissions);
 
       try {
          connection = __getConnection();
@@ -3048,7 +3050,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       __assertVarargPermissionsSpecified(resourcePermissions);
 
       final Set<ResourcePermission> requestedResourcePermissions
-            = getSetWithoutNulls(resourcePermission, resourcePermissions);
+            = __getSetWithoutNullsOrDuplicates(resourcePermission, resourcePermissions);
 
       try {
          connection = __getConnection();
@@ -3189,7 +3191,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       __assertVarargPermissionsSpecified(resourcePermissions);
 
       final Set<ResourcePermission> obsoleteResourcePermissions
-            = getSetWithoutNulls(resourcePermission, resourcePermissions);
+            = __getSetWithoutNullsOrDuplicates(resourcePermission, resourcePermissions);
 
       try {
          connection = __getConnection();
@@ -3605,7 +3607,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       __assertVarargPermissionsSpecified(resourcePermissions);
 
       final Set<ResourcePermission> requestedResourcePermissions
-            = getSetWithoutNulls(resourcePermission, resourcePermissions);
+            = __getSetWithoutNullsOrDuplicates(resourcePermission, resourcePermissions);
 
       try {
          connection = __getConnection();
@@ -3755,7 +3757,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       __assertVarargPermissionsSpecified(resourcePermissions);
 
       final Set<ResourcePermission> requestedResourcePermissions
-            = getSetWithoutNulls(resourcePermission, resourcePermissions);
+            = __getSetWithoutNullsOrDuplicates(resourcePermission, resourcePermissions);
 
       try {
          connection = __getConnection();
@@ -4060,7 +4062,8 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
 
       // next collect the non-system permissions that the accessor has and add it into the globalALLPermissionsMap
       __mergeSourcePermissionsMapIntoTargetPermissionsMap(grantGlobalResourcePermissionPersister
-                                                                .getGlobalResourcePermissions(connection, accessorResource),
+                                                                .getGlobalResourcePermissions(connection,
+                                                                                              accessorResource),
                                                           globalALLPermissionsMap);
 
       return __collapseResourcePermissions(globalALLPermissionsMap);
@@ -4268,7 +4271,8 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       __assertPermissionSpecified(domainPermission);
       __assertVarargPermissionsSpecified(domainPermissions);
 
-      final Set<DomainPermission> requestedDomainPermissions = getSetWithoutNulls(domainPermission, domainPermissions);
+      final Set<DomainPermission> requestedDomainPermissions = __getSetWithoutNullsOrDuplicates(domainPermission,
+                                                                                                domainPermissions);
 
       try {
          connection = __getConnection();
@@ -4370,7 +4374,8 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       __assertPermissionSpecified(domainPermission);
       __assertVarargPermissionsSpecified(domainPermissions);
 
-      final Set<DomainPermission> requestedDomainPermissions = getSetWithoutNulls(domainPermission, domainPermissions);
+      final Set<DomainPermission> requestedDomainPermissions = __getSetWithoutNullsOrDuplicates(domainPermission,
+                                                                                                domainPermissions);
 
       try {
          connection = __getConnection();
@@ -4445,7 +4450,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       __assertVarargPermissionsSpecified(domainCreatePermissions);
 
       final Set<DomainCreatePermission> requestedDomainCreatePermissions
-            = getSetWithoutNulls(domainCreatePermission, domainCreatePermissions);
+            = __getSetWithoutNullsOrDuplicates(domainCreatePermission, domainCreatePermissions);
 
       try {
          connection = __getConnection();
@@ -4584,7 +4589,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       __assertVarargPermissionsSpecified(resourcePermissions);
 
       final Set<ResourcePermission> requestedResourcePermissions
-            = getSetWithoutNulls(resourcePermission, resourcePermissions);
+            = __getSetWithoutNullsOrDuplicates(resourcePermission, resourcePermissions);
 
       try {
          connection = __getConnection();
@@ -4781,7 +4786,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       __assertVarargPermissionsSpecified(resourcePermissions);
 
       final Set<ResourcePermission> requestedResourcePermissions
-            = getSetWithoutNulls(resourcePermission, resourcePermissions);
+            = __getSetWithoutNullsOrDuplicates(resourcePermission, resourcePermissions);
 
       try {
          connection = __getConnection();
@@ -4873,7 +4878,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       __assertVarargPermissionsSpecified(resourcePermissions);
 
       final Set<ResourcePermission> requestedResourcePermissions
-            = getSetWithoutNulls(resourcePermission, resourcePermissions);
+            = __getSetWithoutNullsOrDuplicates(resourcePermission, resourcePermissions);
 
       try {
          connection = __getConnection();
@@ -5021,7 +5026,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       __assertVarargPermissionsSpecified(resourceCreatePermissions);
 
       final Set<ResourceCreatePermission> requestedResourceCreatePermissions
-            = getSetWithoutNulls(resourceCreatePermission, resourceCreatePermissions);
+            = __getSetWithoutNullsOrDuplicates(resourceCreatePermission, resourceCreatePermissions);
 
       try {
          connection = __getConnection();
@@ -5132,7 +5137,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       __assertVarargPermissionsSpecified(resourcePermissions);
 
       final Set<ResourcePermission> requestedResourcePermissions
-            = getSetWithoutNulls(resourcePermission, resourcePermissions);
+            = __getSetWithoutNullsOrDuplicates(resourcePermission, resourcePermissions);
 
       try {
          connection = __getConnection();
@@ -5163,7 +5168,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       __assertVarargPermissionsSpecified(resourcePermissions);
 
       final Set<ResourcePermission> requestedResourcePermissions
-            = getSetWithoutNulls(resourcePermission, resourcePermissions);
+            = __getSetWithoutNullsOrDuplicates(resourcePermission, resourcePermissions);
 
       try {
          connection = __getConnection();
@@ -5303,7 +5308,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       __assertVarargPermissionsSpecified(resourcePermissions);
 
       final Set<ResourcePermission> requestedResourcePermissions
-            = getSetWithoutNulls(resourcePermission, resourcePermissions);
+            = __getSetWithoutNullsOrDuplicates(resourcePermission, resourcePermissions);
 
       try {
          connection = __getConnection();
@@ -5337,7 +5342,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       __assertVarargPermissionsSpecified(resourcePermissions);
 
       final Set<ResourcePermission> requestedResourcePermissions
-            = getSetWithoutNulls(resourcePermission, resourcePermissions);
+            = __getSetWithoutNullsOrDuplicates(resourcePermission, resourcePermissions);
 
       try {
          connection = __getConnection();
@@ -5489,7 +5494,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       __assertVarargPermissionsSpecified(resourcePermissions);
 
       final Set<ResourcePermission> requestedResourcePermissions
-            = getSetWithoutNulls(resourcePermission, resourcePermissions);
+            = __getSetWithoutNullsOrDuplicates(resourcePermission, resourcePermissions);
 
       try {
          connection = __getConnection();
@@ -5841,7 +5846,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
    }
 
    @SafeVarargs
-   protected static <T> Set<T> getSetWithoutNulls(T firstElement, T... elements) {
+   private static <T> Set<T> __getSetWithoutNullsOrDuplicates(T firstElement, T... elements) {
       // not null constraint
       if (elements == null) {
          throw new NullPointerException("An array or a sequence of arguments are required, but none were specified");
@@ -5859,7 +5864,9 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
          }
 
          // duplicate elements get ignored silently
-         resultSet.add(element);
+         if (!resultSet.add(element)) {
+            throw new IllegalArgumentException("Duplicate element: " + element);
+         }
       }
 
       return resultSet;

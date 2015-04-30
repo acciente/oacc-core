@@ -615,7 +615,7 @@ public class TestAccessControl_revokeDomainCreatePermissions extends TestAccessC
    }
 
    @Test
-   public void revokeDomainCreatePermissions_duplicatePermissions_shouldSucceed() {
+   public void revokeDomainCreatePermissions_duplicateIdenticalPermissions_shouldFail() {
       authenticateSystemResource();
       final String grantedPermissionName = DomainPermissions.CREATE_CHILD_DOMAIN;
       final char[] password = generateUniquePassword();
@@ -641,15 +641,19 @@ public class TestAccessControl_revokeDomainCreatePermissions extends TestAccessC
       accessControlContext.authenticate(grantorResource, PasswordCredentials.newInstance(password));
 
       // revoke duplicate permissions and verify
-      accessControlContext
-            .revokeDomainCreatePermissions(accessorResource,
-                                           DomainCreatePermissions.getInstance(DomainCreatePermissions.CREATE),
-                                           DomainCreatePermissions
-                                                 .getInstance(DomainPermissions.getInstance(grantedPermissionName)),
-                                           DomainCreatePermissions
-                                                 .getInstance(DomainPermissions.getInstance(grantedPermissionName)));
-
-      assertThat(accessControlContext.getEffectiveDomainCreatePermissions(accessorResource).isEmpty(), is(true));
+      try {
+         accessControlContext
+               .revokeDomainCreatePermissions(accessorResource,
+                                              DomainCreatePermissions.getInstance(DomainCreatePermissions.CREATE),
+                                              DomainCreatePermissions
+                                                    .getInstance(DomainPermissions.getInstance(grantedPermissionName)),
+                                              DomainCreatePermissions
+                                                    .getInstance(DomainPermissions.getInstance(grantedPermissionName)));
+         fail("revoking create permissions that include duplicate (identical) permissions, should have failed");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("duplicate element"));
+      }
    }
 
    @Test

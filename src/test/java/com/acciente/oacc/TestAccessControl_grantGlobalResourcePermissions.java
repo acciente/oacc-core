@@ -577,7 +577,7 @@ public class TestAccessControl_grantGlobalResourcePermissions extends TestAccess
    }
 
    @Test
-   public void grantGlobalResourcePermissions_duplicatePermissionNames_shouldSucceed() {
+   public void grantGlobalResourcePermissions_duplicateIdenticalPermissions_shouldFail() {
       authenticateSystemResource();
       final String resourceClassName = generateResourceClass(true, false);
       final Resource accessorResource = generateUnauthenticatableResource();
@@ -587,15 +587,17 @@ public class TestAccessControl_grantGlobalResourcePermissions extends TestAccess
       final String permissionName = generateResourceClassPermission(resourceClassName);
 
       // attempt to grant permissions with duplicate permission names
-      accessControlContext.grantGlobalResourcePermissions(accessorResource,
-                                                          resourceClassName,
-                                                          domainName,
-                                                          ResourcePermissions.getInstance(permissionName),
-                                                          ResourcePermissions.getInstance(permissionName));
-
-      final Set<ResourcePermission> permissions_post
-            = accessControlContext.getEffectiveGlobalResourcePermissions(accessorResource, resourceClassName, domainName);
-      assertThat(permissions_post, is(setOf(ResourcePermissions.getInstance(permissionName))));
+      try {
+         accessControlContext.grantGlobalResourcePermissions(accessorResource,
+                                                             resourceClassName,
+                                                             domainName,
+                                                             ResourcePermissions.getInstance(permissionName),
+                                                             ResourcePermissions.getInstance(permissionName));
+         fail("granting global resource permissions with duplicate (identical) permissions should have failed");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("duplicate element"));
+      }
    }
 
    @Test

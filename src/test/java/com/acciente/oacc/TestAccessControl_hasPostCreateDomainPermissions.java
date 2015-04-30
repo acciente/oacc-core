@@ -272,7 +272,8 @@ public class TestAccessControl_hasPostCreateDomainPermissions extends TestAccess
       // setup super-user domain create permission
       Set<DomainCreatePermission> domainCreatePermissions
             = setOf(DomainCreatePermissions.getInstance(DomainCreatePermissions.CREATE, false),
-                    DomainCreatePermissions.getInstance(DomainPermissions.getInstance(DomainPermissions.SUPER_USER, false)));
+                    DomainCreatePermissions.getInstance(DomainPermissions.getInstance(DomainPermissions.SUPER_USER,
+                                                                                      false)));
 
       accessControlContext.setDomainCreatePermissions(accessorResource, domainCreatePermissions);
 
@@ -616,7 +617,7 @@ public class TestAccessControl_hasPostCreateDomainPermissions extends TestAccess
    }
 
    @Test
-   public void hasPostCreateDomainPermissions_duplicatePermissions_shouldSucceed() {
+   public void hasPostCreateDomainPermissions_duplicatePermissions_shouldFail() {
       authenticateSystemResource();
       final Resource accessorResource = generateUnauthenticatableResource();
       final DomainPermission domainPermission = DomainPermissions.getInstance(DomainPermissions.CREATE_CHILD_DOMAIN);
@@ -628,11 +629,43 @@ public class TestAccessControl_hasPostCreateDomainPermissions extends TestAccess
                                                             DomainCreatePermissions.getInstance(domainPermission)));
 
       // verify
-      if (!accessControlContext.hasPostCreateDomainPermissions(domainPermission, domainPermission)) {
-         fail("checking post create domain permission with duplicate permissions should have succeeded");
+      try {
+         accessControlContext.hasPostCreateDomainPermissions(domainPermission, domainPermission);
+         fail("checking post-create domain permission for duplicate (identical) permissions should have failed");
       }
-      if(!accessControlContext.hasPostCreateDomainPermissions(accessorResource, domainPermission, domainPermission)) {
-         fail("checking post create domain permission with duplicate permissions should have succeeded");
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("duplicate element"));
+      }
+      try {
+         accessControlContext.hasPostCreateDomainPermissions(accessorResource, domainPermission, domainPermission);
+         fail("checking post-create domain permission for duplicate (identical) permissions should have failed");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("duplicate element"));
+      }
+   }
+
+   @Test
+   public void hasPostCreateDomainPermissions_duplicatePermissions_shouldSucceed() {
+      authenticateSystemResource();
+      final Resource accessorResource = generateUnauthenticatableResource();
+      final DomainPermission domainPermission
+            = DomainPermissions.getInstance(DomainPermissions.CREATE_CHILD_DOMAIN);
+      final DomainPermission domainPermission_grantable
+            = DomainPermissions.getInstance(DomainPermissions.CREATE_CHILD_DOMAIN, true);
+
+      // setup permission for accessor
+      accessControlContext.setDomainCreatePermissions(accessorResource,
+                                                      setOf(DomainCreatePermissions
+                                                                  .getInstance(DomainCreatePermissions.CREATE),
+                                                            DomainCreatePermissions.getInstance(domainPermission_grantable)));
+
+      // verify
+      if (!accessControlContext.hasPostCreateDomainPermissions(domainPermission, domainPermission_grantable)) {
+         fail("checking post create domain permission with duplicate permissions (with different grant options) should have succeeded");
+      }
+      if(!accessControlContext.hasPostCreateDomainPermissions(accessorResource, domainPermission, domainPermission_grantable)) {
+         fail("checking post create domain permission with duplicate permissions (with different grant options) should have succeeded");
       }
    }
 

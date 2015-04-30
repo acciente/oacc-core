@@ -1310,6 +1310,66 @@ public class TestAccessControl_hasGlobalResourcePermissions extends TestAccessCo
    }
 
    @Test
+   public void hasGlobalResourcePermissions_duplicatePermissions_shouldFailAsSystemResource() {
+      authenticateSystemResource();
+
+      // setup
+      final String resourceClassName = generateResourceClass(true, false);
+
+      // verify
+      try {
+         accessControlContext.hasGlobalResourcePermissions(resourceClassName,
+                                                           ResourcePermissions
+                                                                 .getInstance(ResourcePermissions.IMPERSONATE),
+                                                           ResourcePermissions
+                                                                 .getInstance(ResourcePermissions.IMPERSONATE));
+         fail("checking global resource permission for duplicate (identical) permissions should have failed");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("duplicate element"));
+      }
+      try {
+         accessControlContext.hasGlobalResourcePermissions(SYS_RESOURCE,
+                                                           resourceClassName,
+                                                           ResourcePermissions
+                                                                 .getInstance(ResourcePermissions.IMPERSONATE),
+                                                           ResourcePermissions
+                                                                 .getInstance(ResourcePermissions.IMPERSONATE));
+         fail("checking global resource permission for duplicate (identical) permissions should have failed");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("duplicate element"));
+      }
+
+      final String domainName = generateDomain();
+      try {
+         accessControlContext.hasGlobalResourcePermissions(SYS_RESOURCE,
+                                                           resourceClassName,
+                                                           domainName,
+                                                           ResourcePermissions
+                                                                 .getInstance(ResourcePermissions.IMPERSONATE),
+                                                           ResourcePermissions
+                                                                 .getInstance(ResourcePermissions.IMPERSONATE));
+         fail("checking global resource permission for duplicate (identical) permissions should have failed");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("duplicate element"));
+      }
+      try {
+         accessControlContext.hasGlobalResourcePermissions(resourceClassName,
+                                                           domainName,
+                                                           ResourcePermissions
+                                                                 .getInstance(ResourcePermissions.IMPERSONATE),
+                                                           ResourcePermissions
+                                                                 .getInstance(ResourcePermissions.IMPERSONATE));
+         fail("checking global resource permission for duplicate (identical) permissions should have failed");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("duplicate element"));
+      }
+   }
+
+   @Test
    public void hasGlobalResourcePermissions_duplicatePermissions_shouldSucceedAsSystemResource() {
       authenticateSystemResource();
 
@@ -1321,16 +1381,16 @@ public class TestAccessControl_hasGlobalResourcePermissions extends TestAccessCo
                                                              ResourcePermissions
                                                                    .getInstance(ResourcePermissions.IMPERSONATE),
                                                              ResourcePermissions
-                                                                   .getInstance(ResourcePermissions.IMPERSONATE))) {
-         fail("checking global resource permission with duplicate permissions should have succeeded");
+                                                                   .getInstance(ResourcePermissions.IMPERSONATE, true))) {
+         fail("checking global resource permission with duplicate permissions (with different grant options) should have succeeded");
       }
       if (!accessControlContext.hasGlobalResourcePermissions(SYS_RESOURCE,
                                                              resourceClassName,
                                                              ResourcePermissions
                                                                    .getInstance(ResourcePermissions.IMPERSONATE),
                                                              ResourcePermissions
-                                                                   .getInstance(ResourcePermissions.IMPERSONATE))) {
-         fail("checking global resource permission with duplicate permissions should have succeeded");
+                                                                   .getInstance(ResourcePermissions.IMPERSONATE, true))) {
+         fail("checking global resource permission with duplicate permissions (with different grant options) should have succeeded");
       }
 
       final String domainName = generateDomain();
@@ -1340,16 +1400,16 @@ public class TestAccessControl_hasGlobalResourcePermissions extends TestAccessCo
                                                              ResourcePermissions
                                                                    .getInstance(ResourcePermissions.IMPERSONATE),
                                                              ResourcePermissions
-                                                                   .getInstance(ResourcePermissions.IMPERSONATE))) {
-         fail("checking global resource permission with duplicate permissions should have succeeded");
+                                                                   .getInstance(ResourcePermissions.IMPERSONATE, true))) {
+         fail("checking global resource permission with duplicate permissions (with different grant options) should have succeeded");
       }
       if (!accessControlContext.hasGlobalResourcePermissions(resourceClassName,
                                                              domainName,
                                                              ResourcePermissions
                                                                    .getInstance(ResourcePermissions.IMPERSONATE),
                                                              ResourcePermissions
-                                                                   .getInstance(ResourcePermissions.IMPERSONATE))) {
-         fail("checking global resource permission with duplicate permissions should have succeeded");
+                                                                   .getInstance(ResourcePermissions.IMPERSONATE, true))) {
+         fail("checking global resource permission with duplicate permissions (with different grant options) should have succeeded");
       }
    }
 

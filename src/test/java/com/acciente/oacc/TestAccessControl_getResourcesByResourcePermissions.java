@@ -251,8 +251,10 @@ public class TestAccessControl_getResourcesByResourcePermissions extends TestAcc
       Set<Resource> resourcesByAccessorAndPermission
             = accessControlContext.getResourcesByResourcePermissions(accessorResource,
                                                                      queriedResourceClass,
-                                                                     ResourcePermissions.getInstance(queriedPermission2),
-                                                                     ResourcePermissions.getInstance(queriedPermission1));
+                                                                     ResourcePermissions
+                                                                           .getInstance(queriedPermission2),
+                                                                     ResourcePermissions
+                                                                           .getInstance(queriedPermission1));
       assertThat(resourcesByAccessorAndPermission, is(expectedResources_anyDomain));
 
       Set<Resource> resourcesByAccessorAndPermissionAndDomain
@@ -270,8 +272,10 @@ public class TestAccessControl_getResourcesByResourcePermissions extends TestAcc
 
       Set<Resource> resourcesByPermission
             = accessControlContext.getResourcesByResourcePermissions(queriedResourceClass,
-                                                                     ResourcePermissions.getInstance(queriedPermission1),
-                                                                     ResourcePermissions.getInstance(queriedPermission2));
+                                                                     ResourcePermissions
+                                                                           .getInstance(queriedPermission1),
+                                                                     ResourcePermissions
+                                                                           .getInstance(queriedPermission2));
       assertThat(resourcesByPermission, is(expectedResources_anyDomain));
 
       Set<Resource> resourcesByPermissionAndDomain
@@ -756,7 +760,8 @@ public class TestAccessControl_getResourcesByResourcePermissions extends TestAcc
       accessControlContext.setGlobalResourcePermissions(accessorResource,
                                                         unqueriedResourceClass,
                                                         queriedDomain,
-                                                        setOf(ResourcePermissions.getInstance(unqueriedResourceClassPermissionName)));
+                                                        setOf(ResourcePermissions.getInstance(
+                                                              unqueriedResourceClassPermissionName)));
 
       // verify as system resource
       final Set<Resource> expectedResources_anyDomain = setOf(resource_queriedClassQueriedDomain,
@@ -1420,7 +1425,7 @@ public class TestAccessControl_getResourcesByResourcePermissions extends TestAcc
    }
 
    @Test
-   public void getResourcesByResourcePermissions_duplicates_shouldSucceed() {
+   public void getResourcesByResourcePermissions_duplicates_shouldFail() {
       authenticateSystemResource();
 
       final char[] password = generateUniquePassword();
@@ -1437,13 +1442,82 @@ public class TestAccessControl_getResourcesByResourcePermissions extends TestAcc
                                                   setOf(ResourcePermissions.getInstance(permission)));
 
       // verify as system resource
+      try {
+         accessControlContext.getResourcesByResourcePermissions(accessorResource,
+                                                                resourceClass,
+                                                                ResourcePermissions.getInstance(permission),
+                                                                ResourcePermissions.getInstance(permission));
+         fail("getting resources by resource permission for duplicate (identical) permissions should have failed");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("duplicate element"));
+      }
+      try {
+         accessControlContext.getResourcesByResourcePermissionsAndDomain(accessorResource,
+                                                                         resourceClass,
+                                                                         domain,
+                                                                         ResourcePermissions
+                                                                               .getInstance(permission),
+                                                                         ResourcePermissions
+                                                                               .getInstance(permission));
+         fail("getting resources by resource permission for duplicate (identical) permissions should have failed");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("duplicate element"));
+      }
+
+      // authenticate as accessor
+      accessControlContext.authenticate(accessorResource, PasswordCredentials.newInstance(password));
+
+      try {
+         accessControlContext.getResourcesByResourcePermissions(resourceClass,
+                                                                ResourcePermissions.getInstance(permission),
+                                                                ResourcePermissions.getInstance(permission));
+         fail("getting resources by resource permission for duplicate (identical) permissions should have failed");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("duplicate element"));
+      }
+
+      try {
+         accessControlContext.getResourcesByResourcePermissionsAndDomain(resourceClass,
+                                                                         domain,
+                                                                         ResourcePermissions
+                                                                               .getInstance(permission),
+                                                                         ResourcePermissions
+                                                                               .getInstance(permission));
+         fail("getting resources by resource permission for duplicate (identical) permissions should have failed");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("duplicate element"));
+      }
+   }
+
+   @Test
+   public void getResourcesByResourcePermissions_duplicates_shouldSucceed() {
+      authenticateSystemResource();
+
+      final char[] password = generateUniquePassword();
+      final Resource accessorResource = generateAuthenticatableResource(password);
+
+      final String domain = generateDomain();
+      final String resourceClass = generateResourceClass(false, false);
+      final String permission = generateResourceClassPermission(resourceClass);
+      final Resource resource = accessControlContext.createResource(resourceClass, domain);
+
+      // set permission between accessor and accessed resources
+      accessControlContext.setResourcePermissions(accessorResource,
+                                                  resource,
+                                                  setOf(ResourcePermissions.getInstance(permission, true)));
+
+      // verify as system resource
       final Set<Resource> expectedResources = setOf(resource);
 
       Set<Resource> resourcesByAccessorAndPermission
             = accessControlContext.getResourcesByResourcePermissions(accessorResource,
                                                                      resourceClass,
                                                                      ResourcePermissions.getInstance(permission),
-                                                                     ResourcePermissions.getInstance(permission));
+                                                                     ResourcePermissions.getInstance(permission, true));
       assertThat(resourcesByAccessorAndPermission, is(expectedResources));
 
       Set<Resource> resourcesByAccessorAndPermissionAndDomain
@@ -1453,7 +1527,7 @@ public class TestAccessControl_getResourcesByResourcePermissions extends TestAcc
                                                                               ResourcePermissions
                                                                                     .getInstance(permission),
                                                                               ResourcePermissions
-                                                                                    .getInstance(permission));
+                                                                                    .getInstance(permission, true));
       assertThat(resourcesByAccessorAndPermissionAndDomain, is(expectedResources));
 
       // authenticate as accessor
@@ -1462,7 +1536,7 @@ public class TestAccessControl_getResourcesByResourcePermissions extends TestAcc
       Set<Resource> resourcesByPermission
             = accessControlContext.getResourcesByResourcePermissions(resourceClass,
                                                                      ResourcePermissions.getInstance(permission),
-                                                                     ResourcePermissions.getInstance(permission));
+                                                                     ResourcePermissions.getInstance(permission, true));
       assertThat(resourcesByPermission, is(expectedResources));
 
       Set<Resource> resourcesByPermissionAndDomain
@@ -1471,7 +1545,7 @@ public class TestAccessControl_getResourcesByResourcePermissions extends TestAcc
                                                                               ResourcePermissions
                                                                                     .getInstance(permission),
                                                                               ResourcePermissions
-                                                                                    .getInstance(permission));
+                                                                                    .getInstance(permission, true));
       assertThat(resourcesByPermissionAndDomain, is(expectedResources));
    }
 

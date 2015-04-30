@@ -965,19 +965,15 @@ public class TestAccessControl_revokeResourceCreatePermissions extends TestAcces
    }
 
    @Test
-   public void revokeResourceCreatePermissions_duplicatePermissions_shouldSucceed() {
+   public void revokeResourceCreatePermissions_duplicateIdenticalPermissions_shouldFail() {
       final ResourcePermission resourcePermission_inherit_withGrant
             = ResourcePermissions.getInstance(ResourcePermissions.INHERIT, true);
-      final ResourcePermission resourcePermission_impersonate
-            = ResourcePermissions.getInstance(ResourcePermissions.IMPERSONATE);
       final ResourceCreatePermission createPerm_create
             = ResourceCreatePermissions.getInstance(ResourceCreatePermissions.CREATE);
       final ResourceCreatePermission createPerm_create_withGrant
             = ResourceCreatePermissions.getInstance(ResourceCreatePermissions.CREATE, true);
       final ResourceCreatePermission createPerm_inherit_withGrant
             = ResourceCreatePermissions.getInstance(resourcePermission_inherit_withGrant, true);
-      final ResourceCreatePermission createPerm_impersonate_withGrant
-            = ResourceCreatePermissions.getInstance(resourcePermission_impersonate, true);
 
       authenticateSystemResource();
       final char[] password = generateUniquePassword();
@@ -989,7 +985,7 @@ public class TestAccessControl_revokeResourceCreatePermissions extends TestAcces
       // set up accessorResource
       assertThat(accessControlContext.getEffectiveResourceCreatePermissionsMap(accessorResource).isEmpty(), is(true));
       Set<ResourceCreatePermission> resourceCreatePermissions_pre
-            = setOf(createPerm_create, createPerm_inherit_withGrant, createPerm_impersonate_withGrant);
+            = setOf(createPerm_create, createPerm_inherit_withGrant);
 
       accessControlContext.setResourceCreatePermissions(accessorResource,
                                                         resourceClassName,
@@ -1000,7 +996,7 @@ public class TestAccessControl_revokeResourceCreatePermissions extends TestAcces
 
       // set up grantor
       Set<ResourceCreatePermission> grantorPermissions
-            = setOf(createPerm_create_withGrant, createPerm_inherit_withGrant, createPerm_impersonate_withGrant);
+            = setOf(createPerm_create_withGrant, createPerm_inherit_withGrant);
 
       accessControlContext.setResourceCreatePermissions(grantorResource,
                                                         resourceClassName,
@@ -1013,26 +1009,29 @@ public class TestAccessControl_revokeResourceCreatePermissions extends TestAcces
       accessControlContext.authenticate(grantorResource, PasswordCredentials.newInstance(password));
 
       // revoke create permissions and verify
-      accessControlContext.revokeResourceCreatePermissions(accessorResource,
-                                                           resourceClassName,
-                                                           domainName,
-                                                           createPerm_impersonate_withGrant,
-                                                           createPerm_impersonate_withGrant);
-
-      Set<ResourceCreatePermission> resourceCreatePermissions_expected
-            = setOf(ResourceCreatePermissions.getInstance(ResourceCreatePermissions.CREATE, false),
-                    createPerm_inherit_withGrant);
-      assertThat(accessControlContext.getEffectiveResourceCreatePermissions(accessorResource, resourceClassName, domainName),
-                 is(resourceCreatePermissions_expected));
+      try {
+         accessControlContext.revokeResourceCreatePermissions(accessorResource,
+                                                              resourceClassName,
+                                                              domainName,
+                                                              createPerm_inherit_withGrant,
+                                                              createPerm_inherit_withGrant);
+         fail("revoking resource create permissions for duplicate (identical) permissions, should have failed");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("duplicate element"));
+      }
 
       // revoke duplicate create permissions for implicit domain
-      accessControlContext.revokeResourceCreatePermissions(accessorResource,
-                                                           resourceClassName,
-                                                           createPerm_inherit_withGrant,
-                                                           createPerm_inherit_withGrant);
-
-      assertThat(accessControlContext.getEffectiveResourceCreatePermissions(accessorResource, resourceClassName, domainName),
-                 is(setOf(ResourceCreatePermissions.getInstance(ResourceCreatePermissions.CREATE, false))));
+      try {
+         accessControlContext.revokeResourceCreatePermissions(accessorResource,
+                                                              resourceClassName,
+                                                              createPerm_inherit_withGrant,
+                                                              createPerm_inherit_withGrant);
+         fail("revoking resource create permissions for duplicate (identical) permissions, should have failed");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("duplicate element"));
+      }
    }
 
    @Test

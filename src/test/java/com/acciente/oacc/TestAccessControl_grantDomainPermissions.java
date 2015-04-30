@@ -70,7 +70,8 @@ public class TestAccessControl_grantDomainPermissions extends TestAccessControlB
       final char[] password = generateUniquePassword();
       final Resource authenticatableResource = generateAuthenticatableResource(password);
 
-      final Set<DomainPermission> domainPermissions_granter = setOf(domPerm_superuser_withGrant, domPerm_child_withGrant);
+      final Set<DomainPermission> domainPermissions_granter = setOf(domPerm_superuser_withGrant,
+                                                                    domPerm_child_withGrant);
 
       // grant domain permissions and verify
       accessControlContext.setDomainPermissions(authenticatableResource, domainName, domainPermissions_granter);
@@ -272,7 +273,8 @@ public class TestAccessControl_grantDomainPermissions extends TestAccessControlB
       Set<DomainPermission> grantorPermissions = setOf(DomainPermissions.getInstance(grantedPermissionName, true));
 
       accessControlContext.setDomainPermissions(grantorResource, domainName, grantorPermissions);
-      assertThat(accessControlContext.getEffectiveDomainPermissions(grantorResource, domainName), is(grantorPermissions));
+      assertThat(accessControlContext.getEffectiveDomainPermissions(grantorResource, domainName),
+                 is(grantorPermissions));
 
       // authenticate grantor resource
       accessControlContext.authenticate(grantorResource, PasswordCredentials.newInstance(password));
@@ -310,7 +312,8 @@ public class TestAccessControl_grantDomainPermissions extends TestAccessControlB
       Set<DomainPermission> grantorPermissions = setOf(DomainPermissions.getInstance(grantedPermissionName, true));
 
       accessControlContext.setDomainPermissions(grantorResource, domainName, grantorPermissions);
-      assertThat(accessControlContext.getEffectiveDomainPermissions(grantorResource, domainName), is(grantorPermissions));
+      assertThat(accessControlContext.getEffectiveDomainPermissions(grantorResource, domainName),
+                 is(grantorPermissions));
 
       // authenticate grantor resource
       accessControlContext.authenticate(grantorResource, PasswordCredentials.newInstance(password));
@@ -345,7 +348,8 @@ public class TestAccessControl_grantDomainPermissions extends TestAccessControlB
       Set<DomainPermission> grantorPermissions = setOf(DomainPermissions.getInstance(grantedPermissionName, true));
 
       accessControlContext.setDomainPermissions(grantorResource, domainName, grantorPermissions);
-      assertThat(accessControlContext.getEffectiveDomainPermissions(grantorResource, domainName), is(grantorPermissions));
+      assertThat(accessControlContext.getEffectiveDomainPermissions(grantorResource, domainName),
+                 is(grantorPermissions));
 
       // authenticate grantor resource
       accessControlContext.authenticate(grantorResource, PasswordCredentials.newInstance(password));
@@ -382,7 +386,8 @@ public class TestAccessControl_grantDomainPermissions extends TestAccessControlB
       Set<DomainPermission> grantorPermissions = setOf(DomainPermissions.getInstance(grantedPermissionName, true));
 
       accessControlContext.setDomainPermissions(grantorResource, domainName, grantorPermissions);
-      assertThat(accessControlContext.getEffectiveDomainPermissions(grantorResource, domainName), is(grantorPermissions));
+      assertThat(accessControlContext.getEffectiveDomainPermissions(grantorResource, domainName),
+                 is(grantorPermissions));
 
       // authenticate grantor resource
       accessControlContext.authenticate(grantorResource, PasswordCredentials.newInstance(password));
@@ -596,7 +601,7 @@ public class TestAccessControl_grantDomainPermissions extends TestAccessControlB
       authenticateSystemResource();
       final DomainPermission domainPermission_superUser = DomainPermissions.getInstance(DomainPermissions.SUPER_USER);
       final DomainPermission domainPermission_superUser_withGrant = DomainPermissions.getInstance(DomainPermissions.SUPER_USER,
-                                                                                              true);
+                                                                                                  true);
 
       final String domainName = generateDomain();
       final Resource accessorResource = generateUnauthenticatableResource();
@@ -616,7 +621,7 @@ public class TestAccessControl_grantDomainPermissions extends TestAccessControlB
    }
 
    @Test
-   public void grantDomainPermissions_duplicatePermissionNames_shouldSucceed() {
+   public void grantDomainPermissions_duplicateIdenticalPermissions_shouldFail() {
       authenticateSystemResource();
       final DomainPermission domainPermission_superUser = DomainPermissions.getInstance(DomainPermissions.SUPER_USER);
 
@@ -625,13 +630,15 @@ public class TestAccessControl_grantDomainPermissions extends TestAccessControlB
       assertThat(accessControlContext.getEffectiveDomainPermissions(accessorResource, domainName).isEmpty(), is(true));
 
       // grant domain permissions and verify
-      accessControlContext.grantDomainPermissions(accessorResource,
-                                                  domainName,
-                                                  domainPermission_superUser,
-                                                  domainPermission_superUser);
-
-      assertThat(accessControlContext.getEffectiveDomainPermissions(accessorResource, domainName).size(), is(1));
-      assertThat(accessControlContext.getEffectiveDomainPermissions(accessorResource, domainName),
-                 is(setOf(domainPermission_superUser)));
+      try {
+         accessControlContext.grantDomainPermissions(accessorResource,
+                                                     domainName,
+                                                     domainPermission_superUser,
+                                                     domainPermission_superUser);
+         fail("granting domain permissions with duplicate (identical) permissions should have failed");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("duplicate element"));
+      }
    }
 }

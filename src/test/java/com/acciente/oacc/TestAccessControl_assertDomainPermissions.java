@@ -693,13 +693,36 @@ public class TestAccessControl_assertDomainPermissions extends TestAccessControl
    }
 
    @Test
-   public void assertDomainPermissions_duplicatePermissions_shouldSucceed() {
+   public void assertDomainPermissions_duplicatePermissions_shouldFail() {
       authenticateSystemResource();
       final DomainPermission domPerm_superUser = DomainPermissions.getInstance(DomainPermissions.SUPER_USER);
       final String domainName = generateDomain();
 
-      accessControlContext.assertDomainPermissions(SYS_RESOURCE, domainName, domPerm_superUser, domPerm_superUser);
-      accessControlContext.assertDomainPermissions(domainName, domPerm_superUser, domPerm_superUser);
+      try {
+         accessControlContext.assertDomainPermissions(SYS_RESOURCE, domainName, domPerm_superUser, domPerm_superUser);
+         fail("asserting domain permission for duplicate (identical) permissions should have failed");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("duplicate element"));
+      }
+      try {
+         accessControlContext.assertDomainPermissions(domainName, domPerm_superUser, domPerm_superUser);
+         fail("asserting domain permission for duplicate (identical) permissions should have failed");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("duplicate element"));
+      }
+   }
+
+   @Test
+   public void assertDomainPermissions_duplicatePermissions_shouldSucceed() {
+      authenticateSystemResource();
+      final DomainPermission domPerm_superUser = DomainPermissions.getInstance(DomainPermissions.SUPER_USER);
+      final DomainPermission domPerm_superUser_grantable = DomainPermissions.getInstance(DomainPermissions.SUPER_USER, true);
+      final String domainName = generateDomain();
+
+      accessControlContext.assertDomainPermissions(SYS_RESOURCE, domainName, domPerm_superUser, domPerm_superUser_grantable);
+      accessControlContext.assertDomainPermissions(domainName, domPerm_superUser, domPerm_superUser_grantable);
    }
 
    @Test

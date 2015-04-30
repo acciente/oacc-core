@@ -607,23 +607,29 @@ public class TestAccessControl_assertResourceCreatePermissions extends TestAcces
                                                    true));
       accessControlContext
             .assertResourceCreatePermissions(resourceClassName,
-                                             ResourceCreatePermissions.getInstance(ungrantableCustomPermission_forAccessorDomain),
-                                             ResourceCreatePermissions.getInstance(ungrantableCustomPermission_forAccessorDomain,
+                                             ResourceCreatePermissions.getInstance(
+                                                   ungrantableCustomPermission_forAccessorDomain),
+                                             ResourceCreatePermissions.getInstance(
+                                                   ungrantableCustomPermission_forAccessorDomain,
                                                    true));
       accessControlContext
             .assertResourceCreatePermissions(accessorResource,
                                              resourceClassName,
-                                             ResourceCreatePermissions.getInstance(ungrantableCustomPermission_forAccessorDomain),
-                                             ResourceCreatePermissions.getInstance(ungrantableCustomPermission_forAccessorDomain,
+                                             ResourceCreatePermissions.getInstance(
+                                                   ungrantableCustomPermission_forAccessorDomain),
+                                             ResourceCreatePermissions.getInstance(
+                                                   ungrantableCustomPermission_forAccessorDomain,
                                                    true));
 
       accessControlContext
             .assertResourceCreatePermissions(accessorResource,
                                              resourceClassName,
                                              accessorDomainName,
-                                             ResourceCreatePermissions.getInstance(grantableCustomPermission_forAccessorDomain),
-                                             ResourceCreatePermissions.getInstance(grantableCustomPermission_forAccessorDomain,
-                                                                                   true));
+                                             ResourceCreatePermissions.getInstance(
+                                                   grantableCustomPermission_forAccessorDomain),
+                                             ResourceCreatePermissions.getInstance(
+                                                   grantableCustomPermission_forAccessorDomain,
+                                                   true));
       accessControlContext
             .assertResourceCreatePermissions(accessorResource,
                                              resourceClassName,
@@ -716,7 +722,10 @@ public class TestAccessControl_assertResourceCreatePermissions extends TestAcces
 
       // setup create permissions
       grantResourceCreatePermission(intermediaryResource, resourceClassName, accessorDomainName, customPermissionName_forAccessorDomain);
-      grantResourceCreatePermission(intermediaryResource, resourceClassName, accessedDomainName, customPermissionName_forAccessedDomain);
+      grantResourceCreatePermission(intermediaryResource,
+                                    resourceClassName,
+                                    accessedDomainName,
+                                    customPermissionName_forAccessedDomain);
       // setup inheritance permission
       Set<ResourcePermission> resourcePermissions = new HashSet<>();
       resourcePermissions.add(ResourcePermissions.getInstance(ResourcePermissions.INHERIT));
@@ -730,7 +739,8 @@ public class TestAccessControl_assertResourceCreatePermissions extends TestAcces
                                                             .getInstance(customPermission_forAccessorDomain, false));
       final Set<ResourceCreatePermission> allResourceCreatePermissionsForResourceClassAndAccessorDomain
             = accessControlContext.getEffectiveResourceCreatePermissions(intermediaryResource, resourceClassName, accessorDomainName);
-      assertThat(allResourceCreatePermissionsForResourceClassAndAccessorDomain, is(resourceCreatePermissions_forAccessorDomain));
+      assertThat(allResourceCreatePermissionsForResourceClassAndAccessorDomain, is(
+            resourceCreatePermissions_forAccessorDomain));
 
       Set<ResourceCreatePermission> resourceCreatePermissions_forAccessedDomain = new HashSet<>();
       resourceCreatePermissions_forAccessedDomain.add(ResourceCreatePermissions
@@ -783,8 +793,14 @@ public class TestAccessControl_assertResourceCreatePermissions extends TestAcces
       accessControlContext.createDomain(accessedDomainName, intermediaryDomainName);
 
       // setup create permissions
-      grantResourceCreatePermission(accessorResource, resourceClassName, accessorDomainName, customPermissionName_forAccessorDomain);
-      grantResourceCreatePermission(accessorResource, resourceClassName, intermediaryDomainName, customPermissionName_forIntermediaryDomain);
+      grantResourceCreatePermission(accessorResource,
+                                    resourceClassName,
+                                    accessorDomainName,
+                                    customPermissionName_forAccessorDomain);
+      grantResourceCreatePermission(accessorResource,
+                                    resourceClassName,
+                                    intermediaryDomainName,
+                                    customPermissionName_forIntermediaryDomain);
 
       // verify permissions
       Set<ResourceCreatePermission> resourceCreatePermissions_forAccessorDomain = new HashSet<>();
@@ -800,7 +816,8 @@ public class TestAccessControl_assertResourceCreatePermissions extends TestAcces
       resourceCreatePermissions_forIntermediaryDomain.add(ResourceCreatePermissions
                                                                 .getInstance(ResourceCreatePermissions.CREATE, false));
       resourceCreatePermissions_forIntermediaryDomain.add(ResourceCreatePermissions
-                                                                .getInstance(customPermission_forIntermediaryDomain, false));
+                                                                .getInstance(customPermission_forIntermediaryDomain,
+                                                                             false));
       resourceCreatePermissions_forIntermediaryDomain.addAll(resourceCreatePermissions_forAccessorDomain);
       final Set<ResourceCreatePermission> allResourceCreatePermissionsForResourceClassAndIntermediaryDomain
             = accessControlContext.getEffectiveResourceCreatePermissions(accessorResource, resourceClassName, intermediaryDomainName);
@@ -885,7 +902,8 @@ public class TestAccessControl_assertResourceCreatePermissions extends TestAcces
       resourceCreatePermissions_forIntermediaryDomain.add(ResourceCreatePermissions
                                                                 .getInstance(ResourceCreatePermissions.CREATE, false));
       resourceCreatePermissions_forIntermediaryDomain.add(ResourceCreatePermissions
-                                                                .getInstance(customPermission_forIntermediaryDomain, false));
+                                                                .getInstance(customPermission_forIntermediaryDomain,
+                                                                             false));
       resourceCreatePermissions_forIntermediaryDomain.addAll(resourceCreatePermissions_forDonorDomain);
       final Set<ResourceCreatePermission> allResourceCreatePermissionsForResourceClassAndIntermediaryDomain
             = accessControlContext.getEffectiveResourceCreatePermissions(donorResource, resourceClassName, intermediaryDomainName);
@@ -1320,7 +1338,8 @@ public class TestAccessControl_assertResourceCreatePermissions extends TestAcces
             .assertResourceCreatePermissions(accessorResource,
                                              resourceClassName_whitespaced,
                                              ResourceCreatePermissions
-                                                   .getInstance(ResourcePermissions.getInstance(customPermissionName_forAccessorDomain)));
+                                                   .getInstance(ResourcePermissions.getInstance(
+                                                         customPermissionName_forAccessorDomain)));
       accessControlContext
             .assertResourceCreatePermissions(accessorResource,
                                              resourceClassName_whitespaced,
@@ -1682,6 +1701,69 @@ public class TestAccessControl_assertResourceCreatePermissions extends TestAcces
    }
 
    @Test
+   public void assertResourceCreatePermissions_duplicatePermissions_shouldFailAsAuthenticatedResource() {
+      authenticateSystemResource();
+      // setup
+      final String resourceClassName = generateResourceClass(false, false);
+
+      // verify
+      try {
+         accessControlContext
+               .assertResourceCreatePermissions(resourceClassName,
+                                                ResourceCreatePermissions
+                                                      .getInstance(ResourceCreatePermissions.CREATE),
+                                                ResourceCreatePermissions
+                                                      .getInstance(ResourceCreatePermissions.CREATE));
+         fail("asserting resource create permission for duplicate (identical) permissions should have failed");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("duplicate element"));
+      }
+      try {
+         accessControlContext
+               .assertResourceCreatePermissions(SYS_RESOURCE,
+                                                resourceClassName,
+                                                ResourceCreatePermissions
+                                                      .getInstance(ResourceCreatePermissions.CREATE),
+                                                ResourceCreatePermissions
+                                                      .getInstance(ResourceCreatePermissions.CREATE));
+         fail("asserting resource create permission for duplicate (identical) permissions should have failed");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("duplicate element"));
+      }
+
+      final String domainName = generateDomain();
+      try {
+         accessControlContext
+               .assertResourceCreatePermissions(resourceClassName,
+                                                domainName,
+                                                ResourceCreatePermissions
+                                                      .getInstance(ResourceCreatePermissions.CREATE),
+                                                ResourceCreatePermissions
+                                                      .getInstance(ResourceCreatePermissions.CREATE));
+         fail("asserting resource create permission for duplicate (identical) permissions should have failed");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("duplicate element"));
+      }
+      try {
+         accessControlContext
+               .assertResourceCreatePermissions(SYS_RESOURCE,
+                                                resourceClassName,
+                                                domainName,
+                                                ResourceCreatePermissions
+                                                      .getInstance(ResourceCreatePermissions.CREATE),
+                                                ResourceCreatePermissions
+                                                      .getInstance(ResourceCreatePermissions.CREATE));
+         fail("asserting resource create permission for duplicate (identical) permissions should have failed");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("duplicate element"));
+      }
+   }
+
+   @Test
    public void assertResourceCreatePermissions_duplicatePermissions_succeedsAsAuthenticatedResource() {
       authenticateSystemResource();
       // setup
@@ -1693,14 +1775,14 @@ public class TestAccessControl_assertResourceCreatePermissions extends TestAcces
                                              ResourceCreatePermissions
                                                    .getInstance(ResourceCreatePermissions.CREATE),
                                              ResourceCreatePermissions
-                                                   .getInstance(ResourceCreatePermissions.CREATE));
+                                                   .getInstance(ResourceCreatePermissions.CREATE, true));
       accessControlContext
             .assertResourceCreatePermissions(SYS_RESOURCE,
                                              resourceClassName,
                                              ResourceCreatePermissions
                                                    .getInstance(ResourceCreatePermissions.CREATE),
                                              ResourceCreatePermissions
-                                                   .getInstance(ResourceCreatePermissions.CREATE));
+                                                   .getInstance(ResourceCreatePermissions.CREATE, true));
 
       final String domainName = generateDomain();
       accessControlContext
@@ -1709,7 +1791,7 @@ public class TestAccessControl_assertResourceCreatePermissions extends TestAcces
                                              ResourceCreatePermissions
                                                    .getInstance(ResourceCreatePermissions.CREATE),
                                              ResourceCreatePermissions
-                                                   .getInstance(ResourceCreatePermissions.CREATE));
+                                                   .getInstance(ResourceCreatePermissions.CREATE, true));
       accessControlContext
             .assertResourceCreatePermissions(SYS_RESOURCE,
                                              resourceClassName,
@@ -1717,7 +1799,7 @@ public class TestAccessControl_assertResourceCreatePermissions extends TestAcces
                                              ResourceCreatePermissions
                                                    .getInstance(ResourceCreatePermissions.CREATE),
                                              ResourceCreatePermissions
-                                                   .getInstance(ResourceCreatePermissions.CREATE));
+                                                   .getInstance(ResourceCreatePermissions.CREATE, true));
    }
 
    @Test

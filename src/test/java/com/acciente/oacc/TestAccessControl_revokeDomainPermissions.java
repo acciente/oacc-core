@@ -477,7 +477,7 @@ public class TestAccessControl_revokeDomainPermissions extends TestAccessControl
       final String domainName = generateDomain();
       final Resource accessorResource = generateUnauthenticatableResource();
 
-      // setup accessor permissios
+      // setup accessor permissions
       final Set<DomainPermission> accessorPermissions_pre = setOf(domainPermission_superUser_withGrant);
       accessControlContext.setDomainPermissions(accessorResource,
                                                 domainName,
@@ -498,7 +498,7 @@ public class TestAccessControl_revokeDomainPermissions extends TestAccessControl
    }
 
    @Test
-   public void revokeDomainPermissions_duplicatePermissionNames_shouldSucceed() {
+   public void revokeDomainPermissions_duplicateIdenticalPermissions_shouldFail() {
       authenticateSystemResource();
       final DomainPermission domainPermission_superUser = DomainPermissions.getInstance(DomainPermissions.SUPER_USER);
 
@@ -506,20 +506,25 @@ public class TestAccessControl_revokeDomainPermissions extends TestAccessControl
       final Resource accessorResource = generateUnauthenticatableResource();
       assertThat(accessControlContext.getEffectiveDomainPermissions(accessorResource, domainName).isEmpty(), is(true));
 
-      // setup accessor permissios
+      // setup accessor permissions
       final Set<DomainPermission> accessorPermissions_pre = setOf(domainPermission_superUser);
       accessControlContext.setDomainPermissions(accessorResource,
                                                 domainName,
                                                 accessorPermissions_pre);
-      assertThat(accessControlContext.getEffectiveDomainPermissions(accessorResource, domainName), is( accessorPermissions_pre));
+      assertThat(accessControlContext.getEffectiveDomainPermissions(accessorResource, domainName), is(
+            accessorPermissions_pre));
 
       // revoke domain permissions
-      accessControlContext.revokeDomainPermissions(accessorResource,
-                                                   domainName,
-                                                   domainPermission_superUser,
-                                                   domainPermission_superUser);
-
-      assertThat(accessControlContext.getEffectiveDomainPermissions(accessorResource, domainName).isEmpty(), is(true));
+      try {
+         accessControlContext.revokeDomainPermissions(accessorResource,
+                                                      domainName,
+                                                      domainPermission_superUser,
+                                                      domainPermission_superUser);
+         fail("revoking domain permissions for duplicate (identical) permissions, should have failed");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("duplicate element"));
+      }
    }
 
    @Test

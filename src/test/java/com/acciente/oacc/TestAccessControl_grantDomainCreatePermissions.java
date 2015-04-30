@@ -810,7 +810,7 @@ public class TestAccessControl_grantDomainCreatePermissions extends TestAccessCo
    }
 
    @Test
-   public void grantDomainCreatePermissions_duplicatePermissions_shouldSucceed() {
+   public void grantDomainCreatePermissions_duplicateIdenticalPermissions_shouldFail() {
       authenticateSystemResource();
       final String grantedPermissionName = DomainPermissions.CREATE_CHILD_DOMAIN;
       final char[] password = generateUniquePassword();
@@ -829,21 +829,19 @@ public class TestAccessControl_grantDomainCreatePermissions extends TestAccessCo
       accessControlContext.authenticate(grantorResource, PasswordCredentials.newInstance(password));
 
       // grant duplicate permissions and verify
-      accessControlContext
-            .grantDomainCreatePermissions(accessorResource,
-                                          DomainCreatePermissions.getInstance(DomainCreatePermissions.CREATE),
-                                          DomainCreatePermissions
-                                                .getInstance(DomainPermissions.getInstance(grantedPermissionName)),
-                                          DomainCreatePermissions
-                                                .getInstance(DomainPermissions.getInstance(grantedPermissionName)));
-
-      Set<DomainCreatePermission> permissions_expected
-            = setOf(DomainCreatePermissions.getInstance(DomainCreatePermissions.CREATE),
-                    DomainCreatePermissions.getInstance(DomainPermissions.getInstance(grantedPermissionName)));
-
-      final Set<DomainCreatePermission> permissions_post
-            = accessControlContext.getEffectiveDomainCreatePermissions(accessorResource);
-      assertThat(permissions_post, is(permissions_expected));
+      try {
+         accessControlContext
+               .grantDomainCreatePermissions(accessorResource,
+                                             DomainCreatePermissions.getInstance(DomainCreatePermissions.CREATE),
+                                             DomainCreatePermissions
+                                                   .getInstance(DomainPermissions.getInstance(grantedPermissionName)),
+                                             DomainCreatePermissions
+                                                   .getInstance(DomainPermissions.getInstance(grantedPermissionName)));
+         fail("granting domain create permissions with duplicate (identical) permissions should have failed");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("duplicate element"));
+      }
    }
 
    @Test

@@ -473,7 +473,7 @@ public class TestAccessControl_revokeResourcePermissions extends TestAccessContr
    }
 
    @Test
-   public void revokeResourcePermissions_duplicatePermissionNames_shouldSucceed() {
+   public void revokeResourcePermissions_duplicateIdenticalPermissions_shouldFail() {
       authenticateSystemResource();
       final String resourceClassName = generateResourceClass(false, false);
       final Resource accessorResource = generateUnauthenticatableResource();
@@ -488,13 +488,16 @@ public class TestAccessControl_revokeResourcePermissions extends TestAccessContr
       assertThat(accessControlContext.getEffectiveResourcePermissions(accessorResource, accessedResource), is(permissions_pre));
 
       // attempt to revoke permissions with duplicate permission names
-      accessControlContext.revokeResourcePermissions(accessorResource,
-                                                     accessedResource,
-                                                     ResourcePermissions.getInstance(permissionName),
-                                                     ResourcePermissions.getInstance(permissionName));
-
-      final Set<ResourcePermission> permissions_post = accessControlContext.getEffectiveResourcePermissions(accessorResource, accessedResource);
-      assertThat(permissions_post.isEmpty(), is(true));
+      try {
+         accessControlContext.revokeResourcePermissions(accessorResource,
+                                                        accessedResource,
+                                                        ResourcePermissions.getInstance(permissionName),
+                                                        ResourcePermissions.getInstance(permissionName));
+         fail("revoking resource permissions for duplicate (identical) permissions, should have failed");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("duplicate element"));
+      }
    }
 
    @Test
