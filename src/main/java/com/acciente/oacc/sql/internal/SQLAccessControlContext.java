@@ -989,6 +989,28 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
    @Override
    public void grantDomainPermissions(Resource accessorResource,
                                       String domainName,
+                                      Set<DomainPermission> domainPermissions) {
+      SQLConnection connection = null;
+
+      __assertAuthenticated();
+      __assertResourceSpecified(accessorResource);
+      __assertDomainSpecified(domainName);
+      __assertPermissionsSpecified(domainPermissions);
+      __assertPermissionsSetNotEmpty(domainPermissions);
+
+      try {
+         connection = __getConnection();
+
+         __grantDirectDomainPermissions(connection, accessorResource, domainName, domainPermissions);
+      }
+      finally {
+         __closeConnection(connection);
+      }
+   }
+
+   @Override
+   public void grantDomainPermissions(Resource accessorResource,
+                                      String domainName,
                                       DomainPermission domainPermission,
                                       DomainPermission... domainPermissions) {
       SQLConnection connection = null;
