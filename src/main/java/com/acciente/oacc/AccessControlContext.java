@@ -2064,6 +2064,34 @@ public interface AccessControlContext {
     *
     * @param accessorResource    the resource to which the privilege should be granted
     * @param accessedResource    the resource on which the privilege is granted
+    * @param resourcePermissions  the resource permission to be granted
+    * @throws java.lang.IllegalArgumentException if accessorResource or accessedResource reference does not exist, or
+    *                                            if resourcePermissions is empty, or
+    *                                            if resourcePermissions contains permissions invalid for resource class
+    *                                            of the accessedResource(incl. RESET-CREDENTIALS or IMPERSONATE for
+    *                                            unauthenticatable resource classes), or
+    *                                            if resourcePermissions contains multiple instances of the same
+    *                                            permission that only differ in the 'withGrant' attribute
+    * @throws com.acciente.oacc.NotAuthorizedException if the session resource is not authorized to grant the
+    *                                                  specified permissions on the specified accessed resource
+    * @throws com.acciente.oacc.OaccException          if granting the specified permissions would introduce a cycle
+    *                                                  between accessor and accessed resource via permission inheritance
+    */
+   public void grantResourcePermissions(Resource accessorResource,
+                                        Resource accessedResource,
+                                        Set<ResourcePermission> resourcePermissions);
+
+   /**
+    * Adds the specified resource permissions to the set of permissions that the specified accessor resource
+    * has to the specified accessed resource directly, that is not via inheritance or globally.
+    * <p/>
+    * This method does <em>not</em> replace any direct resource permissions previously granted, but
+    * can only add to the set. Furthermore, removing the 'withGrant' option from an existing permission is not
+    * possible with this method alone - revoke the permission first, then re-grant without the 'withGrant' option,
+    * or use {@link #setResourcePermissions} to specify all direct permissions
+    *
+    * @param accessorResource    the resource to which the privilege should be granted
+    * @param accessedResource    the resource on which the privilege is granted
     * @param resourcePermission  the resource permission to be granted
     * @param resourcePermissions  the other (optional) resource permissions to be granted
     * @throws java.lang.IllegalArgumentException if accessorResource or accessedResource reference does not exist, or

@@ -684,6 +684,13 @@ public class AccessControlContextProxy implements AccessControlContext {
    @Override
    public void grantResourcePermissions(Resource accessorResource,
                                         Resource accessedResource,
+                                        Set<ResourcePermission> resourcePermissions) {
+      accessControlContext.grantResourcePermissions(accessorResource, accessedResource, resourcePermissions);
+   }
+
+   @Override
+   public void grantResourcePermissions(Resource accessorResource,
+                                        Resource accessedResource,
                                         ResourcePermission resourcePermission,
                                         ResourcePermission... resourcePermissions) {
       accessControlContext.grantResourcePermissions(accessorResource, accessedResource, resourcePermission, resourcePermissions);

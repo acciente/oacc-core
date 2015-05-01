@@ -19,6 +19,7 @@ package com.acciente.oacc;
 
 import org.junit.Test;
 
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -50,6 +51,17 @@ public class TestAccessControl_grantResourcePermissions extends TestAccessContro
 
       final Set<ResourcePermission> permissions_post = accessControlContext.getEffectiveResourcePermissions(accessorResource, accessedResource);
       assertThat(permissions_post, is(permissions_pre));
+
+      // test set-based version
+      final Resource accessedResource2 = accessControlContext.createResource(resourceClassName, generateDomain());
+
+      accessControlContext.grantResourcePermissions(accessorResource,
+                                                    accessedResource2,
+                                                    setOf(ResourcePermissions.getInstance(ResourcePermissions.INHERIT),
+                                                          ResourcePermissions.getInstance(customPermissionName)));
+
+      assertThat(accessControlContext.getEffectiveResourcePermissions(accessorResource, accessedResource2),
+                 is(permissions_pre));
    }
 
    @Test
@@ -64,6 +76,16 @@ public class TestAccessControl_grantResourcePermissions extends TestAccessContro
          accessControlContext.grantResourcePermissions(accessorResource,
                                                        accessedResource,
                                                        ResourcePermissions.getInstance(ResourcePermissions.RESET_CREDENTIALS));
+         fail("granting *RESET_CREDENTIALS system permission to an unauthenticatable resource should have failed");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("not valid for unauthenticatable resource"));
+      }
+      try {
+         accessControlContext.grantResourcePermissions(accessorResource,
+                                                       accessedResource,
+                                                       setOf(ResourcePermissions
+                                                                   .getInstance(ResourcePermissions.RESET_CREDENTIALS)));
          fail("granting *RESET_CREDENTIALS system permission to an unauthenticatable resource should have failed");
       }
       catch (IllegalArgumentException e) {
@@ -84,6 +106,15 @@ public class TestAccessControl_grantResourcePermissions extends TestAccessContro
                                                        accessedResource,
                                                        ResourcePermissions
                                                              .getInstance(ResourcePermissions.IMPERSONATE));
+         fail("granting *IMPERSONATE system permission on an unauthenticatable resource should have failed");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("not valid for unauthenticatable resource"));
+      }
+      try {
+         accessControlContext.grantResourcePermissions(accessorResource,
+                                                       accessedResource,
+                                                       setOf(ResourcePermissions.getInstance(ResourcePermissions.IMPERSONATE)));
          fail("granting *IMPERSONATE system permission on an unauthenticatable resource should have failed");
       }
       catch (IllegalArgumentException e) {
@@ -125,6 +156,18 @@ public class TestAccessControl_grantResourcePermissions extends TestAccessContro
 
       final Set<ResourcePermission> permissions_post = accessControlContext.getEffectiveResourcePermissions(accessorResource, accessedResource);
       assertThat(permissions_post, is(permissions_expected));
+
+      // test set-based version
+      final Resource accessorResource2 = generateUnauthenticatableResource();
+      assertThat(accessControlContext.getEffectiveResourcePermissions(accessorResource2, accessedResource).isEmpty(), is(true));
+
+      accessControlContext.grantResourcePermissions(accessorResource2,
+                                                    accessedResource,
+                                                    setOf(ResourcePermissions.getInstance(ResourcePermissions.INHERIT),
+                                                          ResourcePermissions.getInstance(customPermissionName)));
+
+      assertThat(accessControlContext.getEffectiveResourcePermissions(accessorResource2, accessedResource),
+                 is(permissions_expected));
    }
 
    @Test
@@ -135,6 +178,7 @@ public class TestAccessControl_grantResourcePermissions extends TestAccessContro
       final char[] password = generateUniquePassword();
       final Resource grantorResource = generateAuthenticatableResource(password);
       final Resource accessorResource = generateUnauthenticatableResource();
+      final Resource accessorResource2 = generateUnauthenticatableResource();
       final Resource accessedResource = accessControlContext.createResource(resourceClassName, generateDomain());
       assertThat(accessControlContext.getEffectiveResourcePermissions(accessorResource, accessedResource).isEmpty(), is(true));
 
@@ -154,6 +198,9 @@ public class TestAccessControl_grantResourcePermissions extends TestAccessContro
       assertThat(accessControlContext.getEffectiveResourcePermissions(accessorResource, accessedResource),
                  is(setOf(ResourcePermissions.getInstance(ResourcePermissions.INHERIT))));
 
+      accessControlContext.setResourcePermissions(accessorResource2,
+                                                  accessedResource,
+                                                  setOf(ResourcePermissions.getInstance(ResourcePermissions.INHERIT)));
       // authenticate grantor resource
       accessControlContext.authenticate(grantorResource, PasswordCredentials.newInstance(password));
 
@@ -168,6 +215,17 @@ public class TestAccessControl_grantResourcePermissions extends TestAccessContro
 
       final Set<ResourcePermission> permissions_post = accessControlContext.getEffectiveResourcePermissions(accessorResource, accessedResource);
       assertThat(permissions_post, is(permissions_expected));
+
+      // test set-based version
+      assertThat(accessControlContext.getEffectiveResourcePermissions(accessorResource2, accessedResource),
+                 is(setOf(ResourcePermissions.getInstance(ResourcePermissions.INHERIT))));
+
+      accessControlContext.grantResourcePermissions(accessorResource2,
+                                                    accessedResource,
+                                                    setOf(ResourcePermissions.getInstance(customPermissionName)));
+
+      assertThat(accessControlContext.getEffectiveResourcePermissions(accessorResource2, accessedResource),
+                 is(permissions_expected));
    }
 
    @Test
@@ -187,7 +245,8 @@ public class TestAccessControl_grantResourcePermissions extends TestAccessContro
       grantorResourcePermissions.add(ResourcePermissions.getInstance(grantedPermissionName, true));
 
       accessControlContext.setResourcePermissions(grantorResource, accessedResource, grantorResourcePermissions);
-      assertThat(accessControlContext.getEffectiveResourcePermissions(grantorResource, accessedResource), is(grantorResourcePermissions));
+      assertThat(accessControlContext.getEffectiveResourcePermissions(grantorResource, accessedResource), is(
+            grantorResourcePermissions));
 
       // authenticate grantor resource
       accessControlContext.authenticate(grantorResource, PasswordCredentials.newInstance(password));
@@ -208,6 +267,17 @@ public class TestAccessControl_grantResourcePermissions extends TestAccessContro
          assertThat(e.getMessage().toLowerCase(), containsString(ungrantedPermissionName.toLowerCase()));
          assertThat(e.getMessage().toLowerCase(), not(containsString(grantedPermissionName)));
       }
+      try {
+         accessControlContext.grantResourcePermissions(accessorResource,
+                                                       accessedResource,
+                                                       setOf(ResourcePermissions.getInstance(grantedPermissionName),
+                                                             ResourcePermissions.getInstance(ungrantedPermissionName)));
+         fail("granting additional permissions as grantor without authorization should have failed");
+      }
+      catch (NotAuthorizedException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString(ungrantedPermissionName.toLowerCase()));
+         assertThat(e.getMessage().toLowerCase(), not(containsString(grantedPermissionName)));
+      }
    }
 
    @Test
@@ -220,6 +290,7 @@ public class TestAccessControl_grantResourcePermissions extends TestAccessContro
       final char[] password = generateUniquePassword();
       final Resource grantorResource = generateAuthenticatableResource(password);
       final Resource accessorResource = generateUnauthenticatableResource();
+      final Resource accessorResource2 = generateUnauthenticatableResource();
       final Resource donorResource = generateUnauthenticatableResource();
       final String accessedDomain = generateDomain();
       final Resource accessedResource = accessControlContext.createResource(resourceClassName, accessedDomain);
@@ -247,12 +318,25 @@ public class TestAccessControl_grantResourcePermissions extends TestAccessContro
       assertThat(accessControlContext.getEffectiveResourcePermissions(accessorResource, donorResource), is(inheritResourcePermissions));
       assertThat(accessControlContext.getEffectiveResourcePermissions(accessorResource, accessedResource), is(donorResourcePermissions));
 
+      accessControlContext.setResourcePermissions(accessorResource2, donorResource, inheritResourcePermissions);
+
       // global permission
       Set<ResourcePermission> globalResourcePermissions = new HashSet<>();
       globalResourcePermissions.add(ResourcePermissions.getInstance(globalPermissionName));
 
-      accessControlContext.setGlobalResourcePermissions(accessorResource, resourceClassName, accessedDomain, globalResourcePermissions);
-      assertThat(accessControlContext.getEffectiveGlobalResourcePermissions(accessorResource, resourceClassName, accessedDomain), is(globalResourcePermissions));
+      accessControlContext.setGlobalResourcePermissions(accessorResource,
+                                                        resourceClassName,
+                                                        accessedDomain,
+                                                        globalResourcePermissions);
+      assertThat(accessControlContext.getEffectiveGlobalResourcePermissions(accessorResource,
+                                                                            resourceClassName,
+                                                                            accessedDomain), is(
+            globalResourcePermissions));
+
+      accessControlContext.setGlobalResourcePermissions(accessorResource2,
+                                                        resourceClassName,
+                                                        accessedDomain,
+                                                        globalResourcePermissions);
 
       // authenticate grantor resource
       accessControlContext.authenticate(grantorResource, PasswordCredentials.newInstance(password));
@@ -269,6 +353,18 @@ public class TestAccessControl_grantResourcePermissions extends TestAccessContro
 
       final Set<ResourcePermission> permissions_post = accessControlContext.getEffectiveResourcePermissions(accessorResource, accessedResource);
       assertThat(permissions_post, is(permissions_expected));
+
+      // test set-based version
+      assertThat(accessControlContext.getEffectiveResourcePermissions(accessorResource2, donorResource), is( inheritResourcePermissions));
+      assertThat(accessControlContext.getEffectiveGlobalResourcePermissions(accessorResource2, resourceClassName, accessedDomain),
+                 is(globalResourcePermissions));
+
+      accessControlContext.grantResourcePermissions(accessorResource2,
+                                                    accessedResource,
+                                                    setOf(ResourcePermissions.getInstance(grantorPermissionName)));
+
+      assertThat(accessControlContext.getEffectiveResourcePermissions(accessorResource2, accessedResource),
+                 is(permissions_expected));
    }
 
    @Test
@@ -281,6 +377,7 @@ public class TestAccessControl_grantResourcePermissions extends TestAccessContro
       final char[] password = generateUniquePassword();
       final Resource grantorResource = generateAuthenticatableResource(password);
       final Resource accessorResource = generateUnauthenticatableResource();
+      final Resource accessorResource2 = generateUnauthenticatableResource();
       final Resource donorResource = generateUnauthenticatableResource();
       final String accessedDomain = generateDomain();
       final Resource accessedResource = accessControlContext.createResource(resourceClassName, accessedDomain);
@@ -308,15 +405,29 @@ public class TestAccessControl_grantResourcePermissions extends TestAccessContro
       inheritResourcePermissions.add(ResourcePermissions.getInstance(ResourcePermissions.INHERIT));
 
       accessControlContext.setResourcePermissions(accessorResource, donorResource, inheritResourcePermissions);
-      assertThat(accessControlContext.getEffectiveResourcePermissions(accessorResource, donorResource), is(inheritResourcePermissions));
+      assertThat(accessControlContext.getEffectiveResourcePermissions(accessorResource, donorResource), is(
+            inheritResourcePermissions));
       assertThat(accessControlContext.getEffectiveResourcePermissions(accessorResource, accessedResource), is(donorResourcePermissions));
+
+      accessControlContext.setResourcePermissions(accessorResource2, donorResource, inheritResourcePermissions);
 
       // global permission
       Set<ResourcePermission> globalResourcePermissions = new HashSet<>();
       globalResourcePermissions.add(ResourcePermissions.getInstance(globalPermissionName));
 
-      accessControlContext.setGlobalResourcePermissions(accessorResource, resourceClassName, accessedDomain, globalResourcePermissions);
-      assertThat(accessControlContext.getEffectiveGlobalResourcePermissions(accessorResource, resourceClassName, accessedDomain), is(globalResourcePermissions));
+      accessControlContext.setGlobalResourcePermissions(accessorResource,
+                                                        resourceClassName,
+                                                        accessedDomain,
+                                                        globalResourcePermissions);
+      assertThat(accessControlContext.getEffectiveGlobalResourcePermissions(accessorResource,
+                                                                            resourceClassName,
+                                                                            accessedDomain), is(
+            globalResourcePermissions));
+
+      accessControlContext.setGlobalResourcePermissions(accessorResource2,
+                                                        resourceClassName,
+                                                        accessedDomain,
+                                                        globalResourcePermissions);
 
       // authenticate grantor resource
       accessControlContext.authenticate(grantorResource, PasswordCredentials.newInstance(password));
@@ -333,6 +444,18 @@ public class TestAccessControl_grantResourcePermissions extends TestAccessContro
 
       final Set<ResourcePermission> permissions_post = accessControlContext.getEffectiveResourcePermissions(accessorResource, accessedResource);
       assertThat(permissions_post, is(permissions_expected));
+
+      // test set-based version
+      assertThat(accessControlContext.getEffectiveResourcePermissions(accessorResource2, donorResource),
+                 is(inheritResourcePermissions));
+      assertThat(accessControlContext.getEffectiveGlobalResourcePermissions(accessorResource2, resourceClassName, accessedDomain),
+                 is(globalResourcePermissions));
+
+      accessControlContext.grantResourcePermissions(accessorResource2,
+                                                    accessedResource,
+                                                    setOf(ResourcePermissions.getInstance(grantorPermissionName)));
+
+      assertThat(accessControlContext.getEffectiveResourcePermissions(accessorResource2, accessedResource), is(permissions_expected));
    }
 
    @Test
@@ -376,6 +499,17 @@ public class TestAccessControl_grantResourcePermissions extends TestAccessContro
          assertThat(e.getMessage().toLowerCase(), containsString(ungrantedPermissionName.toLowerCase()));
          assertThat(e.getMessage().toLowerCase(), not(containsString(grantedPermissionName)));
       }
+      try {
+         accessControlContext.grantResourcePermissions(accessorResource,
+                                                       accessedResource,
+                                                       setOf(ResourcePermissions.getInstance(grantedPermissionName),
+                                                             ResourcePermissions.getInstance(ungrantedPermissionName)));
+         fail("granting existing permission granted elsewhere without authorization should have failed");
+      }
+      catch (NotAuthorizedException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString(ungrantedPermissionName.toLowerCase()));
+         assertThat(e.getMessage().toLowerCase(), not(containsString(grantedPermissionName)));
+      }
    }
 
    @Test
@@ -386,6 +520,7 @@ public class TestAccessControl_grantResourcePermissions extends TestAccessContro
       final char[] password = generateUniquePassword();
       final Resource grantorResource = generateAuthenticatableResource(password);
       final Resource accessorResource = generateUnauthenticatableResource();
+      final Resource accessorResource2 = generateUnauthenticatableResource();
       final Resource accessedResource = accessControlContext.createResource(resourceClassName, generateDomain());
       assertThat(accessControlContext.getEffectiveResourcePermissions(accessorResource, accessedResource).isEmpty(), is(true));
 
@@ -396,6 +531,8 @@ public class TestAccessControl_grantResourcePermissions extends TestAccessContro
       accessControlContext.setResourcePermissions(accessorResource, accessedResource, accessorPermissions_pre);
       assertThat(accessControlContext.getEffectiveResourcePermissions(accessorResource, accessedResource), is(
             accessorPermissions_pre));
+
+      accessControlContext.setResourcePermissions(accessorResource2, accessedResource, accessorPermissions_pre);
 
       // setup grantor permissions
       Set<ResourcePermission> grantorResourcePermissions = new HashSet<>();
@@ -415,6 +552,17 @@ public class TestAccessControl_grantResourcePermissions extends TestAccessContro
 
       final Set<ResourcePermission> permissions_post = accessControlContext.getEffectiveResourcePermissions(accessorResource, accessedResource);
       assertThat(permissions_post, is(grantorResourcePermissions));
+
+      // test set-based version
+      assertThat(accessControlContext.getEffectiveResourcePermissions(accessorResource2, accessedResource),
+                 is(accessorPermissions_pre));
+
+      accessControlContext.grantResourcePermissions(accessorResource2,
+                                                    accessedResource,
+                                                    setOf(ResourcePermissions.getInstance(grantedPermissionName)));
+
+      assertThat(accessControlContext.getEffectiveResourcePermissions(accessorResource2, accessedResource),
+                 is(grantorResourcePermissions));
    }
 
    @Test
@@ -458,6 +606,17 @@ public class TestAccessControl_grantResourcePermissions extends TestAccessContro
          assertThat(e.getMessage().toLowerCase(), containsString(ungrantedPermissionName.toLowerCase()));
          assertThat(e.getMessage().toLowerCase(), not(containsString(grantedPermissionName)));
       }
+      try {
+         accessControlContext.grantResourcePermissions(accessorResource,
+                                                       accessedResource,
+                                                       setOf(ResourcePermissions.getInstance(grantedPermissionName),
+                                                             ResourcePermissions.getInstance(ungrantedPermissionName)));
+         fail("Downgrading (=removal of granting rights) of permission granted elsewhere, to which I have no granting rights, should have failed");
+      }
+      catch (NotAuthorizedException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString(ungrantedPermissionName.toLowerCase()));
+         assertThat(e.getMessage().toLowerCase(), not(containsString(grantedPermissionName)));
+      }
    }
 
    @Test
@@ -468,6 +627,7 @@ public class TestAccessControl_grantResourcePermissions extends TestAccessContro
       final char[] password = generateUniquePassword();
       final Resource grantorResource = generateAuthenticatableResource(password);
       final Resource accessorResource = generateUnauthenticatableResource();
+      final Resource accessorResource2 = generateUnauthenticatableResource();
       final Resource accessedResource = accessControlContext.createResource(resourceClassName, generateDomain());
       assertThat(accessControlContext.getEffectiveResourcePermissions(accessorResource, accessedResource).isEmpty(), is(true));
 
@@ -478,6 +638,8 @@ public class TestAccessControl_grantResourcePermissions extends TestAccessContro
       accessControlContext.setResourcePermissions(accessorResource, accessedResource, accessorPermissions_pre);
       assertThat(accessControlContext.getEffectiveResourcePermissions(accessorResource, accessedResource), is(
             accessorPermissions_pre));
+
+      accessControlContext.setResourcePermissions(accessorResource2, accessedResource, accessorPermissions_pre);
 
       // setup grantor permissions
       Set<ResourcePermission> grantorResourcePermissions = new HashSet<>();
@@ -493,13 +655,24 @@ public class TestAccessControl_grantResourcePermissions extends TestAccessContro
       // grant permissions as grantor and verify
       accessControlContext.grantResourcePermissions(accessorResource,
                                                     accessedResource,
-                                                    ResourcePermissions.getInstance( grantedPermissionName, true));
+                                                    ResourcePermissions.getInstance(grantedPermissionName, true));
 
       Set<ResourcePermission> permissions_expected = new HashSet<>();
       permissions_expected.add(ResourcePermissions.getInstance(grantedPermissionName, true));
 
       final Set<ResourcePermission> permissions_post = accessControlContext.getEffectiveResourcePermissions(accessorResource, accessedResource);
       assertThat(permissions_post, is(permissions_expected));
+
+      // test set-based version
+      assertThat(accessControlContext.getEffectiveResourcePermissions(accessorResource2, accessedResource), is(
+            accessorPermissions_pre));
+
+      accessControlContext.grantResourcePermissions(accessorResource2,
+                                                    accessedResource,
+                                                    setOf(ResourcePermissions.getInstance(grantedPermissionName, true)));
+
+      assertThat(accessControlContext.getEffectiveResourcePermissions(accessorResource2, accessedResource),
+                 is(permissions_expected));
    }
 
    @Test
@@ -543,6 +716,17 @@ public class TestAccessControl_grantResourcePermissions extends TestAccessContro
          assertThat(e.getMessage().toLowerCase(), containsString(ungrantedPermissionName.toLowerCase()));
          assertThat(e.getMessage().toLowerCase(), not(containsString(grantedPermissionName)));
       }
+      try {
+         accessControlContext.grantResourcePermissions(accessorResource,
+                                                       accessedResource,
+                                                       setOf(ResourcePermissions.getInstance(grantedPermissionName),
+                                                             ResourcePermissions.getInstance(ungrantedPermissionName)));
+         fail("Upgrading (=addition of granting rights) of permission granted elsewhere, to which I have no granting rights, should have failed");
+      }
+      catch (NotAuthorizedException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString(ungrantedPermissionName.toLowerCase()));
+         assertThat(e.getMessage().toLowerCase(), not(containsString(grantedPermissionName)));
+      }
    }
 
    @Test
@@ -564,6 +748,16 @@ public class TestAccessControl_grantResourcePermissions extends TestAccessContro
       catch (OaccException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("cycle"));
       }
+      try {
+         accessControlContext.grantResourcePermissions(accessorResource,
+                                                       accessorResource,
+                                                       setOf(ResourcePermissions
+                                                                   .getInstance(ResourcePermissions.INHERIT, true)));
+         fail("granting direct resource permission of INHERIT to itself would constitute a cycle and should not have succeeded");
+      }
+      catch (OaccException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("cycle"));
+      }
    }
 
    @Test
@@ -574,7 +768,9 @@ public class TestAccessControl_grantResourcePermissions extends TestAccessContro
       final String accessorDomain = generateDomain();
       final String accessorResourceClass = generateResourceClass(true, true);
       final PasswordCredentials accessorCredentials = PasswordCredentials.newInstance(generateUniquePassword());
-      final Resource accessorResource = accessControlContext.createResource(accessorResourceClass, accessorDomain, accessorCredentials);
+      final Resource accessorResource = accessControlContext.createResource(accessorResourceClass,
+                                                                            accessorDomain,
+                                                                            accessorCredentials);
 
       // authenticate as accessor resource
       accessControlContext.authenticate(accessorResource, accessorCredentials);
@@ -586,6 +782,18 @@ public class TestAccessControl_grantResourcePermissions extends TestAccessContro
          accessControlContext.grantResourcePermissions(accessorResource,
                                                        accessorResource,
                                                        ResourcePermissions.getInstance(ResourcePermissions.INHERIT, true));
+         fail("granting direct resource permission of INHERIT to itself should not have succeeded because accessor doesn't (and can't) have grant permission to itself");
+      }
+      catch (NotAuthorizedException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString(String.valueOf(accessorResource).toLowerCase()
+                                                                       + " is not authorized"));
+         assertThat(e.getMessage().toLowerCase(), containsString("following permission"));
+      }
+      try {
+         accessControlContext.grantResourcePermissions(accessorResource,
+                                                       accessorResource,
+                                                       setOf(ResourcePermissions
+                                                                   .getInstance(ResourcePermissions.INHERIT, true)));
          fail("granting direct resource permission of INHERIT to itself should not have succeeded because accessor doesn't (and can't) have grant permission to itself");
       }
       catch (NotAuthorizedException e) {
@@ -622,7 +830,8 @@ public class TestAccessControl_grantResourcePermissions extends TestAccessContro
       final Set<ResourceCreatePermission> resourceCreatePermissions
             = setOf(ResourceCreatePermissions.getInstance(ResourceCreatePermissions.CREATE),
                     ResourceCreatePermissions.getInstance(ResourcePermissions.getInstance(ResourcePermissions.INHERIT)),
-                    ResourceCreatePermissions.getInstance(ResourcePermissions.getInstance(ResourcePermissions.RESET_CREDENTIALS)));
+                    ResourceCreatePermissions.getInstance(ResourcePermissions
+                                                                .getInstance(ResourcePermissions.RESET_CREDENTIALS)));
       accessControlContext.setResourceCreatePermissions(accessorResource,
                                                         accessedResourceClass,
                                                         accessedDomain,
@@ -655,6 +864,16 @@ public class TestAccessControl_grantResourcePermissions extends TestAccessContro
       catch (OaccException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("will cause a cycle"));
       }
+      try {
+         accessControlContext.grantResourcePermissions(accessedResource,
+                                                       accessorResource,
+                                                       setOf(ResourcePermissions
+                                                                   .getInstance(ResourcePermissions.INHERIT)));
+         fail("granting direct resource permissions that would create an inherit cycle should have failed");
+      }
+      catch (OaccException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("will cause a cycle"));
+      }
    }
 
    @Test
@@ -667,7 +886,9 @@ public class TestAccessControl_grantResourcePermissions extends TestAccessContro
       final String accessorDomain = generateDomain();
       final String accessorResourceClass = generateResourceClass(true, false);
       final PasswordCredentials accessorCredentials = PasswordCredentials.newInstance(generateUniquePassword());
-      final Resource accessorResource = accessControlContext.createResource(accessorResourceClass, accessorDomain, accessorCredentials);
+      final Resource accessorResource = accessControlContext.createResource(accessorResourceClass,
+                                                                            accessorDomain,
+                                                                            accessorCredentials);
 
       final String accessedDomain = generateDomain();
       final String accessedResourceClass = generateResourceClass(true, false);
@@ -685,7 +906,8 @@ public class TestAccessControl_grantResourcePermissions extends TestAccessContro
       accessControlContext.assertPostCreateResourcePermissions(accessorResource,
                                                                accessedResourceClass,
                                                                accessedDomain,
-                                                               ResourcePermissions.getInstance(ResourcePermissions.INHERIT));
+                                                               ResourcePermissions
+                                                                     .getInstance(ResourcePermissions.INHERIT));
 
       // authenticate as accessor resource
       accessControlContext.authenticate(accessorResource, accessorCredentials);
@@ -708,6 +930,16 @@ public class TestAccessControl_grantResourcePermissions extends TestAccessContro
          accessControlContext.grantResourcePermissions(accessedResource,
                                                        accessorResource,
                                                        ResourcePermissions.getInstance(ResourcePermissions.INHERIT));
+         fail("granting direct resource permissions that would create an inherit cycle should have failed");
+      }
+      catch (OaccException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("will cause a cycle"));
+      }
+      try {
+         accessControlContext.grantResourcePermissions(accessedResource,
+                                                       accessorResource,
+                                                       setOf(ResourcePermissions
+                                                                   .getInstance(ResourcePermissions.INHERIT)));
          fail("granting direct resource permissions that would create an inherit cycle should have failed");
       }
       catch (OaccException e) {
@@ -737,10 +969,22 @@ public class TestAccessControl_grantResourcePermissions extends TestAccessContro
       catch (IllegalArgumentException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("duplicate permission"));
       }
+      try {
+         accessControlContext.grantResourcePermissions(accessorResource,
+                                                       accessedResource,
+                                                       setOf(ResourcePermissions
+                                                                   .getInstance(ResourcePermissions.INHERIT),
+                                                             ResourcePermissions.getInstance(permissionName, true),
+                                                             ResourcePermissions.getInstance(permissionName, false)));
+         fail("granting permissions that include the same permission - by name - but with different grant-options, should have failed");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("duplicate permission"));
+      }
    }
 
    @Test
-   public void grantResourcePermissions_duplicateIdenticalPermissions_shouldSucceed() {
+   public void grantResourcePermissions_duplicateIdenticalPermissions_shouldFail() {
       authenticateSystemResource();
       final String resourceClassName = generateResourceClass(false, false);
       final Resource accessorResource = generateUnauthenticatableResource();
@@ -792,7 +1036,9 @@ public class TestAccessControl_grantResourcePermissions extends TestAccessContro
       }
 
       try {
-         accessControlContext.grantResourcePermissions(accessedResource, accessedResource, null);
+         accessControlContext.grantResourcePermissions(accessedResource,
+                                                       accessedResource,
+                                                       (ResourcePermission) null);
          fail("granting permissions with null permission set should have failed");
       }
       catch (NullPointerException e) {
@@ -808,6 +1054,70 @@ public class TestAccessControl_grantResourcePermissions extends TestAccessContro
       }
       catch (NullPointerException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("array or a sequence"));
+      }
+
+      try {
+         accessControlContext.grantResourcePermissions(null,
+                                                       accessedResource,
+                                                       setOf(ResourcePermissions
+                                                                   .getInstance(ResourcePermissions.INHERIT)));
+         fail("granting permissions for null accessor resource should have failed");
+      }
+      catch (NullPointerException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("resource required"));
+      }
+
+      try {
+         accessControlContext.grantResourcePermissions(accessedResource,
+                                                       null,
+                                                       setOf(ResourcePermissions
+                                                                   .getInstance(ResourcePermissions.INHERIT)));
+         fail("granting permissions for null accessed resource should have failed");
+      }
+      catch (NullPointerException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("resource required"));
+      }
+
+      try {
+         accessControlContext.grantResourcePermissions(accessedResource,
+                                                       accessedResource,
+                                                       (Set<ResourcePermission>) null);
+         fail("granting permissions with null permission set should have failed");
+      }
+      catch (NullPointerException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("permissions required"));
+      }
+
+      try {
+         accessControlContext.grantResourcePermissions(accessedResource,
+                                                       accessedResource,
+                                                       setOf(ResourcePermissions
+                                                                   .getInstance(ResourcePermissions.INHERIT),
+                                                             null));
+         fail("granting permissions with null permission element should have failed");
+      }
+      catch (NullPointerException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("contains null element"));
+      }
+   }
+
+   @Test
+   public void grantResourcePermissions_emptyPermissionSet_shouldFail() {
+      authenticateSystemResource();
+      final String resourceClassName = generateResourceClass(false, false);
+      final Resource accessorResource = generateUnauthenticatableResource();
+      final Resource accessedResource = accessControlContext.createResource(resourceClassName, generateDomain());
+      assertThat(accessControlContext.getEffectiveResourcePermissions(accessorResource, accessedResource).isEmpty(), is(true));
+
+      // attempt to grant permissions with null references
+      try {
+         accessControlContext.grantResourcePermissions(accessedResource,
+                                                       accessedResource,
+                                                       Collections.<ResourcePermission>emptySet());
+         fail("granting permissions with null permission set should have failed");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("permissions required"));
       }
    }
 
@@ -867,6 +1177,52 @@ public class TestAccessControl_grantResourcePermissions extends TestAccessContro
          accessControlContext.grantResourcePermissions(accessorResource,
                                                        accessedResource,
                                                        ResourcePermissions.getInstance("invalid_permission"));
+         fail("granting permissions with non-existent permission name should have failed");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("is not defined for resource class"));
+      }
+
+      try {
+         accessControlContext.grantResourcePermissions(Resources.getInstance(-999L),
+                                                       accessedResource,
+                                                       setOf(ResourcePermissions
+                                                                   .getInstance(ResourcePermissions.INHERIT),
+                                                             ResourcePermissions.getInstance(customPermissionName)));
+         fail("granting permissions with non-existent accessor resource reference should have failed");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("not found"));
+      }
+
+      try {
+         accessControlContext.grantResourcePermissions(accessorResource,
+                                                       Resources.getInstance(-999L),
+                                                       setOf(ResourcePermissions
+                                                                   .getInstance(ResourcePermissions.INHERIT),
+                                                             ResourcePermissions.getInstance(customPermissionName)));
+         fail("granting permissions with non-existent accessed resource reference should have failed");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("could not determine resource class for resource"));
+      }
+
+      try {
+         accessControlContext.grantResourcePermissions(accessorResource,
+                                                       accessedResource,
+                                                       setOf(ResourcePermissions
+                                                                   .getInstance(generateResourceClassPermission(
+                                                                         generateResourceClass(false, false)))));
+         fail("granting permissions with mismatched resource class should have failed");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("is not defined for resource class"));
+      }
+
+      try {
+         accessControlContext.grantResourcePermissions(accessorResource,
+                                                       accessedResource,
+                                                       setOf(ResourcePermissions.getInstance("invalid_permission")));
          fail("granting permissions with non-existent permission name should have failed");
       }
       catch (IllegalArgumentException e) {
