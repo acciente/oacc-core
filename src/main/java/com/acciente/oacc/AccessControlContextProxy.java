@@ -706,6 +706,14 @@ public class AccessControlContextProxy implements AccessControlContext {
    public void grantGlobalResourcePermissions(Resource accessorResource,
                                               String resourceClassName,
                                               String domainName,
+                                              Set<ResourcePermission> resourcePermissions) {
+      accessControlContext.grantGlobalResourcePermissions(accessorResource, resourceClassName, domainName, resourcePermissions);
+   }
+
+   @Override
+   public void grantGlobalResourcePermissions(Resource accessorResource,
+                                              String resourceClassName,
+                                              String domainName,
                                               ResourcePermission resourcePermission,
                                               ResourcePermission... resourcePermissions) {
       accessControlContext.grantGlobalResourcePermissions(accessorResource, resourceClassName, domainName, resourcePermission, resourcePermissions);
@@ -739,6 +747,13 @@ public class AccessControlContextProxy implements AccessControlContext {
                                             String resourceClassName,
                                             Set<ResourcePermission> resourcePermissions) {
       accessControlContext.setGlobalResourcePermissions(accessorResource, resourceClassName, resourcePermissions);
+   }
+
+   @Override
+   public void grantGlobalResourcePermissions(Resource accessorResource,
+                                              String resourceClassName,
+                                              Set<ResourcePermission> resourcePermissions) {
+      accessControlContext.grantGlobalResourcePermissions(accessorResource, resourceClassName, resourcePermissions);
    }
 
    @Override

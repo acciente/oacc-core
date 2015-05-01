@@ -3033,7 +3033,8 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
                                                                     accessorResource,
                                                                     accessedResource,
                                                                     Id.<ResourceClassId>from(
-                                                                          accessedResourceClassInternalInfo.getResourceClassId()),
+                                                                          accessedResourceClassInternalInfo
+                                                                                .getResourceClassId()),
                                                                     requestedResourcePermissions,
                                                                     grantorResource);
 
@@ -3041,7 +3042,8 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       grantResourcePermissionPersister.addResourcePermissions(connection,
                                                               accessorResource,
                                                               accessedResource,
-                                                              Id.<ResourceClassId>from(accessedResourceClassInternalInfo.getResourceClassId()),
+                                                              Id.<ResourceClassId>from(accessedResourceClassInternalInfo
+                                                                                             .getResourceClassId()),
                                                               requestedResourcePermissions,
                                                               grantorResource);
    }
@@ -3641,6 +3643,47 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       }
    }
 
+
+   @Override
+   public void grantGlobalResourcePermissions(Resource accessorResource,
+                                              String resourceClassName,
+                                              String domainName,
+                                              Set<ResourcePermission> resourcePermissions) {
+      SQLConnection connection = null;
+
+      __assertAuthenticated();
+      __assertResourceSpecified(accessorResource);
+      __assertResourceClassSpecified(resourceClassName);
+      __assertDomainSpecified(domainName);
+      __assertPermissionsSpecified(resourcePermissions);
+      __assertPermissionsSetNotEmpty(resourcePermissions);
+
+      try {
+         connection = __getConnection();
+         resourceClassName = resourceClassName.trim();
+         domainName = domainName.trim();
+
+         __grantDirectGlobalPermissions(connection,
+                                        accessorResource,
+                                        resourceClassName,
+                                        domainName,
+                                        resourcePermissions);
+      }
+      finally {
+         __closeConnection(connection);
+      }
+   }
+
+   @Override
+   public void grantGlobalResourcePermissions(Resource accessorResource,
+                                              String resourceClassName,
+                                              Set<ResourcePermission> resourcePermissions) {
+      grantGlobalResourcePermissions(accessorResource,
+                                     resourceClassName,
+                                     sessionResourceDomainName,
+                                     resourcePermissions);
+
+   }
    @Override
    public void grantGlobalResourcePermissions(Resource accessorResource,
                                               String resourceClassName,

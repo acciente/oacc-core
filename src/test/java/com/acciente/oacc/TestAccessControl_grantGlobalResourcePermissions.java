@@ -19,6 +19,7 @@ package com.acciente.oacc;
 
 import org.junit.Test;
 
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -72,6 +73,23 @@ public class TestAccessControl_grantGlobalResourcePermissions extends TestAccess
       assertThat(accessControlContext.getEffectiveDomainPermissionsMap(accessorResource).isEmpty(), is(true));
       assertThat(accessControlContext.getEffectiveResourcePermissions(accessorResource, accessorResource).isEmpty(), is(true));
       assertThat(accessControlContext.getEffectiveResourcePermissions(accessorResource, SYS_RESOURCE).isEmpty(), is(true));
+
+      // test set-based version
+      final Resource accessorResource2 = generateUnauthenticatableResource();
+      assertThat(accessControlContext.getEffectiveGlobalResourcePermissionsMap(accessorResource2).isEmpty(), is(true));
+
+      accessControlContext.grantGlobalResourcePermissions(accessorResource2,
+                                                          authenticatableResourceClassName,
+                                                          domainName,
+                                                          setOf(ResourcePermissions
+                                                                      .getInstance(ResourcePermissions.IMPERSONATE),
+                                                                ResourcePermissions
+                                                                      .getInstance(permissionName)));
+
+      assertThat(accessControlContext.getEffectiveGlobalResourcePermissions(accessorResource2,
+                                                                            authenticatableResourceClassName,
+                                                                            domainName),
+                 is(permissions_pre));
    }
 
    @Test
@@ -99,6 +117,28 @@ public class TestAccessControl_grantGlobalResourcePermissions extends TestAccess
                                                              resourceClassName,
                                                              ResourcePermissions
                                                                    .getInstance(ResourcePermissions.INHERIT));
+         fail("granting *INHERIT system permission as a global permission should have failed");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("not valid in this context"));
+      }
+
+      try {
+         accessControlContext.grantGlobalResourcePermissions(accessorResource,
+                                                             resourceClassName,
+                                                             domainName,
+                                                             setOf(ResourcePermissions
+                                                                         .getInstance(ResourcePermissions.INHERIT)));
+         fail("granting *INHERIT system permission as a global permission should have failed");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("not valid in this context"));
+      }
+      try {
+         accessControlContext.grantGlobalResourcePermissions(accessorResource,
+                                                             resourceClassName,
+                                                             setOf(ResourcePermissions
+                                                                         .getInstance(ResourcePermissions.INHERIT)));
          fail("granting *INHERIT system permission as a global permission should have failed");
       }
       catch (IllegalArgumentException e) {
@@ -136,6 +176,28 @@ public class TestAccessControl_grantGlobalResourcePermissions extends TestAccess
       catch (IllegalArgumentException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("not valid for unauthenticatable resource"));
       }
+
+      try {
+         accessControlContext.grantGlobalResourcePermissions(accessorResource,
+                                                             resourceClassName,
+                                                             domainName,
+                                                             setOf(ResourcePermissions
+                                                                         .getInstance(ResourcePermissions.RESET_CREDENTIALS)));
+         fail("granting *RESET_CREDENTIALS system permission globally to an unauthenticatable resource class should have failed");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("not valid for unauthenticatable resource"));
+      }
+      try {
+         accessControlContext.grantGlobalResourcePermissions(accessorResource,
+                                                             resourceClassName,
+                                                             setOf(ResourcePermissions
+                                                                         .getInstance(ResourcePermissions.RESET_CREDENTIALS)));
+         fail("granting *RESET_CREDENTIALS system permission globally to an unauthenticatable resource class should have failed");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("not valid for unauthenticatable resource"));
+      }
    }
 
    @Test
@@ -163,6 +225,28 @@ public class TestAccessControl_grantGlobalResourcePermissions extends TestAccess
                                                              resourceClassName,
                                                              ResourcePermissions
                                                                    .getInstance(ResourcePermissions.IMPERSONATE));
+         fail("granting *IMPERSONATE system permission globally to an unauthenticatable resource class should have failed");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("not valid for unauthenticatable resource"));
+      }
+
+      try {
+         accessControlContext.grantGlobalResourcePermissions(accessorResource,
+                                                             resourceClassName,
+                                                             domainName,
+                                                             setOf(ResourcePermissions
+                                                                         .getInstance(ResourcePermissions.IMPERSONATE)));
+         fail("granting *IMPERSONATE system permission globally to an unauthenticatable resource class should have failed");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("not valid for unauthenticatable resource"));
+      }
+      try {
+         accessControlContext.grantGlobalResourcePermissions(accessorResource,
+                                                             resourceClassName,
+                                                             setOf(ResourcePermissions
+                                                                         .getInstance(ResourcePermissions.IMPERSONATE)));
          fail("granting *IMPERSONATE system permission globally to an unauthenticatable resource class should have failed");
       }
       catch (IllegalArgumentException e) {
@@ -210,6 +294,20 @@ public class TestAccessControl_grantGlobalResourcePermissions extends TestAccess
 
       final Set<ResourcePermission> permissions_post = accessControlContext.getEffectiveGlobalResourcePermissions(accessorResource, resourceClassName, domainName);
       assertThat(permissions_post, is(permissions_pre));
+
+      // test set-based version
+      final Resource accessorResource2 = generateUnauthenticatableResource();
+      assertThat(accessControlContext.getEffectiveGlobalResourcePermissionsMap(accessorResource2).isEmpty(), is(true));
+
+      accessControlContext.grantGlobalResourcePermissions(accessorResource2,
+                                                          resourceClassName,
+                                                          domainName,
+                                                          setOf(ResourcePermissions
+                                                                      .getInstance(ResourcePermissions.IMPERSONATE),
+                                                                ResourcePermissions.getInstance(customPermissionName)));
+
+      assertThat(accessControlContext.getEffectiveGlobalResourcePermissions(accessorResource2, resourceClassName, domainName),
+                 is(permissions_pre));
    }
 
    @Test
@@ -237,7 +335,10 @@ public class TestAccessControl_grantGlobalResourcePermissions extends TestAccess
                                                         resourceClassName,
                                                         grantorDomainName,
                                                         grantorResourcePermissions);
-      assertThat(accessControlContext.getEffectiveGlobalResourcePermissions(grantorResource, resourceClassName, grantorDomainName), is(grantorResourcePermissions));
+      assertThat(accessControlContext.getEffectiveGlobalResourcePermissions(grantorResource,
+                                                                            resourceClassName,
+                                                                            grantorDomainName), is(
+            grantorResourcePermissions));
 
       // authenticate grantor resource
       accessControlContext.authenticate(grantorResource, PasswordCredentials.newInstance(password));
@@ -257,6 +358,27 @@ public class TestAccessControl_grantGlobalResourcePermissions extends TestAccess
 
       final Set<ResourcePermission> permissions_post_accessorDomain = accessControlContext.getEffectiveGlobalResourcePermissions(accessorResource, resourceClassName, accessorDomainName);
       assertThat(permissions_post_accessorDomain.isEmpty(), is(true));
+
+      // grant global permissions as grantor and verify
+      final Resource accessorResource2 = generateUnauthenticatableResource();
+      final String accessor2DomainName = accessControlContext.getDomainNameByResource(accessorResource2);
+
+      accessControlContext.grantGlobalResourcePermissions(accessorResource2,
+                                                          resourceClassName,
+                                                          setOf(ResourcePermissions
+                                                                      .getInstance(ResourcePermissions.IMPERSONATE),
+                                                                ResourcePermissions.getInstance(customPermissionName)));
+
+      assertThat(accessControlContext.getEffectiveGlobalResourcePermissions(accessorResource2, resourceClassName),
+                 is(permissions_pre));
+
+      assertThat(accessControlContext.getEffectiveGlobalResourcePermissions(accessorResource2,
+                                                                            resourceClassName,
+                                                                            grantorDomainName),
+                 is(permissions_pre));
+
+      assertThat(accessControlContext.getEffectiveGlobalResourcePermissions(accessorResource2, resourceClassName, accessor2DomainName).isEmpty(),
+                 is(true));
    }
 
    @Test
@@ -275,11 +397,15 @@ public class TestAccessControl_grantGlobalResourcePermissions extends TestAccess
       // grant permissions and verify
       accessControlContext.grantGlobalResourcePermissions(accessorResource, resourceClassName,
                                                           domainName,
-                                                          ResourcePermissions.getInstance(ResourcePermissions.IMPERSONATE, true),
+                                                          ResourcePermissions
+                                                                .getInstance(ResourcePermissions.IMPERSONATE, true),
                                                           ResourcePermissions
                                                                 .getInstance(permissionName));
 
-      final Set<ResourcePermission> permissions_post1 = accessControlContext.getEffectiveGlobalResourcePermissions(accessorResource, resourceClassName, domainName);
+      final Set<ResourcePermission> permissions_post1 = accessControlContext.getEffectiveGlobalResourcePermissions(
+            accessorResource,
+            resourceClassName,
+            domainName);
       assertThat(permissions_post1, is(permissions_pre));
 
       // regrant permission and verify nothing changed
@@ -291,6 +417,16 @@ public class TestAccessControl_grantGlobalResourcePermissions extends TestAccess
 
       final Set<ResourcePermission> permissions_post2 = accessControlContext.getEffectiveGlobalResourcePermissions(accessorResource, resourceClassName, domainName);
       assertThat(permissions_post2, is(permissions_pre));
+
+      // regrant via set-based method
+      accessControlContext.grantGlobalResourcePermissions(accessorResource,
+                                                          resourceClassName,
+                                                          domainName,
+                                                          setOf(ResourcePermissions
+                                                                      .getInstance(permissionName)));
+
+      assertThat(accessControlContext.getEffectiveGlobalResourcePermissions(accessorResource, resourceClassName, domainName),
+                 is(permissions_pre));
    }
 
    @Test
@@ -318,8 +454,13 @@ public class TestAccessControl_grantGlobalResourcePermissions extends TestAccess
       Set<ResourcePermission> grantorPermissions = new HashSet<>();
       grantorPermissions.add(ResourcePermissions.getInstance(grantablePermissionName, true));
 
-      accessControlContext.setGlobalResourcePermissions(grantorResource, resourceClassName, domainName, grantorPermissions);
-      assertThat(accessControlContext.getEffectiveGlobalResourcePermissions(grantorResource, resourceClassName, domainName),
+      accessControlContext.setGlobalResourcePermissions(grantorResource,
+                                                        resourceClassName,
+                                                        domainName,
+                                                        grantorPermissions);
+      assertThat(accessControlContext.getEffectiveGlobalResourcePermissions(grantorResource,
+                                                                            resourceClassName,
+                                                                            domainName),
                  is(grantorPermissions));
 
       // authenticate grantor resource
@@ -332,6 +473,20 @@ public class TestAccessControl_grantGlobalResourcePermissions extends TestAccess
                                                              domainName,
                                                              ResourcePermissions.getInstance(grantablePermissionName),
                                                              ResourcePermissions.getInstance(ungrantablePermissionName));
+         fail("granting existing global permission granted elsewhere without authorization should have failed");
+      }
+      catch (NotAuthorizedException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString(ungrantablePermissionName.toLowerCase()));
+         assertThat(e.getMessage().toLowerCase(), not(containsString(grantablePermissionName)));
+      }
+      try {
+         accessControlContext.grantGlobalResourcePermissions(accessorResource,
+                                                             resourceClassName,
+                                                             domainName,
+                                                             setOf(ResourcePermissions.getInstance(
+                                                                   grantablePermissionName),
+                                                                   ResourcePermissions.getInstance(
+                                                                         ungrantablePermissionName)));
          fail("granting existing global permission granted elsewhere without authorization should have failed");
       }
       catch (NotAuthorizedException e) {
@@ -388,6 +543,25 @@ public class TestAccessControl_grantGlobalResourcePermissions extends TestAccess
       final Set<ResourcePermission> permissions_post
             = accessControlContext.getEffectiveGlobalResourcePermissions(accessorResource, resourceClassName, domainName);
       assertThat(permissions_post, is(accessorPermissions_pre));
+
+      // test set-based version
+      final Resource accessorResource2 = generateUnauthenticatableResource();
+      accessControlContext.setGlobalResourcePermissions(accessorResource2,
+                                                        resourceClassName,
+                                                        domainName,
+                                                        accessorPermissions_pre);
+      assertThat(accessControlContext.getEffectiveGlobalResourcePermissions(accessorResource2,
+                                                                            resourceClassName,
+                                                                            domainName),
+                 is(accessorPermissions_pre));
+
+      accessControlContext.grantGlobalResourcePermissions(accessorResource2,
+                                                          resourceClassName,
+                                                          domainName,
+                                                          setOf(ResourcePermissions.getInstance(grantedPermissionName)));
+
+      assertThat(accessControlContext.getEffectiveGlobalResourcePermissions(accessorResource2, resourceClassName, domainName),
+                 is(accessorPermissions_pre));
    }
 
    @Test
@@ -409,7 +583,9 @@ public class TestAccessControl_grantGlobalResourcePermissions extends TestAccess
                                                         resourceClassName,
                                                         domainName,
                                                         accessorPermissions_pre);
-      assertThat(accessControlContext.getEffectiveGlobalResourcePermissions(accessorResource, resourceClassName, domainName),
+      assertThat(accessControlContext.getEffectiveGlobalResourcePermissions(accessorResource,
+                                                                            resourceClassName,
+                                                                            domainName),
                  is(accessorPermissions_pre));
 
       // setup grantor permissions
@@ -420,7 +596,9 @@ public class TestAccessControl_grantGlobalResourcePermissions extends TestAccess
                                                         resourceClassName,
                                                         domainName,
                                                         grantorResourcePermissions);
-      assertThat(accessControlContext.getEffectiveGlobalResourcePermissions(grantorResource, resourceClassName, domainName),
+      assertThat(accessControlContext.getEffectiveGlobalResourcePermissions(grantorResource,
+                                                                            resourceClassName,
+                                                                            domainName),
                  is(grantorResourcePermissions));
 
       // authenticate grantor resource
@@ -433,6 +611,20 @@ public class TestAccessControl_grantGlobalResourcePermissions extends TestAccess
                                                              domainName,
                                                              ResourcePermissions.getInstance(grantedPermissionName),
                                                              ResourcePermissions.getInstance(ungrantedPermissionName));
+         fail("Downgrading (=removal of granting rights) of global permission granted elsewhere, to which I have no granting rights, should have failed");
+      }
+      catch (NotAuthorizedException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString(ungrantedPermissionName.toLowerCase()));
+         assertThat(e.getMessage().toLowerCase(), not(containsString(grantedPermissionName)));
+      }
+      try {
+         accessControlContext.grantGlobalResourcePermissions(accessorResource,
+                                                             resourceClassName,
+                                                             domainName,
+                                                             setOf(ResourcePermissions
+                                                                         .getInstance(grantedPermissionName),
+                                                                   ResourcePermissions.getInstance(
+                                                                         ungrantedPermissionName)));
          fail("Downgrading (=removal of granting rights) of global permission granted elsewhere, to which I have no granting rights, should have failed");
       }
       catch (NotAuthorizedException e) {
@@ -492,6 +684,26 @@ public class TestAccessControl_grantGlobalResourcePermissions extends TestAccess
       final Set<ResourcePermission> permissions_post
             = accessControlContext.getEffectiveGlobalResourcePermissions(accessorResource, resourceClassName, domainName);
       assertThat(permissions_post, is(permissions_expected));
+
+      // test set-based version
+      final Resource accessorResource2 = generateUnauthenticatableResource();
+      accessControlContext.setGlobalResourcePermissions(accessorResource2,
+                                                        resourceClassName,
+                                                        domainName,
+                                                        accessorPermissions_pre);
+      assertThat(accessControlContext.getEffectiveGlobalResourcePermissions(accessorResource2,
+                                                                            resourceClassName,
+                                                                            domainName),
+                 is(accessorPermissions_pre));
+
+      accessControlContext.grantGlobalResourcePermissions(accessorResource2,
+                                                          resourceClassName,
+                                                          domainName,
+                                                          setOf(ResourcePermissions.getInstance(grantedPermissionName,
+                                                                                                true)));
+
+      assertThat(accessControlContext.getEffectiveGlobalResourcePermissions(accessorResource2, resourceClassName, domainName),
+                 is(permissions_expected));
    }
 
    @Test
@@ -524,7 +736,9 @@ public class TestAccessControl_grantGlobalResourcePermissions extends TestAccess
                                                         resourceClassName,
                                                         domainName,
                                                         grantorResourcePermissions);
-      assertThat(accessControlContext.getEffectiveGlobalResourcePermissions(grantorResource, resourceClassName, domainName),
+      assertThat(accessControlContext.getEffectiveGlobalResourcePermissions(grantorResource,
+                                                                            resourceClassName,
+                                                                            domainName),
                  is(grantorResourcePermissions));
 
       // authenticate grantor resource
@@ -541,6 +755,21 @@ public class TestAccessControl_grantGlobalResourcePermissions extends TestAccess
                                                              domainName,
                                                              ResourcePermissions.getInstance(grantedPermissionName),
                                                              ResourcePermissions.getInstance(ungrantedPermissionName, true));
+         fail("Upgrading (=addition of granting rights) of global permission granted elsewhere, to which I have no granting rights, should have failed");
+      }
+      catch (NotAuthorizedException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString(ungrantedPermissionName.toLowerCase()));
+         assertThat(e.getMessage().toLowerCase(), not(containsString(grantedPermissionName)));
+      }
+      try {
+         accessControlContext.grantGlobalResourcePermissions(accessorResource,
+                                                             resourceClassName,
+                                                             domainName,
+                                                             setOf(ResourcePermissions
+                                                                         .getInstance(grantedPermissionName),
+                                                                   ResourcePermissions.getInstance(
+                                                                         ungrantedPermissionName,
+                                                                         true)));
          fail("Upgrading (=addition of granting rights) of global permission granted elsewhere, to which I have no granting rights, should have failed");
       }
       catch (NotAuthorizedException e) {
@@ -569,6 +798,21 @@ public class TestAccessControl_grantGlobalResourcePermissions extends TestAccess
                                                              ResourcePermissions.getInstance(permissionName, true),
                                                              ResourcePermissions.getInstance(permissionName, false)
                                                              );
+         fail("granting global permissions that include the same permission - by name - but with different grant-options, should have failed");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("duplicate permission"));
+      }
+      try {
+         accessControlContext.grantGlobalResourcePermissions(accessorResource,
+                                                             resourceClassName,
+                                                             domainName,
+                                                             setOf(ResourcePermissions
+                                                                         .getInstance(ResourcePermissions.IMPERSONATE),
+                                                                   ResourcePermissions
+                                                                         .getInstance(permissionName, true),
+                                                                   ResourcePermissions
+                                                                         .getInstance(permissionName, false)));
          fail("granting global permissions that include the same permission - by name - but with different grant-options, should have failed");
       }
       catch (IllegalArgumentException e) {
@@ -642,6 +886,28 @@ public class TestAccessControl_grantGlobalResourcePermissions extends TestAccess
             = accessControlContext.getEffectiveGlobalResourcePermissions(accessorResource, resourceClassName);
       assertThat(permissions_post_implicit, is(permissions2));
 
+      // test set-based version
+      final Resource accessorResource2 = generateUnauthenticatableResource();
+
+      accessControlContext.grantGlobalResourcePermissions(accessorResource2,
+                                                          resourceClassName_whitespaced,
+                                                          domainName_whitespaced,
+                                                          setOf(ResourcePermissions
+                                                                      .getInstance(ResourcePermissions.IMPERSONATE),
+                                                                ResourcePermissions.getInstance(permissionName1)));
+
+      assertThat(accessControlContext.getEffectiveGlobalResourcePermissions(accessorResource2, resourceClassName, domainName),
+                 is(permissions1));
+
+      accessControlContext.grantGlobalResourcePermissions(accessorResource2,
+                                                          resourceClassName_whitespaced,
+                                                          setOf(ResourcePermissions
+                                                                      .getInstance(ResourcePermissions.RESET_CREDENTIALS),
+                                                                ResourcePermissions.getInstance(permissionName2)));
+
+      assertThat(accessControlContext.getEffectiveGlobalResourcePermissions(accessorResource2, resourceClassName),
+                 is(permissions2));
+
    }
 
    @Test
@@ -688,14 +954,19 @@ public class TestAccessControl_grantGlobalResourcePermissions extends TestAccess
       }
 
       try {
-         accessControlContext.grantGlobalResourcePermissions(accessorResource, resourceClassName, null);
+         accessControlContext.grantGlobalResourcePermissions(accessorResource,
+                                                             resourceClassName,
+                                                             (ResourcePermission) null);
          fail("granting permissions with null permission set should have failed");
       }
       catch (NullPointerException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("permission required"));
       }
       try {
-         accessControlContext.grantGlobalResourcePermissions(accessorResource, resourceClassName, domainName, null);
+         accessControlContext.grantGlobalResourcePermissions(accessorResource,
+                                                             resourceClassName,
+                                                             domainName,
+                                                             (ResourcePermission) null);
          fail("granting permissions with null permission set should have failed");
       }
       catch (NullPointerException e) {
@@ -734,6 +1005,121 @@ public class TestAccessControl_grantGlobalResourcePermissions extends TestAccess
       catch (NullPointerException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("domain required"));
       }
+
+      try {
+         accessControlContext.grantGlobalResourcePermissions(null, resourceClassName, setOf(permission_valid));
+         fail("granting permissions for null accessor resource should have failed");
+      }
+      catch (NullPointerException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("resource required"));
+      }
+      try {
+         accessControlContext.grantGlobalResourcePermissions(null, resourceClassName, domainName, setOf(permission_valid));
+         fail("granting permissions for null accessor resource should have failed");
+      }
+      catch (NullPointerException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("resource required"));
+      }
+
+      try {
+         accessControlContext.grantGlobalResourcePermissions(accessorResource, null, setOf(permission_valid));
+         fail("granting permissions for null resource class name should have failed");
+      }
+      catch (NullPointerException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("resource class required"));
+      }
+      try {
+         accessControlContext.grantGlobalResourcePermissions(accessorResource, null, domainName, setOf(permission_valid));
+         fail("granting permissions for null resource class name should have failed");
+      }
+      catch (NullPointerException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("resource class required"));
+      }
+
+      try {
+         accessControlContext.grantGlobalResourcePermissions(accessorResource,
+                                                             resourceClassName,
+                                                             (Set<ResourcePermission>) null);
+         fail("granting permissions with null permission set should have failed");
+      }
+      catch (NullPointerException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("permissions required"));
+      }
+      try {
+         accessControlContext.grantGlobalResourcePermissions(accessorResource,
+                                                             resourceClassName,
+                                                             domainName,
+                                                             (Set<ResourcePermission>) null);
+         fail("granting permissions with null permission set should have failed");
+      }
+      catch (NullPointerException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("permissions required"));
+      }
+
+      try {
+         accessControlContext.grantGlobalResourcePermissions(accessorResource,
+                                                             resourceClassName,
+                                                             setOf(permission_valid, null));
+         fail("granting permissions with null permission should have failed");
+      }
+      catch (NullPointerException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("null element"));
+      }
+      try {
+         accessControlContext.grantGlobalResourcePermissions(accessorResource,
+                                                             resourceClassName,
+                                                             domainName,
+                                                             setOf(permission_valid, null));
+         fail("granting permissions with null permission should have failed");
+      }
+      catch (NullPointerException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("null element"));
+      }
+
+      try {
+         accessControlContext.grantGlobalResourcePermissions(accessorResource,
+                                                             resourceClassName,
+                                                             (String) null,
+                                                             setOf(permission_valid));
+         fail("granting permissions with null domain should have failed");
+      }
+      catch (NullPointerException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("domain required"));
+      }
+   }
+
+   @Test
+   public void grantGlobalResourcePermissions_emptyPermissionSet_shouldFail() {
+      authenticateSystemResource();
+      final String resourceClassName = generateResourceClass(true, false);
+      final Resource accessorResource = generateUnauthenticatableResource();
+      final String domainName = accessControlContext.getDomainNameByResource(accessorResource);
+      assertThat(accessControlContext.getEffectiveGlobalResourcePermissionsMap(accessorResource).isEmpty(), is(true));
+
+      final ResourcePermission permission_valid = ResourcePermissions.getInstance(ResourcePermissions.IMPERSONATE);
+      Set<ResourcePermission> permissions_nullElement = new HashSet<>();
+      permissions_nullElement.add(null);
+
+      // attempt to grant global permissions with null references
+      try {
+         accessControlContext.grantGlobalResourcePermissions(accessorResource,
+                                                             resourceClassName,
+                                                             Collections.<ResourcePermission>emptySet());
+         fail("granting permissions with null permission set should have failed");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("permissions required"));
+      }
+      try {
+         accessControlContext.grantGlobalResourcePermissions(accessorResource,
+                                                             resourceClassName,
+                                                             domainName,
+                                                             Collections.<ResourcePermission>emptySet());
+         fail("granting permissions with null permission set should have failed");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("permissions required"));
+      }
    }
 
    @Test
@@ -762,6 +1148,26 @@ public class TestAccessControl_grantGlobalResourcePermissions extends TestAccess
          accessControlContext.grantGlobalResourcePermissions(accessorResource,
                                                              resourceClassName2,
                                                              ResourcePermissions.getInstance(permissionName1));
+         fail("granting global permissions with mismatched resource class and permission should have failed");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("is not defined for resource class"));
+      }
+
+      try {
+         accessControlContext.grantGlobalResourcePermissions(accessorResource,
+                                                             resourceClassName2,
+                                                             domainName,
+                                                             setOf(ResourcePermissions.getInstance(permissionName1)));
+         fail("granting global permissions with mismatched resource class and permission should have failed");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("is not defined for resource class"));
+      }
+      try {
+         accessControlContext.grantGlobalResourcePermissions(accessorResource,
+                                                             resourceClassName2,
+                                                             setOf(ResourcePermissions.getInstance(permissionName1)));
          fail("granting global permissions with mismatched resource class and permission should have failed");
       }
       catch (IllegalArgumentException e) {
@@ -847,6 +1253,77 @@ public class TestAccessControl_grantGlobalResourcePermissions extends TestAccess
          accessControlContext.grantGlobalResourcePermissions(accessorResource,
                                                              resourceClassName,
                                                              invalid_permission);
+         fail("granting permissions with non-existent permission name should have failed");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("is not defined for resource class"));
+      }
+
+      try {
+         accessControlContext.grantGlobalResourcePermissions(Resources.getInstance(-999L),
+                                                             resourceClassName,
+                                                             domainName,
+                                                             setOf(permission_valid));
+         fail("granting permissions with non-existent accessor resource reference should have failed");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("not found"));
+      }
+      try {
+         accessControlContext.grantGlobalResourcePermissions(Resources.getInstance(-999L),
+                                                             resourceClassName,
+                                                             setOf(permission_valid));
+         fail("granting permissions with non-existent accessor resource reference should have failed");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("not found"));
+      }
+
+      try {
+         accessControlContext.grantGlobalResourcePermissions(accessorResource,
+                                                             "invalid_resourceClass",
+                                                             domainName,
+                                                             setOf(permission_valid));
+         fail("granting permissions with non-existent resource class should have failed");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("could not find resource class"));
+      }
+      try {
+         accessControlContext.grantGlobalResourcePermissions(accessorResource,
+                                                             "invalid_resourceClass",
+                                                             setOf(permission_valid));
+         fail("granting permissions with non-existent resource class should have failed");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("could not find resource class"));
+      }
+
+      try {
+         accessControlContext.grantGlobalResourcePermissions(accessorResource,
+                                                             resourceClassName,
+                                                             "invalid_domain",
+                                                             setOf(permission_valid));
+         fail("granting permissions with non-existent domain should have failed");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("could not find domain"));
+      }
+
+      try {
+         accessControlContext.grantGlobalResourcePermissions(accessorResource,
+                                                             resourceClassName,
+                                                             domainName,
+                                                             setOf(invalid_permission));
+         fail("granting permissions with non-existent permission name should have failed");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("is not defined for resource class"));
+      }
+      try {
+         accessControlContext.grantGlobalResourcePermissions(accessorResource,
+                                                             resourceClassName,
+                                                             setOf(invalid_permission));
          fail("granting permissions with non-existent permission name should have failed");
       }
       catch (IllegalArgumentException e) {

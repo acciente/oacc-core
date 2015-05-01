@@ -2103,6 +2103,48 @@ public interface AccessControlContext {
     * @param accessorResource    the resource to which the privilege should be granted
     * @param resourceClassName   a string resource class name
     * @param domainName          a string domain name
+    * @param resourcePermissions the resource permission to be granted globally to
+    *                            the specified resource class and domain
+    * @throws java.lang.IllegalArgumentException if accessorResource reference does not exist, or
+    *                                            if no resource class of resourceClassName exists, or
+    *                                            if no domain of domainName exists, or
+    *                                            if resourcePermissions is empty, or
+    *                                            if resourcePermissions contains INHERIT permission, or
+    *                                            if resourcePermissions contains permissions invalid for the specified
+    *                                            resource class (incl. RESET-CREDENTIALS or IMPERSONATE for
+    *                                            unauthenticatable resource classes), or
+    *                                            if resourcePermissions contains multiple instances of the same
+    *                                            permission that only differ in the 'withGrant' attribute
+    * @throws com.acciente.oacc.NotAuthorizedException if the session resource is not authorized to grant the
+    *                                                  specified permissions on the specified resource class and domain
+    */
+   public void grantGlobalResourcePermissions(Resource accessorResource,
+                                              String resourceClassName,
+                                              String domainName,
+                                              Set<ResourcePermission> resourcePermissions);
+
+   /**
+    * Adds the global resource permissions a resource has on any resource of the specified
+    * resource class in the specified domain.
+    * <p/>
+    * Global resource permissions are resource permissions that are defined on a resource class for
+    * a given domain and thus apply to any and all resources of that resource class and domain.
+    * They are <strong>not</strong> associated directly with <em>every</em> individual resource of
+    * that resource class and domain!
+    * <p/>
+    * Note that the system-defined CREATE resource permission can <strong>NOT</strong>
+    * be set as a global resource permission, because it would be nonsensical.
+    * Currently the system-defined INHERIT resource permission may also <strong>not</strong> be
+    * set as a global resource permission.
+    * <p/>
+    * This method does <em>not</em> replace any global resource permissions previously granted, but
+    * can only add to the set. Furthermore, removing the 'withGrant' option from an existing permission is not
+    * possible with this method alone - revoke the permission first, then re-grant without the 'withGrant' option,
+    * or use {@link #setGlobalResourcePermissions} to specify all direct permissions
+    *
+    * @param accessorResource    the resource to which the privilege should be granted
+    * @param resourceClassName   a string resource class name
+    * @param domainName          a string domain name
     * @param resourcePermission  the resource permission to be granted globally to
     *                            the specified resource class and domain
     * @param resourcePermissions the other (optional) resource permissions to be granted globally
@@ -2234,6 +2276,45 @@ public interface AccessControlContext {
    public void setGlobalResourcePermissions(Resource accessorResource,
                                             String resourceClassName,
                                             Set<ResourcePermission> resourcePermissions);
+
+   /**
+    * Adds the global resource permissions a resource has on any resource of the specified
+    * resource class in the current session resource's domain.
+    * <p/>
+    * Global resource permissions are resource permissions that are defined on a resource class for
+    * a given domain and thus apply to any and all resources of that resource class and domain.
+    * They are <strong>not</strong> associated directly with <em>every</em> individual resource of
+    * that resource class and domain!
+    * <p/>
+    * Note that the system-defined CREATE resource permission can <strong>NOT</strong>
+    * be set as a global resource permission, because it would be nonsensical.
+    * Currently the system-defined INHERIT resource permission may also <strong>not</strong> be
+    * set as a global resource permission.
+    * <p/>
+    * This method does <em>not</em> replace any global resource permissions previously granted, but
+    * can only add to the set. Furthermore, removing the 'withGrant' option from an existing permission is not
+    * possible with this method alone - revoke the permission first, then re-grant without the 'withGrant' option,
+    * or use {@link #setGlobalResourcePermissions} to specify all direct permissions
+    *
+    * @param accessorResource    the resource to which the privilege should be granted
+    * @param resourceClassName   a string resource class name
+    * @param resourcePermissions the resource permission to be granted globally to
+    *                            the specified resource class and session resource's domain
+    * @throws java.lang.IllegalArgumentException if accessorResource reference does not exist, or
+    *                                            if no resource class of resourceClassName exists, or
+    *                                            if resourcePermissions is empty, or
+    *                                            if resourcePermissions contains INHERIT permission, or
+    *                                            if resourcePermissions contains permissions invalid for the specified
+    *                                            resource class (incl. RESET-CREDENTIALS or IMPERSONATE for
+    *                                            unauthenticatable resource classes), or
+    *                                            if resourcePermissions contains multiple instances of the same
+    *                                            permission that only differ in the 'withGrant' attribute
+    * @throws com.acciente.oacc.NotAuthorizedException if the session resource is not authorized to grant the
+    *                                                  specified permissions on the specified resource class and its own domain
+    */
+   public void grantGlobalResourcePermissions(Resource accessorResource,
+                                              String resourceClassName,
+                                              Set<ResourcePermission> resourcePermissions);
 
    /**
     * Adds the global resource permissions a resource has on any resource of the specified
