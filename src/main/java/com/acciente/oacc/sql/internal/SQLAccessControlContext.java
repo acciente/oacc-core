@@ -1136,6 +1136,28 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
    @Override
    public void revokeDomainPermissions(Resource accessorResource,
                                        String domainName,
+                                       Set<DomainPermission> domainPermissions) {
+      SQLConnection connection = null;
+
+      __assertAuthenticated();
+      __assertResourceSpecified(accessorResource);
+      __assertDomainSpecified(domainName);
+      __assertPermissionsSpecified(domainPermissions);
+      __assertPermissionsSetNotEmpty(domainPermissions);
+
+      try {
+         connection = __getConnection();
+
+         __revokeDirectDomainPermissions(connection, accessorResource, domainName, domainPermissions);
+      }
+      finally {
+         __closeConnection(connection);
+      }
+   }
+
+   @Override
+   public void revokeDomainPermissions(Resource accessorResource,
+                                       String domainName,
                                        DomainPermission domainPermission,
                                        DomainPermission... domainPermissions) {
       SQLConnection connection = null;
@@ -1157,7 +1179,6 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       finally {
          __closeConnection(connection);
       }
-
    }
 
    private void __revokeDirectDomainPermissions(SQLConnection connection,
