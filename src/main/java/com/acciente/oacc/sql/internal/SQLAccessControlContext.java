@@ -3900,6 +3900,46 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
    @Override
    public void revokeGlobalResourcePermissions(Resource accessorResource,
                                                String resourceClassName,
+                                               Set<ResourcePermission> resourcePermissions) {
+      revokeGlobalResourcePermissions(accessorResource,
+                                      resourceClassName,
+                                      sessionResourceDomainName,
+                                      resourcePermissions);
+   }
+
+   @Override
+   public void revokeGlobalResourcePermissions(Resource accessorResource,
+                                               String resourceClassName,
+                                               String domainName,
+                                               Set<ResourcePermission> resourcePermissions) {
+      SQLConnection connection = null;
+
+      __assertAuthenticated();
+      __assertResourceSpecified(accessorResource);
+      __assertResourceClassSpecified(resourceClassName);
+      __assertDomainSpecified(domainName);
+      __assertPermissionsSpecified(resourcePermissions);
+      __assertPermissionsSetNotEmpty(resourcePermissions);
+
+      try {
+         connection = __getConnection();
+         resourceClassName = resourceClassName.trim();
+         domainName = domainName.trim();
+
+         __revokeDirectGlobalPermissions(connection,
+                                         accessorResource,
+                                         resourceClassName,
+                                         domainName,
+                                         resourcePermissions);
+      }
+      finally {
+         __closeConnection(connection);
+      }
+   }
+
+   @Override
+   public void revokeGlobalResourcePermissions(Resource accessorResource,
+                                               String resourceClassName,
                                                ResourcePermission resourcePermission,
                                                ResourcePermission... resourcePermissions) {
       revokeGlobalResourcePermissions(accessorResource,

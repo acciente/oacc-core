@@ -2329,6 +2329,37 @@ public interface AccessControlContext {
     * @param accessorResource    the resource from which the privilege should be revoked
     * @param resourceClassName   a string resource class name
     * @param domainName          a string domain name
+    * @param resourcePermissions the resource permissions to be revoked globally from
+    *                            the specified resource class and domain
+    * @throws java.lang.IllegalArgumentException if accessorResource reference does not exist, or
+    *                                            if no resource class of resourceClassName exists, or
+    *                                            if no domain of domainName exists, or
+    *                                            if resourcePermissions is empty, or
+    *                                            if resourcePermissions contains permissions invalid for the specified
+    *                                            resource class (incl. RESET-CREDENTIALS or IMPERSONATE for
+    *                                            unauthenticatable resource classes), or
+    *                                            if resourcePermissions contains multiple instances of the same
+    *                                            permission that only differ in the 'withGrant' attribute
+    * @throws com.acciente.oacc.NotAuthorizedException if the session resource is not authorized to grant (or in this case
+    *                                                  revoke) the specified permissions on the specified resource class and domain
+    */
+   public void revokeGlobalResourcePermissions(Resource accessorResource,
+                                               String resourceClassName,
+                                               String domainName,
+                                               Set<ResourcePermission> resourcePermissions);
+
+   /**
+    * Revokes the global resource permissions a resource has on any resource of the specified
+    * resource class in the specified domain.
+    * <p/>
+    * Note that this method revokes the specified permission(s) regardless of any specified granting right and regardless
+    * of the granting right the accessor currently has on the specified global permission!
+    * This method is idempotent, that is, when a specified permission is no longer granted, repeated calls to
+    * this method will have no effect.
+    *
+    * @param accessorResource    the resource from which the privilege should be revoked
+    * @param resourceClassName   a string resource class name
+    * @param domainName          a string domain name
     * @param resourcePermission  the resource permission to be revoked globally from
     *                            the specified resource class and domain
     * @param resourcePermissions the other (optional) resource permissions to be revoked globally
@@ -2506,6 +2537,34 @@ public interface AccessControlContext {
                                               String resourceClassName,
                                               ResourcePermission resourcePermission,
                                               ResourcePermission... resourcePermissions);
+
+   /**
+    * Revokes the global resource permissions a resource has on any resource of the specified
+    * resource class in the session resource's domain.
+    * <p/>
+    * Note that this method revokes the specified permission(s) regardless of any specified granting right and regardless
+    * of the granting right the accessor currently has on the specified global permission!
+    * This method is idempotent, that is, when a specified permission is no longer granted, repeated calls to
+    * this method will have no effect.
+    *
+    * @param accessorResource    the resource from which the privilege should be revoked
+    * @param resourceClassName   a string resource class name
+    * @param resourcePermissions the resource permission to be revoked globally from
+    *                            the specified resource class and the session resource's domain
+    * @throws java.lang.IllegalArgumentException if accessorResource reference does not exist, or
+    *                                            if no resource class of resourceClassName exists, or
+    *                                            if resourcePermissions contains permissions invalid for the specified
+    *                                            resource class (incl. RESET-CREDENTIALS or IMPERSONATE for
+    *                                            unauthenticatable resource classes), or
+    *                                            if resourcePermissions contains multiple instances of the same
+    *                                            permission that only differ in the 'withGrant' attribute
+    * @throws com.acciente.oacc.NotAuthorizedException if the session resource is not authorized to grant (or in this case
+    *                                                  revoke) the specified permissions on the specified resource class
+    *                                                  and its own domain
+    */
+   public void revokeGlobalResourcePermissions(Resource accessorResource,
+                                               String resourceClassName,
+                                               Set<ResourcePermission> resourcePermissions);
 
    /**
     * Revokes the global resource permissions a resource has on any resource of the specified
