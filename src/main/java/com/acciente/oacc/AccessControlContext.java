@@ -2222,6 +2222,32 @@ public interface AccessControlContext {
     *
     * @param accessorResource    the resource from which the privilege should be revoked
     * @param accessedResource    the resource on which the privilege was originally granted
+    * @param resourcePermissions the resource permissions to be revoked
+    * @throws java.lang.IllegalArgumentException if accessorResource or accessedResource reference does not exist, or
+    *                                            if resourcePermissions is empty, or
+    *                                            if resourcePermissions contains permissions invalid for resource class
+    *                                            of the accessedResource(incl. RESET-CREDENTIALS or IMPERSONATE for
+    *                                            unauthenticatable resource classes), or
+    *                                            if resourcePermissions contains multiple instances of the same
+    *                                            permission that only differ in the 'withGrant' attribute
+    * @throws com.acciente.oacc.NotAuthorizedException if the session resource is not authorized to grant (or in this case
+    *                                                  revoke) the specified permissions on the specified accessed resource
+    */
+   public void revokeResourcePermissions(Resource accessorResource,
+                                         Resource accessedResource,
+                                         Set<ResourcePermission> resourcePermissions);
+
+   /**
+    * Revokes the specified resource permissions from the set of permissions that the specified accessor resource
+    * has to the specified accessed resource directly, that is not via inheritance or globally.
+    * <p/>
+    * Note that this method revokes the specified permission regardless of any specified granting right and regardless
+    * of the granting right the accessor has on the accessed resource!
+    * This method is idempotent, that is, when a specified permission is no longer granted, repeated calls to
+    * this method will have no effect.
+    *
+    * @param accessorResource    the resource from which the privilege should be revoked
+    * @param accessedResource    the resource on which the privilege was originally granted
     * @param resourcePermission  the resource permission to be revoked
     * @param resourcePermissions  the other (optional) resource permissions to be revoked
     * @throws java.lang.IllegalArgumentException if accessorResource or accessedResource reference does not exist, or

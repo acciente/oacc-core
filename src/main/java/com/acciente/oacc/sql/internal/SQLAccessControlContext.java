@@ -3327,6 +3327,28 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
    @Override
    public void revokeResourcePermissions(Resource accessorResource,
                                          Resource accessedResource,
+                                         Set<ResourcePermission> resourcePermissions) {
+      SQLConnection connection = null;
+
+      __assertAuthenticated();
+      __assertResourceSpecified(accessorResource);
+      __assertResourceSpecified(accessedResource);
+      __assertPermissionsSpecified(resourcePermissions);
+      __assertPermissionsSetNotEmpty(resourcePermissions);
+
+      try {
+         connection = __getConnection();
+
+         __revokeDirectResourcePermissions(connection, accessorResource, accessedResource, resourcePermissions);
+      }
+      finally {
+         __closeConnection(connection);
+      }
+   }
+
+   @Override
+   public void revokeResourcePermissions(Resource accessorResource,
+                                         Resource accessedResource,
                                          ResourcePermission resourcePermission,
                                          ResourcePermission... resourcePermissions) {
       SQLConnection connection = null;

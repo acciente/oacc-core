@@ -721,6 +721,13 @@ public class AccessControlContextProxy implements AccessControlContext {
    @Override
    public void revokeResourcePermissions(Resource accessorResource,
                                          Resource accessedResource,
+                                         Set<ResourcePermission> resourcePermissions) {
+      accessControlContext.revokeResourcePermissions(accessorResource, accessedResource, resourcePermissions);
+   }
+
+   @Override
+   public void revokeResourcePermissions(Resource accessorResource,
+                                         Resource accessedResource,
                                          ResourcePermission resourcePermission,
                                          ResourcePermission... resourcePermissions) {
       accessControlContext.revokeResourcePermissions(accessorResource, accessedResource, resourcePermission, resourcePermissions);
