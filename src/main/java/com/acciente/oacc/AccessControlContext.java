@@ -1648,7 +1648,7 @@ public interface AccessControlContext {
     * @param accessorResource          the resource to which the privilege should be granted
     * @param resourceClassName         a string resource class name
     * @param domainName                a string representing a valid domain name
-    * @param resourceCreatePermissions the resource create permission to be granted
+    * @param resourceCreatePermissions the resource create permissions to be granted
     * @throws java.lang.IllegalArgumentException if accessorResource reference is invalid, or
     *                                            if no domain of domainName exists, or
     *                                            if no resource class of resourceClassName exists, or
@@ -1719,6 +1719,45 @@ public interface AccessControlContext {
                                               String domainName,
                                               ResourceCreatePermission resourceCreatePermission,
                                               ResourceCreatePermission... resourceCreatePermissions);
+
+   /**
+    * Revokes the specified permissions from the set of resource permissions the specified accessor resource will
+    * receive directly, if it created a resource of the specified resource class in the specified domain.
+    * <p/>
+    * This call does not change <em>inherited</em> resource create permissions the specified accessor resource currently is
+    * privileged to.
+    * Note that this method revokes the specified permission regardless of any specified granting right and regardless
+    * of the granting right the accessor has for the permission currently!
+    * <p/>
+    * Also note that after revoking the specified permissions, the remaining set of direct permissions <em>must</em> still
+    * contain the *CREATE system permission. Attempting to revoke a proper subset of the current direct permissions that
+    * includes the *CREATE permission will result in an IllegalArgumentException.
+    * <p/>
+    * This method is idempotent, that is, when a specified permission is no longer granted, repeated calls to
+    * this method will have no effect.
+    *
+    * @param accessorResource          the resource from which the privilege should be revoked
+    * @param resourceClassName         a string resource class name
+    * @param domainName                a string representing a valid domain name
+    * @param resourceCreatePermissions the resource create permissions to be revoked
+    * @throws java.lang.IllegalArgumentException if accessorResource reference is invalid, or
+    *                                            if no domain of domainName exists, or
+    *                                            if no resource class of resourceClassName exists, or
+    *                                            if resourceCreatePermissions is empty, or
+    *                                            if resourceCreatePermissions contains *CREATE system permission and is a
+    *                                            proper subset of the currently granted direct resource create permissions, or
+    *                                            if resourcePermissions contains permissions invalid for the specified
+    *                                            resource class (incl. RESET-CREDENTIALS or IMPERSONATE for
+    *                                            unauthenticatable resource classes), or
+    *                                            if resourceCreatePermissions contains multiple instances of the same
+    *                                            post-create permission that only differ in the 'withGrant' attribute
+    * @throws com.acciente.oacc.NotAuthorizedException if the session resource is not authorized to grant (or in this case
+    *                                                  revoke) resource create permissions on the specified accessor resource
+    */
+   public void revokeResourceCreatePermissions(Resource accessorResource,
+                                               String resourceClassName,
+                                               String domainName,
+                                               Set<ResourceCreatePermission> resourceCreatePermissions);
 
    /**
     * Revokes the specified permissions from the set of resource permissions the specified accessor resource will
@@ -1934,6 +1973,42 @@ public interface AccessControlContext {
                                               String resourceClassName,
                                               ResourceCreatePermission resourceCreatePermission,
                                               ResourceCreatePermission... resourceCreatePermissions);
+
+   /**
+    * Revokes the specified permissions from the set of resource permissions the specified accessor resource will
+    * receive directly, if it created a resource of the specified resource class in the session resource's domain.
+    * <p/>
+    * This call does not change <em>inherited</em> resource create permissions the specified accessor resource currently is
+    * privileged to.
+    * Note that this method revokes the specified permission regardless of any specified granting right and regardless
+    * of the granting right the accessor has for the permission currently!
+    * <p/>
+    * Also note that after revoking the specified permissions, the remaining set of direct permissions <em>must</em> still
+    * contain the *CREATE system permission. Attempting to revoke a proper subset of the current direct permissions that
+    * includes the *CREATE permission will result in an IllegalArgumentException.
+    * <p/>
+    * This method is idempotent, that is, when a specified permission is no longer granted, repeated calls to
+    * this method will have no effect.
+    *
+    * @param accessorResource          the resource from which the privilege should be revoked
+    * @param resourceClassName         a string resource class name
+    * @param resourceCreatePermissions the resource create permission to be revoked
+    * @throws java.lang.IllegalArgumentException if accessorResource reference is invalid, or
+    *                                            if no resource class of resourceClassName exists, or
+    *                                            if resourceCreatePermissions is empty, or
+    *                                            if resourceCreatePermissions contains *CREATE system permission and is a
+    *                                            proper subset of the currently granted direct resource create permissions, or
+    *                                            if resourcePermissions contains permissions invalid for the specified
+    *                                            resource class (incl. RESET-CREDENTIALS or IMPERSONATE for
+    *                                            unauthenticatable resource classes), or
+    *                                            if resourceCreatePermissions contains multiple instances of the same
+    *                                            post-create permission that only differ in the 'withGrant' attribute
+    * @throws com.acciente.oacc.NotAuthorizedException if the session resource is not authorized to grant (or in this case
+    *                                                  revoke) resource create permissions on the specified accessor resource
+    */
+   public void revokeResourceCreatePermissions(Resource accessorResource,
+                                               String resourceClassName,
+                                               Set<ResourceCreatePermission> resourceCreatePermissions);
 
    /**
     * Revokes the specified permissions from the set of resource permissions the specified accessor resource will

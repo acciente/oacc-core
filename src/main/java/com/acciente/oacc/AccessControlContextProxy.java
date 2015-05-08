@@ -610,6 +610,14 @@ public class AccessControlContextProxy implements AccessControlContext {
    public void revokeResourceCreatePermissions(Resource accessorResource,
                                                String resourceClassName,
                                                String domainName,
+                                               Set<ResourceCreatePermission> resourceCreatePermissions) {
+      accessControlContext.revokeResourceCreatePermissions(accessorResource, resourceClassName, domainName, resourceCreatePermissions);
+   }
+
+   @Override
+   public void revokeResourceCreatePermissions(Resource accessorResource,
+                                               String resourceClassName,
+                                               String domainName,
                                                ResourceCreatePermission resourceCreatePermission,
                                                ResourceCreatePermission... resourceCreatePermissions) {
       accessControlContext.revokeResourceCreatePermissions(accessorResource, resourceClassName, domainName, resourceCreatePermission, resourceCreatePermissions);
@@ -649,6 +657,13 @@ public class AccessControlContextProxy implements AccessControlContext {
                                               ResourceCreatePermission resourceCreatePermission,
                                               ResourceCreatePermission... resourceCreatePermissions) {
       accessControlContext.grantResourceCreatePermissions(accessorResource, resourceClassName, resourceCreatePermission, resourceCreatePermissions);
+   }
+
+   @Override
+   public void revokeResourceCreatePermissions(Resource accessorResource,
+                                               String resourceClassName,
+                                               Set<ResourceCreatePermission> resourceCreatePermissions) {
+      accessControlContext.revokeResourceCreatePermissions(accessorResource, resourceClassName, resourceCreatePermissions);
    }
 
    @Override

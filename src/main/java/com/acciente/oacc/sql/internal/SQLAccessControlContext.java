@@ -2441,6 +2441,44 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
    public void revokeResourceCreatePermissions(Resource accessorResource,
                                                String resourceClassName,
                                                String domainName,
+                                               Set<ResourceCreatePermission> resourceCreatePermissions) {
+      SQLConnection connection = null;
+
+      __assertAuthenticated();
+      __assertResourceSpecified(accessorResource);
+      __assertResourceClassSpecified(resourceClassName);
+      __assertDomainSpecified(domainName);
+      __assertPermissionsSpecified(resourceCreatePermissions);
+      __assertPermissionsSetNotEmpty(resourceCreatePermissions);
+
+      try {
+         connection = __getConnection();
+
+         __revokeDirectResourceCreatePermissions(connection,
+                                                 accessorResource,
+                                                 resourceClassName,
+                                                 domainName,
+                                                 resourceCreatePermissions);
+      }
+      finally {
+         __closeConnection(connection);
+      }
+   }
+
+   @Override
+   public void revokeResourceCreatePermissions(Resource accessorResource,
+                                               String resourceClassName,
+                                               Set<ResourceCreatePermission> resourceCreatePermissions) {
+      revokeResourceCreatePermissions(accessorResource,
+                                      resourceClassName,
+                                      sessionResourceDomainName,
+                                      resourceCreatePermissions);
+   }
+
+   @Override
+   public void revokeResourceCreatePermissions(Resource accessorResource,
+                                               String resourceClassName,
+                                               String domainName,
                                                ResourceCreatePermission resourceCreatePermission,
                                                ResourceCreatePermission... resourceCreatePermissions) {
       SQLConnection connection = null;
@@ -2474,29 +2512,11 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
                                                String resourceClassName,
                                                ResourceCreatePermission resourceCreatePermission,
                                                ResourceCreatePermission... resourceCreatePermissions) {
-      SQLConnection connection = null;
-
-      __assertAuthenticated();
-      __assertResourceSpecified(accessorResource);
-      __assertResourceClassSpecified(resourceClassName);
-      __assertPermissionSpecified(resourceCreatePermission);
-      __assertVarargPermissionsSpecified(resourceCreatePermissions);
-
-      final Set<ResourceCreatePermission> requestedResourceCreatePermissions
-            = __getSetWithoutNullsOrDuplicates(resourceCreatePermission, resourceCreatePermissions);
-
-      try {
-         connection = __getConnection();
-
-         __revokeDirectResourceCreatePermissions(connection,
-                                                 accessorResource,
-                                                 resourceClassName,
-                                                 sessionResourceDomainName,
-                                                 requestedResourceCreatePermissions);
-      }
-      finally {
-         __closeConnection(connection);
-      }
+      revokeResourceCreatePermissions(accessorResource,
+                                      resourceClassName,
+                                      sessionResourceDomainName,
+                                      resourceCreatePermission,
+                                      resourceCreatePermissions);
    }
 
    private void __revokeDirectResourceCreatePermissions(SQLConnection connection,
