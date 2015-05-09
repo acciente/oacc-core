@@ -20,6 +20,7 @@ package com.acciente.oacc;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
 public class NotAuthorizedException extends AuthorizationException {
    public NotAuthorizedException(String message) {
@@ -52,6 +53,14 @@ public class NotAuthorizedException extends AuthorizationException {
                                               + action
                                               + " resource "
                                               + String.valueOf(accessedResource));
+   }
+
+   public static NotAuthorizedException newInstanceForDomainCreatePermissions(Resource accessorResource,
+                                                                              Set<DomainCreatePermission> domainCreatePermissions) {
+      return new NotAuthorizedException("Resource "
+                                              + String.valueOf(accessorResource)
+                                              + " does not have domain create permission(s) "
+                                              + String.valueOf(domainCreatePermissions));
    }
 
    public static NotAuthorizedException newInstanceForDomainCreatePermissions(Resource accessorResource,

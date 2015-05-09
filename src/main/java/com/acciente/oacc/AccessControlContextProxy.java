@@ -94,9 +94,20 @@ public class AccessControlContextProxy implements AccessControlContext {
 
    @Override
    public void assertDomainCreatePermissions(Resource accessorResource,
+                                             Set<DomainCreatePermission> domainCreatePermissions) {
+      accessControlContext.assertDomainCreatePermissions(accessorResource, domainCreatePermissions);
+   }
+
+   @Override
+   public void assertDomainCreatePermissions(Resource accessorResource,
                                              DomainCreatePermission domainCreatePermission,
                                              DomainCreatePermission... domainCreatePermissions) {
       accessControlContext.assertDomainCreatePermissions(accessorResource, domainCreatePermission, domainCreatePermissions);
+   }
+
+   @Override
+   public void assertDomainCreatePermissions(Set<DomainCreatePermission> domainCreatePermissions) {
+      accessControlContext.assertDomainCreatePermissions(domainCreatePermissions);
    }
 
    @Override
@@ -107,9 +118,20 @@ public class AccessControlContextProxy implements AccessControlContext {
 
    @Override
    public boolean hasDomainCreatePermissions(Resource accessorResource,
+                                             Set<DomainCreatePermission> domainCreatePermissions) {
+      return accessControlContext.hasDomainCreatePermissions(accessorResource, domainCreatePermissions);
+   }
+
+   @Override
+   public boolean hasDomainCreatePermissions(Resource accessorResource,
                                              DomainCreatePermission domainCreatePermission,
                                              DomainCreatePermission... domainCreatePermissions) {
       return accessControlContext.hasDomainCreatePermissions(accessorResource, domainCreatePermission, domainCreatePermissions);
+   }
+
+   @Override
+   public boolean hasDomainCreatePermissions(Set<DomainCreatePermission> domainCreatePermissions) {
+      return accessControlContext.hasDomainCreatePermissions(domainCreatePermissions);
    }
 
    @Override
