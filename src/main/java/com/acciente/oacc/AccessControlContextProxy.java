@@ -65,6 +65,19 @@ public class AccessControlContextProxy implements AccessControlContext {
    @Override
    public void assertDomainPermissions(Resource accessorResource,
                                        String domainName,
+                                       Set<DomainPermission> domainPermissions) {
+      accessControlContext.assertDomainPermissions(accessorResource, domainName, domainPermissions);
+   }
+
+   @Override
+   public void assertDomainPermissions(String domainName,
+                                       Set<DomainPermission> domainPermissions) {
+      accessControlContext.assertDomainPermissions(domainName, domainPermissions);
+   }
+
+   @Override
+   public void assertDomainPermissions(Resource accessorResource,
+                                       String domainName,
                                        DomainPermission domainPermission,
                                        DomainPermission... domainPermissions) {
       accessControlContext.assertDomainPermissions(accessorResource, domainName, domainPermission, domainPermissions);
@@ -75,6 +88,19 @@ public class AccessControlContextProxy implements AccessControlContext {
                                        DomainPermission domainPermission,
                                        DomainPermission... domainPermissions) {
       accessControlContext.assertDomainPermissions(domainName, domainPermission, domainPermissions);
+   }
+
+   @Override
+   public boolean hasDomainPermissions(Resource accessorResource,
+                                       String domainName,
+                                       Set<DomainPermission> domainPermissions) {
+      return accessControlContext.hasDomainPermissions(accessorResource, domainName, domainPermissions);
+   }
+
+   @Override
+   public boolean hasDomainPermissions(String domainName,
+                                       Set<DomainPermission> domainPermissions) {
+      return accessControlContext.hasDomainPermissions(domainName, domainPermissions);
    }
 
    @Override

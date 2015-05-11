@@ -19,6 +19,7 @@ package com.acciente.oacc;
 
 import org.junit.Test;
 
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -47,14 +48,30 @@ public class TestAccessControl_assertDomainPermissions extends TestAccessControl
                                                    DomainPermissions.getInstance(DomainPermissions.SUPER_USER));
       accessControlContext.assertDomainPermissions(SYS_RESOURCE,
                                                    domainName,
+                                                   setOf(DomainPermissions.getInstance(DomainPermissions.SUPER_USER)));
+      accessControlContext.assertDomainPermissions(SYS_RESOURCE,
+                                                   domainName,
                                                    DomainPermissions.getInstance(DomainPermissions.SUPER_USER, true));
+      accessControlContext.assertDomainPermissions(SYS_RESOURCE,
+                                                   domainName,
+                                                   setOf(DomainPermissions.getInstance(DomainPermissions.SUPER_USER,
+                                                                                       true)));
       accessControlContext.assertDomainPermissions(SYS_RESOURCE,
                                                    domainName,
                                                    DomainPermissions.getInstance(DomainPermissions.CREATE_CHILD_DOMAIN));
       accessControlContext.assertDomainPermissions(SYS_RESOURCE,
                                                    domainName,
+                                                   setOf(DomainPermissions
+                                                               .getInstance(DomainPermissions.CREATE_CHILD_DOMAIN)));
+      accessControlContext.assertDomainPermissions(SYS_RESOURCE,
+                                                   domainName,
                                                    DomainPermissions.getInstance(DomainPermissions.CREATE_CHILD_DOMAIN,
                                                                                  true));
+      accessControlContext.assertDomainPermissions(SYS_RESOURCE,
+                                                   domainName,
+                                                   setOf(DomainPermissions
+                                                               .getInstance(DomainPermissions.CREATE_CHILD_DOMAIN,
+                                                                            true)));
 
       accessControlContext.assertDomainPermissions(SYS_RESOURCE,
                                                    domainName,
@@ -69,6 +86,16 @@ public class TestAccessControl_assertDomainPermissions extends TestAccessControl
                                                    DomainPermissions.getInstance(DomainPermissions.SUPER_USER),
                                                    DomainPermissions.getInstance(DomainPermissions.SUPER_USER,
                                                                                  true));
+      accessControlContext.assertDomainPermissions(SYS_RESOURCE,
+                                                   domainName,
+                                                   setOf(DomainPermissions
+                                                               .getInstance(DomainPermissions.CREATE_CHILD_DOMAIN),
+                                                         DomainPermissions
+                                                               .getInstance(DomainPermissions.CREATE_CHILD_DOMAIN,
+                                                                            true),
+                                                         DomainPermissions.getInstance(DomainPermissions.SUPER_USER),
+                                                         DomainPermissions.getInstance(DomainPermissions.SUPER_USER,
+                                                                                       true)));
 
       accessControlContext.assertDomainPermissions(domainName,
                                                    DomainPermissions.getInstance(DomainPermissions.CREATE_CHILD_DOMAIN),
@@ -77,6 +104,15 @@ public class TestAccessControl_assertDomainPermissions extends TestAccessControl
                                                    DomainPermissions.getInstance(DomainPermissions.SUPER_USER),
                                                    DomainPermissions.getInstance(DomainPermissions.SUPER_USER,
                                                                                  true));
+      accessControlContext.assertDomainPermissions(domainName,
+                                                   setOf(DomainPermissions
+                                                               .getInstance(DomainPermissions.CREATE_CHILD_DOMAIN),
+                                                         DomainPermissions
+                                                               .getInstance(DomainPermissions.CREATE_CHILD_DOMAIN,
+                                                                            true),
+                                                         DomainPermissions.getInstance(DomainPermissions.SUPER_USER),
+                                                         DomainPermissions.getInstance(DomainPermissions.SUPER_USER,
+                                                                                       true)));
 
       try {
          accessControlContext.assertDomainPermissions(accessorResource,
@@ -90,7 +126,26 @@ public class TestAccessControl_assertDomainPermissions extends TestAccessControl
       try {
          accessControlContext.assertDomainPermissions(accessorResource,
                                                       domainName,
+                                                      setOf(DomainPermissions.getInstance(DomainPermissions.SUPER_USER)));
+         fail("asserting domain permission for accessor resource when none exist should have failed");
+      }
+      catch (NotAuthorizedException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("does not have domain permission"));
+      }
+      try {
+         accessControlContext.assertDomainPermissions(accessorResource,
+                                                      domainName,
                                                       DomainPermissions.getInstance(DomainPermissions.CREATE_CHILD_DOMAIN));
+         fail("asserting domain permission for accessor resource when none exist should have failed");
+      }
+      catch (NotAuthorizedException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("does not have domain permission"));
+      }
+      try {
+         accessControlContext.assertDomainPermissions(accessorResource,
+                                                      domainName,
+                                                      setOf(DomainPermissions
+                                                                  .getInstance(DomainPermissions.CREATE_CHILD_DOMAIN)));
          fail("asserting domain permission for accessor resource when none exist should have failed");
       }
       catch (NotAuthorizedException e) {
@@ -101,6 +156,17 @@ public class TestAccessControl_assertDomainPermissions extends TestAccessControl
                                                       domainName,
                                                       DomainPermissions.getInstance(DomainPermissions.SUPER_USER),
                                                       DomainPermissions.getInstance(DomainPermissions.CREATE_CHILD_DOMAIN));
+         fail("asserting multiple domain permission for accessor resource when none exist should have failed");
+      }
+      catch (NotAuthorizedException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("does not have domain permission"));
+      }
+      try {
+         accessControlContext.assertDomainPermissions(accessorResource,
+                                                      domainName,
+                                                      setOf(DomainPermissions.getInstance(DomainPermissions.SUPER_USER),
+                                                            DomainPermissions
+                                                                  .getInstance(DomainPermissions.CREATE_CHILD_DOMAIN)));
          fail("asserting multiple domain permission for accessor resource when none exist should have failed");
       }
       catch (NotAuthorizedException e) {
@@ -129,9 +195,26 @@ public class TestAccessControl_assertDomainPermissions extends TestAccessControl
          assertThat(e.getMessage().toLowerCase(), containsString("does not have domain permission"));
       }
       try {
+         accessControlContext.assertDomainPermissions(domainName,
+                                                      setOf(DomainPermissions.getInstance(DomainPermissions.SUPER_USER)));
+         fail("asserting domain permission for implicit authenticated accessor resource when none exist should have failed");
+      }
+      catch (NotAuthorizedException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("does not have domain permission"));
+      }
+      try {
          accessControlContext.assertDomainPermissions(accessorResource,
                                                       domainName,
                                                       DomainPermissions.getInstance(DomainPermissions.SUPER_USER));
+         fail("asserting domain permission for authenticated accessor resource when none exist should have failed");
+      }
+      catch (NotAuthorizedException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("does not have domain permission"));
+      }
+      try {
+         accessControlContext.assertDomainPermissions(accessorResource,
+                                                      domainName,
+                                                      setOf(DomainPermissions.getInstance(DomainPermissions.SUPER_USER)));
          fail("asserting domain permission for authenticated accessor resource when none exist should have failed");
       }
       catch (NotAuthorizedException e) {
@@ -146,12 +229,33 @@ public class TestAccessControl_assertDomainPermissions extends TestAccessControl
       catch (NotAuthorizedException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("does not have domain permission"));
       }
+      try {
+         accessControlContext.assertDomainPermissions(accessorResource,
+                                                      domainName,
+                                                      setOf(DomainPermissions
+                                                                  .getInstance(DomainPermissions.CREATE_CHILD_DOMAIN)));
+         fail("asserting domain permission for authenticated accessor resource when none exist should have failed");
+      }
+      catch (NotAuthorizedException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("does not have domain permission"));
+      }
 
       try {
          accessControlContext.assertDomainPermissions(accessorResource,
                                                       domainName,
                                                       DomainPermissions.getInstance(DomainPermissions.CREATE_CHILD_DOMAIN),
                                                       DomainPermissions.getInstance(DomainPermissions.SUPER_USER));
+         fail("asserting multiple domain permission for authenticated accessor resource when none exist should have failed");
+      }
+      catch (NotAuthorizedException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("does not have domain permission"));
+      }
+      try {
+         accessControlContext.assertDomainPermissions(accessorResource,
+                                                      domainName,
+                                                      setOf(DomainPermissions
+                                                                  .getInstance(DomainPermissions.CREATE_CHILD_DOMAIN),
+                                                            DomainPermissions.getInstance(DomainPermissions.SUPER_USER)));
          fail("asserting multiple domain permission for authenticated accessor resource when none exist should have failed");
       }
       catch (NotAuthorizedException e) {
@@ -187,6 +291,7 @@ public class TestAccessControl_assertDomainPermissions extends TestAccessControl
 
       accessControlContext.assertDomainPermissions(accessorResource, domainName1, domPerm_superuser, domPerm_child);
       accessControlContext.assertDomainPermissions(accessorResource, domainName1, domPerm_child, domPerm_superuser);
+      accessControlContext.assertDomainPermissions(accessorResource, domainName1, setOf(domPerm_child, domPerm_superuser));
 
       // let's try another domain
       Set<DomainPermission> domainPermissions_pre2 = new HashSet<>();
@@ -201,7 +306,9 @@ public class TestAccessControl_assertDomainPermissions extends TestAccessControl
       assertThat(allDomainPermissions2.get(domainName2), is(domainPermissions_pre2));
 
       accessControlContext.assertDomainPermissions(accessorResource, domainName2, domPerm_child_withGrant);
+      accessControlContext.assertDomainPermissions(accessorResource, domainName2, setOf(domPerm_child_withGrant));
       accessControlContext.assertDomainPermissions(domainName2, domPerm_child_withGrant);
+      accessControlContext.assertDomainPermissions(domainName2, setOf(domPerm_child_withGrant));
    }
 
    @Test
@@ -251,6 +358,28 @@ public class TestAccessControl_assertDomainPermissions extends TestAccessControl
          assertThat(e.getMessage().toLowerCase(), containsString("does not have domain permission"));
       }
 
+      try {
+         accessControlContext.assertDomainPermissions(accessorResource,
+                                                      domainName1,
+                                                      domPerm_child_withGrant,
+                                                      domPerm_child);
+         fail("asserting partially valid domain permission for system resource should have failed");
+      }
+      catch (NotAuthorizedException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("does not have domain permission"));
+      }
+
+      try {
+         accessControlContext.assertDomainPermissions(accessorResource,
+                                                      domainName1,
+                                                      setOf(domPerm_child_withGrant,
+                                                            domPerm_child));
+         fail("asserting partially valid domain permission for system resource should have failed");
+      }
+      catch (NotAuthorizedException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("does not have domain permission"));
+      }
+
       // let's try another domain
       Set<DomainPermission> domainPermissions_pre2 = setOf(domPerm_child_withGrant);
       accessControlContext.setDomainPermissions(accessorResource, domainName2, domainPermissions_pre2);
@@ -271,11 +400,24 @@ public class TestAccessControl_assertDomainPermissions extends TestAccessControl
       catch (NotAuthorizedException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("does not have domain permission"));
       }
+      try {accessControlContext.assertDomainPermissions(accessorResource,
+                                                        domainName2,
+                                                        setOf(domPerm_child_withGrant,
+                                                              domPerm_superuser));
+         fail("asserting partially valid domain permissions should have failed for system resource");
+      }
+      catch (NotAuthorizedException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("does not have domain permission"));
+      }
 
       accessControlContext.assertDomainPermissions(accessorResource,
                                                    domainName2,
                                                    domPerm_child_withGrant,
                                                    domPerm_child);
+      accessControlContext.assertDomainPermissions(accessorResource,
+                                                   domainName2,
+                                                   setOf(domPerm_child_withGrant,
+                                                         domPerm_child));
       // authenticate accessor resource
       accessControlContext.authenticate(accessorResource, PasswordCredentials.newInstance(password));
 
@@ -283,6 +425,15 @@ public class TestAccessControl_assertDomainPermissions extends TestAccessControl
          accessControlContext.assertDomainPermissions(domainName1,
                                                       domPerm_child,
                                                       domPerm_child_withGrant);
+         fail("asserting partially valid domain permission for implicit authenticated resource should have failed");
+      }
+      catch (NotAuthorizedException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("does not have domain permission"));
+      }
+      try {
+         accessControlContext.assertDomainPermissions(domainName1,
+                                                      setOf(domPerm_child,
+                                                            domPerm_child_withGrant));
          fail("asserting partially valid domain permission for implicit authenticated resource should have failed");
       }
       catch (NotAuthorizedException e) {
@@ -321,17 +472,29 @@ public class TestAccessControl_assertDomainPermissions extends TestAccessControl
 
       // verify
       accessControlContext.assertDomainPermissions(accessorResource, domainName1, domPerm_superuser_withGrant);
+      accessControlContext.assertDomainPermissions(accessorResource, domainName1, setOf(domPerm_superuser_withGrant));
       accessControlContext.assertDomainPermissions(accessorResource,
                                                    domainName1,
                                                    domPerm_child_withGrant,
                                                    domPerm_child,
                                                    domPerm_superuser_withGrant,
                                                    domPerm_superuser);
+      accessControlContext.assertDomainPermissions(accessorResource,
+                                                   domainName1,
+                                                   setOf(domPerm_child_withGrant,
+                                                         domPerm_child,
+                                                         domPerm_superuser_withGrant,
+                                                         domPerm_superuser));
       accessControlContext.assertDomainPermissions(domainName1,
                                                    domPerm_child_withGrant,
                                                    domPerm_child,
                                                    domPerm_superuser_withGrant,
                                                    domPerm_superuser);
+      accessControlContext.assertDomainPermissions(domainName1,
+                                                   setOf(domPerm_child_withGrant,
+                                                         domPerm_child,
+                                                         domPerm_superuser_withGrant,
+                                                         domPerm_superuser));
    }
 
    @Test
@@ -368,7 +531,21 @@ public class TestAccessControl_assertDomainPermissions extends TestAccessControl
          assertThat(e.getMessage().toLowerCase(), containsString("does not have domain permission"));
       }
       try {
+         accessControlContext.assertDomainPermissions(accessorResource, domainName1, setOf(domPerm_child_withGrant));
+         fail("asserting domain permission with exceeding granting rights should have failed for authenticated resource");
+      }
+      catch (NotAuthorizedException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("does not have domain permission"));
+      }
+      try {
          accessControlContext.assertDomainPermissions(domainName1, domPerm_child_withGrant);
+         fail("asserting domain permission with exceeding granting rights should have failed for implicit authenticated resource");
+      }
+      catch (NotAuthorizedException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("does not have domain permission"));
+      }
+      try {
+         accessControlContext.assertDomainPermissions(domainName1, setOf(domPerm_child_withGrant));
          fail("asserting domain permission with exceeding granting rights should have failed for implicit authenticated resource");
       }
       catch (NotAuthorizedException e) {
@@ -392,14 +569,14 @@ public class TestAccessControl_assertDomainPermissions extends TestAccessControl
       accessControlContext.authenticate(accessorResource, PasswordCredentials.newInstance(password));
 
       // verify
-      accessControlContext.assertDomainPermissions(accessorResource, domainName2, domPerm_child);
+      accessControlContext.assertDomainPermissions(accessorResource, domainName2, setOf(domPerm_child));
       accessControlContext.assertDomainPermissions(accessorResource,
                                                    domainName2,
-                                                   domPerm_child_withGrant,
-                                                   domPerm_child);
+                                                   setOf(domPerm_child_withGrant,
+                                                         domPerm_child));
       accessControlContext.assertDomainPermissions(domainName2,
-                                                   domPerm_child_withGrant,
-                                                   domPerm_child);
+                                                   setOf(domPerm_child_withGrant,
+                                                         domPerm_child));
    }
 
    @Test
@@ -432,9 +609,16 @@ public class TestAccessControl_assertDomainPermissions extends TestAccessControl
                                                    childDomain,
                                                    domPerm_superuser_withGrant,
                                                    domPerm_createchilddomain_withGrant);
+      accessControlContext.assertDomainPermissions(accessorResource,
+                                                   childDomain,
+                                                   setOf(domPerm_superuser_withGrant,
+                                                         domPerm_createchilddomain_withGrant));
       accessControlContext.assertDomainPermissions(childDomain,
                                                    domPerm_superuser_withGrant,
                                                    domPerm_createchilddomain_withGrant);
+      accessControlContext.assertDomainPermissions(childDomain,
+                                                   setOf(domPerm_superuser_withGrant,
+                                                         domPerm_createchilddomain_withGrant));
    }
 
    @Test
@@ -479,6 +663,10 @@ public class TestAccessControl_assertDomainPermissions extends TestAccessControl
                                                    greatGreatGrandChildDomain,
                                                    domPerm_superuser_withGrant,
                                                    domPerm_createchilddomain_withGrant);
+      accessControlContext.assertDomainPermissions(accessorResource,
+                                                   greatGreatGrandChildDomain,
+                                                   setOf(domPerm_superuser_withGrant,
+                                                         domPerm_createchilddomain_withGrant));
    }
 
    @Test
@@ -518,6 +706,10 @@ public class TestAccessControl_assertDomainPermissions extends TestAccessControl
                                                    domainName,
                                                    domPerm_superuser_withGrant,
                                                    domPerm_createchilddomain_withGrant);
+      accessControlContext.assertDomainPermissions(accessorResource,
+                                                   domainName,
+                                                   setOf(domPerm_superuser_withGrant,
+                                                         domPerm_createchilddomain_withGrant));
    }
 
    @Test
@@ -557,9 +749,16 @@ public class TestAccessControl_assertDomainPermissions extends TestAccessControl
                                                    childDomain,
                                                    domPerm_superuser_withGrant,
                                                    domPerm_createchilddomain_withGrant);
+      accessControlContext.assertDomainPermissions(accessorResource,
+                                                   childDomain,
+                                                   setOf(domPerm_superuser_withGrant,
+                                                         domPerm_createchilddomain_withGrant));
       accessControlContext.assertDomainPermissions(childDomain,
                                                    domPerm_superuser_withGrant,
                                                    domPerm_createchilddomain_withGrant);
+      accessControlContext.assertDomainPermissions(childDomain,
+                                                   setOf(domPerm_superuser_withGrant,
+                                                         domPerm_createchilddomain_withGrant));
    }
 
    @Test
@@ -579,7 +778,9 @@ public class TestAccessControl_assertDomainPermissions extends TestAccessControl
 
       // get domain create permissions and verify
       accessControlContext.assertDomainPermissions(accessorResource, domainName_whitespaced, domCreatePerm_superuser);
+      accessControlContext.assertDomainPermissions(accessorResource, domainName_whitespaced, setOf(domCreatePerm_superuser));
       accessControlContext.assertDomainPermissions(domainName_whitespaced, domCreatePerm_superuser);
+      accessControlContext.assertDomainPermissions(domainName_whitespaced, setOf(domCreatePerm_superuser));
    }
 
    @Test
@@ -614,14 +815,14 @@ public class TestAccessControl_assertDomainPermissions extends TestAccessControl
       }
 
       try {
-         accessControlContext.assertDomainPermissions(accessorResource, domainName, null);
+         accessControlContext.assertDomainPermissions(accessorResource, domainName, (DomainPermission) null);
          fail("asserting domain permissions with null domain permission reference should have failed");
       }
       catch (NullPointerException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("permission required"));
       }
       try {
-         accessControlContext.assertDomainPermissions(domainName, null);
+         accessControlContext.assertDomainPermissions(domainName, (DomainPermission) null);
          fail("asserting domain permissions with null domain permission reference should have failed");
       }
       catch (NullPointerException e) {
@@ -678,6 +879,84 @@ public class TestAccessControl_assertDomainPermissions extends TestAccessControl
       catch (NullPointerException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("without null element"));
       }
+
+      // test set-based version
+      try {
+         accessControlContext.assertDomainPermissions(null, domainName, setOf(domPerm_superUser));
+         fail("asserting domain permissions with null accessor resource reference should have failed");
+      }
+      catch (NullPointerException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("resource required"));
+      }
+
+      try {
+         accessControlContext.assertDomainPermissions(accessorResource, null, setOf(domPerm_superUser));
+         fail("asserting domain permissions with null domain name should have failed");
+      }
+      catch (NullPointerException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("domain required"));
+      }
+      try {
+         accessControlContext.assertDomainPermissions(null, setOf(domPerm_superUser));
+         fail("asserting domain permissions with null domain name should have failed");
+      }
+      catch (NullPointerException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("domain required"));
+      }
+
+      try {
+         accessControlContext.assertDomainPermissions(accessorResource, domainName, (Set<DomainPermission>) null);
+         fail("asserting domain permissions with null domain permission reference should have failed");
+      }
+      catch (NullPointerException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("permissions required"));
+      }
+      try {
+         accessControlContext.assertDomainPermissions(domainName, (Set<DomainPermission>) null);
+         fail("asserting domain permissions with null domain permission reference should have failed");
+      }
+      catch (NullPointerException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("permissions required"));
+      }
+
+      try {
+         accessControlContext.assertDomainPermissions(accessorResource,
+                                                      domainName,
+                                                      setOf(domPerm_superUser, null));
+         fail("asserting domain permissions with null domain permission element should have failed");
+      }
+      catch (NullPointerException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("contains null element"));
+      }
+      try {
+         accessControlContext.assertDomainPermissions(domainName, setOf(domPerm_superUser, null));
+         fail("asserting domain permissions with null domain permission element should have failed");
+      }
+      catch (NullPointerException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("contains null element"));
+      }
+   }
+
+   @Test
+   public void assertDomainPermissions_emptyPermissionSet_shouldFail() {
+      authenticateSystemResource();
+      final Resource accessorResource = generateUnauthenticatableResource();
+      final String domainName = generateDomain();
+
+      try {
+         accessControlContext.assertDomainPermissions(accessorResource, domainName, Collections.<DomainPermission>emptySet());
+         fail("asserting domain permissions with null domain permission reference should have failed");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("permissions required"));
+      }
+      try {
+         accessControlContext.assertDomainPermissions(domainName, Collections.<DomainPermission>emptySet());
+         fail("asserting domain permissions with null domain permission reference should have failed");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("permissions required"));
+      }
    }
 
    @Test
@@ -722,7 +1001,9 @@ public class TestAccessControl_assertDomainPermissions extends TestAccessControl
       final String domainName = generateDomain();
 
       accessControlContext.assertDomainPermissions(SYS_RESOURCE, domainName, domPerm_superUser, domPerm_superUser_grantable);
+      accessControlContext.assertDomainPermissions(SYS_RESOURCE, domainName, setOf(domPerm_superUser, domPerm_superUser_grantable));
       accessControlContext.assertDomainPermissions(domainName, domPerm_superUser, domPerm_superUser_grantable);
+      accessControlContext.assertDomainPermissions(domainName, setOf(domPerm_superUser, domPerm_superUser_grantable));
    }
 
    @Test
@@ -741,6 +1022,13 @@ public class TestAccessControl_assertDomainPermissions extends TestAccessControl
       catch (IllegalArgumentException e) {
          assertThat(e.getMessage().toLowerCase(), containsString(String.valueOf(invalidResource).toLowerCase() + " not found"));
       }
+      try {
+         accessControlContext.assertDomainPermissions(invalidResource, domainName, setOf(domPerm_superUser));
+         fail("asserting domain permissions for invalid accessor resource should have failed");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString(String.valueOf(invalidResource).toLowerCase() + " not found"));
+      }
 
       try {
          accessControlContext.assertDomainPermissions(accessorResource, "invalid_domain", domPerm_superUser);
@@ -750,7 +1038,21 @@ public class TestAccessControl_assertDomainPermissions extends TestAccessControl
          assertThat(e.getMessage().toLowerCase(), containsString("could not find domain"));
       }
       try {
+         accessControlContext.assertDomainPermissions(accessorResource, "invalid_domain", setOf(domPerm_superUser));
+         fail("asserting domain permissions with invalid domain name should have failed");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("could not find domain"));
+      }
+      try {
          accessControlContext.assertDomainPermissions("invalid_domain", domPerm_superUser);
+         fail("asserting domain permissions with invalid domain name should have failed");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("could not find domain"));
+      }
+      try {
+         accessControlContext.assertDomainPermissions("invalid_domain", setOf(domPerm_superUser));
          fail("asserting domain permissions with invalid domain name should have failed");
       }
       catch (IllegalArgumentException e) {

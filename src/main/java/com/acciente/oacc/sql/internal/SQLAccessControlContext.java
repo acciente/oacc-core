@@ -56,6 +56,7 @@ import com.acciente.oacc.sql.internal.persister.id.Id;
 import com.acciente.oacc.sql.internal.persister.id.ResourceClassId;
 import com.acciente.oacc.sql.internal.persister.id.ResourceId;
 import com.acciente.oacc.sql.internal.persister.id.ResourcePermissionId;
+import com.ibm.db2.jcc.a.d;
 
 import javax.sql.DataSource;
 import java.io.Serializable;
@@ -4594,6 +4595,23 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
    @Override
    public void assertDomainPermissions(Resource accessorResource,
                                        String domainName,
+                                       Set<DomainPermission> domainPermissions) {
+      if (!hasDomainPermissions(accessorResource, domainName, domainPermissions)) {
+         throw NotAuthorizedException.newInstanceForDomainPermissions(accessorResource,
+                                                                      domainName,
+                                                                      domainPermissions);
+      }
+   }
+
+   @Override
+   public void assertDomainPermissions(String domainName,
+                                       Set<DomainPermission> domainPermissions) {
+      assertDomainPermissions(sessionResource, domainName, domainPermissions);
+   }
+
+   @Override
+   public void assertDomainPermissions(Resource accessorResource,
+                                       String domainName,
                                        DomainPermission domainPermission,
                                        DomainPermission... domainPermissions) {
       if (!hasDomainPermissions(accessorResource, domainName, domainPermission, domainPermissions)) {
@@ -4609,6 +4627,34 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
                                        DomainPermission domainPermission,
                                        DomainPermission... domainPermissions) {
       assertDomainPermissions(sessionResource, domainName, domainPermission, domainPermissions);
+   }
+
+   @Override
+   public boolean hasDomainPermissions(Resource accessorResource,
+                                       String domainName,
+                                       Set<DomainPermission> domainPermissions) {
+      SQLConnection connection = null;
+
+      __assertAuthenticated();
+      __assertResourceSpecified(accessorResource);
+      __assertDomainSpecified(domainName);
+      __assertPermissionsSpecified(domainPermissions);
+      __assertPermissionsSetNotEmpty(domainPermissions);
+
+      try {
+         connection = __getConnection();
+
+         return __hasDomainPermissions(connection, accessorResource, domainName, domainPermissions);
+      }
+      finally {
+         __closeConnection(connection);
+      }
+   }
+
+   @Override
+   public boolean hasDomainPermissions(String domainName,
+                                       Set<DomainPermission> domainPermissions) {
+      return hasDomainPermissions(sessionResource, domainName, domainPermissions);
    }
 
    @Override
