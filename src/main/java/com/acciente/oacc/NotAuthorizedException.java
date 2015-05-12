@@ -129,6 +129,20 @@ public class NotAuthorizedException extends AuthorizationException {
    public static NotAuthorizedException newInstanceForGlobalResourcePermissions(Resource accessorResource,
                                                                                 String resourceClassName,
                                                                                 String domainName,
+                                                                                Set<ResourcePermission> resourcePermissions) {
+      return new NotAuthorizedException("Resource "
+                                              + String.valueOf(accessorResource)
+                                              + " does not have global permission(s) "
+                                              + String.valueOf(resourcePermissions)
+                                              + " on resources of class "
+                                              + resourceClassName
+                                              + " in domain "
+                                              + domainName);
+   }
+
+   public static NotAuthorizedException newInstanceForGlobalResourcePermissions(Resource accessorResource,
+                                                                                String resourceClassName,
+                                                                                String domainName,
                                                                                 ResourcePermission resourcePermission,
                                                                                 ResourcePermission... resourcePermissions) {
       return new NotAuthorizedException("Resource "

@@ -5031,6 +5031,51 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
    @Override
    public void assertGlobalResourcePermissions(Resource accessorResource,
                                                String resourceClassName,
+                                               Set<ResourcePermission> resourcePermissions) {
+      assertGlobalResourcePermissions(accessorResource,
+                                      resourceClassName,
+                                      sessionResourceDomainName,
+                                      resourcePermissions);
+   }
+
+   @Override
+   public void assertGlobalResourcePermissions(String resourceClassName,
+                                               Set<ResourcePermission> resourcePermissions) {
+      assertGlobalResourcePermissions(sessionResource,
+                                      resourceClassName,
+                                      sessionResourceDomainName,
+                                      resourcePermissions);
+   }
+
+   @Override
+   public void assertGlobalResourcePermissions(Resource accessorResource,
+                                               String resourceClassName,
+                                               String domainName,
+                                               Set<ResourcePermission> resourcePermissions) {
+      if (!hasGlobalResourcePermissions(accessorResource,
+                                        resourceClassName,
+                                        domainName,
+                                        resourcePermissions)) {
+         throw NotAuthorizedException.newInstanceForGlobalResourcePermissions(accessorResource,
+                                                                              resourceClassName,
+                                                                              domainName,
+                                                                              resourcePermissions);
+      }
+   }
+
+   @Override
+   public void assertGlobalResourcePermissions(String resourceClassName,
+                                               String domainName,
+                                               Set<ResourcePermission> resourcePermissions) {
+      assertGlobalResourcePermissions(sessionResource,
+                                      resourceClassName,
+                                      domainName,
+                                      resourcePermissions);
+   }
+
+   @Override
+   public void assertGlobalResourcePermissions(Resource accessorResource,
+                                               String resourceClassName,
                                                ResourcePermission resourcePermission,
                                                ResourcePermission... resourcePermissions) {
       assertGlobalResourcePermissions(accessorResource,
@@ -5080,6 +5125,65 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
                                       domainName,
                                       resourcePermission,
                                       resourcePermissions);
+   }
+
+   @Override
+   public boolean hasGlobalResourcePermissions(Resource accessorResource,
+                                               String resourceClassName,
+                                               Set<ResourcePermission> resourcePermissions) {
+      return hasGlobalResourcePermissions(accessorResource,
+                                          resourceClassName,
+                                          sessionResourceDomainName,
+                                          resourcePermissions);
+   }
+
+   @Override
+   public boolean hasGlobalResourcePermissions(String resourceClassName,
+                                               Set<ResourcePermission> resourcePermissions) {
+      return hasGlobalResourcePermissions(sessionResource,
+                                          resourceClassName,
+                                          sessionResourceDomainName,
+                                          resourcePermissions);
+   }
+
+   @Override
+   public boolean hasGlobalResourcePermissions(Resource accessorResource,
+                                               String resourceClassName,
+                                               String domainName,
+                                               Set<ResourcePermission> resourcePermissions) {
+      SQLConnection connection = null;
+
+      __assertAuthenticated();
+      __assertResourceSpecified(accessorResource);
+      __assertResourceClassSpecified(resourceClassName);
+      __assertDomainSpecified(domainName);
+      __assertPermissionsSpecified(resourcePermissions);
+      __assertPermissionsSetNotEmpty(resourcePermissions);
+
+      try {
+         connection = __getConnection();
+         resourceClassName = resourceClassName.trim();
+         domainName = domainName.trim();
+
+         return __hasGlobalResourcePermissions(connection,
+                                               accessorResource,
+                                               resourceClassName,
+                                               domainName,
+                                               resourcePermissions);
+      }
+      finally {
+         __closeConnection(connection);
+      }
+   }
+
+   @Override
+   public boolean hasGlobalResourcePermissions(String resourceClassName,
+                                               String domainName,
+                                               Set<ResourcePermission> resourcePermissions) {
+      return hasGlobalResourcePermissions(sessionResource,
+                                          resourceClassName,
+                                          domainName,
+                                          resourcePermissions);
    }
 
    @Override
