@@ -399,6 +399,30 @@ public interface AccessControlContext {
     * The method takes into account any direct and inherited domain create permissions the accessor might have.
     *
     * @param accessorResource  the resource requesting the access
+    * @param domainPermissions the permissions to be checked
+    * @throws IllegalArgumentException                 if the accessorResource does not exist
+    * @throws com.acciente.oacc.NotAuthorizedException if the accessor resource would <strong>not</strong> receive the
+    *                                                  specified permissions after creating a domain
+    */
+   public void assertPostCreateDomainPermissions(Resource accessorResource,
+                                                 Set<DomainPermission> domainPermissions);
+
+   /**
+    * Checks if the session resource would receive the specified domain permissions, if it were to create a domain.
+    * The method takes into account any direct and inherited domain create permissions the session resource might have.
+    *
+    * @param domainPermissions the permissions to be checked
+    * @throws com.acciente.oacc.NotAuthorizedException if the session resource would <strong>not</strong> receive the
+    *                                                  specified permissions after creating a domain
+    */
+   public void assertPostCreateDomainPermissions(Set<DomainPermission> domainPermissions);
+
+   /**
+    * Checks if the specified accessor resource would receive the specified domain permissions, if the accessor
+    * were to create a domain.
+    * The method takes into account any direct and inherited domain create permissions the accessor might have.
+    *
+    * @param accessorResource  the resource requesting the access
     * @param domainPermission  the permission to be checked
     * @param domainPermissions the other (optional) permissions to be checked
     * @throws IllegalArgumentException                 if the accessorResource does not exist
@@ -420,6 +444,28 @@ public interface AccessControlContext {
     */
    public void assertPostCreateDomainPermissions(DomainPermission domainPermission,
                                                  DomainPermission... domainPermissions);
+
+   /**
+    * Checks if the specified accessor resource would receive the specified domain permissions, if the accessor
+    * were to create a domain.
+    * The method takes into account any direct and inherited domain create permissions the accessor might have.
+    *
+    * @param accessorResource  the resource requesting the access
+    * @param domainPermissions the permissions to be checked
+    * @throws IllegalArgumentException if the accessorResource does not exist
+    * @return <strong>true</strong> if the accessor resource would receive the specified permissions after creating a domain
+    */
+   public boolean hasPostCreateDomainPermissions(Resource accessorResource,
+                                                 Set<DomainPermission> domainPermissions);
+
+   /**
+    * Checks if the session resource would receive the specified domain permissions, if it were to create a domain.
+    * The method takes into account any direct and inherited domain create permissions the session resource might have.
+    *
+    * @param domainPermissions the permissions to be checked
+    * @return <strong>true</strong> if the session resource would receive the specified permissions after creating a domain
+    */
+   public boolean hasPostCreateDomainPermissions(Set<DomainPermission> domainPermissions);
 
    /**
     * Checks if the specified accessor resource would receive the specified domain permissions, if the accessor

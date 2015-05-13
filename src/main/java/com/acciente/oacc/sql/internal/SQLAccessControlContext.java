@@ -4496,6 +4496,20 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
 
    @Override
    public void assertPostCreateDomainPermissions(Resource accessorResource,
+                                                 Set<DomainPermission> domainPermissions) {
+      if (!hasPostCreateDomainPermissions(accessorResource, domainPermissions)) {
+         throw NotAuthorizedException.newInstanceForPostCreateDomainPermissions(accessorResource,
+                                                                                domainPermissions);
+      }
+   }
+
+   @Override
+   public void assertPostCreateDomainPermissions(Set<DomainPermission> domainPermissions) {
+      assertPostCreateDomainPermissions(sessionResource, domainPermissions);
+   }
+
+   @Override
+   public void assertPostCreateDomainPermissions(Resource accessorResource,
                                                  DomainPermission domainPermission,
                                                  DomainPermission... domainPermissions) {
       if (!hasPostCreateDomainPermissions(accessorResource, domainPermission, domainPermissions)) {
@@ -4509,6 +4523,30 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
    public void assertPostCreateDomainPermissions(DomainPermission domainPermission,
                                                  DomainPermission... domainPermissions) {
       assertPostCreateDomainPermissions(sessionResource, domainPermission, domainPermissions);
+   }
+
+   @Override
+   public boolean hasPostCreateDomainPermissions(Resource accessorResource,
+                                                 Set<DomainPermission> domainPermissions) {
+      SQLConnection connection = null;
+
+      __assertAuthenticated();
+      __assertResourceSpecified(accessorResource);
+      __assertPermissionsSpecified(domainPermissions);
+      __assertPermissionsSetNotEmpty(domainPermissions);
+
+      try {
+         connection = __getConnection();
+         return __hasPostCreateDomainPermissions(connection, accessorResource, domainPermissions);
+      }
+      finally {
+         __closeConnection(connection);
+      }
+   }
+
+   @Override
+   public boolean hasPostCreateDomainPermissions(Set<DomainPermission> domainPermissions) {
+      return hasPostCreateDomainPermissions(sessionResource, domainPermissions);
    }
 
    @Override

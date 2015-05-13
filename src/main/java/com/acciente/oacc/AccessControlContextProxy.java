@@ -168,6 +168,17 @@ public class AccessControlContextProxy implements AccessControlContext {
 
    @Override
    public void assertPostCreateDomainPermissions(Resource accessorResource,
+                                                 Set<DomainPermission> domainPermissions) {
+      accessControlContext.assertPostCreateDomainPermissions(accessorResource, domainPermissions);
+   }
+
+   @Override
+   public void assertPostCreateDomainPermissions(Set<DomainPermission> domainPermissions) {
+      accessControlContext.assertPostCreateDomainPermissions(domainPermissions);
+   }
+
+   @Override
+   public void assertPostCreateDomainPermissions(Resource accessorResource,
                                                  DomainPermission domainPermission,
                                                  DomainPermission... domainPermissions) {
       accessControlContext.assertPostCreateDomainPermissions(accessorResource, domainPermission, domainPermissions);
@@ -177,6 +188,17 @@ public class AccessControlContextProxy implements AccessControlContext {
    public void assertPostCreateDomainPermissions(DomainPermission domainPermission,
                                                  DomainPermission... domainPermissions) {
       accessControlContext.assertPostCreateDomainPermissions(domainPermission, domainPermissions);
+   }
+
+   @Override
+   public boolean hasPostCreateDomainPermissions(Resource accessorResource,
+                                                 Set<DomainPermission> domainPermissions) {
+      return accessControlContext.hasPostCreateDomainPermissions(accessorResource, domainPermissions);
+   }
+
+   @Override
+   public boolean hasPostCreateDomainPermissions(Set<DomainPermission> domainPermissions) {
+      return accessControlContext.hasPostCreateDomainPermissions(domainPermissions);
    }
 
    @Override

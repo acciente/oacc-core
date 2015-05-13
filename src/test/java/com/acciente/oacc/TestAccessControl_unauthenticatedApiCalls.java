@@ -389,7 +389,7 @@ public class TestAccessControl_unauthenticatedApiCalls extends TestAccessControl
 
       // asserts
       try {
-         accessControlContext.assertPostCreateDomainPermissions(null, null);
+         accessControlContext.assertPostCreateDomainPermissions((Resource) null, (DomainPermission) null);
          fail("operation should have failed from unauthenticated context");
       }
       catch (NotAuthenticatedException e) {

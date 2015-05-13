@@ -96,6 +96,15 @@ public class NotAuthorizedException extends AuthorizationException {
    }
 
    public static NotAuthorizedException newInstanceForPostCreateDomainPermissions(Resource accessorResource,
+                                                                                  Set<DomainPermission> domainPermissions) {
+      return new NotAuthorizedException("Resource "
+                                              + String.valueOf(accessorResource)
+                                              + " is not authorized to receive "
+                                              + String.valueOf(domainPermissions)
+                                              + " domain permission(s) after creating a domain");
+   }
+
+   public static NotAuthorizedException newInstanceForPostCreateDomainPermissions(Resource accessorResource,
                                                                                   DomainPermission domainPermission,
                                                                                   DomainPermission... domainPermissions) {
       return new NotAuthorizedException("Resource "
