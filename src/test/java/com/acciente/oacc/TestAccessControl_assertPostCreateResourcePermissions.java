@@ -19,6 +19,7 @@ package com.acciente.oacc;
 
 import org.junit.Test;
 
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -53,6 +54,20 @@ public class TestAccessControl_assertPostCreateResourcePermissions extends TestA
                                                                ResourcePermissions.getInstance(customPermissionName),
                                                                ResourcePermissions.getInstance(ResourcePermissions.INHERIT));
 
+      accessControlContext.assertPostCreateResourcePermissions(resourceClassName,
+                                                               setOf(ResourcePermissions
+                                                                           .getInstance(customPermissionName)));
+      accessControlContext.assertPostCreateResourcePermissions(SYS_RESOURCE,
+                                                               resourceClassName,
+                                                               setOf(ResourcePermissions
+                                                                           .getInstance(customPermissionName)));
+      accessControlContext.assertPostCreateResourcePermissions(SYS_RESOURCE,
+                                                               resourceClassName,
+                                                               setOf(ResourcePermissions
+                                                                           .getInstance(customPermissionName),
+                                                                     ResourcePermissions
+                                                                           .getInstance(ResourcePermissions.INHERIT)));
+
       final String domainName = generateDomain();
       final Set<ResourceCreatePermission> allResourceCreatePermissionsForResourceClassAndDomain
             = accessControlContext.getEffectiveResourceCreatePermissions(SYS_RESOURCE, resourceClassName, domainName);
@@ -71,6 +86,25 @@ public class TestAccessControl_assertPostCreateResourcePermissions extends TestA
                                                                domainName,
                                                                ResourcePermissions.getInstance(customPermissionName),
                                                                ResourcePermissions.getInstance(ResourcePermissions.INHERIT));
+
+      accessControlContext.assertPostCreateResourcePermissions(SYS_RESOURCE,
+                                                               resourceClassName,
+                                                               domainName,
+                                                               setOf(ResourcePermissions
+                                                                           .getInstance(customPermissionName)));
+      accessControlContext.assertPostCreateResourcePermissions(SYS_RESOURCE,
+                                                               resourceClassName,
+                                                               domainName,
+                                                               setOf(ResourcePermissions
+                                                                           .getInstance(customPermissionName),
+                                                                     ResourcePermissions
+                                                                           .getInstance(ResourcePermissions.INHERIT)));
+      accessControlContext.assertPostCreateResourcePermissions(resourceClassName,
+                                                               domainName,
+                                                               setOf(ResourcePermissions
+                                                                           .getInstance(customPermissionName),
+                                                                     ResourcePermissions
+                                                                           .getInstance(ResourcePermissions.INHERIT)));
    }
 
    @Test
@@ -120,6 +154,38 @@ public class TestAccessControl_assertPostCreateResourcePermissions extends TestA
          assertThat(e.getMessage().toLowerCase(), containsString("permission(s) after creating"));
       }
 
+      try {
+         accessControlContext.assertPostCreateResourcePermissions(resourceClassName,
+                                                                  setOf(ResourcePermissions
+                                                                              .getInstance(customPermissionName)));
+         fail("asserting post-create resource permission when none has been granted should not have succeeded for implicit authenticated resource");
+      }
+      catch (NotAuthorizedException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("permission(s) after creating"));
+      }
+      try {
+         accessControlContext.assertPostCreateResourcePermissions(accessorResource,
+                                                                  resourceClassName,
+                                                                  setOf(ResourcePermissions
+                                                                              .getInstance(customPermissionName)));
+         fail("asserting post-create resource permission when none has been granted should not have succeeded for authenticated resource");
+      }
+      catch (NotAuthorizedException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("permission(s) after creating"));
+      }
+      try {
+         accessControlContext.assertPostCreateResourcePermissions(accessorResource,
+                                                                  resourceClassName,
+                                                                  setOf(ResourcePermissions
+                                                                              .getInstance(customPermissionName),
+                                                                        ResourcePermissions
+                                                                              .getInstance(ResourcePermissions.INHERIT)));
+         fail("asserting multiple post-create resource permission when none has been granted should not have succeeded for authenticated resource");
+      }
+      catch (NotAuthorizedException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("permission(s) after creating"));
+      }
+
       final String domainName = generateDomain();
       final Set<ResourceCreatePermission> allResourceCreatePermissionsForResourceClassAndDomain
             = accessControlContext.getEffectiveResourceCreatePermissions(accessorResource, resourceClassName, domainName);
@@ -150,6 +216,43 @@ public class TestAccessControl_assertPostCreateResourcePermissions extends TestA
                                                                   domainName,
                                                                   ResourcePermissions.getInstance(customPermissionName),
                                                                   ResourcePermissions.getInstance(ResourcePermissions.INHERIT));
+         fail("asserting multiple post-create resource permission for domain when none has been granted should not have succeeded for implicit authenticated resource");
+      }
+      catch (NotAuthorizedException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("permission(s) after creating"));
+      }
+
+      try {
+         accessControlContext.assertPostCreateResourcePermissions(accessorResource,
+                                                                  resourceClassName,
+                                                                  domainName,
+                                                                  setOf(ResourcePermissions
+                                                                              .getInstance(customPermissionName)));
+         fail("asserting post-create resource permission for domain when none has been granted should not have succeeded for authenticated resource");
+      }
+      catch (NotAuthorizedException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("permission(s) after creating"));
+      }
+      try {
+         accessControlContext.assertPostCreateResourcePermissions(accessorResource,
+                                                                  resourceClassName,
+                                                                  domainName,
+                                                                  setOf(ResourcePermissions
+                                                                              .getInstance(customPermissionName),
+                                                                        ResourcePermissions
+                                                                              .getInstance(ResourcePermissions.INHERIT)));
+         fail("asserting multiple post-create resource permission for domain when none has been granted should not have succeeded for authenticated resource");
+      }
+      catch (NotAuthorizedException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("permission(s) after creating"));
+      }
+      try {
+         accessControlContext.assertPostCreateResourcePermissions(resourceClassName,
+                                                                  domainName,
+                                                                  setOf(ResourcePermissions
+                                                                              .getInstance(customPermissionName),
+                                                                        ResourcePermissions
+                                                                              .getInstance(ResourcePermissions.INHERIT)));
          fail("asserting multiple post-create resource permission for domain when none has been granted should not have succeeded for implicit authenticated resource");
       }
       catch (NotAuthorizedException e) {
@@ -231,6 +334,25 @@ public class TestAccessControl_assertPostCreateResourcePermissions extends TestA
       accessControlContext.assertPostCreateResourcePermissions(resourceClassName,
                                                                accessedDomainName,
                                                                customPermission_forAccessedDomain);
+
+      accessControlContext.assertPostCreateResourcePermissions(resourceClassName,
+                                                               setOf(customPermission_forAccessorDomain));
+      accessControlContext.assertPostCreateResourcePermissions(accessorResource,
+                                                               resourceClassName,
+                                                               setOf(customPermission_forAccessorDomain));
+
+      accessControlContext.assertPostCreateResourcePermissions(accessorResource,
+                                                               resourceClassName,
+                                                               accessorDomainName,
+                                                               setOf(customPermission_forAccessorDomain));
+
+      accessControlContext.assertPostCreateResourcePermissions(accessorResource,
+                                                               resourceClassName,
+                                                               accessedDomainName,
+                                                               setOf(customPermission_forAccessedDomain));
+      accessControlContext.assertPostCreateResourcePermissions(resourceClassName,
+                                                               accessedDomainName,
+                                                               setOf(customPermission_forAccessedDomain));
    }
 
    @Test
@@ -347,6 +469,65 @@ public class TestAccessControl_assertPostCreateResourcePermissions extends TestA
       catch (NotAuthorizedException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("permission(s) after creating"));
       }
+
+      try {
+         accessControlContext.assertPostCreateResourcePermissions(resourceClassName,
+                                                                  setOf(ResourcePermissions
+                                                                              .getInstance(ResourcePermissions.INHERIT),
+                                                                        customPermission_forAccessorDomain));
+         fail("asserting direct and unauthorized post-create resource permission should have failed for implicit authenticated resource");
+      }
+      catch (NotAuthorizedException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("permission(s) after creating"));
+      }
+      try {
+         accessControlContext.assertPostCreateResourcePermissions(accessorResource,
+                                                                  resourceClassName,
+                                                                  setOf(ResourcePermissions
+                                                                              .getInstance(ResourcePermissions.INHERIT),
+                                                                        customPermission_forAccessorDomain));
+         fail("asserting direct and unauthorized post-create resource permission should have failed for authenticated resource");
+      }
+      catch (NotAuthorizedException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("permission(s) after creating"));
+      }
+
+      try {
+         accessControlContext.assertPostCreateResourcePermissions(accessorResource,
+                                                                  resourceClassName,
+                                                                  accessorDomainName,
+                                                                  setOf(ResourcePermissions
+                                                                              .getInstance(ResourcePermissions.INHERIT),
+                                                                        customPermission_forAccessorDomain));
+         fail("asserting direct and unauthorized post-create resource permission for domain should have failed for authenticated resource");
+      }
+      catch (NotAuthorizedException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("permission(s) after creating"));
+      }
+
+      try {
+         accessControlContext.assertPostCreateResourcePermissions(accessorResource,
+                                                                  resourceClassName,
+                                                                  accessedDomainName,
+                                                                  setOf(ResourcePermissions
+                                                                              .getInstance(ResourcePermissions.INHERIT),
+                                                                        customPermission_forAccessedDomain));
+         fail("asserting direct and unauthorized post-create resource permission for domain should have failed for authenticated resource");
+      }
+      catch (NotAuthorizedException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("permission(s) after creating"));
+      }
+      try {
+         accessControlContext.assertPostCreateResourcePermissions(resourceClassName,
+                                                                  accessedDomainName,
+                                                                  setOf(ResourcePermissions
+                                                                              .getInstance(ResourcePermissions.INHERIT),
+                                                                        customPermission_forAccessedDomain));
+         fail("asserting direct and unauthorized post-create resource permission for domain should have failed for implicit authenticated resource");
+      }
+      catch (NotAuthorizedException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("permission(s) after creating"));
+      }
    }
 
    @Test
@@ -449,7 +630,55 @@ public class TestAccessControl_assertPostCreateResourcePermissions extends TestA
       accessControlContext.assertPostCreateResourcePermissions(resourceClassName,
                                                                accessedDomainName,
                                                                customPermission_forAccessedDomain,
-                                                               ResourcePermissions.getInstance(ResourcePermissions.INHERIT));
+                                                               ResourcePermissions
+                                                                     .getInstance(ResourcePermissions.INHERIT));
+
+      // test set-based versions
+      accessControlContext.assertPostCreateResourcePermissions(resourceClassName,
+                                                               setOf(ResourcePermissions
+                                                                           .getInstance(ResourcePermissions.INHERIT),
+                                                                     customPermission_forAccessorDomain));
+      accessControlContext.assertPostCreateResourcePermissions(accessorResource,
+                                                               resourceClassName,
+                                                               setOf(ResourcePermissions
+                                                                           .getInstance(ResourcePermissions.INHERIT),
+                                                                     customPermission_forAccessorDomain));
+      accessControlContext.assertPostCreateResourcePermissions(accessorResource,
+                                                               resourceClassName,
+                                                               setOf(customPermission_forAccessorDomain,
+                                                                     ResourcePermissions
+                                                                           .getInstance(ResourcePermissions.INHERIT)));
+
+      accessControlContext.assertPostCreateResourcePermissions(accessorResource,
+                                                               resourceClassName,
+                                                               accessorDomainName,
+                                                               setOf(ResourcePermissions
+                                                                           .getInstance(ResourcePermissions.INHERIT),
+                                                                     customPermission_forAccessorDomain));
+      accessControlContext.assertPostCreateResourcePermissions(accessorResource,
+                                                               resourceClassName,
+                                                               accessorDomainName,
+                                                               setOf(customPermission_forAccessorDomain,
+                                                                     ResourcePermissions
+                                                                           .getInstance(ResourcePermissions.INHERIT)));
+
+      accessControlContext.assertPostCreateResourcePermissions(accessorResource,
+                                                               resourceClassName,
+                                                               accessedDomainName,
+                                                               setOf(ResourcePermissions
+                                                                           .getInstance(ResourcePermissions.INHERIT),
+                                                                     customPermission_forAccessedDomain));
+      accessControlContext.assertPostCreateResourcePermissions(accessorResource,
+                                                               resourceClassName,
+                                                               accessedDomainName,
+                                                               setOf(customPermission_forAccessedDomain,
+                                                                     ResourcePermissions
+                                                                           .getInstance(ResourcePermissions.INHERIT)));
+      accessControlContext.assertPostCreateResourcePermissions(resourceClassName,
+                                                               accessedDomainName,
+                                                               setOf(customPermission_forAccessedDomain,
+                                                                     ResourcePermissions
+                                                                           .getInstance(ResourcePermissions.INHERIT)));
    }
 
    @Test
@@ -609,6 +838,102 @@ public class TestAccessControl_assertPostCreateResourcePermissions extends TestA
       catch (NotAuthorizedException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("permission(s) after creating"));
       }
+
+      // test set-based versions
+      accessControlContext.assertPostCreateResourcePermissions(accessorResource,
+                                                               resourceClassName,
+                                                               setOf(grantableCustomPermission_forAccessorDomain));
+      accessControlContext.assertPostCreateResourcePermissions(accessorResource,
+                                                               resourceClassName,
+                                                               setOf(ungrantableCustomPermission_forAccessorDomain));
+      try {
+         accessControlContext.assertPostCreateResourcePermissions(accessorResource,
+                                                                  resourceClassName,
+                                                                  setOf(ungrantableCustomPermission_forAccessorDomain,
+                                                                        ResourcePermissions
+                                                                              .getInstance(ResourcePermissions.INHERIT,
+                                                                                           true)));
+         fail("asserting multiple direct post-create resource permission with exceeded and lesser granting rights should have failed");
+      }
+      catch (NotAuthorizedException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("permission(s) after creating"));
+      }
+      try {
+         accessControlContext.assertPostCreateResourcePermissions(resourceClassName,
+                                                                  setOf(ungrantableCustomPermission_forAccessorDomain,
+                                                                        ResourcePermissions
+                                                                              .getInstance(ResourcePermissions.INHERIT,
+                                                                                           true)));
+         fail("asserting multiple direct post-create resource permission with exceeded and lesser granting rights should have failed");
+      }
+      catch (NotAuthorizedException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("permission(s) after creating"));
+      }
+
+      accessControlContext.assertPostCreateResourcePermissions(accessorResource,
+                                                               resourceClassName,
+                                                               accessorDomainName,
+                                                               setOf(grantableCustomPermission_forAccessorDomain));
+      accessControlContext.assertPostCreateResourcePermissions(accessorResource,
+                                                               resourceClassName,
+                                                               accessorDomainName,
+                                                               setOf(ungrantableCustomPermission_forAccessorDomain));
+      accessControlContext.assertPostCreateResourcePermissions(resourceClassName,
+                                                               accessorDomainName,
+                                                               setOf(ungrantableCustomPermission_forAccessorDomain));
+      try {
+         accessControlContext.assertPostCreateResourcePermissions(accessorResource,
+                                                                  resourceClassName,
+                                                                  accessorDomainName,
+                                                                  setOf(ungrantableCustomPermission_forAccessorDomain,
+                                                                        ResourcePermissions
+                                                                              .getInstance(ResourcePermissions.INHERIT,
+                                                                                           true)));
+         fail("asserting multiple direct post-create resource permission with exceeded and lesser granting rights should have failed");
+      }
+      catch (NotAuthorizedException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("permission(s) after creating"));
+      }
+
+      accessControlContext.assertPostCreateResourcePermissions(accessorResource,
+                                                               resourceClassName,
+                                                               accessedDomainName,
+                                                               setOf(ungrantableCustomPermission_forAccessedDomain));
+      try {
+         accessControlContext.assertPostCreateResourcePermissions(accessorResource,
+                                                                  resourceClassName,
+                                                                  accessedDomainName,
+                                                                  setOf(grantableCustomPermission_forAccessedDomain));
+         fail("asserting post-create resource permission for a direct create permission (for a domain) with exceeded granting rights should have failed");
+      }
+      catch (NotAuthorizedException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("permission(s) after creating"));
+      }
+      try {
+         accessControlContext.assertPostCreateResourcePermissions(accessorResource,
+                                                                  resourceClassName,
+                                                                  accessedDomainName,
+                                                                  setOf(grantableCustomPermission_forAccessedDomain,
+                                                                        ResourcePermissions
+                                                                              .getInstance(ResourcePermissions.INHERIT,
+                                                                                           true)));
+         fail("asserting post-create resource permission for a direct create permission (for a domain) with same and exceeded granting rights should have failed");
+      }
+      catch (NotAuthorizedException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("permission(s) after creating"));
+      }
+      try {
+         accessControlContext.assertPostCreateResourcePermissions(resourceClassName,
+                                                                  accessedDomainName,
+                                                                  setOf(grantableCustomPermission_forAccessedDomain,
+                                                                        ResourcePermissions
+                                                                              .getInstance(ResourcePermissions.INHERIT,
+                                                                                           true)));
+         fail("asserting post-create resource permission for a direct create permission (for a domain) with same and exceeded granting rights should have failed");
+      }
+      catch (NotAuthorizedException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("permission(s) after creating"));
+      }
    }
 
    @Test
@@ -676,6 +1001,15 @@ public class TestAccessControl_assertPostCreateResourcePermissions extends TestA
                                                                resourceClassName,
                                                                accessedDomainName,
                                                                customPermission_forAccessedDomain);
+
+      accessControlContext.assertPostCreateResourcePermissions(accessorResource,
+                                                               resourceClassName,
+                                                               setOf(customPermission_forAccessorDomain));
+
+      accessControlContext.assertPostCreateResourcePermissions(accessorResource,
+                                                               resourceClassName,
+                                                               accessedDomainName,
+                                                               setOf(customPermission_forAccessedDomain));
    }
 
    @Test
@@ -715,7 +1049,8 @@ public class TestAccessControl_assertPostCreateResourcePermissions extends TestA
                                                             .getInstance(customPermission_forAccessorDomain, false));
       final Set<ResourceCreatePermission> allResourceCreatePermissionsForResourceClassAndAccessorDomain
             = accessControlContext.getEffectiveResourceCreatePermissions(accessorResource, resourceClassName, accessorDomainName);
-      assertThat(allResourceCreatePermissionsForResourceClassAndAccessorDomain, is(resourceCreatePermissions_forAccessorDomain));
+      assertThat(allResourceCreatePermissionsForResourceClassAndAccessorDomain, is(
+            resourceCreatePermissions_forAccessorDomain));
 
       Set<ResourceCreatePermission> resourceCreatePermissions_forIntermediaryDomain = new HashSet<>();
       resourceCreatePermissions_forIntermediaryDomain.add(ResourceCreatePermissions
@@ -747,6 +1082,22 @@ public class TestAccessControl_assertPostCreateResourcePermissions extends TestA
                                                                accessedDomainName,
                                                                customPermission_forAccessorDomain,
                                                                customPermission_forIntermediaryDomain);
+
+      accessControlContext.assertPostCreateResourcePermissions(resourceClassName,
+                                                               setOf(customPermission_forAccessorDomain));
+      accessControlContext.assertPostCreateResourcePermissions(accessorResource,
+                                                               resourceClassName,
+                                                               setOf(customPermission_forAccessorDomain));
+
+      accessControlContext.assertPostCreateResourcePermissions(accessorResource,
+                                                               resourceClassName,
+                                                               accessedDomainName,
+                                                               setOf(customPermission_forAccessorDomain,
+                                                                     customPermission_forIntermediaryDomain));
+      accessControlContext.assertPostCreateResourcePermissions(resourceClassName,
+                                                               accessedDomainName,
+                                                               setOf(customPermission_forAccessorDomain,
+                                                                     customPermission_forIntermediaryDomain));
    }
 
    @Test
@@ -771,8 +1122,14 @@ public class TestAccessControl_assertPostCreateResourcePermissions extends TestA
       accessControlContext.createDomain(accessedDomainName, intermediaryDomainName);
 
       // setup create permissions
-      grantResourceCreatePermission(donorResource, resourceClassName, accessorDomainName, customPermissionName_forAccessorDomain);
-      grantResourceCreatePermission(donorResource, resourceClassName, intermediaryDomainName, customPermissionName_forIntermediaryDomain);
+      grantResourceCreatePermission(donorResource,
+                                    resourceClassName,
+                                    accessorDomainName,
+                                    customPermissionName_forAccessorDomain);
+      grantResourceCreatePermission(donorResource,
+                                    resourceClassName,
+                                    intermediaryDomainName,
+                                    customPermissionName_forIntermediaryDomain);
       // setup inheritance permission
       Set<ResourcePermission> inheritanceResourcePermissions = new HashSet<>();
       inheritanceResourcePermissions.add(ResourcePermissions.getInstance(ResourcePermissions.INHERIT));
@@ -818,6 +1175,16 @@ public class TestAccessControl_assertPostCreateResourcePermissions extends TestA
                                                                accessedDomainName,
                                                                customPermission_forAccessorDomain,
                                                                customPermission_forIntermediaryDomain);
+
+      accessControlContext.assertPostCreateResourcePermissions(accessorResource,
+                                                               resourceClassName,
+                                                               setOf(customPermission_forAccessorDomain));
+
+      accessControlContext.assertPostCreateResourcePermissions(accessorResource,
+                                                               resourceClassName,
+                                                               accessedDomainName,
+                                                               setOf(customPermission_forAccessorDomain,
+                                                                     customPermission_forIntermediaryDomain));
    }
 
    @Test
@@ -848,7 +1215,9 @@ public class TestAccessControl_assertPostCreateResourcePermissions extends TestA
       assertThat(allResourceCreatePermissionsForResourceClass.isEmpty(), is(true));
 
       final Set<ResourcePermission> allGlobalResourcePermissionsForResourceClass
-            = accessControlContext.getEffectiveGlobalResourcePermissions(accessorResource, resourceClassName, accessorDomainName);
+            = accessControlContext.getEffectiveGlobalResourcePermissions(accessorResource,
+                                                                         resourceClassName,
+                                                                         accessorDomainName);
       assertThat(allGlobalResourcePermissionsForResourceClass.isEmpty(), is(false));
       assertThat(allGlobalResourcePermissionsForResourceClass, hasItem(globalResourcePermission));
 
@@ -910,6 +1279,70 @@ public class TestAccessControl_assertPostCreateResourcePermissions extends TestA
                                                                   accessorDomainName,
                                                                   ResourcePermissions.getInstance(ResourcePermissions.IMPERSONATE),
                                                                   globalResourcePermission);
+         fail("asserting multiple post-create resource permission without *CREATE should not have succeeded for implicit authenticated resource");
+      }
+      catch (NotAuthorizedException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("permission(s) after creating"));
+      }
+
+      // test set-based version
+      try {
+         accessControlContext.assertPostCreateResourcePermissions(resourceClassName,
+                                                                  setOf(globalResourcePermission));
+         fail("asserting post-create resource permission without *CREATE should not have succeeded for implicit authenticated resource");
+      }
+      catch (NotAuthorizedException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("permission(s) after creating"));
+      }
+      try {
+         accessControlContext.assertPostCreateResourcePermissions(accessorResource,
+                                                                  resourceClassName,
+                                                                  setOf(globalResourcePermission));
+         fail("asserting post-create resource permission without *CREATE should not have succeeded for authenticated resource");
+      }
+      catch (NotAuthorizedException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("permission(s) after creating"));
+      }
+      try {
+         accessControlContext.assertPostCreateResourcePermissions(accessorResource,
+                                                                  resourceClassName,
+                                                                  setOf(ResourcePermissions.getInstance(
+                                                                        ResourcePermissions.IMPERSONATE),
+                                                                        globalResourcePermission));
+         fail("asserting multiple post-create resource permission without *CREATE should not have succeeded for authenticated resource");
+      }
+      catch (NotAuthorizedException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("permission(s) after creating"));
+      }
+
+      try {
+         accessControlContext.assertPostCreateResourcePermissions(accessorResource,
+                                                                  resourceClassName,
+                                                                  accessorDomainName,
+                                                                  setOf(globalResourcePermission));
+         fail("asserting post-create resource permission without *CREATE should not have succeeded for authenticated resource");
+      }
+      catch (NotAuthorizedException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("permission(s) after creating"));
+      }
+      try {
+         accessControlContext.assertPostCreateResourcePermissions(accessorResource,
+                                                                  resourceClassName,
+                                                                  accessorDomainName,
+                                                                  setOf(ResourcePermissions.getInstance(
+                                                                        ResourcePermissions.IMPERSONATE),
+                                                                        globalResourcePermission));
+         fail("asserting multiple post-create resource permission without *CREATE should not have succeeded for authenticated resource");
+      }
+      catch (NotAuthorizedException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("permission(s) after creating"));
+      }
+      try {
+         accessControlContext.assertPostCreateResourcePermissions(resourceClassName,
+                                                                  accessorDomainName,
+                                                                  setOf(ResourcePermissions.getInstance(
+                                                                        ResourcePermissions.IMPERSONATE),
+                                                                        globalResourcePermission));
          fail("asserting multiple post-create resource permission without *CREATE should not have succeeded for implicit authenticated resource");
       }
       catch (NotAuthorizedException e) {
@@ -985,6 +1418,18 @@ public class TestAccessControl_assertPostCreateResourcePermissions extends TestA
                                                                ResourcePermissions.getInstance(ResourcePermissions.IMPERSONATE),
                                                                systemResourcePermission);
 
+      accessControlContext.assertPostCreateResourcePermissions(resourceClassName,
+                                                               setOf(globalResourcePermission,
+                                                                     customResourcePermission,
+                                                                     ResourcePermissions.getInstance(ResourcePermissions.IMPERSONATE),
+                                                                     systemResourcePermission));
+      accessControlContext.assertPostCreateResourcePermissions(accessorResource,
+                                                               resourceClassName,
+                                                               setOf(globalResourcePermission,
+                                                                     customResourcePermission,
+                                                                     ResourcePermissions.getInstance(ResourcePermissions.IMPERSONATE),
+                                                                     systemResourcePermission));
+
       // verify by domain
       accessControlContext.assertPostCreateResourcePermissions(accessorResource,
                                                                resourceClassName,
@@ -999,6 +1444,20 @@ public class TestAccessControl_assertPostCreateResourcePermissions extends TestA
                                                                customResourcePermission,
                                                                ResourcePermissions.getInstance(ResourcePermissions.IMPERSONATE),
                                                                systemResourcePermission);
+
+      accessControlContext.assertPostCreateResourcePermissions(accessorResource,
+                                                               resourceClassName,
+                                                               accessorDomainName,
+                                                               setOf(globalResourcePermission,
+                                                                     customResourcePermission,
+                                                                     ResourcePermissions.getInstance(ResourcePermissions.IMPERSONATE),
+                                                                     systemResourcePermission));
+      accessControlContext.assertPostCreateResourcePermissions(resourceClassName,
+                                                               accessorDomainName,
+                                                               setOf(globalResourcePermission,
+                                                                     customResourcePermission,
+                                                                     ResourcePermissions.getInstance(ResourcePermissions.IMPERSONATE),
+                                                                     systemResourcePermission));
    }
 
    @Test
@@ -1091,6 +1550,52 @@ public class TestAccessControl_assertPostCreateResourcePermissions extends TestA
       catch (NotAuthorizedException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("permission(s) after creating"));
       }
+
+      // test set-based versions
+      accessControlContext.assertPostCreateResourcePermissions(resourceClassName,
+                                                               setOf(grantableGlobalPermission1,
+                                                                     ungrantableGlobalPermission1));
+      accessControlContext.assertPostCreateResourcePermissions(accessorResource,
+                                                               resourceClassName,
+                                                               setOf(grantableGlobalPermission1,
+                                                                     ungrantableGlobalPermission1));
+
+      accessControlContext.assertPostCreateResourcePermissions(accessorResource,
+                                                               resourceClassName,
+                                                               accessorDomainName,
+                                                               setOf(grantableGlobalPermission1,
+                                                                     ungrantableGlobalPermission1));
+      accessControlContext.assertPostCreateResourcePermissions(resourceClassName,
+                                                               accessorDomainName,
+                                                               setOf(grantableGlobalPermission1,
+                                                                     ungrantableGlobalPermission1));
+
+      accessControlContext.assertPostCreateResourcePermissions(accessorResource,
+                                                               resourceClassName,
+                                                               accessedDomainName,
+                                                               setOf(ungrantableGlobalPermission2));
+
+      try {
+         accessControlContext.assertPostCreateResourcePermissions(accessorResource,
+                                                                  resourceClassName,
+                                                                  accessedDomainName,
+                                                                  setOf(grantableGlobalPermission2));
+         fail("asserting post-create resource permission for a global (create) permission (for a domain) with exceeded granting rights should have failed");
+      }
+      catch (NotAuthorizedException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("permission(s) after creating"));
+      }
+      try {
+         accessControlContext.assertPostCreateResourcePermissions(accessorResource,
+                                                                  resourceClassName,
+                                                                  accessedDomainName,
+                                                                  setOf(ungrantableGlobalPermission2,
+                                                                        grantableGlobalPermission2));
+         fail("asserting multiple post-create resource permission for a global (create) permission (for a domain) with same and exceeded granting rights should have failed");
+      }
+      catch (NotAuthorizedException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("permission(s) after creating"));
+      }
    }
 
    @Test
@@ -1130,6 +1635,28 @@ public class TestAccessControl_assertPostCreateResourcePermissions extends TestA
                                                                accessorDomainName,
                                                                ResourcePermissions.getInstance(ResourcePermissions.INHERIT),
                                                                globalResourcePermission);
+
+      accessControlContext.assertPostCreateResourcePermissions(resourceClassName,
+                                                               setOf(ResourcePermissions
+                                                                           .getInstance(ResourcePermissions.INHERIT),
+                                                                     globalResourcePermission));
+      accessControlContext.assertPostCreateResourcePermissions(accessorResource,
+                                                               resourceClassName,
+                                                               setOf(ResourcePermissions
+                                                                           .getInstance(ResourcePermissions.INHERIT),
+                                                                     globalResourcePermission));
+
+      accessControlContext.assertPostCreateResourcePermissions(accessorResource,
+                                                               resourceClassName,
+                                                               accessorDomainName,
+                                                               setOf(ResourcePermissions
+                                                                           .getInstance(ResourcePermissions.INHERIT),
+                                                                     globalResourcePermission));
+      accessControlContext.assertPostCreateResourcePermissions(resourceClassName,
+                                                               accessorDomainName,
+                                                               setOf(ResourcePermissions
+                                                                           .getInstance(ResourcePermissions.INHERIT),
+                                                                     globalResourcePermission));
    }
 
    @Test
@@ -1168,6 +1695,19 @@ public class TestAccessControl_assertPostCreateResourcePermissions extends TestA
                                                                accessorDomainName,
                                                                ResourcePermissions.getInstance(ResourcePermissions.INHERIT),
                                                                globalResourcePermission);
+
+      accessControlContext.assertPostCreateResourcePermissions(accessorResource,
+                                                               resourceClassName,
+                                                               setOf(ResourcePermissions
+                                                                           .getInstance(ResourcePermissions.INHERIT),
+                                                                     globalResourcePermission));
+
+      accessControlContext.assertPostCreateResourcePermissions(accessorResource,
+                                                               resourceClassName,
+                                                               accessorDomainName,
+                                                               setOf(ResourcePermissions
+                                                                           .getInstance(ResourcePermissions.INHERIT),
+                                                                     globalResourcePermission));
    }
 
    @Test
@@ -1270,6 +1810,107 @@ public class TestAccessControl_assertPostCreateResourcePermissions extends TestA
       catch (IllegalArgumentException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("not valid for unauthenticatable resource class"));
       }
+
+      // test set-based versions
+      try {
+         accessControlContext
+               .assertPostCreateResourcePermissions(SYS_RESOURCE,
+                                                    resourceClassName,
+                                                    setOf(ResourcePermissions
+                                                                .getInstance(ResourcePermissions.RESET_CREDENTIALS)));
+         fail("asserting implicit resource create permission invalid for resource class should have failed for system resource");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("not valid for unauthenticatable resource class"));
+      }
+      try {
+         accessControlContext
+               .assertPostCreateResourcePermissions(SYS_RESOURCE,
+                                                    resourceClassName,
+                                                    setOf(ResourcePermissions
+                                                                .getInstance(ResourcePermissions.IMPERSONATE)));
+         fail("asserting implicit resource create permission invalid for resource class should have failed for system resource");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("not valid for unauthenticatable resource class"));
+      }
+      try {
+         accessControlContext
+               .assertPostCreateResourcePermissions(SYS_RESOURCE,
+                                                    resourceClassName,
+                                                    setOf(ResourcePermissions
+                                                                .getInstance(ResourcePermissions.INHERIT),
+                                                          ResourcePermissions
+                                                                .getInstance(ResourcePermissions.IMPERSONATE)));
+         fail("asserting implicit resource create permission valid and invalid for resource class should have failed for system resource");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("not valid for unauthenticatable resource class"));
+      }
+      try {
+         accessControlContext
+               .assertPostCreateResourcePermissions(resourceClassName,
+                                                    setOf(ResourcePermissions
+                                                                .getInstance(ResourcePermissions.INHERIT),
+                                                          ResourcePermissions
+                                                                .getInstance(ResourcePermissions.IMPERSONATE)));
+         fail("asserting implicit resource create permission valid and invalid for resource class should have failed for implicit system resource");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("not valid for unauthenticatable resource class"));
+      }
+
+      try {
+         accessControlContext
+               .assertPostCreateResourcePermissions(SYS_RESOURCE,
+                                                    resourceClassName,
+                                                    domainName,
+                                                    setOf(ResourcePermissions
+                                                                .getInstance(ResourcePermissions.RESET_CREDENTIALS)));
+         fail("asserting implicit resource create permission (for a domain) invalid for resource class should have failed for system resource");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("not valid for unauthenticatable resource class"));
+      }
+      try {
+         accessControlContext
+               .assertPostCreateResourcePermissions(SYS_RESOURCE,
+                                                    resourceClassName,
+                                                    domainName,
+                                                    setOf(ResourcePermissions
+                                                                .getInstance(ResourcePermissions.IMPERSONATE)));
+         fail("asserting implicit resource create permission (for a domain) invalid for resource class should have failed for system resource");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("not valid for unauthenticatable resource class"));
+      }
+      try {
+         accessControlContext
+               .assertPostCreateResourcePermissions(SYS_RESOURCE,
+                                                    resourceClassName,
+                                                    domainName,
+                                                    setOf(ResourcePermissions
+                                                                .getInstance(ResourcePermissions.INHERIT),
+                                                          ResourcePermissions
+                                                                .getInstance(ResourcePermissions.IMPERSONATE)));
+         fail("asserting implicit resource create permission (for a domain) valid and invalid for resource class should have failed for system resource");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("not valid for unauthenticatable resource class"));
+      }
+      try {
+         accessControlContext
+               .assertPostCreateResourcePermissions(resourceClassName,
+                                                    domainName,
+                                                    setOf(ResourcePermissions
+                                                                .getInstance(ResourcePermissions.INHERIT),
+                                                          ResourcePermissions
+                                                                .getInstance(ResourcePermissions.IMPERSONATE)));
+         fail("asserting implicit resource create permission (for a domain) valid and invalid for resource class should have failed for implicit system resource");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("not valid for unauthenticatable resource class"));
+      }
    }
 
    @Test
@@ -1294,6 +1935,13 @@ public class TestAccessControl_assertPostCreateResourcePermissions extends TestA
                                                                resourceClassName_whitespaced,
                                                                ResourcePermissions.getInstance(customPermissionName));
 
+      accessControlContext.assertPostCreateResourcePermissions(resourceClassName_whitespaced,
+                                                               setOf(ResourcePermissions.getInstance(
+                                                                     customPermissionName)));
+      accessControlContext.assertPostCreateResourcePermissions(SYS_RESOURCE,
+                                                               resourceClassName_whitespaced,
+                                                               setOf(ResourcePermissions.getInstance(customPermissionName)));
+
       final String domainName = generateDomain();
       final String domainName_whitespaced = " " + domainName + "\t";
       final Set<ResourceCreatePermission> allResourceCreatePermissionsForResourceClassAndDomain
@@ -1307,6 +1955,15 @@ public class TestAccessControl_assertPostCreateResourcePermissions extends TestA
       accessControlContext.assertPostCreateResourcePermissions(resourceClassName_whitespaced,
                                                                domainName_whitespaced,
                                                                ResourcePermissions.getInstance(customPermissionName));
+      accessControlContext.assertPostCreateResourcePermissions(SYS_RESOURCE,
+                                                               resourceClassName_whitespaced,
+                                                               domainName_whitespaced,
+                                                               setOf(ResourcePermissions.getInstance(
+                                                                     customPermissionName)));
+      accessControlContext.assertPostCreateResourcePermissions(resourceClassName_whitespaced,
+                                                               domainName_whitespaced,
+                                                               setOf(ResourcePermissions.getInstance(
+                                                                     customPermissionName)));
    }
 
    @Test
@@ -1328,7 +1985,10 @@ public class TestAccessControl_assertPostCreateResourcePermissions extends TestA
       final String accessedDomainName_whitespaced = " " + accessedDomainName + "\t";
 
       // setup create permissions
-      grantResourceCreatePermission(accessorResource, resourceClassName, accessorDomainName, customPermissionName_forAccessorDomain);
+      grantResourceCreatePermission(accessorResource,
+                                    resourceClassName,
+                                    accessorDomainName,
+                                    customPermissionName_forAccessorDomain);
       grantResourceCreatePermission(accessorResource,
                                     resourceClassName,
                                     accessedDomainName,
@@ -1351,6 +2011,20 @@ public class TestAccessControl_assertPostCreateResourcePermissions extends TestA
       accessControlContext.assertPostCreateResourcePermissions(resourceClassName_whitespaced,
                                                                accessedDomainName_whitespaced,
                                                                customPermission_forAccessedDomain);
+
+      accessControlContext.assertPostCreateResourcePermissions(resourceClassName_whitespaced,
+                                                               setOf(customPermission_forAccessorDomain));
+      accessControlContext.assertPostCreateResourcePermissions(accessorResource,
+                                                               resourceClassName_whitespaced,
+                                                               setOf(customPermission_forAccessorDomain));
+
+      accessControlContext.assertPostCreateResourcePermissions(accessorResource,
+                                                               resourceClassName_whitespaced,
+                                                               accessedDomainName_whitespaced,
+                                                               setOf(customPermission_forAccessedDomain));
+      accessControlContext.assertPostCreateResourcePermissions(resourceClassName_whitespaced,
+                                                               accessedDomainName_whitespaced,
+                                                               setOf(customPermission_forAccessedDomain));
    }
 
 
@@ -1390,7 +2064,7 @@ public class TestAccessControl_assertPostCreateResourcePermissions extends TestA
       try {
          accessControlContext.assertPostCreateResourcePermissions(SYS_RESOURCE,
                                                                   resourceClassName,
-                                                                  null);
+                                                                  (ResourcePermission) null);
          fail("asserting post-create resource permission for null resource permission reference should have failed for system resource");
       }
       catch (NullPointerException e) {
@@ -1398,7 +2072,7 @@ public class TestAccessControl_assertPostCreateResourcePermissions extends TestA
       }
       try {
          accessControlContext.assertPostCreateResourcePermissions(resourceClassName,
-                                                                  null);
+                                                                  (ResourcePermission) null);
          fail("asserting post-create resource permission for null resource permission reference should have failed for implicit system resource");
       }
       catch (NullPointerException e) {
@@ -1526,7 +2200,7 @@ public class TestAccessControl_assertPostCreateResourcePermissions extends TestA
          accessControlContext.assertPostCreateResourcePermissions(SYS_RESOURCE,
                                                                   resourceClassName,
                                                                   domainName,
-                                                                  null);
+                                                                  (ResourcePermission) null);
          fail("asserting post-create resource permission (by domain) for null resource permission reference should have failed for system resource");
       }
       catch (NullPointerException e) {
@@ -1535,7 +2209,7 @@ public class TestAccessControl_assertPostCreateResourcePermissions extends TestA
       try {
          accessControlContext.assertPostCreateResourcePermissions(resourceClassName,
                                                                   domainName,
-                                                                  null);
+                                                                  (ResourcePermission) null);
          fail("asserting post-create resource permission (by domain) for null resource permission reference should have failed for implicit system resource");
       }
       catch (NullPointerException e) {
@@ -1605,6 +2279,226 @@ public class TestAccessControl_assertPostCreateResourcePermissions extends TestA
       }
       catch (NullPointerException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("without null element"));
+      }
+
+      // test set-based versions
+      try {
+         accessControlContext.assertPostCreateResourcePermissions((Resource) null,
+                                                                  resourceClassName,
+                                                                  setOf(ResourcePermissions
+                                                                              .getInstance(customPermissionName)));
+         fail("asserting post-create resource permission for null accessor resource reference should have failed for system resource");
+      }
+      catch (NullPointerException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("resource required"));
+      }
+      try {
+         accessControlContext.assertPostCreateResourcePermissions(null,
+                                                                  setOf(ResourcePermissions
+                                                                              .getInstance(customPermissionName)));
+         fail("asserting post-create resource permission for null resource class reference should have failed for implicit system resource");
+      }
+      catch (NullPointerException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("resource class required"));
+      }
+      try {
+         accessControlContext.assertPostCreateResourcePermissions(SYS_RESOURCE,
+                                                                  null,
+                                                                  setOf(ResourcePermissions
+                                                                              .getInstance(customPermissionName)));
+         fail("asserting post-create resource permission for null resource class reference should have failed for system resource");
+      }
+      catch (NullPointerException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("resource class required"));
+      }
+      try {
+         accessControlContext.assertPostCreateResourcePermissions(SYS_RESOURCE,
+                                                                  resourceClassName,
+                                                                  (Set<ResourcePermission>) null);
+         fail("asserting post-create resource permission for null resource permission reference should have failed for system resource");
+      }
+      catch (NullPointerException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("permissions required"));
+      }
+      try {
+         accessControlContext.assertPostCreateResourcePermissions(resourceClassName,
+                                                                  (Set<ResourcePermission>) null);
+         fail("asserting post-create resource permission for null resource permission reference should have failed for implicit system resource");
+      }
+      catch (NullPointerException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("permissions required"));
+      }
+      try {
+         accessControlContext.assertPostCreateResourcePermissions(SYS_RESOURCE,
+                                                                  resourceClassName,
+                                                                  setOf(ResourcePermissions
+                                                                              .getInstance(customPermissionName),
+                                                                        null));
+         fail("asserting post-create resource permission for null resource permission element should have failed for system resource");
+      }
+      catch (NullPointerException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("contains null element"));
+      }
+      try {
+         accessControlContext.assertPostCreateResourcePermissions(resourceClassName,
+                                                                  setOf(ResourcePermissions
+                                                                              .getInstance(customPermissionName),
+                                                                        null));
+         fail("asserting post-create resource permission for null resource permission element should have failed for implicit system resource");
+      }
+      catch (NullPointerException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("contains null element"));
+      }
+
+      try {
+         accessControlContext.assertPostCreateResourcePermissions(null,
+                                                                  resourceClassName,
+                                                                  domainName,
+                                                                  setOf(ResourcePermissions
+                                                                              .getInstance(customPermissionName)));
+         fail("asserting post-create resource permission (by domain) for null accessor resource reference should have failed for system resource");
+      }
+      catch (NullPointerException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("resource required"));
+      }
+      try {
+         accessControlContext.assertPostCreateResourcePermissions((String) null,
+                                                                  domainName,
+                                                                  setOf(ResourcePermissions
+                                                                              .getInstance(customPermissionName)));
+         fail("asserting post-create resource permission (by domain) for null resource class reference should have failed for implicit system resource");
+      }
+      catch (NullPointerException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("resource class required"));
+      }
+      try {
+         accessControlContext.assertPostCreateResourcePermissions(SYS_RESOURCE,
+                                                                  null,
+                                                                  domainName,
+                                                                  setOf(ResourcePermissions
+                                                                              .getInstance(customPermissionName)));
+         fail("asserting post-create resource permission (by domain) for null resource class reference should have failed for system resource");
+      }
+      catch (NullPointerException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("resource class required"));
+      }
+      try {
+         accessControlContext.assertPostCreateResourcePermissions((String) null,
+                                                                  domainName,
+                                                                  setOf(ResourcePermissions
+                                                                              .getInstance(customPermissionName)));
+         fail("asserting post-create resource permission (by domain) for null resource class reference should have failed for implicit system resource");
+      }
+      catch (NullPointerException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("resource class required"));
+      }
+      try {
+         accessControlContext.assertPostCreateResourcePermissions(SYS_RESOURCE,
+                                                                  resourceClassName,
+                                                                  (String) null,
+                                                                  setOf(ResourcePermissions
+                                                                              .getInstance(customPermissionName)));
+         fail("asserting post-create resource permission (by domain) for null domain reference should have failed for system resource");
+      }
+      catch (NullPointerException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("domain required"));
+      }
+      try {
+         accessControlContext.assertPostCreateResourcePermissions(resourceClassName,
+                                                                  (String) null,
+                                                                  setOf(ResourcePermissions
+                                                                              .getInstance(customPermissionName)));
+         fail("asserting post-create resource permission (by domain) for null domain reference should have failed for implicit system resource");
+      }
+      catch (NullPointerException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("domain required"));
+      }
+      try {
+         accessControlContext.assertPostCreateResourcePermissions(SYS_RESOURCE,
+                                                                  resourceClassName,
+                                                                  domainName,
+                                                                  (Set<ResourcePermission>) null);
+         fail("asserting post-create resource permission (by domain) for null resource permission reference should have failed for system resource");
+      }
+      catch (NullPointerException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("permissions required"));
+      }
+      try {
+         accessControlContext.assertPostCreateResourcePermissions(resourceClassName,
+                                                                  domainName,
+                                                                  (Set<ResourcePermission>) null);
+         fail("asserting post-create resource permission (by domain) for null resource permission reference should have failed for implicit system resource");
+      }
+      catch (NullPointerException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("permissions required"));
+      }
+      try {
+         accessControlContext.assertPostCreateResourcePermissions(SYS_RESOURCE,
+                                                                  resourceClassName,
+                                                                  domainName,
+                                                                  setOf(ResourcePermissions
+                                                                              .getInstance(customPermissionName),
+                                                                        null));
+         fail("asserting post-create resource permission for null resource permission element should have failed for system resource");
+      }
+      catch (NullPointerException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("contains null element"));
+      }
+      try {
+         accessControlContext.assertPostCreateResourcePermissions(resourceClassName,
+                                                                  domainName,
+                                                                  setOf(ResourcePermissions
+                                                                              .getInstance(customPermissionName),
+                                                                        null));
+         fail("asserting post-create resource permission for null resource permission element should have failed for implicit system resource");
+      }
+      catch (NullPointerException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("contains null element"));
+      }
+   }
+
+   @Test
+   public void assertPostCreateResourcePermissions_emptyPermissionSet_shouldFail() {
+      authenticateSystemResource();
+
+      final String resourceClassName = generateResourceClass(true, false);
+      final String domainName = generateDomain();
+
+      try {
+         accessControlContext.assertPostCreateResourcePermissions(SYS_RESOURCE,
+                                                                  resourceClassName,
+                                                                  Collections.<ResourcePermission>emptySet());
+         fail("asserting post-create resource permission for null resource permission reference should have failed for system resource");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("permissions required"));
+      }
+      try {
+         accessControlContext.assertPostCreateResourcePermissions(resourceClassName,
+                                                                  Collections.<ResourcePermission>emptySet());
+         fail("asserting post-create resource permission for null resource permission reference should have failed for implicit system resource");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("permissions required"));
+      }
+      try {
+         accessControlContext.assertPostCreateResourcePermissions(SYS_RESOURCE,
+                                                                  resourceClassName,
+                                                                  domainName,
+                                                                  Collections.<ResourcePermission>emptySet());
+         fail("asserting post-create resource permission (by domain) for null resource permission reference should have failed for system resource");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("permissions required"));
+      }
+      try {
+         accessControlContext.assertPostCreateResourcePermissions(resourceClassName,
+                                                                  domainName,
+                                                                  Collections.<ResourcePermission>emptySet());
+         fail("asserting post-create resource permission (by domain) for null resource permission reference should have failed for implicit system resource");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("permissions required"));
       }
    }
 
@@ -1713,6 +2607,18 @@ public class TestAccessControl_assertPostCreateResourcePermissions extends TestA
                                                                ResourcePermissions.getInstance(customPermissionName),
                                                                ResourcePermissions.getInstance(customPermissionName, true));
 
+      accessControlContext.assertPostCreateResourcePermissions(resourceClassName,
+                                                               setOf(ResourcePermissions
+                                                                           .getInstance(customPermissionName),
+                                                                     ResourcePermissions
+                                                                           .getInstance(customPermissionName, true)));
+      accessControlContext.assertPostCreateResourcePermissions(SYS_RESOURCE,
+                                                               resourceClassName,
+                                                               setOf(ResourcePermissions
+                                                                           .getInstance(customPermissionName),
+                                                                     ResourcePermissions
+                                                                           .getInstance(customPermissionName, true)));
+
       final String domainName = generateDomain();
       accessControlContext.assertPostCreateResourcePermissions(SYS_RESOURCE,
                                                                resourceClassName,
@@ -1723,6 +2629,19 @@ public class TestAccessControl_assertPostCreateResourcePermissions extends TestA
                                                                domainName,
                                                                ResourcePermissions.getInstance(customPermissionName),
                                                                ResourcePermissions.getInstance(customPermissionName, true));
+      accessControlContext.assertPostCreateResourcePermissions(SYS_RESOURCE,
+                                                               resourceClassName,
+                                                               domainName,
+                                                               setOf(ResourcePermissions
+                                                                           .getInstance(customPermissionName),
+                                                                     ResourcePermissions
+                                                                           .getInstance(customPermissionName, true)));
+      accessControlContext.assertPostCreateResourcePermissions(resourceClassName,
+                                                               domainName,
+                                                               setOf(ResourcePermissions
+                                                                           .getInstance(customPermissionName),
+                                                                     ResourcePermissions
+                                                                           .getInstance(customPermissionName, true)));
    }
 
    @Test
@@ -1863,6 +2782,160 @@ public class TestAccessControl_assertPostCreateResourcePermissions extends TestA
                                                                   domainName,
                                                                   ResourcePermissions.getInstance(customPermissionName),
                                                                   ResourcePermissions.getInstance("invalid_permission"));
+         fail("asserting post-create resource permission (by domain) for valid and invalid resource permission reference should have failed for implicit system resource");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("not defined for resource class"));
+      }
+
+      // test set-based versions
+      try {
+         accessControlContext.assertPostCreateResourcePermissions(invalidResource,
+                                                                  resourceClassName,
+                                                                  setOf(ResourcePermissions
+                                                                              .getInstance(customPermissionName)));
+         fail("asserting post-create resource permission for invalid accessor resource reference should have failed for system resource");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString(String.valueOf(invalidResource).toLowerCase() + " not found"));
+      }
+      try {
+         accessControlContext.assertPostCreateResourcePermissions("invalid_resource_class",
+                                                                  setOf(ResourcePermissions
+                                                                              .getInstance(customPermissionName)));
+         fail("asserting post-create resource permission for invalid resource class reference should have failed for implicit system resource");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("not defined for resource class"));
+      }
+      try {
+         accessControlContext.assertPostCreateResourcePermissions(SYS_RESOURCE,
+                                                                  "invalid_resource_class",
+                                                                  setOf(ResourcePermissions
+                                                                              .getInstance(customPermissionName)));
+         fail("asserting post-create resource permission for invalid resource class reference should have failed for system resource");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("not defined for resource class"));
+      }
+      try {
+         accessControlContext.assertPostCreateResourcePermissions(SYS_RESOURCE,
+                                                                  resourceClassName,
+                                                                  setOf(ResourcePermissions.getInstance(
+                                                                        "invalid_permission")));
+         fail("asserting post-create resource permission for invalid resource permission reference should have failed for system resource");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("not defined for resource class"));
+      }
+      try {
+         accessControlContext.assertPostCreateResourcePermissions(SYS_RESOURCE,
+                                                                  resourceClassName,
+                                                                  setOf(ResourcePermissions
+                                                                              .getInstance(customPermissionName),
+                                                                        ResourcePermissions
+                                                                              .getInstance("invalid_permission")));
+         fail("asserting post-create resource permission for valid and invalid resource permission reference should have failed for system resource");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("not defined for resource class"));
+      }
+      try {
+         accessControlContext.assertPostCreateResourcePermissions(resourceClassName,
+                                                                  setOf(ResourcePermissions
+                                                                              .getInstance(customPermissionName),
+                                                                        ResourcePermissions
+                                                                              .getInstance("invalid_permission")));
+         fail("asserting post-create resource permission for valid and invalid resource permission reference should have failed for implicit system resource");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("not defined for resource class"));
+      }
+
+      try {
+         accessControlContext.assertPostCreateResourcePermissions(invalidResource,
+                                                                  resourceClassName,
+                                                                  domainName,
+                                                                  setOf(ResourcePermissions.getInstance(
+                                                                        customPermissionName)));
+         fail("asserting post-create resource permission (by domain) for invalid accessor resource reference should have failed for system resource");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString(String.valueOf(invalidResource).toLowerCase() + " not found"));
+      }
+      try {
+         accessControlContext.assertPostCreateResourcePermissions("invalid_resource_class",
+                                                                  domainName,
+                                                                  setOf(ResourcePermissions.getInstance(
+                                                                        customPermissionName)));
+         fail("asserting post-create resource permission (by domain) for invalid resource class reference should have failed for implicit system resource");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("not defined for resource class"));
+      }
+      try {
+         accessControlContext.assertPostCreateResourcePermissions(SYS_RESOURCE,
+                                                                  "invalid_resource_class",
+                                                                  domainName,
+                                                                  setOf(ResourcePermissions.getInstance(
+                                                                        customPermissionName)));
+         fail("asserting post-create resource permission (by domain) for invalid resource class reference should have failed for system resource");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("not defined for resource class"));
+      }
+      try {
+         accessControlContext.assertPostCreateResourcePermissions(SYS_RESOURCE,
+                                                                  resourceClassName,
+                                                                  "invalid_domain",
+                                                                  setOf(ResourcePermissions.getInstance(
+                                                                        customPermissionName)));
+         fail("asserting post-create resource permission (by domain) for invalid domain reference should have failed for system resource");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("could not find domain"));
+      }
+      try {
+         accessControlContext.assertPostCreateResourcePermissions(resourceClassName,
+                                                                  "invalid_domain",
+                                                                  setOf(ResourcePermissions.getInstance(
+                                                                        customPermissionName)));
+         fail("asserting post-create resource permission (by domain) for invalid domain reference should have failed for implicit system resource");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("could not find domain"));
+      }
+      try {
+         accessControlContext.assertPostCreateResourcePermissions(SYS_RESOURCE,
+                                                                  resourceClassName,
+                                                                  domainName,
+                                                                  setOf(ResourcePermissions.getInstance(
+                                                                        "invalid_permission")));
+         fail("asserting post-create resource permission (by domain) for invalid resource permission reference should have failed for system resource");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("not defined for resource class"));
+      }
+      try {
+         accessControlContext.assertPostCreateResourcePermissions(SYS_RESOURCE,
+                                                                  resourceClassName,
+                                                                  domainName,
+                                                                  setOf(ResourcePermissions
+                                                                              .getInstance(customPermissionName),
+                                                                        ResourcePermissions
+                                                                              .getInstance("invalid_permission")));
+         fail("asserting post-create resource permission (by domain) for valid and invalid resource permission reference should have failed for system resource");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("not defined for resource class"));
+      }
+      try {
+         accessControlContext.assertPostCreateResourcePermissions(resourceClassName,
+                                                                  domainName,
+                                                                  setOf(ResourcePermissions
+                                                                              .getInstance(customPermissionName),
+                                                                        ResourcePermissions
+                                                                              .getInstance("invalid_permission")));
          fail("asserting post-create resource permission (by domain) for valid and invalid resource permission reference should have failed for implicit system resource");
       }
       catch (IllegalArgumentException e) {

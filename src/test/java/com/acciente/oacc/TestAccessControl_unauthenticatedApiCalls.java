@@ -410,7 +410,10 @@ public class TestAccessControl_unauthenticatedApiCalls extends TestAccessControl
          assertThat(e.getMessage().toLowerCase(), containsString("not authenticated"));
       }
       try {
-         accessControlContext.assertPostCreateResourcePermissions((Resource) null, null, null, null);
+         accessControlContext.assertPostCreateResourcePermissions((Resource) null,
+                                                                  (String) null,
+                                                                  (String) null,
+                                                                  (ResourcePermission) null);
          fail("operation should have failed from unauthenticated context");
       }
       catch (NotAuthenticatedException e) {

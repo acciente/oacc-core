@@ -4872,6 +4872,51 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
    @Override
    public void assertPostCreateResourcePermissions(Resource accessorResource,
                                                    String resourceClassName,
+                                                   Set<ResourcePermission> resourcePermissions) {
+      assertPostCreateResourcePermissions(accessorResource,
+                                          resourceClassName,
+                                          sessionResourceDomainName,
+                                          resourcePermissions);
+   }
+
+   @Override
+   public void assertPostCreateResourcePermissions(String resourceClassName,
+                                                   Set<ResourcePermission> resourcePermissions) {
+      assertPostCreateResourcePermissions(sessionResource,
+                                          resourceClassName,
+                                          sessionResourceDomainName,
+                                          resourcePermissions);
+   }
+
+   @Override
+   public void assertPostCreateResourcePermissions(Resource accessorResource,
+                                                   String resourceClassName,
+                                                   String domainName,
+                                                   Set<ResourcePermission> resourcePermissions) {
+      if (!hasPostCreateResourcePermissions(accessorResource,
+                                            resourceClassName,
+                                            domainName,
+                                            resourcePermissions)) {
+         throw NotAuthorizedException.newInstanceForPostCreateResourcePermissions(accessorResource,
+                                                                                  resourceClassName,
+                                                                                  domainName,
+                                                                                  resourcePermissions );
+      }
+   }
+
+   @Override
+   public void assertPostCreateResourcePermissions(String resourceClassName,
+                                                   String domainName,
+                                                   Set<ResourcePermission> resourcePermissions) {
+      assertPostCreateResourcePermissions(sessionResource,
+                                          resourceClassName,
+                                          domainName,
+                                          resourcePermissions);
+   }
+
+   @Override
+   public void assertPostCreateResourcePermissions(Resource accessorResource,
+                                                   String resourceClassName,
                                                    ResourcePermission resourcePermission,
                                                    ResourcePermission... resourcePermissions) {
       assertPostCreateResourcePermissions(accessorResource,
@@ -4921,6 +4966,65 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
                                           domainName,
                                           resourcePermission,
                                           resourcePermissions);
+   }
+
+   @Override
+   public boolean hasPostCreateResourcePermissions(Resource accessorResource,
+                                                   String resourceClassName,
+                                                   Set<ResourcePermission> resourcePermissions) {
+      return hasPostCreateResourcePermissions(accessorResource,
+                                              resourceClassName,
+                                              sessionResourceDomainName,
+                                              resourcePermissions);
+   }
+
+   @Override
+   public boolean hasPostCreateResourcePermissions(String resourceClassName,
+                                                   Set<ResourcePermission> resourcePermissions) {
+      return hasPostCreateResourcePermissions(sessionResource,
+                                              resourceClassName,
+                                              sessionResourceDomainName,
+                                              resourcePermissions);
+   }
+
+   @Override
+   public boolean hasPostCreateResourcePermissions(Resource accessorResource,
+                                                   String resourceClassName,
+                                                   String domainName,
+                                                   Set<ResourcePermission> resourcePermissions) {
+      SQLConnection connection = null;
+
+      __assertAuthenticated();
+      __assertResourceSpecified(accessorResource);
+      __assertResourceClassSpecified(resourceClassName);
+      __assertDomainSpecified(domainName);
+      __assertPermissionsSpecified(resourcePermissions);
+      __assertPermissionsSetNotEmpty(resourcePermissions);
+
+      try {
+         connection = __getConnection();
+         resourceClassName = resourceClassName.trim();
+         domainName = domainName.trim();
+
+         return __hasPostCreateResourcePermissions(connection,
+                                                   accessorResource,
+                                                   resourceClassName,
+                                                   domainName,
+                                                   resourcePermissions);
+      }
+      finally {
+         __closeConnection(connection);
+      }
+   }
+
+   @Override
+   public boolean hasPostCreateResourcePermissions(String resourceClassName,
+                                                   String domainName,
+                                                   Set<ResourcePermission> resourcePermissions) {
+      return hasPostCreateResourcePermissions(sessionResource,
+                                              resourceClassName,
+                                              domainName,
+                                              resourcePermissions);
    }
 
    @Override
