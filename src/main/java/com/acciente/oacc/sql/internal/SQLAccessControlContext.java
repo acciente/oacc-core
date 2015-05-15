@@ -5428,6 +5428,23 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
    @Override
    public void assertResourcePermissions(Resource accessorResource,
                                          Resource accessedResource,
+                                         Set<ResourcePermission> resourcePermissions) {
+      if (!hasResourcePermissions(accessorResource, accessedResource, resourcePermissions)) {
+         throw NotAuthorizedException.newInstanceForResourcePermissions(accessorResource,
+                                                                        accessedResource,
+                                                                        resourcePermissions);
+      }
+   }
+
+   @Override
+   public void assertResourcePermissions(Resource accessedResource,
+                                         Set<ResourcePermission> resourcePermissions) {
+      assertResourcePermissions(sessionResource, accessedResource, resourcePermissions);
+   }
+
+   @Override
+   public void assertResourcePermissions(Resource accessorResource,
+                                         Resource accessedResource,
                                          ResourcePermission resourcePermission,
                                          ResourcePermission... resourcePermissions) {
       if (!hasResourcePermissions(accessorResource, accessedResource, resourcePermission, resourcePermissions)) {
@@ -5443,6 +5460,34 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
                                          ResourcePermission resourcePermission,
                                          ResourcePermission... resourcePermissions) {
       assertResourcePermissions(sessionResource, accessedResource, resourcePermission, resourcePermissions);
+   }
+
+   @Override
+   public boolean hasResourcePermissions(Resource accessorResource,
+                                         Resource accessedResource,
+                                         Set<ResourcePermission> resourcePermissions) {
+      SQLConnection connection = null;
+
+      __assertAuthenticated();
+      __assertResourceSpecified(accessorResource);
+      __assertResourceSpecified(accessedResource);
+      __assertPermissionsSpecified(resourcePermissions);
+      __assertPermissionsSetNotEmpty(resourcePermissions);
+
+      try {
+         connection = __getConnection();
+
+         return __hasResourcePermissions(connection, accessorResource, accessedResource, resourcePermissions);
+      }
+      finally {
+         __closeConnection(connection);
+      }
+   }
+
+   @Override
+   public boolean hasResourcePermissions(Resource accessedResource,
+                                         Set<ResourcePermission> resourcePermissions) {
+      return hasResourcePermissions(sessionResource, accessedResource, resourcePermissions);
    }
 
    @Override

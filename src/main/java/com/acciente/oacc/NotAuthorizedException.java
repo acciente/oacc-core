@@ -133,6 +133,17 @@ public class NotAuthorizedException extends AuthorizationException {
 
    public static NotAuthorizedException newInstanceForResourcePermissions(Resource accessorResource,
                                                                           Resource accessedResource,
+                                                                          Set<ResourcePermission> resourcePermissions) {
+      return new NotAuthorizedException("Resource "
+                                              + String.valueOf(accessorResource)
+                                              + " does not have permission(s) "
+                                              + String.valueOf(resourcePermissions)
+                                              + " on resource "
+                                              + String.valueOf(accessedResource));
+   }
+
+   public static NotAuthorizedException newInstanceForResourcePermissions(Resource accessorResource,
+                                                                          Resource accessedResource,
                                                                           ResourcePermission resourcePermission,
                                                                           ResourcePermission... resourcePermissions) {
       return new NotAuthorizedException("Resource "

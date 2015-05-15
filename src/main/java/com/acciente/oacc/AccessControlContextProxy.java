@@ -337,6 +337,19 @@ public class AccessControlContextProxy implements AccessControlContext {
    @Override
    public void assertResourcePermissions(Resource accessorResource,
                                          Resource accessedResource,
+                                         Set<ResourcePermission> resourcePermissions) {
+      accessControlContext.assertResourcePermissions(accessorResource, accessedResource, resourcePermissions);
+   }
+
+   @Override
+   public void assertResourcePermissions(Resource accessedResource,
+                                         Set<ResourcePermission> resourcePermissions) {
+      accessControlContext.assertResourcePermissions(accessedResource, resourcePermissions);
+   }
+
+   @Override
+   public void assertResourcePermissions(Resource accessorResource,
+                                         Resource accessedResource,
                                          ResourcePermission resourcePermission,
                                          ResourcePermission... resourcePermissions) {
       accessControlContext.assertResourcePermissions(accessorResource, accessedResource, resourcePermission, resourcePermissions);
@@ -347,6 +360,19 @@ public class AccessControlContextProxy implements AccessControlContext {
                                          ResourcePermission resourcePermission,
                                          ResourcePermission... resourcePermissions) {
       accessControlContext.assertResourcePermissions(accessedResource, resourcePermission, resourcePermissions);
+   }
+
+   @Override
+   public boolean hasResourcePermissions(Resource accessorResource,
+                                         Resource accessedResource,
+                                         Set<ResourcePermission> resourcePermissions) {
+      return accessControlContext.hasResourcePermissions(accessorResource, accessedResource, resourcePermissions);
+   }
+
+   @Override
+   public boolean hasResourcePermissions(Resource accessedResource,
+                                         Set<ResourcePermission> resourcePermissions) {
+      return accessControlContext.hasResourcePermissions(accessedResource, resourcePermissions);
    }
 
    @Override
