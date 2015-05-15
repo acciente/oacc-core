@@ -6212,6 +6212,35 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
    @Override
    public Set<Resource> getAccessorResourcesByResourcePermissions(Resource accessedResource,
                                                                   String resourceClassName,
+                                                                  Set<ResourcePermission> resourcePermissions) {
+      SQLConnection connection = null;
+
+      __assertAuthenticated();
+      __assertResourceSpecified(accessedResource);
+      __assertResourceClassSpecified(resourceClassName);
+      __assertPermissionsSpecified(resourcePermissions);
+      __assertPermissionsSetNotEmpty(resourcePermissions);
+
+      try {
+         connection = __getConnection();
+
+         __assertResourceExists(connection, accessedResource);
+
+         resourceClassName = resourceClassName.trim();
+
+         return __getAccessorResourcesByResourcePermissions(connection,
+                                                            accessedResource,
+                                                            resourceClassName,
+                                                            resourcePermissions);
+      }
+      finally {
+         __closeConnection(connection);
+      }
+   }
+
+   @Override
+   public Set<Resource> getAccessorResourcesByResourcePermissions(Resource accessedResource,
+                                                                  String resourceClassName,
                                                                   ResourcePermission resourcePermission,
                                                                   ResourcePermission... resourcePermissions) {
       SQLConnection connection = null;

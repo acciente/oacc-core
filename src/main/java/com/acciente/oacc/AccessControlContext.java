@@ -1760,6 +1760,26 @@ public interface AccessControlContext {
     *
     * @param accessedResource    the resource relative to which accessor resources are sought
     * @param resourceClassName   a string resource class name
+    * @param resourcePermissions the permissions to check
+    * @return a set of accessor resources to the accessedResource
+    * @throws java.lang.IllegalArgumentException if accessorResource does not exist, or
+    *                                            if no resource class of resourceClassName exists, or
+    *                                            if any resourcePermission is invalid for the specified resource class
+    */
+   public Set<Resource> getAccessorResourcesByResourcePermissions(Resource accessedResource,
+                                                                  String resourceClassName,
+                                                                  Set<ResourcePermission> resourcePermissions);
+
+   /**
+    * Returns a set of resources that have the specified permissions to the specified accessed resource.
+    * <p/>
+    * This method works in the reverse direction of the {@link #getResourcesByResourcePermissions} method, but
+    * unlike <code>getResourcesByResourcePermissions</code> it only takes into account direct permissions.
+    * In other words, this method ignores accessors that can reach the specified accessed resource
+    * via inherited permissions, global permissions and SUPER-USER privileges.
+    *
+    * @param accessedResource    the resource relative to which accessor resources are sought
+    * @param resourceClassName   a string resource class name
     * @param resourcePermission  the permission to check
     * @param resourcePermissions the other (optional) permissions to check
     * @return a set of accessor resources to the accessedResource
