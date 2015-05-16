@@ -5856,6 +5856,74 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
 
    @Override
    public Set<Resource> getResourcesByResourcePermissions(String resourceClassName,
+                                                          Set<ResourcePermission> resourcePermissions) {
+      SQLConnection connection = null;
+
+      __assertAuthenticated();
+      __assertResourceClassSpecified(resourceClassName);
+      __assertPermissionsSpecified(resourcePermissions);
+      __assertPermissionsSetNotEmpty(resourcePermissions);
+
+      try {
+         connection = __getConnection();
+
+         resourceClassName = resourceClassName.trim();
+
+         return __getResourcesByPermissions(connection,
+                                            sessionResource,
+                                            resourceClassName,
+                                            resourcePermissions);
+      }
+      finally {
+         __closeConnection(connection);
+      }
+   }
+
+   @Override
+   public Set<Resource> getResourcesByResourcePermissions(Resource accessorResource,
+                                                          String resourceClassName,
+                                                          Set<ResourcePermission> resourcePermissions) {
+      SQLConnection connection = null;
+
+      __assertAuthenticated();
+      __assertResourceSpecified(accessorResource);
+      __assertResourceClassSpecified(resourceClassName);
+      __assertPermissionsSpecified(resourcePermissions);
+      __assertPermissionsSetNotEmpty(resourcePermissions);
+
+      try {
+         connection = __getConnection();
+
+         resourceClassName = resourceClassName.trim();
+
+         Set<ResourcePermission> anyRequiredResourcePermissions = new HashSet<>(3);
+         anyRequiredResourcePermissions.add(ResourcePermission_IMPERSONATE);
+         anyRequiredResourcePermissions.add(ResourcePermission_INHERIT);
+         anyRequiredResourcePermissions.add(ResourcePermission_RESET_CREDENTIALS);
+
+         if (sessionResource.equals(accessorResource)
+               || __hasAnyPermissions(connection,
+                                      sessionResource,
+                                      accessorResource,
+                                      anyRequiredResourcePermissions)) {
+            return __getResourcesByPermissions(connection,
+                                               accessorResource,
+                                               resourceClassName,
+                                               resourcePermissions);
+         }
+         else {
+            throw NotAuthorizedException.newInstanceForActionOnResource(sessionResource,
+                                                                        "retrieve resources by permission for",
+                                                                        accessorResource);
+         }
+      }
+      finally {
+         __closeConnection(connection);
+      }
+   }
+
+   @Override
+   public Set<Resource> getResourcesByResourcePermissions(String resourceClassName,
                                                           ResourcePermission resourcePermission,
                                                           ResourcePermission... resourcePermissions) {
       SQLConnection connection = null;
@@ -5909,7 +5977,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
          anyRequiredResourcePermissions.add(ResourcePermission_INHERIT);
          anyRequiredResourcePermissions.add(ResourcePermission_RESET_CREDENTIALS);
 
-         if ( sessionResource.equals(accessorResource)
+         if (sessionResource.equals(accessorResource)
                || __hasAnyPermissions(connection,
                                       sessionResource,
                                       accessorResource,
@@ -6021,6 +6089,79 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
                                                                                                  accessorResource,
                                                                                                  resourceClassId));
       return resources;
+   }
+
+   @Override
+   public Set<Resource> getResourcesByResourcePermissionsAndDomain(String resourceClassName,
+                                                                   String domainName,
+                                                                   Set<ResourcePermission> resourcePermissions) {
+      SQLConnection connection = null;
+
+      __assertAuthenticated();
+      __assertResourceClassSpecified(resourceClassName);
+      __assertDomainSpecified(domainName);
+      __assertPermissionsSpecified(resourcePermissions);
+      __assertPermissionsSetNotEmpty(resourcePermissions);
+
+      try {
+         connection = __getConnection();
+
+         resourceClassName = resourceClassName.trim();
+
+         return __getResourcesByPermissionsAndDomain(connection,
+                                                     sessionResource,
+                                                     resourceClassName,
+                                                     domainName,
+                                                     resourcePermissions);
+      }
+      finally {
+         __closeConnection(connection);
+      }
+   }
+
+   @Override
+   public Set<Resource> getResourcesByResourcePermissionsAndDomain(Resource accessorResource,
+                                                                   String resourceClassName,
+                                                                   String domainName,
+                                                                   Set<ResourcePermission> resourcePermissions) {
+      SQLConnection connection = null;
+
+      __assertAuthenticated();
+      __assertResourceSpecified(accessorResource);
+      __assertResourceClassSpecified(resourceClassName);
+      __assertDomainSpecified(domainName);
+      __assertPermissionsSpecified(resourcePermissions);
+      __assertPermissionsSetNotEmpty(resourcePermissions);
+
+      try {
+         connection = __getConnection();
+
+         resourceClassName = resourceClassName.trim();
+         Set<ResourcePermission> anyRequiredResourcePermissions = new HashSet<>(3);
+         anyRequiredResourcePermissions.add(ResourcePermission_IMPERSONATE);
+         anyRequiredResourcePermissions.add(ResourcePermission_INHERIT);
+         anyRequiredResourcePermissions.add(ResourcePermission_RESET_CREDENTIALS);
+
+         if (sessionResource.equals(accessorResource)
+               || __hasAnyPermissions(connection,
+                                      sessionResource,
+                                      accessorResource,
+                                      anyRequiredResourcePermissions)) {
+            return __getResourcesByPermissionsAndDomain(connection,
+                                                        accessorResource,
+                                                        resourceClassName,
+                                                        domainName,
+                                                        resourcePermissions);
+         }
+         else {
+            throw NotAuthorizedException.newInstanceForActionOnResource(sessionResource,
+                                                                        "retrieve resources by permission for",
+                                                                        accessorResource);
+         }
+      }
+      finally {
+         __closeConnection(connection);
+      }
    }
 
    @Override
