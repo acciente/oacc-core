@@ -19,6 +19,8 @@ package com.acciente.oacc;
 
 import org.junit.Test;
 
+import java.util.Set;
+
 import static junit.framework.TestCase.fail;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.junit.Assert.assertThat;
@@ -396,6 +398,13 @@ public class TestAccessControl_unauthenticatedApiCalls extends TestAccessControl
          assertThat(e.getMessage().toLowerCase(), containsString("not authenticated"));
       }
       try {
+         accessControlContext.assertPostCreateDomainPermissions((Resource) null, (Set<DomainPermission>) null);
+         fail("operation should have failed from unauthenticated context");
+      }
+      catch (NotAuthenticatedException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("not authenticated"));
+      }
+      try {
          accessControlContext.assertDomainPermissions((Resource) null, null, (DomainPermission) null);
          fail("operation should have failed from unauthenticated context");
       }
@@ -403,7 +412,21 @@ public class TestAccessControl_unauthenticatedApiCalls extends TestAccessControl
          assertThat(e.getMessage().toLowerCase(), containsString("not authenticated"));
       }
       try {
+         accessControlContext.assertDomainPermissions((Resource) null, null, (Set<DomainPermission>) null);
+         fail("operation should have failed from unauthenticated context");
+      }
+      catch (NotAuthenticatedException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("not authenticated"));
+      }
+      try {
          accessControlContext.assertPostCreateResourcePermissions((Resource) null, null, null);
+         fail("operation should have failed from unauthenticated context");
+      }
+      catch (NotAuthenticatedException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("not authenticated"));
+      }
+      try {
+         accessControlContext.assertPostCreateResourcePermissions((Resource) null, null, (Set<ResourcePermission>) null);
          fail("operation should have failed from unauthenticated context");
       }
       catch (NotAuthenticatedException e) {
@@ -420,7 +443,24 @@ public class TestAccessControl_unauthenticatedApiCalls extends TestAccessControl
          assertThat(e.getMessage().toLowerCase(), containsString("not authenticated"));
       }
       try {
+         accessControlContext.assertPostCreateResourcePermissions((Resource) null,
+                                                                  (String) null,
+                                                                  (String) null,
+                                                                  (Set<ResourcePermission>) null);
+         fail("operation should have failed from unauthenticated context");
+      }
+      catch (NotAuthenticatedException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("not authenticated"));
+      }
+      try {
          accessControlContext.assertGlobalResourcePermissions((Resource) null, null, null);
+         fail("operation should have failed from unauthenticated context");
+      }
+      catch (NotAuthenticatedException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("not authenticated"));
+      }
+      try {
+         accessControlContext.assertGlobalResourcePermissions((Resource) null, null, (Set<ResourcePermission>) null);
          fail("operation should have failed from unauthenticated context");
       }
       catch (NotAuthenticatedException e) {
@@ -434,9 +474,169 @@ public class TestAccessControl_unauthenticatedApiCalls extends TestAccessControl
          assertThat(e.getMessage().toLowerCase(), containsString("not authenticated"));
       }
       try {
+         accessControlContext.assertGlobalResourcePermissions(null, null, (String) null, (Set<ResourcePermission>) null);
+         fail("operation should have failed from unauthenticated context");
+      }
+      catch (NotAuthenticatedException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("not authenticated"));
+      }
+      try {
          accessControlContext.assertResourcePermissions((Resource) null,
                                                         (Resource) null,
                                                         (ResourcePermission) null);
+         fail("operation should have failed from unauthenticated context");
+      }
+      catch (NotAuthenticatedException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("not authenticated"));
+      }
+      try {
+         accessControlContext.assertResourcePermissions((Resource) null,
+                                                        (Resource) null,
+                                                        (Set<ResourcePermission>) null);
+         fail("operation should have failed from unauthenticated context");
+      }
+      catch (NotAuthenticatedException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("not authenticated"));
+      }
+
+      // grant/revoke
+
+      try {
+         accessControlContext.grantDomainCreatePermissions(null, (DomainCreatePermission) null);
+         fail("operation should have failed from unauthenticated context");
+      }
+      catch (NotAuthenticatedException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("not authenticated"));
+      }
+      try {
+         accessControlContext.grantDomainCreatePermissions(null, (Set<DomainCreatePermission>) null);
+         fail("operation should have failed from unauthenticated context");
+      }
+      catch (NotAuthenticatedException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("not authenticated"));
+      }
+      try {
+         accessControlContext.grantDomainPermissions(null, null, (DomainPermission) null);
+         fail("operation should have failed from unauthenticated context");
+      }
+      catch (NotAuthenticatedException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("not authenticated"));
+      }
+      try {
+         accessControlContext.grantDomainPermissions(null, null, (Set<DomainPermission>) null);
+         fail("operation should have failed from unauthenticated context");
+      }
+      catch (NotAuthenticatedException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("not authenticated"));
+      }
+      try {
+         accessControlContext.grantGlobalResourcePermissions(null, null, (String) null, (ResourcePermission) null);
+         fail("operation should have failed from unauthenticated context");
+      }
+      catch (NotAuthenticatedException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("not authenticated"));
+      }
+      try {
+         accessControlContext.grantGlobalResourcePermissions(null, null, (String) null, (Set<ResourcePermission>) null);
+         fail("operation should have failed from unauthenticated context");
+      }
+      catch (NotAuthenticatedException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("not authenticated"));
+      }
+      try {
+         accessControlContext.grantResourceCreatePermissions(null, null, (String) null, (ResourceCreatePermission) null);
+         fail("operation should have failed from unauthenticated context");
+      }
+      catch (NotAuthenticatedException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("not authenticated"));
+      }
+      try {
+         accessControlContext.grantResourceCreatePermissions(null, null, (String) null, (Set<ResourceCreatePermission>) null);
+         fail("operation should have failed from unauthenticated context");
+      }
+      catch (NotAuthenticatedException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("not authenticated"));
+      }
+      try {
+         accessControlContext.grantResourcePermissions(null, null, (ResourcePermission) null);
+         fail("operation should have failed from unauthenticated context");
+      }
+      catch (NotAuthenticatedException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("not authenticated"));
+      }
+      try {
+         accessControlContext.grantResourcePermissions(null, null, (Set<ResourcePermission>) null);
+         fail("operation should have failed from unauthenticated context");
+      }
+      catch (NotAuthenticatedException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("not authenticated"));
+      }
+
+      try {
+         accessControlContext.revokeDomainCreatePermissions(null, (DomainCreatePermission) null);
+         fail("operation should have failed from unauthenticated context");
+      }
+      catch (NotAuthenticatedException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("not authenticated"));
+      }
+      try {
+         accessControlContext.revokeDomainCreatePermissions(null, (Set<DomainCreatePermission>) null);
+         fail("operation should have failed from unauthenticated context");
+      }
+      catch (NotAuthenticatedException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("not authenticated"));
+      }
+      try {
+         accessControlContext.revokeDomainPermissions(null, null, (DomainPermission) null);
+         fail("operation should have failed from unauthenticated context");
+      }
+      catch (NotAuthenticatedException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("not authenticated"));
+      }
+      try {
+         accessControlContext.revokeDomainPermissions(null, null, (Set<DomainPermission>) null);
+         fail("operation should have failed from unauthenticated context");
+      }
+      catch (NotAuthenticatedException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("not authenticated"));
+      }
+      try {
+         accessControlContext.revokeGlobalResourcePermissions(null, null, (String) null, (ResourcePermission) null);
+         fail("operation should have failed from unauthenticated context");
+      }
+      catch (NotAuthenticatedException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("not authenticated"));
+      }
+      try {
+         accessControlContext.revokeGlobalResourcePermissions(null, null, (String) null, (Set<ResourcePermission>) null);
+         fail("operation should have failed from unauthenticated context");
+      }
+      catch (NotAuthenticatedException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("not authenticated"));
+      }
+      try {
+         accessControlContext.revokeResourceCreatePermissions(null, null, (String) null, (ResourceCreatePermission) null);
+         fail("operation should have failed from unauthenticated context");
+      }
+      catch (NotAuthenticatedException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("not authenticated"));
+      }
+      try {
+         accessControlContext.revokeResourceCreatePermissions(null, null, (String) null, (Set<ResourceCreatePermission>) null);
+         fail("operation should have failed from unauthenticated context");
+      }
+      catch (NotAuthenticatedException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("not authenticated"));
+      }
+      try {
+         accessControlContext.revokeResourcePermissions(null, null, (ResourcePermission) null);
+         fail("operation should have failed from unauthenticated context");
+      }
+      catch (NotAuthenticatedException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("not authenticated"));
+      }
+      try {
+         accessControlContext.revokeResourcePermissions(null, null, (Set<ResourcePermission>) null);
          fail("operation should have failed from unauthenticated context");
       }
       catch (NotAuthenticatedException e) {
