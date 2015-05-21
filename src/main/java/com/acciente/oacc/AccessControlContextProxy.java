@@ -91,6 +91,30 @@ public class AccessControlContextProxy implements AccessControlContext {
    }
 
    @Override
+   public void assertDomainPermissions(Resource accessorResource,
+                                       Set<DomainPermission> domainPermissions) {
+      accessControlContext.assertDomainPermissions(accessorResource, domainPermissions);
+   }
+
+   @Override
+   public void assertDomainPermissions(Set<DomainPermission> domainPermissions) {
+      accessControlContext.assertDomainPermissions(domainPermissions);
+   }
+
+   @Override
+   public void assertDomainPermissions(Resource accessorResource,
+                                       DomainPermission domainPermission,
+                                       DomainPermission... domainPermissions) {
+      accessControlContext.assertDomainPermissions(accessorResource, domainPermission, domainPermissions);
+   }
+
+   @Override
+   public void assertDomainPermissions(DomainPermission domainPermission,
+                                       DomainPermission... domainPermissions) {
+      accessControlContext.assertDomainPermissions(domainPermission, domainPermissions);
+   }
+
+   @Override
    public boolean hasDomainPermissions(Resource accessorResource,
                                        String domainName,
                                        Set<DomainPermission> domainPermissions) {
@@ -116,6 +140,30 @@ public class AccessControlContextProxy implements AccessControlContext {
                                        DomainPermission domainPermission,
                                        DomainPermission... domainPermissions) {
       return accessControlContext.hasDomainPermissions(domainName, domainPermission, domainPermissions);
+   }
+
+   @Override
+   public boolean hasDomainPermissions(Resource accessorResource,
+                                       Set<DomainPermission> domainPermissions) {
+      return accessControlContext.hasDomainPermissions(accessorResource, domainPermissions);
+   }
+
+   @Override
+   public boolean hasDomainPermissions(Set<DomainPermission> domainPermissions) {
+      return accessControlContext.hasDomainPermissions(domainPermissions);
+   }
+
+   @Override
+   public boolean hasDomainPermissions(Resource accessorResource,
+                                       DomainPermission domainPermission,
+                                       DomainPermission... domainPermissions) {
+      return accessControlContext.hasDomainPermissions(accessorResource, domainPermission, domainPermissions);
+   }
+
+   @Override
+   public boolean hasDomainPermissions(DomainPermission domainPermission,
+                                       DomainPermission... domainPermissions) {
+      return accessControlContext.hasDomainPermissions(domainPermission, domainPermissions);
    }
 
    @Override

@@ -405,7 +405,7 @@ public class TestAccessControl_unauthenticatedApiCalls extends TestAccessControl
          assertThat(e.getMessage().toLowerCase(), containsString("not authenticated"));
       }
       try {
-         accessControlContext.assertDomainPermissions((Resource) null, null, (DomainPermission) null);
+         accessControlContext.assertDomainPermissions((Resource) null, (String) null, (DomainPermission) null);
          fail("operation should have failed from unauthenticated context");
       }
       catch (NotAuthenticatedException e) {
@@ -413,6 +413,20 @@ public class TestAccessControl_unauthenticatedApiCalls extends TestAccessControl
       }
       try {
          accessControlContext.assertDomainPermissions((Resource) null, null, (Set<DomainPermission>) null);
+         fail("operation should have failed from unauthenticated context");
+      }
+      catch (NotAuthenticatedException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("not authenticated"));
+      }
+      try {
+         accessControlContext.assertDomainPermissions((Resource) null, (DomainPermission) null);
+         fail("operation should have failed from unauthenticated context");
+      }
+      catch (NotAuthenticatedException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("not authenticated"));
+      }
+      try {
+         accessControlContext.assertDomainPermissions((Resource) null, (Set<DomainPermission>) null);
          fail("operation should have failed from unauthenticated context");
       }
       catch (NotAuthenticatedException e) {

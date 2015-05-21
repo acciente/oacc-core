@@ -221,6 +221,68 @@ public interface AccessControlContext {
 
    /**
     * Checks if the specified accessor resource has the specified domain permissions on
+    * the session resource's domain.
+    * This method takes into account any direct domain permissions, inherited domain permissions
+    * and any domain permissions the accessor may have to ancestors of the specified domain, as well
+    * as any super-user privileges.
+    *
+    * @param accessorResource  the resource on which access is being checked
+    * @param domainPermissions the permissions to be checked
+    * @throws java.lang.IllegalArgumentException       if the accessorResource does not exist
+    * @throws com.acciente.oacc.NotAuthorizedException if the accessor resource <strong>does not</strong> have the
+    *                                                  specified domain permissions, or
+    *                                                  if the accessor resource does not exist
+    */
+   public void assertDomainPermissions(Resource accessorResource,
+                                       Set<DomainPermission> domainPermissions);
+
+   /**
+    * Checks if the session resource has the specified domain permissions on the session resource's domain.
+    * This method takes into account any direct domain permissions, inherited domain permissions
+    * and any domain permissions the session resource may have to ancestors of the specified domain, as well
+    * as any super-user privileges.
+    *
+    * @param domainPermissions the permissions to be checked
+    * @throws com.acciente.oacc.NotAuthorizedException if the session resource <strong>does not</strong> have the
+    *                                                  specified domain permissions
+    */
+   public void assertDomainPermissions(Set<DomainPermission> domainPermissions);
+
+   /**
+    * Checks if the specified accessor resource has the specified domain permissions on
+    * the session resource's domain.
+    * This method takes into account any direct domain permissions, inherited domain permissions
+    * and any domain permissions the accessor may have to ancestors of the specified domain, as well
+    * as any super-user privileges.
+    *
+    * @param accessorResource  the resource on which access is being checked
+    * @param domainPermission  the permission to be checked
+    * @param domainPermissions the other (optional) permissions to be checked
+    * @throws java.lang.IllegalArgumentException       if the accessorResource does not exist
+    * @throws com.acciente.oacc.NotAuthorizedException if the accessor resource <strong>does not</strong> have the
+    *                                                  specified domain permissions, or
+    *                                                  if the accessor resource does not exist
+    */
+   public void assertDomainPermissions(Resource accessorResource,
+                                       DomainPermission domainPermission,
+                                       DomainPermission... domainPermissions);
+
+   /**
+    * Checks if the session resource has the specified domain permissions on the session resource's domain.
+    * This method takes into account any direct domain permissions, inherited domain permissions
+    * and any domain permissions the session resource may have to ancestors of the specified domain, as well
+    * as any super-user privileges.
+    *
+    * @param domainPermission  the permission to be checked
+    * @param domainPermissions the other (optional) permissions to be checked
+    * @throws com.acciente.oacc.NotAuthorizedException if the session resource <strong>does not</strong> have the
+    *                                                  specified domain permissions
+    */
+   public void assertDomainPermissions(DomainPermission domainPermission,
+                                       DomainPermission... domainPermissions);
+
+   /**
+    * Checks if the specified accessor resource has the specified domain permissions on
     * the specified domain.
     * This method takes into account any direct domain permissions, inherited domain permissions
     * and any domain permissions the accessor may have to ancestors of the specified domain, as well
@@ -289,6 +351,67 @@ public interface AccessControlContext {
     */
    public boolean hasDomainPermissions(String domainName,
                                        DomainPermission domainPermission,
+                                       DomainPermission... domainPermissions);
+
+   /**
+    * Checks if the specified accessor resource has the specified domain permissions on
+    * the session resource's domain.
+    * This method takes into account any direct domain permissions, inherited domain permissions
+    * and any domain permissions the accessor may have to ancestors of the specified domain, as well
+    * as any super-user privileges.
+    *
+    * @param accessorResource  the resource on which access is being checked
+    * @param domainPermissions the permissions to be checked
+    * @return  <strong>true</strong> if the accessor resource has the specified domain permissions,
+    *          <strong>false</strong> otherwise or if the accessor resource does not exist
+    * @throws java.lang.IllegalArgumentException if the accessorResource does not exist
+    */
+   public boolean hasDomainPermissions(Resource accessorResource,
+                                       Set<DomainPermission> domainPermissions);
+
+   /**
+    * Checks if the session resource has the specified domain permissions on the session resource's domain.
+    * This method takes into account any direct domain permissions, inherited domain permissions
+    * and any domain permissions the session resource may have to ancestors of the specified domain, as well
+    * as any super-user privileges.
+    *
+    * @param domainPermissions the permissions to be checked
+    * @return  <strong>true</strong> if the session resource has the specified domain permissions,
+    *          <strong>false</strong> otherwise
+    */
+   public boolean hasDomainPermissions(Set<DomainPermission> domainPermissions);
+
+   /**
+    * Checks if the specified accessor resource has the specified domain permissions on
+    * the session resource's domain.
+    * This method takes into account any direct domain permissions, inherited domain permissions
+    * and any domain permissions the accessor may have to ancestors of the specified domain, as well
+    * as any super-user privileges.
+    *
+    * @param accessorResource  the resource on which access is being checked
+    * @param domainPermission  the permission to be checked
+    * @param domainPermissions the other (optional) permissions to be checked
+    * @return  <strong>true</strong> if the accessor resource has the specified domain permissions,
+    *          <strong>false</strong> otherwise or if the accessor resource does not exist
+    * @throws java.lang.IllegalArgumentException if the accessorResource does not exist
+    */
+   public boolean hasDomainPermissions(Resource accessorResource,
+                                       DomainPermission domainPermission,
+                                       DomainPermission... domainPermissions);
+
+   /**
+    * Checks if the session resource has the specified domain permissions on the session resource's domain.
+    * This method takes into account any direct domain permissions, inherited domain permissions
+    * and any domain permissions the session resource may have to ancestors of the specified domain, as well
+    * as any super-user privileges.
+    *
+    * @param domainPermission  the permission to be checked
+    * @param domainPermissions the other (optional) permissions to be checked
+    * @return  <strong>true</strong> if the session resource has the specified domain permissions,
+    *          <strong>false</strong> otherwise
+    * @throws java.lang.IllegalArgumentException  if no domain of domainName exists
+    */
+   public boolean hasDomainPermissions(DomainPermission domainPermission,
                                        DomainPermission... domainPermissions);
 
    /**

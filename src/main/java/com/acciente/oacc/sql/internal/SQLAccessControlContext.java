@@ -4668,6 +4668,29 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
    }
 
    @Override
+   public void assertDomainPermissions(Resource accessorResource,
+                                       Set<DomainPermission> domainPermissions) {
+      assertDomainPermissions(accessorResource, sessionResourceDomainName, domainPermissions);
+   }
+
+   @Override
+   public void assertDomainPermissions(Set<DomainPermission> domainPermissions) {
+      assertDomainPermissions(sessionResource, sessionResourceDomainName, domainPermissions);
+   }
+
+   @Override
+   public void assertDomainPermissions(Resource accessorResource,
+                                       DomainPermission domainPermission,
+                                       DomainPermission... domainPermissions) {
+      assertDomainPermissions(accessorResource, sessionResourceDomainName, domainPermission, domainPermissions);   }
+
+   @Override
+   public void assertDomainPermissions(DomainPermission domainPermission,
+                                       DomainPermission... domainPermissions) {
+      assertDomainPermissions(sessionResource, sessionResourceDomainName, domainPermission, domainPermissions);
+   }
+
+   @Override
    public boolean hasDomainPermissions(Resource accessorResource,
                                        String domainName,
                                        Set<DomainPermission> domainPermissions) {
@@ -4727,6 +4750,28 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
                                        DomainPermission... domainPermissions) {
       return hasDomainPermissions(sessionResource, domainName, domainPermission, domainPermissions);
    }
+
+   @Override
+   public boolean hasDomainPermissions(Resource accessorResource,
+                                       Set<DomainPermission> domainPermissions) {
+      return hasDomainPermissions(accessorResource, sessionResourceDomainName, domainPermissions);
+   }
+
+   @Override
+   public boolean hasDomainPermissions(Set<DomainPermission> domainPermissions) {
+      return hasDomainPermissions(sessionResource, sessionResourceDomainName, domainPermissions);
+   }
+
+   @Override
+   public boolean hasDomainPermissions(Resource accessorResource,
+                                       DomainPermission domainPermission,
+                                       DomainPermission... domainPermissions) {
+      return hasDomainPermissions(accessorResource, sessionResourceDomainName, domainPermission, domainPermissions);   }
+
+   @Override
+   public boolean hasDomainPermissions(DomainPermission domainPermission,
+                                       DomainPermission... domainPermissions) {
+      return hasDomainPermissions(sessionResource, sessionResourceDomainName, domainPermission, domainPermissions);   }
 
    private boolean __hasDomainPermissions(SQLConnection connection,
                                           Resource accessorResource,
