@@ -2356,7 +2356,7 @@ public interface AccessControlContext {
     * @param domainPermissions the permissions to be granted on the specified domain
     * @throws java.lang.IllegalArgumentException       if accessorResource reference does not exist
     * @throws com.acciente.oacc.NotAuthorizedException if the session resource is not authorized to set
-    *                                                  domain permissions on the specified domain
+    *                                                  domain permissions on the session resource's domain
     */
    public void setDomainPermissions(Resource accessorResource,
                                     Set<DomainPermission> domainPermissions);
@@ -2411,6 +2411,53 @@ public interface AccessControlContext {
     */
    public void grantDomainPermissions(Resource accessorResource,
                                       String domainName,
+                                      DomainPermission domainPermission,
+                                      DomainPermission... domainPermissions);
+
+   /**
+    * Adds to the direct domain permissions the specified accessor resource has on the session resource's domain.
+    * <p/>
+    * This call does not change <em>inherited</em> domain permissions the specified accessor resource has
+    * on the specified domain, or any domain permissions already granted on <em>ancestors</em> of the domain.
+    *
+    * This method does <em>not</em> replace any domain permissions previously granted, but can only add to the set.
+    * Furthermore, removing the 'withGrant' option from an existing permission is not possible with this method
+    * alone - revoke the permission first, then re-grant without the 'withGrant' option, or use {@link
+    * #setDomainPermissions} to specify all direct permissions
+    *
+    * @param accessorResource  the resource to which the privilege should be granted
+    * @param domainPermissions the permissions to be granted on the specified domain
+    * @throws java.lang.IllegalArgumentException       if accessorResource reference does not exist
+    *                                                  if domainPermissions is empty, or
+    *                                                  if domainPermissions contains multiple instances of the same
+    *                                                  permission that only differ in the 'withGrant' attribute
+    * @throws com.acciente.oacc.NotAuthorizedException if the session resource is not authorized to set
+    *                                                  domain permissions on the session resource's domain
+    */
+   public void grantDomainPermissions(Resource accessorResource,
+                                      Set<DomainPermission> domainPermissions);
+
+   /**
+    * Adds to the direct domain permissions the specified accessor resource has on the session resource's domain.
+    * <p/>
+    * This call does not change <em>inherited</em> domain permissions the specified accessor resource has
+    * on the specified domain, or any domain permissions already granted on <em>ancestors</em> of the domain.
+    *
+    * This method does <em>not</em> replace any domain permissions previously granted, but can only add to the set.
+    * Furthermore, removing the 'withGrant' option from an existing permission is not possible with this method
+    * alone - revoke the permission first, then re-grant without the 'withGrant' option, or use {@link
+    * #setDomainPermissions} to specify all direct permissions
+    *
+    * @param accessorResource  the resource to which the privilege should be granted
+    * @param domainPermission  the permission to be granted on the specified domain
+    * @param domainPermissions the other (optional) permissions to be granted on the specified domain
+    * @throws java.lang.IllegalArgumentException       if accessorResource reference does not exist
+    *                                                  if domainPermissions contains multiple instances of the same
+    *                                                  permission that only differ in the 'withGrant' attribute
+    * @throws com.acciente.oacc.NotAuthorizedException if the session resource is not authorized to set
+    *                                                  domain permissions on the session resource's domain
+    */
+   public void grantDomainPermissions(Resource accessorResource,
                                       DomainPermission domainPermission,
                                       DomainPermission... domainPermissions);
 
