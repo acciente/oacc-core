@@ -886,6 +886,12 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       }
    }
 
+   @Override
+   public void setDomainPermissions(Resource accessorResource,
+                                    Set<DomainPermission> domainPermissions) {
+      setDomainPermissions(accessorResource, sessionResourceDomainName, domainPermissions);
+   }
+
    private void __setDirectDomainPermissions(SQLConnection connection,
                                              Resource accessorResource,
                                              String domainName,

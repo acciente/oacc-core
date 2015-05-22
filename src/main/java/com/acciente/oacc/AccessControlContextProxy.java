@@ -877,6 +877,12 @@ public class AccessControlContextProxy implements AccessControlContext {
    }
 
    @Override
+   public void setDomainPermissions(Resource accessorResource,
+                                    Set<DomainPermission> domainPermissions) {
+      accessControlContext.setDomainPermissions(accessorResource, domainPermissions);
+   }
+
+   @Override
    public void grantDomainPermissions(Resource accessorResource,
                                       String domainName,
                                       Set<DomainPermission> domainPermissions) {

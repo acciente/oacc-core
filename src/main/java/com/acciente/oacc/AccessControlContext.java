@@ -2344,6 +2344,24 @@ public interface AccessControlContext {
                                     Set<DomainPermission> domainPermissions);
 
    /**
+    * Sets the direct domain permissions the specified accessor resource has on the session resource's domain.
+    * <p/>
+    * Note that this method overwrites any <em>direct</em> domain permissions to the specified domain that
+    * the accessor has, <em>including permissions granted by other resources</em>.
+    * <p/>
+    * This call does not change <em>inherited</em> domain permissions the specified accessor resource has
+    * on the specified domain, or any domain permissions already granted on <em>ancestors</em> of the domain.
+    *
+    * @param accessorResource  the resource to which the privilege should be granted
+    * @param domainPermissions the permissions to be granted on the specified domain
+    * @throws java.lang.IllegalArgumentException       if accessorResource reference does not exist
+    * @throws com.acciente.oacc.NotAuthorizedException if the session resource is not authorized to set
+    *                                                  domain permissions on the specified domain
+    */
+   public void setDomainPermissions(Resource accessorResource,
+                                    Set<DomainPermission> domainPermissions);
+
+   /**
     * Adds to the direct domain permissions the specified accessor resource has on the specified domain.
     * <p/>
     * This call does not change <em>inherited</em> domain permissions the specified accessor resource has
