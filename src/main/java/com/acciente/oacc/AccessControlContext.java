@@ -2515,6 +2515,53 @@ public interface AccessControlContext {
                                        DomainPermission... domainPermissions);
 
    /**
+    * Revokes the direct domain permissions from set the specified accessor resource has on the session resource's domain.
+    * <p/>
+    * This call does not change <em>inherited</em> domain permissions the specified accessor resource has
+    * on the specified domain, or any domain permissions already granted on <em>ancestors</em> of the domain.
+    *
+    * Note that this method revokes the specified permission regardless of any specified granting right and regardless
+    * of the granting right the accessor has on the accessed resource!
+    * This method is idempotent, that is, when a specified permission is no longer granted, repeated calls to
+    * this method will have no effect.
+    *
+    * @param accessorResource  the resource from which the privilege should be revoked
+    * @param domainPermissions the permission to be revoked on the specified domain
+    * @throws java.lang.IllegalArgumentException       if accessorResource reference does not exist, or
+    *                                                  if domainPermissions is empty, or
+    *                                                  if domainPermissions contains multiple instances of the same
+    *                                                  permission that only differ in the 'withGrant' attribute
+    * @throws com.acciente.oacc.NotAuthorizedException if the session resource is not authorized to grant (or in this
+    *                                                  case revoke) domain permissions on the session resource's domain
+    */
+   public void revokeDomainPermissions(Resource accessorResource,
+                                       Set<DomainPermission> domainPermissions);
+
+   /**
+    * Revokes the direct domain permissions from set the specified accessor resource has on the session resource's domain.
+    * <p/>
+    * This call does not change <em>inherited</em> domain permissions the specified accessor resource has
+    * on the specified domain, or any domain permissions already granted on <em>ancestors</em> of the domain.
+    *
+    * Note that this method revokes the specified permission regardless of any specified granting right and regardless
+    * of the granting right the accessor has on the accessed resource!
+    * This method is idempotent, that is, when a specified permission is no longer granted, repeated calls to
+    * this method will have no effect.
+    *
+    * @param accessorResource  the resource from which the privilege should be revoked
+    * @param domainPermission  the permission to be revoked on the specified domain
+    * @param domainPermissions the other (optional) permissions to be revoked on the specified domain
+    * @throws java.lang.IllegalArgumentException       if accessorResource reference does not exist, or
+    *                                                  if domainPermissions contains multiple instances of the same
+    *                                                  permission that only differ in the 'withGrant' attribute
+    * @throws com.acciente.oacc.NotAuthorizedException if the session resource is not authorized to grant (or in this
+    *                                                  case revoke) domain permissions on the session resource's domain
+    */
+   public void revokeDomainPermissions(Resource accessorResource,
+                                       DomainPermission domainPermission,
+                                       DomainPermission... domainPermissions);
+
+   /**
     * Gets all domain permissions the accessor resource has directly to the specified domain.
     * <p/>
     * This method only takes into account direct domain permissions, but not any inherited

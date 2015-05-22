@@ -1201,6 +1201,19 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       }
    }
 
+   @Override
+   public void revokeDomainPermissions(Resource accessorResource,
+                                       Set<DomainPermission> domainPermissions) {
+      revokeDomainPermissions(accessorResource, sessionResourceDomainName, domainPermissions);
+   }
+
+   @Override
+   public void revokeDomainPermissions(Resource accessorResource,
+                                       DomainPermission domainPermission,
+                                       DomainPermission... domainPermissions) {
+      revokeDomainPermissions(accessorResource, sessionResourceDomainName, domainPermission, domainPermissions);
+   }
+
    private void __revokeDirectDomainPermissions(SQLConnection connection,
                                                 Resource accessorResource,
                                                 String domainName,
