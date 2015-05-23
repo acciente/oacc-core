@@ -2578,6 +2578,19 @@ public interface AccessControlContext {
                                                      String domainName);
 
    /**
+    * Gets all domain permissions the accessor resource has directly to the session resource's domain.
+    * <p/>
+    * This method only takes into account direct domain permissions, but not any inherited
+    * domain permissions and not any domain permissions the accessor may have to ancestors of
+    * the specified domain.
+    *
+    * @param accessorResource the accessor resource relative which permissions should be returned
+    * @return the set of all direct domain permission the accessor resource has to the domain
+    * @throws java.lang.IllegalArgumentException if accessorResource reference does not exist
+    */
+   public Set<DomainPermission> getDomainPermissions(Resource accessorResource);
+
+   /**
     * Gets all domain permissions the accessor resource has directly to any domain, mapped by domain name.
     * <p/>
     * This method only takes into account direct domain permissions, but not any inherited domain

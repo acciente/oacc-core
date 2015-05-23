@@ -1304,6 +1304,11 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
    }
 
    @Override
+   public Set<DomainPermission> getDomainPermissions(Resource accessorResource) {
+      return getDomainPermissions(accessorResource, sessionResourceDomainName);
+   }
+
+   @Override
    public Map<String, Set<DomainPermission>> getDomainPermissionsMap(Resource accessorResource) {
       SQLConnection connection = null;
 

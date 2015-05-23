@@ -945,6 +945,11 @@ public class AccessControlContextProxy implements AccessControlContext {
    }
 
    @Override
+   public Set<DomainPermission> getDomainPermissions(Resource accessorResource) {
+      return accessControlContext.getDomainPermissions(accessorResource);
+   }
+
+   @Override
    public Map<String, Set<DomainPermission>> getDomainPermissionsMap(Resource accessorResource) {
       return accessControlContext.getDomainPermissionsMap(accessorResource);
    }

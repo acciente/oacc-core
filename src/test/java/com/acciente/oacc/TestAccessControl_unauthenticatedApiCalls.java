@@ -136,6 +136,13 @@ public class TestAccessControl_unauthenticatedApiCalls extends TestAccessControl
          assertThat(e.getMessage().toLowerCase(), containsString("not authenticated"));
       }
       try {
+         accessControlContext.getDomainPermissions(null);
+         fail("operation should have failed from unauthenticated context");
+      }
+      catch (NotAuthenticatedException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("not authenticated"));
+      }
+      try {
          accessControlContext.getDomainPermissionsMap(null);
          fail("operation should have failed from unauthenticated context");
       }
