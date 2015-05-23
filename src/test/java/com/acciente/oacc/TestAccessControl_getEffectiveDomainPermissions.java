@@ -40,6 +40,9 @@ public class TestAccessControl_getEffectiveDomainPermissions extends TestAccessC
       final String domainName = generateDomain();
       final Set<DomainPermission> domainPermissions = accessControlContext.getEffectiveDomainPermissions(accessorResource, domainName);
       assertThat(domainPermissions.isEmpty(), is(true));
+
+      final Set<DomainPermission> sysDomainPermissions = accessControlContext.getEffectiveDomainPermissions(accessorResource);
+      assertThat(sysDomainPermissions.isEmpty(), is(true));
    }
 
    @Test
@@ -54,6 +57,9 @@ public class TestAccessControl_getEffectiveDomainPermissions extends TestAccessC
       final String domainName = generateDomain();
       final Set<DomainPermission> domainPermissions = accessControlContext.getEffectiveDomainPermissions(accessorResource, domainName);
       assertThat(domainPermissions.isEmpty(), is(true));
+
+      final Set<DomainPermission> authDomainPermissions = accessControlContext.getEffectiveDomainPermissions(accessorResource);
+      assertThat(authDomainPermissions.isEmpty(), is(true));
    }
 
    @Test
@@ -68,6 +74,7 @@ public class TestAccessControl_getEffectiveDomainPermissions extends TestAccessC
 
       final String domainName1 = generateDomain();
       final String domainName2 = generateDomain();
+      final String sysDomainName = accessControlContext.getDomainNameByResource(SYS_RESOURCE);
 
       // set domain create permissions
       Resource accessorResource = generateUnauthenticatableResource();
@@ -97,6 +104,21 @@ public class TestAccessControl_getEffectiveDomainPermissions extends TestAccessC
 
       final Set<DomainPermission> domainPermissions_post2 = accessControlContext.getEffectiveDomainPermissions(accessorResource, domainName2);
       assertThat(domainPermissions_post2, is(domainPermissions_pre2));
+
+      // let's try implicit system domain
+      Set<DomainPermission> domainPermissions_pre3 = new HashSet<>();
+      domainPermissions_pre3.add(domCreatePerm_child_withGrant);
+      accessControlContext.setDomainPermissions(accessorResource, sysDomainName, domainPermissions_pre3);
+
+      // get domain create permissions and verify
+      final Map<String,Set<DomainPermission>> allDomainPermissions3 = accessControlContext.getEffectiveDomainPermissionsMap(accessorResource);
+      assertThat(allDomainPermissions3.size(), is(3));
+      assertThat(allDomainPermissions3.get(domainName1), is(domainPermissions_pre1));
+      assertThat(allDomainPermissions3.get(domainName2), is(domainPermissions_pre2));
+      assertThat(allDomainPermissions3.get(sysDomainName), is(domainPermissions_pre3));
+
+      final Set<DomainPermission> domainPermissions_post3 = accessControlContext.getEffectiveDomainPermissions(accessorResource);
+      assertThat(domainPermissions_post3, is(domainPermissions_pre3));
    }
 
    @Test
@@ -140,6 +162,12 @@ public class TestAccessControl_getEffectiveDomainPermissions extends TestAccessC
       assertThat(allDomainPermissions.size(), is(2));
       assertThat(allDomainPermissions.get(parentDomain), is(parentDomainPermissions_pre));
       assertThat(allDomainPermissions.get(childDomain), is(childDomainPermissions_expected));
+
+      final char[] password = generateUniquePassword();
+      Resource authenticatableResource = generateAuthenticatableResource(password, childDomain);
+      accessControlContext.authenticate(authenticatableResource, PasswordCredentials.newInstance(password));
+      final Set<DomainPermission> authDomainPermissions_post = accessControlContext.getEffectiveDomainPermissions(accessorResource);
+      assertThat(authDomainPermissions_post, is(childDomainPermissions_expected));
    }
 
    @Test
@@ -210,6 +238,12 @@ public class TestAccessControl_getEffectiveDomainPermissions extends TestAccessC
       assertThat(allDomainPermissions.get(grandChildDomain), is(grandChildDomainPermissions_expected));
       assertThat(allDomainPermissions.get(greatGrandChildDomain), is(greatGrandChildDomainPermissions_expected));
       assertThat(allDomainPermissions.get(greatGreatGrandChildDomain), is(greatGreatGrandChildDomainPermissions_expected));
+
+      final char[] password = generateUniquePassword();
+      Resource authenticatableResource = generateAuthenticatableResource(password, greatGreatGrandChildDomain);
+      accessControlContext.authenticate(authenticatableResource, PasswordCredentials.newInstance(password));
+      final Set<DomainPermission> authDomainPermissions_post = accessControlContext.getEffectiveDomainPermissions(accessorResource);
+      assertThat(authDomainPermissions_post, is(greatGreatGrandChildDomainPermissions_expected));
    }
 
    @Test
@@ -256,6 +290,12 @@ public class TestAccessControl_getEffectiveDomainPermissions extends TestAccessC
       final Map<String,Set<DomainPermission>> allDomainPermissions = accessControlContext.getEffectiveDomainPermissionsMap(accessorResource);
       assertThat(allDomainPermissions.size(), is(1));
       assertThat(allDomainPermissions.get(domainName), is(domainPermissions_expected));
+
+      final char[] password = generateUniquePassword();
+      Resource authenticatableResource = generateAuthenticatableResource(password, domainName);
+      accessControlContext.authenticate(authenticatableResource, PasswordCredentials.newInstance(password));
+      final Set<DomainPermission> authDomainPermissions_post = accessControlContext.getEffectiveDomainPermissions(accessorResource);
+      assertThat(authDomainPermissions_post, is(domainPermissions_expected));
    }
 
    @Test
@@ -311,6 +351,12 @@ public class TestAccessControl_getEffectiveDomainPermissions extends TestAccessC
       assertThat(allDomainPermissions.size(), is(2));
       assertThat(allDomainPermissions.get(parentDomain), is(parentDomainPermissions_expected));
       assertThat(allDomainPermissions.get(childDomain), is(childDomainPermissions_expected));
+
+      final char[] password = generateUniquePassword();
+      Resource authenticatableResource = generateAuthenticatableResource(password, childDomain);
+      accessControlContext.authenticate(authenticatableResource, PasswordCredentials.newInstance(password));
+      final Set<DomainPermission> authDomainPermissions_post = accessControlContext.getEffectiveDomainPermissions(accessorResource);
+      assertThat(authDomainPermissions_post, is(childDomainPermissions_expected));
    }
 
    @Test
@@ -356,6 +402,13 @@ public class TestAccessControl_getEffectiveDomainPermissions extends TestAccessC
       catch (NullPointerException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("resource required"));
       }
+      try {
+         accessControlContext.getEffectiveDomainPermissions(null);
+         fail("getting effective domain permissions with null accessor resource reference should have failed");
+      }
+      catch (NullPointerException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("resource required"));
+      }
 
       try {
          accessControlContext.getEffectiveDomainPermissions(generateUnauthenticatableResource(), null);
@@ -377,6 +430,13 @@ public class TestAccessControl_getEffectiveDomainPermissions extends TestAccessC
 
       try {
          accessControlContext.getEffectiveDomainPermissions(invalidResource, domainName);
+         fail("getting effective domain permissions with invalid resource reference should have failed");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString(String.valueOf(invalidResource).toLowerCase() + " not found"));
+      }
+      try {
+         accessControlContext.getEffectiveDomainPermissions(invalidResource);
          fail("getting effective domain permissions with invalid resource reference should have failed");
       }
       catch (IllegalArgumentException e) {

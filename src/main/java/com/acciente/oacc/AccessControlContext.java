@@ -2582,10 +2582,10 @@ public interface AccessControlContext {
     * <p/>
     * This method only takes into account direct domain permissions, but not any inherited
     * domain permissions and not any domain permissions the accessor may have to ancestors of
-    * the specified domain.
+    * the session resource's domain.
     *
     * @param accessorResource the accessor resource relative which permissions should be returned
-    * @return the set of all direct domain permission the accessor resource has to the domain
+    * @return the set of all direct domain permission the accessor resource has to session resource's domain
     * @throws java.lang.IllegalArgumentException if accessorResource reference does not exist
     */
    public Set<DomainPermission> getDomainPermissions(Resource accessorResource);
@@ -2621,6 +2621,21 @@ public interface AccessControlContext {
     */
    public Set<DomainPermission> getEffectiveDomainPermissions(Resource accessorResource,
                                                               String domainName);
+
+   /**
+    * Gets all effective domain permissions the accessor resource has to the session resource's domain.
+    * <p/>
+    * This method takes into account direct domain permissions, inherited domain permissions
+    * and any domain permissions the accessor may have to ancestors of the specified domain.
+    * In other words, this method will return the domain permissions the specified accessor
+    * resource has to the session resource's domain as a result of the permissions the accessor has on
+    * any ancestor (parent, or grandparent, etc.) of that domain.
+    *
+    * @param accessorResource the accessor resource relative which permissions should be returned
+    * @return the set of all effective domain permission the accessor resource has to the session resource's domain
+    * @throws java.lang.IllegalArgumentException if accessorResource reference does not exist
+    */
+   public Set<DomainPermission> getEffectiveDomainPermissions(Resource accessorResource);
 
    /**
     * Gets all effective domain permissions the accessor resource has to any domain, mapped by domain name.
