@@ -56,7 +56,6 @@ import com.acciente.oacc.sql.internal.persister.id.Id;
 import com.acciente.oacc.sql.internal.persister.id.ResourceClassId;
 import com.acciente.oacc.sql.internal.persister.id.ResourceId;
 import com.acciente.oacc.sql.internal.persister.id.ResourcePermissionId;
-import com.ibm.db2.jcc.a.d;
 
 import javax.sql.DataSource;
 import java.io.Serializable;
