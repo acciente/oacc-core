@@ -6207,6 +6207,14 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
    }
 
    @Override
+   public Set<Resource> getResourcesByResourcePermissionsAndDomain(String resourceClassName,
+                                                                   Set<ResourcePermission> resourcePermissions) {
+      return getResourcesByResourcePermissionsAndDomain(resourceClassName,
+                                                        sessionResourceDomainName,
+                                                        resourcePermissions);
+   }
+
+   @Override
    public Set<Resource> getResourcesByResourcePermissionsAndDomain(Resource accessorResource,
                                                                    String resourceClassName,
                                                                    String domainName,
@@ -6252,6 +6260,16 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
    }
 
    @Override
+   public Set<Resource> getResourcesByResourcePermissionsAndDomain(Resource accessorResource,
+                                                                   String resourceClassName,
+                                                                   Set<ResourcePermission> resourcePermissions) {
+      return getResourcesByResourcePermissionsAndDomain(accessorResource,
+                                                        resourceClassName,
+                                                        sessionResourceDomainName,
+                                                        resourcePermissions);
+   }
+
+   @Override
    public Set<Resource> getResourcesByResourcePermissionsAndDomain(String resourceClassName,
                                                                    String domainName,
                                                                    ResourcePermission resourcePermission,
@@ -6281,6 +6299,16 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       finally {
          __closeConnection(connection);
       }
+   }
+
+   @Override
+   public Set<Resource> getResourcesByResourcePermissionsAndDomain(String resourceClassName,
+                                                                   ResourcePermission resourcePermission,
+                                                                   ResourcePermission... resourcePermissions) {
+      return getResourcesByResourcePermissionsAndDomain(resourceClassName,
+                                                        sessionResourceDomainName,
+                                                        resourcePermission,
+                                                        resourcePermissions);
    }
 
    @Override
@@ -6330,6 +6358,19 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       finally {
          __closeConnection(connection);
       }
+   }
+
+   @Override
+   public Set<Resource> getResourcesByResourcePermissionsAndDomain(Resource accessorResource,
+                                                                   String resourceClassName,
+                                                                   ResourcePermission resourcePermission,
+                                                                   ResourcePermission... resourcePermissions) {
+      return getResourcesByResourcePermissionsAndDomain(accessorResource,
+                                                        resourceClassName,
+                                                        sessionResourceDomainName,
+                                                        resourcePermission,
+                                                        resourcePermissions);
+
    }
 
    private Set<Resource> __getResourcesByPermissionsAndDomain(SQLConnection connection,
