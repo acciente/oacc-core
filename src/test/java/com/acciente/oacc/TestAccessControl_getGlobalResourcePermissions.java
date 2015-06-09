@@ -38,10 +38,6 @@ public class TestAccessControl_getGlobalResourcePermissions extends TestAccessCo
       assertThat(allGlobalPermissions.isEmpty(), is(true));
 
       final String resourceClassName = generateResourceClass(false, false);
-      final Set<ResourcePermission> globalResourcePermissionsByClass
-            = accessControlContext.getGlobalResourcePermissions(accessorResource, resourceClassName);
-      assertThat(globalResourcePermissionsByClass.isEmpty(), is(true));
-
       final String domainName = generateDomain();
       final Set<ResourcePermission> globalResourcePermissions
             = accessControlContext.getGlobalResourcePermissions(accessorResource, resourceClassName, domainName);
@@ -58,10 +54,6 @@ public class TestAccessControl_getGlobalResourcePermissions extends TestAccessCo
       assertThat(allGlobalPermissions.isEmpty(), is(true));
 
       final String resourceClassName = generateResourceClass(false, false);
-      final Set<ResourcePermission> globalResourcePermissionsByClass
-            = accessControlContext.getGlobalResourcePermissions(accessorResource, resourceClassName);
-      assertThat(globalResourcePermissionsByClass.isEmpty(), is(true));
-
       final String domainName = generateDomain();
       final Set<ResourcePermission> globalResourcePermissions
             = accessControlContext.getGlobalResourcePermissions(accessorResource, resourceClassName, domainName);
@@ -91,10 +83,6 @@ public class TestAccessControl_getGlobalResourcePermissions extends TestAccessCo
                                                                 authenticatableResourceClassName,
                                                                 sysDomainName);
       assertThat(permissions_post_specific, is(permissions_pre));
-
-      final Set<ResourcePermission> permissions_post_sessionDomain
-            = accessControlContext.getGlobalResourcePermissions(accessorResource, authenticatableResourceClassName);
-      assertThat(permissions_post_sessionDomain, is(permissions_pre));
 
       final Map<String, Map<String, Set<ResourcePermission>>> permissions_post_all
             = accessControlContext.getGlobalResourcePermissionsMap(accessorResource);
@@ -141,10 +129,6 @@ public class TestAccessControl_getGlobalResourcePermissions extends TestAccessCo
       final Set<ResourcePermission> permissions_post_specific
             = accessControlContext.getGlobalResourcePermissions(accessorResource, resourceClassName, grantorDomainName);
       assertThat(permissions_post_specific, is(permissions_pre));
-
-      final Set<ResourcePermission> permissions_post_sessionDomain
-            = accessControlContext.getGlobalResourcePermissions(accessorResource, resourceClassName);
-      assertThat(permissions_post_sessionDomain, is(permissions_pre));
 
       final Map<String, Map<String, Set<ResourcePermission>>> permissions_post_all
             = accessControlContext.getGlobalResourcePermissionsMap(accessorResource);
@@ -200,10 +184,6 @@ public class TestAccessControl_getGlobalResourcePermissions extends TestAccessCo
                                                                 childDomainName);
       assertThat(permissions_post_childDomain, is(permissions_childDomain_pre));
 
-      final Set<ResourcePermission> permissions_post_sessionDomain
-            = accessControlContext.getGlobalResourcePermissions(accessorResource, authenticatableResourceClassName);
-      assertThat(permissions_post_sessionDomain, is(permissions_parentDomain_pre));
-
       final Map<String, Map<String, Set<ResourcePermission>>> permissions_post_all
             = accessControlContext.getGlobalResourcePermissionsMap(accessorResource);
       assertThat(permissions_post_all.size(), is(2));
@@ -258,10 +238,6 @@ public class TestAccessControl_getGlobalResourcePermissions extends TestAccessCo
             = accessControlContext.getGlobalResourcePermissions(accessorResource, resourceClassName, domainName);
       assertThat(resourcePermissions_post, is(directResourcePermissions_pre));
 
-      final Set<ResourcePermission> resourcePermissions_post2
-            = accessControlContext.getGlobalResourcePermissions(accessorResource, resourceClassName);
-      assertThat(resourcePermissions_post2, is(directResourcePermissions_pre));
-
       final Map<String, Map<String,Set<ResourcePermission>>> allGlobalResourcePermissions
             = accessControlContext.getGlobalResourcePermissionsMap(accessorResource);
       assertThat(allGlobalResourcePermissions.size(), is(1));
@@ -294,10 +270,6 @@ public class TestAccessControl_getGlobalResourcePermissions extends TestAccessCo
                                                                 resourceClassName_whitespaced,
                                                                 domainName_whitespaced);
       assertThat(permissions_post_specific, is(permissions_pre));
-
-      final Set<ResourcePermission> permissions_post_sessionDomain
-            = accessControlContext.getGlobalResourcePermissions(accessorResource, resourceClassName_whitespaced);
-      assertThat(permissions_post_sessionDomain, is(permissions_pre));
    }
 
    @Test
@@ -316,13 +288,6 @@ public class TestAccessControl_getGlobalResourcePermissions extends TestAccessCo
       final String resourceClassName = generateResourceClass(false, false);
       final String domainName = generateDomain();
       try {
-         accessControlContext.getGlobalResourcePermissions(null, resourceClassName);
-         fail("getting direct global resource permissions with null resource should have failed");
-      }
-      catch (NullPointerException e) {
-         assertThat(e.getMessage().toLowerCase(), containsString("resource required"));
-      }
-      try {
          accessControlContext.getGlobalResourcePermissions(null, resourceClassName, domainName);
          fail("getting direct global resource permissions with null resource should have failed");
       }
@@ -330,13 +295,6 @@ public class TestAccessControl_getGlobalResourcePermissions extends TestAccessCo
          assertThat(e.getMessage().toLowerCase(), containsString("resource required"));
       }
 
-      try {
-         accessControlContext.getGlobalResourcePermissions(accessorResource, null);
-         fail("getting direct global resource permissions with null resource class name should have failed");
-      }
-      catch (NullPointerException e) {
-         assertThat(e.getMessage().toLowerCase(), containsString("resource class required"));
-      }
       try {
          accessControlContext.getGlobalResourcePermissions(accessorResource, null, domainName);
          fail("getting direct global resource permissions with null resource class name should have failed");
@@ -364,13 +322,6 @@ public class TestAccessControl_getGlobalResourcePermissions extends TestAccessCo
       final Resource invalidResource = Resources.getInstance(-999L);
 
       try {
-         accessControlContext.getGlobalResourcePermissions(invalidResource, resourceClassName);
-         fail("getting direct global resource permissions with invalid accessor resource reference should have failed");
-      }
-      catch (IllegalArgumentException e) {
-         assertThat(e.getMessage().toLowerCase(), containsString(String.valueOf(invalidResource).toLowerCase() + " not found"));
-      }
-      try {
          accessControlContext.getGlobalResourcePermissions(invalidResource, resourceClassName, domainName);
          fail("getting direct global resource permissions with invalid accessor resource reference should have failed");
       }
@@ -378,13 +329,6 @@ public class TestAccessControl_getGlobalResourcePermissions extends TestAccessCo
          assertThat(e.getMessage().toLowerCase(), containsString(String.valueOf(invalidResource).toLowerCase() + " not found"));
       }
 
-      try {
-         accessControlContext.getGlobalResourcePermissions(validResource, "invalid_resourceClassName");
-         fail("getting direct global resource permissions with invalid accessed resource class reference should have failed");
-      }
-      catch (IllegalArgumentException e) {
-         assertThat(e.getMessage().toLowerCase(), containsString("could not find resource class"));
-      }
       try {
          accessControlContext.getGlobalResourcePermissions(validResource, "invalid_resourceClassName", domainName);
          fail("getting direct global resource permissions with invalid accessed resource class reference should have failed");

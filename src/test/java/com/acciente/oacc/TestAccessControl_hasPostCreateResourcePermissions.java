@@ -87,9 +87,7 @@ public class TestAccessControl_hasPostCreateResourcePermissions extends TestAcce
       final Resource accessorResource = generateAuthenticatableResource(password);
 
       // verify setup
-      final Set<ResourceCreatePermission> allResourceCreatePermissionsForResourceClass
-            = accessControlContext.getEffectiveResourceCreatePermissions(accessorResource, resourceClassName);
-      assertThat(allResourceCreatePermissionsForResourceClass.isEmpty(), is(true));
+      assertThat(accessControlContext.getEffectiveResourceCreatePermissionsMap(accessorResource).isEmpty(), is(true));
       final String domainName = generateDomain();
 
       // authenticate accessor/creator resource

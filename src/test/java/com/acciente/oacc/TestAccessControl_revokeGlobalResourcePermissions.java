@@ -63,6 +63,11 @@ public class TestAccessControl_revokeGlobalResourcePermissions extends TestAcces
                                                            ResourcePermissions
                                                                  .getInstance(permissionName));
 
+      assertThat(accessControlContext.getEffectiveGlobalResourcePermissions(accessorResource,
+                                                                            authenticatableResourceClassName,
+                                                                            domainName).isEmpty(),
+                 is(true));
+
       // reset for implicit domain
       accessControlContext.setGlobalResourcePermissions(accessorResource,
                                                         authenticatableResourceClassName,
@@ -82,7 +87,9 @@ public class TestAccessControl_revokeGlobalResourcePermissions extends TestAcces
                                                                  .getInstance(permissionName));
 
       final Set<ResourcePermission> permissions_post_implicit
-            = accessControlContext.getEffectiveGlobalResourcePermissions(accessorResource, authenticatableResourceClassName);
+            = accessControlContext.getEffectiveGlobalResourcePermissions(accessorResource,
+                                                                         authenticatableResourceClassName,
+                                                                         domainName);
       assertThat(permissions_post_implicit.isEmpty(), is(true));
 
       // test set-based version
@@ -128,7 +135,8 @@ public class TestAccessControl_revokeGlobalResourcePermissions extends TestAcces
                                                                        .getInstance(permissionName)));
 
       assertThat(accessControlContext.getEffectiveGlobalResourcePermissions(accessorResource2,
-                                                                            authenticatableResourceClassName).isEmpty(),
+                                                                            authenticatableResourceClassName,
+                                                                            domainName).isEmpty(),
                  is(true));
    }
 
@@ -177,7 +185,9 @@ public class TestAccessControl_revokeGlobalResourcePermissions extends TestAcces
                                                                  .getInstance(permissionName));
 
       final Set<ResourcePermission> permissions_post_implicit
-            = accessControlContext.getEffectiveGlobalResourcePermissions(accessorResource, authenticatableResourceClassName);
+            = accessControlContext.getEffectiveGlobalResourcePermissions(accessorResource,
+                                                                         authenticatableResourceClassName,
+                                                                         domainName);
       assertThat(permissions_post_implicit.isEmpty(), is(true));
 
       accessControlContext.revokeGlobalResourcePermissions(accessorResource,
@@ -188,7 +198,8 @@ public class TestAccessControl_revokeGlobalResourcePermissions extends TestAcces
                                                                        .getInstance(permissionName)));
 
       assertThat(accessControlContext.getEffectiveGlobalResourcePermissions(accessorResource,
-                                                                            authenticatableResourceClassName).isEmpty(),
+                                                                            authenticatableResourceClassName,
+                                                                            domainName).isEmpty(),
                  is(true));
    }
 
@@ -1257,12 +1268,13 @@ public class TestAccessControl_revokeGlobalResourcePermissions extends TestAcces
       assertThat(permissions_post_specific.size(), is(1));
 
       // revoke permissions for implicit domain and verify
+      final String sysDomainName = accessControlContext.getDomainNameByResource(SYS_RESOURCE);
       accessControlContext.revokeGlobalResourcePermissions(accessorResource,
                                                            resourceClassName_whitespaced,
                                                            ResourcePermissions.getInstance(permissionName2));
 
       final Set<ResourcePermission> permissions_post_implicit
-            = accessControlContext.getEffectiveGlobalResourcePermissions(accessorResource, resourceClassName);
+            = accessControlContext.getEffectiveGlobalResourcePermissions(accessorResource, resourceClassName, sysDomainName);
       assertThat(permissions_post_implicit.isEmpty(), is(true));
 
       // test set-based version
@@ -1284,7 +1296,7 @@ public class TestAccessControl_revokeGlobalResourcePermissions extends TestAcces
                                                            ResourcePermissions.getInstance(permissionName2));
 
       assertThat(accessControlContext
-                       .getEffectiveGlobalResourcePermissions(accessorResource2, resourceClassName).isEmpty(),
+                       .getEffectiveGlobalResourcePermissions(accessorResource2, resourceClassName, sysDomainName).isEmpty(),
                  is(true));
    }
 

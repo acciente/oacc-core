@@ -70,7 +70,7 @@ public class TestAccessControl_setResourceCreatePermissions extends TestAccessCo
       authenticateSystemResource();
       final String resourceClassName = generateResourceClass(false, false);
       final Resource accessorResource = generateAuthenticatableResource(generateUniquePassword());
-      assertThat(accessControlContext.getEffectiveResourceCreatePermissions(accessorResource, resourceClassName).isEmpty(),
+      assertThat(accessControlContext.getEffectiveResourceCreatePermissionsMap(accessorResource).isEmpty(),
                  is(true));
 
       Set<ResourceCreatePermission> permissions_pre = new HashSet<>();
@@ -102,7 +102,7 @@ public class TestAccessControl_setResourceCreatePermissions extends TestAccessCo
       authenticateSystemResource();
       final String resourceClassName = generateResourceClass(false, false);
       final Resource accessorResource = generateAuthenticatableResource(generateUniquePassword());
-      assertThat(accessControlContext.getEffectiveResourceCreatePermissions(accessorResource, resourceClassName).isEmpty(),
+      assertThat(accessControlContext.getEffectiveResourceCreatePermissionsMap(accessorResource).isEmpty(),
                  is(true));
 
       Set<ResourceCreatePermission> permissions_pre = new HashSet<>();
@@ -328,7 +328,10 @@ public class TestAccessControl_setResourceCreatePermissions extends TestAccessCo
                                                         resourceCreatePermissions_pre);
 
       final Set<ResourceCreatePermission> resourceCreatePermissions_implicitDomain_post
-            = accessControlContext.getEffectiveResourceCreatePermissions(accessorResource, resourceClassName);
+            = accessControlContext.getEffectiveResourceCreatePermissions(accessorResource,
+                                                                         resourceClassName,
+                                                                         accessControlContext
+                                                                               .getDomainNameByResource(accessControlContext.getSessionResource()));
       assertThat(resourceCreatePermissions_implicitDomain_post, is(resourceCreatePermissions_pre));
       assertThat(resourceCreatePermissions_implicitDomain_post, hasItem(createPerm_create));
       assertThat(resourceCreatePermissions_implicitDomain_post, hasItem(createPerm_customPerm));     // whitespace is trimmed upon permission creation

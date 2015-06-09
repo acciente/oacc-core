@@ -214,9 +214,6 @@ public class TestAccessControl_setGlobalResourcePermissions extends TestAccessCo
       // set global permissions as grantor and verify
       accessControlContext.setGlobalResourcePermissions(accessorResource, resourceClassName, permissions_pre);
 
-      final Set<ResourcePermission> permissions_post = accessControlContext.getEffectiveGlobalResourcePermissions(accessorResource, resourceClassName);
-      assertThat(permissions_post, is(permissions_pre));
-
       final Set<ResourcePermission> permissions_post_explicit = accessControlContext.getEffectiveGlobalResourcePermissions(accessorResource, resourceClassName, grantorDomainName);
       assertThat(permissions_post_explicit, is(permissions_pre));
 
@@ -588,6 +585,7 @@ public class TestAccessControl_setGlobalResourcePermissions extends TestAccessCo
       assertThat(permissions_post_specific, is(permissions_pre));
 
       // set permissions for implicit domain and verify
+      final String sysDomainName = accessControlContext.getDomainNameByResource(SYS_RESOURCE);
       Set<ResourcePermission> permissions_pre2 = new HashSet<>();
       permissions_pre2.add(ResourcePermissions.getInstance(ResourcePermissions.RESET_CREDENTIALS));
       permissions_pre2.add(ResourcePermissions.getInstance(generateResourceClassPermission(
@@ -598,7 +596,7 @@ public class TestAccessControl_setGlobalResourcePermissions extends TestAccessCo
                                                         permissions_pre2);
 
       final Set<ResourcePermission> permissions_post_implicit
-            = accessControlContext.getEffectiveGlobalResourcePermissions(accessorResource, resourceClassName);
+            = accessControlContext.getEffectiveGlobalResourcePermissions(accessorResource, resourceClassName, sysDomainName);
       assertThat(permissions_post_implicit, is(permissions_pre2));
 
    }

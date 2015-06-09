@@ -39,10 +39,6 @@ public class TestAccessControl_getEffectiveResourceCreatePermissions extends Tes
       assertThat(allCreatePermissions.isEmpty(), is(true));
 
       final String resourceClassName = generateResourceClass(false, false);
-      final Set<ResourceCreatePermission> resourceCreatePermissionsByClass
-            = accessControlContext.getEffectiveResourceCreatePermissions(accessorResource, resourceClassName);
-      assertThat(resourceCreatePermissionsByClass.isEmpty(), is(true));
-
       final String domainName = generateDomain();
       final Set<ResourceCreatePermission> resourceCreatePermissions
             = accessControlContext.getEffectiveResourceCreatePermissions(accessorResource, resourceClassName, domainName);
@@ -59,10 +55,6 @@ public class TestAccessControl_getEffectiveResourceCreatePermissions extends Tes
       assertThat(allCreatePermissions.isEmpty(), is(true));
 
       final String resourceClassName = generateResourceClass(false, false);
-      final Set<ResourceCreatePermission> resourceCreatePermissionsByClass
-            = accessControlContext.getEffectiveResourceCreatePermissions(accessorResource, resourceClassName);
-      assertThat(resourceCreatePermissionsByClass.isEmpty(), is(true));
-
       final String domainName = generateDomain();
       final Set<ResourceCreatePermission> resourceCreatePermissions
             = accessControlContext.getEffectiveResourceCreatePermissions(accessorResource, resourceClassName, domainName);
@@ -105,26 +97,10 @@ public class TestAccessControl_getEffectiveResourceCreatePermissions extends Tes
             = accessControlContext.getEffectiveResourceCreatePermissions(accessorResource, resourceClassName, domainName);
       assertThat(resourceCreatePermissions_post, is(resourceCreatePermissions_pre1));
 
-      // set create permissions on session's domain and verify
-      Set<ResourceCreatePermission> resourceCreatePermissions_pre2 = new HashSet<>();
-      resourceCreatePermissions_pre2.add(createPerm_create_withGrant);
-      resourceCreatePermissions_pre2.add(createPerm_resetPwd);
-      accessControlContext.setResourceCreatePermissions(accessorResource,
-                                                        resourceClassName,
-                                                        resourceCreatePermissions_pre2);
-
-      final Set<ResourceCreatePermission> resourceCreatePermissions_post2
-            = accessControlContext.getEffectiveResourceCreatePermissions(accessorResource, resourceClassName);
-      assertThat(resourceCreatePermissions_post2, is(resourceCreatePermissions_pre2));
-
       // get all create permissions and verify for each domain/class combination
       final Map<String, Map<String, Set<ResourceCreatePermission>>> createPermissionsByDomainAndClass
             = accessControlContext.getEffectiveResourceCreatePermissionsMap(accessorResource);
-      assertThat(createPermissionsByDomainAndClass.size(), is(2));
-      final Map<String, Set<ResourceCreatePermission>> createPermsByResourceClass_sysDomain
-            = createPermissionsByDomainAndClass.get(sysDomainName);
-      assertThat(createPermsByResourceClass_sysDomain.size(), is(1));
-      assertThat(createPermsByResourceClass_sysDomain.get(resourceClassName), is(resourceCreatePermissions_pre2));
+      assertThat(createPermissionsByDomainAndClass.size(), is(1));
       final Map<String, Set<ResourceCreatePermission>> createPermsByResourceClass_customDomain
             = createPermissionsByDomainAndClass.get(domainName);
       assertThat(createPermsByResourceClass_customDomain.size(), is(1));
@@ -185,7 +161,7 @@ public class TestAccessControl_getEffectiveResourceCreatePermissions extends Tes
 
       // get all create permissions and verify for each domain/resource-class combination
       final Set<ResourceCreatePermission> resourceCreatePermissions_post2
-            = accessControlContext.getEffectiveResourceCreatePermissions(accessorResource, resourceClassName);
+            = accessControlContext.getEffectiveResourceCreatePermissions(accessorResource, resourceClassName, sessionDomainName);
       assertThat(resourceCreatePermissions_post2, is(resourceCreatePermissions_pre2));
 
       final Map<String, Map<String, Set<ResourceCreatePermission>>> createPermissionsByDomainAndClass
@@ -278,14 +254,6 @@ public class TestAccessControl_getEffectiveResourceCreatePermissions extends Tes
             = allCreatePermissions.get(childDomainName);
       assertThat(createPermsByResourceClass_sysDomain.size(), is(1));
       assertThat(createPermsByResourceClass_sysDomain.get(resourceClassName), is(childResourceCreatePermissions_expected));
-
-      // authenticate as accesssor resource and verify
-      accessControlContext.authenticate(accessorResource, PasswordCredentials.newInstance(password));
-      final Set<ResourceCreatePermission> accessorResourceCreatePermissions_post
-            = accessControlContext.getEffectiveResourceCreatePermissions(accessorResource, resourceClassName);
-      assertThat(accessorResourceCreatePermissions_post, is(childResourceCreatePermissions_expected));
-
-
    }
 
    @Test
@@ -327,10 +295,6 @@ public class TestAccessControl_getEffectiveResourceCreatePermissions extends Tes
       final Set<ResourceCreatePermission> permissions_post
             = accessControlContext.getEffectiveResourceCreatePermissions(accessorResource, resourceClass, domainName);
       assertThat(permissions_post, is(permissions_expected));
-
-      final Set<ResourceCreatePermission> permissions_post2
-            = accessControlContext.getEffectiveResourceCreatePermissions(accessorResource, resourceClass);
-      assertThat(permissions_post2, is(permissions_expected));
    }
 
    @Test
@@ -394,10 +358,6 @@ public class TestAccessControl_getEffectiveResourceCreatePermissions extends Tes
       final Set<ResourceCreatePermission> permissions_post
             = accessControlContext.getEffectiveResourceCreatePermissions(accessorResource, resourceClass, domainName);
       assertThat(permissions_post, is(permissions_expected));
-
-      final Set<ResourceCreatePermission> permissions_post2
-            = accessControlContext.getEffectiveResourceCreatePermissions(accessorResource, resourceClass);
-      assertThat(permissions_post2, is(permissions_expected));
    }
 
    @Test
@@ -474,10 +434,6 @@ public class TestAccessControl_getEffectiveResourceCreatePermissions extends Tes
       final Set<ResourceCreatePermission> permissions_post
             = accessControlContext.getEffectiveResourceCreatePermissions(accessorResource, resourceClass, domainName);
       assertThat(permissions_post, is(permissions_expected));
-
-      final Set<ResourceCreatePermission> permissions_post2
-            = accessControlContext.getEffectiveResourceCreatePermissions(accessorResource, resourceClass);
-      assertThat(permissions_post2, is(permissions_expected));
    }
 
    @Test
@@ -556,10 +512,6 @@ public class TestAccessControl_getEffectiveResourceCreatePermissions extends Tes
       final Set<ResourceCreatePermission> permissions_post
             = accessControlContext.getEffectiveResourceCreatePermissions(accessorResource, resourceClass, domainName);
       assertThat(permissions_post, is(permissions_expected));
-
-      final Set<ResourceCreatePermission> permissions_post2
-            = accessControlContext.getEffectiveResourceCreatePermissions(accessorResource, resourceClass);
-      assertThat(permissions_post2, is(permissions_expected));
    }
 
    @Test
@@ -620,10 +572,6 @@ public class TestAccessControl_getEffectiveResourceCreatePermissions extends Tes
       final Set<ResourceCreatePermission> permissions_post
             = accessControlContext.getEffectiveResourceCreatePermissions(accessorResource, resourceClass, domainName);
       assertThat(permissions_post, is(permissions_expected));
-
-      final Set<ResourceCreatePermission> permissions_post2
-            = accessControlContext.getEffectiveResourceCreatePermissions(accessorResource, resourceClass);
-      assertThat(permissions_post2, is(permissions_expected));
    }
 
    @Test
@@ -664,18 +612,6 @@ public class TestAccessControl_getEffectiveResourceCreatePermissions extends Tes
                                                                          resourceClassName_whitespaced,
                                                                          domainName_whitespaced);
       assertThat(resourceCreatePermissions_post, is(resourceCreatePermissions_pre1));
-
-      // set create permissions on session's domain and verify
-      Set<ResourceCreatePermission> resourceCreatePermissions_pre2 = new HashSet<>();
-      resourceCreatePermissions_pre2.add(createPerm_create_withGrant);
-      resourceCreatePermissions_pre2.add(createPerm_resetPwd);
-      accessControlContext.setResourceCreatePermissions(accessorResource,
-                                                        resourceClassName,
-                                                        resourceCreatePermissions_pre2);
-
-      final Set<ResourceCreatePermission> resourceCreatePermissions_post2
-            = accessControlContext.getEffectiveResourceCreatePermissions(accessorResource, resourceClassName_whitespaced);
-      assertThat(resourceCreatePermissions_post2, is(resourceCreatePermissions_pre2));
    }
 
    @Test
@@ -694,13 +630,6 @@ public class TestAccessControl_getEffectiveResourceCreatePermissions extends Tes
       final String resourceClassName = generateResourceClass(false, false);
       final String domainName = generateDomain();
       try {
-         accessControlContext.getEffectiveResourceCreatePermissions(null, resourceClassName);
-         fail("getting create permissions with null resource class name should have failed");
-      }
-      catch (NullPointerException e) {
-         assertThat(e.getMessage().toLowerCase(), containsString("resource required"));
-      }
-      try {
          accessControlContext.getEffectiveResourceCreatePermissions(null, resourceClassName, domainName);
          fail("getting create permissions with null resource class name should have failed");
       }
@@ -708,13 +637,6 @@ public class TestAccessControl_getEffectiveResourceCreatePermissions extends Tes
          assertThat(e.getMessage().toLowerCase(), containsString("resource required"));
       }
 
-      try {
-         accessControlContext.getEffectiveResourceCreatePermissions(accessorResource, null);
-         fail("getting create permissions with null resource class name should have failed");
-      }
-      catch (NullPointerException e) {
-         assertThat(e.getMessage().toLowerCase(), containsString("resource class required"));
-      }
       try {
          accessControlContext.getEffectiveResourceCreatePermissions(accessorResource, null, domainName);
          fail("getting create permissions with null resource class name should have failed");
@@ -742,26 +664,11 @@ public class TestAccessControl_getEffectiveResourceCreatePermissions extends Tes
       final Resource invalidResource = Resources.getInstance(-999L);
 
       try {
-         accessControlContext.getEffectiveResourceCreatePermissions(invalidResource, resourceClassName);
-         fail("getting create-permissions with reference to non-existent resource reference should have failed");
-      }
-      catch (IllegalArgumentException e) {
-         assertThat(e.getMessage().toLowerCase(), containsString(String.valueOf(invalidResource).toLowerCase() + " not found"));
-      }
-      try {
          accessControlContext.getEffectiveResourceCreatePermissions(invalidResource, resourceClassName, domainName);
          fail("getting create-permissions with reference to non-existent resource reference should have failed");
       }
       catch (IllegalArgumentException e) {
          assertThat(e.getMessage().toLowerCase(), containsString(String.valueOf(invalidResource).toLowerCase() + " not found"));
-      }
-
-      try {
-         accessControlContext.getEffectiveResourceCreatePermissions(accessorResource, "invalid_resource_class");
-         fail("getting create-permissions with reference to non-existent resource class name should have failed");
-      }
-      catch (IllegalArgumentException e) {
-         assertThat(e.getMessage().toLowerCase(), containsString("could not find resource class"));
       }
 
       try {

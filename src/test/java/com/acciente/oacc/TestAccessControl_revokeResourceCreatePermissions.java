@@ -1564,7 +1564,9 @@ public class TestAccessControl_revokeResourceCreatePermissions extends TestAcces
                                                         resourceClassName,
                                                         permissions_pre);
       assertThat(accessControlContext.getEffectiveResourceCreatePermissions(accessorResource,
-                                                                            resourceClassName),
+                                                                            resourceClassName,
+                                                                            accessControlContext
+                                                                                  .getDomainNameByResource(accessControlContext.getSessionResource())),
                  is(permissions_pre));
 
       accessControlContext.revokeResourceCreatePermissions(accessorResource,
@@ -1589,7 +1591,9 @@ public class TestAccessControl_revokeResourceCreatePermissions extends TestAcces
                                                         resourceClassName,
                                                         permissions_pre);
       assertThat(accessControlContext.getEffectiveResourceCreatePermissions(accessorResource2,
-                                                                            resourceClassName),
+                                                                            resourceClassName,
+                                                                            accessControlContext
+                                                                                  .getDomainNameByResource(accessControlContext.getSessionResource())),
                  is(permissions_pre));
 
       accessControlContext.revokeResourceCreatePermissions(accessorResource2,

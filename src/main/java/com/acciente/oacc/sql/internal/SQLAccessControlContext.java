@@ -1270,11 +1270,6 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
    }
 
    @Override
-   public Set<DomainPermission> getDomainPermissions(Resource accessorResource) {
-      return getDomainPermissions(accessorResource, sessionResourceDomainName);
-   }
-
-   @Override
    public Map<String, Set<DomainPermission>> getDomainPermissionsMap(Resource accessorResource) {
       SQLConnection connection = null;
 
@@ -1314,11 +1309,6 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       finally {
          __closeConnection(connection);
       }
-   }
-
-   @Override
-   public Set<DomainPermission> getEffectiveDomainPermissions(Resource accessorResource) {
-      return getEffectiveDomainPermissions(accessorResource, sessionResourceDomainName);
    }
 
    private Set<DomainPermission> __getEffectiveDomainPermissions(SQLConnection connection,
@@ -2707,32 +2697,6 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
    }
 
    @Override
-   public Set<ResourceCreatePermission> getResourceCreatePermissions(Resource accessorResource,
-                                                                     String resourceClassName) {
-      SQLConnection connection = null;
-
-      __assertAuthenticated();
-      __assertResourceSpecified(accessorResource);
-      __assertResourceClassSpecified(resourceClassName);
-
-      try {
-         connection = __getConnection();
-
-         __assertResourceExists(connection, accessorResource);
-
-         resourceClassName = resourceClassName.trim();
-
-         return __getDirectResourceCreatePermissions(connection,
-                                                     accessorResource,
-                                                     resourceClassName,
-                                                     sessionResourceDomainName);
-      }
-      finally {
-         __closeConnection(connection);
-      }
-   }
-
-   @Override
    public Map<String, Map<String, Set<ResourceCreatePermission>>> getResourceCreatePermissionsMap(Resource accessorResource) {
       SQLConnection connection = null;
 
@@ -2799,32 +2763,6 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
                                                         accessorResource,
                                                         resourceClassName,
                                                         domainName);
-      }
-      finally {
-         __closeConnection(connection);
-      }
-   }
-
-   @Override
-   public Set<ResourceCreatePermission> getEffectiveResourceCreatePermissions(Resource accessorResource,
-                                                                              String resourceClassName) {
-      SQLConnection connection = null;
-
-      __assertAuthenticated();
-      __assertResourceSpecified(accessorResource);
-      __assertResourceClassSpecified(resourceClassName);
-
-      try {
-         connection = __getConnection();
-
-         __assertResourceExists(connection, accessorResource);
-
-         resourceClassName = resourceClassName.trim();
-
-         return __getEffectiveResourceCreatePermissions(connection,
-                                                        accessorResource,
-                                                        resourceClassName,
-                                                        sessionResourceDomainName);
       }
       finally {
          __closeConnection(connection);
@@ -4161,32 +4099,6 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
    }
 
    @Override
-   public Set<ResourcePermission> getGlobalResourcePermissions(Resource accessorResource,
-                                                               String resourceClassName) {
-      SQLConnection connection = null;
-
-      __assertAuthenticated();
-      __assertResourceSpecified(accessorResource);
-      __assertResourceClassSpecified(resourceClassName);
-
-      try {
-         connection = __getConnection();
-
-         __assertResourceExists(connection, accessorResource);
-
-         resourceClassName = resourceClassName.trim();
-
-         return __getDirectGlobalResourcePermissions(connection,
-                                                     accessorResource,
-                                                     resourceClassName,
-                                                     sessionResourceDomainName);
-      }
-      finally {
-         __closeConnection(connection);
-      }
-   }
-
-   @Override
    public Set<ResourcePermission> getEffectiveGlobalResourcePermissions(Resource accessorResource,
                                                                         String resourceClassName,
                                                                         String domainName) {
@@ -4209,32 +4121,6 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
                                                         accessorResource,
                                                         resourceClassName,
                                                         domainName);
-      }
-      finally {
-         __closeConnection(connection);
-      }
-   }
-
-   @Override
-   public Set<ResourcePermission> getEffectiveGlobalResourcePermissions(Resource accessorResource,
-                                                                        String resourceClassName) {
-      SQLConnection connection = null;
-
-      __assertAuthenticated();
-      __assertResourceSpecified(accessorResource);
-      __assertResourceClassSpecified(resourceClassName);
-
-      try {
-         connection = __getConnection();
-
-         __assertResourceExists(connection, accessorResource);
-
-         resourceClassName = resourceClassName.trim();
-
-         return __getEffectiveGlobalResourcePermissions(connection,
-                                                        accessorResource,
-                                                        resourceClassName,
-                                                        sessionResourceDomainName);
       }
       finally {
          __closeConnection(connection);

@@ -754,7 +754,11 @@ public class TestSQLAccessControlContext extends TestSQLAccessControlContextBase
 
       testName("assert: getEffectiveGlobalResourcePermissions( newUser_1 ) equals " + resourcePermissions);
       try {
-         Set<ResourcePermission> newUser_1_ResourcePermissions = accessControlContext.getEffectiveGlobalResourcePermissions(newUser_1, "USER");
+         Set<ResourcePermission> newUser_1_ResourcePermissions
+               = accessControlContext.getEffectiveGlobalResourcePermissions(newUser_1,
+                                                                            "USER",
+                                                                            accessControlContext
+                                                                                  .getDomainNameByResource(accessControlContext.getSessionResource()));
 
          if (newUser_1_ResourcePermissions.equals(resourcePermissions)) {
             testOK();

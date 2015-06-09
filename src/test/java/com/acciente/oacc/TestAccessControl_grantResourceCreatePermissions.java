@@ -1517,8 +1517,7 @@ public class TestAccessControl_grantResourceCreatePermissions extends TestAccess
       authenticateSystemResource();
       final String resourceClassName = generateResourceClass(false, false);
       final Resource accessorResource = generateAuthenticatableResource(generateUniquePassword());
-      assertThat(accessControlContext.getEffectiveResourceCreatePermissions(accessorResource, resourceClassName).isEmpty(),
-                 is(true));
+      assertThat(accessControlContext.getEffectiveResourceCreatePermissionsMap(accessorResource).isEmpty(), is(true));
 
       // attempt to grant *RESET_CREDENTIALS system permission
       try {
@@ -1586,8 +1585,7 @@ public class TestAccessControl_grantResourceCreatePermissions extends TestAccess
       authenticateSystemResource();
       final String resourceClassName = generateResourceClass(false, false);
       final Resource accessorResource = generateAuthenticatableResource(generateUniquePassword());
-      assertThat(accessControlContext.getEffectiveResourceCreatePermissions(accessorResource, resourceClassName).isEmpty(),
-                 is(true));
+      assertThat(accessControlContext.getEffectiveResourceCreatePermissionsMap(accessorResource).isEmpty(), is(true));
 
       // attempt to grant *IMPERSONATE system permission
       try {
@@ -1743,7 +1741,10 @@ public class TestAccessControl_grantResourceCreatePermissions extends TestAccess
                                                           createPerm_customPerm_ws);
 
       final Set<ResourceCreatePermission> resourceCreatePermissions_implicitDomain_post
-            = accessControlContext.getEffectiveResourceCreatePermissions(accessorResource, resourceClassName);
+            = accessControlContext.getEffectiveResourceCreatePermissions(accessorResource,
+                                                                         resourceClassName,
+                                                                         accessControlContext
+                                                                               .getDomainNameByResource(accessControlContext.getSessionResource()));
       assertThat(resourceCreatePermissions_implicitDomain_post, is(permissions_expected));
       assertThat(resourceCreatePermissions_implicitDomain_post, hasItem(createPerm_create));
       assertThat(resourceCreatePermissions_implicitDomain_post, hasItem(createPerm_customPerm));     // whitespace is trimmed upon permission creation
@@ -1768,7 +1769,10 @@ public class TestAccessControl_grantResourceCreatePermissions extends TestAccess
                                                           setOf(createPerm_create,
                                                                 createPerm_customPerm_ws));
 
-      assertThat(accessControlContext.getEffectiveResourceCreatePermissions(accessorResource2, resourceClassName),
+      assertThat(accessControlContext.getEffectiveResourceCreatePermissions(accessorResource2,
+                                                                            resourceClassName,
+                                                                            accessControlContext
+                                                                                  .getDomainNameByResource(accessControlContext.getSessionResource())),
                  is(permissions_expected));
    }
 

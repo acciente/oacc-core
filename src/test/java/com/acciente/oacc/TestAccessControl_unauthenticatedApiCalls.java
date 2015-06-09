@@ -139,13 +139,6 @@ public class TestAccessControl_unauthenticatedApiCalls extends TestAccessControl
          assertThat(e.getMessage().toLowerCase(), containsString("not authenticated"));
       }
       try {
-         accessControlContext.getDomainPermissions(null);
-         fail("operation should have failed from unauthenticated context");
-      }
-      catch (NotAuthenticatedException e) {
-         assertThat(e.getMessage().toLowerCase(), containsString("not authenticated"));
-      }
-      try {
          accessControlContext.getDomainPermissionsMap(null);
          fail("operation should have failed from unauthenticated context");
       }
@@ -160,13 +153,6 @@ public class TestAccessControl_unauthenticatedApiCalls extends TestAccessControl
          assertThat(e.getMessage().toLowerCase(), containsString("not authenticated"));
       }
       try {
-         accessControlContext.getEffectiveDomainPermissions(null);
-         fail("operation should have failed from unauthenticated context");
-      }
-      catch (NotAuthenticatedException e) {
-         assertThat(e.getMessage().toLowerCase(), containsString("not authenticated"));
-      }
-      try {
          accessControlContext.getEffectiveDomainPermissionsMap(null);
          fail("operation should have failed from unauthenticated context");
       }
@@ -174,13 +160,6 @@ public class TestAccessControl_unauthenticatedApiCalls extends TestAccessControl
          assertThat(e.getMessage().toLowerCase(), containsString("not authenticated"));
       }
 
-      try {
-         accessControlContext.getResourceCreatePermissions(null, null);
-         fail("operation should have failed from unauthenticated context");
-      }
-      catch (NotAuthenticatedException e) {
-         assertThat(e.getMessage().toLowerCase(), containsString("not authenticated"));
-      }
       try {
          accessControlContext.getResourceCreatePermissions(null, null, null);
          fail("operation should have failed from unauthenticated context");
@@ -190,13 +169,6 @@ public class TestAccessControl_unauthenticatedApiCalls extends TestAccessControl
       }
       try {
          accessControlContext.getResourceCreatePermissionsMap(null);
-         fail("operation should have failed from unauthenticated context");
-      }
-      catch (NotAuthenticatedException e) {
-         assertThat(e.getMessage().toLowerCase(), containsString("not authenticated"));
-      }
-      try {
-         accessControlContext.getEffectiveResourceCreatePermissions(null, null);
          fail("operation should have failed from unauthenticated context");
       }
       catch (NotAuthenticatedException e) {
@@ -233,13 +205,6 @@ public class TestAccessControl_unauthenticatedApiCalls extends TestAccessControl
       }
 
       try {
-         accessControlContext.getGlobalResourcePermissions(null, null);
-         fail("operation should have failed from unauthenticated context");
-      }
-      catch (NotAuthenticatedException e) {
-         assertThat(e.getMessage().toLowerCase(), containsString("not authenticated"));
-      }
-      try {
          accessControlContext.getGlobalResourcePermissions(null, null, null);
          fail("operation should have failed from unauthenticated context");
       }
@@ -248,13 +213,6 @@ public class TestAccessControl_unauthenticatedApiCalls extends TestAccessControl
       }
       try {
          accessControlContext.getGlobalResourcePermissionsMap(null);
-         fail("operation should have failed from unauthenticated context");
-      }
-      catch (NotAuthenticatedException e) {
-         assertThat(e.getMessage().toLowerCase(), containsString("not authenticated"));
-      }
-      try {
-         accessControlContext.getEffectiveGlobalResourcePermissions(null, null);
          fail("operation should have failed from unauthenticated context");
       }
       catch (NotAuthenticatedException e) {

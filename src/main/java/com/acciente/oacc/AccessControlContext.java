@@ -1606,19 +1606,6 @@ public interface AccessControlContext {
                                                      String domainName);
 
    /**
-    * Gets all domain permissions the accessor resource has directly to the session resource's domain.
-    * <p/>
-    * This method only takes into account direct domain permissions, but not any inherited
-    * domain permissions and not any domain permissions the accessor may have to ancestors of
-    * the session resource's domain.
-    *
-    * @param accessorResource the accessor resource relative which permissions should be returned
-    * @return the set of all direct domain permission the accessor resource has to session resource's domain
-    * @throws java.lang.IllegalArgumentException if accessorResource reference does not exist
-    */
-   public Set<DomainPermission> getDomainPermissions(Resource accessorResource);
-
-   /**
     * Gets all domain permissions the accessor resource has directly to any domain, mapped by domain name.
     * <p/>
     * This method only takes into account direct domain permissions, but not any inherited domain
@@ -1649,21 +1636,6 @@ public interface AccessControlContext {
     */
    public Set<DomainPermission> getEffectiveDomainPermissions(Resource accessorResource,
                                                               String domainName);
-
-   /**
-    * Gets all effective domain permissions the accessor resource has to the session resource's domain.
-    * <p/>
-    * This method takes into account direct domain permissions, inherited domain permissions
-    * and any domain permissions the accessor may have to ancestors of the specified domain.
-    * In other words, this method will return the domain permissions the specified accessor
-    * resource has to the session resource's domain as a result of the permissions the accessor has on
-    * any ancestor (parent, or grandparent, etc.) of that domain.
-    *
-    * @param accessorResource the accessor resource relative which permissions should be returned
-    * @return the set of all effective domain permission the accessor resource has to the session resource's domain
-    * @throws java.lang.IllegalArgumentException if accessorResource reference does not exist
-    */
-   public Set<DomainPermission> getEffectiveDomainPermissions(Resource accessorResource);
 
    /**
     * Gets all effective domain permissions the accessor resource has to any domain, mapped by domain name.
@@ -2144,44 +2116,6 @@ public interface AccessControlContext {
                                                String resourceClassName,
                                                ResourceCreatePermission resourceCreatePermission,
                                                ResourceCreatePermission... resourceCreatePermissions);
-
-   /**
-    * Gets all direct resource create permissions the accessor resource has to the specified
-    * resource class in the the current session resource's domain (which define a subset of
-    * the resource permissions the accessor resource would receive directly, if it created a
-    * resource of the specified resource class in the current session resource's domain).
-    * <p/>
-    * This method only takes into account direct resource create permissions, but not inherited
-    * resource create permissions and not any resource create permissions the accessor may have to
-    * ancestors of the current session resource's domain.
-    *
-    * @param accessorResource  the accessor resource relative which permissions should be returned
-    * @param resourceClassName a string resource class name
-    * @return a set of direct resource create permissions
-    * @throws java.lang.IllegalArgumentException if accessorResource reference does not exist, or
-    *                                            if no resource class of resourceClassName exists
-    */
-   public Set<ResourceCreatePermission> getResourceCreatePermissions(Resource accessorResource,
-                                                                     String resourceClassName);
-
-   /**
-    * Gets all effective resource create permissions the accessor resource has to the specified
-    * resource class in the the current session resource's domain (which effectively define
-    * the resource permissions the accessor resource will receive directly, if it created
-    * a resource of the specified resource class in the current session resource's domain).
-    * <p/>
-    * This method takes into account direct resource create permissions, inherited
-    * resource create permissions and any resource create permissions the accessor may have to
-    * ancestors of the current session resource's domain.
-    *
-    * @param accessorResource  the accessor resource relative which permissions should be returned
-    * @param resourceClassName a string resource class name
-    * @return a set of effective resource create permissions
-    * @throws java.lang.IllegalArgumentException if accessorResource reference does not exist, or
-    *                                            if no resource class of resourceClassName exists
-    */
-   public Set<ResourceCreatePermission> getEffectiveResourceCreatePermissions(Resource accessorResource,
-                                                                              String resourceClassName);
 
    /**
     * Gets all direct resource create permissions the accessor resource has to any resource class in
@@ -2794,42 +2728,6 @@ public interface AccessControlContext {
                                                String resourceClassName,
                                                ResourcePermission resourcePermission,
                                                ResourcePermission... resourcePermissions);
-
-   /**
-    * Gets the global resource permissions the specified accessor resource has directly to the resources of
-    * the specified resource class in the current session resource's domain.
-    * <p/>
-    * This method only takes into account direct global resource permissions, but not inherited
-    * global resource permissions and not any global resource permissions the accessor may have to
-    * ancestors of the current session resource's domain.
-    *
-    * @param accessorResource  the resource relative to which the permissions should be returned
-    * @param resourceClassName a string resource class name
-    * @return the set of direct global resource permissions the accessor resource has to resources of
-    *         the specified resource class in the current session resource's domain
-    * @throws java.lang.IllegalArgumentException if accessorResource reference does not exist, or
-    *                                            if no resource class of resourceClassName exists
-    */
-   public Set<ResourcePermission> getGlobalResourcePermissions(Resource accessorResource,
-                                                               String resourceClassName);
-
-   /**
-    * Gets the effective global resource permissions the specified accessor resource has to the resources of
-    * the specified resource class in the current session resource's domain.
-    * <p/>
-    * This method takes into account direct global resource permissions, inherited
-    * global resource permissions and any global resource permissions the accessor may have to
-    * ancestors of the current session resource's domain.
-    *
-    * @param accessorResource  the resource relative to which the permissions should be returned
-    * @param resourceClassName a string resource class name
-    * @return the set of effective global resource permissions the accessor resource has to resources of
-    *         the specified resource class in the current session resource's domain
-    * @throws java.lang.IllegalArgumentException if accessorResource reference does not exist, or
-    *                                            if no resource class of resourceClassName exists
-    */
-   public Set<ResourcePermission> getEffectiveGlobalResourcePermissions(Resource accessorResource,
-                                                                        String resourceClassName);
 
    /**
     * Gets all global resource permissions the specified accessor resource has directly to any resources

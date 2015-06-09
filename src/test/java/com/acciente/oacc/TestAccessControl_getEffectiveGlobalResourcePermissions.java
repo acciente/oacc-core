@@ -39,11 +39,8 @@ public class TestAccessControl_getEffectiveGlobalResourcePermissions extends Tes
       assertThat(allGlobalPermissions.isEmpty(), is(true));
 
       final String resourceClassName = generateResourceClass(false, false);
-      final Set<ResourcePermission> globalResourcePermissionsByClass
-            = accessControlContext.getEffectiveGlobalResourcePermissions(accessorResource, resourceClassName);
-      assertThat(globalResourcePermissionsByClass.isEmpty(), is(true));
-
       final String domainName = generateDomain();
+
       final Set<ResourcePermission> globalResourcePermissions
             = accessControlContext.getEffectiveGlobalResourcePermissions(accessorResource, resourceClassName, domainName);
       assertThat(globalResourcePermissions.isEmpty(), is(true));
@@ -59,11 +56,8 @@ public class TestAccessControl_getEffectiveGlobalResourcePermissions extends Tes
       assertThat(allGlobalPermissions.isEmpty(), is(true));
 
       final String resourceClassName = generateResourceClass(false, false);
-      final Set<ResourcePermission> globalResourcePermissionsByClass
-            = accessControlContext.getEffectiveGlobalResourcePermissions(accessorResource, resourceClassName);
-      assertThat(globalResourcePermissionsByClass.isEmpty(), is(true));
-
       final String domainName = generateDomain();
+
       final Set<ResourcePermission> globalResourcePermissions
             = accessControlContext.getEffectiveGlobalResourcePermissions(accessorResource, resourceClassName, domainName);
       assertThat(globalResourcePermissions.isEmpty(), is(true));
@@ -82,7 +76,8 @@ public class TestAccessControl_getEffectiveGlobalResourcePermissions extends Tes
       permissions_pre.add(ResourcePermissions.getInstance(ResourcePermissions.IMPERSONATE));
       permissions_pre.add(ResourcePermissions.getInstance(generateResourceClassPermission(
             authenticatableResourceClassName)));
-      accessControlContext.setGlobalResourcePermissions(accessorResource, authenticatableResourceClassName,
+      accessControlContext.setGlobalResourcePermissions(accessorResource,
+                                                        authenticatableResourceClassName,
                                                         sysDomainName,
                                                         permissions_pre);
 
@@ -92,10 +87,6 @@ public class TestAccessControl_getEffectiveGlobalResourcePermissions extends Tes
                                                                          authenticatableResourceClassName,
                                                                          sysDomainName);
       assertThat(permissions_post_specific, is(permissions_pre));
-
-      final Set<ResourcePermission> permissions_post_sessionDomain
-            = accessControlContext.getEffectiveGlobalResourcePermissions(accessorResource, authenticatableResourceClassName);
-      assertThat(permissions_post_sessionDomain, is(permissions_pre));
 
       final Map<String, Map<String, Set<ResourcePermission>>> permissions_post_all
             = accessControlContext.getEffectiveGlobalResourcePermissionsMap(accessorResource);
@@ -124,14 +115,16 @@ public class TestAccessControl_getEffectiveGlobalResourcePermissions extends Tes
       permissions_pre.add(ResourcePermissions.getInstance(customPermissionName));
 
       // setup grantor permissions
-      accessControlContext.setGlobalResourcePermissions(grantorResource, resourceClassName,
-                                                        grantorDomainName, grantorResourcePermissions
-      );
+      accessControlContext.setGlobalResourcePermissions(grantorResource,
+                                                        resourceClassName,
+                                                        grantorDomainName,
+                                                        grantorResourcePermissions);
       assertThat(accessControlContext.getEffectiveGlobalResourcePermissions(grantorResource, resourceClassName, grantorDomainName),
                  is(grantorResourcePermissions));
-      accessControlContext.setGlobalResourcePermissions(accessorResource, resourceClassName,
-                                                        grantorDomainName, permissions_pre
-      );
+      accessControlContext.setGlobalResourcePermissions(accessorResource,
+                                                        resourceClassName,
+                                                        grantorDomainName,
+                                                        permissions_pre);
 
       // authenticate grantor resource
       accessControlContext.authenticate(grantorResource, PasswordCredentials.newInstance(password));
@@ -140,10 +133,6 @@ public class TestAccessControl_getEffectiveGlobalResourcePermissions extends Tes
       final Set<ResourcePermission> permissions_post_specific
             = accessControlContext.getEffectiveGlobalResourcePermissions(accessorResource, resourceClassName, grantorDomainName);
       assertThat(permissions_post_specific, is(permissions_pre));
-
-      final Set<ResourcePermission> permissions_post_sessionDomain
-            = accessControlContext.getEffectiveGlobalResourcePermissions(accessorResource, resourceClassName);
-      assertThat(permissions_post_sessionDomain, is(permissions_pre));
 
       final Map<String, Map<String, Set<ResourcePermission>>> permissions_post_all
             = accessControlContext.getEffectiveGlobalResourcePermissionsMap(accessorResource);
@@ -169,9 +158,10 @@ public class TestAccessControl_getEffectiveGlobalResourcePermissions extends Tes
       final ResourcePermission resourcePermission_parentDomain = ResourcePermissions.getInstance(
             generateResourceClassPermission(authenticatableResourceClassName));
       permissions_parentDomain_pre.add(resourcePermission_parentDomain);
-      accessControlContext.setGlobalResourcePermissions(accessorResource, authenticatableResourceClassName,
-                                                        sysDomainName, permissions_parentDomain_pre
-      );
+      accessControlContext.setGlobalResourcePermissions(accessorResource,
+                                                        authenticatableResourceClassName,
+                                                        sysDomainName,
+                                                        permissions_parentDomain_pre);
 
       // setup global permissions on child domain
       Set<ResourcePermission> permissions_childDomain_pre = new HashSet<>();
@@ -180,9 +170,10 @@ public class TestAccessControl_getEffectiveGlobalResourcePermissions extends Tes
       final ResourcePermission resourcePermission_childDomain = ResourcePermissions.getInstance(
             generateResourceClassPermission(authenticatableResourceClassName));
       permissions_childDomain_pre.add(resourcePermission_childDomain);
-      accessControlContext.setGlobalResourcePermissions(accessorResource, authenticatableResourceClassName,
-                                                        childDomainName, permissions_childDomain_pre
-      );
+      accessControlContext.setGlobalResourcePermissions(accessorResource,
+                                                        authenticatableResourceClassName,
+                                                        childDomainName,
+                                                        permissions_childDomain_pre);
 
       // verify
       Set<ResourcePermission> permissions_expected = new HashSet<>();
@@ -202,10 +193,6 @@ public class TestAccessControl_getEffectiveGlobalResourcePermissions extends Tes
                                                                          authenticatableResourceClassName,
                                                                          childDomainName);
       assertThat(permissions_post_childDomain, is(permissions_expected));
-
-      final Set<ResourcePermission> permissions_post_sessionDomain
-            = accessControlContext.getEffectiveGlobalResourcePermissions(accessorResource, authenticatableResourceClassName);
-      assertThat(permissions_post_sessionDomain, is(permissions_parentDomain_pre));
 
       final Map<String, Map<String, Set<ResourcePermission>>> permissions_post_all
             = accessControlContext.getEffectiveGlobalResourcePermissionsMap(accessorResource);
@@ -238,8 +225,8 @@ public class TestAccessControl_getEffectiveGlobalResourcePermissions extends Tes
       directResourcePermissions_pre.add(resPerm_resetCredentials);
       accessControlContext.setGlobalResourcePermissions(accessorResource,
                                                         resourceClassName,
-                                                        domainName, directResourcePermissions_pre
-      );
+                                                        domainName,
+                                                        directResourcePermissions_pre);
 
       // set donor permissions
       Resource donorResource = generateUnauthenticatableResource();
@@ -248,8 +235,8 @@ public class TestAccessControl_getEffectiveGlobalResourcePermissions extends Tes
       donorResourcePermissions_pre.add(resPerm_resetCredentials_withGrant);
       accessControlContext.setGlobalResourcePermissions(donorResource,
                                                         resourceClassName,
-                                                        domainName, donorResourcePermissions_pre
-      );
+                                                        domainName,
+                                                        donorResourcePermissions_pre);
 
       // set accessor --INHERIT-> donor
       Set<ResourcePermission> inheritanceResourcePermisions = new HashSet<>();
@@ -266,10 +253,6 @@ public class TestAccessControl_getEffectiveGlobalResourcePermissions extends Tes
       final Set<ResourcePermission> resourcePermissions_post
             = accessControlContext.getEffectiveGlobalResourcePermissions(accessorResource, resourceClassName, domainName);
       assertThat(resourcePermissions_post, is(resourcePermissions_expected));
-
-      final Set<ResourcePermission> resourcePermissions_post2
-            = accessControlContext.getEffectiveGlobalResourcePermissions(accessorResource, resourceClassName);
-      assertThat(resourcePermissions_post2, is(resourcePermissions_expected));
 
       final Map<String, Map<String,Set<ResourcePermission>>> allGlobalResourcePermissions
             = accessControlContext.getEffectiveGlobalResourcePermissionsMap(accessorResource);
@@ -303,16 +286,16 @@ public class TestAccessControl_getEffectiveGlobalResourcePermissions extends Tes
       parentResourcePermissions_pre.add(resPerm_resetCredentials_withGrant);
       accessControlContext.setGlobalResourcePermissions(accessorResource,
                                                         resourceClassName,
-                                                        parentDomain, parentResourcePermissions_pre
-      );
+                                                        parentDomain,
+                                                        parentResourcePermissions_pre);
 
       // set child domain global resource permissions
       Set<ResourcePermission> childResourcePermissions_pre = new HashSet<>();
       childResourcePermissions_pre.add(resPerm_resetCredentials);
       accessControlContext.setGlobalResourcePermissions(accessorResource,
                                                         resourceClassName,
-                                                        childDomain, childResourcePermissions_pre
-      );
+                                                        childDomain,
+                                                        childResourcePermissions_pre);
 
       // set donor permissions
       Resource donorResource = generateUnauthenticatableResource();
@@ -320,8 +303,8 @@ public class TestAccessControl_getEffectiveGlobalResourcePermissions extends Tes
       parentDomainDonorPermissions_pre.add(resPerm_impersonate_withGrant);
       accessControlContext.setGlobalResourcePermissions(donorResource,
                                                         resourceClassName,
-                                                        parentDomain, parentDomainDonorPermissions_pre
-      );
+                                                        parentDomain,
+                                                        parentDomainDonorPermissions_pre);
 
       // set accessor --INHERIT-> donor
       Set<ResourcePermission> inheritanceResourcePermisions = new HashSet<>();
@@ -342,10 +325,6 @@ public class TestAccessControl_getEffectiveGlobalResourcePermissions extends Tes
       final Set<ResourcePermission> childResourcePermissions_post 
             = accessControlContext.getEffectiveGlobalResourcePermissions(accessorResource, resourceClassName, childDomain);
       assertThat(childResourcePermissions_post, is(childResourcePermissions_expected));
-
-      final Set<ResourcePermission> sessionResourcePermissions_post
-            = accessControlContext.getEffectiveGlobalResourcePermissions(accessorResource, resourceClassName);
-      assertThat(sessionResourcePermissions_post, is(childResourcePermissions_expected));
 
       final Map<String, Map<String,Set<ResourcePermission>>> allGlobalResourcePermissions
             = accessControlContext.getEffectiveGlobalResourcePermissionsMap(accessorResource);
@@ -371,9 +350,10 @@ public class TestAccessControl_getEffectiveGlobalResourcePermissions extends Tes
       permissions_pre.add(ResourcePermissions.getInstance(ResourcePermissions.IMPERSONATE));
       permissions_pre.add(ResourcePermissions.getInstance(generateResourceClassPermission(
             resourceClassName)));
-      accessControlContext.setGlobalResourcePermissions(accessorResource, resourceClassName,
-                                                        domainName, permissions_pre
-      );
+      accessControlContext.setGlobalResourcePermissions(accessorResource,
+                                                        resourceClassName,
+                                                        domainName,
+                                                        permissions_pre);
 
       // verify
       final Set<ResourcePermission> permissions_post_specific
@@ -381,10 +361,6 @@ public class TestAccessControl_getEffectiveGlobalResourcePermissions extends Tes
                                                                          resourceClassName_whitespaced,
                                                                          domainName_whitespaced);
       assertThat(permissions_post_specific, is(permissions_pre));
-
-      final Set<ResourcePermission> permissions_post_sessionDomain
-            = accessControlContext.getEffectiveGlobalResourcePermissions(accessorResource, resourceClassName_whitespaced);
-      assertThat(permissions_post_sessionDomain, is(permissions_pre));
    }
 
    @Test
@@ -403,13 +379,6 @@ public class TestAccessControl_getEffectiveGlobalResourcePermissions extends Tes
       final String resourceClassName = generateResourceClass(false, false);
       final String domainName = generateDomain();
       try {
-         accessControlContext.getEffectiveGlobalResourcePermissions(null, resourceClassName);
-         fail("getting effective global resource permissions with null resource should have failed");
-      }
-      catch (NullPointerException e) {
-         assertThat(e.getMessage().toLowerCase(), containsString("resource required"));
-      }
-      try {
          accessControlContext.getEffectiveGlobalResourcePermissions(null, resourceClassName, domainName);
          fail("getting effective global resource permissions with null resource should have failed");
       }
@@ -417,13 +386,6 @@ public class TestAccessControl_getEffectiveGlobalResourcePermissions extends Tes
          assertThat(e.getMessage().toLowerCase(), containsString("resource required"));
       }
 
-      try {
-         accessControlContext.getEffectiveGlobalResourcePermissions(accessorResource, null);
-         fail("getting effective global resource permissions with null resource class name should have failed");
-      }
-      catch (NullPointerException e) {
-         assertThat(e.getMessage().toLowerCase(), containsString("resource class required"));
-      }
       try {
          accessControlContext.getEffectiveGlobalResourcePermissions(accessorResource, null, domainName);
          fail("getting effective global resource permissions with null resource class name should have failed");
@@ -451,25 +413,11 @@ public class TestAccessControl_getEffectiveGlobalResourcePermissions extends Tes
       final Resource invalidResource = Resources.getInstance(-999L);
 
       try {
-         accessControlContext.getEffectiveGlobalResourcePermissions(invalidResource, resourceClassName);
-         fail("getting effective global resource permissions with invalid accessor resource reference should have failed");
-      }
-      catch (IllegalArgumentException e) {
-         assertThat(e.getMessage().toLowerCase(), containsString(String.valueOf(invalidResource).toLowerCase() + " not found"));
-      }
-      try {
          accessControlContext.getEffectiveGlobalResourcePermissions(invalidResource, resourceClassName, domainName);
          fail("getting effective global resource permissions with invalid accessor resource reference should have failed");
       }
       catch (IllegalArgumentException e) {
          assertThat(e.getMessage().toLowerCase(), containsString(String.valueOf(invalidResource).toLowerCase() + " not found"));
-      }
-      try {
-         accessControlContext.getEffectiveGlobalResourcePermissions(validResource, "invalid_resourceClassName");
-         fail("getting effective global resource permissions with invalid accessed resource class reference should have failed");
-      }
-      catch (IllegalArgumentException e) {
-         assertThat(e.getMessage().toLowerCase(), containsString("could not find resource class"));
       }
       try {
          accessControlContext.getEffectiveGlobalResourcePermissions(validResource, "invalid_resourceClassName", domainName);
