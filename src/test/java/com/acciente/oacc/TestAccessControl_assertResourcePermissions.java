@@ -51,20 +51,12 @@ public class TestAccessControl_assertResourcePermissions extends TestAccessContr
                                                      accessedResource,
                                                      ResourcePermissions.getInstance(customPermissionName),
                                                      ResourcePermissions.getInstance(ResourcePermissions.INHERIT));
-      accessControlContext.assertResourcePermissions(accessedResource,
-                                                     ResourcePermissions.getInstance(customPermissionName),
-                                                     ResourcePermissions.getInstance(ResourcePermissions.INHERIT));
 
       accessControlContext.assertResourcePermissions(SYS_RESOURCE,
                                                      accessedResource,
                                                      setOf(ResourcePermissions.getInstance(customPermissionName)));
       accessControlContext.assertResourcePermissions(SYS_RESOURCE,
                                                      accessedResource,
-                                                     setOf(ResourcePermissions
-                                                                 .getInstance(customPermissionName),
-                                                           ResourcePermissions
-                                                                 .getInstance(ResourcePermissions.INHERIT)));
-      accessControlContext.assertResourcePermissions(accessedResource,
                                                      setOf(ResourcePermissions
                                                                  .getInstance(customPermissionName),
                                                            ResourcePermissions
@@ -103,14 +95,6 @@ public class TestAccessControl_assertResourcePermissions extends TestAccessContr
          assertThat(e.getMessage().toLowerCase(), containsString("does not have permission"));
       }
       try {
-         accessControlContext.assertResourcePermissions(accessedResource,
-                                                        ResourcePermissions.getInstance(customPermissionName));
-         fail("asserting resource permission for domain when none has been granted should not have succeeded for implicit authenticated resource");
-      }
-      catch (NotAuthorizedException e) {
-         assertThat(e.getMessage().toLowerCase(), containsString("does not have permission"));
-      }
-      try {
          accessControlContext.assertResourcePermissions(accessorResource,
                                                         accessedResource,
                                                         ResourcePermissions.getInstance(customPermissionName),
@@ -126,14 +110,6 @@ public class TestAccessControl_assertResourcePermissions extends TestAccessContr
                                                         accessedResource,
                                                         setOf(ResourcePermissions.getInstance(customPermissionName)));
          fail("asserting resource permission for domain when none has been granted should not have succeeded for authenticated resource");
-      }
-      catch (NotAuthorizedException e) {
-         assertThat(e.getMessage().toLowerCase(), containsString("does not have permission"));
-      }
-      try {
-         accessControlContext.assertResourcePermissions(accessedResource,
-                                                        setOf(ResourcePermissions.getInstance(customPermissionName)));
-         fail("asserting resource permission for domain when none has been granted should not have succeeded for implicit authenticated resource");
       }
       catch (NotAuthorizedException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("does not have permission"));
@@ -173,10 +149,7 @@ public class TestAccessControl_assertResourcePermissions extends TestAccessContr
       accessControlContext.authenticate(accessorResource, PasswordCredentials.newInstance(password));
 
       // verify
-      accessControlContext.assertResourcePermissions(accessedResource, customPermission);
       accessControlContext.assertResourcePermissions(accessorResource, accessedResource, customPermission);
-
-      accessControlContext.assertResourcePermissions(accessedResource, setOf(customPermission));
       accessControlContext.assertResourcePermissions(accessorResource, accessedResource, setOf(customPermission));
    }
 
@@ -202,31 +175,11 @@ public class TestAccessControl_assertResourcePermissions extends TestAccessContr
 
       // verify
       try {
-         accessControlContext.assertResourcePermissions(accessedResource,
-                                                        customPermission,
-                                                        ResourcePermissions.getInstance(ResourcePermissions.INHERIT));
-         fail("asserting direct and unauthorized resource permission for implicit authenticated resource should have failed");
-      }
-      catch (NotAuthorizedException e) {
-         assertThat(e.getMessage().toLowerCase(), containsString("does not have permission"));
-      }
-      try {
          accessControlContext.assertResourcePermissions(accessorResource,
                                                         accessedResource,
                                                         customPermission,
                                                         ResourcePermissions.getInstance(ResourcePermissions.INHERIT));
          fail("asserting direct and unauthorized resource permission for authenticated resource should have failed");
-      }
-      catch (NotAuthorizedException e) {
-         assertThat(e.getMessage().toLowerCase(), containsString("does not have permission"));
-      }
-
-      try {
-         accessControlContext.assertResourcePermissions(accessedResource,
-                                                        setOf(customPermission,
-                                                              ResourcePermissions
-                                                                    .getInstance(ResourcePermissions.INHERIT)));
-         fail("asserting direct and unauthorized resource permission for implicit authenticated resource should have failed");
       }
       catch (NotAuthorizedException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("does not have permission"));
@@ -266,18 +219,11 @@ public class TestAccessControl_assertResourcePermissions extends TestAccessContr
       accessControlContext.authenticate(accessorResource, PasswordCredentials.newInstance(password));
 
       // verify
-      accessControlContext.assertResourcePermissions(accessedResource,
-                                                     customPermission,
-                                                     ResourcePermissions.getInstance(ResourcePermissions.INHERIT));
       accessControlContext.assertResourcePermissions(accessorResource,
                                                      accessedResource,
                                                      customPermission,
                                                      ResourcePermissions.getInstance(ResourcePermissions.INHERIT));
 
-      accessControlContext.assertResourcePermissions(accessedResource,
-                                                     setOf(customPermission,
-                                                           ResourcePermissions
-                                                                 .getInstance(ResourcePermissions.INHERIT)));
       accessControlContext.assertResourcePermissions(accessorResource,
                                                      accessedResource,
                                                      setOf(customPermission,
@@ -316,10 +262,6 @@ public class TestAccessControl_assertResourcePermissions extends TestAccessContr
       accessControlContext.authenticate(accessorResource, PasswordCredentials.newInstance(password));
 
       // verify
-      accessControlContext.assertResourcePermissions(accessedResource,
-                                                     customPermission1_withoutGrant,
-                                                     customPermission1_withGrant,
-                                                     customPermission2_withoutGrant);
       accessControlContext.assertResourcePermissions(accessorResource,
                                                      accessedResource,
                                                      customPermission1_withoutGrant,
@@ -333,18 +275,7 @@ public class TestAccessControl_assertResourcePermissions extends TestAccessContr
       catch (NotAuthorizedException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("does not have permission"));
       }
-      try {
-         accessControlContext.assertResourcePermissions(accessedResource, customPermission2_withGrant);
-         fail("asserting resource permission with grant when the one granted does not have grant should not have succeeded for implicit authenticated resource");
-      }
-      catch (NotAuthorizedException e) {
-         assertThat(e.getMessage().toLowerCase(), containsString("does not have permission"));
-      }
 
-      accessControlContext.assertResourcePermissions(accessedResource,
-                                                     setOf(customPermission1_withoutGrant,
-                                                           customPermission1_withGrant,
-                                                           customPermission2_withoutGrant));
       accessControlContext.assertResourcePermissions(accessorResource,
                                                      accessedResource,
                                                      setOf(customPermission1_withoutGrant,
@@ -354,13 +285,6 @@ public class TestAccessControl_assertResourcePermissions extends TestAccessContr
       try {
          accessControlContext.assertResourcePermissions(accessorResource, accessedResource, setOf(customPermission2_withGrant));
          fail("asserting resource permission with grant when the one granted does not have grant should not have succeeded for authenticated resource");
-      }
-      catch (NotAuthorizedException e) {
-         assertThat(e.getMessage().toLowerCase(), containsString("does not have permission"));
-      }
-      try {
-         accessControlContext.assertResourcePermissions(accessedResource, setOf(customPermission2_withGrant));
-         fail("asserting resource permission with grant when the one granted does not have grant should not have succeeded for implicit authenticated resource");
       }
       catch (NotAuthorizedException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("does not have permission"));
@@ -394,10 +318,7 @@ public class TestAccessControl_assertResourcePermissions extends TestAccessContr
       accessControlContext.authenticate(accessorResource, PasswordCredentials.newInstance(password));
 
       // verify
-      accessControlContext.assertResourcePermissions(accessedResource, customPermission);
       accessControlContext.assertResourcePermissions(accessorResource, accessedResource, customPermission);
-
-      accessControlContext.assertResourcePermissions(accessedResource, setOf(customPermission));
       accessControlContext.assertResourcePermissions(accessorResource, accessedResource, setOf(customPermission));
    }
 
@@ -429,10 +350,7 @@ public class TestAccessControl_assertResourcePermissions extends TestAccessContr
       accessControlContext.authenticate(accessorResource, PasswordCredentials.newInstance(password));
 
       // verify
-      accessControlContext.assertResourcePermissions(accessedResource, customPermission);
       accessControlContext.assertResourcePermissions(accessorResource, accessedResource, customPermission);
-
-      accessControlContext.assertResourcePermissions(accessedResource, setOf(customPermission));
       accessControlContext.assertResourcePermissions(accessorResource, accessedResource, setOf(customPermission));
    }
 
@@ -508,17 +426,9 @@ public class TestAccessControl_assertResourcePermissions extends TestAccessContr
                                                      accessedResource,
                                                      customPermission,
                                                      ResourcePermissions.getInstance(ResourcePermissions.INHERIT));
-      accessControlContext.assertResourcePermissions(accessedResource,
-                                                     customPermission,
-                                                     ResourcePermissions.getInstance(ResourcePermissions.INHERIT));
-
       accessControlContext.assertResourcePermissions(accessorResource, accessedResource, setOf(customPermission));
       accessControlContext.assertResourcePermissions(accessorResource,
                                                      accessedResource,
-                                                     setOf(customPermission,
-                                                           ResourcePermissions
-                                                                 .getInstance(ResourcePermissions.INHERIT)));
-      accessControlContext.assertResourcePermissions(accessedResource,
                                                      setOf(customPermission,
                                                            ResourcePermissions
                                                                  .getInstance(ResourcePermissions.INHERIT)));
@@ -580,14 +490,6 @@ public class TestAccessControl_assertResourcePermissions extends TestAccessContr
 
       // verify
       try {
-         accessControlContext.assertResourcePermissions(unauthenticatableResource,
-                                                        ResourcePermissions.getInstance(ResourcePermissions.RESET_CREDENTIALS));
-         fail("asserting implicit resource permission invalid for resource class should have failed for implicit system resource");
-      }
-      catch (IllegalArgumentException e) {
-         assertThat(e.getMessage().toLowerCase(), containsString("not valid for unauthenticatable resource class"));
-      }
-      try {
          accessControlContext.assertResourcePermissions(SYS_RESOURCE,
                                                         unauthenticatableResource,
                                                         ResourcePermissions.getInstance(ResourcePermissions.RESET_CREDENTIALS));
@@ -611,15 +513,6 @@ public class TestAccessControl_assertResourcePermissions extends TestAccessContr
                                                         ResourcePermissions.getInstance(ResourcePermissions.INHERIT),
                                                         ResourcePermissions.getInstance(ResourcePermissions.IMPERSONATE));
          fail("asserting multiple implicit global resource permission valid and invalid for resource class should have failed for system resource");
-      }
-      catch (IllegalArgumentException e) {
-         assertThat(e.getMessage().toLowerCase(), containsString("not valid for unauthenticatable resource class"));
-      }
-      try {
-         accessControlContext.assertResourcePermissions(unauthenticatableResource,
-                                                        ResourcePermissions.getInstance(ResourcePermissions.INHERIT),
-                                                        ResourcePermissions.getInstance(ResourcePermissions.IMPERSONATE));
-         fail("asserting multiple implicit global resource permission valid and invalid for resource class should have failed for implicit system resource");
       }
       catch (IllegalArgumentException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("not valid for unauthenticatable resource class"));
@@ -627,15 +520,6 @@ public class TestAccessControl_assertResourcePermissions extends TestAccessContr
 
       // test set-based versions
       try {
-         accessControlContext.assertResourcePermissions(unauthenticatableResource,
-                                                        setOf(ResourcePermissions
-                                                                    .getInstance(ResourcePermissions.RESET_CREDENTIALS)));
-         fail("asserting implicit resource permission invalid for resource class should have failed for implicit system resource");
-      }
-      catch (IllegalArgumentException e) {
-         assertThat(e.getMessage().toLowerCase(), containsString("not valid for unauthenticatable resource class"));
-      }
-      try {
          accessControlContext.assertResourcePermissions(SYS_RESOURCE,
                                                         unauthenticatableResource,
                                                         setOf(ResourcePermissions
@@ -663,17 +547,6 @@ public class TestAccessControl_assertResourcePermissions extends TestAccessContr
                                                               ResourcePermissions
                                                                     .getInstance(ResourcePermissions.IMPERSONATE)));
          fail("asserting multiple implicit global resource permission valid and invalid for resource class should have failed for system resource");
-      }
-      catch (IllegalArgumentException e) {
-         assertThat(e.getMessage().toLowerCase(), containsString("not valid for unauthenticatable resource class"));
-      }
-      try {
-         accessControlContext.assertResourcePermissions(unauthenticatableResource,
-                                                        setOf(ResourcePermissions
-                                                                    .getInstance(ResourcePermissions.INHERIT),
-                                                              ResourcePermissions
-                                                                    .getInstance(ResourcePermissions.IMPERSONATE)));
-         fail("asserting multiple implicit global resource permission valid and invalid for resource class should have failed for implicit system resource");
       }
       catch (IllegalArgumentException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("not valid for unauthenticatable resource class"));
@@ -710,12 +583,6 @@ public class TestAccessControl_assertResourcePermissions extends TestAccessContr
          assertThat(e.getMessage().toLowerCase(), containsString("resource required"));
       }
       try {
-         accessControlContext.assertResourcePermissions((Resource) null, customPermission);
-      }
-      catch (NullPointerException e) {
-         assertThat(e.getMessage().toLowerCase(), containsString("resource required"));
-      }
-      try {
          accessControlContext.assertResourcePermissions(accessorResource, (Resource) null, customPermission);
       }
       catch (NullPointerException e) {
@@ -728,31 +595,13 @@ public class TestAccessControl_assertResourcePermissions extends TestAccessContr
          assertThat(e.getMessage().toLowerCase(), containsString("resource permission required"));
       }
       try {
-         accessControlContext.assertResourcePermissions(accessedResource, (ResourcePermission) null);
-      }
-      catch (NullPointerException e) {
-         assertThat(e.getMessage().toLowerCase(), containsString("resource permission required"));
-      }
-      try {
          accessControlContext.assertResourcePermissions(accessorResource, accessedResource, customPermission, null);
       }
       catch (NullPointerException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("array or a sequence"));
       }
       try {
-         accessControlContext.assertResourcePermissions(accessedResource, customPermission, null);
-      }
-      catch (NullPointerException e) {
-         assertThat(e.getMessage().toLowerCase(), containsString("array or a sequence"));
-      }
-      try {
          accessControlContext.assertResourcePermissions(accessorResource, accessedResource, customPermission, new ResourcePermission[] {null});
-      }
-      catch (NullPointerException e) {
-         assertThat(e.getMessage().toLowerCase(), containsString("without null element"));
-      }
-      try {
-         accessControlContext.assertResourcePermissions(accessedResource, customPermission, new ResourcePermission[] {null});
       }
       catch (NullPointerException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("without null element"));
@@ -767,22 +616,10 @@ public class TestAccessControl_assertResourcePermissions extends TestAccessContr
       catch (NullPointerException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("without null element"));
       }
-      try {
-         accessControlContext.assertResourcePermissions(accessedResource, customPermission, customPermission2, null);
-      }
-      catch (NullPointerException e) {
-         assertThat(e.getMessage().toLowerCase(), containsString("without null element"));
-      }
 
       // test set-based versions
       try {
          accessControlContext.assertResourcePermissions(null, accessedResource, setOf(customPermission));
-      }
-      catch (NullPointerException e) {
-         assertThat(e.getMessage().toLowerCase(), containsString("resource required"));
-      }
-      try {
-         accessControlContext.assertResourcePermissions((Resource) null, setOf(customPermission));
       }
       catch (NullPointerException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("resource required"));
@@ -800,19 +637,7 @@ public class TestAccessControl_assertResourcePermissions extends TestAccessContr
          assertThat(e.getMessage().toLowerCase(), containsString("permissions required"));
       }
       try {
-         accessControlContext.assertResourcePermissions(accessedResource, (Set<ResourcePermission>) null);
-      }
-      catch (NullPointerException e) {
-         assertThat(e.getMessage().toLowerCase(), containsString("permissions required"));
-      }
-      try {
          accessControlContext.assertResourcePermissions(accessorResource, accessedResource, setOf(customPermission, null));
-      }
-      catch (NullPointerException e) {
-         assertThat(e.getMessage().toLowerCase(), containsString("contains null element"));
-      }
-      try {
-         accessControlContext.assertResourcePermissions(accessedResource, setOf(customPermission, null));
       }
       catch (NullPointerException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("contains null element"));
@@ -846,12 +671,6 @@ public class TestAccessControl_assertResourcePermissions extends TestAccessContr
       catch (IllegalArgumentException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("permissions required"));
       }
-      try {
-         accessControlContext.assertResourcePermissions(accessedResource, Collections.<ResourcePermission>emptySet());
-      }
-      catch (IllegalArgumentException e) {
-         assertThat(e.getMessage().toLowerCase(), containsString("permissions required"));
-      }
    }
 
    @Test
@@ -875,10 +694,7 @@ public class TestAccessControl_assertResourcePermissions extends TestAccessContr
       accessControlContext.authenticate(accessorResource, PasswordCredentials.newInstance(password));
 
       // verify
-      accessControlContext.assertResourcePermissions(accessedResource, customPermission);
       accessControlContext.assertResourcePermissions(accessorResource, accessedResource, customPermission);
-
-      accessControlContext.assertResourcePermissions(accessedResource, customPermission, new ResourcePermission[] {});
       accessControlContext.assertResourcePermissions(accessorResource, accessedResource, customPermission, new ResourcePermission[] {});
    }
 
@@ -899,15 +715,6 @@ public class TestAccessControl_assertResourcePermissions extends TestAccessContr
       accessControlContext.authenticate(accessorResource, PasswordCredentials.newInstance(password));
 
       // verify
-      try {
-         accessControlContext.assertResourcePermissions(accessedResource,
-                                                        ResourcePermissions.getInstance(ResourcePermissions.INHERIT),
-                                                        ResourcePermissions.getInstance(ResourcePermissions.INHERIT));
-         fail("asserting resource permission for duplicate (identical) permissions should have failed");
-      }
-      catch (IllegalArgumentException e) {
-         assertThat(e.getMessage().toLowerCase(), containsString("duplicate element"));
-      }
       try {
          accessControlContext.assertResourcePermissions(accessorResource,
                                                         accessedResource,
@@ -937,19 +744,11 @@ public class TestAccessControl_assertResourcePermissions extends TestAccessContr
       accessControlContext.authenticate(accessorResource, PasswordCredentials.newInstance(password));
 
       // verify
-      accessControlContext.assertResourcePermissions(accessedResource,
-                                                     ResourcePermissions.getInstance(ResourcePermissions.INHERIT),
-                                                     ResourcePermissions.getInstance(ResourcePermissions.INHERIT, true));
       accessControlContext.assertResourcePermissions(accessorResource,
                                                      accessedResource,
                                                      ResourcePermissions.getInstance(ResourcePermissions.INHERIT),
                                                      ResourcePermissions.getInstance(ResourcePermissions.INHERIT, true));
 
-      accessControlContext.assertResourcePermissions(accessedResource,
-                                                     setOf(ResourcePermissions
-                                                                 .getInstance(ResourcePermissions.INHERIT),
-                                                           ResourcePermissions
-                                                                 .getInstance(ResourcePermissions.INHERIT, true)));
       accessControlContext.assertResourcePermissions(accessorResource,
                                                      accessedResource,
                                                      setOf(ResourcePermissions
@@ -989,12 +788,6 @@ public class TestAccessControl_assertResourcePermissions extends TestAccessContr
          assertThat(e.getMessage().toLowerCase(), containsString(String.valueOf(invalidResource).toLowerCase() + " not found"));
       }
       try {
-         accessControlContext.assertResourcePermissions(invalidResource, customPermission);
-      }
-      catch (IllegalArgumentException e) {
-         assertThat(e.getMessage().toLowerCase(), containsString("could not determine resource class for resource"));
-      }
-      try {
          accessControlContext.assertResourcePermissions(accessorResource, invalidResource, customPermission);
       }
       catch (IllegalArgumentException e) {
@@ -1002,12 +795,6 @@ public class TestAccessControl_assertResourcePermissions extends TestAccessContr
       }
       try {
          accessControlContext.assertResourcePermissions(accessorResource, accessedResource, invalidPermission);
-      }
-      catch (IllegalArgumentException e) {
-         assertThat(e.getMessage().toLowerCase(), containsString("is not defined for resource class"));
-      }
-      try {
-         accessControlContext.assertResourcePermissions(accessedResource, invalidPermission);
       }
       catch (IllegalArgumentException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("is not defined for resource class"));
@@ -1021,14 +808,6 @@ public class TestAccessControl_assertResourcePermissions extends TestAccessContr
       catch (IllegalArgumentException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("is not defined for resource class"));
       }
-      try {
-         accessControlContext.assertResourcePermissions(accessedResource,
-                                                      customPermission,
-                                                      invalidPermission);
-      }
-      catch (IllegalArgumentException e) {
-         assertThat(e.getMessage().toLowerCase(), containsString("is not defined for resource class"));
-      }
 
       // test set-based versions
       try {
@@ -1036,12 +815,6 @@ public class TestAccessControl_assertResourcePermissions extends TestAccessContr
       }
       catch (IllegalArgumentException e) {
          assertThat(e.getMessage().toLowerCase(), containsString(String.valueOf(invalidResource).toLowerCase() + " not found"));
-      }
-      try {
-         accessControlContext.assertResourcePermissions(invalidResource, setOf(customPermission));
-      }
-      catch (IllegalArgumentException e) {
-         assertThat(e.getMessage().toLowerCase(), containsString("could not determine resource class for resource"));
       }
       try {
          accessControlContext.assertResourcePermissions(accessorResource, invalidResource, setOf(customPermission));
@@ -1056,21 +829,8 @@ public class TestAccessControl_assertResourcePermissions extends TestAccessContr
          assertThat(e.getMessage().toLowerCase(), containsString("is not defined for resource class"));
       }
       try {
-         accessControlContext.assertResourcePermissions(accessedResource, setOf(invalidPermission));
-      }
-      catch (IllegalArgumentException e) {
-         assertThat(e.getMessage().toLowerCase(), containsString("is not defined for resource class"));
-      }
-      try {
          accessControlContext.assertResourcePermissions(accessorResource,
                                                         accessedResource,
-                                                        setOf(customPermission, invalidPermission));
-      }
-      catch (IllegalArgumentException e) {
-         assertThat(e.getMessage().toLowerCase(), containsString("is not defined for resource class"));
-      }
-      try {
-         accessControlContext.assertResourcePermissions(accessedResource,
                                                         setOf(customPermission, invalidPermission));
       }
       catch (IllegalArgumentException e) {

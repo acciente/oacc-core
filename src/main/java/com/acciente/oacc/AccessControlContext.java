@@ -166,21 +166,6 @@ public interface AccessControlContext {
                                        Set<DomainPermission> domainPermissions);
 
    /**
-    * Checks if the session resource has the specified domain permissions on the specified domain.
-    * This method takes into account any direct domain permissions, inherited domain permissions
-    * and any domain permissions the session resource may have to ancestors of the specified domain, as well
-    * as any super-user privileges.
-    *
-    * @param domainName        the domain for which the permission should be checked
-    * @param domainPermissions the permissions to be checked
-    * @throws java.lang.IllegalArgumentException       if no domain of domainName exists
-    * @throws com.acciente.oacc.NotAuthorizedException if the session resource <strong>does not</strong> have the
-    *                                                  specified domain permissions
-    */
-   public void assertDomainPermissions(String domainName,
-                                       Set<DomainPermission> domainPermissions);
-
-   /**
     * Checks if the specified accessor resource has the specified domain permissions on
     * the specified domain.
     * This method takes into account any direct domain permissions, inherited domain permissions
@@ -203,85 +188,6 @@ public interface AccessControlContext {
                                        DomainPermission... domainPermissions);
 
    /**
-    * Checks if the session resource has the specified domain permissions on the specified domain.
-    * This method takes into account any direct domain permissions, inherited domain permissions
-    * and any domain permissions the session resource may have to ancestors of the specified domain, as well
-    * as any super-user privileges.
-    *
-    * @param domainName        the domain for which the permission should be checked
-    * @param domainPermission  the permission to be checked
-    * @param domainPermissions the other (optional) permissions to be checked
-    * @throws java.lang.IllegalArgumentException       if no domain of domainName exists
-    * @throws com.acciente.oacc.NotAuthorizedException if the session resource <strong>does not</strong> have the
-    *                                                  specified domain permissions
-    */
-   public void assertDomainPermissions(String domainName,
-                                       DomainPermission domainPermission,
-                                       DomainPermission... domainPermissions);
-
-   /**
-    * Checks if the specified accessor resource has the specified domain permissions on
-    * the session resource's domain.
-    * This method takes into account any direct domain permissions, inherited domain permissions
-    * and any domain permissions the accessor may have to ancestors of the specified domain, as well
-    * as any super-user privileges.
-    *
-    * @param accessorResource  the resource on which access is being checked
-    * @param domainPermissions the permissions to be checked
-    * @throws java.lang.IllegalArgumentException       if the accessorResource does not exist
-    * @throws com.acciente.oacc.NotAuthorizedException if the accessor resource <strong>does not</strong> have the
-    *                                                  specified domain permissions, or
-    *                                                  if the accessor resource does not exist
-    */
-   public void assertDomainPermissions(Resource accessorResource,
-                                       Set<DomainPermission> domainPermissions);
-
-   /**
-    * Checks if the session resource has the specified domain permissions on the session resource's domain.
-    * This method takes into account any direct domain permissions, inherited domain permissions
-    * and any domain permissions the session resource may have to ancestors of the specified domain, as well
-    * as any super-user privileges.
-    *
-    * @param domainPermissions the permissions to be checked
-    * @throws com.acciente.oacc.NotAuthorizedException if the session resource <strong>does not</strong> have the
-    *                                                  specified domain permissions
-    */
-   public void assertDomainPermissions(Set<DomainPermission> domainPermissions);
-
-   /**
-    * Checks if the specified accessor resource has the specified domain permissions on
-    * the session resource's domain.
-    * This method takes into account any direct domain permissions, inherited domain permissions
-    * and any domain permissions the accessor may have to ancestors of the specified domain, as well
-    * as any super-user privileges.
-    *
-    * @param accessorResource  the resource on which access is being checked
-    * @param domainPermission  the permission to be checked
-    * @param domainPermissions the other (optional) permissions to be checked
-    * @throws java.lang.IllegalArgumentException       if the accessorResource does not exist
-    * @throws com.acciente.oacc.NotAuthorizedException if the accessor resource <strong>does not</strong> have the
-    *                                                  specified domain permissions, or
-    *                                                  if the accessor resource does not exist
-    */
-   public void assertDomainPermissions(Resource accessorResource,
-                                       DomainPermission domainPermission,
-                                       DomainPermission... domainPermissions);
-
-   /**
-    * Checks if the session resource has the specified domain permissions on the session resource's domain.
-    * This method takes into account any direct domain permissions, inherited domain permissions
-    * and any domain permissions the session resource may have to ancestors of the specified domain, as well
-    * as any super-user privileges.
-    *
-    * @param domainPermission  the permission to be checked
-    * @param domainPermissions the other (optional) permissions to be checked
-    * @throws com.acciente.oacc.NotAuthorizedException if the session resource <strong>does not</strong> have the
-    *                                                  specified domain permissions
-    */
-   public void assertDomainPermissions(DomainPermission domainPermission,
-                                       DomainPermission... domainPermissions);
-
-   /**
     * Checks if the specified accessor resource has the specified domain permissions on
     * the specified domain.
     * This method takes into account any direct domain permissions, inherited domain permissions
@@ -298,21 +204,6 @@ public interface AccessControlContext {
     */
    public boolean hasDomainPermissions(Resource accessorResource,
                                        String domainName,
-                                       Set<DomainPermission> domainPermissions);
-
-   /**
-    * Checks if the session resource has the specified domain permissions on the specified domain.
-    * This method takes into account any direct domain permissions, inherited domain permissions
-    * and any domain permissions the session resource may have to ancestors of the specified domain, as well
-    * as any super-user privileges.
-    *
-    * @param domainName        the domain for which the permission should be checked
-    * @param domainPermissions the permissions to be checked
-    * @return  <strong>true</strong> if the session resource has the specified domain permissions,
-    *          <strong>false</strong> otherwise
-    * @throws java.lang.IllegalArgumentException  if no domain of domainName exists
-    */
-   public boolean hasDomainPermissions(String domainName,
                                        Set<DomainPermission> domainPermissions);
 
    /**
@@ -334,84 +225,6 @@ public interface AccessControlContext {
    public boolean hasDomainPermissions(Resource accessorResource,
                                        String domainName,
                                        DomainPermission domainPermission,
-                                       DomainPermission... domainPermissions);
-
-   /**
-    * Checks if the session resource has the specified domain permissions on the specified domain.
-    * This method takes into account any direct domain permissions, inherited domain permissions
-    * and any domain permissions the session resource may have to ancestors of the specified domain, as well
-    * as any super-user privileges.
-    *
-    * @param domainName        the domain for which the permission should be checked
-    * @param domainPermission  the permission to be checked
-    * @param domainPermissions the other (optional) permissions to be checked
-    * @return  <strong>true</strong> if the session resource has the specified domain permissions,
-    *          <strong>false</strong> otherwise
-    * @throws java.lang.IllegalArgumentException  if no domain of domainName exists
-    */
-   public boolean hasDomainPermissions(String domainName,
-                                       DomainPermission domainPermission,
-                                       DomainPermission... domainPermissions);
-
-   /**
-    * Checks if the specified accessor resource has the specified domain permissions on
-    * the session resource's domain.
-    * This method takes into account any direct domain permissions, inherited domain permissions
-    * and any domain permissions the accessor may have to ancestors of the specified domain, as well
-    * as any super-user privileges.
-    *
-    * @param accessorResource  the resource on which access is being checked
-    * @param domainPermissions the permissions to be checked
-    * @return  <strong>true</strong> if the accessor resource has the specified domain permissions,
-    *          <strong>false</strong> otherwise or if the accessor resource does not exist
-    * @throws java.lang.IllegalArgumentException if the accessorResource does not exist
-    */
-   public boolean hasDomainPermissions(Resource accessorResource,
-                                       Set<DomainPermission> domainPermissions);
-
-   /**
-    * Checks if the session resource has the specified domain permissions on the session resource's domain.
-    * This method takes into account any direct domain permissions, inherited domain permissions
-    * and any domain permissions the session resource may have to ancestors of the specified domain, as well
-    * as any super-user privileges.
-    *
-    * @param domainPermissions the permissions to be checked
-    * @return  <strong>true</strong> if the session resource has the specified domain permissions,
-    *          <strong>false</strong> otherwise
-    */
-   public boolean hasDomainPermissions(Set<DomainPermission> domainPermissions);
-
-   /**
-    * Checks if the specified accessor resource has the specified domain permissions on
-    * the session resource's domain.
-    * This method takes into account any direct domain permissions, inherited domain permissions
-    * and any domain permissions the accessor may have to ancestors of the specified domain, as well
-    * as any super-user privileges.
-    *
-    * @param accessorResource  the resource on which access is being checked
-    * @param domainPermission  the permission to be checked
-    * @param domainPermissions the other (optional) permissions to be checked
-    * @return  <strong>true</strong> if the accessor resource has the specified domain permissions,
-    *          <strong>false</strong> otherwise or if the accessor resource does not exist
-    * @throws java.lang.IllegalArgumentException if the accessorResource does not exist
-    */
-   public boolean hasDomainPermissions(Resource accessorResource,
-                                       DomainPermission domainPermission,
-                                       DomainPermission... domainPermissions);
-
-   /**
-    * Checks if the session resource has the specified domain permissions on the session resource's domain.
-    * This method takes into account any direct domain permissions, inherited domain permissions
-    * and any domain permissions the session resource may have to ancestors of the specified domain, as well
-    * as any super-user privileges.
-    *
-    * @param domainPermission  the permission to be checked
-    * @param domainPermissions the other (optional) permissions to be checked
-    * @return  <strong>true</strong> if the session resource has the specified domain permissions,
-    *          <strong>false</strong> otherwise
-    * @throws java.lang.IllegalArgumentException  if no domain of domainName exists
-    */
-   public boolean hasDomainPermissions(DomainPermission domainPermission,
                                        DomainPermission... domainPermissions);
 
    /**
@@ -445,28 +258,6 @@ public interface AccessControlContext {
                                              DomainCreatePermission... domainCreatePermissions);
 
    /**
-    * Checks if the session resource has the specified domain create permissions.
-    * This method takes into account any direct and inherited domain create permissions.
-    *
-    * @param domainCreatePermissions the domain create permissions to be checked
-    * @throws com.acciente.oacc.NotAuthorizedException if the session resource <strong>does not</strong> have the
-    *                                                  specified domain create permissions
-    */
-   public void assertDomainCreatePermissions(Set<DomainCreatePermission> domainCreatePermissions);
-
-   /**
-    * Checks if the session resource has the specified domain create permissions.
-    * This method takes into account any direct and inherited domain create permissions.
-    *
-    * @param domainCreatePermission  the domain create permission to be checked
-    * @param domainCreatePermissions the other (optional) domain create permissions to be checked
-    * @throws com.acciente.oacc.NotAuthorizedException if the session resource <strong>does not</strong> have the
-    *                                                  specified domain create permissions
-    */
-   public void assertDomainCreatePermissions(DomainCreatePermission domainCreatePermission,
-                                             DomainCreatePermission... domainCreatePermissions);
-
-   /**
     * Checks if the specified accessor resource has the specified domain create permissions.
     * This method takes into account any direct and inherited domain create permissions.
     *
@@ -495,28 +286,6 @@ public interface AccessControlContext {
                                              DomainCreatePermission... domainCreatePermissions);
 
    /**
-    * Checks if the session resource has the specified domain create permissions.
-    * This method takes into account any direct and inherited domain create permissions.
-    *
-    * @param domainCreatePermissions the domain create permissions to be checked
-    * @return  <strong>true</strong> if the session resource has the specified domain create permissions,
-    *          <strong>false</strong> otherwise
-    */
-   public boolean hasDomainCreatePermissions(Set<DomainCreatePermission> domainCreatePermissions);
-
-   /**
-    * Checks if the session resource has the specified domain create permissions.
-    * This method takes into account any direct and inherited domain create permissions.
-    *
-    * @param domainCreatePermission  the domain create permission to be checked
-    * @param domainCreatePermissions the other (optional) domain create permissions to be checked
-    * @return  <strong>true</strong> if the session resource has the specified domain create permissions,
-    *          <strong>false</strong> otherwise
-    */
-   public boolean hasDomainCreatePermissions(DomainCreatePermission domainCreatePermission,
-                                             DomainCreatePermission... domainCreatePermissions);
-
-   /**
     * Checks if the specified accessor resource would receive the specified domain permissions, if the accessor
     * were to create a domain.
     * The method takes into account any direct and inherited domain create permissions the accessor might have.
@@ -529,16 +298,6 @@ public interface AccessControlContext {
     */
    public void assertPostCreateDomainPermissions(Resource accessorResource,
                                                  Set<DomainPermission> domainPermissions);
-
-   /**
-    * Checks if the session resource would receive the specified domain permissions, if it were to create a domain.
-    * The method takes into account any direct and inherited domain create permissions the session resource might have.
-    *
-    * @param domainPermissions the permissions to be checked
-    * @throws com.acciente.oacc.NotAuthorizedException if the session resource would <strong>not</strong> receive the
-    *                                                  specified permissions after creating a domain
-    */
-   public void assertPostCreateDomainPermissions(Set<DomainPermission> domainPermissions);
 
    /**
     * Checks if the specified accessor resource would receive the specified domain permissions, if the accessor
@@ -557,18 +316,6 @@ public interface AccessControlContext {
                                                  DomainPermission... domainPermissions);
 
    /**
-    * Checks if the session resource would receive the specified domain permissions, if it were to create a domain.
-    * The method takes into account any direct and inherited domain create permissions the session resource might have.
-    *
-    * @param domainPermission  the permission to be checked
-    * @param domainPermissions the other (optional) permissions to be checked
-    * @throws com.acciente.oacc.NotAuthorizedException if the session resource would <strong>not</strong> receive the
-    *                                                  specified permissions after creating a domain
-    */
-   public void assertPostCreateDomainPermissions(DomainPermission domainPermission,
-                                                 DomainPermission... domainPermissions);
-
-   /**
     * Checks if the specified accessor resource would receive the specified domain permissions, if the accessor
     * were to create a domain.
     * The method takes into account any direct and inherited domain create permissions the accessor might have.
@@ -580,15 +327,6 @@ public interface AccessControlContext {
     */
    public boolean hasPostCreateDomainPermissions(Resource accessorResource,
                                                  Set<DomainPermission> domainPermissions);
-
-   /**
-    * Checks if the session resource would receive the specified domain permissions, if it were to create a domain.
-    * The method takes into account any direct and inherited domain create permissions the session resource might have.
-    *
-    * @param domainPermissions the permissions to be checked
-    * @return <strong>true</strong> if the session resource would receive the specified permissions after creating a domain
-    */
-   public boolean hasPostCreateDomainPermissions(Set<DomainPermission> domainPermissions);
 
    /**
     * Checks if the specified accessor resource would receive the specified domain permissions, if the accessor
@@ -606,51 +344,6 @@ public interface AccessControlContext {
                                                  DomainPermission... domainPermissions);
 
    /**
-    * Checks if the session resource would receive the specified domain permissions, if it were to create a domain.
-    * The method takes into account any direct and inherited domain create permissions the session resource might have.
-    *
-    * @param domainPermission  the permission to be checked
-    * @param domainPermissions the other (optional) permissions to be checked
-    * @return <strong>true</strong> if the session resource would receive the specified permissions after creating a domain
-    */
-   public boolean hasPostCreateDomainPermissions(DomainPermission domainPermission,
-                                                 DomainPermission... domainPermissions);
-
-   /**
-    * Checks if the specified accessor resource has the specified global resource permissions on
-    * the specified resource class in the session resource's domain.
-    * This method takes into account any global permissions that the accessor resource may have.
-    *
-    * @param accessorResource    the resource on which access is being checked
-    * @param resourceClassName   a string resource class name
-    * @param resourcePermissions the permissions to be checked
-    * @throws java.lang.IllegalArgumentException if the accessorResource does not exist, or
-    *                                            if no resource class of resourceClassName exists, or
-    *                                            if any resourcePermission is invalid for the resource class
-    * @throws com.acciente.oacc.NotAuthorizedException if the accessor resource <strong>does not</strong> have the
-    *                                                  specified global permissions, or
-    *                                                  if the accessor resource does not exist
-    */
-   public void assertGlobalResourcePermissions(Resource accessorResource,
-                                               String resourceClassName,
-                                               Set<ResourcePermission> resourcePermissions);
-
-   /**
-    * Checks if the session resource has the specified global resource permissions on the specified
-    * resource class in the session resource's domain.
-    * This method takes into account any global permissions that the session resource may have.
-    *
-    * @param resourceClassName   a string resource class name
-    * @param resourcePermissions the permissions to be checked
-    * @throws java.lang.IllegalArgumentException if no resource class of resourceClassName exists, or
-    *                                            if any resourcePermission is invalid for the resource class
-    * @throws com.acciente.oacc.NotAuthorizedException if the session resource <strong>does not</strong> have the
-    *                                                  specified global permissions
-    */
-   public void assertGlobalResourcePermissions(String resourceClassName,
-                                               Set<ResourcePermission> resourcePermissions);
-
-   /**
     * Checks if the specified accessor resource has the specified global resource permissions on
     * the specified resource class in the specified domain.
     * This method takes into account any global permissions that the accessor resource may have.
@@ -671,63 +364,6 @@ public interface AccessControlContext {
                                                String resourceClassName,
                                                String domainName,
                                                Set<ResourcePermission> resourcePermissions);
-
-   /**
-    * Checks if the session resource has the specified global resource permissions on the specified
-    * resource class in the specified domain.
-    * This method takes into account any global permissions that the session resource may have.
-    *
-    * @param resourceClassName   a string resource class name
-    * @param domainName          the domain in which the permissions should be checked
-    * @param resourcePermissions the permissions to be checked
-    * @throws java.lang.IllegalArgumentException if the accessorResource does not exist, or
-    *                                            if no resource class of resourceClassName exists, or
-    *                                            if any resourcePermission is invalid for the resource class, or
-    *                                            if no domain of domainName exists
-    * @throws com.acciente.oacc.NotAuthorizedException if the session resource <strong>does not</strong> have the
-    *                                                  specified global permissions
-    */
-   public void assertGlobalResourcePermissions(String resourceClassName,
-                                               String domainName,
-                                               Set<ResourcePermission> resourcePermissions);
-
-   /**
-    * Checks if the specified accessor resource has the specified global resource permissions on
-    * the specified resource class in the session resource's domain.
-    * This method takes into account any global permissions that the accessor resource may have.
-    *
-    * @param accessorResource    the resource on which access is being checked
-    * @param resourceClassName   a string resource class name
-    * @param resourcePermission  the permission to be checked
-    * @param resourcePermissions the other (optional) permissions to be checked
-    * @throws java.lang.IllegalArgumentException if the accessorResource does not exist, or
-    *                                            if no resource class of resourceClassName exists, or
-    *                                            if any resourcePermission is invalid for the resource class
-    * @throws com.acciente.oacc.NotAuthorizedException if the accessor resource <strong>does not</strong> have the
-    *                                                  specified global permissions, or
-    *                                                  if the accessor resource does not exist
-    */
-   public void assertGlobalResourcePermissions(Resource accessorResource,
-                                               String resourceClassName,
-                                               ResourcePermission resourcePermission,
-                                               ResourcePermission... resourcePermissions);
-
-   /**
-    * Checks if the session resource has the specified global resource permissions on the specified
-    * resource class in the session resource's domain.
-    * This method takes into account any global permissions that the session resource may have.
-    *
-    * @param resourceClassName   a string resource class name
-    * @param resourcePermission  the permission to be checked
-    * @param resourcePermissions the other (optional) permissions to be checked
-    * @throws java.lang.IllegalArgumentException if no resource class of resourceClassName exists, or
-    *                                            if any resourcePermission is invalid for the resource class
-    * @throws com.acciente.oacc.NotAuthorizedException if the session resource <strong>does not</strong> have the
-    *                                                  specified global permissions
-    */
-   public void assertGlobalResourcePermissions(String resourceClassName,
-                                               ResourcePermission resourcePermission,
-                                               ResourcePermission... resourcePermissions);
 
    /**
     * Checks if the specified accessor resource has the specified global resource permissions on
@@ -754,60 +390,6 @@ public interface AccessControlContext {
                                                ResourcePermission... resourcePermissions);
 
    /**
-    * Checks if the session resource has the specified global resource permissions on the specified
-    * resource class in the specified domain.
-    * This method takes into account any global permissions that the session resource may have.
-    *
-    * @param resourceClassName   a string resource class name
-    * @param domainName          the domain in which the permissions should be checked
-    * @param resourcePermission  the permission to be checked
-    * @param resourcePermissions the other (optional) permissions to be checked
-    * @throws java.lang.IllegalArgumentException if the accessorResource does not exist, or
-    *                                            if no resource class of resourceClassName exists, or
-    *                                            if any resourcePermission is invalid for the resource class, or
-    *                                            if no domain of domainName exists
-    * @throws com.acciente.oacc.NotAuthorizedException if the session resource <strong>does not</strong> have the
-    *                                                  specified global permissions
-    */
-   public void assertGlobalResourcePermissions(String resourceClassName,
-                                               String domainName,
-                                               ResourcePermission resourcePermission,
-                                               ResourcePermission... resourcePermissions);
-
-   /**
-    * Checks if the specified accessor resource has the specified global resource permissions on
-    * the specified resource class in the session resource's domain.
-    * This method takes into account any global permissions that the accessor resource may have.
-    *
-    * @param accessorResource    the resource on which access is being checked
-    * @param resourceClassName   a string resource class name
-    * @param resourcePermissions the permissions to be checked
-    * @return <strong>true</strong> if the accessor resource has the specified global permissions,
-    *         <strong>false</strong> otherwise
-    * @throws java.lang.IllegalArgumentException if the accessorResource does not exist, or
-    *                                            if no resource class of resourceClassName exists, or
-    *                                            if any resourcePermission is invalid for the resource class
-    */
-   public boolean hasGlobalResourcePermissions(Resource accessorResource,
-                                               String resourceClassName,
-                                               Set<ResourcePermission> resourcePermissions);
-
-   /**
-    * Checks if the session resource has the specified global resource permissions on the specified
-    * resource class in the session resource's domain.
-    * This method takes into account any global permissions that the session resource may have.
-    *
-    * @param resourceClassName   a string resource class name
-    * @param resourcePermissions the permissions to be checked
-    * @return <strong>true</strong> if the session resource has the specified global permissions,
-    *         <strong>false</strong> otherwise
-    * @throws java.lang.IllegalArgumentException if no resource class of resourceClassName exists, or
-    *                                            if any resourcePermission is invalid for the resource class
-    */
-   public boolean hasGlobalResourcePermissions(String resourceClassName,
-                                               Set<ResourcePermission> resourcePermissions);
-
-   /**
     * Checks if the specified accessor resource has the specified global resource permissions on
     * the specified resource class in the specified domain.
     * This method takes into account any global permissions that the accessor resource may have.
@@ -829,61 +411,6 @@ public interface AccessControlContext {
                                                Set<ResourcePermission> resourcePermissions);
 
    /**
-    * Checks if the session resource has the specified global resource permissions on the specified
-    * resource class in the specified domain.
-    * This method takes into account any global permissions that the session resource may have.
-    *
-    * @param resourceClassName   a string resource class name
-    * @param domainName          the domain in which the permissions should be checked
-    * @param resourcePermissions the permissions to be checked
-    * @return <strong>true</strong> if the session resource has the specified global permissions,
-    *         <strong>false</strong> otherwise
-    * @throws java.lang.IllegalArgumentException if no resource class of resourceClassName exists, or
-    *                                            if any resourcePermission is invalid for the resource class, or
-    *                                            if no domain of domainName exists
-    */
-   public boolean hasGlobalResourcePermissions(String resourceClassName,
-                                               String domainName,
-                                               Set<ResourcePermission> resourcePermissions);
-
-   /**
-    * Checks if the specified accessor resource has the specified global resource permissions on
-    * the specified resource class in the session resource's domain.
-    * This method takes into account any global permissions that the accessor resource may have.
-    *
-    * @param accessorResource    the resource on which access is being checked
-    * @param resourceClassName   a string resource class name
-    * @param resourcePermission  the permission to be checked
-    * @param resourcePermissions the other (optional) permissions to be checked
-    * @return <strong>true</strong> if the accessor resource has the specified global permissions,
-    *         <strong>false</strong> otherwise
-    * @throws java.lang.IllegalArgumentException if the accessorResource does not exist, or
-    *                                            if no resource class of resourceClassName exists, or
-    *                                            if any resourcePermission is invalid for the resource class
-    */
-   public boolean hasGlobalResourcePermissions(Resource accessorResource,
-                                               String resourceClassName,
-                                               ResourcePermission resourcePermission,
-                                               ResourcePermission... resourcePermissions);
-
-   /**
-    * Checks if the session resource has the specified global resource permissions on the specified
-    * resource class in the session resource's domain.
-    * This method takes into account any global permissions that the session resource may have.
-    *
-    * @param resourceClassName   a string resource class name
-    * @param resourcePermission  the permission to be checked
-    * @param resourcePermissions the other (optional) permissions to be checked
-    * @return <strong>true</strong> if the session resource has the specified global permissions,
-    *         <strong>false</strong> otherwise
-    * @throws java.lang.IllegalArgumentException if no resource class of resourceClassName exists, or
-    *                                            if any resourcePermission is invalid for the resource class
-    */
-   public boolean hasGlobalResourcePermissions(String resourceClassName,
-                                               ResourcePermission resourcePermission,
-                                               ResourcePermission... resourcePermissions);
-
-   /**
     * Checks if the specified accessor resource has the specified global resource permissions on
     * the specified resource class in the specified domain.
     * This method takes into account any global permissions that the accessor resource may have.
@@ -902,26 +429,6 @@ public interface AccessControlContext {
     */
    public boolean hasGlobalResourcePermissions(Resource accessorResource,
                                                String resourceClassName,
-                                               String domainName,
-                                               ResourcePermission resourcePermission,
-                                               ResourcePermission... resourcePermissions);
-
-   /**
-    * Checks if the session resource has the specified global resource permissions on the specified
-    * resource class in the specified domain.
-    * This method takes into account any global permissions that the session resource may have.
-    *
-    * @param resourceClassName   a string resource class name
-    * @param domainName          the domain in which the permissions should be checked
-    * @param resourcePermission  the permission to be checked
-    * @param resourcePermissions the other (optional) permissions to be checked
-    * @return <strong>true</strong> if the session resource has the specified global permissions,
-    *         <strong>false</strong> otherwise
-    * @throws java.lang.IllegalArgumentException if no resource class of resourceClassName exists, or
-    *                                            if any resourcePermission is invalid for the resource class, or
-    *                                            if no domain of domainName exists
-    */
-   public boolean hasGlobalResourcePermissions(String resourceClassName,
                                                String domainName,
                                                ResourcePermission resourcePermission,
                                                ResourcePermission... resourcePermissions);
@@ -944,20 +451,6 @@ public interface AccessControlContext {
                                          Set<ResourcePermission> resourcePermissions);
 
    /**
-    * Checks if the session resource has the specified resource permissions to the specified accessed resource.
-    * This method takes into account direct, inherited and global permissions of the session resource.
-    *
-    * @param accessedResource    the resource on which access is being requested
-    * @param resourcePermissions the permissions to be checked
-    * @throws java.lang.IllegalArgumentException if the accessedResource does not exists, or
-    *                                            if any resourcePermission is invalid for the resource class of accessedResource
-    * @throws com.acciente.oacc.NotAuthorizedException if the session resource <strong>does not</strong> have the
-    *                                                  specified permissions
-    */
-   public void assertResourcePermissions(Resource accessedResource,
-                                         Set<ResourcePermission> resourcePermissions);
-
-   /**
     * Checks if the specified accessor resource has the specified resource permissions
     * to the specified accessed resource.
     * This method takes into account direct, inherited and global permissions of accessor resource.
@@ -977,22 +470,6 @@ public interface AccessControlContext {
                                          ResourcePermission... resourcePermissions);
 
    /**
-    * Checks if the session resource has the specified resource permissions to the specified accessed resource.
-    * This method takes into account direct, inherited and global permissions of the session resource.
-    *
-    * @param accessedResource    the resource on which access is being requested
-    * @param resourcePermission  the permission to be checked
-    * @param resourcePermissions the other (optional) permissions to be checked
-    * @throws java.lang.IllegalArgumentException if the accessedResource does not exists, or
-    *                                            if any resourcePermission is invalid for the resource class of accessedResource
-    * @throws com.acciente.oacc.NotAuthorizedException if the session resource <strong>does not</strong> have the
-    *                                                  specified permissions
-    */
-   public void assertResourcePermissions(Resource accessedResource,
-                                         ResourcePermission resourcePermission,
-                                         ResourcePermission... resourcePermissions);
-
-   /**
     * Checks if the specified accessor resource has the specified resource permissions
     * to the specified accessed resource.
     * This method takes into account direct, inherited and global permissions of accessor resource.
@@ -1006,19 +483,6 @@ public interface AccessControlContext {
     */
    public boolean hasResourcePermissions(Resource accessorResource,
                                          Resource accessedResource,
-                                         Set<ResourcePermission> resourcePermissions);
-
-   /**
-    * Checks if the session resource has the specified resource permissions to the specified accessed resource.
-    * This method takes into account direct, inherited and global permissions of the session resource.
-    *
-    * @param accessedResource    the resource on which access is being requested
-    * @param resourcePermissions the permissions to be checked
-    * @return <strong>true</strong> if the session resource has the specified permissions
-    * @throws java.lang.IllegalArgumentException if the accessedResource does not exists, or
-    *                                            if any resourcePermission is invalid for the resource class of accessedResource
-    */
-   public boolean hasResourcePermissions(Resource accessedResource,
                                          Set<ResourcePermission> resourcePermissions);
 
    /**
@@ -1038,59 +502,6 @@ public interface AccessControlContext {
                                          Resource accessedResource,
                                          ResourcePermission resourcePermission,
                                          ResourcePermission... resourcePermissions);
-
-   /**
-    * Checks if the session resource has the specified resource permissions to the specified accessed resource.
-    * This method takes into account direct, inherited and global permissions of the session resource.
-    *
-    * @param accessedResource    the resource on which access is being requested
-    * @param resourcePermission  the permission to be checked
-    * @param resourcePermissions the other (optional) permissions to be checked
-    * @return <strong>true</strong> if the session resource has the specified permissions
-    * @throws java.lang.IllegalArgumentException if the accessedResource does not exists, or
-    *                                            if any resourcePermission is invalid for the resource class of accessedResource
-    */
-   public boolean hasResourcePermissions(Resource accessedResource,
-                                         ResourcePermission resourcePermission,
-                                         ResourcePermission... resourcePermissions);
-
-   /**
-    * Checks if the specified accessor resource has the specified create permissions on an object of
-    * the specified class in the session resource's domain.
-    * The method takes into account any any direct and inherited resource create permissions of the
-    * specified accessor resource.
-    *
-    * @param accessorResource          the resource requesting the access
-    * @param resourceClassName         a string resource class name
-    * @param resourceCreatePermissions the create permissions to be checked
-    * @throws java.lang.IllegalArgumentException       if the accessorResource does not exist, or
-    *                                                  if no resource class of resourceClassName exists, or
-    *                                                  if any resourceCreatePermission is invalid for the resource class
-    * @throws com.acciente.oacc.NotAuthorizedException if the accessor resource does <strong>not</strong> have the
-    *                                                  specified resource create permissions for the specified class
-    *                                                  in the current session domain, or
-    *                                                  if the accessor resource does not exist
-    */
-   public void assertResourceCreatePermissions(Resource accessorResource,
-                                               String resourceClassName,
-                                               Set<ResourceCreatePermission> resourceCreatePermissions);
-
-   /**
-    * Checks if the session resource has the specified create permissions on an object of the specified
-    * resource class in the session resource's domain.
-    * The method takes into account any any direct and inherited resource create permissions of the
-    * specified session resource.
-    *
-    * @param resourceClassName         a string resource class name
-    * @param resourceCreatePermissions the create permissions to be checked
-    * @throws java.lang.IllegalArgumentException       if no resource class of resourceClassName exists, or
-    *                                                  if any resourceCreatePermission is invalid for the resource class
-    * @throws com.acciente.oacc.NotAuthorizedException if the session resource does <strong>not</strong> have the
-    *                                                  specified resource create permissions for the specified class
-    *                                                  in the current session domain
-    */
-   public void assertResourceCreatePermissions(String resourceClassName,
-                                               Set<ResourceCreatePermission> resourceCreatePermissions);
 
    /**
     * Checks if the specified accessor resource has the specified create permissions on an object of
@@ -1115,68 +526,6 @@ public interface AccessControlContext {
                                                String resourceClassName,
                                                String domainName,
                                                Set<ResourceCreatePermission> resourceCreatePermissions);
-
-   /**
-    * Checks if the session resource has the specified create permissions on an object of the specified
-    * resource class in the specified domain.
-    * The method takes into account any any direct and inherited resource create permissions of the
-    * specified session resource.
-    *
-    * @param resourceClassName         a string resource class name
-    * @param domainName                the domain in which the permissions should be checked
-    * @param resourceCreatePermissions the create permissions to be checked
-    * @throws java.lang.IllegalArgumentException       if no resource class of resourceClassName exists, or
-    *                                                  if any resourceCreatePermission is invalid for the resource class, or
-    *                                                  if no domain of domainName exists
-    * @throws com.acciente.oacc.NotAuthorizedException if the session resource does <strong>not</strong> have the
-    *                                                  specified resource create permissions for the specified class
-    *                                                  in the specified domain
-    */
-   public void assertResourceCreatePermissions(String resourceClassName,
-                                               String domainName,
-                                               Set<ResourceCreatePermission> resourceCreatePermissions);
-
-   /**
-    * Checks if the specified accessor resource has the specified create permissions on an object of
-    * the specified class in the session resource's domain.
-    * The method takes into account any any direct and inherited resource create permissions of the
-    * specified accessor resource.
-    *
-    * @param accessorResource          the resource requesting the access
-    * @param resourceClassName         a string resource class name
-    * @param resourceCreatePermission  the create permission to be checked
-    * @param resourceCreatePermissions the other (optional) create permissions to be checked
-    * @throws java.lang.IllegalArgumentException       if the accessorResource does not exist, or
-    *                                                  if no resource class of resourceClassName exists, or
-    *                                                  if any resourceCreatePermission is invalid for the resource class
-    * @throws com.acciente.oacc.NotAuthorizedException if the accessor resource does <strong>not</strong> have the
-    *                                                  specified resource create permissions for the specified class
-    *                                                  in the current session domain, or
-    *                                                  if the accessor resource does not exist
-    */
-   public void assertResourceCreatePermissions(Resource accessorResource,
-                                               String resourceClassName,
-                                               ResourceCreatePermission resourceCreatePermission,
-                                               ResourceCreatePermission... resourceCreatePermissions);
-
-   /**
-    * Checks if the session resource has the specified create permissions on an object of the specified
-    * resource class in the session resource's domain.
-    * The method takes into account any any direct and inherited resource create permissions of the
-    * specified session resource.
-    *
-    * @param resourceClassName         a string resource class name
-    * @param resourceCreatePermission  the create permission to be checked
-    * @param resourceCreatePermissions the other (optional) create permissions to be checked
-    * @throws java.lang.IllegalArgumentException       if no resource class of resourceClassName exists, or
-    *                                                  if any resourceCreatePermission is invalid for the resource class
-    * @throws com.acciente.oacc.NotAuthorizedException if the session resource does <strong>not</strong> have the
-    *                                                  specified resource create permissions for the specified class
-    *                                                  in the current session domain
-    */
-   public void assertResourceCreatePermissions(String resourceClassName,
-                                               ResourceCreatePermission resourceCreatePermission,
-                                               ResourceCreatePermission... resourceCreatePermissions);
 
    /**
     * Checks if the specified accessor resource has the specified create permissions on an object of
@@ -1205,65 +554,6 @@ public interface AccessControlContext {
                                                ResourceCreatePermission... resourceCreatePermissions);
 
    /**
-    * Checks if the session resource has the specified create permissions on an object of the specified
-    * resource class in the specified domain.
-    * The method takes into account any any direct and inherited resource create permissions of the
-    * specified session resource.
-    *
-    * @param resourceClassName         a string resource class name
-    * @param domainName                the domain in which the permissions should be checked
-    * @param resourceCreatePermission  the create permission to be checked
-    * @param resourceCreatePermissions the other (optional) create permissions to be checked
-    * @throws java.lang.IllegalArgumentException       if no resource class of resourceClassName exists, or
-    *                                                  if any resourceCreatePermission is invalid for the resource class, or
-    *                                                  if no domain of domainName exists
-    * @throws com.acciente.oacc.NotAuthorizedException if the session resource does <strong>not</strong> have the
-    *                                                  specified resource create permissions for the specified class
-    *                                                  in the specified domain
-    */
-   public void assertResourceCreatePermissions(String resourceClassName,
-                                               String domainName,
-                                               ResourceCreatePermission resourceCreatePermission,
-                                               ResourceCreatePermission... resourceCreatePermissions);
-
-   /**
-    * Checks if the specified accessor resource has the specified create permissions on an object of
-    * the specified class in the session resource's domain.
-    * The method takes into account any any direct and inherited resource create permissions of the
-    * specified accessor resource.
-    *
-    * @param accessorResource          the resource requesting the access
-    * @param resourceClassName         a string resource class name
-    * @param resourceCreatePermissions the create permissions to be checked
-    * @return <strong>true</strong> if the accessor resource has the specified resource create permissions for the
-    *         specified resource class in the current session domain,
-    *         <strong>false</strong> otherwise
-    * @throws java.lang.IllegalArgumentException  if the accessorResource does not exist, or
-    *                                             if no resource class of resourceClassName exists, or
-    *                                             if any resourceCreatePermission is invalid for the resource class
-    */
-   public boolean hasResourceCreatePermissions(Resource accessorResource,
-                                               String resourceClassName,
-                                               Set<ResourceCreatePermission> resourceCreatePermissions);
-
-   /**
-    * Checks if the session resource has the specified create permissions on an object of the specified
-    * resource class in the session resource's domain.
-    * The method takes into account any any direct and inherited resource create permissions of the
-    * specified session resource.
-    *
-    * @param resourceClassName         a string resource class name
-    * @param resourceCreatePermissions the create permissions to be checked
-    * @return <strong>true</strong> if the session resource has the specified resource create permissions for the
-    *         specified resource class in the current session domain,
-    *         <strong>false</strong> otherwise
-    * @throws java.lang.IllegalArgumentException  if no resource class of resourceClassName exists, or
-    *                                             if any resourceCreatePermission is invalid for the resource class
-    */
-   public boolean hasResourceCreatePermissions(String resourceClassName,
-                                               Set<ResourceCreatePermission> resourceCreatePermissions);
-
-   /**
     * Checks if the specified accessor resource has the specified create permissions on an object of
     * the specified class in the specified domain.
     * The method takes into account any any direct and inherited resource create permissions of the
@@ -1285,67 +575,6 @@ public interface AccessControlContext {
                                                String resourceClassName,
                                                String domainName,
                                                Set<ResourceCreatePermission> resourceCreatePermissions);
-
-   /**
-    * Checks if the session resource has the specified create permissions on an object of the specified
-    * resource class in the specified domain.
-    * The method takes into account any any direct and inherited resource create permissions of the
-    * specified session resource.
-    *
-    * @param resourceClassName         a string resource class name
-    * @param domainName                the domain in which the permissions should be checked
-    * @param resourceCreatePermissions the create permissions to be checked
-    * @return <strong>true</strong> if the session resource has the specified resource create permissions for the
-    *         specified resource class in the specified domain,
-    *         <strong>false</strong> otherwise
-    * @throws java.lang.IllegalArgumentException if no resource class of resourceClassName exists, or
-    *                                            if any resourceCreatePermission is invalid for the resource class, or
-    *                                            if no domain of domainName exists
-    */
-   public boolean hasResourceCreatePermissions(String resourceClassName,
-                                               String domainName,
-                                               Set<ResourceCreatePermission> resourceCreatePermissions);
-
-   /**
-    * Checks if the specified accessor resource has the specified create permissions on an object of
-    * the specified class in the session resource's domain.
-    * The method takes into account any any direct and inherited resource create permissions of the
-    * specified accessor resource.
-    *
-    * @param accessorResource          the resource requesting the access
-    * @param resourceClassName         a string resource class name
-    * @param resourceCreatePermission  the create permission to be checked
-    * @param resourceCreatePermissions the other (optional) create permissions to be checked
-    * @return <strong>true</strong> if the accessor resource has the specified resource create permissions for the
-    *         specified resource class in the current session domain,
-    *         <strong>false</strong> otherwise
-    * @throws java.lang.IllegalArgumentException  if the accessorResource does not exist, or
-    *                                             if no resource class of resourceClassName exists, or
-    *                                             if any resourceCreatePermission is invalid for the resource class
-    */
-   public boolean hasResourceCreatePermissions(Resource accessorResource,
-                                               String resourceClassName,
-                                               ResourceCreatePermission resourceCreatePermission,
-                                               ResourceCreatePermission... resourceCreatePermissions);
-
-   /**
-    * Checks if the session resource has the specified create permissions on an object of the specified
-    * resource class in the session resource's domain.
-    * The method takes into account any any direct and inherited resource create permissions of the
-    * specified session resource.
-    *
-    * @param resourceClassName         a string resource class name
-    * @param resourceCreatePermission  the create permission to be checked
-    * @param resourceCreatePermissions the other (optional) create permissions to be checked
-    * @return <strong>true</strong> if the session resource has the specified resource create permissions for the
-    *         specified resource class in the current session domain,
-    *         <strong>false</strong> otherwise
-    * @throws java.lang.IllegalArgumentException  if no resource class of resourceClassName exists, or
-    *                                             if any resourceCreatePermission is invalid for the resource class
-    */
-   public boolean hasResourceCreatePermissions(String resourceClassName,
-                                               ResourceCreatePermission resourceCreatePermission,
-                                               ResourceCreatePermission... resourceCreatePermissions);
 
    /**
     * Checks if the specified accessor resource has the specified create permissions on an object of
@@ -1371,66 +600,6 @@ public interface AccessControlContext {
                                                String domainName,
                                                ResourceCreatePermission resourceCreatePermission,
                                                ResourceCreatePermission... resourceCreatePermissions);
-
-   /**
-    * Checks if the session resource has the specified create permissions on an object of the specified
-    * resource class in the specified domain.
-    * The method takes into account any any direct and inherited resource create permissions of the
-    * specified session resource.
-    *
-    * @param resourceClassName         a string resource class name
-    * @param domainName                the domain in which the permissions should be checked
-    * @param resourceCreatePermission  the create permission to be checked
-    * @param resourceCreatePermissions the other (optional) create permissions to be checked
-    * @return <strong>true</strong> if the session resource has the specified resource create permissions for the
-    *         specified resource class in the specified domain,
-    *         <strong>false</strong> otherwise
-    * @throws java.lang.IllegalArgumentException if no resource class of resourceClassName exists, or
-    *                                            if any resourceCreatePermission is invalid for the resource class, or
-    *                                            if no domain of domainName exists
-    */
-   public boolean hasResourceCreatePermissions(String resourceClassName,
-                                               String domainName,
-                                               ResourceCreatePermission resourceCreatePermission,
-                                               ResourceCreatePermission... resourceCreatePermissions);
-
-   /**
-    * Checks if the specified accessor resource would receive the specified permissions on an object of
-    * the specified class in the session resource's domain, if it were to create such an object.
-    * The method takes into account any resource create permissions and global resource permissions
-    * of the specified accessor resource.
-    *
-    * @param accessorResource    the resource requesting the access
-    * @param resourceClassName   a string resource class name
-    * @param resourcePermissions the permissions to be checked
-    * @throws java.lang.IllegalArgumentException       if the accessorResource does not exist, or
-    *                                                  if no resource class of resourceClassName exists, or
-    *                                                  if any resourcePermission is invalid for the resource class
-    * @throws com.acciente.oacc.NotAuthorizedException if the accessor resource would <strong>not</strong> receive the
-    *                                                  specified permissions after creating a resource of the specified class
-    *                                                  in the current session domain, or
-    *                                                  if the accessor resource does not exist
-    */
-   public void assertPostCreateResourcePermissions(Resource accessorResource,
-                                                   String resourceClassName,
-                                                   Set<ResourcePermission> resourcePermissions);
-
-   /**
-    * Checks if the session resource would receive the specified permissions on an object of
-    * the specified class in the session resource's domain, if it were to create such an object.
-    * The method takes into account any resource create permissions and global resource permissions
-    * of the session resource.
-    *
-    * @param resourceClassName   a string resource class name
-    * @param resourcePermissions the permissions to be checked
-    * @throws java.lang.IllegalArgumentException       if no resource class of resourceClassName exists, or
-    *                                                  if any resourcePermission is invalid for the resource class
-    * @throws com.acciente.oacc.NotAuthorizedException if the session resource would <strong>not</strong> receive the
-    *                                                  specified permissions after creating a resource of the specified class
-    *                                                  in the current session domain
-    */
-   public void assertPostCreateResourcePermissions(String resourceClassName,
-                                                   Set<ResourcePermission> resourcePermissions);
 
    /**
     * Checks if the specified accessor resource would receive the specified permissions on an object of
@@ -1455,68 +624,6 @@ public interface AccessControlContext {
                                                    String resourceClassName,
                                                    String domainName,
                                                    Set<ResourcePermission> resourcePermissions);
-
-   /**
-    * Checks if the session resource would receive the specified permissions on an object of
-    * the specified class in the specified domain, if it were to create such an object.
-    * The method takes into account any resource create permissions and global resource permissions
-    * of the session resource.
-    *
-    * @param resourceClassName   a string resource class name
-    * @param domainName          the domain in which the permissions should be checked
-    * @param resourcePermissions the permissions to be checked
-    * @throws java.lang.IllegalArgumentException       if no resource class of resourceClassName exists, or
-    *                                                  if no domain of domainName exists, or
-    *                                                  if any resourcePermission is invalid for the resource class
-    * @throws com.acciente.oacc.NotAuthorizedException if the session resource would <strong>not</strong> receive the
-    *                                                  specified permissions after creating a resource of the specified
-    *                                                  class in the specified domain
-    */
-   public void assertPostCreateResourcePermissions(String resourceClassName,
-                                                   String domainName,
-                                                   Set<ResourcePermission> resourcePermissions);
-
-   /**
-    * Checks if the specified accessor resource would receive the specified permissions on an object of
-    * the specified class in the session resource's domain, if it were to create such an object.
-    * The method takes into account any resource create permissions and global resource permissions
-    * of the specified accessor resource.
-    *
-    * @param accessorResource    the resource requesting the access
-    * @param resourceClassName   a string resource class name
-    * @param resourcePermission  the permission to be checked
-    * @param resourcePermissions the other (optional) permissions to be checked
-    * @throws java.lang.IllegalArgumentException       if the accessorResource does not exist, or
-    *                                                  if no resource class of resourceClassName exists, or
-    *                                                  if any resourcePermission is invalid for the resource class
-    * @throws com.acciente.oacc.NotAuthorizedException if the accessor resource would <strong>not</strong> receive the
-    *                                                  specified permissions after creating a resource of the specified class
-    *                                                  in the current session domain, or
-    *                                                  if the accessor resource does not exist
-    */
-   public void assertPostCreateResourcePermissions(Resource accessorResource,
-                                                   String resourceClassName,
-                                                   ResourcePermission resourcePermission,
-                                                   ResourcePermission... resourcePermissions);
-
-   /**
-    * Checks if the session resource would receive the specified permissions on an object of
-    * the specified class in the session resource's domain, if it were to create such an object.
-    * The method takes into account any resource create permissions and global resource permissions
-    * of the session resource.
-    *
-    * @param resourceClassName   a string resource class name
-    * @param resourcePermission  the permission to be checked
-    * @param resourcePermissions the other (optional) permissions to be checked
-    * @throws java.lang.IllegalArgumentException       if no resource class of resourceClassName exists, or
-    *                                                  if any resourcePermission is invalid for the resource class
-    * @throws com.acciente.oacc.NotAuthorizedException if the session resource would <strong>not</strong> receive the
-    *                                                  specified permissions after creating a resource of the specified class
-    *                                                  in the current session domain
-    */
-   public void assertPostCreateResourcePermissions(String resourceClassName,
-                                                   ResourcePermission resourcePermission,
-                                                   ResourcePermission... resourcePermissions);
 
    /**
     * Checks if the specified accessor resource would receive the specified permissions on an object of
@@ -1545,65 +652,6 @@ public interface AccessControlContext {
                                                    ResourcePermission... resourcePermissions);
 
    /**
-    * Checks if the session resource would receive the specified permissions on an object of
-    * the specified class in the specified domain, if it were to create such an object.
-    * The method takes into account any resource create permissions and global resource permissions
-    * of the session resource.
-    *
-    * @param resourceClassName   a string resource class name
-    * @param domainName          the domain in which the permissions should be checked
-    * @param resourcePermission  the permission to be checked
-    * @param resourcePermissions the other (optional) permissions to be checked
-    * @throws java.lang.IllegalArgumentException       if no resource class of resourceClassName exists, or
-    *                                                  if no domain of domainName exists, or
-    *                                                  if any resourcePermission is invalid for the resource class
-    * @throws com.acciente.oacc.NotAuthorizedException if the session resource would <strong>not</strong> receive the
-    *                                                  specified permissions after creating a resource of the specified
-    *                                                  class in the specified domain
-    */
-   public void assertPostCreateResourcePermissions(String resourceClassName,
-                                                   String domainName,
-                                                   ResourcePermission resourcePermission,
-                                                   ResourcePermission... resourcePermissions);
-
-   /**
-    * Checks if the specified accessor resource would receive the specified permissions on an object of
-    * the specified class in the session resource's domain, if it were to create such an object.
-    * The method takes into account any resource create permissions and global resource permissions
-    * of the specified accessor resource.
-    *
-    * @param accessorResource    the resource requesting the access
-    * @param resourceClassName   a string resource class name
-    * @param resourcePermissions the permissions to be checked
-    * @return <strong>true</strong> if the accessor resource would receive the specified permissions after creating a
-    *         resource of the specified class in the current session domain,
-    *         <strong>false</strong> otherwise
-    * @throws java.lang.IllegalArgumentException if the accessorResource does not exist, or
-    *                                            if no resource class of resourceClassName exists, or
-    *                                            if any resourcePermission is invalid for the resource class
-    */
-   public boolean hasPostCreateResourcePermissions(Resource accessorResource,
-                                                   String resourceClassName,
-                                                   Set<ResourcePermission> resourcePermissions);
-
-   /**
-    * Checks if the session resource would receive the specified permissions on an object of
-    * the specified class in the session resource's domain, if it were to create such an object.
-    * The method takes into account any resource create permissions and global resource permissions
-    * of the session resource.
-    *
-    * @param resourceClassName   a string resource class name
-    * @param resourcePermissions the permissions to be checked
-    * @return <strong>true</strong> if the session resource would receive the specified permissions after creating a
-    *         resource of the specified class in the current session domain,
-    *         <strong>false</strong> otherwise
-    * @throws java.lang.IllegalArgumentException if no resource class of resourceClassName exists, or
-    *                                            if any resourcePermission is invalid for the resource class
-    */
-   public boolean hasPostCreateResourcePermissions(String resourceClassName,
-                                                   Set<ResourcePermission> resourcePermissions);
-
-   /**
     * Checks if the specified accessor resource would receive the specified permissions on an object of
     * the specified class in the specified domain, if it were to create such an object.
     * The method takes into account any resource create permissions and global resource permissions
@@ -1627,67 +675,6 @@ public interface AccessControlContext {
                                                    Set<ResourcePermission> resourcePermissions);
 
    /**
-    * Checks if the session resource would receive the specified permissions on an object of
-    * the specified class in the specified domain, if it were to create such an object.
-    * The method takes into account any resource create permissions and global resource permissions
-    * of the specified session resource.
-    *
-    * @param resourceClassName   a string resource class name
-    * @param domainName          the domain in which the permissions should be checked
-    * @param resourcePermissions the permissions to be checked
-    * @return <strong>true</strong> if the session resource would receive the specified permissions after creating a
-    *         resource of the specified class in the specified domain,
-    *         <strong>false</strong> otherwise
-    * @throws java.lang.IllegalArgumentException if no resource class of resourceClassName exists, or
-    *                                            if no domain of domainName exists, or
-    *                                            if any resourcePermission is invalid for the resource class
-    */
-   public boolean hasPostCreateResourcePermissions(String resourceClassName,
-                                                   String domainName,
-                                                   Set<ResourcePermission> resourcePermissions);
-
-   /**
-    * Checks if the specified accessor resource would receive the specified permissions on an object of
-    * the specified class in the session resource's domain, if it were to create such an object.
-    * The method takes into account any resource create permissions and global resource permissions
-    * of the specified accessor resource.
-    *
-    * @param accessorResource    the resource requesting the access
-    * @param resourceClassName   a string resource class name
-    * @param resourcePermission  the permission to be checked
-    * @param resourcePermissions the other (optional) permissions to be checked
-    * @return <strong>true</strong> if the accessor resource would receive the specified permissions after creating a
-    *         resource of the specified class in the current session domain,
-    *         <strong>false</strong> otherwise
-    * @throws java.lang.IllegalArgumentException if the accessorResource does not exist, or
-    *                                            if no resource class of resourceClassName exists, or
-    *                                            if any resourcePermission is invalid for the resource class
-    */
-   public boolean hasPostCreateResourcePermissions(Resource accessorResource,
-                                                   String resourceClassName,
-                                                   ResourcePermission resourcePermission,
-                                                   ResourcePermission... resourcePermissions);
-
-   /**
-    * Checks if the session resource would receive the specified permissions on an object of
-    * the specified class in the session resource's domain, if it were to create such an object.
-    * The method takes into account any resource create permissions and global resource permissions
-    * of the session resource.
-    *
-    * @param resourceClassName   a string resource class name
-    * @param resourcePermission  the permission to be checked
-    * @param resourcePermissions the other (optional) permissions to be checked
-    * @return <strong>true</strong> if the session resource would receive the specified permissions after creating a
-    *         resource of the specified class in the current session domain,
-    *         <strong>false</strong> otherwise
-    * @throws java.lang.IllegalArgumentException if no resource class of resourceClassName exists, or
-    *                                            if any resourcePermission is invalid for the resource class
-    */
-   public boolean hasPostCreateResourcePermissions(String resourceClassName,
-                                                   ResourcePermission resourcePermission,
-                                                   ResourcePermission... resourcePermissions);
-
-   /**
     * Checks if the specified accessor resource would receive the specified permissions on an object of
     * the specified class in the specified domain, if it were to create such an object.
     * The method takes into account any resource create permissions and global resource permissions
@@ -1708,28 +695,6 @@ public interface AccessControlContext {
     */
    public boolean hasPostCreateResourcePermissions(Resource accessorResource,
                                                    String resourceClassName,
-                                                   String domainName,
-                                                   ResourcePermission resourcePermission,
-                                                   ResourcePermission... resourcePermissions);
-
-   /**
-    * Checks if the session resource would receive the specified permissions on an object of
-    * the specified class in the specified domain, if it were to create such an object.
-    * The method takes into account any resource create permissions and global resource permissions
-    * of the specified session resource.
-    *
-    * @param resourceClassName   a string resource class name
-    * @param domainName          the domain in which the permissions should be checked
-    * @param resourcePermission  the permission to be checked
-    * @param resourcePermissions the other (optional) permissions to be checked
-    * @return <strong>true</strong> if the session resource would receive the specified permissions after creating a
-    *         resource of the specified class in the specified domain,
-    *         <strong>false</strong> otherwise
-    * @throws java.lang.IllegalArgumentException if no resource class of resourceClassName exists, or
-    *                                            if no domain of domainName exists, or
-    *                                            if any resourcePermission is invalid for the resource class
-    */
-   public boolean hasPostCreateResourcePermissions(String resourceClassName,
                                                    String domainName,
                                                    ResourcePermission resourcePermission,
                                                    ResourcePermission... resourcePermissions);
