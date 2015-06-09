@@ -68,7 +68,8 @@ public class TestAccessControl_createAuthenticatableResource extends TestAccessC
       assertThat(resourcesByPermission.isEmpty(), is(true));
 
       // create resource and verify
-      final Resource resource = accessControlContext.createResource(resourceClassName, domainName,
+      final Resource resource = accessControlContext.createResource(resourceClassName,
+                                                                    domainName,
                                                                     PasswordCredentials.newInstance(password));
 
       assertThat(resource, is(not(nullValue())));
@@ -80,7 +81,8 @@ public class TestAccessControl_createAuthenticatableResource extends TestAccessC
       assertThat(resourceClassInfo.getResourceClassName(), is(resourceClassName));
 
       // create another resource with a short password
-      final Resource resource_shortPwd = accessControlContext.createResource(resourceClassName, domainName,
+      final Resource resource_shortPwd = accessControlContext.createResource(resourceClassName,
+                                                                             domainName,
                                                                      PasswordCredentials.newInstance(shortPwd));
 
       assertThat(resource_shortPwd, is(not(nullValue())));
@@ -93,7 +95,8 @@ public class TestAccessControl_createAuthenticatableResource extends TestAccessC
       assertThat(resourceClassInfo2.getResourceClassName(), is(resourceClassName));
 
       // create another resource with a whitespaced password
-      final Resource resource_whitespacedPwd = accessControlContext.createResource(resourceClassName, domainName,
+      final Resource resource_whitespacedPwd = accessControlContext.createResource(resourceClassName,
+                                                                                   domainName,
                                                                      PasswordCredentials.newInstance(whitespacedPwd));
 
       assertThat(resource_whitespacedPwd, is(not(nullValue())));
@@ -152,36 +155,6 @@ public class TestAccessControl_createAuthenticatableResource extends TestAccessC
       resourcesByPermission2 = accessControlContext.getResourcesByResourcePermissions(resourceClassName,
                                                                                       implicitResourcePermission2);
       assertThat(resourcesByPermission2.size(), is(1));
-
-      // verify we can authenticate
-      accessControlContext.authenticate(resource, PasswordCredentials.newInstance(password));
-   }
-
-   @Test
-   public void createAuthenticatableResource_validWithDefaultSessionDomain() {
-      final String resourceClassName = generateResourceClass(true, false);
-      final char[] password = generateUniquePassword();
-
-      // (ironically,) set up an authenticatable resource with resource class create permission
-      final Resource authenticatedResource = generateResourceAndAuthenticate();
-      final String domainName = accessControlContext.getDomainNameByResource(authenticatedResource);
-      final String permissionName = generateResourceClassPermission(resourceClassName);
-      final ResourcePermission grantedResourcePermission = ResourcePermissions.getInstance(permissionName);
-      grantResourceCreatePermission(authenticatedResource, resourceClassName, domainName, permissionName);
-
-      Set<Resource> resourcesByPermission = accessControlContext.getResourcesByResourcePermissions(resourceClassName,
-                                                                                                   grantedResourcePermission);
-      assertThat(resourcesByPermission.isEmpty(), is(true));
-
-      // create resource and verify
-      final Resource resource = accessControlContext.createResource(resourceClassName,
-                                                                    PasswordCredentials.newInstance(password));
-
-      assertThat(resource, is(not(nullValue())));
-      assertThat(accessControlContext.getDomainNameByResource(resource), is(domainName));
-      resourcesByPermission = accessControlContext.getResourcesByResourcePermissions(resourceClassName,
-                                                                                     grantedResourcePermission);
-      assertThat(resourcesByPermission.size(), is(1));
 
       // verify we can authenticate
       accessControlContext.authenticate(resource, PasswordCredentials.newInstance(password));
@@ -446,14 +419,6 @@ public class TestAccessControl_createAuthenticatableResource extends TestAccessC
       catch (IllegalArgumentException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("credentials not supported, but specified"));
       }
-
-      try {
-         accessControlContext.createResource(resourceClassName, PasswordCredentials.newInstance(password));
-         fail("creating authenticatable resource for unauthenticatable resource class name should have failed");
-      }
-      catch (IllegalArgumentException e) {
-         assertThat(e.getMessage().toLowerCase(), containsString("credentials not supported, but specified"));
-      }
    }
 
    @Test
@@ -465,30 +430,6 @@ public class TestAccessControl_createAuthenticatableResource extends TestAccessC
       final char[] password = generateUniquePassword();
 
       // attempt to create resources with null parameters
-      try {
-         accessControlContext.createResource(null, PasswordCredentials.newInstance(password));
-         fail("creating authenticatable resource with null resource class name should have failed");
-      }
-      catch (NullPointerException e) {
-         assertThat(e.getMessage().toLowerCase(), containsString("resource class required"));
-      }
-
-      try {
-         accessControlContext.createResource(resourceClassName, (Credentials) null);
-         fail("creating authenticatable resource with null credentials should have failed");
-      }
-      catch (NullPointerException e) {
-         assertThat(e.getMessage().toLowerCase(), containsString("credentials required, none specified"));
-      }
-
-      try {
-         accessControlContext.createResource(resourceClassName, PasswordCredentials.newInstance(null));
-         fail("creating authenticatable resource with null password should have failed");
-      }
-      catch (InvalidCredentialsException e) {
-         assertThat(e.getMessage().toLowerCase(), containsString("password required, none specified"));
-      }
-
       try {
          accessControlContext.createResource(null, domainName, PasswordCredentials.newInstance(password));
          fail("creating authenticatable resource with null resource class name should have failed");
@@ -559,36 +500,6 @@ public class TestAccessControl_createAuthenticatableResource extends TestAccessC
 
       // attempt to create authenticatable resources with empty or whitespaced parameters
       try {
-         accessControlContext.createResource("", PasswordCredentials.newInstance(password));
-         fail("creating authenticatable resource with empty resource class name should have failed");
-      }
-      catch (IllegalArgumentException e) {
-         assertThat(e.getMessage().toLowerCase(), containsString("resource class required"));
-      }
-      try {
-         accessControlContext.createResource(" \t", PasswordCredentials.newInstance(password));
-         fail("creating authenticatable resource with empty resource class name should have failed");
-      }
-      catch (IllegalArgumentException e) {
-         assertThat(e.getMessage().toLowerCase(), containsString("resource class required"));
-      }
-
-      try {
-         accessControlContext.createResource(resourceClassName, PasswordCredentials.newInstance("".toCharArray()));
-         fail("creating authenticatable resource with empty password should have failed");
-      }
-      catch (InvalidCredentialsException e) {
-         assertThat(e.getMessage().toLowerCase(), containsString("password cannot be zero length"));
-      }
-      try {
-         accessControlContext.createResource(resourceClassName, PasswordCredentials.newInstance(" \t".toCharArray()));
-         fail("creating authenticatable resource with empty password should have failed");
-      }
-      catch (InvalidCredentialsException e) {
-         assertThat(e.getMessage().toLowerCase(), containsString("password cannot be blank"));
-      }
-
-      try {
          accessControlContext.createResource("", domainName, PasswordCredentials.newInstance(password));
          fail("creating authenticatable resource with empty resource class name should have failed");
       }
@@ -648,14 +559,6 @@ public class TestAccessControl_createAuthenticatableResource extends TestAccessC
 
       // attempt to create authenticatable resources with non-existent references to class or domain names
       try {
-         accessControlContext.createResource("does_not_exist", PasswordCredentials.newInstance(password));
-         fail("creating authenticatable resource with non-existent resource class name should fail");
-      }
-      catch (IllegalArgumentException e) {
-         assertThat(e.getMessage().toLowerCase(), containsString("could not find resource class"));
-      }
-
-      try {
          accessControlContext.createResource("does_not_exist", domainName, PasswordCredentials.newInstance(password));
          fail("creating authenticatable resource with non-existent resource class name should fail");
       }
@@ -687,23 +590,6 @@ public class TestAccessControl_createAuthenticatableResource extends TestAccessC
          accessControlContext.createResource(resourceClassName,
                                              domainName,
                                              PasswordCredentials.newInstance(password));
-         fail("creating authenticatable resource without authorization should fail");
-      }
-      catch (NotAuthorizedException e) {
-         assertThat(e.getMessage().toLowerCase(), containsString("create resource"));
-      }
-   }
-
-   @Test
-   public void createAuthenticatableResource_notAuthorizedWithDefaultSessionDomain_shouldFail() {
-      final String resourceClassName = generateResourceClass(true, false);
-      final char[] password = generateUniquePassword();
-
-      generateResourceAndAuthenticate();
-
-      // attempt to create authenticatable resource without create-permission authorization
-      try {
-         accessControlContext.createResource(resourceClassName, PasswordCredentials.newInstance(password));
          fail("creating authenticatable resource without authorization should fail");
       }
       catch (NotAuthorizedException e) {

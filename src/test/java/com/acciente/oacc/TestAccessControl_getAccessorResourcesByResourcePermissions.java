@@ -76,7 +76,10 @@ public class TestAccessControl_getAccessorResourcesByResourcePermissions extends
       final Set<ResourcePermission> resourcePermissions
             = setOf(ResourcePermissions.getInstance(queriedPermissionName));
 
-      final Resource unqueriedAccessedResource = accessControlContext.createResource(accessedResourceClassName);
+      final Resource unqueriedAccessedResource = accessControlContext.createResource(accessedResourceClassName,
+                                                                                     accessControlContext
+                                                                                           .getDomainNameByResource(
+                                                                                                 SYS_RESOURCE));
       final Resource unqueriedAccessorResource = generateUnauthenticatableResource();
 
       // set permission between accessor and queried accessed
@@ -118,7 +121,10 @@ public class TestAccessControl_getAccessorResourcesByResourcePermissions extends
       final Set<ResourcePermission> resourcePermissions
             = setOf(ResourcePermissions.getInstance(queriedPermissionName));
 
-      final Resource unqueriedAccessedResource = accessControlContext.createResource(accessedResourceClassName);
+      final Resource unqueriedAccessedResource = accessControlContext.createResource(accessedResourceClassName,
+                                                                                     accessControlContext
+                                                                                           .getDomainNameByResource(
+                                                                                                 SYS_RESOURCE));
       final Resource unqueriedAccessorResource = generateUnauthenticatableResource();
 
       // set permission between accessor and queried accessed
@@ -162,7 +168,10 @@ public class TestAccessControl_getAccessorResourcesByResourcePermissions extends
       final String unqueriedPermissionName = generateResourceClassPermission(accessedResourceClassName);
       final ResourcePermission unqueriedResourcePermission = ResourcePermissions.getInstance(unqueriedPermissionName);
 
-      final Resource unqueriedAccessedResource = accessControlContext.createResource(accessedResourceClassName);
+      final Resource unqueriedAccessedResource = accessControlContext.createResource(accessedResourceClassName,
+                                                                                     accessControlContext
+                                                                                           .getDomainNameByResource(
+                                                                                                 SYS_RESOURCE));
       final Resource unqueriedAccessorResource = generateUnauthenticatableResource();
 
       // set permission between accessor and queried accessed
@@ -216,7 +225,10 @@ public class TestAccessControl_getAccessorResourcesByResourcePermissions extends
       final String unqueriedPermissionName = generateResourceClassPermission(accessedResourceClassName);
       final ResourcePermission unqueriedResourcePermission = ResourcePermissions.getInstance(unqueriedPermissionName);
 
-      final Resource unqueriedAccessedResource = accessControlContext.createResource(accessedResourceClassName);
+      final Resource unqueriedAccessedResource = accessControlContext.createResource(accessedResourceClassName,
+                                                                                     accessControlContext
+                                                                                           .getDomainNameByResource(
+                                                                                                 SYS_RESOURCE));
       final Resource unqueriedAccessorResource = generateUnauthenticatableResource();
 
       // set permission between accessor and queried accessed
@@ -260,7 +272,10 @@ public class TestAccessControl_getAccessorResourcesByResourcePermissions extends
       final String unqueriedPermissionName = generateResourceClassPermission(accessedResourceClassName);
       final ResourcePermission unqueriedResourcePermission = ResourcePermissions.getInstance(unqueriedPermissionName);
 
-      final Resource unqueriedAccessedResource = accessControlContext.createResource(accessedResourceClassName);
+      final Resource unqueriedAccessedResource = accessControlContext.createResource(accessedResourceClassName,
+                                                                                     accessControlContext
+                                                                                           .getDomainNameByResource(
+                                                                                                 SYS_RESOURCE));
       final Resource unqueriedAccessorResource = generateUnauthenticatableResource();
 
       // set permission between accessor and queried accessed
@@ -320,7 +335,10 @@ public class TestAccessControl_getAccessorResourcesByResourcePermissions extends
       final String unqueriedPermissionName = generateResourceClassPermission(accessedResourceClassName);
       final ResourcePermission unqueriedResourcePermission = ResourcePermissions.getInstance(unqueriedPermissionName);
 
-      final Resource unqueriedAccessedResource = accessControlContext.createResource(accessedResourceClassName);
+      final Resource unqueriedAccessedResource = accessControlContext.createResource(accessedResourceClassName,
+                                                                                     accessControlContext
+                                                                                           .getDomainNameByResource(
+                                                                                                 SYS_RESOURCE));
       final Resource unqueriedAccessorResource = generateUnauthenticatableResource();
 
       // set permission between accessor and queried accessed
@@ -383,7 +401,9 @@ public class TestAccessControl_getAccessorResourcesByResourcePermissions extends
       final ResourcePermission permission2_withGrant = ResourcePermissions.getInstance(permissionName2, true);
       final ResourcePermission permission2_withoutGrant = ResourcePermissions.getInstance(permissionName2);
 
-      final Resource unqueriedAccessedResource = accessControlContext.createResource(accessedResourceClassName);
+      final Resource unqueriedAccessedResource = accessControlContext.createResource(accessedResourceClassName,
+                                                                                     accessControlContext
+                                                                                           .getDomainNameByResource(SYS_RESOURCE));
       final Resource unqueriedAccessorResource = generateUnauthenticatableResource();
 
       // set permission between accessor and queried accessed

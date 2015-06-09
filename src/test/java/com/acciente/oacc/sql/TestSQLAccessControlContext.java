@@ -323,7 +323,9 @@ public class TestSQLAccessControlContext extends TestSQLAccessControlContextBase
       // we attempt to create a resource which we expect to succeed
       testName("createResource( BLOG )");
       try {
-         accessControlContext.createResource("BLOG");
+         accessControlContext.createResource("BLOG",
+                                             accessControlContext
+                                                   .getDomainNameByResource(accessControlContext.getSessionResource()));
          testOK();
       }
       catch (OaccException e) {
@@ -333,7 +335,9 @@ public class TestSQLAccessControlContext extends TestSQLAccessControlContextBase
       // we attempt to create a resource which we expect to succeed
       testName("createResource( BLOG )");
       try {
-         accessControlContext.createResource("BLOG");
+         accessControlContext.createResource("BLOG",
+                                             accessControlContext
+                                                   .getDomainNameByResource(accessControlContext.getSessionResource()));
          testOK();
       }
       catch (OaccException e) {
@@ -420,7 +424,9 @@ public class TestSQLAccessControlContext extends TestSQLAccessControlContextBase
       // we attempt to create a resource which we expect to succeed
       testName("createResource( BLOG )");
       try {
-         accessControlContext.createResource("BLOG");
+         accessControlContext.createResource("BLOG",
+                                             accessControlContext
+                                                   .getDomainNameByResource(accessControlContext.getSessionResource()));
          testOK();
       }
       catch (OaccException e) {
@@ -430,7 +436,9 @@ public class TestSQLAccessControlContext extends TestSQLAccessControlContextBase
       // we attempt to create a resource which we expect to succeed
       testName("createResource( BLOG )");
       try {
-         accessControlContext.createResource("BLOG");
+         accessControlContext.createResource("BLOG",
+                                             accessControlContext
+                                                   .getDomainNameByResource(accessControlContext.getSessionResource()));
          testOK();
       }
       catch (OaccException e) {
@@ -602,7 +610,10 @@ public class TestSQLAccessControlContext extends TestSQLAccessControlContextBase
       // we create new user #1
       setupName("newUser_1 = createAuthResource( USER, <pwd> )");
       try {
-         newUser_1 = accessControlContext.createResource("USER", PasswordCredentials.newInstance(PASSWORD));
+         newUser_1 = accessControlContext.createResource("USER",
+                                                         accessControlContext
+                                                               .getDomainNameByResource(accessControlContext.getSessionResource()),
+                                                         PasswordCredentials.newInstance(PASSWORD));
          setupOK();
       }
       catch (OaccException e) {
@@ -612,7 +623,10 @@ public class TestSQLAccessControlContext extends TestSQLAccessControlContextBase
       // we create new user #2
       setupName("newUser_2 = createAuthResource( USER, <pwd> )");
       try {
-         newUser_2 = accessControlContext.createResource("USER", PasswordCredentials.newInstance(PASSWORD2));
+         newUser_2 = accessControlContext.createResource("USER",
+                                                         accessControlContext
+                                                               .getDomainNameByResource(accessControlContext.getSessionResource()),
+                                                         PasswordCredentials.newInstance(PASSWORD2));
          setupOK();
       }
       catch (OaccException e) {
@@ -715,7 +729,10 @@ public class TestSQLAccessControlContext extends TestSQLAccessControlContextBase
       // we create new user #1
       setupName("newUser_1 = createAuthResource( USER, <pwd> )");
       try {
-         newUser_1 = accessControlContext.createResource("USER", PasswordCredentials.newInstance(PASSWORD));
+         newUser_1 = accessControlContext.createResource("USER",
+                                                         accessControlContext
+                                                               .getDomainNameByResource(accessControlContext.getSessionResource()),
+                                                         PasswordCredentials.newInstance(PASSWORD));
          setupOK();
       }
       catch (OaccException e) {
@@ -779,7 +796,10 @@ public class TestSQLAccessControlContext extends TestSQLAccessControlContextBase
       // we create new user #1
       setupName("newUser_1 = createAuthResource( USER, <pwd> )");
       try {
-         newUser_1 = accessControlContext.createResource("USER", PasswordCredentials.newInstance(PASSWORD));
+         newUser_1 = accessControlContext.createResource("USER",
+                                                         accessControlContext
+                                                               .getDomainNameByResource(accessControlContext.getSessionResource()),
+                                                         PasswordCredentials.newInstance(PASSWORD));
          setupOK();
       }
       catch (OaccException e) {
@@ -789,7 +809,10 @@ public class TestSQLAccessControlContext extends TestSQLAccessControlContextBase
       // we create new user #2
       setupName("newUser_2 = createAuthResource( USER, <pwd> )");
       try {
-         newUser_2 = accessControlContext.createResource("USER", PasswordCredentials.newInstance(PASSWORD2));
+         newUser_2 = accessControlContext.createResource("USER",
+                                                         accessControlContext
+                                                               .getDomainNameByResource(accessControlContext.getSessionResource()),
+                                                         PasswordCredentials.newInstance(PASSWORD2));
          setupOK();
       }
       catch (OaccException e) {
@@ -827,7 +850,9 @@ public class TestSQLAccessControlContext extends TestSQLAccessControlContextBase
       setupName("15 x createResource( BLOG )");
       try {
          for (int i = 0; i < 15; i++) {
-            accessControlContext.createResource("BLOG");
+            accessControlContext.createResource("BLOG",
+                                                accessControlContext
+                                                      .getDomainNameByResource(accessControlContext.getSessionResource()));
          }
          setupOK();
       }

@@ -36,7 +36,9 @@ public class TestAccessControl_assertResourcePermissions extends TestAccessContr
       final String resourceClassName = generateResourceClass(false, false);
       final String customPermissionName = generateResourceClassPermission(resourceClassName);
 
-      final Resource accessedResource = accessControlContext.createResource(resourceClassName);
+      final Resource accessedResource = accessControlContext.createResource(resourceClassName,
+                                                                            accessControlContext
+                                                                                  .getDomainNameByResource(SYS_RESOURCE));
 
       // verify setup
       final Set<ResourcePermission> allResourcePermissions
@@ -74,7 +76,9 @@ public class TestAccessControl_assertResourcePermissions extends TestAccessContr
       final Resource accessorResource = generateAuthenticatableResource(password);
 
       final Resource accessedResource
-            = accessControlContext.createResource(resourceClassName, PasswordCredentials.newInstance(generateUniquePassword()));
+            = accessControlContext.createResource(resourceClassName,
+                                                  accessControlContext.getDomainNameByResource(SYS_RESOURCE),
+                                                  PasswordCredentials.newInstance(generateUniquePassword()));
 
       // verify setup
       final Set<ResourcePermission> allResourcePermissions

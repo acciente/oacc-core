@@ -107,7 +107,9 @@ public class TestAccessControl_customAuthenticationProvider extends TestAccessCo
    public void createResource_withoutCredentials_shouldFail() {
       customAccessControlContext.authenticate(adminResource, PasswordCredentials.newInstance(ADMIN_PASSWORD));
 
-      final Resource resource = customAccessControlContext.createResource(generateResourceClass(true, true));
+      final Resource resource
+            = customAccessControlContext.createResource(generateResourceClass(true, true),
+                                                        customAccessControlContext.getDomainNameByResource(adminResource));
       assertThat(resource, is(not(nullValue())));
    }
 

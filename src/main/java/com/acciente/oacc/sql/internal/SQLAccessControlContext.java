@@ -675,22 +675,6 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
    }
 
    @Override
-   public Resource createResource(String resourceClassName) {
-      SQLConnection connection = null;
-
-      __assertAuthenticated();
-
-      try {
-         connection = __getConnection();
-
-         return __createResource(connection, resourceClassName, sessionResourceDomainName, null);
-      }
-      finally {
-         __closeConnection(connection);
-      }
-   }
-
-   @Override
    public Resource createResource(String resourceClassName, String domainName) {
       SQLConnection connection = null;
 
@@ -698,23 +682,6 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
          connection = __getConnection();
 
          return __createResource(connection, resourceClassName, domainName, null);
-      }
-      finally {
-         __closeConnection(connection);
-      }
-   }
-
-   @Override
-   public Resource createResource(String resourceClassName, Credentials credentials) {
-      SQLConnection connection = null;
-
-      __assertAuthenticated();
-      __assertCredentialsSpecified(credentials);
-
-      try {
-         connection = __getConnection();
-
-         return __createResource(connection, resourceClassName, sessionResourceDomainName, credentials);
       }
       finally {
          __closeConnection(connection);

@@ -97,14 +97,17 @@ public class TestAccessControl_unauthenticatedApiCalls extends TestAccessControl
          assertThat(e.getMessage().toLowerCase(), containsString("not authenticated"));
       }
       try {
-         accessControlContext.createResource("any_resource_class_name");
+         final String resourceClassName = generateResourceClass(false, false);
+         accessControlContext.createResource(resourceClassName, "any_domain_name");
          fail("operation should have failed from unauthenticated context");
       }
       catch (NotAuthenticatedException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("not authenticated"));
       }
       try {
-         accessControlContext.createResource("any_resource_class_name",
+         final String resourceClassName = generateResourceClass(true, false);
+         accessControlContext.createResource(resourceClassName,
+                                             "any_domain_name",
                                              PasswordCredentials.newInstance(generateUniquePassword()));
          fail("operation should have failed from unauthenticated context");
       }

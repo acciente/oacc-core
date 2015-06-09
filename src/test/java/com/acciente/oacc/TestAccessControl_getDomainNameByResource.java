@@ -33,12 +33,13 @@ public class TestAccessControl_getDomainNameByResource extends TestAccessControl
 
       generateUnauthenticatableResource();
       final String resourceClassName = generateResourceClass(false, true);
-      final Resource queriedResource = accessControlContext.createResource(resourceClassName);
+      final String sysDomainName = accessControlContext.getDomainNameByResource(SYS_RESOURCE);
+      final Resource queriedResource = accessControlContext.createResource(resourceClassName, sysDomainName);
 
       // verify
       final String domainName = accessControlContext.getDomainNameByResource(queriedResource);
       assertThat(domainName, is(not(nullValue())));
-      assertThat(domainName, is(accessControlContext.getDomainNameByResource(SYS_RESOURCE)));
+      assertThat(domainName, is(sysDomainName));
    }
 
    @Test

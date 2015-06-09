@@ -125,31 +125,6 @@ public class TestAccessControl_createResource extends TestAccessControlBase {
    }
 
    @Test
-   public void createResource_validWithDefaultSessionDomain() {
-      final String resourceClassName = generateResourceClass(false, false);
-
-      // set up an authenticatable resource with resource class create permission
-      final Resource authenticatedResource = generateResourceAndAuthenticate();
-      final String domainName = accessControlContext.getDomainNameByResource(authenticatedResource);
-      final String permissionName = generateResourceClassPermission(resourceClassName);
-      final ResourcePermission grantedResourcePermission = ResourcePermissions.getInstance(permissionName);
-      grantResourceCreatePermission(authenticatedResource, resourceClassName, domainName, permissionName);
-
-      Set<Resource> resourcesByPermission = accessControlContext.getResourcesByResourcePermissions(resourceClassName,
-                                                                                                   grantedResourcePermission);
-      assertThat(resourcesByPermission.isEmpty(), is(true));
-
-      // create resource and verify
-      final Resource resource = accessControlContext.createResource(resourceClassName);
-
-      assertThat(resource, is(not(nullValue())));
-      assertThat(accessControlContext.getDomainNameByResource(resource), is(domainName));
-      resourcesByPermission = accessControlContext.getResourcesByResourcePermissions(resourceClassName,
-                                                                                     grantedResourcePermission);
-      assertThat(resourcesByPermission.size(), is(1));
-   }
-
-   @Test
    public void createResource_whitespaceConsistent_AsAuthorized() {
       final String domainName = generateDomain();
       final String resourceClassName = generateResourceClass(false, false);
@@ -316,14 +291,6 @@ public class TestAccessControl_createResource extends TestAccessControlBase {
       catch (InvalidCredentialsException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("credentials required"));
       }
-
-      try {
-         accessControlContext.createResource(resourceClassName);
-         fail("creating resource without credentials for authenticatable resource class should have failed");
-      }
-      catch (InvalidCredentialsException e) {
-         assertThat(e.getMessage().toLowerCase(), containsString("credentials required"));
-      }
    }
 
    @Test
@@ -335,21 +302,12 @@ public class TestAccessControl_createResource extends TestAccessControlBase {
 
       // attempt to create resources with null parameters
       try {
-         accessControlContext.createResource(null);
-         fail("creating resource with null resource class name should have failed");
-      }
-      catch (NullPointerException e) {
-         assertThat(e.getMessage().toLowerCase(), containsString("resource class required"));
-      }
-
-      try {
          accessControlContext.createResource(null, domainName);
          fail("creating resource with null resource class name should have failed");
       }
       catch (NullPointerException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("resource class required"));
       }
-
       try {
          accessControlContext.createResource(resourceClassName, (String) null);
          fail("creating resource with null domain name should have failed");
@@ -367,22 +325,6 @@ public class TestAccessControl_createResource extends TestAccessControlBase {
       final String resourceClassName = generateResourceClass(false, false);
 
       // attempt to create resources with empty or whitespace parameters
-      try {
-         accessControlContext.createResource("");
-         fail("creating resource with empty resource class name should have failed");
-      }
-      catch (IllegalArgumentException e) {
-         assertThat(e.getMessage().toLowerCase(), containsString("resource class required"));
-      }
-
-      try {
-         accessControlContext.createResource(" \t");
-         fail("creating resource with empty resource class name should have failed");
-      }
-      catch (IllegalArgumentException e) {
-         assertThat(e.getMessage().toLowerCase(), containsString("resource class required"));
-      }
-
       try {
          accessControlContext.createResource("", domainName);
          fail("creating resource with empty resource class name should have failed");
@@ -425,21 +367,12 @@ public class TestAccessControl_createResource extends TestAccessControlBase {
 
       // attempt to create resources with non-existent references to class or domain names
       try {
-         accessControlContext.createResource("does_not_exist");
-         fail("creating resource with non-existent resource class name should fail");
-      }
-      catch (IllegalArgumentException e) {
-         assertThat(e.getMessage().toLowerCase(), containsString("could not find resource class"));
-      }
-
-      try {
          accessControlContext.createResource("does_not_exist", domainName);
          fail("creating resource with non-existent resource class name should fail");
       }
       catch (IllegalArgumentException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("could not find resource class"));
       }
-
       try {
          accessControlContext.createResource(resourceClassName, "does_not_exist");
          fail("creating resource with non-existent domain name should have failed");
@@ -459,23 +392,6 @@ public class TestAccessControl_createResource extends TestAccessControlBase {
       // attempt to create resource without create-permission authorization
       try {
          accessControlContext.createResource(resourceClassName, domainName);
-         fail("creating resource without authorization should fail");
-      }
-      catch (NotAuthorizedException e) {
-         assertThat(e.getMessage().toLowerCase(), containsString(String.valueOf(resource).toLowerCase()
-                                                                       + " is not authorized to create resource"));
-      }
-   }
-
-   @Test
-   public void createResource_notAuthorizedWithDefaultSessionDomain_shouldFail() {
-      final String resourceClassName = generateResourceClass(false, false);
-
-      final Resource resource = generateResourceAndAuthenticate();
-
-      // attempt to create resource without create-permission authorization
-      try {
-         accessControlContext.createResource(resourceClassName);
          fail("creating resource without authorization should fail");
       }
       catch (NotAuthorizedException e) {

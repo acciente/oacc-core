@@ -1146,22 +1146,6 @@ public interface AccessControlContext {
    public void createDomain(String domainName, String parentDomainName);
 
    /**
-    * Creates a new resource of the specified resource class in the same domain as this session resource.
-    * <p/>
-    * Note that a custom {@link AuthenticationProvider} implementation is required to support
-    * creation of an authenticatable resource without providing explicit credentials
-    *
-    * @param resourceClassName a string resource class name
-    * @return the integer resourceId of the newly created resource
-    * @throws java.lang.IllegalArgumentException if no resource class of resourceClassName exists
-    * @throws com.acciente.oacc.NotAuthorizedException if the session resource is not authorized to create a new resource
-    *                                                  of the specified resource class in the session resource's domain
-    * @throws com.acciente.oacc.OaccException          if creating the new resource would introduce a cycle between the
-    *                                                  session resource and new resource via permission inheritance
-    */
-   public Resource createResource(String resourceClassName);
-
-   /**
     * Creates a new resource of the specified resource class within the specified domain.
     * <p/>
     * Note that a custom {@link AuthenticationProvider} implementation is required to support
@@ -1178,21 +1162,6 @@ public interface AccessControlContext {
     *                                                  session resource and new resource via permission inheritance
     */
    public Resource createResource(String resourceClassName, String domainName);
-
-   /**
-    * Creates a new authenticatable resource of the specified resource class in the same domain as the session resource.
-    *
-    * @param resourceClassName a string resource class name
-    * @param credentials       the credentials to authenticate the new resource
-    * @return the integer resourceId of the newly created resource
-    * @throws java.lang.IllegalArgumentException if no resource class of resourceClassName exists, or
-    *                                            if resource class is not authenticatable
-    * @throws com.acciente.oacc.NotAuthorizedException if the session resource is not authorized to create a new resource
-    *                                                  of the specified resource class in the session resource's domain
-    * @throws com.acciente.oacc.OaccException          if creating the new resource would introduce a cycle between the
-    *                                                  session resource and new resource via permission inheritance
-    */
-   public Resource createResource(String resourceClassName, Credentials credentials);
 
    /**
     * Creates a new authenticatable resource of the specified resource class within the specified domain.
