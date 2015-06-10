@@ -63,7 +63,8 @@ public class TestAccessControl_createAuthenticatableResource extends TestAccessC
       final ResourcePermission grantedResourcePermission = ResourcePermissions.getInstance(permissionName);
       grantResourceCreatePermission(authenticatedResource, resourceClassName, domainName, permissionName);
 
-      Set<Resource> resourcesByPermission = accessControlContext.getResourcesByResourcePermissions(resourceClassName,
+      Set<Resource> resourcesByPermission = accessControlContext.getResourcesByResourcePermissions(authenticatedResource,
+                                                                                                   resourceClassName,
                                                                                                    grantedResourcePermission);
       assertThat(resourcesByPermission.isEmpty(), is(true));
 
@@ -73,7 +74,8 @@ public class TestAccessControl_createAuthenticatableResource extends TestAccessC
                                                                     PasswordCredentials.newInstance(password));
 
       assertThat(resource, is(not(nullValue())));
-      resourcesByPermission = accessControlContext.getResourcesByResourcePermissions(resourceClassName,
+      resourcesByPermission = accessControlContext.getResourcesByResourcePermissions(authenticatedResource,
+                                                                                     resourceClassName,
                                                                                      grantedResourcePermission);
       assertThat(resourcesByPermission.size(), is(1));
       assertThat(accessControlContext.getDomainNameByResource(resource), is(domainName));
@@ -86,7 +88,8 @@ public class TestAccessControl_createAuthenticatableResource extends TestAccessC
                                                                      PasswordCredentials.newInstance(shortPwd));
 
       assertThat(resource_shortPwd, is(not(nullValue())));
-      resourcesByPermission = accessControlContext.getResourcesByResourcePermissions(resourceClassName,
+      resourcesByPermission = accessControlContext.getResourcesByResourcePermissions(authenticatedResource,
+                                                                                     resourceClassName,
                                                                                      grantedResourcePermission);
       assertThat(resourcesByPermission.size(), is(2));
       assertThat(resource_shortPwd.getId(), is(not(resource.getId())));
@@ -100,7 +103,8 @@ public class TestAccessControl_createAuthenticatableResource extends TestAccessC
                                                                      PasswordCredentials.newInstance(whitespacedPwd));
 
       assertThat(resource_whitespacedPwd, is(not(nullValue())));
-      resourcesByPermission = accessControlContext.getResourcesByResourcePermissions(resourceClassName,
+      resourcesByPermission = accessControlContext.getResourcesByResourcePermissions(authenticatedResource,
+                                                                                     resourceClassName,
                                                                                      grantedResourcePermission);
       assertThat(resourcesByPermission.size(), is(3));
       assertThat(resource_whitespacedPwd.getId(), is(not(resource.getId())));
@@ -129,10 +133,12 @@ public class TestAccessControl_createAuthenticatableResource extends TestAccessC
 
       final ResourcePermission implicitResourcePermission = ResourcePermissions.getInstance(permissionName);
       final ResourcePermission implicitResourcePermission2 = ResourcePermissions.getInstance(permissionName2);
-      Set<Resource> resourcesByPermission = accessControlContext.getResourcesByResourcePermissions(resourceClassName,
+      Set<Resource> resourcesByPermission = accessControlContext.getResourcesByResourcePermissions(authenticatedResource,
+                                                                                                   resourceClassName,
                                                                                                    implicitResourcePermission);
       assertThat(resourcesByPermission.isEmpty(), is(true));
-      Set<Resource> resourcesByPermission2 = accessControlContext.getResourcesByResourcePermissions(resourceClassName,
+      Set<Resource> resourcesByPermission2 = accessControlContext.getResourcesByResourcePermissions(authenticatedResource,
+                                                                                                    resourceClassName,
                                                                                                     implicitResourcePermission2);
       assertThat(resourcesByPermission2.isEmpty(), is(true));
 
@@ -149,10 +155,12 @@ public class TestAccessControl_createAuthenticatableResource extends TestAccessC
       assertThat(resourceClassInfo.getResourceClassName(), is(resourceClassName));
 
       // verify resource created while unauthenticated gets *ALL* available resource class permissions
-      resourcesByPermission = accessControlContext.getResourcesByResourcePermissions(resourceClassName,
+      resourcesByPermission = accessControlContext.getResourcesByResourcePermissions(SYS_RESOURCE,
+                                                                                     resourceClassName,
                                                                                      implicitResourcePermission);
       assertThat(resourcesByPermission.size(), is(1));
-      resourcesByPermission2 = accessControlContext.getResourcesByResourcePermissions(resourceClassName,
+      resourcesByPermission2 = accessControlContext.getResourcesByResourcePermissions(SYS_RESOURCE,
+                                                                                      resourceClassName,
                                                                                       implicitResourcePermission2);
       assertThat(resourcesByPermission2.size(), is(1));
 
@@ -172,7 +180,8 @@ public class TestAccessControl_createAuthenticatableResource extends TestAccessC
       final ResourcePermission grantedResourcePermission = ResourcePermissions.getInstance(permissionName);
       grantResourceCreatePermission(authenticatedResource, resourceClassName, domainName, permissionName);
 
-      Set<Resource> resourcesByPermission = accessControlContext.getResourcesByResourcePermissions(resourceClassName,
+      Set<Resource> resourcesByPermission = accessControlContext.getResourcesByResourcePermissions(authenticatedResource,
+                                                                                                   resourceClassName,
                                                                                                    grantedResourcePermission);
       assertThat(resourcesByPermission.isEmpty(), is(true));
 
@@ -185,7 +194,8 @@ public class TestAccessControl_createAuthenticatableResource extends TestAccessC
                                                                                PasswordCredentials.newInstance(password));
 
       assertThat(whitespacedResource, is(not(nullValue())));
-      resourcesByPermission = accessControlContext.getResourcesByResourcePermissions(resourceClassName,
+      resourcesByPermission = accessControlContext.getResourcesByResourcePermissions(authenticatedResource,
+                                                                                     resourceClassName,
                                                                                      grantedResourcePermission);
       assertThat(resourcesByPermission.size(), is(1));
       assertThat(accessControlContext.getDomainNameByResource(whitespacedResource), is(domainName));
@@ -195,7 +205,8 @@ public class TestAccessControl_createAuthenticatableResource extends TestAccessC
                                                                     PasswordCredentials.newInstance(password));
 
       assertThat(resource, is(not(nullValue())));
-      resourcesByPermission = accessControlContext.getResourcesByResourcePermissions(resourceClassName,
+      resourcesByPermission = accessControlContext.getResourcesByResourcePermissions(authenticatedResource,
+                                                                                     resourceClassName,
                                                                                      grantedResourcePermission);
       assertThat(resourcesByPermission.size(), is(2));
       assertThat(resource.getId(), is(not(whitespacedResource.getId())));
@@ -260,10 +271,12 @@ public class TestAccessControl_createAuthenticatableResource extends TestAccessC
          final ResourcePermission grantedResourcePermission_UPPER = ResourcePermissions.getInstance(permissionName);
 
          Set<Resource> resourcesByPermission;
-         resourcesByPermission = accessControlContext.getResourcesByResourcePermissions(resourceClass_lower,
+         resourcesByPermission = accessControlContext.getResourcesByResourcePermissions(authenticatedResource,
+                                                                                        resourceClass_lower,
                                                                                         grantedResourcePermission_lower);
          assertThat(resourcesByPermission.isEmpty(), is(true));
-         resourcesByPermission = accessControlContext.getResourcesByResourcePermissions(resourceClass_UPPER,
+         resourcesByPermission = accessControlContext.getResourcesByResourcePermissions(authenticatedResource,
+                                                                                        resourceClass_UPPER,
                                                                                         grantedResourcePermission_UPPER);
          assertThat(resourcesByPermission.isEmpty(), is(true));
 
@@ -272,7 +285,8 @@ public class TestAccessControl_createAuthenticatableResource extends TestAccessC
                accessControlContext.createResource(resourceClass_lower, domain_lower,
                                                    PasswordCredentials.newInstance(password_lower));
          assertThat(resource_lowlow, is(not(nullValue())));
-         resourcesByPermission = accessControlContext.getResourcesByResourcePermissions(resourceClass_lower,
+         resourcesByPermission = accessControlContext.getResourcesByResourcePermissions(authenticatedResource,
+                                                                                        resourceClass_lower,
                                                                                         grantedResourcePermission_lower);
          assertThat(resourcesByPermission.size(), is(1));
 
@@ -281,7 +295,8 @@ public class TestAccessControl_createAuthenticatableResource extends TestAccessC
                                                      PasswordCredentials.newInstance(password_UPPER));
          assertThat(resource_lowUP, is(not(nullValue())));
          assertThat(resource_lowUP.getId(), is(not(resource_lowlow.getId())));
-         resourcesByPermission = accessControlContext.getResourcesByResourcePermissions(resourceClass_lower,
+         resourcesByPermission = accessControlContext.getResourcesByResourcePermissions(authenticatedResource,
+                                                                                        resourceClass_lower,
                                                                                         grantedResourcePermission_lower);
          assertThat(resourcesByPermission.size(), is(2));
 
@@ -291,7 +306,8 @@ public class TestAccessControl_createAuthenticatableResource extends TestAccessC
                                                    PasswordCredentials.newInstance(password_lower));
          assertThat(resource_UPlow, is(not(nullValue())));
          resourcesByPermission
-               = accessControlContext.getResourcesByResourcePermissions(resourceClass_UPPER,
+               = accessControlContext.getResourcesByResourcePermissions(authenticatedResource,
+                                                                        resourceClass_UPPER,
                                                                         grantedResourcePermission_UPPER);
          assertThat(resourcesByPermission.size(), is(1));
 
@@ -301,7 +317,8 @@ public class TestAccessControl_createAuthenticatableResource extends TestAccessC
                                                    PasswordCredentials.newInstance(password_UPPER));
          assertThat(resource_UPUP, is(not(nullValue())));
          assertThat(resource_UPUP.getId(), is(not(resource_UPlow.getId())));
-         resourcesByPermission = accessControlContext.getResourcesByResourcePermissions(resourceClass_UPPER,
+         resourcesByPermission = accessControlContext.getResourcesByResourcePermissions(authenticatedResource,
+                                                                                        resourceClass_UPPER,
                                                                                         grantedResourcePermission_UPPER);
          assertThat(resourcesByPermission.size(), is(2));
 
@@ -332,10 +349,12 @@ public class TestAccessControl_createAuthenticatableResource extends TestAccessC
          final ResourcePermission grantedResourcePermission = ResourcePermissions.getInstance(permissionName);
 
          Set<Resource> resourcesByPermission;
-         resourcesByPermission = accessControlContext.getResourcesByResourcePermissions(resourceClass_lower,
+         resourcesByPermission = accessControlContext.getResourcesByResourcePermissions(authenticatedResource,
+                                                                                        resourceClass_lower,
                                                                                         grantedResourcePermission);
          assertThat(resourcesByPermission.isEmpty(), is(true));
-         resourcesByPermission = accessControlContext.getResourcesByResourcePermissions(resourceClass_UPPER,
+         resourcesByPermission = accessControlContext.getResourcesByResourcePermissions(authenticatedResource,
+                                                                                        resourceClass_UPPER,
                                                                                         grantedResourcePermission);
          assertThat(resourcesByPermission.isEmpty(), is(true));
 
@@ -346,7 +365,8 @@ public class TestAccessControl_createAuthenticatableResource extends TestAccessC
                                                      PasswordCredentials.newInstance(password_lower));
          assertThat(resource_lowlow, is(not(nullValue())));
          resourcesByPermission
-               = accessControlContext.getResourcesByResourcePermissions(resourceClass_lower,
+               = accessControlContext.getResourcesByResourcePermissions(authenticatedResource,
+                                                                        resourceClass_lower,
                                                                         grantedResourcePermission);
          assertThat(resourcesByPermission.size(), is(1));
 
@@ -356,7 +376,8 @@ public class TestAccessControl_createAuthenticatableResource extends TestAccessC
                                                      PasswordCredentials.newInstance(password_UPPER));
          assertThat(resource_lowUP, is(not(nullValue())));
          assertThat(resource_lowUP.getId(), is(not(resource_lowlow.getId())));
-         resourcesByPermission = accessControlContext.getResourcesByResourcePermissions(resourceClass_lower,
+         resourcesByPermission = accessControlContext.getResourcesByResourcePermissions(authenticatedResource,
+                                                                                        resourceClass_lower,
                                                                                         grantedResourcePermission);
          assertThat(resourcesByPermission.size(), is(2));
 
@@ -367,7 +388,8 @@ public class TestAccessControl_createAuthenticatableResource extends TestAccessC
          assertThat(resource_UPlow, is(not(nullValue())));
          assertThat(resource_UPlow.getId(), is(not(resource_lowlow.getId())));
          assertThat(resource_UPlow.getId(), is(not(resource_lowUP.getId())));
-         resourcesByPermission = accessControlContext.getResourcesByResourcePermissions(resourceClass_UPPER,
+         resourcesByPermission = accessControlContext.getResourcesByResourcePermissions(authenticatedResource,
+                                                                                        resourceClass_UPPER,
                                                                                         grantedResourcePermission);
          assertThat(resourcesByPermission.size(), is(3));
 
@@ -379,7 +401,8 @@ public class TestAccessControl_createAuthenticatableResource extends TestAccessC
          assertThat(resource_UPUP.getId(), is(not(resource_lowlow.getId())));
          assertThat(resource_UPUP.getId(), is(not(resource_lowUP.getId())));
          assertThat(resource_UPUP.getId(), is(not(resource_UPlow.getId())));
-         resourcesByPermission = accessControlContext.getResourcesByResourcePermissions(resourceClass_UPPER,
+         resourcesByPermission = accessControlContext.getResourcesByResourcePermissions(authenticatedResource,
+                                                                                        resourceClass_UPPER,
                                                                                         grantedResourcePermission);
          assertThat(resourcesByPermission.size(), is(4));
 

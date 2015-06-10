@@ -738,22 +738,6 @@ public interface AccessControlContext {
 
    /**
     * Returns a set of resources (of the specified resource class) on which
-    * the current session resource has the specified permissions.
-    * <p/>
-    * The method takes into account direct, inherited and global permissions, as well as
-    * resources that are reachable as a result of SUPER-USER permissions.
-    *
-    * @param resourceClassName   a string resource class name
-    * @param resourcePermissions the permissions to check
-    * @return a set of resources
-    * @throws java.lang.IllegalArgumentException if no resource class of resourceClassName exists, or
-    *                                            if any resourcePermission is invalid for the specified resource class
-    */
-   public Set<Resource> getResourcesByResourcePermissions(String resourceClassName,
-                                                          Set<ResourcePermission> resourcePermissions);
-
-   /**
-    * Returns a set of resources (of the specified resource class) on which
     * the specified accessor resource has the specified permissions, regardless of domain.
     * <p/>
     * The method takes into account direct, inherited and global permissions, as well as
@@ -778,24 +762,6 @@ public interface AccessControlContext {
    public Set<Resource> getResourcesByResourcePermissions(Resource accessorResource,
                                                           String resourceClassName,
                                                           Set<ResourcePermission> resourcePermissions);
-
-   /**
-    * Returns a set of resources (of the specified resource class) on which
-    * the current session resource has the specified permissions.
-    * <p/>
-    * The method takes into account direct, inherited and global permissions, as well as
-    * resources that are reachable as a result of SUPER-USER permissions.
-    *
-    * @param resourceClassName   a string resource class name
-    * @param resourcePermission  the permission to check
-    * @param resourcePermissions the other (optional) permissions to check
-    * @return a set of resources
-    * @throws java.lang.IllegalArgumentException if no resource class of resourceClassName exists, or
-    *                                            if any resourcePermission is invalid for the specified resource class
-    */
-   public Set<Resource> getResourcesByResourcePermissions(String resourceClassName,
-                                                          ResourcePermission resourcePermission,
-                                                          ResourcePermission... resourcePermissions);
 
    /**
     * Returns a set of resources (of the specified resource class) on which
@@ -825,43 +791,6 @@ public interface AccessControlContext {
                                                           String resourceClassName,
                                                           ResourcePermission resourcePermission,
                                                           ResourcePermission... resourcePermissions);
-
-   /**
-    * Returns a set of resources (of the specified resource class) on which
-    * the current session resource has the specified permissions, within the specified domain
-    * or within any descendant domains.
-    * <p/>
-    * The method takes into account direct, inherited and global permissions, as well as
-    * resources that are reachable as a result of SUPER-USER permissions.
-    *
-    * @param resourceClassName   a string resource class name
-    * @param domainName          a domain name
-    * @param resourcePermissions the permissions to check
-    * @return a set of resources
-    * @throws java.lang.IllegalArgumentException if no resource class of resourceClassName exists, or
-    *                                            if any resourcePermission is invalid for the specified resource class, or
-    *                                            if no domain of domainName exists
-    */
-   public Set<Resource> getResourcesByResourcePermissionsAndDomain(String resourceClassName,
-                                                                   String domainName,
-                                                                   Set<ResourcePermission> resourcePermissions);
-
-   /**
-    * Returns a set of resources (of the specified resource class) on which
-    * the current session resource has the specified permissions, within the session resource's domain
-    * or within any descendant domains.
-    * <p/>
-    * The method takes into account direct, inherited and global permissions, as well as
-    * resources that are reachable as a result of SUPER-USER permissions.
-    *
-    * @param resourceClassName   a string resource class name
-    * @param resourcePermissions the permissions to check
-    * @return a set of resources
-    * @throws java.lang.IllegalArgumentException if no resource class of resourceClassName exists, or
-    *                                            if any resourcePermission is invalid for the specified resource class
-    */
-   public Set<Resource> getResourcesByResourcePermissionsAndDomain(String resourceClassName,
-                                                                   Set<ResourcePermission> resourcePermissions);
 
    /**
     * Returns a set of resources (of the specified resource class) on which
@@ -897,75 +826,6 @@ public interface AccessControlContext {
    /**
     * Returns a set of resources (of the specified resource class) on which
     * the specified accessor resource has the specified permissions, within the
-    * session resource's domain or within any descendant domains.
-    * <p/>
-    * The method takes into account direct, inherited and global permissions, as well as
-    * resources that are reachable as a result of SUPER-USER permissions.
-    * <p/>
-    * Note that the current session resource must either be the specified accessor resource, or
-    * the current session resource must have IMPERSONATE, INHERIT or RESET-CREDENTIALS permissions to
-    * the specified accessor resource, or must have SUPER-USER permission to the (parent-) domain
-    * of the specified accessor resource, otherwise an exception is thrown.
-    *
-    * @param accessorResource    the resource relative to which the set of accessible resources is computed
-    * @param resourceClassName   a string resource class name
-    * @param resourcePermissions the permissions to check
-    * @return a set of resources
-    * @throws java.lang.IllegalArgumentException if accessorResource does not exist, or
-    *                                            if no resource class of resourceClassName exists, or
-    *                                            if any resourcePermission is invalid for the specified resource class
-    * @throws com.acciente.oacc.NotAuthorizedException if the session resource is not the accessor resource and
-    *                                                  the session resource does not have either IMPERSONATE, INHERIT
-    *                                                  or RESET-CREDENTIALS permissions on the accessor resource
-    */
-   public Set<Resource> getResourcesByResourcePermissionsAndDomain(Resource accessorResource,
-                                                                   String resourceClassName,
-                                                                   Set<ResourcePermission> resourcePermissions);
-
-   /**
-    * Returns a set of resources (of the specified resource class) on which
-    * the current session resource has the specified permissions, within the specified domain
-    * or within any descendant domains.
-    * <p/>
-    * The method takes into account direct, inherited and global permissions, as well as
-    * resources that are reachable as a result of SUPER-USER permissions.
-    *
-    * @param resourceClassName   a string resource class name
-    * @param domainName          a domain name
-    * @param resourcePermission  the permission to check
-    * @param resourcePermissions the other (optional) permissions to check
-    * @return a set of resources
-    * @throws java.lang.IllegalArgumentException if no resource class of resourceClassName exists, or
-    *                                            if any resourcePermission is invalid for the specified resource class, or
-    *                                            if no domain of domainName exists
-    */
-   public Set<Resource> getResourcesByResourcePermissionsAndDomain(String resourceClassName,
-                                                                   String domainName,
-                                                                   ResourcePermission resourcePermission,
-                                                                   ResourcePermission... resourcePermissions);
-
-   /**
-    * Returns a set of resources (of the specified resource class) on which
-    * the current session resource has the specified permissions, within the session resource's domain
-    * or within any descendant domains.
-    * <p/>
-    * The method takes into account direct, inherited and global permissions, as well as
-    * resources that are reachable as a result of SUPER-USER permissions.
-    *
-    * @param resourceClassName   a string resource class name
-    * @param resourcePermission  the permission to check
-    * @param resourcePermissions the other (optional) permissions to check
-    * @return a set of resources
-    * @throws java.lang.IllegalArgumentException if no resource class of resourceClassName exists, or
-    *                                            if any resourcePermission is invalid for the specified resource class
-    */
-   public Set<Resource> getResourcesByResourcePermissionsAndDomain(String resourceClassName,
-                                                                   ResourcePermission resourcePermission,
-                                                                   ResourcePermission... resourcePermissions);
-
-   /**
-    * Returns a set of resources (of the specified resource class) on which
-    * the specified accessor resource has the specified permissions, within the
     * specified domain or within any descendant domains.
     * <p/>
     * The method takes into account direct, inherited and global permissions, as well as
@@ -993,36 +853,6 @@ public interface AccessControlContext {
    public Set<Resource> getResourcesByResourcePermissionsAndDomain(Resource accessorResource,
                                                                    String resourceClassName,
                                                                    String domainName,
-                                                                   ResourcePermission resourcePermission,
-                                                                   ResourcePermission... resourcePermissions);
-
-   /**
-    * Returns a set of resources (of the specified resource class) on which
-    * the specified accessor resource has the specified permissions, within the
-    * session resource's domain or within any descendant domains.
-    * <p/>
-    * The method takes into account direct, inherited and global permissions, as well as
-    * resources that are reachable as a result of SUPER-USER permissions.
-    * <p/>
-    * Note that the current session resource must either be the specified accessor resource, or
-    * the current session resource must have IMPERSONATE, INHERIT or RESET-CREDENTIALS permissions to
-    * the specified accessor resource, or must have SUPER-USER permission to the (parent-) domain
-    * of the specified accessor resource, otherwise an exception is thrown.
-    *
-    * @param accessorResource    the resource relative to which the set of accessible resources is computed
-    * @param resourceClassName   a string resource class name
-    * @param resourcePermission  the permission to check
-    * @param resourcePermissions the other (optional) permissions to check
-    * @return a set of resources
-    * @throws java.lang.IllegalArgumentException if accessorResource does not exist, or
-    *                                            if no resource class of resourceClassName exists, or
-    *                                            if any resourcePermission is invalid for the specified resource class
-    * @throws com.acciente.oacc.NotAuthorizedException if the session resource is not the accessor resource and
-    *                                                  the session resource does not have either IMPERSONATE, INHERIT
-    *                                                  or RESET-CREDENTIALS permissions on the accessor resource
-    */
-   public Set<Resource> getResourcesByResourcePermissionsAndDomain(Resource accessorResource,
-                                                                   String resourceClassName,
                                                                    ResourcePermission resourcePermission,
                                                                    ResourcePermission... resourcePermissions);
 

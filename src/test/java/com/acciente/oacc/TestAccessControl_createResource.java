@@ -56,7 +56,8 @@ public class TestAccessControl_createResource extends TestAccessControlBase {
       final ResourcePermission grantedResourcePermission = ResourcePermissions.getInstance(permissionName);
       grantResourceCreatePermission(authenticatedResource, resourceClassName, domainName, permissionName);
 
-      Set<Resource> resourcesByPermission = accessControlContext.getResourcesByResourcePermissions(resourceClassName,
+      Set<Resource> resourcesByPermission = accessControlContext.getResourcesByResourcePermissions(authenticatedResource,
+                                                                                                   resourceClassName,
                                                                                                    grantedResourcePermission);
       assertThat(resourcesByPermission.isEmpty(), is(true));
 
@@ -64,7 +65,8 @@ public class TestAccessControl_createResource extends TestAccessControlBase {
       final Resource resource = accessControlContext.createResource(resourceClassName, domainName);
 
       assertThat(resource, is(not(nullValue())));
-      resourcesByPermission = accessControlContext.getResourcesByResourcePermissions(resourceClassName,
+      resourcesByPermission = accessControlContext.getResourcesByResourcePermissions(authenticatedResource,
+                                                                                     resourceClassName,
                                                                                      grantedResourcePermission);
       assertThat(resourcesByPermission.size(), is(1));
       assertThat(accessControlContext.getDomainNameByResource(resource), is(domainName));
@@ -75,7 +77,8 @@ public class TestAccessControl_createResource extends TestAccessControlBase {
       final Resource resource2 = accessControlContext.createResource(resourceClassName, domainName);
 
       assertThat(resource2, is(not(nullValue())));
-      resourcesByPermission = accessControlContext.getResourcesByResourcePermissions(resourceClassName,
+      resourcesByPermission = accessControlContext.getResourcesByResourcePermissions(authenticatedResource,
+                                                                                     resourceClassName,
                                                                                      grantedResourcePermission);
       assertThat(resourcesByPermission.size(), is(2));
       assertThat(resource2.getId(), is(not(resource.getId())));
@@ -97,10 +100,12 @@ public class TestAccessControl_createResource extends TestAccessControlBase {
 
       final ResourcePermission implicitResourcePermission = ResourcePermissions.getInstance(permissionName);
       final ResourcePermission implicitResourcePermission2 = ResourcePermissions.getInstance(permissionName2);
-      Set<Resource> resourcesByPermission = accessControlContext.getResourcesByResourcePermissions(resourceClassName,
+      Set<Resource> resourcesByPermission = accessControlContext.getResourcesByResourcePermissions(authenticatedResource,
+                                                                                                   resourceClassName,
                                                                                                    implicitResourcePermission);
       assertThat(resourcesByPermission.isEmpty(), is(true));
-      Set<Resource> resourcesByPermission2 = accessControlContext.getResourcesByResourcePermissions(resourceClassName,
+      Set<Resource> resourcesByPermission2 = accessControlContext.getResourcesByResourcePermissions(authenticatedResource,
+                                                                                                    resourceClassName,
                                                                                                     implicitResourcePermission2);
       assertThat(resourcesByPermission2.isEmpty(), is(true));
 
@@ -116,10 +121,12 @@ public class TestAccessControl_createResource extends TestAccessControlBase {
       assertThat(resourceClassInfo.getResourceClassName(), is(resourceClassName));
 
       // verify resource created while unauthenticated gets *ALL* available resource class permissions
-      resourcesByPermission = accessControlContext.getResourcesByResourcePermissions(resourceClassName,
+      resourcesByPermission = accessControlContext.getResourcesByResourcePermissions(SYS_RESOURCE,
+                                                                                     resourceClassName,
                                                                                      implicitResourcePermission);
       assertThat(resourcesByPermission.size(), is(1));
-      resourcesByPermission2 = accessControlContext.getResourcesByResourcePermissions(resourceClassName,
+      resourcesByPermission2 = accessControlContext.getResourcesByResourcePermissions(SYS_RESOURCE,
+                                                                                      resourceClassName,
                                                                                       implicitResourcePermission2);
       assertThat(resourcesByPermission2.size(), is(1));
    }
@@ -135,7 +142,8 @@ public class TestAccessControl_createResource extends TestAccessControlBase {
       final ResourcePermission grantedResourcePermission = ResourcePermissions.getInstance(permissionName);
       grantResourceCreatePermission(authenticatedResource, resourceClassName, domainName, permissionName);
 
-      Set<Resource> resourcesByPermission = accessControlContext.getResourcesByResourcePermissions(resourceClassName,
+      Set<Resource> resourcesByPermission = accessControlContext.getResourcesByResourcePermissions(authenticatedResource,
+                                                                                                   resourceClassName,
                                                                                                    grantedResourcePermission);
       assertThat(resourcesByPermission.isEmpty(), is(true));
 
@@ -145,7 +153,8 @@ public class TestAccessControl_createResource extends TestAccessControlBase {
       final Resource resource = accessControlContext.createResource(resourceClassName_whitespaced, domainName_whitespaced);
 
       assertThat(resource, is(not(nullValue())));
-      resourcesByPermission = accessControlContext.getResourcesByResourcePermissions(resourceClassName,
+      resourcesByPermission = accessControlContext.getResourcesByResourcePermissions(authenticatedResource,
+                                                                                     resourceClassName,
                                                                                      grantedResourcePermission);
       assertThat(resourcesByPermission.size(), is(1));
 
@@ -153,7 +162,8 @@ public class TestAccessControl_createResource extends TestAccessControlBase {
       final Resource resource2 = accessControlContext.createResource(resourceClassName, domainName);
 
       assertThat(resource2, is(not(nullValue())));
-      resourcesByPermission = accessControlContext.getResourcesByResourcePermissions(resourceClassName,
+      resourcesByPermission = accessControlContext.getResourcesByResourcePermissions(authenticatedResource,
+                                                                                     resourceClassName,
                                                                                      grantedResourcePermission);
       assertThat(resourcesByPermission.size(), is(2));
       assertThat(resource2.getId(), is(not(resource.getId())));
@@ -190,37 +200,43 @@ public class TestAccessControl_createResource extends TestAccessControlBase {
          final ResourcePermission grantedResourcePermission_UPPER = ResourcePermissions.getInstance(permissionName);
 
          Set<Resource> resourcesByPermission;
-         resourcesByPermission = accessControlContext.getResourcesByResourcePermissions(resourceClass_lower,
+         resourcesByPermission = accessControlContext.getResourcesByResourcePermissions(authenticatedResource,
+                                                                                        resourceClass_lower,
                                                                                         grantedResourcePermission_lower);
          assertThat(resourcesByPermission.isEmpty(), is(true));
-         resourcesByPermission = accessControlContext.getResourcesByResourcePermissions(resourceClass_UPPER,
+         resourcesByPermission = accessControlContext.getResourcesByResourcePermissions(authenticatedResource,
+                                                                                        resourceClass_UPPER,
                                                                                         grantedResourcePermission_UPPER);
          assertThat(resourcesByPermission.isEmpty(), is(true));
 
          // create resources with case-sensitive domain/class names and verify resources get created in different domain/classes
          final Resource resource_lowlow = accessControlContext.createResource(resourceClass_lower, domain_lower);
          assertThat(resource_lowlow, is(not(nullValue())));
-         resourcesByPermission = accessControlContext.getResourcesByResourcePermissions(resourceClass_lower,
+         resourcesByPermission = accessControlContext.getResourcesByResourcePermissions(authenticatedResource,
+                                                                                        resourceClass_lower,
                                                                                         grantedResourcePermission_lower);
          assertThat(resourcesByPermission.size(), is(1));
 
          final Resource resource_lowUP = accessControlContext.createResource(resourceClass_lower, domain_UPPER);
          assertThat(resource_lowUP, is(not(nullValue())));
          assertThat(resource_lowUP.getId(), is(not(resource_lowlow.getId())));
-         resourcesByPermission = accessControlContext.getResourcesByResourcePermissions(resourceClass_lower,
+         resourcesByPermission = accessControlContext.getResourcesByResourcePermissions(authenticatedResource,
+                                                                                        resourceClass_lower,
                                                                                         grantedResourcePermission_lower);
          assertThat(resourcesByPermission.size(), is(2));
 
          final Resource resource_UPlow = accessControlContext.createResource(resourceClass_UPPER, domain_lower);
          assertThat(resource_UPlow, is(not(nullValue())));
-         resourcesByPermission = accessControlContext.getResourcesByResourcePermissions(resourceClass_UPPER,
+         resourcesByPermission = accessControlContext.getResourcesByResourcePermissions(authenticatedResource,
+                                                                                        resourceClass_UPPER,
                                                                                         grantedResourcePermission_UPPER);
          assertThat(resourcesByPermission.size(), is(1));
 
          final Resource resource_UPUP = accessControlContext.createResource(resourceClass_UPPER, domain_UPPER);
          assertThat(resource_UPUP, is(not(nullValue())));
          assertThat(resource_UPUP.getId(), is(not(resource_UPlow.getId())));
-         resourcesByPermission = accessControlContext.getResourcesByResourcePermissions(resourceClass_UPPER,
+         resourcesByPermission = accessControlContext.getResourcesByResourcePermissions(authenticatedResource,
+                                                                                        resourceClass_UPPER,
                                                                                         grantedResourcePermission_UPPER);
          assertThat(resourcesByPermission.size(), is(2));
       }
@@ -236,24 +252,28 @@ public class TestAccessControl_createResource extends TestAccessControlBase {
          final ResourcePermission grantedResourcePermission = ResourcePermissions.getInstance(permissionName);
 
          Set<Resource> resourcesByPermission;
-         resourcesByPermission = accessControlContext.getResourcesByResourcePermissions(resourceClass_lower,
+         resourcesByPermission = accessControlContext.getResourcesByResourcePermissions(authenticatedResource,
+                                                                                        resourceClass_lower,
                                                                                         grantedResourcePermission);
          assertThat(resourcesByPermission.isEmpty(), is(true));
-         resourcesByPermission = accessControlContext.getResourcesByResourcePermissions(resourceClass_UPPER,
+         resourcesByPermission = accessControlContext.getResourcesByResourcePermissions(authenticatedResource,
+                                                                                        resourceClass_UPPER,
                                                                                         grantedResourcePermission);
          assertThat(resourcesByPermission.isEmpty(), is(true));
 
          // create resources with case-sensitive domain/class names and verify resources get created in same domain/classes
          final Resource resource_lowlow = accessControlContext.createResource(resourceClass_lower, domain_lower);
          assertThat(resource_lowlow, is(not(nullValue())));
-         resourcesByPermission = accessControlContext.getResourcesByResourcePermissions(resourceClass_lower,
+         resourcesByPermission = accessControlContext.getResourcesByResourcePermissions(authenticatedResource,
+                                                                                        resourceClass_lower,
                                                                                         grantedResourcePermission);
          assertThat(resourcesByPermission.size(), is(1));
 
          final Resource resource_lowUP = accessControlContext.createResource(resourceClass_lower, domain_UPPER);
          assertThat(resource_lowUP, is(not(nullValue())));
          assertThat(resource_lowUP.getId(), is(not(resource_lowlow.getId())));
-         resourcesByPermission = accessControlContext.getResourcesByResourcePermissions(resourceClass_lower,
+         resourcesByPermission = accessControlContext.getResourcesByResourcePermissions(authenticatedResource,
+                                                                                        resourceClass_lower,
                                                                                         grantedResourcePermission);
          assertThat(resourcesByPermission.size(), is(2));
 
@@ -261,7 +281,8 @@ public class TestAccessControl_createResource extends TestAccessControlBase {
          assertThat(resource_UPlow, is(not(nullValue())));
          assertThat(resource_UPlow.getId(), is(not(resource_lowlow.getId())));
          assertThat(resource_UPlow.getId(), is(not(resource_lowUP.getId())));
-         resourcesByPermission = accessControlContext.getResourcesByResourcePermissions(resourceClass_UPPER,
+         resourcesByPermission = accessControlContext.getResourcesByResourcePermissions(authenticatedResource,
+                                                                                        resourceClass_UPPER,
                                                                                         grantedResourcePermission);
          assertThat(resourcesByPermission.size(), is(3));
 
@@ -270,7 +291,8 @@ public class TestAccessControl_createResource extends TestAccessControlBase {
          assertThat(resource_UPUP.getId(), is(not(resource_lowlow.getId())));
          assertThat(resource_UPUP.getId(), is(not(resource_lowUP.getId())));
          assertThat(resource_UPUP.getId(), is(not(resource_UPlow.getId())));
-         resourcesByPermission = accessControlContext.getResourcesByResourcePermissions(resourceClass_UPPER,
+         resourcesByPermission = accessControlContext.getResourcesByResourcePermissions(authenticatedResource,
+                                                                                        resourceClass_UPPER,
                                                                                         grantedResourcePermission);
          assertThat(resourcesByPermission.size(), is(4));
       }
