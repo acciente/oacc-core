@@ -1007,19 +1007,6 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       }
    }
 
-   @Override
-   public void grantDomainPermissions(Resource accessorResource,
-                                      Set<DomainPermission> domainPermissions) {
-      grantDomainPermissions(accessorResource, sessionResourceDomainName, domainPermissions);
-   }
-
-   @Override
-   public void grantDomainPermissions(Resource accessorResource,
-                                      DomainPermission domainPermission,
-                                      DomainPermission... domainPermissions) {
-      grantDomainPermissions(accessorResource, sessionResourceDomainName, domainPermission, domainPermissions);
-   }
-
    private void __grantDirectDomainPermissions(SQLConnection connection,
                                                Resource accessorResource,
                                                String domainName,
@@ -1165,19 +1152,6 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       finally {
          __closeConnection(connection);
       }
-   }
-
-   @Override
-   public void revokeDomainPermissions(Resource accessorResource,
-                                       Set<DomainPermission> domainPermissions) {
-      revokeDomainPermissions(accessorResource, sessionResourceDomainName, domainPermissions);
-   }
-
-   @Override
-   public void revokeDomainPermissions(Resource accessorResource,
-                                       DomainPermission domainPermission,
-                                       DomainPermission... domainPermissions) {
-      revokeDomainPermissions(accessorResource, sessionResourceDomainName, domainPermission, domainPermissions);
    }
 
    private void __revokeDirectDomainPermissions(SQLConnection connection,
@@ -2211,16 +2185,6 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
    @Override
    public void grantResourceCreatePermissions(Resource accessorResource,
                                               String resourceClassName,
-                                              Set<ResourceCreatePermission> resourceCreatePermissions) {
-      grantResourceCreatePermissions(accessorResource,
-                                     resourceClassName,
-                                     sessionResourceDomainName,
-                                     resourceCreatePermissions);
-   }
-
-   @Override
-   public void grantResourceCreatePermissions(Resource accessorResource,
-                                              String resourceClassName,
                                               String domainName,
                                               ResourceCreatePermission resourceCreatePermission,
                                               ResourceCreatePermission... resourceCreatePermissions) {
@@ -2248,18 +2212,6 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       finally {
          __closeConnection(connection);
       }
-   }
-
-   @Override
-   public void grantResourceCreatePermissions(Resource accessorResource,
-                                              String resourceClassName,
-                                              ResourceCreatePermission resourceCreatePermission,
-                                              ResourceCreatePermission... resourceCreatePermissions) {
-      grantResourceCreatePermissions(accessorResource,
-                                     resourceClassName,
-                                     sessionResourceDomainName,
-                                     resourceCreatePermission,
-                                     resourceCreatePermissions);
    }
 
    private void __grantDirectResourceCreatePermissions(SQLConnection connection,
@@ -2467,16 +2419,6 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
    @Override
    public void revokeResourceCreatePermissions(Resource accessorResource,
                                                String resourceClassName,
-                                               Set<ResourceCreatePermission> resourceCreatePermissions) {
-      revokeResourceCreatePermissions(accessorResource,
-                                      resourceClassName,
-                                      sessionResourceDomainName,
-                                      resourceCreatePermissions);
-   }
-
-   @Override
-   public void revokeResourceCreatePermissions(Resource accessorResource,
-                                               String resourceClassName,
                                                String domainName,
                                                ResourceCreatePermission resourceCreatePermission,
                                                ResourceCreatePermission... resourceCreatePermissions) {
@@ -2504,18 +2446,6 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       finally {
          __closeConnection(connection);
       }
-   }
-
-   @Override
-   public void revokeResourceCreatePermissions(Resource accessorResource,
-                                               String resourceClassName,
-                                               ResourceCreatePermission resourceCreatePermission,
-                                               ResourceCreatePermission... resourceCreatePermissions) {
-      revokeResourceCreatePermissions(accessorResource,
-                                      resourceClassName,
-                                      sessionResourceDomainName,
-                                      resourceCreatePermission,
-                                      resourceCreatePermissions);
    }
 
    private void __revokeDirectResourceCreatePermissions(SQLConnection connection,
@@ -3729,28 +3659,6 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
    @Override
    public void grantGlobalResourcePermissions(Resource accessorResource,
                                               String resourceClassName,
-                                              Set<ResourcePermission> resourcePermissions) {
-      grantGlobalResourcePermissions(accessorResource,
-                                     resourceClassName,
-                                     sessionResourceDomainName,
-                                     resourcePermissions);
-
-   }
-   @Override
-   public void grantGlobalResourcePermissions(Resource accessorResource,
-                                              String resourceClassName,
-                                              ResourcePermission resourcePermission,
-                                              ResourcePermission... resourcePermissions) {
-      grantGlobalResourcePermissions(accessorResource,
-                                     resourceClassName,
-                                     sessionResourceDomainName,
-                                     resourcePermission,
-                                     resourcePermissions);
-   }
-
-   @Override
-   public void grantGlobalResourcePermissions(Resource accessorResource,
-                                              String resourceClassName,
                                               String domainName,
                                               ResourcePermission resourcePermission,
                                               ResourcePermission... resourcePermissions) {
@@ -3889,16 +3797,6 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
    @Override
    public void revokeGlobalResourcePermissions(Resource accessorResource,
                                                String resourceClassName,
-                                               Set<ResourcePermission> resourcePermissions) {
-      revokeGlobalResourcePermissions(accessorResource,
-                                      resourceClassName,
-                                      sessionResourceDomainName,
-                                      resourcePermissions);
-   }
-
-   @Override
-   public void revokeGlobalResourcePermissions(Resource accessorResource,
-                                               String resourceClassName,
                                                String domainName,
                                                Set<ResourcePermission> resourcePermissions) {
       SQLConnection connection = null;
@@ -3924,18 +3822,6 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       finally {
          __closeConnection(connection);
       }
-   }
-
-   @Override
-   public void revokeGlobalResourcePermissions(Resource accessorResource,
-                                               String resourceClassName,
-                                               ResourcePermission resourcePermission,
-                                               ResourcePermission... resourcePermissions) {
-      revokeGlobalResourcePermissions(accessorResource,
-                                      resourceClassName,
-                                      sessionResourceDomainName,
-                                      resourcePermission,
-                                      resourcePermissions);
    }
 
    @Override

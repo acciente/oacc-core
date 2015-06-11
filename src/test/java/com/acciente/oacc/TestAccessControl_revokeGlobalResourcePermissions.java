@@ -68,30 +68,6 @@ public class TestAccessControl_revokeGlobalResourcePermissions extends TestAcces
                                                                             domainName).isEmpty(),
                  is(true));
 
-      // reset for implicit domain
-      accessControlContext.setGlobalResourcePermissions(accessorResource,
-                                                        authenticatableResourceClassName,
-                                                        permissions_pre);
-
-      assertThat(accessControlContext.getEffectiveGlobalResourcePermissions(accessorResource,
-                                                                            authenticatableResourceClassName,
-                                                                            domainName),
-                 is(permissions_pre));
-
-      // revoke permissions and verify for implicit domain
-      accessControlContext.revokeGlobalResourcePermissions(accessorResource,
-                                                           authenticatableResourceClassName,
-                                                           ResourcePermissions
-                                                                 .getInstance(ResourcePermissions.IMPERSONATE),
-                                                           ResourcePermissions
-                                                                 .getInstance(permissionName));
-
-      final Set<ResourcePermission> permissions_post_implicit
-            = accessControlContext.getEffectiveGlobalResourcePermissions(accessorResource,
-                                                                         authenticatableResourceClassName,
-                                                                         domainName);
-      assertThat(permissions_post_implicit.isEmpty(), is(true));
-
       // test set-based version
       final Resource accessorResource2 = generateUnauthenticatableResource();
       accessControlContext.setGlobalResourcePermissions(accessorResource2,
@@ -107,28 +83,6 @@ public class TestAccessControl_revokeGlobalResourcePermissions extends TestAcces
       accessControlContext.revokeGlobalResourcePermissions(accessorResource2,
                                                            authenticatableResourceClassName,
                                                            domainName,
-                                                           setOf(ResourcePermissions
-                                                                       .getInstance(ResourcePermissions.IMPERSONATE),
-                                                                 ResourcePermissions
-                                                                       .getInstance(permissionName)));
-
-      assertThat(accessControlContext.getEffectiveGlobalResourcePermissions(accessorResource2,
-                                                                            authenticatableResourceClassName,
-                                                                            domainName).isEmpty(),
-                 is(true));
-
-      // reset for implicit domain
-      accessControlContext.setGlobalResourcePermissions(accessorResource2,
-                                                        authenticatableResourceClassName,
-                                                        permissions_pre);
-
-      assertThat(accessControlContext.getEffectiveGlobalResourcePermissions(accessorResource2,
-                                                                            authenticatableResourceClassName,
-                                                                            domainName),
-                 is(permissions_pre));
-
-      accessControlContext.revokeGlobalResourcePermissions(accessorResource2,
-                                                           authenticatableResourceClassName,
                                                            setOf(ResourcePermissions
                                                                        .getInstance(ResourcePermissions.IMPERSONATE),
                                                                  ResourcePermissions
@@ -166,32 +120,6 @@ public class TestAccessControl_revokeGlobalResourcePermissions extends TestAcces
       accessControlContext.revokeGlobalResourcePermissions(accessorResource,
                                                            authenticatableResourceClassName,
                                                            domainName,
-                                                           setOf(ResourcePermissions
-                                                                       .getInstance(ResourcePermissions.IMPERSONATE),
-                                                                 ResourcePermissions
-                                                                       .getInstance(permissionName)));
-
-      assertThat(accessControlContext.getEffectiveGlobalResourcePermissions(accessorResource,
-                                                                            authenticatableResourceClassName,
-                                                                            domainName).isEmpty(),
-                 is(true));
-
-      // revoke permissions and verify for implicit domain
-      accessControlContext.revokeGlobalResourcePermissions(accessorResource,
-                                                           authenticatableResourceClassName,
-                                                           ResourcePermissions
-                                                                 .getInstance(ResourcePermissions.IMPERSONATE),
-                                                           ResourcePermissions
-                                                                 .getInstance(permissionName));
-
-      final Set<ResourcePermission> permissions_post_implicit
-            = accessControlContext.getEffectiveGlobalResourcePermissions(accessorResource,
-                                                                         authenticatableResourceClassName,
-                                                                         domainName);
-      assertThat(permissions_post_implicit.isEmpty(), is(true));
-
-      accessControlContext.revokeGlobalResourcePermissions(accessorResource,
-                                                           authenticatableResourceClassName,
                                                            setOf(ResourcePermissions
                                                                        .getInstance(ResourcePermissions.IMPERSONATE),
                                                                  ResourcePermissions
@@ -264,34 +192,6 @@ public class TestAccessControl_revokeGlobalResourcePermissions extends TestAcces
                                                                             authenticatableResourceClassName,
                                                                             domainName),
                  is(setOf(ResourcePermissions.getInstance(grantablePermissionName, true))));
-
-      // revoke permissions and verify for implicit domain
-      try {
-         accessControlContext.revokeGlobalResourcePermissions(accessorResource,
-                                                              authenticatableResourceClassName,
-                                                              ResourcePermissions
-                                                                    .getInstance(grantablePermissionName),
-                                                              ResourcePermissions
-                                                                    .getInstance(ungrantablePermissionName));
-         fail("revoking permissions without grant-authorization should have failed");
-      }
-      catch (NotAuthorizedException e) {
-         assertThat(e.getMessage().toLowerCase(), containsString(ungrantablePermissionName.toLowerCase()));
-         assertThat(e.getMessage().toLowerCase(), not(containsString(grantablePermissionName)));
-      }
-      try {
-         accessControlContext.revokeGlobalResourcePermissions(accessorResource,
-                                                              authenticatableResourceClassName,
-                                                              setOf(ResourcePermissions
-                                                                          .getInstance(grantablePermissionName),
-                                                                    ResourcePermissions
-                                                                          .getInstance(ungrantablePermissionName)));
-         fail("revoking permissions without grant-authorization should have failed");
-      }
-      catch (NotAuthorizedException e) {
-         assertThat(e.getMessage().toLowerCase(), containsString(ungrantablePermissionName.toLowerCase()));
-         assertThat(e.getMessage().toLowerCase(), not(containsString(grantablePermissionName)));
-      }
    }
 
    @Test
@@ -310,15 +210,7 @@ public class TestAccessControl_revokeGlobalResourcePermissions extends TestAcces
                                                                  .getInstance(ResourcePermissions.INHERIT));
       accessControlContext.revokeGlobalResourcePermissions(accessorResource,
                                                            resourceClassName,
-                                                           ResourcePermissions
-                                                                 .getInstance(ResourcePermissions.INHERIT));
-      accessControlContext.revokeGlobalResourcePermissions(accessorResource,
-                                                           resourceClassName,
                                                            domainName,
-                                                           setOf(ResourcePermissions
-                                                                       .getInstance(ResourcePermissions.INHERIT)));
-      accessControlContext.revokeGlobalResourcePermissions(accessorResource,
-                                                           resourceClassName,
                                                            setOf(ResourcePermissions
                                                                        .getInstance(ResourcePermissions.INHERIT)));
    }
@@ -346,27 +238,7 @@ public class TestAccessControl_revokeGlobalResourcePermissions extends TestAcces
       try {
          accessControlContext.revokeGlobalResourcePermissions(accessorResource,
                                                               resourceClassName,
-                                                              ResourcePermissions
-                                                                    .getInstance(ResourcePermissions.RESET_CREDENTIALS));
-         fail("revoking reset-credentials permission for unauthenticatable resource should have failed");
-      }
-      catch (IllegalArgumentException e) {
-         assertThat(e.getMessage().toLowerCase(), containsString("not valid for unauthenticatable resource"));
-      }
-      try {
-         accessControlContext.revokeGlobalResourcePermissions(accessorResource,
-                                                              resourceClassName,
                                                               domainName,
-                                                              setOf(ResourcePermissions
-                                                                          .getInstance(ResourcePermissions.RESET_CREDENTIALS)));
-         fail("revoking reset-credentials permission for unauthenticatable resource should have failed");
-      }
-      catch (IllegalArgumentException e) {
-         assertThat(e.getMessage().toLowerCase(), containsString("not valid for unauthenticatable resource"));
-      }
-      try {
-         accessControlContext.revokeGlobalResourcePermissions(accessorResource,
-                                                              resourceClassName,
                                                               setOf(ResourcePermissions
                                                                           .getInstance(ResourcePermissions.RESET_CREDENTIALS)));
          fail("revoking reset-credentials permission for unauthenticatable resource should have failed");
@@ -399,27 +271,7 @@ public class TestAccessControl_revokeGlobalResourcePermissions extends TestAcces
       try {
          accessControlContext.revokeGlobalResourcePermissions(accessorResource,
                                                               resourceClassName,
-                                                              ResourcePermissions
-                                                                    .getInstance(ResourcePermissions.IMPERSONATE));
-         fail("revoking impersonate permission for unauthenticatable resource should have failed");
-      }
-      catch (IllegalArgumentException e) {
-         assertThat(e.getMessage().toLowerCase(), containsString("not valid for unauthenticatable resource"));
-      }
-      try {
-         accessControlContext.revokeGlobalResourcePermissions(accessorResource,
-                                                              resourceClassName,
                                                               domainName,
-                                                              setOf(ResourcePermissions
-                                                                          .getInstance(ResourcePermissions.IMPERSONATE)));
-         fail("revoking impersonate permission for unauthenticatable resource should have failed");
-      }
-      catch (IllegalArgumentException e) {
-         assertThat(e.getMessage().toLowerCase(), containsString("not valid for unauthenticatable resource"));
-      }
-      try {
-         accessControlContext.revokeGlobalResourcePermissions(accessorResource,
-                                                              resourceClassName,
                                                               setOf(ResourcePermissions
                                                                           .getInstance(ResourcePermissions.IMPERSONATE)));
          fail("revoking impersonate permission for unauthenticatable resource should have failed");
@@ -497,77 +349,6 @@ public class TestAccessControl_revokeGlobalResourcePermissions extends TestAcces
 
       assertThat(accessControlContext
                        .getEffectiveGlobalResourcePermissions(accessorResource2, resourceClassName, domainName).isEmpty(),
-                 is(true));
-   }
-
-   @Test
-   public void revokeGlobalResourcePermissions_validWithDefaultSessionDomain() {
-      authenticateSystemResource();
-      final String resourceClassName = generateResourceClass(true, false);
-      final String customPermissionName = generateResourceClassPermission(resourceClassName);
-      final char[] password = generateUniquePassword();
-      final Resource grantorResource = generateAuthenticatableResource(password);
-      final String grantorDomainName = accessControlContext.getDomainNameByResource(grantorResource);
-
-      // set permissions
-      Set<ResourcePermission> permissions_pre
-            = setOf(ResourcePermissions.getInstance(ResourcePermissions.IMPERSONATE),
-                    ResourcePermissions.getInstance(customPermissionName));
-      final Resource accessorResource = generateUnauthenticatableResource();
-      accessControlContext.setGlobalResourcePermissions(accessorResource,
-                                                        resourceClassName,
-                                                        grantorDomainName,
-                                                        permissions_pre);
-
-      assertThat(accessControlContext.getEffectiveGlobalResourcePermissions(accessorResource, resourceClassName, grantorDomainName),
-                 is(permissions_pre));
-
-      final Resource accessorResource2 = generateUnauthenticatableResource();
-      accessControlContext.setGlobalResourcePermissions(accessorResource2,
-                                                        resourceClassName,
-                                                        grantorDomainName,
-                                                        permissions_pre);
-
-      // setup grantor permissions
-      Set<ResourcePermission> grantorResourcePermissions = new HashSet<>();
-      grantorResourcePermissions.add(ResourcePermissions.getInstance(ResourcePermissions.IMPERSONATE, true));
-      grantorResourcePermissions.add(ResourcePermissions.getInstance(customPermissionName, true));
-
-      accessControlContext.setGlobalResourcePermissions(grantorResource,
-                                                        resourceClassName,
-                                                        grantorDomainName,
-                                                        grantorResourcePermissions);
-      assertThat(accessControlContext.getEffectiveGlobalResourcePermissions(grantorResource,
-                                                                            resourceClassName,
-                                                                            grantorDomainName), is(
-            grantorResourcePermissions));
-
-      // authenticate grantor resource
-      accessControlContext.authenticate(grantorResource, PasswordCredentials.newInstance(password));
-
-      // revoke global permissions as grantor and verify
-      accessControlContext.revokeGlobalResourcePermissions(accessorResource,
-                                                           resourceClassName,
-                                                           ResourcePermissions
-                                                                 .getInstance(ResourcePermissions.IMPERSONATE),
-                                                           ResourcePermissions.getInstance(customPermissionName));
-
-      final Set<ResourcePermission> permissions_post_explicit = accessControlContext
-            .getEffectiveGlobalResourcePermissions(accessorResource, resourceClassName, grantorDomainName);
-      assertThat(permissions_post_explicit.isEmpty(), is(true));
-
-      // test set-based version
-      assertThat(accessControlContext.getEffectiveGlobalResourcePermissions(accessorResource2, resourceClassName, grantorDomainName),
-                 is(permissions_pre));
-
-      accessControlContext.revokeGlobalResourcePermissions(accessorResource2,
-                                                           resourceClassName,
-                                                           setOf(ResourcePermissions
-                                                                       .getInstance(ResourcePermissions.IMPERSONATE),
-                                                                 ResourcePermissions.getInstance(customPermissionName)));
-
-      assertThat(accessControlContext
-                       .getEffectiveGlobalResourcePermissions(accessorResource2, resourceClassName, grantorDomainName).isEmpty(),
                  is(true));
    }
 
@@ -675,6 +456,7 @@ public class TestAccessControl_revokeGlobalResourcePermissions extends TestAcces
       // revoke global permissions as grantor and verify
       accessControlContext.revokeGlobalResourcePermissions(accessorResource,
                                                            resourceClassName,
+                                                           grantorDomainName,
                                                            ResourcePermissions
                                                                  .getInstance(ResourcePermissions.IMPERSONATE));
 
@@ -690,6 +472,7 @@ public class TestAccessControl_revokeGlobalResourcePermissions extends TestAcces
 
       accessControlContext.revokeGlobalResourcePermissions(accessorResource2,
                                                            resourceClassName,
+                                                           grantorDomainName,
                                                            setOf(ResourcePermissions
                                                                        .getInstance(ResourcePermissions.IMPERSONATE)));
 
@@ -753,36 +536,11 @@ public class TestAccessControl_revokeGlobalResourcePermissions extends TestAcces
          assertThat(e.getMessage().toLowerCase(), containsString(ungrantablePermissionName.toLowerCase()));
          assertThat(e.getMessage().toLowerCase(), not(containsString(grantablePermissionName)));
       }
-      try {
-         accessControlContext.revokeGlobalResourcePermissions(accessorResource,
-                                                              resourceClassName,
-                                                              ResourcePermissions.getInstance(grantablePermissionName),
-                                                              ResourcePermissions
-                                                                    .getInstance(ungrantablePermissionName));
-         fail("revoking existing global permission granted elsewhere without authorization should have failed");
-      }
-      catch (NotAuthorizedException e) {
-         assertThat(e.getMessage().toLowerCase(), containsString(ungrantablePermissionName.toLowerCase()));
-         assertThat(e.getMessage().toLowerCase(), not(containsString(grantablePermissionName)));
-      }
 
       try {
          accessControlContext.revokeGlobalResourcePermissions(accessorResource,
                                                               resourceClassName,
                                                               domainName,
-                                                              setOf(ResourcePermissions.getInstance(
-                                                                          grantablePermissionName),
-                                                                    ResourcePermissions
-                                                                          .getInstance(ungrantablePermissionName)));
-         fail("revoking existing global permission granted elsewhere without authorization should have failed");
-      }
-      catch (NotAuthorizedException e) {
-         assertThat(e.getMessage().toLowerCase(), containsString(ungrantablePermissionName.toLowerCase()));
-         assertThat(e.getMessage().toLowerCase(), not(containsString(grantablePermissionName)));
-      }
-      try {
-         accessControlContext.revokeGlobalResourcePermissions(accessorResource,
-                                                              resourceClassName,
                                                               setOf(ResourcePermissions.getInstance(
                                                                           grantablePermissionName),
                                                                     ResourcePermissions
@@ -801,8 +559,6 @@ public class TestAccessControl_revokeGlobalResourcePermissions extends TestAcces
       final String resourceClassName = generateResourceClass(false, false);
       final String grantedPermissionName1 = generateResourceClassPermission(resourceClassName);
       final String grantedPermissionName2 = generateResourceClassPermission(resourceClassName);
-      final String grantedPermissionName3 = generateResourceClassPermission(resourceClassName);
-      final String grantedPermissionName4 = generateResourceClassPermission(resourceClassName);
       final char[] password = generateUniquePassword();
       final Resource grantorResource = generateAuthenticatableResource(password);
       final String domainName = accessControlContext.getDomainNameByResource(grantorResource);
@@ -810,9 +566,7 @@ public class TestAccessControl_revokeGlobalResourcePermissions extends TestAcces
       // setup accessor permissions
       Set<ResourcePermission> accessorPermissions_pre
             = setOf(ResourcePermissions.getInstance(grantedPermissionName1),
-                    ResourcePermissions.getInstance(grantedPermissionName2, true),
-                    ResourcePermissions.getInstance(grantedPermissionName3),
-                    ResourcePermissions.getInstance(grantedPermissionName4, true));
+                    ResourcePermissions.getInstance(grantedPermissionName2, true));
 
       final Resource accessorResource = generateUnauthenticatableResource();
       accessControlContext.setGlobalResourcePermissions(accessorResource,
@@ -831,9 +585,7 @@ public class TestAccessControl_revokeGlobalResourcePermissions extends TestAcces
       // setup grantor permissions
       Set<ResourcePermission> grantorResourcePermissions
             = setOf(ResourcePermissions.getInstance(grantedPermissionName1, true),
-                    ResourcePermissions.getInstance(grantedPermissionName2, true),
-                    ResourcePermissions.getInstance(grantedPermissionName3, true),
-                    ResourcePermissions.getInstance(grantedPermissionName4, true));
+                    ResourcePermissions.getInstance(grantedPermissionName2, true));
 
       accessControlContext.setGlobalResourcePermissions(grantorResource,
                                                         resourceClassName,
@@ -854,19 +606,7 @@ public class TestAccessControl_revokeGlobalResourcePermissions extends TestAcces
 
       final Set<ResourcePermission> permissions_post1
             = accessControlContext.getEffectiveGlobalResourcePermissions(accessorResource, resourceClassName, domainName);
-      assertThat(permissions_post1.size(), is(2));
-
-      // revoke remaining permissions for implicit domain
-      accessControlContext.revokeGlobalResourcePermissions(accessorResource,
-                                                           resourceClassName,
-                                                           ResourcePermissions.getInstance(grantedPermissionName3),
-                                                           ResourcePermissions.getInstance(grantedPermissionName4, true));
-
-      final Set<ResourcePermission> permissions_post2
-            = accessControlContext.getEffectiveGlobalResourcePermissions(accessorResource,
-                                                                         resourceClassName,
-                                                                         domainName);
-      assertThat(permissions_post2.isEmpty(), is(true));
+      assertThat(permissions_post1.isEmpty(), is(true));
 
       // test set-based version
       assertThat(accessControlContext.getEffectiveGlobalResourcePermissions(accessorResource2, resourceClassName, domainName),
@@ -881,18 +621,6 @@ public class TestAccessControl_revokeGlobalResourcePermissions extends TestAcces
                                                                                                  true)));
 
       assertThat(accessControlContext
-                       .getEffectiveGlobalResourcePermissions(accessorResource2, resourceClassName, domainName).size(),
-                 is(2));
-
-      // test set-based version for implicit domain
-      accessControlContext.revokeGlobalResourcePermissions(accessorResource2,
-                                                           resourceClassName,
-                                                           setOf(ResourcePermissions
-                                                                       .getInstance(grantedPermissionName3),
-                                                                 ResourcePermissions.getInstance(grantedPermissionName4,
-                                                                                                 true)));
-
-      assertThat(accessControlContext
                        .getEffectiveGlobalResourcePermissions(accessorResource2, resourceClassName, domainName).isEmpty(),
                  is(true));
    }
@@ -901,16 +629,14 @@ public class TestAccessControl_revokeGlobalResourcePermissions extends TestAcces
    public void revokeGlobalResourcePermissions_lesserGrantingRightPermissions_shouldSucceedAsAuthorized() {
       authenticateSystemResource();
       final String resourceClassName = generateResourceClass(false, false);
-      final String grantedPermissionName1 = generateResourceClassPermission(resourceClassName);
-      final String grantedPermissionName2 = generateResourceClassPermission(resourceClassName);
+      final String grantedPermissionName = generateResourceClassPermission(resourceClassName);
       final char[] password = generateUniquePassword();
       final Resource grantorResource = generateAuthenticatableResource(password);
       final String domainName = accessControlContext.getDomainNameByResource(grantorResource);
 
       // setup accessor permissions
       Set<ResourcePermission> accessorPermissions_pre
-            = setOf(ResourcePermissions.getInstance(grantedPermissionName1),
-                    ResourcePermissions.getInstance(grantedPermissionName2));
+            = setOf(ResourcePermissions.getInstance(grantedPermissionName));
 
       final Resource accessorResource = generateUnauthenticatableResource();
       accessControlContext.setGlobalResourcePermissions(accessorResource,
@@ -928,8 +654,7 @@ public class TestAccessControl_revokeGlobalResourcePermissions extends TestAcces
 
       // setup grantor permissions
       Set<ResourcePermission> grantorResourcePermissions
-            = setOf(ResourcePermissions.getInstance(grantedPermissionName1, true),
-                    ResourcePermissions.getInstance(grantedPermissionName2, true));
+            = setOf(ResourcePermissions.getInstance(grantedPermissionName, true));
 
       accessControlContext.setGlobalResourcePermissions(grantorResource,
                                                         resourceClassName,
@@ -945,22 +670,11 @@ public class TestAccessControl_revokeGlobalResourcePermissions extends TestAcces
       accessControlContext.revokeGlobalResourcePermissions(accessorResource,
                                                            resourceClassName,
                                                            domainName,
-                                                           ResourcePermissions.getInstance(grantedPermissionName1, true));
+                                                           ResourcePermissions.getInstance(grantedPermissionName, true));
 
-      final Set<ResourcePermission> permissions_post1
-            = accessControlContext.getEffectiveGlobalResourcePermissions(accessorResource, resourceClassName, domainName);
-      assertThat(permissions_post1.size(), is(1));
-
-      // revoke remaining permissions for implicit domain
-      accessControlContext.revokeGlobalResourcePermissions(accessorResource,
-                                                           resourceClassName,
-                                                           ResourcePermissions.getInstance(grantedPermissionName2, true));
-
-      final Set<ResourcePermission> permissions_post2
-            = accessControlContext.getEffectiveGlobalResourcePermissions(accessorResource,
-                                                                         resourceClassName,
-                                                                         domainName);
-      assertThat(permissions_post2.isEmpty(), is(true));
+      assertThat(accessControlContext
+                       .getEffectiveGlobalResourcePermissions(accessorResource, resourceClassName, domainName).isEmpty(),
+                 is(true));
 
       // test set-based version
       assertThat(accessControlContext.getEffectiveGlobalResourcePermissions(accessorResource2, resourceClassName, domainName),
@@ -969,19 +683,8 @@ public class TestAccessControl_revokeGlobalResourcePermissions extends TestAcces
       accessControlContext.revokeGlobalResourcePermissions(accessorResource2,
                                                            resourceClassName,
                                                            domainName,
-                                                           setOf(ResourcePermissions.getInstance(grantedPermissionName1,
+                                                           setOf(ResourcePermissions.getInstance(grantedPermissionName,
                                                                                                  true)));
-
-      assertThat(accessControlContext
-                       .getEffectiveGlobalResourcePermissions(accessorResource2, resourceClassName, domainName).size(),
-                 is(1));
-
-      // test set-based version for implicit domain
-      accessControlContext.revokeGlobalResourcePermissions(accessorResource2,
-                                                           resourceClassName,
-                                                           setOf(ResourcePermissions.getInstance(grantedPermissionName2,
-                                                                                                 true)));
-
       assertThat(accessControlContext
                        .getEffectiveGlobalResourcePermissions(accessorResource2, resourceClassName, domainName).isEmpty(),
                  is(true));
@@ -991,16 +694,14 @@ public class TestAccessControl_revokeGlobalResourcePermissions extends TestAcces
    public void revokeGlobalResourcePermissions_greaterGrantingRightPermissions_shouldSucceedAsAuthorized() {
       authenticateSystemResource();
       final String resourceClassName = generateResourceClass(false, false);
-      final String grantedPermissionName1 = generateResourceClassPermission(resourceClassName);
-      final String grantedPermissionName2 = generateResourceClassPermission(resourceClassName);
+      final String grantedPermissionName = generateResourceClassPermission(resourceClassName);
       final char[] password = generateUniquePassword();
       final Resource grantorResource = generateAuthenticatableResource(password);
       final String domainName = accessControlContext.getDomainNameByResource(grantorResource);
 
       // setup accessor permissions
       Set<ResourcePermission> accessorPermissions_pre
-            = setOf(ResourcePermissions.getInstance(grantedPermissionName1, true),
-                    ResourcePermissions.getInstance(grantedPermissionName2, true));
+            = setOf(ResourcePermissions.getInstance(grantedPermissionName, true));
 
       final Resource accessorResource = generateUnauthenticatableResource();
       accessControlContext.setGlobalResourcePermissions(accessorResource,
@@ -1019,8 +720,7 @@ public class TestAccessControl_revokeGlobalResourcePermissions extends TestAcces
                                                         accessorPermissions_pre);
       // setup grantor permissions
       Set<ResourcePermission> grantorResourcePermissions
-            = setOf(ResourcePermissions.getInstance(grantedPermissionName1, true),
-                    ResourcePermissions.getInstance(grantedPermissionName2, true));
+            = setOf(ResourcePermissions.getInstance(grantedPermissionName, true));
 
       accessControlContext.setGlobalResourcePermissions(grantorResource,
                                                         resourceClassName,
@@ -1036,22 +736,11 @@ public class TestAccessControl_revokeGlobalResourcePermissions extends TestAcces
       accessControlContext.revokeGlobalResourcePermissions(accessorResource,
                                                            resourceClassName,
                                                            domainName,
-                                                           ResourcePermissions.getInstance(grantedPermissionName1));
+                                                           ResourcePermissions.getInstance(grantedPermissionName));
 
-      final Set<ResourcePermission> permissions_post1
-            = accessControlContext.getEffectiveGlobalResourcePermissions(accessorResource, resourceClassName, domainName);
-      assertThat(permissions_post1.size(), is(1));
-
-      // revoke remaining permissions for implicit domain
-      accessControlContext.revokeGlobalResourcePermissions(accessorResource,
-                                                           resourceClassName,
-                                                           ResourcePermissions.getInstance(grantedPermissionName2));
-
-      final Set<ResourcePermission> permissions_post2
-            = accessControlContext.getEffectiveGlobalResourcePermissions(accessorResource,
-                                                                         resourceClassName,
-                                                                         domainName);
-      assertThat(permissions_post2.isEmpty(), is(true));
+      assertThat(accessControlContext
+                       .getEffectiveGlobalResourcePermissions(accessorResource, resourceClassName, domainName).isEmpty(),
+                 is(true));
 
       // test set-based version
       assertThat(accessControlContext.getEffectiveGlobalResourcePermissions(accessorResource2, resourceClassName, domainName),
@@ -1061,17 +750,7 @@ public class TestAccessControl_revokeGlobalResourcePermissions extends TestAcces
                                                            resourceClassName,
                                                            domainName,
                                                            setOf(ResourcePermissions
-                                                                       .getInstance(grantedPermissionName1)));
-
-      assertThat(accessControlContext
-                       .getEffectiveGlobalResourcePermissions(accessorResource2, resourceClassName, domainName).size(),
-                 is(1));
-
-      // test set-based version for implicit domain
-      accessControlContext.revokeGlobalResourcePermissions(accessorResource2,
-                                                           resourceClassName,
-                                                           setOf(ResourcePermissions
-                                                                       .getInstance(grantedPermissionName2)));
+                                                                       .getInstance(grantedPermissionName)));
 
       assertThat(accessControlContext
                        .getEffectiveGlobalResourcePermissions(accessorResource2, resourceClassName, domainName).isEmpty(),
@@ -1119,35 +798,11 @@ public class TestAccessControl_revokeGlobalResourcePermissions extends TestAcces
       catch (IllegalArgumentException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("duplicate permission"));
       }
-      try {
-         accessControlContext.revokeGlobalResourcePermissions(accessorResource,
-                                                              resourceClassName,
-                                                              ResourcePermissions
-                                                                    .getInstance(ResourcePermissions.IMPERSONATE),
-                                                              ResourcePermissions.getInstance(permissionName, true),
-                                                              ResourcePermissions.getInstance(permissionName, false));
-         fail("revoking global permissions that include the same permission - by name - but with different grant-options, should have failed");
-      }
-      catch (IllegalArgumentException e) {
-         assertThat(e.getMessage().toLowerCase(), containsString("duplicate permission"));
-      }
 
       try {
          accessControlContext.revokeGlobalResourcePermissions(accessorResource,
                                                               resourceClassName,
                                                               domainName,
-                                                              setOf(ResourcePermissions
-                                                                          .getInstance(ResourcePermissions.IMPERSONATE),
-                                                                    ResourcePermissions.getInstance(permissionName, true),
-                                                                    ResourcePermissions.getInstance(permissionName, false)));
-         fail("revoking global permissions that include the same permission - by name - but with different grant-options, should have failed");
-      }
-      catch (IllegalArgumentException e) {
-         assertThat(e.getMessage().toLowerCase(), containsString("duplicate permission"));
-      }
-      try {
-         accessControlContext.revokeGlobalResourcePermissions(accessorResource,
-                                                              resourceClassName,
                                                               setOf(ResourcePermissions
                                                                           .getInstance(ResourcePermissions.IMPERSONATE),
                                                                     ResourcePermissions.getInstance(permissionName, true),
@@ -1197,17 +852,6 @@ public class TestAccessControl_revokeGlobalResourcePermissions extends TestAcces
       catch (IllegalArgumentException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("duplicate element"));
       }
-
-      try {
-         accessControlContext.revokeGlobalResourcePermissions(accessorResource,
-                                                              resourceClassName,
-                                                              ResourcePermissions.getInstance(permissionName),
-                                                              ResourcePermissions.getInstance(permissionName));
-         fail("revoking global resource permissions for duplicate (identical) permissions, should have failed");
-      }
-      catch (IllegalArgumentException e) {
-         assertThat(e.getMessage().toLowerCase(), containsString("duplicate element"));
-      }
    }
 
    @Test
@@ -1221,12 +865,10 @@ public class TestAccessControl_revokeGlobalResourcePermissions extends TestAcces
       final String domainName_whitespaced = " " + domainName + "\t";
 
       final String permissionName1 = generateResourceClassPermission(resourceClassName);
-      final String permissionName2 = generateResourceClassPermission(resourceClassName);
 
       // setup accessor permissions
       Set<ResourcePermission> accessorPermissions_pre
-            = setOf(ResourcePermissions.getInstance(permissionName1),
-                    ResourcePermissions.getInstance(permissionName2));
+            = setOf(ResourcePermissions.getInstance(permissionName1));
 
       final Resource accessorResource = generateUnauthenticatableResource();
       accessControlContext.setGlobalResourcePermissions(accessorResource,
@@ -1244,8 +886,7 @@ public class TestAccessControl_revokeGlobalResourcePermissions extends TestAcces
 
       // setup grantor permissions
       Set<ResourcePermission> grantorResourcePermissions
-            = setOf(ResourcePermissions.getInstance(permissionName1, true),
-                    ResourcePermissions.getInstance(permissionName2, true));
+            = setOf(ResourcePermissions.getInstance(permissionName1, true));
 
       accessControlContext.setGlobalResourcePermissions(grantorResource,
                                                         resourceClassName,
@@ -1263,19 +904,9 @@ public class TestAccessControl_revokeGlobalResourcePermissions extends TestAcces
                                                            domainName_whitespaced,
                                                            ResourcePermissions.getInstance(permissionName1));
 
-      final Set<ResourcePermission> permissions_post_specific
-            = accessControlContext.getEffectiveGlobalResourcePermissions(accessorResource, resourceClassName, domainName);
-      assertThat(permissions_post_specific.size(), is(1));
-
-      // revoke permissions for implicit domain and verify
-      final String sysDomainName = accessControlContext.getDomainNameByResource(SYS_RESOURCE);
-      accessControlContext.revokeGlobalResourcePermissions(accessorResource,
-                                                           resourceClassName_whitespaced,
-                                                           ResourcePermissions.getInstance(permissionName2));
-
-      final Set<ResourcePermission> permissions_post_implicit
-            = accessControlContext.getEffectiveGlobalResourcePermissions(accessorResource, resourceClassName, sysDomainName);
-      assertThat(permissions_post_implicit.isEmpty(), is(true));
+      assertThat(accessControlContext
+                       .getEffectiveGlobalResourcePermissions(accessorResource, resourceClassName, domainName).isEmpty(),
+                 is(true));
 
       // test set-based version
       assertThat(accessControlContext.getEffectiveGlobalResourcePermissions(accessorResource2, resourceClassName, domainName),
@@ -1287,16 +918,7 @@ public class TestAccessControl_revokeGlobalResourcePermissions extends TestAcces
                                                            ResourcePermissions.getInstance(permissionName1));
 
       assertThat(accessControlContext
-                       .getEffectiveGlobalResourcePermissions(accessorResource2, resourceClassName, domainName).size(),
-                 is(1));
-
-      // test set-based version for implicit domain and verify
-      accessControlContext.revokeGlobalResourcePermissions(accessorResource2,
-                                                           resourceClassName_whitespaced,
-                                                           ResourcePermissions.getInstance(permissionName2));
-
-      assertThat(accessControlContext
-                       .getEffectiveGlobalResourcePermissions(accessorResource2, resourceClassName, sysDomainName).isEmpty(),
+                       .getEffectiveGlobalResourcePermissions(accessorResource2, resourceClassName, domainName).isEmpty(),
                  is(true));
    }
 
@@ -1312,13 +934,6 @@ public class TestAccessControl_revokeGlobalResourcePermissions extends TestAcces
 
       // attempt to revoke global permissions with null references
       try {
-         accessControlContext.revokeGlobalResourcePermissions(null, resourceClassName, permission_valid);
-         fail("revoking permissions for null accessor resource should have failed");
-      }
-      catch (NullPointerException e) {
-         assertThat(e.getMessage().toLowerCase(), containsString("resource required"));
-      }
-      try {
          accessControlContext.revokeGlobalResourcePermissions(null, resourceClassName, domainName, permission_valid);
          fail("revoking permissions for null accessor resource should have failed");
       }
@@ -1326,13 +941,6 @@ public class TestAccessControl_revokeGlobalResourcePermissions extends TestAcces
          assertThat(e.getMessage().toLowerCase(), containsString("resource required"));
       }
 
-      try {
-         accessControlContext.revokeGlobalResourcePermissions(accessorResource, null, permission_valid);
-         fail("revoking permissions for null resource class name should have failed");
-      }
-      catch (NullPointerException e) {
-         assertThat(e.getMessage().toLowerCase(), containsString("resource class required"));
-      }
       try {
          accessControlContext.revokeGlobalResourcePermissions(accessorResource, null, domainName, permission_valid);
          fail("revoking permissions for null resource class name should have failed");
@@ -1344,15 +952,6 @@ public class TestAccessControl_revokeGlobalResourcePermissions extends TestAcces
       try {
          accessControlContext.revokeGlobalResourcePermissions(accessorResource,
                                                               resourceClassName,
-                                                              (ResourcePermission) null);
-         fail("revoking permissions with null permission set should have failed");
-      }
-      catch (NullPointerException e) {
-         assertThat(e.getMessage().toLowerCase(), containsString("permission required"));
-      }
-      try {
-         accessControlContext.revokeGlobalResourcePermissions(accessorResource,
-                                                              resourceClassName,
                                                               domainName,
                                                               (ResourcePermission) null);
          fail("revoking permissions with null permission set should have failed");
@@ -1361,16 +960,6 @@ public class TestAccessControl_revokeGlobalResourcePermissions extends TestAcces
          assertThat(e.getMessage().toLowerCase(), containsString("permission required"));
       }
 
-      try {
-         accessControlContext.revokeGlobalResourcePermissions(accessorResource,
-                                                             resourceClassName,
-                                                             permission_valid,
-                                                             null);
-         fail("revoking permissions with null permission should have failed");
-      }
-      catch (NullPointerException e) {
-         assertThat(e.getMessage().toLowerCase(), containsString("array or a sequence"));
-      }
       try {
          accessControlContext.revokeGlobalResourcePermissions(accessorResource,
                                                              resourceClassName,
@@ -1395,13 +984,6 @@ public class TestAccessControl_revokeGlobalResourcePermissions extends TestAcces
       }
 
       try {
-         accessControlContext.revokeGlobalResourcePermissions(null, resourceClassName, setOf(permission_valid));
-         fail("revoking permissions for null accessor resource should have failed");
-      }
-      catch (NullPointerException e) {
-         assertThat(e.getMessage().toLowerCase(), containsString("resource required"));
-      }
-      try {
          accessControlContext.revokeGlobalResourcePermissions(null, resourceClassName, domainName, setOf(permission_valid));
          fail("revoking permissions for null accessor resource should have failed");
       }
@@ -1409,13 +991,6 @@ public class TestAccessControl_revokeGlobalResourcePermissions extends TestAcces
          assertThat(e.getMessage().toLowerCase(), containsString("resource required"));
       }
 
-      try {
-         accessControlContext.revokeGlobalResourcePermissions(accessorResource, null, setOf(permission_valid));
-         fail("revoking permissions for null resource class name should have failed");
-      }
-      catch (NullPointerException e) {
-         assertThat(e.getMessage().toLowerCase(), containsString("resource class required"));
-      }
       try {
          accessControlContext.revokeGlobalResourcePermissions(accessorResource, null, domainName, setOf(permission_valid));
          fail("revoking permissions for null resource class name should have failed");
@@ -1427,15 +1002,6 @@ public class TestAccessControl_revokeGlobalResourcePermissions extends TestAcces
       try {
          accessControlContext.revokeGlobalResourcePermissions(accessorResource,
                                                               resourceClassName,
-                                                              (Set<ResourcePermission>) null);
-         fail("revoking permissions with null permission set should have failed");
-      }
-      catch (NullPointerException e) {
-         assertThat(e.getMessage().toLowerCase(), containsString("permissions required"));
-      }
-      try {
-         accessControlContext.revokeGlobalResourcePermissions(accessorResource,
-                                                              resourceClassName,
                                                               domainName,
                                                               (Set<ResourcePermission>) null);
          fail("revoking permissions with null permission set should have failed");
@@ -1444,15 +1010,6 @@ public class TestAccessControl_revokeGlobalResourcePermissions extends TestAcces
          assertThat(e.getMessage().toLowerCase(), containsString("permissions required"));
       }
 
-      try {
-         accessControlContext.revokeGlobalResourcePermissions(accessorResource,
-                                                              resourceClassName,
-                                                              setOf(permission_valid, null));
-         fail("revoking permissions with null permission should have failed");
-      }
-      catch (NullPointerException e) {
-         assertThat(e.getMessage().toLowerCase(), containsString("contains null element"));
-      }
       try {
          accessControlContext.revokeGlobalResourcePermissions(accessorResource,
                                                               resourceClassName,
@@ -1488,15 +1045,6 @@ public class TestAccessControl_revokeGlobalResourcePermissions extends TestAcces
       try {
          accessControlContext.revokeGlobalResourcePermissions(accessorResource,
                                                               resourceClassName,
-                                                              Collections.<ResourcePermission>emptySet());
-         fail("revoking permissions with null permission set should have failed");
-      }
-      catch (IllegalArgumentException e) {
-         assertThat(e.getMessage().toLowerCase(), containsString("permissions required"));
-      }
-      try {
-         accessControlContext.revokeGlobalResourcePermissions(accessorResource,
-                                                              resourceClassName,
                                                               domainName,
                                                               Collections.<ResourcePermission>emptySet());
          fail("revoking permissions with null permission set should have failed");
@@ -1529,27 +1077,9 @@ public class TestAccessControl_revokeGlobalResourcePermissions extends TestAcces
          assertThat(e.getMessage().toLowerCase(), containsString("not found"));
       }
       try {
-         accessControlContext.revokeGlobalResourcePermissions(Resources.getInstance(-999L),
-                                                              resourceClassName,
-                                                              permission_valid);
-         fail("revoking permissions with non-existent accessor resource reference should have failed");
-      }
-      catch (IllegalArgumentException e) {
-         assertThat(e.getMessage().toLowerCase(), containsString("not found"));
-      }
-      try {
          accessControlContext.revokeGlobalResourcePermissions(accessorResource,
                                                               "invalid_resourceClass",
                                                               domainName,
-                                                              permission_valid);
-         fail("revoking permissions with non-existent resource class reference should have failed");
-      }
-      catch (IllegalArgumentException e) {
-         assertThat(e.getMessage().toLowerCase(), containsString("could not find resource class"));
-      }
-      try {
-         accessControlContext.revokeGlobalResourcePermissions(accessorResource,
-                                                              "invalid_resourceClass",
                                                               permission_valid);
          fail("revoking permissions with non-existent resource class reference should have failed");
       }
@@ -1578,27 +1108,9 @@ public class TestAccessControl_revokeGlobalResourcePermissions extends TestAcces
          assertThat(e.getMessage().toLowerCase(), containsString("not found"));
       }
       try {
-         accessControlContext.revokeGlobalResourcePermissions(Resources.getInstance(-999L),
-                                                              resourceClassName,
-                                                              setOf(permission_valid));
-         fail("revoking permissions with non-existent accessor resource reference should have failed");
-      }
-      catch (IllegalArgumentException e) {
-         assertThat(e.getMessage().toLowerCase(), containsString("not found"));
-      }
-      try {
          accessControlContext.revokeGlobalResourcePermissions(accessorResource,
                                                               "invalid_resourceClass",
                                                               domainName,
-                                                              setOf(permission_valid));
-         fail("revoking permissions with non-existent resource class reference should have failed");
-      }
-      catch (IllegalArgumentException e) {
-         assertThat(e.getMessage().toLowerCase(), containsString("could not find resource class"));
-      }
-      try {
-         accessControlContext.revokeGlobalResourcePermissions(accessorResource,
-                                                              "invalid_resourceClass",
                                                               setOf(permission_valid));
          fail("revoking permissions with non-existent resource class reference should have failed");
       }
@@ -1642,30 +1154,11 @@ public class TestAccessControl_revokeGlobalResourcePermissions extends TestAcces
       catch (IllegalArgumentException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("not defined for resource class"));
       }
-      try {
-         accessControlContext.revokeGlobalResourcePermissions(accessorResource,
-                                                              resourceClassName,
-                                                              permission_valid,
-                                                              permission_invalid);
-         fail("revoking permissions with mismatched resource class and permission should have failed");
-      }
-      catch (IllegalArgumentException e) {
-         assertThat(e.getMessage().toLowerCase(), containsString("not defined for resource class"));
-      }
 
       try {
          accessControlContext.revokeGlobalResourcePermissions(accessorResource,
                                                               resourceClassName,
                                                               domainName,
-                                                              setOf(permission_valid, permission_invalid));
-         fail("revoking permissions with mismatched resource class and permission should have failed");
-      }
-      catch (IllegalArgumentException e) {
-         assertThat(e.getMessage().toLowerCase(), containsString("not defined for resource class"));
-      }
-      try {
-         accessControlContext.revokeGlobalResourcePermissions(accessorResource,
-                                                              resourceClassName,
                                                               setOf(permission_valid, permission_invalid));
          fail("revoking permissions with mismatched resource class and permission should have failed");
       }

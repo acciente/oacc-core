@@ -526,20 +526,6 @@ public class TestAccessControl_unauthenticatedApiCalls extends TestAccessControl
          assertThat(e.getMessage().toLowerCase(), containsString("not authenticated"));
       }
       try {
-         accessControlContext.grantDomainPermissions((Resource) null, (DomainPermission) null);
-         fail("operation should have failed from unauthenticated context");
-      }
-      catch (NotAuthenticatedException e) {
-         assertThat(e.getMessage().toLowerCase(), containsString("not authenticated"));
-      }
-      try {
-         accessControlContext.grantDomainPermissions((Resource) null, (Set<DomainPermission>) null);
-         fail("operation should have failed from unauthenticated context");
-      }
-      catch (NotAuthenticatedException e) {
-         assertThat(e.getMessage().toLowerCase(), containsString("not authenticated"));
-      }
-      try {
          accessControlContext.grantGlobalResourcePermissions(null, null, (String) null, (ResourcePermission) null);
          fail("operation should have failed from unauthenticated context");
       }
@@ -605,20 +591,6 @@ public class TestAccessControl_unauthenticatedApiCalls extends TestAccessControl
       }
       try {
          accessControlContext.revokeDomainPermissions(null, (String) null, (Set<DomainPermission>) null);
-         fail("operation should have failed from unauthenticated context");
-      }
-      catch (NotAuthenticatedException e) {
-         assertThat(e.getMessage().toLowerCase(), containsString("not authenticated"));
-      }
-      try {
-         accessControlContext.revokeDomainPermissions((Resource) null, (DomainPermission) null);
-         fail("operation should have failed from unauthenticated context");
-      }
-      catch (NotAuthenticatedException e) {
-         assertThat(e.getMessage().toLowerCase(), containsString("not authenticated"));
-      }
-      try {
-         accessControlContext.revokeDomainPermissions(null, (Set<DomainPermission>) null);
          fail("operation should have failed from unauthenticated context");
       }
       catch (NotAuthenticatedException e) {

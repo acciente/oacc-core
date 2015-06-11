@@ -65,12 +65,6 @@ public class TestAccessControl_revokeDomainPermissions extends TestAccessControl
             = accessControlContext.getEffectiveDomainPermissions(accessorResource, domainName);
       assertThat(domainPermissions_post.isEmpty(), is(true));
 
-      accessControlContext.revokeDomainPermissions(accessorResource,
-                                                   domainPermission_superUser,
-                                                   domainPermission_child_withGrant);
-
-      assertThat(accessControlContext.getEffectiveDomainPermissions(accessorResource, sysDomainName).isEmpty(), is(true));
-
       // test set-based version
       final Resource accessorResource2 = generateUnauthenticatableResource();
       accessControlContext.setDomainPermissions(accessorResource2,
@@ -88,11 +82,6 @@ public class TestAccessControl_revokeDomainPermissions extends TestAccessControl
                                                    setOf(domainPermission_superUser,
                                                          domainPermission_child_withGrant));
       assertThat(accessControlContext.getEffectiveDomainPermissions(accessorResource2, domainName).isEmpty(), is(true));
-
-      accessControlContext.revokeDomainPermissions(accessorResource2,
-                                                   setOf(domainPermission_superUser,
-                                                         domainPermission_child_withGrant));
-      assertThat(accessControlContext.getEffectiveDomainPermissions(accessorResource2, sysDomainName).isEmpty(), is(true));
    }
 
    @Test
@@ -111,7 +100,6 @@ public class TestAccessControl_revokeDomainPermissions extends TestAccessControl
       final Resource accessorResource2 = generateUnauthenticatableResource();
 
       final String domainName = generateDomain();
-      final String grantorDomainName = accessControlContext.getDomainNameByResource(authenticatableResource);
 
       // setup accessor permissions
       final Set<DomainPermission> accessorPermissions_pre = setOf(domPerm_child_withGrant, domPerm_superuser);
@@ -120,20 +108,10 @@ public class TestAccessControl_revokeDomainPermissions extends TestAccessControl
                                                 accessorPermissions_pre);
       assertThat(accessControlContext.getEffectiveDomainPermissions(accessorResource, domainName), is( accessorPermissions_pre));
 
-      accessControlContext.setDomainPermissions(accessorResource,
-                                                grantorDomainName,
-                                                accessorPermissions_pre);
-      assertThat(accessControlContext.getEffectiveDomainPermissions(accessorResource, grantorDomainName), is( accessorPermissions_pre));
-
       accessControlContext.setDomainPermissions(accessorResource2,
                                                 domainName,
                                                 accessorPermissions_pre);
       assertThat(accessControlContext.getEffectiveDomainPermissions(accessorResource2, domainName), is( accessorPermissions_pre));
-
-      accessControlContext.setDomainPermissions(accessorResource2,
-                                                grantorDomainName,
-                                                accessorPermissions_pre);
-      assertThat(accessControlContext.getEffectiveDomainPermissions(accessorResource2, grantorDomainName), is( accessorPermissions_pre));
 
       // grant domain permissions
       final Set<DomainPermission> grantorPermissions_pre = setOf(domPerm_superuser_withGrant, domPerm_child_withGrant);
@@ -142,10 +120,6 @@ public class TestAccessControl_revokeDomainPermissions extends TestAccessControl
       Set<DomainPermission> grantorPermissions_post;
       grantorPermissions_post = accessControlContext.getEffectiveDomainPermissions(authenticatableResource, domainName);
       assertThat(grantorPermissions_post, is(grantorPermissions_pre));
-
-      accessControlContext.setDomainPermissions(authenticatableResource, grantorDomainName, grantorPermissions_pre);
-      assertThat(accessControlContext.getEffectiveDomainPermissions(authenticatableResource, grantorDomainName),
-                 is(grantorPermissions_pre));
 
       // revoke domainPermissions as the authenticatable resource and verify
       accessControlContext.authenticate(authenticatableResource, PasswordCredentials.newInstance(password));
@@ -157,12 +131,6 @@ public class TestAccessControl_revokeDomainPermissions extends TestAccessControl
       grantorPermissions_post = accessControlContext.getEffectiveDomainPermissions(accessorResource, domainName);
       assertThat(grantorPermissions_post.isEmpty(), is(true));
 
-      accessControlContext.revokeDomainPermissions(accessorResource,
-                                                   domPerm_superuser,
-                                                   domPerm_child_withGrant);
-
-      assertThat(accessControlContext.getEffectiveDomainPermissions(accessorResource, grantorDomainName).isEmpty(), is(true));
-
       // test set-based version
       accessControlContext.revokeDomainPermissions(accessorResource2,
                                                    domainName,
@@ -170,12 +138,6 @@ public class TestAccessControl_revokeDomainPermissions extends TestAccessControl
                                                          domPerm_child_withGrant));
 
       assertThat(accessControlContext.getEffectiveDomainPermissions(accessorResource2, domainName).isEmpty(), is(true));
-
-      accessControlContext.revokeDomainPermissions(accessorResource2,
-                                                   setOf(domPerm_superuser,
-                                                         domPerm_child_withGrant));
-
-      assertThat(accessControlContext.getEffectiveDomainPermissions(accessorResource2, grantorDomainName).isEmpty(), is(true));
    }
 
    @Test
@@ -202,20 +164,10 @@ public class TestAccessControl_revokeDomainPermissions extends TestAccessControl
       assertThat(domainPermissions_post.isEmpty(), is(true));
 
       accessControlContext.revokeDomainPermissions(accessorResource,
-                                                   domainPermission_superUser,
-                                                   domainPermission_child_withGrant);
-      assertThat(accessControlContext.getEffectiveDomainPermissions(accessorResource, sysDomainName).isEmpty(), is(true));
-
-      accessControlContext.revokeDomainPermissions(accessorResource,
                                                    domainName,
                                                    setOf(domainPermission_superUser,
                                                          domainPermission_child_withGrant));
       assertThat(accessControlContext.getEffectiveDomainPermissions(accessorResource, domainName).isEmpty(), is(true));
-
-      accessControlContext.revokeDomainPermissions(accessorResource,
-                                                   setOf(domainPermission_superUser,
-                                                         domainPermission_child_withGrant));
-      assertThat(accessControlContext.getEffectiveDomainPermissions(accessorResource, sysDomainName).isEmpty(), is(true));
    }
 
    @Test
@@ -230,7 +182,6 @@ public class TestAccessControl_revokeDomainPermissions extends TestAccessControl
       final Resource authenticatableResource = generateAuthenticatableResource(password);
       final Resource accessorResource = generateUnauthenticatableResource();
       final String domainName = generateDomain();
-      final String grantorDomainName = accessControlContext.getDomainNameByResource(authenticatableResource);
 
       // grant domain permissions
       final Set<DomainPermission> grantorPermissions_pre = setOf(domPerm_child_withGrant);
@@ -239,10 +190,6 @@ public class TestAccessControl_revokeDomainPermissions extends TestAccessControl
       Set<DomainPermission> grantorPermissions_post;
       grantorPermissions_post = accessControlContext.getEffectiveDomainPermissions(authenticatableResource, domainName);
       assertThat(grantorPermissions_post, is(grantorPermissions_pre));
-
-      accessControlContext.setDomainPermissions(authenticatableResource, grantorDomainName, grantorPermissions_pre);
-      assertThat(accessControlContext.getEffectiveDomainPermissions(authenticatableResource, grantorDomainName),
-                 is(grantorPermissions_pre));
 
       // revoke domainPermissions as the authenticatable resource and verify
       accessControlContext.authenticate(authenticatableResource, PasswordCredentials.newInstance(password));
@@ -257,30 +204,10 @@ public class TestAccessControl_revokeDomainPermissions extends TestAccessControl
          assertThat(e.getMessage().toLowerCase(), containsString(domPerm_superuser.getPermissionName().toLowerCase()));
          assertThat(e.getMessage().toLowerCase(), not(containsString(domPerm_child_withGrant.getPermissionName().toLowerCase())));
       }
-      try {
-         accessControlContext.revokeDomainPermissions(accessorResource,
-                                                      domPerm_superuser,
-                                                      domPerm_child_withGrant);
-         fail("revoking permissions without grant-authorization should have failed");
-      }
-      catch (NotAuthorizedException e) {
-         assertThat(e.getMessage().toLowerCase(), containsString(domPerm_superuser.getPermissionName().toLowerCase()));
-         assertThat(e.getMessage().toLowerCase(), not(containsString(domPerm_child_withGrant.getPermissionName().toLowerCase())));
-      }
 
       try {
          accessControlContext.revokeDomainPermissions(accessorResource,
                                                       domainName,
-                                                      setOf(domPerm_superuser,
-                                                            domPerm_child_withGrant));
-         fail("revoking permissions without grant-authorization should have failed");
-      }
-      catch (NotAuthorizedException e) {
-         assertThat(e.getMessage().toLowerCase(), containsString(domPerm_superuser.getPermissionName().toLowerCase()));
-         assertThat(e.getMessage().toLowerCase(), not(containsString(domPerm_child_withGrant.getPermissionName().toLowerCase())));
-      }
-      try {
-         accessControlContext.revokeDomainPermissions(accessorResource,
                                                       setOf(domPerm_superuser,
                                                             domPerm_child_withGrant));
          fail("revoking permissions without grant-authorization should have failed");
@@ -299,10 +226,8 @@ public class TestAccessControl_revokeDomainPermissions extends TestAccessControl
                                                                                               true);
 
       final String domainName = generateDomain();
-      final String sysDomainName = accessControlContext.getDomainNameByResource(SYS_RESOURCE);
       final Resource accessorResource = generateUnauthenticatableResource();
       assertThat(accessControlContext.getEffectiveDomainPermissions(accessorResource, domainName).isEmpty(), is(true));
-      assertThat(accessControlContext.getEffectiveDomainPermissions(accessorResource, sysDomainName).isEmpty(), is(true));
 
       // setup accessor permissions
       final Set<DomainPermission> domainPermissions_pre = setOf(domainPermission_child_withGrant,
@@ -311,11 +236,6 @@ public class TestAccessControl_revokeDomainPermissions extends TestAccessControl
                                                 domainName,
                                                 domainPermissions_pre);
       assertThat(accessControlContext.getEffectiveDomainPermissions(accessorResource, domainName), is( domainPermissions_pre));
-
-      accessControlContext.setDomainPermissions(accessorResource,
-                                                sysDomainName,
-                                                domainPermissions_pre);
-      assertThat(accessControlContext.getEffectiveDomainPermissions(accessorResource, sysDomainName), is( domainPermissions_pre));
 
       // revoke domain permissions and verify
       accessControlContext.revokeDomainPermissions(accessorResource,
@@ -327,11 +247,6 @@ public class TestAccessControl_revokeDomainPermissions extends TestAccessControl
             = accessControlContext.getEffectiveDomainPermissions(accessorResource, domainName);
       assertThat(domainPermissions_post.isEmpty(), is(true));
 
-      accessControlContext.revokeDomainPermissions(accessorResource,
-                                                   domainPermission_superUser,
-                                                   domainPermission_child_withGrant);
-      assertThat(accessControlContext.getEffectiveDomainPermissions(accessorResource, sysDomainName).isEmpty(), is(true));
-
       // revoke permissions again and verify
       accessControlContext.revokeDomainPermissions(accessorResource,
                                                    domainName,
@@ -342,22 +257,12 @@ public class TestAccessControl_revokeDomainPermissions extends TestAccessControl
             = accessControlContext.getEffectiveDomainPermissions(accessorResource, domainName);
       assertThat(domainPermissions_post2.isEmpty(), is(true));
 
-      accessControlContext.revokeDomainPermissions(accessorResource,
-                                                   domainPermission_superUser,
-                                                   domainPermission_child_withGrant);
-      assertThat(accessControlContext.getEffectiveDomainPermissions(accessorResource, sysDomainName).isEmpty(), is(true));
-
       // revoke permissions again via set-based version and verify
       accessControlContext.revokeDomainPermissions(accessorResource,
                                                    domainName,
                                                    setOf(domainPermission_superUser,
                                                          domainPermission_child_withGrant));
       assertThat(accessControlContext.getEffectiveDomainPermissions(accessorResource, domainName).isEmpty(), is(true));
-
-      accessControlContext.revokeDomainPermissions(accessorResource,
-                                                   setOf(domainPermission_superUser,
-                                                         domainPermission_child_withGrant));
-      assertThat(accessControlContext.getEffectiveDomainPermissions(accessorResource, sysDomainName).isEmpty(), is(true));
    }
 
    @Test
@@ -376,7 +281,6 @@ public class TestAccessControl_revokeDomainPermissions extends TestAccessControl
       final Resource accessorResource2 = generateUnauthenticatableResource();
 
       final String domainName = generateDomain();
-      final String grantorDomainName = accessControlContext.getDomainNameByResource(authenticatableResource);
 
       // setup accessor permissions
       final Set<DomainPermission> accessorPermissions_pre = setOf(domPerm_child_withGrant,
@@ -387,14 +291,8 @@ public class TestAccessControl_revokeDomainPermissions extends TestAccessControl
       assertThat(accessControlContext.getEffectiveDomainPermissions(accessorResource, domainName),
                  is(accessorPermissions_pre));
 
-      accessControlContext.setDomainPermissions(accessorResource,
-                                                grantorDomainName,
-                                                accessorPermissions_pre);
       accessControlContext.setDomainPermissions(accessorResource2,
                                                 domainName,
-                                                accessorPermissions_pre);
-      accessControlContext.setDomainPermissions(accessorResource2,
-                                                grantorDomainName,
                                                 accessorPermissions_pre);
 
       // grant domain permissions
@@ -405,10 +303,6 @@ public class TestAccessControl_revokeDomainPermissions extends TestAccessControl
       grantorPermissions_post = accessControlContext.getEffectiveDomainPermissions(authenticatableResource, domainName);
       assertThat(grantorPermissions_post, is(grantorPermissions_pre));
 
-      accessControlContext.setDomainPermissions(authenticatableResource, grantorDomainName, grantorPermissions_pre);
-      assertThat(accessControlContext.getEffectiveDomainPermissions(authenticatableResource, grantorDomainName),
-                 is(grantorPermissions_pre));
-
       // revoke domainPermissions as the authenticatable resource and verify
       accessControlContext.authenticate(authenticatableResource, PasswordCredentials.newInstance(password));
       accessControlContext.revokeDomainPermissions(accessorResource,
@@ -417,13 +311,6 @@ public class TestAccessControl_revokeDomainPermissions extends TestAccessControl
 
       grantorPermissions_post = accessControlContext.getEffectiveDomainPermissions(accessorResource, domainName);
       assertThat(grantorPermissions_post, is(setOf(domPerm_child_withGrant)));
-
-      assertThat(accessControlContext.getEffectiveDomainPermissions(accessorResource, grantorDomainName),
-                 is(accessorPermissions_pre));
-      accessControlContext.revokeDomainPermissions(accessorResource,
-                                                   domPerm_superuser);
-      assertThat(accessControlContext.getEffectiveDomainPermissions(accessorResource, grantorDomainName),
-                 is(setOf(domPerm_child_withGrant)));
 
       // test set-based version
       assertThat(accessControlContext.getEffectiveDomainPermissions(accessorResource2, domainName),
@@ -434,13 +321,6 @@ public class TestAccessControl_revokeDomainPermissions extends TestAccessControl
 
       grantorPermissions_post = accessControlContext.getEffectiveDomainPermissions(accessorResource2, domainName);
       assertThat(grantorPermissions_post, is(setOf(domPerm_child_withGrant)));
-
-      assertThat(accessControlContext.getEffectiveDomainPermissions(accessorResource2, grantorDomainName),
-                 is(accessorPermissions_pre));
-      accessControlContext.revokeDomainPermissions(accessorResource2,
-                                                   setOf(domPerm_superuser));
-      assertThat(accessControlContext.getEffectiveDomainPermissions(accessorResource2, grantorDomainName),
-                 is(setOf(domPerm_child_withGrant)));
    }
 
    @Test
@@ -452,7 +332,6 @@ public class TestAccessControl_revokeDomainPermissions extends TestAccessControl
       final Resource grantorResource = generateAuthenticatableResource(password);
       final Resource accessorResource = generateUnauthenticatableResource();
       final String domainName = generateDomain();
-      final String grantorDomainName = accessControlContext.getDomainNameByResource(grantorResource);
 
       // setup accessor permissions
       Set<DomainPermission> accessorPermissions_pre
@@ -462,17 +341,11 @@ public class TestAccessControl_revokeDomainPermissions extends TestAccessControl
       accessControlContext.setDomainPermissions(accessorResource, domainName, accessorPermissions_pre);
       assertThat(accessControlContext.getEffectiveDomainPermissions(accessorResource, domainName), is(accessorPermissions_pre));
 
-      accessControlContext.setDomainPermissions(accessorResource, grantorDomainName, accessorPermissions_pre);
-      assertThat(accessControlContext.getEffectiveDomainPermissions(accessorResource, grantorDomainName), is(accessorPermissions_pre));
-
       // setup grantor permissions
       Set<DomainPermission> grantorPermissions = setOf(DomainPermissions.getInstance(grantedPermissionName, true));
 
       accessControlContext.setDomainPermissions(grantorResource, domainName, grantorPermissions);
       assertThat(accessControlContext.getEffectiveDomainPermissions(grantorResource, domainName), is(grantorPermissions));
-
-      accessControlContext.setDomainPermissions(grantorResource, grantorDomainName, grantorPermissions);
-      assertThat(accessControlContext.getEffectiveDomainPermissions(grantorResource, grantorDomainName), is(grantorPermissions));
 
       // authenticate grantor resource
       accessControlContext.authenticate(grantorResource, PasswordCredentials.newInstance(password));
@@ -489,30 +362,10 @@ public class TestAccessControl_revokeDomainPermissions extends TestAccessControl
          assertThat(e.getMessage().toLowerCase(), containsString(ungrantedPermissionName.toLowerCase()));
          assertThat(e.getMessage().toLowerCase(), not(containsString(grantedPermissionName)));
       }
-      try {
-         accessControlContext.revokeDomainPermissions(accessorResource,
-                                                      DomainPermissions.getInstance(grantedPermissionName),
-                                                      DomainPermissions.getInstance(ungrantedPermissionName));
-         fail("revoking existing permission granted elsewhere without authorization should have failed");
-      }
-      catch (NotAuthorizedException e) {
-         assertThat(e.getMessage().toLowerCase(), containsString(ungrantedPermissionName.toLowerCase()));
-         assertThat(e.getMessage().toLowerCase(), not(containsString(grantedPermissionName)));
-      }
 
       try {
          accessControlContext.revokeDomainPermissions(accessorResource,
                                                       domainName,
-                                                      setOf(DomainPermissions.getInstance(grantedPermissionName),
-                                                            DomainPermissions.getInstance(ungrantedPermissionName)));
-         fail("revoking existing permission granted elsewhere without authorization should have failed");
-      }
-      catch (NotAuthorizedException e) {
-         assertThat(e.getMessage().toLowerCase(), containsString(ungrantedPermissionName.toLowerCase()));
-         assertThat(e.getMessage().toLowerCase(), not(containsString(grantedPermissionName)));
-      }
-      try {
-         accessControlContext.revokeDomainPermissions(accessorResource,
                                                       setOf(DomainPermissions.getInstance(grantedPermissionName),
                                                             DomainPermissions.getInstance(ungrantedPermissionName)));
          fail("revoking existing permission granted elsewhere without authorization should have failed");
@@ -539,7 +392,6 @@ public class TestAccessControl_revokeDomainPermissions extends TestAccessControl
       final Resource accessorResource2 = generateUnauthenticatableResource();
 
       final String domainName = generateDomain();
-      final String grantorDomainName = accessControlContext.getDomainNameByResource(authenticatableResource);
 
       // setup accessor permissions
       final Set<DomainPermission> accessorPermissions_pre = setOf(domPerm_child_withGrant,
@@ -550,15 +402,10 @@ public class TestAccessControl_revokeDomainPermissions extends TestAccessControl
       assertThat(accessControlContext.getEffectiveDomainPermissions(accessorResource, domainName),
                  is(accessorPermissions_pre));
 
-      accessControlContext.setDomainPermissions(accessorResource,
-                                                grantorDomainName,
-                                                accessorPermissions_pre);
       accessControlContext.setDomainPermissions(accessorResource2,
                                                 domainName,
                                                 accessorPermissions_pre);
-      accessControlContext.setDomainPermissions(accessorResource2,
-                                                grantorDomainName,
-                                                accessorPermissions_pre);
+
       // grant domain permissions
       final Set<DomainPermission> grantorPermissions_pre = setOf(domPerm_superuser_withGrant, domPerm_child_withGrant);
       accessControlContext.setDomainPermissions(authenticatableResource, domainName, grantorPermissions_pre);
@@ -566,10 +413,6 @@ public class TestAccessControl_revokeDomainPermissions extends TestAccessControl
       Set<DomainPermission> grantorPermissions_post;
       grantorPermissions_post = accessControlContext.getEffectiveDomainPermissions(authenticatableResource, domainName);
       assertThat(grantorPermissions_post, is(grantorPermissions_pre));
-
-      accessControlContext.setDomainPermissions(authenticatableResource, grantorDomainName, grantorPermissions_pre);
-      assertThat(accessControlContext.getEffectiveDomainPermissions(authenticatableResource, grantorDomainName),
-                 is(grantorPermissions_pre));
 
       // revoke domainPermissions as the authenticatable resource and verify
       accessControlContext.authenticate(authenticatableResource, PasswordCredentials.newInstance(password));
@@ -581,13 +424,6 @@ public class TestAccessControl_revokeDomainPermissions extends TestAccessControl
       grantorPermissions_post = accessControlContext.getEffectiveDomainPermissions(accessorResource, domainName);
       assertThat(grantorPermissions_post.isEmpty(), is(true));
 
-      assertThat(accessControlContext.getEffectiveDomainPermissions(accessorResource, grantorDomainName),
-                 is(accessorPermissions_pre));
-      accessControlContext.revokeDomainPermissions(accessorResource,
-                                                   domPerm_superuser,
-                                                   domPerm_child_withGrant);
-      assertThat(accessControlContext.getEffectiveDomainPermissions(accessorResource, grantorDomainName).isEmpty(), is(true));
-
       // test set-based version
       assertThat(accessControlContext.getEffectiveDomainPermissions(accessorResource2, domainName),
                  is(accessorPermissions_pre));
@@ -598,13 +434,6 @@ public class TestAccessControl_revokeDomainPermissions extends TestAccessControl
                                                          domPerm_child_withGrant));
 
       assertThat(accessControlContext.getEffectiveDomainPermissions(accessorResource2, domainName).isEmpty(), is(true));
-
-      assertThat(accessControlContext.getEffectiveDomainPermissions(accessorResource2, grantorDomainName),
-                 is(accessorPermissions_pre));
-      accessControlContext.revokeDomainPermissions(accessorResource2,
-                                                   setOf(domPerm_superuser,
-                                                         domPerm_child_withGrant));
-      assertThat(accessControlContext.getEffectiveDomainPermissions(accessorResource2, grantorDomainName).isEmpty(), is(true));
    }
 
    @Test
@@ -625,7 +454,6 @@ public class TestAccessControl_revokeDomainPermissions extends TestAccessControl
       final Resource accessorResource2 = generateUnauthenticatableResource();
 
       final String domainName = generateDomain();
-      final String grantorDomainName = accessControlContext.getDomainNameByResource(authenticatableResource);
 
       // setup accessor permissions
       final Set<DomainPermission> accessorPermissions_pre = setOf(domPerm_child,
@@ -636,26 +464,16 @@ public class TestAccessControl_revokeDomainPermissions extends TestAccessControl
       assertThat(accessControlContext.getEffectiveDomainPermissions(accessorResource, domainName),
                  is(accessorPermissions_pre));
 
-      accessControlContext.setDomainPermissions(accessorResource,
-                                                grantorDomainName,
-                                                accessorPermissions_pre);
       accessControlContext.setDomainPermissions(accessorResource2,
                                                 domainName,
-                                                accessorPermissions_pre);
-      accessControlContext.setDomainPermissions(accessorResource2,
-                                                grantorDomainName,
                                                 accessorPermissions_pre);
 
       // grant domain permissions
       final Set<DomainPermission> grantorPermissions_pre = setOf(domPerm_superuser_withGrant, domPerm_child_withGrant);
       accessControlContext.setDomainPermissions(authenticatableResource, domainName, grantorPermissions_pre);
-      accessControlContext.setDomainPermissions(authenticatableResource, grantorDomainName, grantorPermissions_pre);
 
       Set<DomainPermission> grantorPermissions_post;
       grantorPermissions_post = accessControlContext.getEffectiveDomainPermissions(authenticatableResource, domainName);
-      assertThat(grantorPermissions_post, is(grantorPermissions_pre));
-
-      grantorPermissions_post = accessControlContext.getEffectiveDomainPermissions(authenticatableResource, grantorDomainName);
       assertThat(grantorPermissions_post, is(grantorPermissions_pre));
 
       // revoke domainPermissions as the authenticatable resource and verify
@@ -668,13 +486,6 @@ public class TestAccessControl_revokeDomainPermissions extends TestAccessControl
       grantorPermissions_post = accessControlContext.getEffectiveDomainPermissions(accessorResource, domainName);
       assertThat(grantorPermissions_post.isEmpty(), is(true));
 
-      assertThat(accessControlContext.getEffectiveDomainPermissions(accessorResource, grantorDomainName),
-                 is(accessorPermissions_pre));
-      accessControlContext.revokeDomainPermissions(accessorResource,
-                                                   domPerm_superuser_withGrant,
-                                                   domPerm_child_withGrant);
-      assertThat(accessControlContext.getEffectiveDomainPermissions(accessorResource, grantorDomainName).isEmpty(), is(true));
-
       // test set-based version
       assertThat(accessControlContext.getEffectiveDomainPermissions(accessorResource2, domainName),
                  is( accessorPermissions_pre));
@@ -683,13 +494,6 @@ public class TestAccessControl_revokeDomainPermissions extends TestAccessControl
                                                    setOf(domPerm_superuser_withGrant,
                                                          domPerm_child_withGrant));
       assertThat(accessControlContext.getEffectiveDomainPermissions(accessorResource2, domainName).isEmpty(), is(true));
-
-      assertThat(accessControlContext.getEffectiveDomainPermissions(accessorResource2, grantorDomainName),
-                 is( accessorPermissions_pre));
-      accessControlContext.revokeDomainPermissions(accessorResource2,
-                                                   setOf(domPerm_superuser_withGrant,
-                                                         domPerm_child_withGrant));
-      assertThat(accessControlContext.getEffectiveDomainPermissions(accessorResource2, grantorDomainName).isEmpty(), is(true));
    }
 
    @Test
@@ -711,7 +515,6 @@ public class TestAccessControl_revokeDomainPermissions extends TestAccessControl
       final Resource accessorResource2 = generateUnauthenticatableResource();
 
       final String domainName = generateDomain();
-      final String grantorDomainName = accessControlContext.getDomainNameByResource(authenticatableResource);
 
       // setup accessor permissions
       final Set<DomainPermission> accessorPermissions_pre = setOf(domPerm_child_withGrant,
@@ -722,15 +525,10 @@ public class TestAccessControl_revokeDomainPermissions extends TestAccessControl
       assertThat(accessControlContext.getEffectiveDomainPermissions(accessorResource, domainName),
                  is(accessorPermissions_pre));
 
-      accessControlContext.setDomainPermissions(accessorResource,
-                                                grantorDomainName,
-                                                accessorPermissions_pre);
       accessControlContext.setDomainPermissions(accessorResource2,
                                                 domainName,
                                                 accessorPermissions_pre);
-      accessControlContext.setDomainPermissions(accessorResource2,
-                                                grantorDomainName,
-                                                accessorPermissions_pre);
+
       // grant domain permissions
       final Set<DomainPermission> grantorPermissions_pre = setOf(domPerm_superuser_withGrant, domPerm_child_withGrant);
       accessControlContext.setDomainPermissions(authenticatableResource, domainName, grantorPermissions_pre);
@@ -738,10 +536,6 @@ public class TestAccessControl_revokeDomainPermissions extends TestAccessControl
       Set<DomainPermission> grantorPermissions_post;
       grantorPermissions_post = accessControlContext.getEffectiveDomainPermissions(authenticatableResource, domainName);
       assertThat(grantorPermissions_post, is(grantorPermissions_pre));
-
-      accessControlContext.setDomainPermissions(authenticatableResource, grantorDomainName, grantorPermissions_pre);
-      assertThat(accessControlContext.getEffectiveDomainPermissions(authenticatableResource, grantorDomainName),
-                 is(grantorPermissions_pre));
 
       // revoke domainPermissions as the authenticatable resource and verify
       accessControlContext.authenticate(authenticatableResource, PasswordCredentials.newInstance(password));
@@ -753,13 +547,6 @@ public class TestAccessControl_revokeDomainPermissions extends TestAccessControl
       grantorPermissions_post = accessControlContext.getEffectiveDomainPermissions(accessorResource, domainName);
       assertThat(grantorPermissions_post.isEmpty(), is(true));
 
-      assertThat(accessControlContext.getEffectiveDomainPermissions(accessorResource, grantorDomainName),
-                 is(accessorPermissions_pre));
-      accessControlContext.revokeDomainPermissions(accessorResource,
-                                                   domPerm_superuser,
-                                                   domPerm_child);
-      assertThat(accessControlContext.getEffectiveDomainPermissions(accessorResource, domainName).isEmpty(), is(true));
-
       // test set-based version
       assertThat(accessControlContext.getEffectiveDomainPermissions(accessorResource2, domainName),
                  is(accessorPermissions_pre));
@@ -768,13 +555,6 @@ public class TestAccessControl_revokeDomainPermissions extends TestAccessControl
                                                    setOf(domPerm_superuser,
                                                          domPerm_child));
       assertThat(accessControlContext.getEffectiveDomainPermissions(accessorResource2, domainName).isEmpty(), is(true));
-
-      assertThat(accessControlContext.getEffectiveDomainPermissions(accessorResource2, grantorDomainName),
-                 is(accessorPermissions_pre));
-      accessControlContext.revokeDomainPermissions(accessorResource2,
-                                                   setOf(domPerm_superuser,
-                                                         domPerm_child));
-      assertThat(accessControlContext.getEffectiveDomainPermissions(accessorResource2, grantorDomainName).isEmpty(), is(true));
    }
 
    @Test
@@ -796,7 +576,6 @@ public class TestAccessControl_revokeDomainPermissions extends TestAccessControl
       final Resource accessorResource2 = generateUnauthenticatableResource();
 
       final String domainName = generateDomain();
-      final String grantorDomainName = accessControlContext.getDomainNameByResource(authenticatableResource);
 
       // setup accessor permissions
       final Set<DomainPermission> accessorPermissions_pre = setOf(domPerm_child,
@@ -807,14 +586,8 @@ public class TestAccessControl_revokeDomainPermissions extends TestAccessControl
       assertThat(accessControlContext.getEffectiveDomainPermissions(accessorResource, domainName),
                  is(accessorPermissions_pre));
 
-      accessControlContext.setDomainPermissions(accessorResource,
-                                                grantorDomainName,
-                                                accessorPermissions_pre);
       accessControlContext.setDomainPermissions(accessorResource2,
                                                 domainName,
-                                                accessorPermissions_pre);
-      accessControlContext.setDomainPermissions(accessorResource2,
-                                                grantorDomainName,
                                                 accessorPermissions_pre);
 
       // grant domain permissions to authenticatable resource without granting rights
@@ -824,10 +597,6 @@ public class TestAccessControl_revokeDomainPermissions extends TestAccessControl
       Set<DomainPermission> domainPermissions_post;
       domainPermissions_post = accessControlContext.getEffectiveDomainPermissions(authenticatableResource, domainName);
       assertThat(domainPermissions_post, is(domainPermissions_granter));
-
-      accessControlContext.setDomainPermissions(authenticatableResource, grantorDomainName, domainPermissions_granter);
-      assertThat(accessControlContext.getEffectiveDomainPermissions(authenticatableResource, grantorDomainName),
-                 is(domainPermissions_granter));
 
       // revoke domainPermissions as the authenticatable resource and verify
       accessControlContext.authenticate(authenticatableResource, PasswordCredentials.newInstance(password));
@@ -839,13 +608,6 @@ public class TestAccessControl_revokeDomainPermissions extends TestAccessControl
       domainPermissions_post = accessControlContext.getEffectiveDomainPermissions(accessorResource, domainName);
       assertThat(domainPermissions_post.isEmpty(), is(true));
 
-      assertThat(accessControlContext.getEffectiveDomainPermissions(accessorResource, grantorDomainName),
-                 is(accessorPermissions_pre));
-      accessControlContext.revokeDomainPermissions(accessorResource,
-                                                   domPerm_superuser_withGrant,
-                                                   domPerm_child);
-      assertThat(accessControlContext.getEffectiveDomainPermissions(accessorResource, grantorDomainName).isEmpty(), is(true));
-
       // test set-based version
       assertThat(accessControlContext.getEffectiveDomainPermissions(accessorResource2, domainName),
                  is(accessorPermissions_pre));
@@ -854,13 +616,6 @@ public class TestAccessControl_revokeDomainPermissions extends TestAccessControl
                                                    setOf(domPerm_superuser_withGrant,
                                                          domPerm_child));
       assertThat(accessControlContext.getEffectiveDomainPermissions(accessorResource2, domainName).isEmpty(), is(true));
-
-      assertThat(accessControlContext.getEffectiveDomainPermissions(accessorResource2, grantorDomainName),
-                 is(accessorPermissions_pre));
-      accessControlContext.revokeDomainPermissions(accessorResource2,
-                                                   setOf(domPerm_superuser_withGrant,
-                                                         domPerm_child));
-      assertThat(accessControlContext.getEffectiveDomainPermissions(accessorResource2, grantorDomainName).isEmpty(), is(true));
    }
 
    @Test
@@ -897,28 +652,10 @@ public class TestAccessControl_revokeDomainPermissions extends TestAccessControl
       catch (IllegalArgumentException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("duplicate permission"));
       }
-      try {
-         accessControlContext.revokeDomainPermissions(accessorResource,
-                                                      domainPermission_superUser,
-                                                      domainPermission_superUser_withGrant);
-         fail("revoking permissions that include the same permission - by name - but with different grant-options, should have failed");
-      }
-      catch (IllegalArgumentException e) {
-         assertThat(e.getMessage().toLowerCase(), containsString("duplicate permission"));
-      }
 
       try {
          accessControlContext.revokeDomainPermissions(accessorResource,
                                                       domainName,
-                                                      setOf(domainPermission_superUser,
-                                                            domainPermission_superUser_withGrant));
-         fail("revoking permissions that include the same permission - by name - but with different grant-options, should have failed");
-      }
-      catch (IllegalArgumentException e) {
-         assertThat(e.getMessage().toLowerCase(), containsString("duplicate permission"));
-      }
-      try {
-         accessControlContext.revokeDomainPermissions(accessorResource,
                                                       setOf(domainPermission_superUser,
                                                             domainPermission_superUser_withGrant));
          fail("revoking permissions that include the same permission - by name - but with different grant-options, should have failed");
@@ -955,15 +692,6 @@ public class TestAccessControl_revokeDomainPermissions extends TestAccessControl
       try {
          accessControlContext.revokeDomainPermissions(accessorResource,
                                                       domainName,
-                                                      domainPermission_superUser,
-                                                      domainPermission_superUser);
-         fail("revoking domain permissions for duplicate (identical) permissions, should have failed");
-      }
-      catch (IllegalArgumentException e) {
-         assertThat(e.getMessage().toLowerCase(), containsString("duplicate element"));
-      }
-      try {
-         accessControlContext.revokeDomainPermissions(accessorResource,
                                                       domainPermission_superUser,
                                                       domainPermission_superUser);
          fail("revoking domain permissions for duplicate (identical) permissions, should have failed");
@@ -1096,55 +824,6 @@ public class TestAccessControl_revokeDomainPermissions extends TestAccessControl
       catch (NullPointerException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("contains null element"));
       }
-
-      // test with implicit domain
-      try {
-         accessControlContext.revokeDomainPermissions(null, domCreatePerm_child_withGrant);
-         fail("revoking domain permissions with null accessor resource should have failed");
-      }
-      catch (NullPointerException e) {
-         assertThat(e.getMessage().toLowerCase(), containsString("resource required"));
-      }
-
-      try {
-         accessControlContext.revokeDomainPermissions(accessorResource, (DomainPermission) null);
-         fail("revoking domain permissions with null domain permission set should have failed");
-      }
-      catch (NullPointerException e) {
-         assertThat(e.getMessage().toLowerCase(), containsString("permission required"));
-      }
-
-      try {
-         accessControlContext.revokeDomainPermissions(accessorResource, domCreatePerm_child_withGrant, null);
-         fail("revoking domain permissions with null element in domain permission set should have failed");
-      }
-      catch (NullPointerException e) {
-         assertThat(e.getMessage().toLowerCase(), containsString("array or a sequence"));
-      }
-
-      try {
-         accessControlContext.revokeDomainPermissions(null, setOf(domCreatePerm_child_withGrant));
-         fail("revoking domain permissions with null accessor resource should have failed");
-      }
-      catch (NullPointerException e) {
-         assertThat(e.getMessage().toLowerCase(), containsString("resource required"));
-      }
-
-      try {
-         accessControlContext.revokeDomainPermissions(accessorResource, (Set<DomainPermission>) null);
-         fail("revoking domain permissions with null domain permission set should have failed");
-      }
-      catch (NullPointerException e) {
-         assertThat(e.getMessage().toLowerCase(), containsString("permissions required"));
-      }
-
-      try {
-         accessControlContext.revokeDomainPermissions(accessorResource, setOf(domCreatePerm_child_withGrant, null));
-         fail("revoking domain permissions with null element in domain permission set should have failed");
-      }
-      catch (NullPointerException e) {
-         assertThat(e.getMessage().toLowerCase(), containsString("contains null element"));
-      }
    }
 
    @Test
@@ -1157,13 +836,6 @@ public class TestAccessControl_revokeDomainPermissions extends TestAccessControl
       // attempt to revoke domain permissions with nulls
       try {
          accessControlContext.revokeDomainPermissions(accessorResource, domainName, Collections.<DomainPermission>emptySet());
-         fail("revoking domain permissions with null domain permission set should have failed");
-      }
-      catch (IllegalArgumentException e) {
-         assertThat(e.getMessage().toLowerCase(), containsString("permissions required"));
-      }
-      try {
-         accessControlContext.revokeDomainPermissions(accessorResource, Collections.<DomainPermission>emptySet());
          fail("revoking domain permissions with null domain permission set should have failed");
       }
       catch (IllegalArgumentException e) {
@@ -1218,25 +890,6 @@ public class TestAccessControl_revokeDomainPermissions extends TestAccessControl
       }
       catch (IllegalArgumentException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("could not find domain"));
-      }
-
-      // test with implicit domain
-      try {
-         accessControlContext.revokeDomainPermissions(Resources.getInstance(-999L),
-                                                      domCreatePerm_child_withGrant);
-         fail("revoking domain permissions with non-existent accessor resource reference should have failed");
-      }
-      catch (IllegalArgumentException e) {
-         assertThat(e.getMessage().toLowerCase(), containsString("not found"));
-      }
-
-      try {
-         accessControlContext.revokeDomainPermissions(Resources.getInstance(-999L),
-                                                      setOf(domCreatePerm_child_withGrant));
-         fail("revoking domain permissions with non-existent accessor resource reference should have failed");
-      }
-      catch (IllegalArgumentException e) {
-         assertThat(e.getMessage().toLowerCase(), containsString("not found"));
       }
    }
 }
