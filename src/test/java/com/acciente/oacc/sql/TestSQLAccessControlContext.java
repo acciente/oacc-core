@@ -745,7 +745,12 @@ public class TestSQLAccessControlContext extends TestSQLAccessControlContextBase
       resourcePermissions.add(ResourcePermissions.getInstance("VIEW"));
       setupName("setGlobalResourcePermissions( newUser_1, \"" + resourcePermissions + "\" )");
       try {
-         accessControlContext.setGlobalResourcePermissions(newUser_1, "USER", resourcePermissions);
+         accessControlContext.setGlobalResourcePermissions(newUser_1,
+                                                           "USER",
+                                                           accessControlContext
+                                                                 .getDomainNameByResource(accessControlContext
+                                                                                                .getSessionResource()),
+                                                           resourcePermissions);
          setupOK();
       }
       catch (OaccException e) {
@@ -832,7 +837,11 @@ public class TestSQLAccessControlContext extends TestSQLAccessControlContextBase
                                                                                                           false), false));
       setupName("setCreatePermission( newUser_1, \"" + resourceCreatePermissions + "\" )");
       try {
-         accessControlContext.setResourceCreatePermissions(newUser_1, "BLOG", resourceCreatePermissions);
+         accessControlContext.setResourceCreatePermissions(newUser_1,
+                                                           "BLOG",
+                                                           accessControlContext
+                                                                 .getDomainNameByResource(accessControlContext.getSessionResource()),
+                                                           resourceCreatePermissions);
          setupOK();
       }
       catch (OaccException e) {

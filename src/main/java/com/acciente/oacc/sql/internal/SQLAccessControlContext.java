@@ -852,12 +852,6 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       }
    }
 
-   @Override
-   public void setDomainPermissions(Resource accessorResource,
-                                    Set<DomainPermission> domainPermissions) {
-      setDomainPermissions(accessorResource, sessionResourceDomainName, domainPermissions);
-   }
-
    private void __setDirectDomainPermissions(SQLConnection connection,
                                              Resource accessorResource,
                                              String domainName,
@@ -1875,31 +1869,6 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
                                               accessorResource,
                                               resourceClassName,
                                               domainName,
-                                              resourceCreatePermissions);
-      }
-      finally {
-         __closeConnection(connection);
-      }
-   }
-
-   @Override
-   public void setResourceCreatePermissions(Resource accessorResource,
-                                            String resourceClassName,
-                                            Set<ResourceCreatePermission> resourceCreatePermissions) {
-      SQLConnection connection = null;
-
-      __assertAuthenticated();
-      __assertResourceSpecified(accessorResource);
-      __assertResourceClassSpecified(resourceClassName);
-      __assertPermissionsSpecified(resourceCreatePermissions);
-
-      try {
-         connection = __getConnection();
-
-         __setDirectResourceCreatePermissions(connection,
-                                              accessorResource,
-                                              resourceClassName,
-                                              sessionResourceDomainName,
                                               resourceCreatePermissions);
       }
       finally {
@@ -3433,32 +3402,6 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
                                       accessorResource,
                                       resourceClassName,
                                       domainName,
-                                      resourcePermissions);
-      }
-      finally {
-         __closeConnection(connection);
-      }
-   }
-
-   @Override
-   public void setGlobalResourcePermissions(Resource accessorResource,
-                                            String resourceClassName,
-                                            Set<ResourcePermission> resourcePermissions) {
-      SQLConnection connection = null;
-
-      __assertAuthenticated();
-      __assertResourceSpecified(accessorResource);
-      __assertResourceClassSpecified(resourceClassName);
-      __assertPermissionsSpecified(resourcePermissions);
-
-      try {
-         connection = __getConnection();
-         resourceClassName = resourceClassName.trim();
-
-         __setDirectGlobalPermissions(connection,
-                                      accessorResource,
-                                      resourceClassName,
-                                      sessionResourceDomainName,
                                       resourcePermissions);
       }
       finally {

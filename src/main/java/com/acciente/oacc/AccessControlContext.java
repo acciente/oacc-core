@@ -1202,24 +1202,6 @@ public interface AccessControlContext {
                                     Set<DomainPermission> domainPermissions);
 
    /**
-    * Sets the direct domain permissions the specified accessor resource has on the session resource's domain.
-    * <p/>
-    * Note that this method overwrites any <em>direct</em> domain permissions to the specified domain that
-    * the accessor has, <em>including permissions granted by other resources</em>.
-    * <p/>
-    * This call does not change <em>inherited</em> domain permissions the specified accessor resource has
-    * on the specified domain, or any domain permissions already granted on <em>ancestors</em> of the domain.
-    *
-    * @param accessorResource  the resource to which the privilege should be granted
-    * @param domainPermissions the permissions to be granted on the specified domain
-    * @throws java.lang.IllegalArgumentException       if accessorResource reference does not exist
-    * @throws com.acciente.oacc.NotAuthorizedException if the session resource is not authorized to set
-    *                                                  domain permissions on the session resource's domain
-    */
-   public void setDomainPermissions(Resource accessorResource,
-                                    Set<DomainPermission> domainPermissions);
-
-   /**
     * Adds to the direct domain permissions the specified accessor resource has on the specified domain.
     * <p/>
     * This call does not change <em>inherited</em> domain permissions the specified accessor resource has
@@ -1648,42 +1630,6 @@ public interface AccessControlContext {
    public Set<ResourceCreatePermission> getEffectiveResourceCreatePermissions(Resource accessorResource,
                                                                               String resourceClassName,
                                                                               String domainName);
-
-   /**
-    * Sets the resource permissions the specified accessor resource will receive directly, if it
-    * created a resource of the specified resource class in the current session resource's domain.
-    * <p/>
-    * Note that the system-defined CREATE permission must be included in the specified set of
-    * resource create permissions, unless all permissions should be revoked.
-    * <p/>
-    * Including the CREATE permission allows the accessor resource to create resources of the
-    * specified resource class and domain. But if the CREATE permission is the <em>only</em> one specified,
-    * then the accessor would not receive <em>any</em> direct permissions on the newly created resource.
-    * This is appropriate, for example, if the accessor would already obtain privileges to
-    * the newly created resource via global resource permissions, or if indeed the accessor
-    * should not receive any direct access to the newly created resource.
-    * <p/>
-    * Also note that this method replaces any <em>direct</em> resource create permissions previously
-    * granted, but does not affect any resource create permissions the specified accessor resource
-    * receives via <em>inheritance</em> or from any <em>ancestor</em> of the current session resource's domain.
-    *
-    * @param accessorResource          the resource to which the privilege should be granted
-    * @param resourceClassName         a string resource class name
-    * @param resourceCreatePermissions a set of resource create permissions to be granted
-    * @throws java.lang.IllegalArgumentException if accessorResource reference is invalid, or
-    *                                            if no resource class of resourceClassName exists, or
-    *                                            if resourceCreatePermissions does not contain *CREATE permission, or
-    *                                            if resourceCreatePermissions contains post-create permissions invalid for
-    *                                            the specified resource class (incl. RESET-CREDENTIALS or IMPERSONATE for
-    *                                            unauthenticatable resource classes), or
-    *                                            if resourceCreatePermissions contains multiple instances of the same
-    *                                            post-create permission that only differ in the 'withGrant' attribute
-    * @throws com.acciente.oacc.NotAuthorizedException if the session resource is not authorized to set
-    *                                                  resource create permissions on the specified accessor resource
-    */
-   public void setResourceCreatePermissions(Resource accessorResource,
-                                            String resourceClassName,
-                                            Set<ResourceCreatePermission> resourceCreatePermissions);
 
    /**
     * Gets all direct resource create permissions the accessor resource has to any resource class in
@@ -2122,43 +2068,6 @@ public interface AccessControlContext {
    public Set<ResourcePermission> getEffectiveGlobalResourcePermissions(Resource accessorResource,
                                                                         String resourceClassName,
                                                                         String domainName);
-
-   /**
-    * Sets the global resource permissions a resource has on any resource of the specified
-    * resource class in the current session resource's domain.
-    * <p/>
-    * Global resource permissions are resource permissions that are defined on a resource class for
-    * a given domain and thus apply to any and all resources of that resource class and domain.
-    * They are <strong>not</strong> associated directly with <em>every</em> individual resource of
-    * that resource class and domain!
-    * <p/>
-    * Note that the system-defined CREATE resource permission can <strong>NOT</strong>
-    * be set as a global resource permission, because it would be nonsensical.
-    * Currently the system-defined INHERIT resource permission may also <strong>not</strong> be
-    * set as a global resource permission.
-    * <p/>
-    * This method replaces any <em>direct</em> global resource permissions previously granted, but
-    * does not affect any global resource permissions the specified accessor resource receives via
-    * <em>inheritance</em> or from any <em>ancestors</em> of the current session resource's domain.
-    *
-    * @param accessorResource    the resource to which the privilege should be granted
-    * @param resourceClassName   a string resource class name
-    * @param resourcePermissions the set of resource permissions to be granted globally to the
-    *                            specified resource class and session resource's domain
-    * @throws java.lang.IllegalArgumentException if accessorResource reference does not exist, or
-    *                                            if no resource class of resourceClassName exists, or
-    *                                            if resourcePermissions contains INHERIT permission, or
-    *                                            if resourcePermissions contains permissions invalid for the specified
-    *                                            resource class (incl. RESET-CREDENTIALS or IMPERSONATE for
-    *                                            unauthenticatable resource classes), or
-    *                                            if resourcePermissions contains multiple instances of the same
-    *                                            permission that only differ in the 'withGrant' attribute
-    * @throws com.acciente.oacc.NotAuthorizedException if the session resource is not authorized to set
-    *                                                  resource create permissions on the specified accessor resource
-    */
-   public void setGlobalResourcePermissions(Resource accessorResource,
-                                            String resourceClassName,
-                                            Set<ResourcePermission> resourcePermissions);
 
    /**
     * Gets all global resource permissions the specified accessor resource has directly to any resources
