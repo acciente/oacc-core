@@ -4128,13 +4128,18 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       __assertAuthenticated();
       __assertResourceSpecified(resource);
 
-      try {
-         connection = __getConnection();
-
-         return domainPersister.getResourceDomainNameByResourceId(connection, resource);
+      if (sessionResource.equals(resource)) {
+         return sessionResourceDomainName;
       }
-      finally {
-         __closeConnection(connection);
+      else {
+         try {
+            connection = __getConnection();
+
+            return domainPersister.getResourceDomainNameByResourceId(connection, resource);
+         }
+         finally {
+            __closeConnection(connection);
+         }
       }
    }
 
