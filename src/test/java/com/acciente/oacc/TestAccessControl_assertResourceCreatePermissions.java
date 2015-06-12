@@ -1585,7 +1585,7 @@ public class TestAccessControl_assertResourceCreatePermissions extends TestAcces
          fail("asserting resource create permission (by domain) for invalid resource class reference should have failed for system resource");
       }
       catch (IllegalArgumentException e) {
-         assertThat(e.getMessage().toLowerCase(), containsString("not defined for resource class"));
+         assertThat(e.getMessage().toLowerCase(), containsString("could not find resource class"));
       }
       try {
          accessControlContext
@@ -1650,7 +1650,7 @@ public class TestAccessControl_assertResourceCreatePermissions extends TestAcces
          fail("asserting resource create permission (by domain) for invalid resource class reference should have failed for system resource");
       }
       catch (IllegalArgumentException e) {
-         assertThat(e.getMessage().toLowerCase(), containsString("not defined for resource class"));
+         assertThat(e.getMessage().toLowerCase(), containsString("could not find resource class"));
       }
       try {
          accessControlContext

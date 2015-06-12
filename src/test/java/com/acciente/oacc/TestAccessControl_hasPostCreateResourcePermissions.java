@@ -1607,7 +1607,7 @@ public class TestAccessControl_hasPostCreateResourcePermissions extends TestAcce
          fail("checking post-create resource permission (by domain) for invalid resource class reference should have failed for system resource");
       }
       catch (IllegalArgumentException e) {
-         assertThat(e.getMessage().toLowerCase(), containsString("not defined for resource class"));
+         assertThat(e.getMessage().toLowerCase(), containsString("could not find resource class"));
       }
       try {
          accessControlContext.hasPostCreateResourcePermissions(SYS_RESOURCE,
@@ -1662,7 +1662,7 @@ public class TestAccessControl_hasPostCreateResourcePermissions extends TestAcce
          fail("checking post-create resource permission (by domain) for invalid resource class reference should have failed for system resource");
       }
       catch (IllegalArgumentException e) {
-         assertThat(e.getMessage().toLowerCase(), containsString("not defined for resource class"));
+         assertThat(e.getMessage().toLowerCase(), containsString("could not find resource class"));
       }
       try {
          accessControlContext.hasPostCreateResourcePermissions(SYS_RESOURCE,
