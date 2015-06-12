@@ -19,10 +19,10 @@ package com.acciente.oacc;
 
 import org.junit.Test;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import static org.hamcrest.CoreMatchers.containsString;
+import static org.hamcrest.CoreMatchers.hasItems;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
@@ -38,10 +38,44 @@ public class TestAccessControl_getResourcePermissionNames extends TestAccessCont
 
       final String permissionName = generateResourceClassPermission(resourceClassName);
 
-      final List<String> expectedPermissions = new ArrayList<>();
-      expectedPermissions.add(permissionName);
+      assertThat(accessControlContext.getResourcePermissionNames(resourceClassName).size(), is(2));
+      assertThat(accessControlContext.getResourcePermissionNames(resourceClassName),
+                 hasItems(permissionName,
+                          ResourcePermissions.INHERIT));
+   }
 
-      assertThat(accessControlContext.getResourcePermissionNames(resourceClassName), is(expectedPermissions));
+   @Test
+   public void getResourcePermissionNames_unauthenticatableResourceClass() {
+      authenticateSystemResource();
+
+      final Resource resource = generateUnauthenticatableResource();
+      final ResourceClassInfo resourceClassInfo = accessControlContext.getResourceClassInfoByResource(resource);
+      final String resourceClassName = resourceClassInfo.getResourceClassName();
+
+      final String permissionName = generateResourceClassPermission(resourceClassName);
+
+      final List<String> resourcePermissionNames = accessControlContext.getResourcePermissionNames(resourceClassName);
+      assertThat(resourcePermissionNames.size(), is(2));
+      assertThat(resourcePermissionNames, hasItems(permissionName,
+                                                   ResourcePermissions.INHERIT));
+   }
+
+   @Test
+   public void getResourcePermissionNames_authenticatableResourceClass() {
+      authenticateSystemResource();
+
+      final Resource resource = generateAuthenticatableResource(generateUniquePassword());
+      final ResourceClassInfo resourceClassInfo = accessControlContext.getResourceClassInfoByResource(resource);
+      final String resourceClassName = resourceClassInfo.getResourceClassName();
+
+      final String permissionName = generateResourceClassPermission(resourceClassName);
+
+      final List<String> resourcePermissionNames = accessControlContext.getResourcePermissionNames(resourceClassName);
+      assertThat(resourcePermissionNames.size(), is(4));
+      assertThat(resourcePermissionNames, hasItems(permissionName,
+                                                   ResourcePermissions.INHERIT,
+                                                   ResourcePermissions.IMPERSONATE,
+                                                   ResourcePermissions.RESET_CREDENTIALS));
    }
 
    @Test
@@ -55,17 +89,24 @@ public class TestAccessControl_getResourcePermissionNames extends TestAccessCont
 
       final String permissionName = generateResourceClassPermission(resourceClassName);
 
-      final List<String> expectedPermissions = new ArrayList<>();
-      expectedPermissions.add(permissionName);
-
-      assertThat(accessControlContext.getResourcePermissionNames(resourceClassName_whitespaced), is(expectedPermissions));
+      final List<String> resourcePermissionNames = accessControlContext.getResourcePermissionNames(
+            resourceClassName_whitespaced);
+      assertThat(resourcePermissionNames.size(), is(2));
+      assertThat(resourcePermissionNames, hasItems(permissionName,
+                                                   ResourcePermissions.INHERIT));
    }
 
    @Test
    public void getResourcePermissionNames_nonExistentReferences_shouldSucceed() {
       authenticateSystemResource();
 
-      assertThat(accessControlContext.getResourcePermissionNames("does_not_exist").isEmpty(), is(true));
+      try {
+         accessControlContext.getResourcePermissionNames("does_not_exist");
+         fail("getting resource permission names with non-existent resource class name should have failed");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("could not find resource class"));
+      }
    }
 
    @Test

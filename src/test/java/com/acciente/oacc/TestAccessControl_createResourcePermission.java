@@ -41,20 +41,21 @@ public class TestAccessControl_createResourcePermission extends TestAccessContro
       final String permissionName1 = generateUniquePermissionName();
       List<String> permissionNames;
       permissionNames = accessControlContext.getResourcePermissionNames(resourceClassName);
-      assertThat(permissionNames.isEmpty(), is(true));
+      assertThat(permissionNames.size(), is(1));
+      assertThat(permissionNames, hasItems(ResourcePermissions.INHERIT));
 
       // create permission and verify
       accessControlContext.createResourcePermission(resourceClassName, permissionName1);
       permissionNames = accessControlContext.getResourcePermissionNames(resourceClassName);
-      assertThat(permissionNames.size(), is(1));
-      assertThat(permissionNames, hasItem(permissionName1));
+      assertThat(permissionNames.size(), is(2));
+      assertThat(permissionNames, hasItems(ResourcePermissions.INHERIT, permissionName1));
 
       // add another permission and verify
       final String permissionName2 = generateUniquePermissionName();
       accessControlContext.createResourcePermission(resourceClassName, permissionName2);
       permissionNames = accessControlContext.getResourcePermissionNames(resourceClassName);
-      assertThat(permissionNames.size(), is(2));
-      assertThat(permissionNames, hasItems(permissionName1, permissionName2));
+      assertThat(permissionNames.size(), is(3));
+      assertThat(permissionNames, hasItems(ResourcePermissions.INHERIT, permissionName1, permissionName2));
    }
 
    @Test
@@ -67,13 +68,14 @@ public class TestAccessControl_createResourcePermission extends TestAccessContro
       final String permissionNameWhitespaced = " " + permissionNameTrimmed + "\t";
       List<String> permissionNames;
       permissionNames = accessControlContext.getResourcePermissionNames(resourceClassNameTrimmed);
-      assertThat(permissionNames.isEmpty(), is(true));
+      assertThat(permissionNames.size(), is(1));
+      assertThat(permissionNames, hasItems(ResourcePermissions.INHERIT));
 
       // create permission and verify
       accessControlContext.createResourcePermission(resourceClassNameWhitespaced, permissionNameWhitespaced);
       permissionNames = accessControlContext.getResourcePermissionNames(resourceClassNameTrimmed);
-      assertThat(permissionNames.size(), is(1));
-      assertThat(permissionNames, hasItem(permissionNameTrimmed));
+      assertThat(permissionNames.size(), is(2));
+      assertThat(permissionNames, hasItems(ResourcePermissions.INHERIT, permissionNameTrimmed));
    }
 
    @Test
@@ -93,42 +95,45 @@ public class TestAccessControl_createResourcePermission extends TestAccessContro
          accessControlContext.createResourceClass(resourceClassName_UPPER, false, false);
 
          permissionNames = accessControlContext.getResourcePermissionNames(resourceClassName_lower);
-         assertThat(permissionNames.isEmpty(), is(true));
+         assertThat(permissionNames.size(), is(1));
+         assertThat(permissionNames, hasItems(ResourcePermissions.INHERIT));
          permissionNames = accessControlContext.getResourcePermissionNames(resourceClassName_UPPER);
-         assertThat(permissionNames.isEmpty(), is(true));
+         assertThat(permissionNames.size(), is(1));
+         assertThat(permissionNames, hasItems(ResourcePermissions.INHERIT));
 
          // create permission with case-sensitive class/permission name combinations and verify
          accessControlContext.createResourcePermission(resourceClassName_lower, permissionName_lower);
          permissionNames = accessControlContext.getResourcePermissionNames(resourceClassName_lower);
-         assertThat(permissionNames.size(), is(1));
-         assertThat(permissionNames, hasItem(permissionName_lower));
+         assertThat(permissionNames.size(), is(2));
+         assertThat(permissionNames, hasItems(ResourcePermissions.INHERIT, permissionName_lower));
          assertThat(permissionNames, not(hasItem(permissionName_UPPER)));
 
          accessControlContext.createResourcePermission(resourceClassName_UPPER, permissionName_lower);
          permissionNames = accessControlContext.getResourcePermissionNames(resourceClassName_UPPER);
-         assertThat(permissionNames.size(), is(1));
-         assertThat(permissionNames, hasItem(permissionName_lower));
+         assertThat(permissionNames.size(), is(2));
+         assertThat(permissionNames, hasItems(ResourcePermissions.INHERIT, permissionName_lower));
          assertThat(permissionNames, not(hasItem(permissionName_UPPER)));
 
          accessControlContext.createResourcePermission(resourceClassName_lower, permissionName_UPPER);
          permissionNames = accessControlContext.getResourcePermissionNames(resourceClassName_lower);
-         assertThat(permissionNames.size(), is(2));
-         assertThat(permissionNames, hasItems(permissionName_lower, permissionName_UPPER));
+         assertThat(permissionNames.size(), is(3));
+         assertThat(permissionNames, hasItems(ResourcePermissions.INHERIT, permissionName_lower, permissionName_UPPER));
 
          accessControlContext.createResourcePermission(resourceClassName_UPPER, permissionName_UPPER);
          permissionNames = accessControlContext.getResourcePermissionNames(resourceClassName_UPPER);
-         assertThat(permissionNames.size(), is(2));
-         assertThat(permissionNames, hasItems(permissionName_lower, permissionName_UPPER));
+         assertThat(permissionNames.size(), is(3));
+         assertThat(permissionNames, hasItems(ResourcePermissions.INHERIT, permissionName_lower, permissionName_UPPER));
       }
       else {
          permissionNames = accessControlContext.getResourcePermissionNames(resourceClassName_lower);
-         assertThat(permissionNames.isEmpty(), is(true));
+         assertThat(permissionNames.size(), is(1));
+         assertThat(permissionNames, hasItems(ResourcePermissions.INHERIT));
 
          // create permission with case-sensitive class/permission name combinations and verify
          accessControlContext.createResourcePermission(resourceClassName_lower, permissionName_lower);
          permissionNames = accessControlContext.getResourcePermissionNames(resourceClassName_lower);
-         assertThat(permissionNames.size(), is(1));
-         assertThat(permissionNames, hasItem(permissionName_lower));
+         assertThat(permissionNames.size(), is(2));
+         assertThat(permissionNames, hasItems(ResourcePermissions.INHERIT, permissionName_lower));
          assertThat(permissionNames, not(hasItem(permissionName_UPPER)));
 
          try {
@@ -241,8 +246,8 @@ public class TestAccessControl_createResourcePermission extends TestAccessContro
       catch (IllegalArgumentException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("duplicate"));
          List<String> permissionNames = accessControlContext.getResourcePermissionNames(resourceClassName);
-         assertThat(permissionNames.size(), is(1));
-         assertThat(permissionNames, hasItem(permissionName));
+         assertThat(permissionNames.size(), is(2));
+         assertThat(permissionNames, hasItems(ResourcePermissions.INHERIT, permissionName));
       }
       // check if whitespace makes a difference
       try {
@@ -252,8 +257,8 @@ public class TestAccessControl_createResourcePermission extends TestAccessContro
       catch (IllegalArgumentException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("duplicate"));
          List<String> permissionNames = accessControlContext.getResourcePermissionNames(resourceClassName);
-         assertThat(permissionNames.size(), is(1));
-         assertThat(permissionNames, hasItem(permissionName));
+         assertThat(permissionNames.size(), is(2));
+         assertThat(permissionNames, hasItems(ResourcePermissions.INHERIT, permissionName));
       }
    }
 }

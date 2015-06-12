@@ -2130,10 +2130,12 @@ public interface AccessControlContext {
    public List<String> getResourceClassNames();
 
    /**
-    * Returns the list of all resource permission names defined for the specified resource class name
+    * Returns the list of all resource permission names defined for the specified resource class name,
+    * including the applicable system permissions as well as any custom permissions
     *
     * @param resourceClassName the resource class name for which the permissions should be retrieved
-    * @return a list of string permission names, or an empty list if no resource class of resourceClassName exists
+    * @return a list of string permission names
+    * @throws java.lang.IllegalArgumentException if no resource class of resourceClassName exists
     */
    public List<String> getResourcePermissionNames(String resourceClassName);
 }

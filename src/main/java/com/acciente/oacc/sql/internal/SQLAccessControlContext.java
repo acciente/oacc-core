@@ -61,6 +61,7 @@ import javax.sql.DataSource;
 import java.io.Serializable;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -5705,7 +5706,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
          connection = __getConnection();
          resourceClassName = resourceClassName.trim();
 
-         return resourceClassPermissionPersister.getPermissionNames(connection, resourceClassName);
+         return __getApplicableResourcePermissionNames(connection, resourceClassName);
       }
       finally {
          __closeConnection(connection);
@@ -5713,6 +5714,27 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
    }
 
    // private shared helper methods
+
+   private List<String> __getApplicableResourcePermissionNames(SQLConnection connection,
+                                                               String resourceClassName) {
+      final ResourceClassInternalInfo resourceClassInternalInfo
+            = resourceClassPersister.getResourceClassInfo(connection, resourceClassName);
+
+      // check if the resource class is valid
+      if (resourceClassInternalInfo == null) {
+         throw new IllegalArgumentException("Could not find resource class: " + resourceClassName);
+      }
+
+      final List<String> permissionNames = resourceClassPermissionPersister.getPermissionNames(connection,
+                                                                                               resourceClassName);
+      permissionNames.add(ResourcePermissions.INHERIT);
+
+      if (resourceClassInternalInfo.isAuthenticatable()) {
+         permissionNames.add(ResourcePermissions.IMPERSONATE);
+         permissionNames.add(ResourcePermissions.RESET_CREDENTIALS);
+      }
+      return permissionNames;
+   }
 
    private boolean __isSuperUserOfResource(SQLConnection connection,
                                            Resource accessorResource,
@@ -5928,7 +5950,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
                permissionNames = resourceClassPermissionPersister.getPermissionNames(connection, resourceClassName);
             }
             if (!permissionNames.contains(resourcePermission.getPermissionName())) {
-               throw new IllegalArgumentException("Permission: " + resourcePermission + " is not defined for resource class: " + resourceClassName);
+               throw new IllegalArgumentException("Permission: " + String.valueOf(resourcePermission) + " is not defined for resource class: " + resourceClassName);
             }
          }
       }
