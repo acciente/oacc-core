@@ -288,7 +288,8 @@ public interface AccessControlContext {
    /**
     * Checks if the specified accessor resource would receive the specified domain permissions, if the accessor
     * were to create a domain.
-    * The method takes into account any direct and inherited domain create permissions the accessor might have.
+    * The method takes into account any direct and inherited domain create permissions the accessor might have, as well
+    * as any super-user privileges.
     *
     * @param accessorResource  the resource requesting the access
     * @param domainPermissions the permissions to be checked
@@ -302,7 +303,8 @@ public interface AccessControlContext {
    /**
     * Checks if the specified accessor resource would receive the specified domain permissions, if the accessor
     * were to create a domain.
-    * The method takes into account any direct and inherited domain create permissions the accessor might have.
+    * The method takes into account any direct and inherited domain create permissions the accessor might have, as well
+    * as any super-user privileges.
     *
     * @param accessorResource  the resource requesting the access
     * @param domainPermission  the permission to be checked
@@ -318,7 +320,8 @@ public interface AccessControlContext {
    /**
     * Checks if the specified accessor resource would receive the specified domain permissions, if the accessor
     * were to create a domain.
-    * The method takes into account any direct and inherited domain create permissions the accessor might have.
+    * The method takes into account any direct and inherited domain create permissions the accessor might have, as well
+    * as any super-user privileges.
     *
     * @param accessorResource  the resource requesting the access
     * @param domainPermissions the permissions to be checked
@@ -331,7 +334,8 @@ public interface AccessControlContext {
    /**
     * Checks if the specified accessor resource would receive the specified domain permissions, if the accessor
     * were to create a domain.
-    * The method takes into account any direct and inherited domain create permissions the accessor might have.
+    * The method takes into account any direct and inherited domain create permissions the accessor might have, as well
+    * as any super-user privileges.
     *
     * @param accessorResource  the resource requesting the access
     * @param domainPermission  the permission to be checked
@@ -346,7 +350,8 @@ public interface AccessControlContext {
    /**
     * Checks if the specified accessor resource has the specified global resource permissions on
     * the specified resource class in the specified domain.
-    * This method takes into account any global permissions that the accessor resource may have.
+    * This method takes into account any global permissions that the accessor resource may have, as well
+    * as any super-user privileges.
     *
     * @param accessorResource    the resource on which access is being checked
     * @param resourceClassName   a string resource class name
@@ -368,7 +373,8 @@ public interface AccessControlContext {
    /**
     * Checks if the specified accessor resource has the specified global resource permissions on
     * the specified resource class in the specified domain.
-    * This method takes into account any global permissions that the accessor resource may have.
+    * This method takes into account any global permissions that the accessor resource may have, as well
+    * as any super-user privileges.
     *
     * @param accessorResource    the resource on which access is being checked
     * @param resourceClassName   a string resource class name
@@ -392,7 +398,8 @@ public interface AccessControlContext {
    /**
     * Checks if the specified accessor resource has the specified global resource permissions on
     * the specified resource class in the specified domain.
-    * This method takes into account any global permissions that the accessor resource may have.
+    * This method takes into account any global permissions that the accessor resource may have, as well
+    * as any super-user privileges.
     *
     * @param accessorResource    the resource on which access is being checked
     * @param resourceClassName   a string resource class name
@@ -413,7 +420,8 @@ public interface AccessControlContext {
    /**
     * Checks if the specified accessor resource has the specified global resource permissions on
     * the specified resource class in the specified domain.
-    * This method takes into account any global permissions that the accessor resource may have.
+    * This method takes into account any global permissions that the accessor resource may have, as well
+    * as any super-user privileges.
     *
     * @param accessorResource    the resource on which access is being checked
     * @param resourceClassName   a string resource class name
@@ -436,7 +444,8 @@ public interface AccessControlContext {
    /**
     * Checks if the specified accessor resource has the specified resource permissions
     * to the specified accessed resource.
-    * This method takes into account direct, inherited and global permissions of accessor resource.
+    * This method takes into account direct, inherited and global permissions of accessor resource, as well
+    * as any super-user privileges.
     *
     * @param accessorResource    the resource requesting the access
     * @param accessedResource    the resource on which access is being requested
@@ -453,7 +462,8 @@ public interface AccessControlContext {
    /**
     * Checks if the specified accessor resource has the specified resource permissions
     * to the specified accessed resource.
-    * This method takes into account direct, inherited and global permissions of accessor resource.
+    * This method takes into account direct, inherited and global permissions of accessor resource, as well
+    * as any super-user privileges.
     *
     * @param accessorResource    the resource requesting the access
     * @param accessedResource    the resource on which access is being requested
@@ -472,7 +482,8 @@ public interface AccessControlContext {
    /**
     * Checks if the specified accessor resource has the specified resource permissions
     * to the specified accessed resource.
-    * This method takes into account direct, inherited and global permissions of accessor resource.
+    * This method takes into account direct, inherited and global permissions of accessor resource, as well
+    * as any super-user privileges.
     *
     * @param accessorResource    the resource requesting the access
     * @param accessedResource    the resource on which access is being requested
@@ -488,7 +499,8 @@ public interface AccessControlContext {
    /**
     * Checks if the specified accessor resource has the specified resource permissions
     * to the specified accessed resource.
-    * This method takes into account direct, inherited and global permissions of accessor resource.
+    * This method takes into account direct, inherited and global permissions of accessor resource, as well
+    * as any super-user privileges.
     *
     * @param accessorResource    the resource requesting the access
     * @param accessedResource    the resource on which access is being requested
@@ -507,7 +519,7 @@ public interface AccessControlContext {
     * Checks if the specified accessor resource has the specified create permissions on an object of
     * the specified class in the specified domain.
     * The method takes into account any any direct and inherited resource create permissions of the
-    * specified accessor resource.
+    * specified accessor resource, as well as any super-user privileges.
     *
     * @param accessorResource          the resource requesting the access
     * @param resourceClassName         a string resource class name
@@ -531,7 +543,7 @@ public interface AccessControlContext {
     * Checks if the specified accessor resource has the specified create permissions on an object of
     * the specified class in the specified domain.
     * The method takes into account any any direct and inherited resource create permissions of the
-    * specified accessor resource.
+    * specified accessor resource, as well as any super-user privileges.
     *
     * @param accessorResource          the resource requesting the access
     * @param resourceClassName         a string resource class name
@@ -557,7 +569,7 @@ public interface AccessControlContext {
     * Checks if the specified accessor resource has the specified create permissions on an object of
     * the specified class in the specified domain.
     * The method takes into account any any direct and inherited resource create permissions of the
-    * specified accessor resource.
+    * specified accessor resource, as well as any super-user privileges.
     *
     * @param accessorResource          the resource requesting the access
     * @param resourceClassName         a string resource class name
@@ -580,7 +592,7 @@ public interface AccessControlContext {
     * Checks if the specified accessor resource has the specified create permissions on an object of
     * the specified class in the specified domain.
     * The method takes into account any any direct and inherited resource create permissions of the
-    * specified accessor resource.
+    * specified accessor resource, as well as any super-user privileges.
     *
     * @param accessorResource          the resource requesting the access
     * @param resourceClassName         a string resource class name
@@ -629,7 +641,7 @@ public interface AccessControlContext {
     * Checks if the specified accessor resource would receive the specified permissions on an object of
     * the specified class in the specified domain, if it were to create such an object.
     * The method takes into account any resource create permissions and global resource permissions
-    * of the specified accessor resource.
+    * of the specified accessor resource, as well as any super-user privileges, as well as any super-user privileges.
     *
     * @param accessorResource    the resource requesting the access
     * @param resourceClassName   a string resource class name
@@ -655,7 +667,7 @@ public interface AccessControlContext {
     * Checks if the specified accessor resource would receive the specified permissions on an object of
     * the specified class in the specified domain, if it were to create such an object.
     * The method takes into account any resource create permissions and global resource permissions
-    * of the specified accessor resource.
+    * of the specified accessor resource, as well as any super-user privileges.
     *
     * @param accessorResource    the resource requesting the access
     * @param resourceClassName   a string resource class name
@@ -678,7 +690,7 @@ public interface AccessControlContext {
     * Checks if the specified accessor resource would receive the specified permissions on an object of
     * the specified class in the specified domain, if it were to create such an object.
     * The method takes into account any resource create permissions and global resource permissions
-    * of the specified accessor resource.
+    * of the specified accessor resource, as well as any super-user privileges.
     *
     * @param accessorResource    the resource requesting the access
     * @param resourceClassName   a string resource class name
@@ -712,9 +724,12 @@ public interface AccessControlContext {
     * Returns the domains which are descendants of the specified domain.
     * The returned set includes the specified domain (unless the specified domain does not exist);
     * in other words, a domain is considered its own descendant
+    * <p/>
+    * Note that this returns not just the names of direct first-level descendant domains, but the names of all descendant
+    * domains, regardless of level
     *
     * @param domainName a domain name for which to retrieve the descendants
-    * @return a set of unique string domain names, including the domain queried about (when it exists)
+    * @return a set of unique string domain names, including the domain queried about, or an empty set if the specified domain does not exist
     */
    public Set<String> getDomainDescendants(String domainName);
 
