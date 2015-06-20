@@ -37,9 +37,9 @@ public class TestAccessControl_hasGlobalResourcePermissions extends TestAccessCo
       final String domainName = generateDomain();
 
       // verify setup
-      final Set<ResourceCreatePermission> allResourceCreatePermissionsForResourceClassAndDomain
-            = accessControlContext.getEffectiveResourceCreatePermissions(SYS_RESOURCE, resourceClassName, domainName);
-      assertThat(allResourceCreatePermissionsForResourceClassAndDomain.isEmpty(), is(true));
+      final Set<ResourceCreatePermission> directResourceCreatePermissionsForResourceClassAndDomain
+            = accessControlContext.getResourceCreatePermissions(SYS_RESOURCE, resourceClassName, domainName);
+      assertThat(directResourceCreatePermissionsForResourceClassAndDomain.isEmpty(), is(true));
 
       // verify
       if (!accessControlContext.hasGlobalResourcePermissions(SYS_RESOURCE,
@@ -953,9 +953,9 @@ public class TestAccessControl_hasGlobalResourcePermissions extends TestAccessCo
       final String domainName = generateDomain();
       final String domainName_whitespaced = " " + domainName + "\t";
 
-      final Set<ResourceCreatePermission> allResourceCreatePermissionsForResourceClassAndDomain
-            = accessControlContext.getEffectiveResourceCreatePermissions(SYS_RESOURCE, resourceClassName, domainName);
-      assertThat(allResourceCreatePermissionsForResourceClassAndDomain.isEmpty(), is(true));
+      final Set<ResourceCreatePermission> directResourceCreatePermissionsForResourceClassAndDomain
+            = accessControlContext.getResourceCreatePermissions(SYS_RESOURCE, resourceClassName, domainName);
+      assertThat(directResourceCreatePermissionsForResourceClassAndDomain.isEmpty(), is(true));
 
       // verify
       if (!accessControlContext.hasGlobalResourcePermissions(SYS_RESOURCE,

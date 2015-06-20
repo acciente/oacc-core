@@ -52,7 +52,7 @@ public class TestAccessControl_grantDomainPermissions extends TestAccessControlB
             = setOf(domainPermission_superUser, domainPermission_child_withGrant);
 
       final Set<DomainPermission> domainPermissions_post
-            = accessControlContext.getEffectiveDomainPermissions(accessorResource, domainName);
+            = accessControlContext.getDomainPermissions(accessorResource, domainName);
       assertThat(domainPermissions_post, is(domainPermissions_expected));
 
       // test set-based version
@@ -64,7 +64,7 @@ public class TestAccessControl_grantDomainPermissions extends TestAccessControlB
                                                   setOf(domainPermission_superUser,
                                                         domainPermission_child_withGrant));
 
-      assertThat(accessControlContext.getEffectiveDomainPermissions(accessorResource2, domainName),
+      assertThat(accessControlContext.getDomainPermissions(accessorResource2, domainName),
                  is(domainPermissions_expected));
    }
 
@@ -106,7 +106,7 @@ public class TestAccessControl_grantDomainPermissions extends TestAccessControlB
 
       Set<DomainPermission> domainPermissions_expected = setOf(domPerm_superuser, domPerm_child_withGrant);
       assertThat(domainPermissions_expected, is(not(domainPermissions_granter)));
-      domainPermissions_post = accessControlContext.getEffectiveDomainPermissions(accessorResource, domainName);
+      domainPermissions_post = accessControlContext.getDomainPermissions(accessorResource, domainName);
       assertThat(domainPermissions_post, is(domainPermissions_expected));
 
       // test set-based version
@@ -117,7 +117,7 @@ public class TestAccessControl_grantDomainPermissions extends TestAccessControlB
                                                   setOf(domPerm_superuser,
                                                         domPerm_child_withGrant));
 
-      assertThat(accessControlContext.getEffectiveDomainPermissions(accessorResource2, domainName),
+      assertThat(accessControlContext.getDomainPermissions(accessorResource2, domainName),
                  is(domainPermissions_expected));
    }
 
@@ -145,7 +145,7 @@ public class TestAccessControl_grantDomainPermissions extends TestAccessControlB
       accessControlContext.setDomainPermissions(authenticatableResource, domainName, domainPermissions_granter);
 
       Set<DomainPermission> domainPermissions_post;
-      domainPermissions_post = accessControlContext.getEffectiveDomainPermissions(authenticatableResource, domainName);
+      domainPermissions_post = accessControlContext.getDomainPermissions(authenticatableResource, domainName);
       assertThat(domainPermissions_post, is(domainPermissions_granter));
 
       // now create a new resource
@@ -161,7 +161,7 @@ public class TestAccessControl_grantDomainPermissions extends TestAccessControlB
 
       Set<DomainPermission> domainPermissions_expected = setOf(domCreatePerm_superuser_withGrant, domCreatePerm_child);
       assertThat(domainPermissions_expected, is(not(domainPermissions_granter)));
-      domainPermissions_post = accessControlContext.getEffectiveDomainPermissions(accessorResource, domainName);
+      domainPermissions_post = accessControlContext.getDomainPermissions(accessorResource, domainName);
       assertThat(domainPermissions_post, is(domainPermissions_expected));
 
       // test set-based version
@@ -173,7 +173,7 @@ public class TestAccessControl_grantDomainPermissions extends TestAccessControlB
                                                   setOf(domCreatePerm_superuser_withGrant,
                                                         domCreatePerm_child));
 
-      assertThat(accessControlContext.getEffectiveDomainPermissions(accessorResource2, domainName),
+      assertThat(accessControlContext.getDomainPermissions(accessorResource2, domainName),
                  is(domainPermissions_expected));
    }
 
@@ -215,7 +215,7 @@ public class TestAccessControl_grantDomainPermissions extends TestAccessControlB
 
       Set<DomainPermission> domainPermissions_expected = setOf(domPerm_superuser, domPerm_child_withGrant);
       assertThat(domainPermissions_expected, is(not(domainPermissions_granter)));
-      domainPermissions_post = accessControlContext.getEffectiveDomainPermissions(accessorResource, domainName);
+      domainPermissions_post = accessControlContext.getDomainPermissions(accessorResource, domainName);
       assertThat(domainPermissions_post, is(domainPermissions_expected));
 
       // test set-based version
@@ -225,7 +225,7 @@ public class TestAccessControl_grantDomainPermissions extends TestAccessControlB
                  is(setOf(domPerm_child_withGrant)));
 
       accessControlContext.grantDomainPermissions(accessorResource2, domainName, setOf(domPerm_superuser));
-      assertThat(accessControlContext.getEffectiveDomainPermissions(accessorResource2, domainName),
+      assertThat(accessControlContext.getDomainPermissions(accessorResource2, domainName),
                  is(domainPermissions_expected));
    }
 
@@ -300,20 +300,20 @@ public class TestAccessControl_grantDomainPermissions extends TestAccessControlB
                                                   domainPermission_child_withGrant);
 
       final Set<DomainPermission> domainPermissions_post
-            = accessControlContext.getEffectiveDomainPermissions(accessorResource, domainName);
+            = accessControlContext.getDomainPermissions(accessorResource, domainName);
       assertThat(domainPermissions_post, is(domainPermissions_expected));
 
       // regrant domain permissions and verify that nothing changed
       accessControlContext.grantDomainPermissions(accessorResource, domainName, domainPermission_child);
 
       final Set<DomainPermission> domainPermissions_post2
-            = accessControlContext.getEffectiveDomainPermissions(accessorResource, domainName);
+            = accessControlContext.getDomainPermissions(accessorResource, domainName);
       assertThat(domainPermissions_post2, is(domainPermissions_expected));
 
       // regrant via set-based version
       accessControlContext.grantDomainPermissions(accessorResource, domainName, setOf(domainPermission_child));
 
-      assertThat(accessControlContext.getEffectiveDomainPermissions(accessorResource, domainName),
+      assertThat(accessControlContext.getDomainPermissions(accessorResource, domainName),
                  is(domainPermissions_expected));
    }
 
@@ -331,14 +331,14 @@ public class TestAccessControl_grantDomainPermissions extends TestAccessControlB
       Set<DomainPermission> accessorPermissions_pre = setOf(DomainPermissions.getInstance(ungrantedPermissionName));
 
       accessControlContext.setDomainPermissions(accessorResource, domainName, accessorPermissions_pre);
-      assertThat(accessControlContext.getEffectiveDomainPermissions(accessorResource, domainName),
+      assertThat(accessControlContext.getDomainPermissions(accessorResource, domainName),
                  is(accessorPermissions_pre));
 
       // setup grantor permissions
       Set<DomainPermission> grantorPermissions = setOf(DomainPermissions.getInstance(grantedPermissionName, true));
 
       accessControlContext.setDomainPermissions(grantorResource, domainName, grantorPermissions);
-      assertThat(accessControlContext.getEffectiveDomainPermissions(grantorResource, domainName),
+      assertThat(accessControlContext.getDomainPermissions(grantorResource, domainName),
                  is(grantorPermissions));
 
       // authenticate grantor resource
@@ -431,13 +431,13 @@ public class TestAccessControl_grantDomainPermissions extends TestAccessControlB
                                                                                           true));
 
       accessControlContext.setDomainPermissions(accessorResource, domainName, accessorPermissions_pre);
-      assertThat(accessControlContext.getEffectiveDomainPermissions(accessorResource, domainName), is(accessorPermissions_pre));
+      assertThat(accessControlContext.getDomainPermissions(accessorResource, domainName), is(accessorPermissions_pre));
 
       // setup grantor permissions
       Set<DomainPermission> grantorPermissions = setOf(DomainPermissions.getInstance(grantedPermissionName, true));
 
       accessControlContext.setDomainPermissions(grantorResource, domainName, grantorPermissions);
-      assertThat(accessControlContext.getEffectiveDomainPermissions(grantorResource, domainName),
+      assertThat(accessControlContext.getDomainPermissions(grantorResource, domainName),
                  is(grantorPermissions));
 
       // authenticate grantor resource
@@ -532,13 +532,13 @@ public class TestAccessControl_grantDomainPermissions extends TestAccessControlB
       Set<DomainPermission> accessorPermissions_pre = setOf(DomainPermissions.getInstance(ungrantedPermissionName));
 
       accessControlContext.setDomainPermissions(accessorResource, domainName, accessorPermissions_pre);
-      assertThat(accessControlContext.getEffectiveDomainPermissions(accessorResource, domainName), is(accessorPermissions_pre));
+      assertThat(accessControlContext.getDomainPermissions(accessorResource, domainName), is(accessorPermissions_pre));
 
       // setup grantor permissions
       Set<DomainPermission> grantorPermissions = setOf(DomainPermissions.getInstance(grantedPermissionName, true));
 
       accessControlContext.setDomainPermissions(grantorResource, domainName, grantorPermissions);
-      assertThat(accessControlContext.getEffectiveDomainPermissions(grantorResource, domainName),
+      assertThat(accessControlContext.getDomainPermissions(grantorResource, domainName),
                  is(grantorPermissions));
 
       // authenticate grantor resource
@@ -590,7 +590,7 @@ public class TestAccessControl_grantDomainPermissions extends TestAccessControlB
       Set<DomainPermission> domainPermissions_expected = setOf(domCreatePerm_superuser_trailingspaces,
                                                                domCreatePerm_child_withGrant);
       final Set<DomainPermission> domainPermissions_post
-            = accessControlContext.getEffectiveDomainPermissions(accessorResource, domainName);
+            = accessControlContext.getDomainPermissions(accessorResource, domainName);
       assertThat(domainPermissions_post, is(domainPermissions_expected));
 
       // test set-based version
@@ -602,7 +602,7 @@ public class TestAccessControl_grantDomainPermissions extends TestAccessControlB
                                                   setOf(domCreatePerm_superuser_trailingspaces,
                                                         domCreatePerm_child_withGrant));
 
-      assertThat(accessControlContext.getEffectiveDomainPermissions(accessorResource2, domainName),
+      assertThat(accessControlContext.getDomainPermissions(accessorResource2, domainName),
                  is(domainPermissions_expected));
    }
 

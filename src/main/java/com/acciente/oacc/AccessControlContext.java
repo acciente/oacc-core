@@ -1356,7 +1356,8 @@ public interface AccessControlContext {
     * Gets all effective domain permissions the accessor resource has to the specified domain.
     * <p/>
     * This method takes into account direct domain permissions, inherited domain permissions
-    * and any domain permissions the accessor may have to ancestors of the specified domain.
+    * and any domain permissions the accessor may have to ancestors of the specified domain, as well
+    * as any super-user privileges.
     * In other words, this method will return the domain permissions the specified accessor
     * resource has to the specified domain as a result of the permissions the accessor has on
     * any ancestor (parent, or grandparent, etc.) of that domain.
@@ -1374,7 +1375,8 @@ public interface AccessControlContext {
     * Gets all effective domain permissions the accessor resource has to any domain, mapped by domain name.
     * <p/>
     * This method takes into account direct domain permissions, inherited domain permissions
-    * and any domain permissions the accessor may have to ancestors of each domain.
+    * and any domain permissions the accessor may have to ancestors of each domain, as well
+    * as any super-user privileges.
     * The result is returned as a map keyed by the domain name, where each value is the
     * set of permissions for the domain name of the key.
     *
@@ -1632,7 +1634,7 @@ public interface AccessControlContext {
     * <p/>
     * This method takes into account direct resource create permissions, inherited
     * resource create permissions and any resource create permissions the accessor may have to
-    * ancestors of the specified domain.
+    * ancestors of the specified domain, as well as any super-user privileges.
     *
     * @param accessorResource  the accessor resource relative which permissions should be returned
     * @param resourceClassName a string resource class name
@@ -1676,7 +1678,7 @@ public interface AccessControlContext {
     * <p/>
     * This method takes into account direct resource create permissions, inherited
     * resource create permissions and any resource create permissions the accessor may have to
-    * ancestors of each domain.
+    * ancestors of each domain, as well as any super-user privileges.
     * <p/>
     * The result is returned as a map keyed by the domain name, where each value is another
     * map keyed by resource class name, in which each value is the set of resource create permissions
@@ -1844,7 +1846,8 @@ public interface AccessControlContext {
     * Gets the effective resource permissions that the specified accessor resource has to the
     * specified accessed resource.
     * <p/>
-    * This method takes into account direct, inherited and global permissions of the specified accessor resource.
+    * This method takes into account direct, inherited and global permissions of the specified accessor resource,
+    * as well as any super-user privileges.
     *
     * @param accessorResource the resource relative to which the permissions should be returned
     * @param accessedResource the resource on which the privileges were granted
@@ -2069,7 +2072,7 @@ public interface AccessControlContext {
     * <p/>
     * This method takes into account direct global resource permissions, inherited
     * global resource permissions and any global resource permissions the accessor may have to
-    * ancestors of the specified domain.
+    * ancestors of the specified domain, as well as any super-user privileges.
     *
     * @param accessorResource  the resource relative to which the permissions should be returned
     * @param resourceClassName a string resource class name
@@ -2109,7 +2112,7 @@ public interface AccessControlContext {
     * <p/>
     * This method takes into account direct global resource permissions, inherited
     * global resource permissions and any global resource permissions the accessor may have to
-    * ancestors of each domain.
+    * ancestors of each domain, as well as any super-user privileges.
     * <p/>
     * The result is returned as a map keyed by the domain name, where each value is another
     * map keyed by resource class name, in which each value is the set of global resource permissions

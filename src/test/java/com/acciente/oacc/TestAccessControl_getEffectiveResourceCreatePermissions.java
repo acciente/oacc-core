@@ -298,7 +298,7 @@ public class TestAccessControl_getEffectiveResourceCreatePermissions extends Tes
    }
 
    @Test
-   public void getEffectiveDomainCreatePermissions_inheritWithDifferentGrantingRights_shouldSucceedAsAuthorized() {
+   public void getEffectiveResourceCreatePermissions_inheritWithDifferentGrantingRights_shouldSucceedAsAuthorized() {
       authenticateSystemResource();
       final String donorPermissionName_impersonate = ResourcePermissions.IMPERSONATE;
       final String donorPermissionName_resetCredentials = ResourcePermissions.RESET_CREDENTIALS;
@@ -361,7 +361,7 @@ public class TestAccessControl_getEffectiveResourceCreatePermissions extends Tes
    }
 
    @Test
-   public void getEffectiveDomainCreatePermissions_inheritFromTwoResourcesWithDifferentGrantingRights_shouldSucceedAsAuthorized() {
+   public void getEffectiveResourceCreatePermissions_inheritFromTwoResourcesWithDifferentGrantingRights_shouldSucceedAsAuthorized() {
       authenticateSystemResource();
       final String donorPermissionName_impersonate = ResourcePermissions.IMPERSONATE;
       final String donorPermissionName_resetCredentials = ResourcePermissions.RESET_CREDENTIALS;
@@ -572,6 +572,66 @@ public class TestAccessControl_getEffectiveResourceCreatePermissions extends Tes
       final Set<ResourceCreatePermission> permissions_post
             = accessControlContext.getEffectiveResourceCreatePermissions(accessorResource, resourceClass, domainName);
       assertThat(permissions_post, is(permissions_expected));
+   }
+
+   @Test
+   public void getEffectiveResourceCreatePermissions_superUser_validAsSystemResource() {
+      authenticateSystemResource();
+      final String authenticatableResourceClassName = generateResourceClass(true, false);
+      final Resource accessorResource = generateUnauthenticatableResource();
+      final String domainName = generateDomain();
+      assertThat(accessControlContext.getEffectiveResourceCreatePermissionsMap(accessorResource).isEmpty(), is(true));
+
+      // set super-user domain permissions
+      accessControlContext.setDomainPermissions(accessorResource,
+                                                domainName,
+                                                setOf(DomainPermissions.getInstance(DomainPermissions.SUPER_USER)));
+
+
+      // setup direct global permissions
+      final ResourcePermission customPermission
+            = ResourcePermissions.getInstance(generateResourceClassPermission(authenticatableResourceClassName));
+      final ResourceCreatePermission customCreatePermission
+            = ResourceCreatePermissions.getInstance(customPermission);
+      Set<ResourceCreatePermission> createPermissions_direct
+            = setOf(ResourceCreatePermissions.getInstance(ResourceCreatePermissions.CREATE),
+                    ResourceCreatePermissions.getInstance(ResourcePermissions.getInstance(ResourcePermissions.IMPERSONATE, true)),
+                    customCreatePermission);
+      accessControlContext.setResourceCreatePermissions(accessorResource,
+                                                        authenticatableResourceClassName,
+                                                        domainName,
+                                                        createPermissions_direct);
+
+      // verify
+      Set<ResourceCreatePermission> permissions_expected
+            = setOf(ResourceCreatePermissions.getInstance(ResourceCreatePermissions.CREATE, true),
+                    ResourceCreatePermissions
+                          .getInstance(ResourcePermissions.getInstance(ResourcePermissions.INHERIT, true), true),
+                    ResourceCreatePermissions
+                          .getInstance(ResourcePermissions.getInstance(ResourcePermissions.IMPERSONATE, true), true),
+                    ResourceCreatePermissions
+                          .getInstance(ResourcePermissions.getInstance(ResourcePermissions.RESET_CREDENTIALS, true), true),
+                    ResourceCreatePermissions
+                          .getInstance(ResourcePermissions.getInstance(customPermission.getPermissionName(), true), true));
+
+      final Set<ResourceCreatePermission> permissions_post
+            = accessControlContext.getEffectiveResourceCreatePermissions(accessorResource,
+                                                                         authenticatableResourceClassName,
+                                                                         domainName);
+      assertThat(permissions_post, is(permissions_expected));
+
+      final Map<String, Map<String, Set<ResourceCreatePermission>>> permissions_post_all
+            = accessControlContext.getEffectiveResourceCreatePermissionsMap(accessorResource);
+      assertThat(permissions_post_all.size(), is(1));
+      assertThat(permissions_post_all.get(domainName).size(), is(2));
+      assertThat(permissions_post_all.get(domainName).get(authenticatableResourceClassName), is(permissions_expected));
+      assertThat(permissions_post_all.get(domainName).get(accessControlContext
+                                                                .getResourceClassInfoByResource(accessorResource)
+                                                                .getResourceClassName()),
+                 is(setOf(ResourceCreatePermissions
+                                .getInstance(ResourceCreatePermissions.CREATE, true),
+                          ResourceCreatePermissions
+                                .getInstance(ResourcePermissions.getInstance(ResourcePermissions.INHERIT, true), true))));
    }
 
    @Test

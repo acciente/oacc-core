@@ -41,9 +41,9 @@ public class TestAccessControl_assertResourcePermissions extends TestAccessContr
                                                                                   .getDomainNameByResource(SYS_RESOURCE));
 
       // verify setup
-      final Set<ResourcePermission> allResourcePermissions
-            = accessControlContext.getEffectiveResourcePermissions(SYS_RESOURCE, accessedResource);
-      assertThat(allResourcePermissions.isEmpty(), is(true));
+      final Set<ResourcePermission> directResourcePermissions
+            = accessControlContext.getResourcePermissions(SYS_RESOURCE, accessedResource);
+      assertThat(directResourcePermissions.isEmpty(), is(true));
 
       // verify
       accessControlContext.assertResourcePermissions(SYS_RESOURCE,

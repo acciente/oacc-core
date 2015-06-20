@@ -375,6 +375,45 @@ public class TestAccessControl_getEffectiveResourcePermissions extends TestAcces
    }
 
    @Test
+   public void getEffectiveResourcePermissions_superUser_validAsSystemResource() {
+      authenticateSystemResource();
+      final String authenticatableResourceClassName = generateResourceClass(true, false);
+      final Resource accessorResource = generateUnauthenticatableResource();
+      final String accessedDomain = generateDomain();
+      final Resource accessedResource
+            = accessControlContext.createResource(authenticatableResourceClassName,
+                                                  accessedDomain,
+                                                  PasswordCredentials.newInstance(generateUniquePassword()));
+
+      assertThat(accessControlContext.getEffectiveResourcePermissions(accessorResource, accessedResource).isEmpty(), is(true));
+
+      // set super-user domain permissions
+      accessControlContext.setDomainPermissions(accessorResource,
+                                                accessedDomain,
+                                                setOf(DomainPermissions.getInstance(DomainPermissions.SUPER_USER)));
+
+      // set direct permissions
+      final ResourcePermission customPermission
+            = ResourcePermissions.getInstance(generateResourceClassPermission(authenticatableResourceClassName));
+
+      Set<ResourcePermission> directPermissions = setOf(customPermission);
+
+      accessControlContext.setResourcePermissions(accessorResource, accessedResource, directPermissions);
+      assertThat(accessControlContext.getResourcePermissions(accessorResource, accessedResource), is(directPermissions));
+
+      // verify
+      Set<ResourcePermission> permissions_expected
+            = setOf(ResourcePermissions.getInstance(ResourcePermissions.INHERIT, true),
+                    ResourcePermissions.getInstance(ResourcePermissions.IMPERSONATE, true),
+                    ResourcePermissions.getInstance(ResourcePermissions.RESET_CREDENTIALS, true),
+                    ResourcePermissions.getInstance(customPermission.getPermissionName(), true));
+
+      final Set<ResourcePermission> permissions_post
+            = accessControlContext.getEffectiveResourcePermissions(accessorResource, accessedResource);
+      assertThat(permissions_post, is(permissions_expected));
+   }
+
+   @Test
    public void getEffectiveResourcePermissions_nulls_shouldFail() {
       authenticateSystemResource();
 

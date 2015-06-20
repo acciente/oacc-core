@@ -761,10 +761,10 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
          final Set<ResourceCreatePermission> resourceCreatePermissions;
          boolean createPermissionOK = false;
 
-         resourceCreatePermissions = __getEffectiveResourceCreatePermissions(connection,
-                                                                             sessionResource,
-                                                                             resourceClassName,
-                                                                             domainName);
+         resourceCreatePermissions = __getEffectiveResourceCreatePermissionsIgnoringSuperUserPrivileges(connection,
+                                                                                                        sessionResource,
+                                                                                                        resourceClassName,
+                                                                                                        domainName);
          newResourcePermissions = __getPostCreateResourcePermissions(resourceCreatePermissions);
 
          if (resourceCreatePermissions.size() > 0) {
@@ -1283,11 +1283,25 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
          throw new IllegalArgumentException("Could not find domain: " + domainName);
       }
 
+      return __getEffectiveDomainPermissions(connection, accessorResource, domainId);
+   }
+
+   private Set<DomainPermission> __getEffectiveDomainPermissions(SQLConnection connection,
+                                                                 Resource accessorResource,
+                                                                 Id<DomainId> domainId) {
       // only system permissions are possible on a domain
-      return __collapseDomainPermissions(grantDomainPermissionSysPersister
-                                               .getDomainSysPermissionsIncludeInherited(connection,
+      final Set<DomainPermission> domainSysPermissionsIncludingInherited
+            = grantDomainPermissionSysPersister.getDomainSysPermissionsIncludeInherited(connection,
                                                                                         accessorResource,
-                                                                                        domainId));
+                                                                                        domainId);
+      for (DomainPermission permission : domainSysPermissionsIncludingInherited) {
+         // check if super-user privileges apply and construct set of all possible permissions, if necessary
+         if (DomainPermissions.SUPER_USER.equals(permission.getPermissionName())) {
+            return __getApplicableDomainPermissions();
+         }
+      }
+
+      return __collapseDomainPermissions(domainSysPermissionsIncludingInherited);
    }
 
    private Set<DomainPermission> __collapseDomainPermissions(Set<DomainPermission> domainPermissions) {
@@ -1317,12 +1331,37 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
 
          __assertResourceExists(connection, accessorResource);
 
-         return __collapseDomainPermissions(grantDomainPermissionSysPersister
-                                                  .getDomainSysPermissionsIncludeInherited(connection, accessorResource));
+         return __getEffectiveDomainPermissionsMap(connection, accessorResource);
       }
       finally {
          __closeConnection(connection);
       }
+   }
+
+   private Map<String, Set<DomainPermission>> __getEffectiveDomainPermissionsMap(SQLConnection connection,
+                                                                                 Resource accessorResource) {
+      final Map<String, Set<DomainPermission>> domainSysPermissionsIncludingInherited
+            = grantDomainPermissionSysPersister.getDomainSysPermissionsIncludeInherited(connection,
+                                                                                        accessorResource);
+
+      for (String domainName : domainSysPermissionsIncludingInherited.keySet()) {
+         final Set<DomainPermission> domainPermissions = domainSysPermissionsIncludingInherited.get(domainName);
+
+         if (domainPermissions.contains(DomainPermission_SUPER_USER)
+               || domainPermissions.contains(DomainPermission_SUPER_USER_GRANT)) {
+            domainSysPermissionsIncludingInherited.put(domainName, __getApplicableDomainPermissions());
+         }
+      }
+
+      return __collapseDomainPermissions(domainSysPermissionsIncludingInherited);
+   }
+
+   private static Set<DomainPermission> __getApplicableDomainPermissions() {
+      Set<DomainPermission> superDomainPermissions = new HashSet<>(2);
+      superDomainPermissions.add(DomainPermission_SUPER_USER_GRANT);
+      superDomainPermissions.add(DomainPermission_CREATE_CHILD_DOMAIN_GRANT);
+
+      return superDomainPermissions;
    }
 
    private Map<String, Set<DomainPermission>> __collapseDomainPermissions(Map<String, Set<DomainPermission>> domainPermissionsMap) {
@@ -1901,10 +1940,10 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       if (!__isSuperUserOfDomain(connection, sessionResource, domainName)) {
          final Set<ResourceCreatePermission>
                grantorPermissions
-               = __getEffectiveResourceCreatePermissions(connection,
-                                                         sessionResource,
-                                                         resourceClassName,
-                                                         domainName);
+               = __getEffectiveResourceCreatePermissionsIgnoringSuperUserPrivileges(connection,
+                                                                                    sessionResource,
+                                                                                    resourceClassName,
+                                                                                    domainName);
 
          final Set<ResourceCreatePermission>
                directAccessorPermissions
@@ -2196,10 +2235,10 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       // check if the grantor (=session resource) is authorized to grant the requested permissions
       if (!__isSuperUserOfDomain(connection, sessionResource, domainName)) {
          final Set<ResourceCreatePermission> grantorPermissions
-               = __getEffectiveResourceCreatePermissions(connection,
-                                                         sessionResource,
-                                                         resourceClassName,
-                                                         domainName);
+               = __getEffectiveResourceCreatePermissionsIgnoringSuperUserPrivileges(connection,
+                                                                                    sessionResource,
+                                                                                    resourceClassName,
+                                                                                    domainName);
 
          final Set<ResourceCreatePermission> unauthorizedAddPermissions
                = __subtractResourceCreatePermissionsIfGrantableFrom(requestedResourceCreatePermissions, grantorPermissions);
@@ -2427,10 +2466,10 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       // check if the grantor (=session resource) is authorized to grant the requested permissions
       if (!__isSuperUserOfDomain(connection, sessionResource, domainName)) {
          final Set<ResourceCreatePermission> grantorPermissions
-               = __getEffectiveResourceCreatePermissions(connection,
-                                                         sessionResource,
-                                                         resourceClassName,
-                                                         domainName);
+               = __getEffectiveResourceCreatePermissionsIgnoringSuperUserPrivileges(connection,
+                                                                                    sessionResource,
+                                                                                    resourceClassName,
+                                                                                    domainName);
 
          final Set<ResourceCreatePermission> unauthorizedPermissions
                = __subtractResourceCreatePermissionsIfGrantableFrom(requestedResourceCreatePermissions,
@@ -2647,10 +2686,10 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       }
    }
 
-   private Set<ResourceCreatePermission> __getEffectiveResourceCreatePermissions(SQLConnection connection,
-                                                                                 Resource accessorResource,
-                                                                                 String resourceClassName,
-                                                                                 String domainName) {
+   private Set<ResourceCreatePermission> __getEffectiveResourceCreatePermissionsIgnoringSuperUserPrivileges(SQLConnection connection,
+                                                                                                            Resource accessorResource,
+                                                                                                            String resourceClassName,
+                                                                                                            String domainName) {
       // verify that resource class is defined
       Id<ResourceClassId> resourceClassId = resourceClassPersister.getResourceClassId(connection, resourceClassName);
 
@@ -2664,6 +2703,55 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       if (domainId == null) {
          throw new IllegalArgumentException("Could not find domain: " + domainName);
       }
+
+      // collect the create permissions that this resource has to this resource class
+      Set<ResourceCreatePermission> resourceCreatePermissions = new HashSet<>();
+
+      // first read the *CREATE system permission the accessor has to the specified resource class
+      resourceCreatePermissions.addAll(
+            grantResourceCreatePermissionSysPersister.getResourceCreateSysPermissionsIncludeInherited(connection,
+                                                                                                      accessorResource,
+                                                                                                      resourceClassId,
+                                                                                                      domainId));
+
+      // next read the post create system permissions the accessor has to the specified resource class
+      resourceCreatePermissions
+            .addAll(grantResourceCreatePermissionPostCreateSysPersister
+                          .getResourceCreatePostCreateSysPermissionsIncludeInherited(connection,
+                                                                                     accessorResource,
+                                                                                     resourceClassId,
+                                                                                     domainId));
+
+      // next read the post create non-system permissions the accessor has to the specified resource class
+      resourceCreatePermissions
+            .addAll(grantResourceCreatePermissionPostCreatePersister
+                          .getResourceCreatePostCreatePermissionsIncludeInherited(connection,
+                                                                                  accessorResource,
+                                                                                  resourceClassId,
+                                                                                  domainId));
+      return __collapseResourceCreatePermissions(resourceCreatePermissions);
+   }
+
+   private Set<ResourceCreatePermission> __getEffectiveResourceCreatePermissions(SQLConnection connection,
+                                                                                 Resource accessorResource,
+                                                                                 String resourceClassName,
+                                                                                 String domainName) {
+      // verify that resource class is defined
+      final ResourceClassInternalInfo resourceClassInternalInfo
+            = __getResourceClassInternalInfo(connection, resourceClassName);
+
+      // verify that domain is defined
+      final Id<DomainId> domainId = domainPersister.getResourceDomainId(connection, domainName);
+
+      if (domainId == null) {
+         throw new IllegalArgumentException("Could not find domain: " + domainName);
+      }
+
+      if (__isSuperUserOfDomain(connection, accessorResource, domainName)) {
+         return __getApplicableResourceCreatePermissions(connection, resourceClassInternalInfo);
+      }
+
+      Id<ResourceClassId> resourceClassId = Id.from(resourceClassInternalInfo.getResourceClassId());
 
       // collect the create permissions that this resource has to this resource class
       Set<ResourceCreatePermission> resourceCreatePermissions = new HashSet<>();
@@ -2750,6 +2838,39 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
             grantResourceCreatePermissionPostCreatePersister
                   .getResourceCreatePostCreatePermissionsIncludeInherited(connection, accessorResource),
             allResourceCreatePermissionsMap);
+
+      // finally, collect all applicable create permissions when accessor has super-user privileges to any domain
+      // and add them into the globalALLPermissionsMap
+      final Map<String, Map<String, Set<ResourceCreatePermission>>> allSuperResourceCreatePermissionsMap = new HashMap<>();
+      Map<String, Set<ResourceCreatePermission>> superResourceCreatePermissionsMap = null;
+
+      final Map<String, Set<DomainPermission>> effectiveDomainPermissionsMap
+            = __getEffectiveDomainPermissionsMap(connection, accessorResource);
+
+      for (String domainName : effectiveDomainPermissionsMap.keySet()) {
+         final Set<DomainPermission> effectiveDomainPermissions = effectiveDomainPermissionsMap.get(domainName);
+         if (effectiveDomainPermissions.contains(DomainPermission_SUPER_USER)
+               || effectiveDomainPermissions.contains(DomainPermission_SUPER_USER_GRANT)) {
+
+            if (superResourceCreatePermissionsMap == null) {
+               // lazy-construct super-user-privileged resource-permissions map by resource classes
+               final List<String> resourceClassNames = resourceClassPersister.getResourceClassNames(connection);
+               superResourceCreatePermissionsMap = new HashMap<>(resourceClassNames.size());
+               for (String resourceClassName : resourceClassNames) {
+                  final Set<ResourceCreatePermission> applicableResourceCreatePermissions
+                        = __getApplicableResourceCreatePermissions(connection,
+                                                                   __getResourceClassInternalInfo(connection,
+                                                                                                  resourceClassName));
+
+                  superResourceCreatePermissionsMap.put(resourceClassName, applicableResourceCreatePermissions);
+               }
+            }
+            allSuperResourceCreatePermissionsMap.put(domainName, superResourceCreatePermissionsMap);
+         }
+      }
+
+      __mergeSourceCreatePermissionsMapIntoTargetCreatePermissionsMap(allSuperResourceCreatePermissionsMap,
+                                                                      allResourceCreatePermissionsMap);
 
       return __collapseResourceCreatePermissions(allResourceCreatePermissionsMap);
    }
@@ -2845,9 +2966,9 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
             // next check if the grantor (i.e. session resource) has permissions to grant the requested permissions
             final Set<ResourcePermission>
                   grantorResourcePermissions
-                  = __getEffectiveResourcePermissions(connection,
-                                                      grantorResource,
-                                                      accessedResource);
+                  = __getEffectiveResourcePermissionsIgnoringSuperUserPrivileges(connection,
+                                                                                 grantorResource,
+                                                                                 accessedResource);
 
             final Set<ResourcePermission>
                   directAccessorResourcePermissions
@@ -2889,9 +3010,10 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
          // if inherit permissions are about to be granted, first check for cycles
          if (requestedResourcePermissions.contains(ResourcePermission_INHERIT)
                || requestedResourcePermissions.contains(ResourcePermission_INHERIT_GRANT)) {
-            Set<ResourcePermission> reversePathResourcePermissions = __getEffectiveResourcePermissions(connection,
-                                                                                                       accessedResource,
-                                                                                                       accessorResource);
+            Set<ResourcePermission> reversePathResourcePermissions
+                  = __getEffectiveResourcePermissionsIgnoringSuperUserPrivileges(connection,
+                                                                                 accessedResource,
+                                                                                 accessorResource);
 
             if (reversePathResourcePermissions.contains(ResourcePermission_INHERIT)
                   || reversePathResourcePermissions.contains(ResourcePermission_INHERIT_GRANT)
@@ -3050,7 +3172,9 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       if (!__isSuperUserOfResource(connection, sessionResource, accessedResource)) {
          final Set<ResourcePermission>
                grantorResourcePermissions
-               = __getEffectiveResourcePermissions(connection, sessionResource, accessedResource);
+               = __getEffectiveResourcePermissionsIgnoringSuperUserPrivileges(connection,
+                                                                              sessionResource,
+                                                                              accessedResource);
 
          final Set<ResourcePermission>
                unauthorizedPermissions
@@ -3095,9 +3219,10 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       // if inherit permissions are about to be granted, first check for cycles
       if (addPermissions.contains(ResourcePermission_INHERIT)
             || addPermissions.contains(ResourcePermission_INHERIT_GRANT)) {
-         Set<ResourcePermission> reversePathResourcePermissions = __getEffectiveResourcePermissions(connection,
-                                                                                                    accessedResource,
-                                                                                                    accessorResource);
+         Set<ResourcePermission> reversePathResourcePermissions
+               = __getEffectiveResourcePermissionsIgnoringSuperUserPrivileges(connection,
+                                                                              accessedResource,
+                                                                              accessorResource);
 
          if (reversePathResourcePermissions.contains(ResourcePermission_INHERIT)
                || reversePathResourcePermissions.contains(ResourcePermission_INHERIT_GRANT)
@@ -3213,7 +3338,9 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       if (!__isSuperUserOfResource(connection, sessionResource, accessedResource)) {
          final Set<ResourcePermission>
                grantorResourcePermissions
-               = __getEffectiveResourcePermissions(connection, sessionResource, accessedResource);
+               = __getEffectiveResourcePermissionsIgnoringSuperUserPrivileges(connection,
+                                                                              sessionResource,
+                                                                              accessedResource);
 
          final Set<ResourcePermission>
                unauthorizedPermissions
@@ -3324,6 +3451,48 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
                                                                      Resource accessedResource) {
       Set<ResourcePermission> resourcePermissions = new HashSet<>();
 
+      final Id<DomainId> accessedDomainId = resourcePersister.getDomainIdByResource(connection, accessedResource);
+      final ResourceClassInternalInfo resourceClassInternalInfo
+            = resourceClassPersister.getResourceClassInfoByResourceId(connection, accessedResource);
+
+      if (__isSuperUserOfDomain(connection, accessorResource, accessedDomainId)) {
+         return __getApplicableResourcePermissions(connection, resourceClassInternalInfo);
+      }
+
+      // collect the system permissions that the accessor resource has to the accessed resource
+      resourcePermissions.addAll(grantResourcePermissionSysPersister
+                                       .getResourceSysPermissionsIncludeInherited(connection,
+                                                                                  accessorResource,
+                                                                                  accessedResource));
+
+      // collect the non-system permissions that the accessor has to the accessed resource
+      resourcePermissions.addAll(grantResourcePermissionPersister.getResourcePermissionsIncludeInherited(connection,
+                                                                                                         accessorResource,
+                                                                                                         accessedResource));
+
+      final Id<ResourceClassId> accessedResourceClassId = Id.from(resourceClassInternalInfo.getResourceClassId());
+
+      // collect the global system permissions that the accessor has to the accessed resource's domain
+      resourcePermissions
+            .addAll(grantGlobalResourcePermissionSysPersister.getGlobalSysPermissionsIncludeInherited(connection,
+                                                                                                      accessorResource,
+                                                                                                      accessedResourceClassId,
+                                                                                                      accessedDomainId));
+
+      // first collect the global non-system permissions that the accessor this resource has to the accessed resource's domain
+      resourcePermissions
+            .addAll(grantGlobalResourcePermissionPersister.getGlobalResourcePermissionsIncludeInherited(connection,
+                                                                                                        accessorResource,
+                                                                                                        accessedResourceClassId,
+                                                                                                        accessedDomainId));
+      return __collapseResourcePermissions(resourcePermissions);
+   }
+
+   private Set<ResourcePermission> __getEffectiveResourcePermissionsIgnoringSuperUserPrivileges(SQLConnection connection,
+                                                                                                Resource accessorResource,
+                                                                                                Resource accessedResource) {
+      Set<ResourcePermission> resourcePermissions = new HashSet<>();
+
       // collect the system permissions that the accessor resource has to the accessed resource
       resourcePermissions.addAll(grantResourcePermissionSysPersister
                                        .getResourceSysPermissionsIncludeInherited(connection,
@@ -3416,10 +3585,10 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
          // check if the grantor (=session resource) is authorized to grant the requested permissions
          final Set<ResourcePermission>
                grantorPermissions
-               = __getEffectiveGlobalResourcePermissions(connection,
-                                                         sessionResource,
-                                                         resourceClassName,
-                                                         domainName);
+               = __getEffectiveGlobalResourcePermissionsIgnoringSuperUserPrivileges(connection,
+                                                                                    sessionResource,
+                                                                                    resourceClassName,
+                                                                                    domainName);
          final Set<ResourcePermission>
                directAccessorPermissions
                = __getDirectGlobalResourcePermissions(connection,
@@ -3645,7 +3814,10 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       // check for authorization
       if (!__isSuperUserOfDomain(connection, sessionResource, domainName)) {
          final Set<ResourcePermission> grantorPermissions
-               = __getEffectiveGlobalResourcePermissions(connection, sessionResource, resourceClassName, domainName);
+               = __getEffectiveGlobalResourcePermissionsIgnoringSuperUserPrivileges(connection,
+                                                                                    sessionResource,
+                                                                                    resourceClassName,
+                                                                                    domainName);
 
          final Set<ResourcePermission> unauthorizedPermissions
                = __subtractResourcePermissionsIfGrantableFrom(requestedResourcePermissions, grantorPermissions);
@@ -3811,7 +3983,10 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       // check for authorization
       if (!__isSuperUserOfDomain(connection, sessionResource, domainName)) {
          final Set<ResourcePermission> grantorPermissions
-               = __getEffectiveGlobalResourcePermissions(connection, sessionResource, resourceClassName, domainName);
+               = __getEffectiveGlobalResourcePermissionsIgnoringSuperUserPrivileges(connection,
+                                                                                    sessionResource,
+                                                                                    resourceClassName,
+                                                                                    domainName);
 
          final Set<ResourcePermission> unauthorizedPermissions
                = __subtractResourcePermissionsIfGrantableFrom(requestedResourcePermissions, grantorPermissions);
@@ -3934,10 +4109,10 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       }
    }
 
-   private Set<ResourcePermission> __getEffectiveGlobalResourcePermissions(SQLConnection connection,
-                                                                           Resource accessorResource,
-                                                                           String resourceClassName,
-                                                                           String domainName) {
+   private Set<ResourcePermission> __getEffectiveGlobalResourcePermissionsIgnoringSuperUserPrivileges(SQLConnection connection,
+                                                                                                      Resource accessorResource,
+                                                                                                      String resourceClassName,
+                                                                                                      String domainName) {
       // verify that resource class is defined
       final Id<ResourceClassId> resourceClassId = resourceClassPersister.getResourceClassId(connection, resourceClassName);
 
@@ -3968,6 +4143,78 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
                                                                                      resourceClassId,
                                                                                      domainId));
       return __collapseResourcePermissions(resourcePermissions);
+   }
+
+   private Set<ResourcePermission> __getEffectiveGlobalResourcePermissions(SQLConnection connection,
+                                                                           Resource accessorResource,
+                                                                           String resourceClassName,
+                                                                           String domainName) {
+      // verify that resource class is defined
+      final ResourceClassInternalInfo resourceClassInternalInfo = __getResourceClassInternalInfo(connection,
+                                                                                                 resourceClassName);
+
+      // verify the domain
+      final Id<DomainId> domainId = domainPersister.getResourceDomainId(connection, domainName);
+
+      if (domainId == null) {
+         throw new IllegalArgumentException("Could not find domain: " + domainName);
+      }
+
+      if (__isSuperUserOfDomain(connection, accessorResource, domainName)) {
+         return __getApplicableResourcePermissions(connection, resourceClassInternalInfo);
+      }
+
+      final Id<ResourceClassId> resourceClassId = Id.from(resourceClassInternalInfo.getResourceClassId());
+      Set<ResourcePermission> resourcePermissions = new HashSet<>();
+
+      // first collect the system permissions that the accessor has to the accessed resource
+      resourcePermissions.addAll(grantGlobalResourcePermissionSysPersister
+                                       .getGlobalSysPermissionsIncludeInherited(connection,
+                                                                                accessorResource,
+                                                                                resourceClassId,
+                                                                                domainId));
+
+      // first collect the non-system permissions that the accessor this resource has to the accessor resource
+      resourcePermissions.addAll(grantGlobalResourcePermissionPersister
+                                       .getGlobalResourcePermissionsIncludeInherited(connection,
+                                                                                     accessorResource,
+                                                                                     resourceClassId,
+                                                                                     domainId));
+      return __collapseResourcePermissions(resourcePermissions);
+   }
+
+   private Set<ResourcePermission> __getApplicableResourcePermissions(SQLConnection connection,
+                                                                      ResourceClassInternalInfo resourceClassInternalInfo) {
+      final List<String> resourcePermissionNames
+            = __getApplicableResourcePermissionNames(connection, resourceClassInternalInfo);
+
+      Set<ResourcePermission> superResourcePermissions = new HashSet<>(resourcePermissionNames.size());
+
+      for (String permissionName : resourcePermissionNames) {
+         superResourcePermissions.add(ResourcePermissions.getInstance(permissionName, true));
+      }
+
+      return superResourcePermissions;
+   }
+
+   private Set<ResourceCreatePermission> __getApplicableResourceCreatePermissions(SQLConnection connection,
+                                                                                  ResourceClassInternalInfo resourceClassInternalInfo) {
+
+      final List<String> resourcePermissionNames
+            = __getApplicableResourcePermissionNames(connection, resourceClassInternalInfo);
+
+      Set<ResourceCreatePermission> superResourceCreatePermissions = new HashSet<>(resourcePermissionNames.size()+1);
+
+      superResourceCreatePermissions.add(ResourceCreatePermissions.getInstance(ResourceCreatePermissions.CREATE, true));
+
+      for (String permissionName : resourcePermissionNames) {
+         superResourceCreatePermissions.add(ResourceCreatePermissions
+                                                  .getInstance(ResourcePermissions
+                                                                     .getInstance(permissionName, true),
+                                                               true));
+      }
+
+      return superResourceCreatePermissions;
    }
 
    private Set<ResourcePermission> __collapseResourcePermissions(Set<ResourcePermission> resourcePermissions) {
@@ -4054,6 +4301,38 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
             grantGlobalResourcePermissionPersister.getGlobalResourcePermissionsIncludeInherited(connection,
                                                                                                 accessorResource),
             globalALLPermissionsMap);
+
+      // finally, collect all applicable permissions when accessor has super-user privileges to any domain
+      // and add them into the globalALLPermissionsMap
+      final Map<String, Map<String, Set<ResourcePermission>>> superGlobalResourcePermissionsMap = new HashMap<>();
+      Map<String, Set<ResourcePermission>> superResourcePermissionsMap = null;
+
+      final Map<String, Set<DomainPermission>> effectiveDomainPermissionsMap
+            = __getEffectiveDomainPermissionsMap(connection, accessorResource);
+
+      for (String domainName : effectiveDomainPermissionsMap.keySet()) {
+         final Set<DomainPermission> effectiveDomainPermissions = effectiveDomainPermissionsMap.get(domainName);
+         if (effectiveDomainPermissions.contains(DomainPermission_SUPER_USER)
+               || effectiveDomainPermissions.contains(DomainPermission_SUPER_USER_GRANT)) {
+
+            if (superResourcePermissionsMap == null) {
+               // lazy-construct super-user-privileged resource-permissions map by resource classes
+               final List<String> resourceClassNames = resourceClassPersister.getResourceClassNames(connection);
+               superResourcePermissionsMap = new HashMap<>(resourceClassNames.size());
+               for (String resourceClassName : resourceClassNames) {
+                  final Set<ResourcePermission> applicableResourcePermissions
+                        = __getApplicableResourcePermissions(connection,
+                                                             __getResourceClassInternalInfo(connection,
+                                                                                            resourceClassName));
+
+                  superResourcePermissionsMap.put(resourceClassName, applicableResourcePermissions);
+               }
+            }
+            superGlobalResourcePermissionsMap.put(domainName, superResourcePermissionsMap);
+         }
+      }
+
+      __mergeSourcePermissionsMapIntoTargetPermissionsMap(superGlobalResourcePermissionsMap, globalALLPermissionsMap);
 
       return __collapseResourcePermissions(globalALLPermissionsMap);
    }
@@ -4513,7 +4792,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
          throw NotAuthorizedException.newInstanceForPostCreateResourcePermissions(accessorResource,
                                                                                   resourceClassName,
                                                                                   domainName,
-                                                                                  resourcePermissions );
+                                                                                  resourcePermissions);
       }
    }
 
@@ -4532,7 +4811,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
                                                                                   resourceClassName,
                                                                                   domainName,
                                                                                   resourcePermission,
-                                                                                  resourcePermissions );
+                                                                                  resourcePermissions);
       }
    }
 
@@ -5390,7 +5669,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
          anyRequiredResourcePermissions.add(ResourcePermission_INHERIT);
          anyRequiredResourcePermissions.add(ResourcePermission_RESET_CREDENTIALS);
 
-         if ( sessionResource.equals(accessorResource)
+         if (sessionResource.equals(accessorResource)
                || __hasAnyPermissions(connection,
                                       sessionResource,
                                       accessorResource,
@@ -5734,6 +6013,17 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
                                          Resource accessorResource,
                                          String queriedDomain) {
       Set<DomainPermission> domainPermissions = __getEffectiveDomainPermissions(connection, accessorResource, queriedDomain);
+
+      return domainPermissions.contains(DomainPermission_SUPER_USER)
+            || domainPermissions.contains(DomainPermission_SUPER_USER_GRANT);
+   }
+
+   private boolean __isSuperUserOfDomain(SQLConnection connection,
+                                         Resource accessorResource,
+                                         Id<DomainId> queriedDomainId) {
+      Set<DomainPermission> domainPermissions = __getEffectiveDomainPermissions(connection,
+                                                                                accessorResource,
+                                                                                queriedDomainId);
 
       return domainPermissions.contains(DomainPermission_SUPER_USER)
             || domainPermissions.contains(DomainPermission_SUPER_USER_GRANT);

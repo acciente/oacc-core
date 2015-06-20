@@ -252,7 +252,7 @@ public class TestAccessControl_assertDomainPermissions extends TestAccessControl
 
       // get domain create permissions and verify
       final Map<String,Set<DomainPermission>> allDomainPermissions
-            = accessControlContext.getEffectiveDomainPermissionsMap(accessorResource);
+            = accessControlContext.getDomainPermissionsMap(accessorResource);
       assertThat(allDomainPermissions.size(), is(1));
       assertThat(allDomainPermissions.get(domainName1), is(domainPermissions_pre1));
 
@@ -267,7 +267,7 @@ public class TestAccessControl_assertDomainPermissions extends TestAccessControl
 
       // get domain create permissions and verify
       final Map<String,Set<DomainPermission>> allDomainPermissions2
-            = accessControlContext.getEffectiveDomainPermissionsMap(accessorResource);
+            = accessControlContext.getDomainPermissionsMap(accessorResource);
       assertThat(allDomainPermissions2.size(), is(2));
       assertThat(allDomainPermissions2.get(domainName1), is(domainPermissions_pre1));
       assertThat(allDomainPermissions2.get(domainName2), is(domainPermissions_pre2));
@@ -408,7 +408,7 @@ public class TestAccessControl_assertDomainPermissions extends TestAccessControl
 
       // get domain create permissions
       final Map<String,Set<DomainPermission>> allDomainPermissions
-            = accessControlContext.getEffectiveDomainPermissionsMap(accessorResource);
+            = accessControlContext.getDomainPermissionsMap(accessorResource);
       assertThat(allDomainPermissions.size(), is(1));
       assertThat(allDomainPermissions.get(domainName1), is(domainPermissions_pre1));
 

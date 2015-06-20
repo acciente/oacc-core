@@ -40,9 +40,9 @@ public class TestAccessControl_hasPostCreateResourcePermissions extends TestAcce
       final String domainName = generateDomain();
 
       // verify setup
-      final Set<ResourceCreatePermission> allResourceCreatePermissionsForResourceClassAndDomain
-            = accessControlContext.getEffectiveResourceCreatePermissions(SYS_RESOURCE, resourceClassName, domainName);
-      assertThat(allResourceCreatePermissionsForResourceClassAndDomain.isEmpty(), is(true));
+      final Set<ResourceCreatePermission> directResourceCreatePermissionsForResourceClassAndDomain
+            = accessControlContext.getResourceCreatePermissions(SYS_RESOURCE, resourceClassName, domainName);
+      assertThat(directResourceCreatePermissionsForResourceClassAndDomain.isEmpty(), is(true));
 
       // verify
       if (!accessControlContext.hasPostCreateResourcePermissions(SYS_RESOURCE,
@@ -1193,9 +1193,9 @@ public class TestAccessControl_hasPostCreateResourcePermissions extends TestAcce
       final String domainName = generateDomain();
 
       // verify setup
-      final Set<ResourceCreatePermission> allResourceCreatePermissionsForResourceClass
-            = accessControlContext.getEffectiveResourceCreatePermissions(SYS_RESOURCE, resourceClassName, domainName);
-      assertThat(allResourceCreatePermissionsForResourceClass.isEmpty(), is(true));
+      final Set<ResourceCreatePermission> directResourceCreatePermissionsForResourceClass
+            = accessControlContext.getResourceCreatePermissions(SYS_RESOURCE, resourceClassName, domainName);
+      assertThat(directResourceCreatePermissionsForResourceClass.isEmpty(), is(true));
 
       // verify
       try {
@@ -1284,9 +1284,9 @@ public class TestAccessControl_hasPostCreateResourcePermissions extends TestAcce
       final String domainName_whitespaced = " " + domainName + "\t";
 
       // verify setup
-      final Set<ResourceCreatePermission> allResourceCreatePermissionsForResourceClassAndDomain
-            = accessControlContext.getEffectiveResourceCreatePermissions(SYS_RESOURCE, resourceClassName, domainName);
-      assertThat(allResourceCreatePermissionsForResourceClassAndDomain.isEmpty(), is(true));
+      final Set<ResourceCreatePermission> directResourceCreatePermissionsForResourceClassAndDomain
+            = accessControlContext.getResourceCreatePermissions(SYS_RESOURCE, resourceClassName, domainName);
+      assertThat(directResourceCreatePermissionsForResourceClassAndDomain.isEmpty(), is(true));
 
       // verify
       // checking post-create resource permission (even when none has been granted) should succeed for system resource

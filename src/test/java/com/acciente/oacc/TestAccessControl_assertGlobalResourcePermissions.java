@@ -36,11 +36,6 @@ public class TestAccessControl_assertGlobalResourcePermissions extends TestAcces
       final String customPermissionName = generateResourceClassPermission(resourceClassName);
       final String domainName = generateDomain();
 
-      // verify setup
-      final Set<ResourceCreatePermission> allResourceCreatePermissionsForResourceClassAndDomain
-            = accessControlContext.getEffectiveResourceCreatePermissions(SYS_RESOURCE, resourceClassName, domainName);
-      assertThat(allResourceCreatePermissionsForResourceClassAndDomain.isEmpty(), is(true));
-
       // verify
       accessControlContext.assertGlobalResourcePermissions(SYS_RESOURCE,
                                                            resourceClassName,
@@ -901,10 +896,6 @@ public class TestAccessControl_assertGlobalResourcePermissions extends TestAcces
       final String domainName_whitespaced = " " + domainName + "\t";
 
       // verify
-      final Set<ResourceCreatePermission> allResourceCreatePermissionsForResourceClassAndDomain
-            = accessControlContext.getEffectiveResourceCreatePermissions(SYS_RESOURCE, resourceClassName, domainName);
-      assertThat(allResourceCreatePermissionsForResourceClassAndDomain.isEmpty(), is(true));
-
       accessControlContext.assertGlobalResourcePermissions(SYS_RESOURCE,
                                                            resourceClassName_whitespaced,
                                                            domainName_whitespaced,

@@ -203,6 +203,55 @@ public class TestAccessControl_getEffectiveGlobalResourcePermissions extends Tes
    }
 
    @Test
+   public void getEffectiveGlobalResourcePermissions_superUser_validAsSystemResource() {
+      authenticateSystemResource();
+      final String authenticatableResourceClassName = generateResourceClass(true, false);
+      final Resource accessorResource = generateUnauthenticatableResource();
+      final String domainName = generateDomain();
+      assertThat(accessControlContext.getEffectiveGlobalResourcePermissionsMap(accessorResource).isEmpty(), is(true));
+
+      // set super-user domain permissions
+      accessControlContext.setDomainPermissions(accessorResource,
+                                                domainName,
+                                                setOf(DomainPermissions.getInstance(DomainPermissions.SUPER_USER)));
+
+
+      // setup direct global permissions
+      final ResourcePermission customPermission
+            = ResourcePermissions.getInstance(generateResourceClassPermission(authenticatableResourceClassName));
+      Set<ResourcePermission> globalPermissions_direct
+            = setOf(ResourcePermissions.getInstance(ResourcePermissions.IMPERSONATE, false),
+                    customPermission);
+      accessControlContext.setGlobalResourcePermissions(accessorResource,
+                                                        authenticatableResourceClassName,
+                                                        domainName,
+                                                        globalPermissions_direct);
+
+      // verify
+      Set<ResourcePermission> permissions_expected
+            = setOf(ResourcePermissions.getInstance(ResourcePermissions.INHERIT, true),
+                    ResourcePermissions.getInstance(ResourcePermissions.IMPERSONATE, true),
+                    ResourcePermissions.getInstance(ResourcePermissions.RESET_CREDENTIALS, true),
+                    ResourcePermissions.getInstance(customPermission.getPermissionName(), true));
+
+      final Set<ResourcePermission> permissions_post
+            = accessControlContext.getEffectiveGlobalResourcePermissions(accessorResource,
+                                                                         authenticatableResourceClassName,
+                                                                         domainName);
+      assertThat(permissions_post, is(permissions_expected));
+
+      final Map<String, Map<String, Set<ResourcePermission>>> permissions_post_all
+            = accessControlContext.getEffectiveGlobalResourcePermissionsMap(accessorResource);
+      assertThat(permissions_post_all.size(), is(1));
+      assertThat(permissions_post_all.get(domainName).size(), is(2));
+      assertThat(permissions_post_all.get(domainName).get(authenticatableResourceClassName), is(permissions_expected));
+      assertThat(permissions_post_all.get(domainName).get(accessControlContext
+                                                                .getResourceClassInfoByResource(accessorResource)
+                                                                .getResourceClassName()),
+                 is(setOf(ResourcePermissions.getInstance(ResourcePermissions.INHERIT, true))));
+   }
+
+   @Test
    public void getEffectiveGlobalResourcePermissions_validWithInheritFromResource() {
       authenticateSystemResource();
       final String resourceClassName = generateResourceClass(true, false);
