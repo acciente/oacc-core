@@ -88,6 +88,48 @@ public class TestAccessControl_createResource extends TestAccessControlBase {
    }
 
    @Test
+   public void createResource_validAsAuthorized_withPostCreateSysPermission() {
+      final String domainName = generateDomain();
+      final String resourceClassName = generateResourceClass(false, false);
+
+      // set up an authenticatable resource with resource class create permission
+      final Resource authenticatedResource = generateResourceAndAuthenticate();
+      final String permissionName = ResourcePermissions.INHERIT;
+      final ResourcePermission grantedResourcePermission = ResourcePermissions.getInstance(permissionName);
+      grantResourceCreatePermission(authenticatedResource, resourceClassName, domainName, permissionName);
+
+      Set<Resource> resourcesByPermission = accessControlContext.getResourcesByResourcePermissions(authenticatedResource,
+                                                                                                   resourceClassName,
+                                                                                                   grantedResourcePermission);
+      assertThat(resourcesByPermission.isEmpty(), is(true));
+
+      // create resource and verify
+      final Resource resource = accessControlContext.createResource(resourceClassName, domainName);
+
+      assertThat(resource, is(not(nullValue())));
+      resourcesByPermission = accessControlContext.getResourcesByResourcePermissions(authenticatedResource,
+                                                                                     resourceClassName,
+                                                                                     grantedResourcePermission);
+      assertThat(resourcesByPermission.size(), is(1));
+      assertThat(accessControlContext.getDomainNameByResource(resource), is(domainName));
+      final ResourceClassInfo resourceClassInfo = accessControlContext.getResourceClassInfoByResource(resource);
+      assertThat(resourceClassInfo.getResourceClassName(), is(resourceClassName));
+
+      // create another resource
+      final Resource resource2 = accessControlContext.createResource(resourceClassName, domainName);
+
+      assertThat(resource2, is(not(nullValue())));
+      resourcesByPermission = accessControlContext.getResourcesByResourcePermissions(authenticatedResource,
+                                                                                     resourceClassName,
+                                                                                     grantedResourcePermission);
+      assertThat(resourcesByPermission.size(), is(2));
+      assertThat(resource2.getId(), is(not(resource.getId())));
+      assertThat(accessControlContext.getDomainNameByResource(resource2), is(domainName));
+      final ResourceClassInfo resourceClassInfo2 = accessControlContext.getResourceClassInfoByResource(resource);
+      assertThat(resourceClassInfo2.getResourceClassName(), is(resourceClassName));
+   }
+
+   @Test
    public void createResource_validAsUnauthenticated() {
       final String domainName = generateDomain();
       final String resourceClassName = generateResourceClass(false, true);

@@ -66,6 +66,7 @@ public class SQLStrings implements Serializable {
    public final String SQL_findInGrantDomainPermissionSys_withoutInheritance_ResourceDomainName_SysPermissionID_IsWithGrant_BY_AccessorID;
    public final String SQL_createInGrantDomainPermissionSys_WITH_AccessorID_GrantorID_AccessedDomainID_IsWithGrant_SysPermissionID;
    public final String SQL_updateInGrantDomainPermissionSys_SET_GrantorID_IsWithGrant_BY_AccessorID_AccessedDomainID_SysPermissionID;
+   public final String SQL_removeInGrantDomainPermissionSys_BY_AccessorID;
    public final String SQL_removeInGrantDomainPermissionSys_BY_AccessorID_AccessedDomainID;
    public final String SQL_removeInGrantDomainPermissionSys_BY_AccessorID_AccessedDomainID_SysPermissionID;
 
@@ -98,6 +99,7 @@ public class SQLStrings implements Serializable {
    // Resource
    public final String SQL_findInResource_COUNTResourceID_BY_ResourceClassID_DomainID;
    public final String SQL_createInResource_WITH_ResourceID_ResourceClassID_DomainID;
+   public final String SQL_removeInResource_BY_ResourceID;
    public final String SQL_findInResource_ResourceId_BY_ResourceID;
    public final String SQL_findInResource_DomainID_BY_ResourceID;
 
@@ -108,6 +110,7 @@ public class SQLStrings implements Serializable {
    public final String SQL_findInGrantResourceCreatePermissionSys_withoutInheritance_ResourceDomainName_ResourceClassName_SysPermissionId_IsWithGrant_BY_AccessorID;
    public final String SQL_createInGrantResourceCreatePermissionSys_WITH_AccessorID_GrantorID_AccessedDomainID_IsWithGrant_ResourceClassID_SysPermissionId;
    public final String SQL_updateInGrantResourceCreatePermissionSys_SET_GrantorID_IsWithGrant_BY__AccessorID_AccessedDomainID_ResourceClassID_SysPermissionId;
+   public final String SQL_removeInGrantResourceCreatePermissionSys_BY_AccessorID;
    public final String SQL_removeInGrantResourceCreatePermissionSys_BY_AccessorID_AccessedDomainID_ResourceClassID;
    public final String SQL_removeInGrantResourceCreatePermissionSys_BY_AccessorID_AccessedDomainID_ResourceClassID_SysPermissionID;
    // GrantResourceCreatePermissionPostCreateSys
@@ -117,6 +120,7 @@ public class SQLStrings implements Serializable {
    public final String SQL_findInGrantResourceCreatePermissionPostCreateSys_withoutInheritance_ResourceDomainName_ResourceClassName_PostCreateSysPermissionID_PostCreateIsWithGrant_IsWithGrant_BY_AccessorID;
    public final String SQL_createInGrantResourceCreatePermissionPostCreateSys_WITH_AccessorID_GrantorID_AccessedDomainID_IsWithGrant_PostCreateIsWithGrant_ResourceClassID_PostCreateSysPermissionID;
    public final String SQL_updateInGrantResourceCreatePermissionPostCreateSys_SET_GrantorID_IsWithGrant_PostCreateIsWithGrant_BY_AccessorID_AccessedDomainID_ResourceClassID_PostCreateSysPermissionID;
+   public final String SQL_removeInGrantResourceCreatePermissionPostCreateSys_BY_AccessorID;
    public final String SQL_removeInGrantResourceCreatePermissionPostCreateSys_BY_AccessorID_AccessedDomainID_ResourceClassID;
    public final String SQL_removeInGrantResourceCreatePermissionPostCreateSys_BY_AccessorID_AccessedDomainID_ResourceClassID_PostCreateSysPermissionID;
    // GrantResourceCreatePermissionPostCreate
@@ -126,6 +130,7 @@ public class SQLStrings implements Serializable {
    public final String SQL_findInGrantResourceCreatePermissionPostCreate_withoutInheritance_ResourceDomainName_ResourceClassName_PostCreatePermissionName_PostCreateIsWithGrant_IsWithGrant_BY_AccessorID;
    public final String SQL_createInGrantResourceCreatePermissionPostCreate_WITH_AccessorID_GrantorID_AccessedDomainID_IsWithGrant_PostCreateIsWithGrant_ResourceClassID_PostCreatePermissionName;
    public final String SQL_updateInGrantResourceCreatePermissionPostCreate_SET_GrantorID_IsWithGrant_PostCreateIsWithGrant_BY_AccessorID_AccessedDomainID_ResourceClassID_PostCreatePermissionName;
+   public final String SQL_removeInGrantResourceCreatePermissionPostCreate_BY_AccessorID;
    public final String SQL_removeInGrantResourceCreatePermissionPostCreate_BY_AccessorID_AccessedDomainID_ResourceClassID;
    public final String SQL_removeInGrantResourceCreatePermissionPostCreate_BY_AccessorID_AccessedDomainID_ResourceClassID_PostCreatePermissionName;
 
@@ -134,6 +139,7 @@ public class SQLStrings implements Serializable {
    public final String SQL_findInGrantResourcePermissionSys_withoutInheritance_ResourceClassName_SysPermissionID_IsWithGrant_BY_AccessorID_AccessedID;
    public final String SQL_createInGrantResourcePermissionSys_WITH_AccessorID_GrantorID_AccessedID_IsWithGrant_ResourceClassID_SysPermissionID;
    public final String SQL_updateInGrantResourcePermissionSys_SET_GrantorID_IsWithGrant_BY_AccessorID_AccessedID_ResourceClassID_SysPermissionID;
+   public final String SQL_removeInGrantResourcePermissionSys_BY_AccessorID_OR_AccessedID;
    public final String SQL_removeInGrantResourcePermissionSys_BY_AccessorID_AccessedID;
    public final String SQL_removeInGrantResourcePermissionSys_BY_AccessorID_AccessedID_ResourceClassID_SysPermissionID;
    // GrantResourcePermission
@@ -141,6 +147,7 @@ public class SQLStrings implements Serializable {
    public final String SQL_findInGrantResourcePermission_withoutInheritance_ResourceClassName_PermissionName_IsWithGrant_BY_AccessorID_AccessedID;
    public final String SQL_createInGrantResourcePermission_WITH_AccessorID_GrantorID_AccessedID_IsWithGrant_ResourceClassID_PermissionName;
    public final String SQL_updateInGrantResourcePermission_SET_GrantorID_IsWithGrant_BY_AccessorID_AccessedID_ResourceClassID_PermissionName;
+   public final String SQL_removeInGrantResourcePermission_BY_AccessorID_OR_AccessedID;
    public final String SQL_removeInGrantResourcePermission_BY_AccessorID_AccessedID;
    public final String SQL_removeInGrantResourcePermission_BY_AccessorID_AccessedID_ResourceClassID_PermissionName;
 
@@ -151,6 +158,7 @@ public class SQLStrings implements Serializable {
    public final String SQL_findInGrantGlobalResourcePermissionSys_withoutInheritance_ResourceDomainName_ResourceClassName_SysPermissionID_IsWithGrant_BY_AccessorID;
    public final String SQL_createInGrantGlobalResourcePermissionSys_WITH_AccessorID_GrantorID_AccessedDomainID_IsWithGrant_ResourceClassID_SysPermissionID;
    public final String SQL_updateInGrantGlobalResourcePermissionSys_SET_GrantorID_IsWithGrant_BY_AccessorID_AccessedDomainID_ResourceClassID_SysPermissionID;
+   public final String SQL_removeInGrantGlobalResourcePermissionSys_BY_AccessorID;
    public final String SQL_removeInGrantGlobalResourcePermissionSys_BY_AccessorID_AccessedDomainID_ResourceClassID;
    public final String SQL_removeInGrantGlobalResourcePermissionSys_BY_AccessorID_AccessedDomainID_ResourceClassID_SysPermissionID;
    // GrantGlobalResourcePermission
@@ -160,6 +168,7 @@ public class SQLStrings implements Serializable {
    public final String SQL_findInGrantGlobalResourcePermission_withoutInheritance_ResourceDomainName_ResourceClassName_PermissionName_IsWithGrant_BY_AccessorID;
    public final String SQL_createInGrantGlobalResourcePermission_WITH_AccessorID_GrantorID_AccessedDomainID_IsWithGrant_ResourceClassID_PermissionName;
    public final String SQL_updateInGrantGlobalResourcePermission_SET_GrantorID_IsWithGrant_BY_AccessorID_AccessedDomainID_ResourceClassID_PermissionName;
+   public final String SQL_removeInGrantGlobalResourcePermission_BY_AccessorID;
    public final String SQL_removeInGrantGlobalResourcePermission_BY_AccessorID_AccessedDomainID_ResourceClassID;
    public final String SQL_removeInGrantGlobalResourcePermission_BY_AccessorID_AccessedDomainID_ResourceClassID_PermissionName;
 
@@ -428,6 +437,11 @@ public class SQLStrings implements Serializable {
             + "Grant_DomPerm_Sys SET GrantorResourceId = ?, IsWithGrant = ?"
             + "wHERE AccessorResourceId = ? AND AccessedDomainId = ? AND SysPermissionId = ?";
 
+      SQL_removeInGrantDomainPermissionSys_BY_AccessorID
+            = "DELETE FROM "
+            + schemaNameAndTablePrefix
+            + "Grant_DomPerm_Sys WHERE AccessorResourceId = ?";
+
       SQL_removeInGrantDomainPermissionSys_BY_AccessorID_AccessedDomainID
             = "DELETE FROM "
             + schemaNameAndTablePrefix
@@ -622,6 +636,9 @@ public class SQLStrings implements Serializable {
             + schemaNameAndTablePrefix
             + "Resource ( ResourceId, ResourceClassId, DomainId ) VALUES ( ?, ?, ? )";
 
+      SQL_removeInResource_BY_ResourceID
+            = "DELETE FROM " + schemaNameAndTablePrefix + "Resource WHERE ResourceId = ?";
+
       // Resource
       SQL_findInResource_ResourceId_BY_ResourceID
             = "SELECT ResourceId FROM " + schemaNameAndTablePrefix + "Resource WHERE ResourceId = ?";
@@ -685,6 +702,11 @@ public class SQLStrings implements Serializable {
             + schemaNameAndTablePrefix
             + "Grant_ResCrPerm_Sys SET GrantorResourceId = ?, IsWithGrant = ? "
             + "WHERE AccessorResourceId = ? AND AccessedDomainId = ? AND ResourceClassId = ? AND SysPermissionId = ?";
+
+      SQL_removeInGrantResourceCreatePermissionSys_BY_AccessorID
+            = "DELETE FROM "
+            + schemaNameAndTablePrefix
+            + "Grant_ResCrPerm_Sys WHERE AccessorResourceId = ?";
 
       SQL_removeInGrantResourceCreatePermissionSys_BY_AccessorID_AccessedDomainID_ResourceClassID
             = "DELETE FROM "
@@ -752,6 +774,11 @@ public class SQLStrings implements Serializable {
             + schemaNameAndTablePrefix
             + "Grant_ResCrPerm_PostCr_Sys SET GrantorResourceId = ?, IsWithGrant = ?, PostCreateIsWithGrant = ? "
             + "WHERE AccessorResourceId = ? AND AccessedDomainId = ? AND ResourceClassId = ? AND PostCreateSysPermissionId = ?";
+
+      SQL_removeInGrantResourceCreatePermissionPostCreateSys_BY_AccessorID
+            = "DELETE FROM "
+            + schemaNameAndTablePrefix
+            + "Grant_ResCrPerm_PostCr_Sys WHERE AccessorResourceId = ?";
 
       SQL_removeInGrantResourceCreatePermissionPostCreateSys_BY_AccessorID_AccessedDomainID_ResourceClassID
             = "DELETE FROM "
@@ -835,6 +862,11 @@ public class SQLStrings implements Serializable {
             + schemaNameAndTablePrefix
             + "ResourceClassPermission A WHERE A.ResourceClassId = ResourceClassId AND A.PermissionName = ? )";
 
+      SQL_removeInGrantResourceCreatePermissionPostCreate_BY_AccessorID
+            = "DELETE FROM "
+            + schemaNameAndTablePrefix
+            + "Grant_ResCrPerm_PostCr WHERE AccessorResourceId = ?";
+
       SQL_removeInGrantResourceCreatePermissionPostCreate_BY_AccessorID_AccessedDomainID_ResourceClassID
             = "DELETE FROM "
             + schemaNameAndTablePrefix
@@ -878,6 +910,11 @@ public class SQLStrings implements Serializable {
             + schemaNameAndTablePrefix
             + "Grant_ResPerm_Sys SET GrantorResourceId = ?, IsWithGrant = ? "
             + "WHERE AccessorResourceId = ? AND AccessedResourceId = ? AND ResourceClassId = ? AND SysPermissionId = ?";
+
+      SQL_removeInGrantResourcePermissionSys_BY_AccessorID_OR_AccessedID
+            = "DELETE FROM "
+            + schemaNameAndTablePrefix
+            + "Grant_ResPerm_Sys WHERE AccessorResourceId = ? OR AccessedResourceId = ?";
 
       SQL_removeInGrantResourcePermissionSys_BY_AccessorID_AccessedID
             = "DELETE FROM "
@@ -928,6 +965,11 @@ public class SQLStrings implements Serializable {
             + "SELECT A.PermissionId FROM "
             + schemaNameAndTablePrefix
             + "ResourceClassPermission A WHERE A.ResourceClassId = ResourceClassId AND A.PermissionName = ? )";
+
+      SQL_removeInGrantResourcePermission_BY_AccessorID_OR_AccessedID
+            = "DELETE FROM "
+            + schemaNameAndTablePrefix
+            + "Grant_ResPerm WHERE AccessorResourceId = ? OR AccessedResourceId = ?";
 
       SQL_removeInGrantResourcePermission_BY_AccessorID_AccessedID
             = "DELETE FROM "
@@ -998,6 +1040,11 @@ public class SQLStrings implements Serializable {
             + schemaNameAndTablePrefix
             + "Grant_Global_ResPerm_Sys SET GrantorResourceId = ?, IsWithGrant = ? "
             + "WHERE AccessorResourceId = ? AND AccessedDomainId = ? AND ResourceClassId = ? AND SysPermissionId = ?";
+
+      SQL_removeInGrantGlobalResourcePermissionSys_BY_AccessorID
+            = "DELETE FROM "
+            + schemaNameAndTablePrefix
+            + "Grant_Global_ResPerm_Sys WHERE AccessorResourceId = ?";
 
       SQL_removeInGrantGlobalResourcePermissionSys_BY_AccessorID_AccessedDomainID_ResourceClassID
             = "DELETE FROM "
@@ -1078,6 +1125,11 @@ public class SQLStrings implements Serializable {
             + "SELECT A.PermissionId FROM "
             + schemaNameAndTablePrefix
             + "ResourceClassPermission A WHERE A.ResourceClassId = ResourceClassId AND A.PermissionName = ? )";
+
+      SQL_removeInGrantGlobalResourcePermission_BY_AccessorID
+            = "DELETE FROM "
+            + schemaNameAndTablePrefix
+            + "Grant_Global_ResPerm WHERE AccessorResourceId = ?";
 
       SQL_removeInGrantGlobalResourcePermission_BY_AccessorID_AccessedDomainID_ResourceClassID
             = "DELETE FROM "

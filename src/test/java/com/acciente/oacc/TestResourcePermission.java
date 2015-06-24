@@ -28,7 +28,8 @@ import static org.junit.Assert.fail;
 public class TestResourcePermission {
    @Test
    public void getSysPermissionNames() {
-      assertThat(ResourcePermissions.getSysPermissionNames().size(), is(3));
+      assertThat(ResourcePermissions.getSysPermissionNames().size(), is(4));
+      assertThat(ResourcePermissions.getSysPermissionNames(), hasItem(ResourcePermissions.DELETE));
       assertThat(ResourcePermissions.getSysPermissionNames(), hasItem(ResourcePermissions.IMPERSONATE));
       assertThat(ResourcePermissions.getSysPermissionNames(), hasItem(ResourcePermissions.INHERIT));
       assertThat(ResourcePermissions.getSysPermissionNames(), hasItem(ResourcePermissions.RESET_CREDENTIALS));

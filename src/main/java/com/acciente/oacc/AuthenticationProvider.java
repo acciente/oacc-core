@@ -64,4 +64,11 @@ public interface AuthenticationProvider {
     * @param credentials the new authentication credentials for the resource
     */
    void setCredentials(Resource resource, Credentials credentials);
+
+   /**
+    * Removes the authentication credentials of the specified resource.
+    *
+    * @param resource the resource for which the credentials should be removed
+    */
+   void deleteCredentials(Resource resource);
 }

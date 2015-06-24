@@ -293,6 +293,23 @@ public class GrantResourceCreatePermissionPostCreateSysPersister extends Persist
       }
    }
 
+   public void removeAllResourceCreatePostCreateSysPermissions(SQLConnection connection,
+                                                               Resource accessorResource) {
+      SQLStatement statement = null;
+      try {
+         // revoke any existing post-create system permissions this accessor has to this domain + resource class
+         statement = connection.prepareStatement(sqlStrings.SQL_removeInGrantResourceCreatePermissionPostCreateSys_BY_AccessorID);
+         statement.setResourceId(1, accessorResource);
+         statement.executeUpdate();
+      }
+      catch (SQLException e) {
+         throw new RuntimeException(e);
+      }
+      finally {
+         closeStatement(statement);
+      }
+   }
+
    public void removeResourceCreatePostCreateSysPermissions(SQLConnection connection,
                                                             Resource accessorResource,
                                                             Id<ResourceClassId> accessedResourceClassId,

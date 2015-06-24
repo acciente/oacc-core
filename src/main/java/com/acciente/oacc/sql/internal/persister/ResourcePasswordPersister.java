@@ -95,7 +95,7 @@ public class ResourcePasswordPersister extends Persister {
 
          if (!resultSet.next()) {
             // insert new row
-            insertStatement = connection.prepareStatement(sqlPasswordStrings.SQL_createInResourcePassword_WITH_ResourceID_ResourceClassID_DomainID_Password);
+            insertStatement = connection.prepareStatement(sqlPasswordStrings.SQL_createInResourcePassword_WITH_ResourceID_Password);
             insertStatement.setResourceId(1, resourceId);
             insertStatement.setString(2, newEncryptedBoundPassword);
 
@@ -124,4 +124,22 @@ public class ResourcePasswordPersister extends Persister {
          closeStatement(updateStatement);
       }
    }
+
+   public void removeEncryptedBoundPasswordByResourceId(SQLConnection connection, Resource resource) {
+      SQLStatement statement = null;
+
+      try {
+         statement = connection.prepareStatement(sqlPasswordStrings.SQL_removeInResourcePassword_BY_ResourceID);
+         statement.setResourceId(1, resource);
+
+         assertOneRowUpdated(statement.executeUpdate());
+      }
+      catch (SQLException e) {
+         throw new RuntimeException(e);
+      }
+      finally {
+         closeStatement(statement);
+      }
+   }
+
 }

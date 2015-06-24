@@ -229,7 +229,8 @@ public class TestAccessControl_getEffectiveGlobalResourcePermissions extends Tes
 
       // verify
       Set<ResourcePermission> permissions_expected
-            = setOf(ResourcePermissions.getInstance(ResourcePermissions.INHERIT, true),
+            = setOf(ResourcePermissions.getInstance(ResourcePermissions.DELETE, true),
+                    ResourcePermissions.getInstance(ResourcePermissions.INHERIT, true),
                     ResourcePermissions.getInstance(ResourcePermissions.IMPERSONATE, true),
                     ResourcePermissions.getInstance(ResourcePermissions.RESET_CREDENTIALS, true),
                     ResourcePermissions.getInstance(customPermission.getPermissionName(), true));
@@ -248,7 +249,8 @@ public class TestAccessControl_getEffectiveGlobalResourcePermissions extends Tes
       assertThat(permissions_post_all.get(domainName).get(accessControlContext
                                                                 .getResourceClassInfoByResource(accessorResource)
                                                                 .getResourceClassName()),
-                 is(setOf(ResourcePermissions.getInstance(ResourcePermissions.INHERIT, true))));
+                 is(setOf(ResourcePermissions.getInstance(ResourcePermissions.DELETE, true),
+                          ResourcePermissions.getInstance(ResourcePermissions.INHERIT, true))));
    }
 
    @Test

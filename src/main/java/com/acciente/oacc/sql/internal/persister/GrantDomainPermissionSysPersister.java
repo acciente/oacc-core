@@ -306,6 +306,23 @@ public class GrantDomainPermissionSysPersister extends Persister {
       }
    }
 
+   public void removeAllDomainSysPermissions(SQLConnection connection,
+                                             Resource accessorResource) {
+      SQLStatement statement = null;
+
+      try {
+         statement = connection.prepareStatement(sqlStrings.SQL_removeInGrantDomainPermissionSys_BY_AccessorID);
+         statement.setResourceId(1, accessorResource);
+         statement.executeUpdate();
+      }
+      catch (SQLException e) {
+         throw new RuntimeException(e);
+      }
+      finally {
+         closeStatement(statement);
+      }
+   }
+
    public void removeDomainSysPermissions(SQLConnection connection,
                                           Resource accessorResource,
                                           Id<DomainId> resourceDomainId) {

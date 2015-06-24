@@ -606,6 +606,8 @@ public class TestAccessControl_getEffectiveResourceCreatePermissions extends Tes
       Set<ResourceCreatePermission> permissions_expected
             = setOf(ResourceCreatePermissions.getInstance(ResourceCreatePermissions.CREATE, true),
                     ResourceCreatePermissions
+                          .getInstance(ResourcePermissions.getInstance(ResourcePermissions.DELETE, true), true),
+                    ResourceCreatePermissions
                           .getInstance(ResourcePermissions.getInstance(ResourcePermissions.INHERIT, true), true),
                     ResourceCreatePermissions
                           .getInstance(ResourcePermissions.getInstance(ResourcePermissions.IMPERSONATE, true), true),
@@ -630,6 +632,8 @@ public class TestAccessControl_getEffectiveResourceCreatePermissions extends Tes
                                                                 .getResourceClassName()),
                  is(setOf(ResourceCreatePermissions
                                 .getInstance(ResourceCreatePermissions.CREATE, true),
+                          ResourceCreatePermissions
+                                .getInstance(ResourcePermissions.getInstance(ResourcePermissions.DELETE, true), true),
                           ResourceCreatePermissions
                                 .getInstance(ResourcePermissions.getInstance(ResourcePermissions.INHERIT, true), true))));
    }

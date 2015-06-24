@@ -274,6 +274,22 @@ public class GrantResourcePermissionPersister extends Persister {
       }
    }
 
+   public void removeAllResourcePermissionsAsAccessorOrAccessed(SQLConnection connection, Resource resource) {
+      SQLStatement statement = null;
+      try {
+         statement = connection.prepareStatement(sqlStrings.SQL_removeInGrantResourcePermission_BY_AccessorID_OR_AccessedID);
+         statement.setResourceId(1, resource);
+         statement.setResourceId(2, resource);
+         statement.executeUpdate();
+      }
+      catch (SQLException e) {
+         throw new RuntimeException(e);
+      }
+      finally {
+         closeStatement(statement);
+      }
+   }
+
    public void removeResourcePermissions(SQLConnection connection,
                                          Resource accessorResource,
                                          Resource accessedResource) {

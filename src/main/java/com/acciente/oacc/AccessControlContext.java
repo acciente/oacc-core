@@ -759,7 +759,7 @@ public interface AccessControlContext {
     * resources that are reachable as a result of SUPER-USER permissions.
     * <p/>
     * Note that the current session resource must either be the specified accessor resource, or
-    * the current session resource must have IMPERSONATE, INHERIT or RESET-CREDENTIALS permissions to
+    * the current session resource must have DELETE, IMPERSONATE, INHERIT or RESET-CREDENTIALS permissions to
     * the specified accessor resource, or must have SUPER-USER permission to the (parent-) domain
     * of the specified accessor resource, otherwise an exception is thrown.
     *
@@ -786,7 +786,7 @@ public interface AccessControlContext {
     * resources that are reachable as a result of SUPER-USER permissions.
     * <p/>
     * Note that the current session resource must either be the specified accessor resource, or
-    * the current session resource must have IMPERSONATE, INHERIT or RESET-CREDENTIALS permissions to
+    * the current session resource must have DELETE, IMPERSONATE, INHERIT or RESET-CREDENTIALS permissions to
     * the specified accessor resource, or must have SUPER-USER permission to the (parent-) domain
     * of the specified accessor resource, otherwise an exception is thrown.
     *
@@ -816,7 +816,7 @@ public interface AccessControlContext {
     * resources that are reachable as a result of SUPER-USER permissions.
     * <p/>
     * Note that the current session resource must either be the specified accessor resource, or
-    * the current session resource must have IMPERSONATE, INHERIT or RESET-CREDENTIALS permissions to
+    * the current session resource must have DELETE, IMPERSONATE, INHERIT or RESET-CREDENTIALS permissions to
     * the specified accessor resource, or must have SUPER-USER permission to the (parent-) domain
     * of the specified accessor resource, otherwise an exception is thrown.
     *
@@ -847,7 +847,7 @@ public interface AccessControlContext {
     * resources that are reachable as a result of SUPER-USER permissions.
     * <p/>
     * Note that the current session resource must either be the specified accessor resource, or
-    * the current session resource must have IMPERSONATE, INHERIT or RESET-CREDENTIALS permissions to
+    * the current session resource must have DELETE, IMPERSONATE, INHERIT or RESET-CREDENTIALS permissions to
     * the specified accessor resource, or must have SUPER-USER permission to the (parent-) domain
     * of the specified accessor resource, otherwise an exception is thrown.
     *
@@ -1024,6 +1024,20 @@ public interface AccessControlContext {
     *                                                  session resource and new resource via permission inheritance
     */
    public Resource createResource(String resourceClassName, String domainName, Credentials credentials);
+
+   /**
+    * Deletes the specified resource.
+    * <p/>
+    * Note this method performs a cascading delete of any permissions the obsolete resource has as
+    * an accessor resource OR as an accessed resource, before the specified resource is itself deleted.
+    *
+    * @param obsoleteResource the resource to be deleted
+    * @return <strong>true</strong> if the resource was deleted as a result of this call,
+    *         <strong>false</strong> if the specified resource did not exist
+    * @throws com.acciente.oacc.NotAuthorizedException if the session resource is not authorized to delete the
+    *                                                  specified obsolete resource
+    */
+   public boolean deleteResource(Resource obsoleteResource);
 
    /**
     * Sets the domain permissions the specified accessor resource will receive if it created a domain.

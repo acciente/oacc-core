@@ -113,6 +113,10 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
          = ResourcePermissions.getInstance(ResourcePermissions.RESET_CREDENTIALS, false);
    private static final ResourcePermission ResourcePermission_RESET_CREDENTIALS_GRANT
          = ResourcePermissions.getInstance(ResourcePermissions.RESET_CREDENTIALS, true);
+   private static final ResourcePermission ResourcePermission_DELETE
+         = ResourcePermissions.getInstance(ResourcePermissions.DELETE, false);
+   private static final ResourcePermission ResourcePermission_DELETE_GRANT
+         = ResourcePermissions.getInstance(ResourcePermissions.DELETE, true);
 
    // persisters
    private final ResourceClassPersister                              resourceClassPersister;
@@ -752,6 +756,8 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
             newResourcePermissions.add(ResourcePermissions.getInstance(permissionName, true));
          }
 
+         newResourcePermissions.add(ResourcePermissions.getInstance(ResourcePermissions.DELETE, true));
+
          if (resourceClassInternalInfo.isAuthenticatable()) {
             newResourcePermissions.add(ResourcePermissions.getInstance(ResourcePermissions.RESET_CREDENTIALS, true));
             newResourcePermissions.add(ResourcePermissions.getInstance(ResourcePermissions.IMPERSONATE, true));
@@ -827,6 +833,85 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
    }
 
    @Override
+   public boolean deleteResource(Resource obsoleteResource) {
+      SQLConnection connection = null;
+
+      __assertAuthenticated();
+      __assertResourceSpecified(obsoleteResource);
+
+      try {
+         connection = __getConnection();
+
+         return __deleteResource(connection, obsoleteResource);
+      }
+      finally {
+         __closeConnection(connection);
+      }
+   }
+
+   private boolean __deleteResource(SQLConnection connection,
+                                    Resource obsoleteResource) {
+      // short-circuit out of this call if the specified resource does not exist
+      try {
+         resourcePersister.verifyResourceExists(connection, obsoleteResource);
+      }
+      catch (IllegalArgumentException e) {
+         if (e.getMessage().toLowerCase().contains("not found")) {
+            return false;
+         }
+         throw e;
+      }
+
+      // check for authorization
+      if (!__isSuperUserOfResource(connection, sessionResource, obsoleteResource)) {
+         final Set<ResourcePermission> sessionResourcePermissions
+               = __getEffectiveResourcePermissionsIgnoringSuperUserPrivileges(connection,
+                                                                              sessionResource,
+                                                                              obsoleteResource);
+
+         if (!sessionResourcePermissions.contains(ResourcePermission_DELETE) &&
+               !sessionResourcePermissions.contains(ResourcePermission_DELETE_GRANT)) {
+            throw NotAuthorizedException.newInstanceForActionOnResource(sessionResource, "delete", obsoleteResource);
+         }
+      }
+
+      // remove the resource's credentials, if necessary
+      final ResourceClassInternalInfo resourceClassInternalInfo
+            = resourceClassPersister.getResourceClassInfoByResourceId(connection, obsoleteResource);
+
+      if (resourceClassInternalInfo.isAuthenticatable()) {
+         authenticationProvider.deleteCredentials(obsoleteResource);
+      }
+
+      // remove any permissions the obsolete resource has as an accessor resource
+      grantDomainCreatePermissionPostCreateSysPersister.removeDomainCreatePostCreateSysPermissions(connection, obsoleteResource);
+      grantDomainCreatePermissionSysPersister.removeDomainCreateSysPermissions(connection, obsoleteResource);
+      grantDomainPermissionSysPersister.removeAllDomainSysPermissions(connection, obsoleteResource);
+      grantResourceCreatePermissionPostCreatePersister.removeAllResourceCreatePostCreatePermissions(connection, obsoleteResource);
+      grantResourceCreatePermissionPostCreateSysPersister.removeAllResourceCreatePostCreateSysPermissions(connection, obsoleteResource);
+      grantResourceCreatePermissionSysPersister.removeAllResourceCreateSysPermissions(connection, obsoleteResource);
+      grantGlobalResourcePermissionPersister.removeAllGlobalResourcePermissions(connection, obsoleteResource);
+      grantGlobalResourcePermissionSysPersister.removeAllGlobalSysPermissions(connection, obsoleteResource);
+
+      // remove any permissions the obsolete resource has as an accessor resource OR as an accessed resource
+      grantResourcePermissionPersister.removeAllResourcePermissionsAsAccessorOrAccessed(connection, obsoleteResource);
+      grantResourcePermissionSysPersister.removeAllResourceSysPermissionsAsAccessorOrAccessed(connection, obsoleteResource);
+
+      // remove the resource
+      resourcePersister.deleteResource(connection, obsoleteResource);
+
+      // handle special case where deleted resource is the session or authenticated resource
+      if (authenticatedResource.equals(obsoleteResource)) {
+         unauthenticate();
+      }
+      else if (sessionResource.equals(obsoleteResource)) {
+         unimpersonate();
+      }
+
+      return true;
+   }
+
+   @Override
    public void setDomainPermissions(Resource accessorResource,
                                     String domainName,
                                     Set<DomainPermission> permissions) {
@@ -846,7 +931,6 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
          __closeConnection(connection);
       }
    }
-
    private void __setDirectDomainPermissions(SQLConnection connection,
                                              Resource accessorResource,
                                              String domainName,
@@ -5374,6 +5458,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
          resourceClassName = resourceClassName.trim();
 
          Set<ResourcePermission> anyRequiredResourcePermissions = new HashSet<>(3);
+         anyRequiredResourcePermissions.add(ResourcePermission_DELETE);
          anyRequiredResourcePermissions.add(ResourcePermission_IMPERSONATE);
          anyRequiredResourcePermissions.add(ResourcePermission_INHERIT);
          anyRequiredResourcePermissions.add(ResourcePermission_RESET_CREDENTIALS);
@@ -5421,6 +5506,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
          resourceClassName = resourceClassName.trim();
 
          Set<ResourcePermission> anyRequiredResourcePermissions = new HashSet<>(3);
+         anyRequiredResourcePermissions.add(ResourcePermission_DELETE);
          anyRequiredResourcePermissions.add(ResourcePermission_IMPERSONATE);
          anyRequiredResourcePermissions.add(ResourcePermission_INHERIT);
          anyRequiredResourcePermissions.add(ResourcePermission_RESET_CREDENTIALS);
@@ -5585,6 +5671,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
 
          resourceClassName = resourceClassName.trim();
          Set<ResourcePermission> anyRequiredResourcePermissions = new HashSet<>(3);
+         anyRequiredResourcePermissions.add(ResourcePermission_DELETE);
          anyRequiredResourcePermissions.add(ResourcePermission_IMPERSONATE);
          anyRequiredResourcePermissions.add(ResourcePermission_INHERIT);
          anyRequiredResourcePermissions.add(ResourcePermission_RESET_CREDENTIALS);
@@ -5665,6 +5752,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
 
          resourceClassName = resourceClassName.trim();
          Set<ResourcePermission> anyRequiredResourcePermissions = new HashSet<>(3);
+         anyRequiredResourcePermissions.add(ResourcePermission_DELETE);
          anyRequiredResourcePermissions.add(ResourcePermission_IMPERSONATE);
          anyRequiredResourcePermissions.add(ResourcePermission_INHERIT);
          anyRequiredResourcePermissions.add(ResourcePermission_RESET_CREDENTIALS);
@@ -5979,6 +6067,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
             = resourceClassPermissionPersister.getPermissionNames(connection,
                                                                   resourceClassInternalInfo.getResourceClassName());
       permissionNames.add(ResourcePermissions.INHERIT);
+      permissionNames.add(ResourcePermissions.DELETE);
 
       if (resourceClassInternalInfo.isAuthenticatable()) {
          permissionNames.add(ResourcePermissions.IMPERSONATE);
@@ -6222,11 +6311,11 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
    }
 
    private void __assertResourceExists(SQLConnection connection,
-                                       Resource accessorResource) {
-      // look up accessor resource, but only if it's not the session or authenticated resource (which are already known to exist)
-      if (!sessionResource.equals(accessorResource) && !authenticatedResource.equals(accessorResource)) {
+                                       Resource resource) {
+      // look up resource, but only if it's not the session or authenticated resource (which are already known to exist)
+      if (!sessionResource.equals(resource) && !authenticatedResource.equals(resource)) {
          // the persister method will throw an IllegalArgumentException if the lookup fails
-         resourcePersister.verifyResourceExists(connection, accessorResource);
+         resourcePersister.verifyResourceExists(connection, resource);
       }
    }
 

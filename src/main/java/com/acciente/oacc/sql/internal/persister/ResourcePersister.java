@@ -84,6 +84,24 @@ public class ResourcePersister extends Persister {
       }
    }
 
+   public void deleteResource(SQLConnection connection,
+                              Resource resource) {
+      SQLStatement statement = null;
+
+      try {
+         statement = connection.prepareStatement(sqlStrings.SQL_removeInResource_BY_ResourceID);
+         statement.setResourceId(1, resource);
+
+         assertOneRowInserted(statement.executeUpdate());
+      }
+      catch (SQLException e) {
+         throw new RuntimeException(e);
+      }
+      finally {
+         closeStatement(statement);
+      }
+   }
+
    public Id<DomainId> getDomainIdByResource(SQLConnection connection,
                                              Resource resource) {
       SQLStatement statement = null;

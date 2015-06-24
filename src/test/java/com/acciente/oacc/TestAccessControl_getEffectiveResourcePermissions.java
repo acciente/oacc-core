@@ -403,7 +403,8 @@ public class TestAccessControl_getEffectiveResourcePermissions extends TestAcces
 
       // verify
       Set<ResourcePermission> permissions_expected
-            = setOf(ResourcePermissions.getInstance(ResourcePermissions.INHERIT, true),
+            = setOf(ResourcePermissions.getInstance(ResourcePermissions.DELETE, true),
+                    ResourcePermissions.getInstance(ResourcePermissions.INHERIT, true),
                     ResourcePermissions.getInstance(ResourcePermissions.IMPERSONATE, true),
                     ResourcePermissions.getInstance(ResourcePermissions.RESET_CREDENTIALS, true),
                     ResourcePermissions.getInstance(customPermission.getPermissionName(), true));

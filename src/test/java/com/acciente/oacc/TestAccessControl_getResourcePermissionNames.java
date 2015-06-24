@@ -38,9 +38,10 @@ public class TestAccessControl_getResourcePermissionNames extends TestAccessCont
 
       final String permissionName = generateResourceClassPermission(resourceClassName);
 
-      assertThat(accessControlContext.getResourcePermissionNames(resourceClassName).size(), is(2));
+      assertThat(accessControlContext.getResourcePermissionNames(resourceClassName).size(), is(3));
       assertThat(accessControlContext.getResourcePermissionNames(resourceClassName),
                  hasItems(permissionName,
+                          ResourcePermissions.DELETE,
                           ResourcePermissions.INHERIT));
    }
 
@@ -55,8 +56,9 @@ public class TestAccessControl_getResourcePermissionNames extends TestAccessCont
       final String permissionName = generateResourceClassPermission(resourceClassName);
 
       final List<String> resourcePermissionNames = accessControlContext.getResourcePermissionNames(resourceClassName);
-      assertThat(resourcePermissionNames.size(), is(2));
+      assertThat(resourcePermissionNames.size(), is(3));
       assertThat(resourcePermissionNames, hasItems(permissionName,
+                                                   ResourcePermissions.DELETE,
                                                    ResourcePermissions.INHERIT));
    }
 
@@ -71,8 +73,9 @@ public class TestAccessControl_getResourcePermissionNames extends TestAccessCont
       final String permissionName = generateResourceClassPermission(resourceClassName);
 
       final List<String> resourcePermissionNames = accessControlContext.getResourcePermissionNames(resourceClassName);
-      assertThat(resourcePermissionNames.size(), is(4));
+      assertThat(resourcePermissionNames.size(), is(5));
       assertThat(resourcePermissionNames, hasItems(permissionName,
+                                                   ResourcePermissions.DELETE,
                                                    ResourcePermissions.INHERIT,
                                                    ResourcePermissions.IMPERSONATE,
                                                    ResourcePermissions.RESET_CREDENTIALS));
@@ -91,8 +94,9 @@ public class TestAccessControl_getResourcePermissionNames extends TestAccessCont
 
       final List<String> resourcePermissionNames = accessControlContext.getResourcePermissionNames(
             resourceClassName_whitespaced);
-      assertThat(resourcePermissionNames.size(), is(2));
+      assertThat(resourcePermissionNames.size(), is(3));
       assertThat(resourcePermissionNames, hasItems(permissionName,
+                                                   ResourcePermissions.DELETE,
                                                    ResourcePermissions.INHERIT));
    }
 

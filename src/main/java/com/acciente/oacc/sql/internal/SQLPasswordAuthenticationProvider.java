@@ -159,6 +159,19 @@ public class SQLPasswordAuthenticationProvider implements AuthenticationProvider
       }
    }
 
+   @Override
+   public void deleteCredentials(Resource resource) {
+      SQLConnection connection = null;
+      try {
+         connection = getConnection();
+
+         resourcePasswordPersister.removeEncryptedBoundPasswordByResourceId(connection, resource);
+      }
+      finally {
+         closeConnection(connection);
+      }
+   }
+
    private void __setResourcePassword(SQLConnection connection, Resource resource, char[] newPassword) {
       char[] newBoundPassword = null;
       try {

@@ -234,5 +234,17 @@ public class TestAccessControl_customAuthenticationProvider extends TestAccessCo
 
          super.setCredentials(resource, credentials);
       }
+
+      @Override
+      public void deleteCredentials(Resource resource) {
+         if (SYS_RESOURCE.equals(resource)) {
+            throw new IllegalArgumentException("deleting credentials of system resource is not supported");
+         }
+         else if (guestResource != null && guestResource.equals(resource)) {
+            throw new IllegalArgumentException("deleting credentials of guest resource is not supported");
+         }
+
+         super.deleteCredentials(resource);
+      }
    }
 }

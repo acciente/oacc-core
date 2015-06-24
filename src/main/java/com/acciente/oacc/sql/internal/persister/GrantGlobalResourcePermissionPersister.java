@@ -346,6 +346,24 @@ public class GrantGlobalResourcePermissionPersister extends Persister {
       }
    }
 
+   public void removeAllGlobalResourcePermissions(SQLConnection connection,
+                                                  Resource accessorResource) {
+
+      SQLStatement statement = null;
+      try {
+         // revoke any existing non-system permissions this accessor has to this domain + resource class
+         statement = connection.prepareStatement(sqlStrings.SQL_removeInGrantGlobalResourcePermission_BY_AccessorID);
+         statement.setResourceId(1, accessorResource);
+         statement.executeUpdate();
+      }
+      catch (SQLException e) {
+         throw new RuntimeException(e);
+      }
+      finally {
+         closeStatement(statement);
+      }
+   }
+
    public void removeGlobalResourcePermissions(SQLConnection connection,
                                                Resource accessorResource,
                                                Id<ResourceClassId> accessedResourceClassId,
