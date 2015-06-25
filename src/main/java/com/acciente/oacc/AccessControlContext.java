@@ -68,7 +68,7 @@ public interface AccessControlContext {
     * @throws java.lang.IllegalArgumentException        if the resource does not exist or is not of an authenticatable resource class
     * @throws com.acciente.oacc.AuthenticationException if authentication fails
     */
-   public void authenticate(Resource resource, Credentials credentials);
+   void authenticate(Resource resource, Credentials credentials);
 
    /**
     * Authenticates this security session against an {@link AuthenticationProvider} without
@@ -81,14 +81,14 @@ public interface AccessControlContext {
     * @param resource the resource to be authenticated
     * @throws java.lang.IllegalArgumentException if the resource does not exist or is not of an authenticatable resource class
     */
-   public void authenticate(Resource resource);
+   void authenticate(Resource resource);
 
    /**
     * Logs out of this session, to be specific, disassociates any security credentials from this session.
     * <p/>
     * If no resource is currently authenticated, this call has no effect.
     */
-   public void unauthenticate();
+   void unauthenticate();
 
    /**
     * Switches the security credentials of this session to those of the specified resource.
@@ -104,7 +104,7 @@ public interface AccessControlContext {
     * @throws com.acciente.oacc.NotAuthorizedException if the authenticated resource does not have permission to
     *                                                  impersonate the specified resource
     */
-   public void impersonate(Resource resource);
+   void impersonate(Resource resource);
 
    /**
     * Unimpersonates the currently impersonated resource.
@@ -113,7 +113,7 @@ public interface AccessControlContext {
     * <p/>
     * If no resource is currently being impersonated, this call has no effect.
     */
-   public void unimpersonate();
+   void unimpersonate();
 
    /**
     * Sets the authentication credentials of the specified authenticatable resource (= a resource of a
@@ -143,7 +143,7 @@ public interface AccessControlContext {
     * @throws com.acciente.oacc.NotAuthorizedException      if the authenticated resource does not have permission to
     *                                                       reset the credentials of the specified resource
     */
-   public void setCredentials(Resource resource, Credentials newCredentials);
+   void setCredentials(Resource resource, Credentials newCredentials);
 
    /**
     * Checks if the specified accessor resource has the specified domain permissions on
@@ -161,9 +161,9 @@ public interface AccessControlContext {
     *                                                  specified domain permissions, or
     *                                                  if the accessor resource does not exist
     */
-   public void assertDomainPermissions(Resource accessorResource,
-                                       String domainName,
-                                       Set<DomainPermission> domainPermissions);
+   void assertDomainPermissions(Resource accessorResource,
+                                String domainName,
+                                Set<DomainPermission> domainPermissions);
 
    /**
     * Checks if the specified accessor resource has the specified domain permissions on
@@ -182,10 +182,10 @@ public interface AccessControlContext {
     *                                                  specified domain permissions, or
     *                                                  if the accessor resource does not exist
     */
-   public void assertDomainPermissions(Resource accessorResource,
-                                       String domainName,
-                                       DomainPermission domainPermission,
-                                       DomainPermission... domainPermissions);
+   void assertDomainPermissions(Resource accessorResource,
+                                String domainName,
+                                DomainPermission domainPermission,
+                                DomainPermission... domainPermissions);
 
    /**
     * Checks if the specified accessor resource has the specified domain permissions on
@@ -202,9 +202,9 @@ public interface AccessControlContext {
     * @throws java.lang.IllegalArgumentException if the accessorResource does not exist, or
     *                                            if no domain of domainName exists
     */
-   public boolean hasDomainPermissions(Resource accessorResource,
-                                       String domainName,
-                                       Set<DomainPermission> domainPermissions);
+   boolean hasDomainPermissions(Resource accessorResource,
+                                String domainName,
+                                Set<DomainPermission> domainPermissions);
 
    /**
     * Checks if the specified accessor resource has the specified domain permissions on
@@ -222,10 +222,10 @@ public interface AccessControlContext {
     * @throws java.lang.IllegalArgumentException if the accessorResource does not exist, or
     *                                            if no domain of domainName exists
     */
-   public boolean hasDomainPermissions(Resource accessorResource,
-                                       String domainName,
-                                       DomainPermission domainPermission,
-                                       DomainPermission... domainPermissions);
+   boolean hasDomainPermissions(Resource accessorResource,
+                                String domainName,
+                                DomainPermission domainPermission,
+                                DomainPermission... domainPermissions);
 
    /**
     * Checks if the specified accessor resource has the specified domain create permissions.
@@ -238,8 +238,8 @@ public interface AccessControlContext {
     *                                                  specified domain create permissions, or
     *                                                  if the accessor resource does not exist
     */
-   public void assertDomainCreatePermissions(Resource accessorResource,
-                                             Set<DomainCreatePermission> domainCreatePermissions);
+   void assertDomainCreatePermissions(Resource accessorResource,
+                                      Set<DomainCreatePermission> domainCreatePermissions);
 
    /**
     * Checks if the specified accessor resource has the specified domain create permissions.
@@ -253,9 +253,9 @@ public interface AccessControlContext {
     *                                                  specified domain create permissions, or
     *                                                  if the accessor resource does not exist
     */
-   public void assertDomainCreatePermissions(Resource accessorResource,
-                                             DomainCreatePermission domainCreatePermission,
-                                             DomainCreatePermission... domainCreatePermissions);
+   void assertDomainCreatePermissions(Resource accessorResource,
+                                      DomainCreatePermission domainCreatePermission,
+                                      DomainCreatePermission... domainCreatePermissions);
 
    /**
     * Checks if the specified accessor resource has the specified domain create permissions.
@@ -267,8 +267,8 @@ public interface AccessControlContext {
     * @return  <strong>true</strong> if the accessor resource has the specified domain create permissions,
     *          <strong>false</strong> otherwise
     */
-   public boolean hasDomainCreatePermissions(Resource accessorResource,
-                                             Set<DomainCreatePermission> domainCreatePermissions);
+   boolean hasDomainCreatePermissions(Resource accessorResource,
+                                      Set<DomainCreatePermission> domainCreatePermissions);
 
    /**
     * Checks if the specified accessor resource has the specified domain create permissions.
@@ -281,9 +281,9 @@ public interface AccessControlContext {
     * @return  <strong>true</strong> if the accessor resource has the specified domain create permissions,
     *          <strong>false</strong> otherwise
     */
-   public boolean hasDomainCreatePermissions(Resource accessorResource,
-                                             DomainCreatePermission domainCreatePermission,
-                                             DomainCreatePermission... domainCreatePermissions);
+   boolean hasDomainCreatePermissions(Resource accessorResource,
+                                      DomainCreatePermission domainCreatePermission,
+                                      DomainCreatePermission... domainCreatePermissions);
 
    /**
     * Checks if the specified accessor resource would receive the specified domain permissions, if the accessor
@@ -297,8 +297,8 @@ public interface AccessControlContext {
     * @throws com.acciente.oacc.NotAuthorizedException if the accessor resource would <strong>not</strong> receive the
     *                                                  specified permissions after creating a domain
     */
-   public void assertPostCreateDomainPermissions(Resource accessorResource,
-                                                 Set<DomainPermission> domainPermissions);
+   void assertPostCreateDomainPermissions(Resource accessorResource,
+                                          Set<DomainPermission> domainPermissions);
 
    /**
     * Checks if the specified accessor resource would receive the specified domain permissions, if the accessor
@@ -313,9 +313,9 @@ public interface AccessControlContext {
     * @throws com.acciente.oacc.NotAuthorizedException if the accessor resource would <strong>not</strong> receive the
     *                                                  specified permissions after creating a domain
     */
-   public void assertPostCreateDomainPermissions(Resource accessorResource,
-                                                 DomainPermission domainPermission,
-                                                 DomainPermission... domainPermissions);
+   void assertPostCreateDomainPermissions(Resource accessorResource,
+                                          DomainPermission domainPermission,
+                                          DomainPermission... domainPermissions);
 
    /**
     * Checks if the specified accessor resource would receive the specified domain permissions, if the accessor
@@ -328,8 +328,8 @@ public interface AccessControlContext {
     * @throws IllegalArgumentException if the accessorResource does not exist
     * @return <strong>true</strong> if the accessor resource would receive the specified permissions after creating a domain
     */
-   public boolean hasPostCreateDomainPermissions(Resource accessorResource,
-                                                 Set<DomainPermission> domainPermissions);
+   boolean hasPostCreateDomainPermissions(Resource accessorResource,
+                                          Set<DomainPermission> domainPermissions);
 
    /**
     * Checks if the specified accessor resource would receive the specified domain permissions, if the accessor
@@ -343,9 +343,9 @@ public interface AccessControlContext {
     * @throws IllegalArgumentException if the accessorResource does not exist
     * @return <strong>true</strong> if the accessor resource would receive the specified permissions after creating a domain
     */
-   public boolean hasPostCreateDomainPermissions(Resource accessorResource,
-                                                 DomainPermission domainPermission,
-                                                 DomainPermission... domainPermissions);
+   boolean hasPostCreateDomainPermissions(Resource accessorResource,
+                                          DomainPermission domainPermission,
+                                          DomainPermission... domainPermissions);
 
    /**
     * Checks if the specified accessor resource has the specified global resource permissions on
@@ -365,10 +365,10 @@ public interface AccessControlContext {
     *                                                  specified global permissions, or
     *                                                  if the accessor resource does not exist
     */
-   public void assertGlobalResourcePermissions(Resource accessorResource,
-                                               String resourceClassName,
-                                               String domainName,
-                                               Set<ResourcePermission> resourcePermissions);
+   void assertGlobalResourcePermissions(Resource accessorResource,
+                                        String resourceClassName,
+                                        String domainName,
+                                        Set<ResourcePermission> resourcePermissions);
 
    /**
     * Checks if the specified accessor resource has the specified global resource permissions on
@@ -389,11 +389,11 @@ public interface AccessControlContext {
     *                                                  specified global permissions, or
     *                                                  if the accessor resource does not exist
     */
-   public void assertGlobalResourcePermissions(Resource accessorResource,
-                                               String resourceClassName,
-                                               String domainName,
-                                               ResourcePermission resourcePermission,
-                                               ResourcePermission... resourcePermissions);
+   void assertGlobalResourcePermissions(Resource accessorResource,
+                                        String resourceClassName,
+                                        String domainName,
+                                        ResourcePermission resourcePermission,
+                                        ResourcePermission... resourcePermissions);
 
    /**
     * Checks if the specified accessor resource has the specified global resource permissions on
@@ -412,10 +412,10 @@ public interface AccessControlContext {
     *                                            if any resourcePermission is invalid for the resource class, or
     *                                            if no domain of domainName exists
     */
-   public boolean hasGlobalResourcePermissions(Resource accessorResource,
-                                               String resourceClassName,
-                                               String domainName,
-                                               Set<ResourcePermission> resourcePermissions);
+   boolean hasGlobalResourcePermissions(Resource accessorResource,
+                                        String resourceClassName,
+                                        String domainName,
+                                        Set<ResourcePermission> resourcePermissions);
 
    /**
     * Checks if the specified accessor resource has the specified global resource permissions on
@@ -435,11 +435,11 @@ public interface AccessControlContext {
     *                                            if any resourcePermission is invalid for the resource class, or
     *                                            if no domain of domainName exists
     */
-   public boolean hasGlobalResourcePermissions(Resource accessorResource,
-                                               String resourceClassName,
-                                               String domainName,
-                                               ResourcePermission resourcePermission,
-                                               ResourcePermission... resourcePermissions);
+   boolean hasGlobalResourcePermissions(Resource accessorResource,
+                                        String resourceClassName,
+                                        String domainName,
+                                        ResourcePermission resourcePermission,
+                                        ResourcePermission... resourcePermissions);
 
    /**
     * Checks if the specified accessor resource has the specified resource permissions
@@ -455,9 +455,9 @@ public interface AccessControlContext {
     * @throws com.acciente.oacc.NotAuthorizedException if the accessor resource <strong>does not</strong> have the
     *                                                  specified permissions
     */
-   public void assertResourcePermissions(Resource accessorResource,
-                                         Resource accessedResource,
-                                         Set<ResourcePermission> resourcePermissions);
+   void assertResourcePermissions(Resource accessorResource,
+                                  Resource accessedResource,
+                                  Set<ResourcePermission> resourcePermissions);
 
    /**
     * Checks if the specified accessor resource has the specified resource permissions
@@ -474,10 +474,10 @@ public interface AccessControlContext {
     * @throws com.acciente.oacc.NotAuthorizedException if the accessor resource <strong>does not</strong> have the
     *                                                  specified permissions
     */
-   public void assertResourcePermissions(Resource accessorResource,
-                                         Resource accessedResource,
-                                         ResourcePermission resourcePermission,
-                                         ResourcePermission... resourcePermissions);
+   void assertResourcePermissions(Resource accessorResource,
+                                  Resource accessedResource,
+                                  ResourcePermission resourcePermission,
+                                  ResourcePermission... resourcePermissions);
 
    /**
     * Checks if the specified accessor resource has the specified resource permissions
@@ -492,9 +492,9 @@ public interface AccessControlContext {
     * @throws java.lang.IllegalArgumentException if the accessorResource or the accessedResource does not exist, or
     *                                            if any resourcePermission is invalid for the resource class of accessedResource
     */
-   public boolean hasResourcePermissions(Resource accessorResource,
-                                         Resource accessedResource,
-                                         Set<ResourcePermission> resourcePermissions);
+   boolean hasResourcePermissions(Resource accessorResource,
+                                  Resource accessedResource,
+                                  Set<ResourcePermission> resourcePermissions);
 
    /**
     * Checks if the specified accessor resource has the specified resource permissions
@@ -510,10 +510,10 @@ public interface AccessControlContext {
     * @throws java.lang.IllegalArgumentException if the accessorResource or the accessedResource does not exist, or
     *                                            if any resourcePermission is invalid for the resource class of accessedResource
     */
-   public boolean hasResourcePermissions(Resource accessorResource,
-                                         Resource accessedResource,
-                                         ResourcePermission resourcePermission,
-                                         ResourcePermission... resourcePermissions);
+   boolean hasResourcePermissions(Resource accessorResource,
+                                  Resource accessedResource,
+                                  ResourcePermission resourcePermission,
+                                  ResourcePermission... resourcePermissions);
 
    /**
     * Checks if the specified accessor resource has the specified create permissions on an object of
@@ -534,10 +534,10 @@ public interface AccessControlContext {
     *                                                  in the specified domain, or
     *                                                  if the accessor resource does not exist
     */
-   public void assertResourceCreatePermissions(Resource accessorResource,
-                                               String resourceClassName,
-                                               String domainName,
-                                               Set<ResourceCreatePermission> resourceCreatePermissions);
+   void assertResourceCreatePermissions(Resource accessorResource,
+                                        String resourceClassName,
+                                        String domainName,
+                                        Set<ResourceCreatePermission> resourceCreatePermissions);
 
    /**
     * Checks if the specified accessor resource has the specified create permissions on an object of
@@ -559,11 +559,11 @@ public interface AccessControlContext {
     *                                                  in the specified domain, or
     *                                                  if the accessor resource does not exist
     */
-   public void assertResourceCreatePermissions(Resource accessorResource,
-                                               String resourceClassName,
-                                               String domainName,
-                                               ResourceCreatePermission resourceCreatePermission,
-                                               ResourceCreatePermission... resourceCreatePermissions);
+   void assertResourceCreatePermissions(Resource accessorResource,
+                                        String resourceClassName,
+                                        String domainName,
+                                        ResourceCreatePermission resourceCreatePermission,
+                                        ResourceCreatePermission... resourceCreatePermissions);
 
    /**
     * Checks if the specified accessor resource has the specified create permissions on an object of
@@ -583,10 +583,10 @@ public interface AccessControlContext {
     *                                            if any resourceCreatePermission is invalid for the resource class, or
     *                                            if no domain of domainName exists
     */
-   public boolean hasResourceCreatePermissions(Resource accessorResource,
-                                               String resourceClassName,
-                                               String domainName,
-                                               Set<ResourceCreatePermission> resourceCreatePermissions);
+   boolean hasResourceCreatePermissions(Resource accessorResource,
+                                        String resourceClassName,
+                                        String domainName,
+                                        Set<ResourceCreatePermission> resourceCreatePermissions);
 
    /**
     * Checks if the specified accessor resource has the specified create permissions on an object of
@@ -607,11 +607,11 @@ public interface AccessControlContext {
     *                                            if any resourceCreatePermission is invalid for the resource class, or
     *                                            if no domain of domainName exists
     */
-   public boolean hasResourceCreatePermissions(Resource accessorResource,
-                                               String resourceClassName,
-                                               String domainName,
-                                               ResourceCreatePermission resourceCreatePermission,
-                                               ResourceCreatePermission... resourceCreatePermissions);
+   boolean hasResourceCreatePermissions(Resource accessorResource,
+                                        String resourceClassName,
+                                        String domainName,
+                                        ResourceCreatePermission resourceCreatePermission,
+                                        ResourceCreatePermission... resourceCreatePermissions);
 
    /**
     * Checks if the specified accessor resource would receive the specified permissions on an object of
@@ -632,10 +632,10 @@ public interface AccessControlContext {
     *                                                  class in the specified domain, or
     *                                                  if the accessor resource does not exist
     */
-   public void assertPostCreateResourcePermissions(Resource accessorResource,
-                                                   String resourceClassName,
-                                                   String domainName,
-                                                   Set<ResourcePermission> resourcePermissions);
+   void assertPostCreateResourcePermissions(Resource accessorResource,
+                                            String resourceClassName,
+                                            String domainName,
+                                            Set<ResourcePermission> resourcePermissions);
 
    /**
     * Checks if the specified accessor resource would receive the specified permissions on an object of
@@ -657,11 +657,11 @@ public interface AccessControlContext {
     *                                                  class in the specified domain, or
     *                                                  if the accessor resource does not exist
     */
-   public void assertPostCreateResourcePermissions(Resource accessorResource,
-                                                   String resourceClassName,
-                                                   String domainName,
-                                                   ResourcePermission resourcePermission,
-                                                   ResourcePermission... resourcePermissions);
+   void assertPostCreateResourcePermissions(Resource accessorResource,
+                                            String resourceClassName,
+                                            String domainName,
+                                            ResourcePermission resourcePermission,
+                                            ResourcePermission... resourcePermissions);
 
    /**
     * Checks if the specified accessor resource would receive the specified permissions on an object of
@@ -681,10 +681,10 @@ public interface AccessControlContext {
     *                                            if no domain of domainName exists, or
     *                                            if any resourcePermission is invalid for the resource class
     */
-   public boolean hasPostCreateResourcePermissions(Resource accessorResource,
-                                                   String resourceClassName,
-                                                   String domainName,
-                                                   Set<ResourcePermission> resourcePermissions);
+   boolean hasPostCreateResourcePermissions(Resource accessorResource,
+                                            String resourceClassName,
+                                            String domainName,
+                                            Set<ResourcePermission> resourcePermissions);
 
    /**
     * Checks if the specified accessor resource would receive the specified permissions on an object of
@@ -705,11 +705,11 @@ public interface AccessControlContext {
     *                                            if no domain of domainName exists, or
     *                                            if any resourcePermission is invalid for the resource class
     */
-   public boolean hasPostCreateResourcePermissions(Resource accessorResource,
-                                                   String resourceClassName,
-                                                   String domainName,
-                                                   ResourcePermission resourcePermission,
-                                                   ResourcePermission... resourcePermissions);
+   boolean hasPostCreateResourcePermissions(Resource accessorResource,
+                                            String resourceClassName,
+                                            String domainName,
+                                            ResourcePermission resourcePermission,
+                                            ResourcePermission... resourcePermissions);
 
    /**
     * Returns the domain to which the specified resource belongs.
@@ -718,7 +718,7 @@ public interface AccessControlContext {
     * @return a string domain name
     * @throws java.lang.IllegalArgumentException if resource does not exists
     */
-   public String getDomainNameByResource(Resource resource);
+   String getDomainNameByResource(Resource resource);
 
    /**
     * Returns the domains which are descendants of the specified domain.
@@ -731,7 +731,7 @@ public interface AccessControlContext {
     * @param domainName a domain name for which to retrieve the descendants
     * @return a set of unique string domain names, including the domain queried about, or an empty set if the specified domain does not exist
     */
-   public Set<String> getDomainDescendants(String domainName);
+   Set<String> getDomainDescendants(String domainName);
 
    /**
     * Returns information about the specified resource class.
@@ -740,7 +740,7 @@ public interface AccessControlContext {
     * @return a ResourceClassInfo object containing information about the resource class
     * @throws java.lang.IllegalArgumentException if no resource class of resourceClassName exists
     */
-   public ResourceClassInfo getResourceClassInfo(String resourceClassName);
+   ResourceClassInfo getResourceClassInfo(String resourceClassName);
 
    /**
     * Returns information about the resource class to which the specified resource belongs.
@@ -749,7 +749,7 @@ public interface AccessControlContext {
     * @return returns a ResourceClassInfo object containing information about the resource class of the specified resource
     * @throws java.lang.IllegalArgumentException if no resource class of resourceClassName exists
     */
-   public ResourceClassInfo getResourceClassInfoByResource(Resource resource);
+   ResourceClassInfo getResourceClassInfoByResource(Resource resource);
 
    /**
     * Returns a set of resources (of the specified resource class) on which
@@ -774,9 +774,9 @@ public interface AccessControlContext {
     *                                                  the session resource does not have either IMPERSONATE, INHERIT
     *                                                  or RESET-CREDENTIALS permissions on the accessor resource
     */
-   public Set<Resource> getResourcesByResourcePermissions(Resource accessorResource,
-                                                          String resourceClassName,
-                                                          Set<ResourcePermission> resourcePermissions);
+   Set<Resource> getResourcesByResourcePermissions(Resource accessorResource,
+                                                   String resourceClassName,
+                                                   Set<ResourcePermission> resourcePermissions);
 
    /**
     * Returns a set of resources (of the specified resource class) on which
@@ -802,10 +802,10 @@ public interface AccessControlContext {
     *                                                  the session resource does not have either IMPERSONATE, INHERIT
     *                                                  or RESET-CREDENTIALS permissions on the accessor resource
     */
-   public Set<Resource> getResourcesByResourcePermissions(Resource accessorResource,
-                                                          String resourceClassName,
-                                                          ResourcePermission resourcePermission,
-                                                          ResourcePermission... resourcePermissions);
+   Set<Resource> getResourcesByResourcePermissions(Resource accessorResource,
+                                                   String resourceClassName,
+                                                   ResourcePermission resourcePermission,
+                                                   ResourcePermission... resourcePermissions);
 
    /**
     * Returns a set of resources (of the specified resource class) on which
@@ -833,10 +833,10 @@ public interface AccessControlContext {
     *                                                  the session resource does not have either IMPERSONATE, INHERIT
     *                                                  or RESET-CREDENTIALS permissions on the accessor resource
     */
-   public Set<Resource> getResourcesByResourcePermissionsAndDomain(Resource accessorResource,
-                                                                   String resourceClassName,
-                                                                   String domainName,
-                                                                   Set<ResourcePermission> resourcePermissions);
+   Set<Resource> getResourcesByResourcePermissionsAndDomain(Resource accessorResource,
+                                                            String resourceClassName,
+                                                            String domainName,
+                                                            Set<ResourcePermission> resourcePermissions);
 
    /**
     * Returns a set of resources (of the specified resource class) on which
@@ -865,11 +865,11 @@ public interface AccessControlContext {
     *                                                  the session resource does not have either IMPERSONATE, INHERIT
     *                                                  or RESET-CREDENTIALS permissions on the accessor resource
     */
-   public Set<Resource> getResourcesByResourcePermissionsAndDomain(Resource accessorResource,
-                                                                   String resourceClassName,
-                                                                   String domainName,
-                                                                   ResourcePermission resourcePermission,
-                                                                   ResourcePermission... resourcePermissions);
+   Set<Resource> getResourcesByResourcePermissionsAndDomain(Resource accessorResource,
+                                                            String resourceClassName,
+                                                            String domainName,
+                                                            ResourcePermission resourcePermission,
+                                                            ResourcePermission... resourcePermissions);
 
    /**
     * Returns a set of resources that have the specified permissions to the specified accessed resource.
@@ -887,9 +887,9 @@ public interface AccessControlContext {
     *                                            if no resource class of resourceClassName exists, or
     *                                            if any resourcePermission is invalid for the specified resource class
     */
-   public Set<Resource> getAccessorResourcesByResourcePermissions(Resource accessedResource,
-                                                                  String resourceClassName,
-                                                                  Set<ResourcePermission> resourcePermissions);
+   Set<Resource> getAccessorResourcesByResourcePermissions(Resource accessedResource,
+                                                           String resourceClassName,
+                                                           Set<ResourcePermission> resourcePermissions);
 
    /**
     * Returns a set of resources that have the specified permissions to the specified accessed resource.
@@ -908,10 +908,10 @@ public interface AccessControlContext {
     *                                            if no resource class of resourceClassName exists, or
     *                                            if any resourcePermission is invalid for the specified resource class
     */
-   public Set<Resource> getAccessorResourcesByResourcePermissions(Resource accessedResource,
-                                                                  String resourceClassName,
-                                                                  ResourcePermission resourcePermission,
-                                                                  ResourcePermission... resourcePermissions);
+   Set<Resource> getAccessorResourcesByResourcePermissions(Resource accessedResource,
+                                                           String resourceClassName,
+                                                           ResourcePermission resourcePermission,
+                                                           ResourcePermission... resourcePermissions);
 
    /**
     * Returns the resource that is currently authenticated in this session.
@@ -919,7 +919,7 @@ public interface AccessControlContext {
     * @return a resource
     * @throws com.acciente.oacc.NotAuthenticatedException if no resource is authenticated
     */
-   public Resource getAuthenticatedResource();
+   Resource getAuthenticatedResource();
 
    /**
     * Returns the session resource, that is, the resource whose security credentials are
@@ -931,7 +931,7 @@ public interface AccessControlContext {
     * @return a resource
     * @throws com.acciente.oacc.NotAuthenticatedException if no resource is authenticated
     */
-   public Resource getSessionResource();
+   Resource getSessionResource();
 
    /**
     * Creates a new resource class.
@@ -948,9 +948,9 @@ public interface AccessControlContext {
     * @throws java.lang.IllegalArgumentException       if a resource class of resourceClassName already exists
     * @throws com.acciente.oacc.NotAuthorizedException if the authenticated resource is not the system resource
     */
-   public void createResourceClass(String resourceClassName,
-                                   boolean authenticatable,
-                                   boolean unauthenticatedCreateAllowed);
+   void createResourceClass(String resourceClassName,
+                            boolean authenticatable,
+                            boolean unauthenticatedCreateAllowed);
 
    /**
     * Creates a new resource permission that may be applied to objects of the specified resource class.
@@ -961,13 +961,13 @@ public interface AccessControlContext {
     * @param resourceClassName a string resource class name
     * @param permissionName    the string representing the name of this permission.
     *                          Samples of typical permission names:
-    *                          CREATE, READ, WRITE, UPDATE, VIEW, POST, EDIT, etc.
+    *                          READ, WRITE, UPDATE, VIEW, POST, EDIT, etc.
     * @throws java.lang.IllegalArgumentException       if no resource class of resourceClassName exists, or
     *                                                  if a resource permission of permissionName already exists, or
     *                                                  if the permissionName is prefixed with an asterisk ('*')
     * @throws com.acciente.oacc.NotAuthorizedException if the authenticated resource is not the system resource
     */
-   public void createResourcePermission(String resourceClassName, String permissionName);
+   void createResourcePermission(String resourceClassName, String permissionName);
 
    /**
     * Creates a new domain (at the root level of the domain hierarchy).
@@ -976,7 +976,7 @@ public interface AccessControlContext {
     * @throws java.lang.IllegalArgumentException       if a domain of domainName already exists
     * @throws com.acciente.oacc.NotAuthorizedException if the session resource is not authorized to create domains
     */
-   public void createDomain(String domainName);
+   void createDomain(String domainName);
 
    /**
     * Creates a new domain under the specified parent domain.
@@ -988,7 +988,7 @@ public interface AccessControlContext {
     * @throws com.acciente.oacc.NotAuthorizedException if the session resource is not authorized to create
     *                                                  child domains under the specified parent domain
     */
-   public void createDomain(String domainName, String parentDomainName);
+   void createDomain(String domainName, String parentDomainName);
 
    /**
     * Creates a new resource of the specified resource class within the specified domain.
@@ -1006,7 +1006,7 @@ public interface AccessControlContext {
     * @throws com.acciente.oacc.OaccException          if creating the new resource would introduce a cycle between the
     *                                                  session resource and new resource via permission inheritance
     */
-   public Resource createResource(String resourceClassName, String domainName);
+   Resource createResource(String resourceClassName, String domainName);
 
    /**
     * Creates a new authenticatable resource of the specified resource class within the specified domain.
@@ -1023,7 +1023,7 @@ public interface AccessControlContext {
     * @throws com.acciente.oacc.OaccException          if creating the new resource would introduce a cycle between the
     *                                                  session resource and new resource via permission inheritance
     */
-   public Resource createResource(String resourceClassName, String domainName, Credentials credentials);
+   Resource createResource(String resourceClassName, String domainName, Credentials credentials);
 
    /**
     * Deletes the specified resource.
@@ -1037,7 +1037,7 @@ public interface AccessControlContext {
     * @throws com.acciente.oacc.NotAuthorizedException if the session resource is not authorized to delete the
     *                                                  specified obsolete resource
     */
-   public boolean deleteResource(Resource obsoleteResource);
+   boolean deleteResource(Resource obsoleteResource);
 
    /**
     * Sets the domain permissions the specified accessor resource will receive if it created a domain.
@@ -1056,8 +1056,8 @@ public interface AccessControlContext {
     * @throws com.acciente.oacc.NotAuthorizedException if the session resource is not authorized to set
     *                                                  domain create permissions on the specified accessor resource
     */
-   public void setDomainCreatePermissions(Resource accessorResource,
-                                          Set<DomainCreatePermission> domainCreatePermissions);
+   void setDomainCreatePermissions(Resource accessorResource,
+                                   Set<DomainCreatePermission> domainCreatePermissions);
 
    /**
     * Adds to the set of domain permissions the specified accessor resource will receive if it created a domain.
@@ -1089,8 +1089,8 @@ public interface AccessControlContext {
     * @throws com.acciente.oacc.NotAuthorizedException if the session resource is not authorized to set
     *                                                  domain create permissions on the specified accessor resource
     */
-   public void grantDomainCreatePermissions(Resource accessorResource,
-                                            Set<DomainCreatePermission> domainCreatePermissions);
+   void grantDomainCreatePermissions(Resource accessorResource,
+                                     Set<DomainCreatePermission> domainCreatePermissions);
 
    /**
     * Adds to the set of domain permissions the specified accessor resource will receive if it created a domain.
@@ -1122,9 +1122,9 @@ public interface AccessControlContext {
     * @throws com.acciente.oacc.NotAuthorizedException if the session resource is not authorized to set
     *                                                  domain create permissions on the specified accessor resource
     */
-   public void grantDomainCreatePermissions(Resource accessorResource,
-                                            DomainCreatePermission domainCreatePermission,
-                                            DomainCreatePermission... domainCreatePermissions);
+   void grantDomainCreatePermissions(Resource accessorResource,
+                                     DomainCreatePermission domainCreatePermission,
+                                     DomainCreatePermission... domainCreatePermissions);
 
    /**
     * Revokes the specified direct domain permissions from set the specified accessor resource will receive if it
@@ -1153,8 +1153,8 @@ public interface AccessControlContext {
     * @throws com.acciente.oacc.NotAuthorizedException if the session resource is not authorized to grant (in this case
     *                                                  revoke) domain create permissions on the specified accessor resource
     */
-   public void revokeDomainCreatePermissions(Resource accessorResource,
-                                             Set<DomainCreatePermission> domainCreatePermissions);
+   void revokeDomainCreatePermissions(Resource accessorResource,
+                                      Set<DomainCreatePermission> domainCreatePermissions);
 
    /**
     * Revokes the specified direct domain permissions from set the specified accessor resource will receive if it
@@ -1183,9 +1183,9 @@ public interface AccessControlContext {
     * @throws com.acciente.oacc.NotAuthorizedException if the session resource is not authorized to grant (in this case
     *                                                  revoke) domain create permissions on the specified accessor resource
     */
-   public void revokeDomainCreatePermissions(Resource accessorResource,
-                                             DomainCreatePermission domainCreatePermission,
-                                             DomainCreatePermission... domainCreatePermissions);
+   void revokeDomainCreatePermissions(Resource accessorResource,
+                                      DomainCreatePermission domainCreatePermission,
+                                      DomainCreatePermission... domainCreatePermissions);
 
    /**
     * Gets all direct domain create permissions the specified accessor resource has.
@@ -1197,7 +1197,7 @@ public interface AccessControlContext {
     * @return a set of direct domain create permission the accessor resource has
     * @throws java.lang.IllegalArgumentException if accessorResource reference does not exist
     */
-   public Set<DomainCreatePermission> getDomainCreatePermissions(Resource accessorResource);
+   Set<DomainCreatePermission> getDomainCreatePermissions(Resource accessorResource);
 
    /**
     * Gets all effective domain create permissions the specified accessor resource has, both directly
@@ -1207,7 +1207,7 @@ public interface AccessControlContext {
     * @return a set of effective domain create permission the accessor resource has
     * @throws java.lang.IllegalArgumentException if accessorResource reference does not exist
     */
-   public Set<DomainCreatePermission> getEffectiveDomainCreatePermissions(Resource accessorResource);
+   Set<DomainCreatePermission> getEffectiveDomainCreatePermissions(Resource accessorResource);
 
    /**
     * Sets the direct domain permissions the specified accessor resource has on the specified domain.
@@ -1226,9 +1226,9 @@ public interface AccessControlContext {
     * @throws com.acciente.oacc.NotAuthorizedException if the session resource is not authorized to set
     *                                                  domain permissions on the specified domain
     */
-   public void setDomainPermissions(Resource accessorResource,
-                                    String domainName,
-                                    Set<DomainPermission> domainPermissions);
+   void setDomainPermissions(Resource accessorResource,
+                             String domainName,
+                             Set<DomainPermission> domainPermissions);
 
    /**
     * Adds to the direct domain permissions the specified accessor resource has on the specified domain.
@@ -1252,9 +1252,9 @@ public interface AccessControlContext {
     * @throws com.acciente.oacc.NotAuthorizedException if the session resource is not authorized to set
     *                                                  domain permissions on the specified domain
     */
-   public void grantDomainPermissions(Resource accessorResource,
-                                      String domainName,
-                                      Set<DomainPermission> domainPermissions);
+   void grantDomainPermissions(Resource accessorResource,
+                               String domainName,
+                               Set<DomainPermission> domainPermissions);
 
    /**
     * Adds to the direct domain permissions the specified accessor resource has on the specified domain.
@@ -1278,10 +1278,10 @@ public interface AccessControlContext {
     * @throws com.acciente.oacc.NotAuthorizedException if the session resource is not authorized to set
     *                                                  domain permissions on the specified domain
     */
-   public void grantDomainPermissions(Resource accessorResource,
-                                      String domainName,
-                                      DomainPermission domainPermission,
-                                      DomainPermission... domainPermissions);
+   void grantDomainPermissions(Resource accessorResource,
+                               String domainName,
+                               DomainPermission domainPermission,
+                               DomainPermission... domainPermissions);
 
    /**
     * Revokes the direct domain permissions from set the specified accessor resource has on the specified domain.
@@ -1305,9 +1305,9 @@ public interface AccessControlContext {
     * @throws com.acciente.oacc.NotAuthorizedException if the session resource is not authorized to grant (or in this
     *                                                  case revoke) domain permissions on the specified domain
     */
-   public void revokeDomainPermissions(Resource accessorResource,
-                                       String domainName,
-                                       Set<DomainPermission> domainPermissions);
+   void revokeDomainPermissions(Resource accessorResource,
+                                String domainName,
+                                Set<DomainPermission> domainPermissions);
 
    /**
     * Revokes the direct domain permissions from set the specified accessor resource has on the specified domain.
@@ -1331,10 +1331,10 @@ public interface AccessControlContext {
     * @throws com.acciente.oacc.NotAuthorizedException if the session resource is not authorized to grant (or in this
     *                                                  case revoke) domain permissions on the specified domain
     */
-   public void revokeDomainPermissions(Resource accessorResource,
-                                       String domainName,
-                                       DomainPermission domainPermission,
-                                       DomainPermission... domainPermissions);
+   void revokeDomainPermissions(Resource accessorResource,
+                                String domainName,
+                                DomainPermission domainPermission,
+                                DomainPermission... domainPermissions);
 
    /**
     * Gets all domain permissions the accessor resource has directly to the specified domain.
@@ -1349,8 +1349,8 @@ public interface AccessControlContext {
     * @throws java.lang.IllegalArgumentException if accessorResource reference does not exist, or
     *                                            if no domain of domainName exists
     */
-   public Set<DomainPermission> getDomainPermissions(Resource accessorResource,
-                                                     String domainName);
+   Set<DomainPermission> getDomainPermissions(Resource accessorResource,
+                                              String domainName);
 
    /**
     * Gets all domain permissions the accessor resource has directly to any domain, mapped by domain name.
@@ -1364,7 +1364,7 @@ public interface AccessControlContext {
     * @return the sets of direct domain permission the accessor resource has to any domain, mapped by domain name
     * @throws java.lang.IllegalArgumentException if accessorResource reference does not exist
     */
-   public Map<String, Set<DomainPermission>> getDomainPermissionsMap(Resource accessorResource);
+   Map<String, Set<DomainPermission>> getDomainPermissionsMap(Resource accessorResource);
 
    /**
     * Gets all effective domain permissions the accessor resource has to the specified domain.
@@ -1382,8 +1382,8 @@ public interface AccessControlContext {
     * @throws java.lang.IllegalArgumentException if accessorResource reference does not exist, or
     *                                            if no domain of domainName exists
     */
-   public Set<DomainPermission> getEffectiveDomainPermissions(Resource accessorResource,
-                                                              String domainName);
+   Set<DomainPermission> getEffectiveDomainPermissions(Resource accessorResource,
+                                                       String domainName);
 
    /**
     * Gets all effective domain permissions the accessor resource has to any domain, mapped by domain name.
@@ -1398,7 +1398,7 @@ public interface AccessControlContext {
     * @return the sets of effective domain permission the accessor resource has to any domain, mapped by domain name
     * @throws java.lang.IllegalArgumentException if accessorResource reference does not exist
     */
-   public Map<String, Set<DomainPermission>> getEffectiveDomainPermissionsMap(Resource accessorResource);
+   Map<String, Set<DomainPermission>> getEffectiveDomainPermissionsMap(Resource accessorResource);
 
    /**
     * Sets the resource permissions the specified accessor resource will receive directly, if it
@@ -1434,10 +1434,10 @@ public interface AccessControlContext {
     * @throws com.acciente.oacc.NotAuthorizedException if the session resource is not authorized to set
     *                                                  resource create permissions on the specified accessor resource
     */
-   public void setResourceCreatePermissions(Resource accessorResource,
-                                            String resourceClassName,
-                                            String domainName,
-                                            Set<ResourceCreatePermission> resourceCreatePermissions);
+   void setResourceCreatePermissions(Resource accessorResource,
+                                     String resourceClassName,
+                                     String domainName,
+                                     Set<ResourceCreatePermission> resourceCreatePermissions);
 
    /**
     * Adds to the set of resource permissions the specified accessor resource will receive directly, if it
@@ -1484,10 +1484,10 @@ public interface AccessControlContext {
     * @throws com.acciente.oacc.NotAuthorizedException if the session resource is not authorized to set
     *                                                  resource create permissions on the specified accessor resource
     */
-   public void grantResourceCreatePermissions(Resource accessorResource,
-                                              String resourceClassName,
-                                              String domainName,
-                                              Set<ResourceCreatePermission> resourceCreatePermissions);
+   void grantResourceCreatePermissions(Resource accessorResource,
+                                       String resourceClassName,
+                                       String domainName,
+                                       Set<ResourceCreatePermission> resourceCreatePermissions);
    /**
     * Adds to the set of resource permissions the specified accessor resource will receive directly, if it
     * created a resource of the specified resource class in the specified domain.
@@ -1533,11 +1533,11 @@ public interface AccessControlContext {
     * @throws com.acciente.oacc.NotAuthorizedException if the session resource is not authorized to set
     *                                                  resource create permissions on the specified accessor resource
     */
-   public void grantResourceCreatePermissions(Resource accessorResource,
-                                              String resourceClassName,
-                                              String domainName,
-                                              ResourceCreatePermission resourceCreatePermission,
-                                              ResourceCreatePermission... resourceCreatePermissions);
+   void grantResourceCreatePermissions(Resource accessorResource,
+                                       String resourceClassName,
+                                       String domainName,
+                                       ResourceCreatePermission resourceCreatePermission,
+                                       ResourceCreatePermission... resourceCreatePermissions);
 
    /**
     * Revokes the specified permissions from the set of resource permissions the specified accessor resource will
@@ -1573,10 +1573,10 @@ public interface AccessControlContext {
     * @throws com.acciente.oacc.NotAuthorizedException if the session resource is not authorized to grant (or in this case
     *                                                  revoke) resource create permissions on the specified accessor resource
     */
-   public void revokeResourceCreatePermissions(Resource accessorResource,
-                                               String resourceClassName,
-                                               String domainName,
-                                               Set<ResourceCreatePermission> resourceCreatePermissions);
+   void revokeResourceCreatePermissions(Resource accessorResource,
+                                        String resourceClassName,
+                                        String domainName,
+                                        Set<ResourceCreatePermission> resourceCreatePermissions);
 
    /**
     * Revokes the specified permissions from the set of resource permissions the specified accessor resource will
@@ -1612,11 +1612,11 @@ public interface AccessControlContext {
     * @throws com.acciente.oacc.NotAuthorizedException if the session resource is not authorized to grant (or in this case
     *                                                  revoke) resource create permissions on the specified accessor resource
     */
-   public void revokeResourceCreatePermissions(Resource accessorResource,
-                                               String resourceClassName,
-                                               String domainName,
-                                               ResourceCreatePermission resourceCreatePermission,
-                                               ResourceCreatePermission... resourceCreatePermissions);
+   void revokeResourceCreatePermissions(Resource accessorResource,
+                                        String resourceClassName,
+                                        String domainName,
+                                        ResourceCreatePermission resourceCreatePermission,
+                                        ResourceCreatePermission... resourceCreatePermissions);
 
    /**
     * Gets all direct resource create permissions the accessor resource has to the specified
@@ -1636,9 +1636,9 @@ public interface AccessControlContext {
     *                                            if no resource class of resourceClassName exists, or
     *                                            if no domain of domainName exists
     */
-   public Set<ResourceCreatePermission> getResourceCreatePermissions(Resource accessorResource,
-                                                                     String resourceClassName,
-                                                                     String domainName);
+   Set<ResourceCreatePermission> getResourceCreatePermissions(Resource accessorResource,
+                                                              String resourceClassName,
+                                                              String domainName);
 
    /**
     * Gets all effective resource create permissions the accessor resource has to the specified
@@ -1658,9 +1658,9 @@ public interface AccessControlContext {
     *                                            if no resource class of resourceClassName exists, or
     *                                            if no domain of domainName exists
     */
-   public Set<ResourceCreatePermission> getEffectiveResourceCreatePermissions(Resource accessorResource,
-                                                                              String resourceClassName,
-                                                                              String domainName);
+   Set<ResourceCreatePermission> getEffectiveResourceCreatePermissions(Resource accessorResource,
+                                                                       String resourceClassName,
+                                                                       String domainName);
 
    /**
     * Gets all direct resource create permissions the accessor resource has to any resource class in
@@ -1681,7 +1681,7 @@ public interface AccessControlContext {
     * @return a map of maps of direct resource create permissions, keyed by domain name and resource class name
     * @throws java.lang.IllegalArgumentException if accessorResource reference does not exist
     */
-   public Map<String, Map<String, Set<ResourceCreatePermission>>> getResourceCreatePermissionsMap(Resource accessorResource);
+   Map<String, Map<String, Set<ResourceCreatePermission>>> getResourceCreatePermissionsMap(Resource accessorResource);
 
    /**
     * Gets all effective resource create permissions the accessor resource has to any resource class in
@@ -1702,7 +1702,7 @@ public interface AccessControlContext {
     * @return a map of maps of effective resource create permissions, keyed by domain name and resource class name
     * @throws java.lang.IllegalArgumentException if accessorResource reference does not exist
     */
-   public Map<String, Map<String, Set<ResourceCreatePermission>>> getEffectiveResourceCreatePermissionsMap(Resource accessorResource);
+   Map<String, Map<String, Set<ResourceCreatePermission>>> getEffectiveResourceCreatePermissionsMap(Resource accessorResource);
 
    /**
     * Sets the specified resource permissions that the specified accessor resource has to the
@@ -1727,9 +1727,9 @@ public interface AccessControlContext {
     * @throws com.acciente.oacc.OaccException          if granting the specified permissions would introduce a cycle
     *                                                  between accessor and accessed resource via permission inheritance
     */
-   public void setResourcePermissions(Resource accessorResource,
-                                      Resource accessedResource,
-                                      Set<ResourcePermission> resourcePermissions);
+   void setResourcePermissions(Resource accessorResource,
+                               Resource accessedResource,
+                               Set<ResourcePermission> resourcePermissions);
 
    /**
     * Adds the specified resource permissions to the set of permissions that the specified accessor resource
@@ -1755,9 +1755,9 @@ public interface AccessControlContext {
     * @throws com.acciente.oacc.OaccException          if granting the specified permissions would introduce a cycle
     *                                                  between accessor and accessed resource via permission inheritance
     */
-   public void grantResourcePermissions(Resource accessorResource,
-                                        Resource accessedResource,
-                                        Set<ResourcePermission> resourcePermissions);
+   void grantResourcePermissions(Resource accessorResource,
+                                 Resource accessedResource,
+                                 Set<ResourcePermission> resourcePermissions);
 
    /**
     * Adds the specified resource permissions to the set of permissions that the specified accessor resource
@@ -1783,10 +1783,10 @@ public interface AccessControlContext {
     * @throws com.acciente.oacc.OaccException          if granting the specified permissions would introduce a cycle
     *                                                  between accessor and accessed resource via permission inheritance
     */
-   public void grantResourcePermissions(Resource accessorResource,
-                                        Resource accessedResource,
-                                        ResourcePermission resourcePermission,
-                                        ResourcePermission... resourcePermissions);
+   void grantResourcePermissions(Resource accessorResource,
+                                 Resource accessedResource,
+                                 ResourcePermission resourcePermission,
+                                 ResourcePermission... resourcePermissions);
 
    /**
     * Revokes the specified resource permissions from the set of permissions that the specified accessor resource
@@ -1810,9 +1810,9 @@ public interface AccessControlContext {
     * @throws com.acciente.oacc.NotAuthorizedException if the session resource is not authorized to grant (or in this case
     *                                                  revoke) the specified permissions on the specified accessed resource
     */
-   public void revokeResourcePermissions(Resource accessorResource,
-                                         Resource accessedResource,
-                                         Set<ResourcePermission> resourcePermissions);
+   void revokeResourcePermissions(Resource accessorResource,
+                                  Resource accessedResource,
+                                  Set<ResourcePermission> resourcePermissions);
 
    /**
     * Revokes the specified resource permissions from the set of permissions that the specified accessor resource
@@ -1836,10 +1836,10 @@ public interface AccessControlContext {
     * @throws com.acciente.oacc.NotAuthorizedException if the session resource is not authorized to grant (or in this case
     *                                                  revoke) the specified permissions on the specified accessed resource
     */
-   public void revokeResourcePermissions(Resource accessorResource,
-                                         Resource accessedResource,
-                                         ResourcePermission resourcePermission,
-                                         ResourcePermission... resourcePermissions);
+   void revokeResourcePermissions(Resource accessorResource,
+                                  Resource accessedResource,
+                                  ResourcePermission resourcePermission,
+                                  ResourcePermission... resourcePermissions);
 
    /**
     * Gets the resource permissions that the specified accessor resource has directly to the
@@ -1853,8 +1853,8 @@ public interface AccessControlContext {
     * @return a set of direct resource permissions
     * @throws java.lang.IllegalArgumentException if accessorResource or accessedResource does not exist
     */
-   public Set<ResourcePermission> getResourcePermissions(Resource accessorResource,
-                                                         Resource accessedResource);
+   Set<ResourcePermission> getResourcePermissions(Resource accessorResource,
+                                                  Resource accessedResource);
 
    /**
     * Gets the effective resource permissions that the specified accessor resource has to the
@@ -1868,8 +1868,8 @@ public interface AccessControlContext {
     * @return a set of effective resource permissions
     * @throws java.lang.IllegalArgumentException if accessorResource or accessedResource does not exist
     */
-   public Set<ResourcePermission> getEffectiveResourcePermissions(Resource accessorResource,
-                                                                  Resource accessedResource);
+   Set<ResourcePermission> getEffectiveResourcePermissions(Resource accessorResource,
+                                                           Resource accessedResource);
 
    /**
     * Sets the global resource permissions a resource has on any resource of the specified
@@ -1906,10 +1906,10 @@ public interface AccessControlContext {
     * @throws com.acciente.oacc.NotAuthorizedException if the session resource is not authorized to set
     *                                                  global resource permissions for the specified accessor resource
     */
-   public void setGlobalResourcePermissions(Resource accessorResource,
-                                            String resourceClassName,
-                                            String domainName,
-                                            Set<ResourcePermission> resourcePermissions);
+   void setGlobalResourcePermissions(Resource accessorResource,
+                                     String resourceClassName,
+                                     String domainName,
+                                     Set<ResourcePermission> resourcePermissions);
 
    /**
     * Adds the global resource permissions a resource has on any resource of the specified
@@ -1948,10 +1948,10 @@ public interface AccessControlContext {
     * @throws com.acciente.oacc.NotAuthorizedException if the session resource is not authorized to grant the
     *                                                  specified permissions on the specified resource class and domain
     */
-   public void grantGlobalResourcePermissions(Resource accessorResource,
-                                              String resourceClassName,
-                                              String domainName,
-                                              Set<ResourcePermission> resourcePermissions);
+   void grantGlobalResourcePermissions(Resource accessorResource,
+                                       String resourceClassName,
+                                       String domainName,
+                                       Set<ResourcePermission> resourcePermissions);
 
    /**
     * Adds the global resource permissions a resource has on any resource of the specified
@@ -1990,11 +1990,11 @@ public interface AccessControlContext {
     * @throws com.acciente.oacc.NotAuthorizedException if the session resource is not authorized to grant the
     *                                                  specified permissions on the specified resource class and domain
     */
-   public void grantGlobalResourcePermissions(Resource accessorResource,
-                                              String resourceClassName,
-                                              String domainName,
-                                              ResourcePermission resourcePermission,
-                                              ResourcePermission... resourcePermissions);
+   void grantGlobalResourcePermissions(Resource accessorResource,
+                                       String resourceClassName,
+                                       String domainName,
+                                       ResourcePermission resourcePermission,
+                                       ResourcePermission... resourcePermissions);
 
    /**
     * Revokes the global resource permissions a resource has on any resource of the specified
@@ -2022,10 +2022,10 @@ public interface AccessControlContext {
     * @throws com.acciente.oacc.NotAuthorizedException if the session resource is not authorized to grant (or in this case
     *                                                  revoke) the specified permissions on the specified resource class and domain
     */
-   public void revokeGlobalResourcePermissions(Resource accessorResource,
-                                               String resourceClassName,
-                                               String domainName,
-                                               Set<ResourcePermission> resourcePermissions);
+   void revokeGlobalResourcePermissions(Resource accessorResource,
+                                        String resourceClassName,
+                                        String domainName,
+                                        Set<ResourcePermission> resourcePermissions);
 
    /**
     * Revokes the global resource permissions a resource has on any resource of the specified
@@ -2053,11 +2053,11 @@ public interface AccessControlContext {
     * @throws com.acciente.oacc.NotAuthorizedException if the session resource is not authorized to grant (or in this case
     *                                                  revoke) the specified permissions on the specified resource class and domain
     */
-   public void revokeGlobalResourcePermissions(Resource accessorResource,
-                                               String resourceClassName,
-                                               String domainName,
-                                               ResourcePermission resourcePermission,
-                                               ResourcePermission... resourcePermissions);
+   void revokeGlobalResourcePermissions(Resource accessorResource,
+                                        String resourceClassName,
+                                        String domainName,
+                                        ResourcePermission resourcePermission,
+                                        ResourcePermission... resourcePermissions);
 
    /**
     * Gets the global resource permissions the specified accessor resource has directly to the resources of
@@ -2076,9 +2076,9 @@ public interface AccessControlContext {
     *                                            if no resource class of resourceClassName exists, or
     *                                            if no domain of domainName exists
     */
-   public Set<ResourcePermission> getGlobalResourcePermissions(Resource accessorResource,
-                                                               String resourceClassName,
-                                                               String domainName);
+   Set<ResourcePermission> getGlobalResourcePermissions(Resource accessorResource,
+                                                        String resourceClassName,
+                                                        String domainName);
 
    /**
     * Gets the effective global resource permissions the specified accessor resource has to the resources of
@@ -2097,9 +2097,9 @@ public interface AccessControlContext {
     *                                            if no resource class of resourceClassName exists, or
     *                                            if no domain of domainName exists
     */
-   public Set<ResourcePermission> getEffectiveGlobalResourcePermissions(Resource accessorResource,
-                                                                        String resourceClassName,
-                                                                        String domainName);
+   Set<ResourcePermission> getEffectiveGlobalResourcePermissions(Resource accessorResource,
+                                                                 String resourceClassName,
+                                                                 String domainName);
 
    /**
     * Gets all global resource permissions the specified accessor resource has directly to any resources
@@ -2118,7 +2118,7 @@ public interface AccessControlContext {
     *         by domain name and resource class name
     * @throws java.lang.IllegalArgumentException if accessorResource reference does not exist
     */
-   public Map<String, Map<String, Set<ResourcePermission>>> getGlobalResourcePermissionsMap(Resource accessorResource);
+   Map<String, Map<String, Set<ResourcePermission>>> getGlobalResourcePermissionsMap(Resource accessorResource);
 
    /**
     * Gets all effective global resource permissions the specified accessor resource has to the resources of
@@ -2137,14 +2137,14 @@ public interface AccessControlContext {
     *         by domain name and resource class name
     * @throws java.lang.IllegalArgumentException if accessorResource reference does not exist
     */
-   public Map<String, Map<String, Set<ResourcePermission>>> getEffectiveGlobalResourcePermissionsMap(Resource accessorResource);
+   Map<String, Map<String, Set<ResourcePermission>>> getEffectiveGlobalResourcePermissionsMap(Resource accessorResource);
 
    /**
     * Returns the list of names of all resource classes defined in the system
     *
     * @return a list of string resource class names
     */
-   public List<String> getResourceClassNames();
+   List<String> getResourceClassNames();
 
    /**
     * Returns the list of all resource permission names defined for the specified resource class name,
@@ -2154,5 +2154,5 @@ public interface AccessControlContext {
     * @return a list of string permission names
     * @throws java.lang.IllegalArgumentException if no resource class of resourceClassName exists
     */
-   public List<String> getResourcePermissionNames(String resourceClassName);
+   List<String> getResourcePermissionNames(String resourceClassName);
 }

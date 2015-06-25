@@ -25,7 +25,7 @@ public interface CleanablePasswordEncryptor {
     * @param password the plaintext password as a cleanable char[]
     * @return the BASE-64 digest of encrypting the specified password
     */
-   public String encryptPassword(char[] password);
+   String encryptPassword(char[] password);
 
 
    /**
@@ -35,7 +35,7 @@ public interface CleanablePasswordEncryptor {
     * @param encryptedPassword the (BASE-64) digest from an earlier encryption against which to check the plaintext password
     * @return true if passwords match, false otherwise
     */
-   public boolean checkPassword(char[] plainPassword,
-                                String encryptedPassword);
+   boolean checkPassword(char[] plainPassword,
+                         String encryptedPassword);
 
 }
