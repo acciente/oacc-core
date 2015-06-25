@@ -23,7 +23,7 @@ package com.acciente.oacc;
  * All security relationships for the application object are defined using the using
  * its corresponding resource.
  *
- * To create a new resource use  {@link AccessControlContext#createResource(String)}
+ * To create a new resource use  {@link AccessControlContext#createResource}
  * or one of its variants in {@link AccessControlContext}.
  *
  * To create a Resource instance using a previously persisted resource id use the
