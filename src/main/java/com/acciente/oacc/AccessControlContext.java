@@ -91,6 +91,14 @@ public interface AccessControlContext {
    void unauthenticate();
 
    /**
+    * Returns the resource that is currently authenticated in this session.
+    *
+    * @return a resource
+    * @throws com.acciente.oacc.NotAuthenticatedException if no resource is authenticated
+    */
+   Resource getAuthenticatedResource();
+
+   /**
     * Switches the security credentials of this session to those of the specified resource.
     * <p/>
     * The currently authenticated resource has to have IMPERSONATE permissions to the specified resource.
@@ -114,6 +122,18 @@ public interface AccessControlContext {
     * If no resource is currently being impersonated, this call has no effect.
     */
    void unimpersonate();
+
+   /**
+    * Returns the session resource, that is, the resource whose security credentials are
+    * associated with this session.
+    * <p/>
+    * The session resource is the same as the authenticated resource, unless another resource
+    * is being {@link #impersonate impersonated}.
+    *
+    * @return a resource
+    * @throws com.acciente.oacc.NotAuthenticatedException if no resource is authenticated
+    */
+   Resource getSessionResource();
 
    /**
     * Sets the authentication credentials of the specified authenticatable resource (= a resource of a
@@ -712,46 +732,6 @@ public interface AccessControlContext {
                                             ResourcePermission... resourcePermissions);
 
    /**
-    * Returns the domain to which the specified resource belongs.
-    *
-    * @param resource the resource for which to retrieve the domain name
-    * @return a string domain name
-    * @throws java.lang.IllegalArgumentException if resource does not exists
-    */
-   String getDomainNameByResource(Resource resource);
-
-   /**
-    * Returns the domains which are descendants of the specified domain.
-    * The returned set includes the specified domain (unless the specified domain does not exist);
-    * in other words, a domain is considered its own descendant
-    * <p/>
-    * Note that this returns not just the names of direct first-level descendant domains, but the names of all descendant
-    * domains, regardless of level
-    *
-    * @param domainName a domain name for which to retrieve the descendants
-    * @return a set of unique string domain names, including the domain queried about, or an empty set if the specified domain does not exist
-    */
-   Set<String> getDomainDescendants(String domainName);
-
-   /**
-    * Returns information about the specified resource class.
-    *
-    * @param resourceClassName a string resource class name about which to retrieve information
-    * @return a ResourceClassInfo object containing information about the resource class
-    * @throws java.lang.IllegalArgumentException if no resource class of resourceClassName exists
-    */
-   ResourceClassInfo getResourceClassInfo(String resourceClassName);
-
-   /**
-    * Returns information about the resource class to which the specified resource belongs.
-    *
-    * @param resource a resource about whose resource class to retrieve information
-    * @return returns a ResourceClassInfo object containing information about the resource class of the specified resource
-    * @throws java.lang.IllegalArgumentException if no resource class of resourceClassName exists
-    */
-   ResourceClassInfo getResourceClassInfoByResource(Resource resource);
-
-   /**
     * Returns a set of resources (of the specified resource class) on which
     * the specified accessor resource has the specified permissions, regardless of domain.
     * <p/>
@@ -914,24 +894,61 @@ public interface AccessControlContext {
                                                            ResourcePermission... resourcePermissions);
 
    /**
-    * Returns the resource that is currently authenticated in this session.
+    * Returns the domain to which the specified resource belongs.
     *
-    * @return a resource
-    * @throws com.acciente.oacc.NotAuthenticatedException if no resource is authenticated
+    * @param resource the resource for which to retrieve the domain name
+    * @return a string domain name
+    * @throws java.lang.IllegalArgumentException if resource does not exists
     */
-   Resource getAuthenticatedResource();
+   String getDomainNameByResource(Resource resource);
 
    /**
-    * Returns the session resource, that is, the resource whose security credentials are
-    * associated with this session.
+    * Returns the domains which are descendants of the specified domain.
+    * The returned set includes the specified domain (unless the specified domain does not exist);
+    * in other words, a domain is considered its own descendant
     * <p/>
-    * The session resource is the same as the authenticated resource, unless another resource
-    * is being {@link #impersonate impersonated}.
+    * Note that this returns not just the names of direct first-level descendant domains, but the names of all descendant
+    * domains, regardless of level
     *
-    * @return a resource
-    * @throws com.acciente.oacc.NotAuthenticatedException if no resource is authenticated
+    * @param domainName a domain name for which to retrieve the descendants
+    * @return a set of unique string domain names, including the domain queried about, or an empty set if the specified domain does not exist
     */
-   Resource getSessionResource();
+   Set<String> getDomainDescendants(String domainName);
+
+   /**
+    * Returns information about the specified resource class.
+    *
+    * @param resourceClassName a string resource class name about which to retrieve information
+    * @return a ResourceClassInfo object containing information about the resource class
+    * @throws java.lang.IllegalArgumentException if no resource class of resourceClassName exists
+    */
+   ResourceClassInfo getResourceClassInfo(String resourceClassName);
+
+   /**
+    * Returns information about the resource class to which the specified resource belongs.
+    *
+    * @param resource a resource about whose resource class to retrieve information
+    * @return returns a ResourceClassInfo object containing information about the resource class of the specified resource
+    * @throws java.lang.IllegalArgumentException if no resource class of resourceClassName exists
+    */
+   ResourceClassInfo getResourceClassInfoByResource(Resource resource);
+
+   /**
+    * Returns the list of names of all resource classes defined in the system
+    *
+    * @return a list of string resource class names
+    */
+   List<String> getResourceClassNames();
+
+   /**
+    * Returns the list of all resource permission names defined for the specified resource class name,
+    * including the applicable system permissions as well as any custom permissions
+    *
+    * @param resourceClassName the resource class name for which the permissions should be retrieved
+    * @return a list of string permission names
+    * @throws java.lang.IllegalArgumentException if no resource class of resourceClassName exists
+    */
+   List<String> getResourcePermissionNames(String resourceClassName);
 
    /**
     * Creates a new resource class.
@@ -2138,21 +2155,4 @@ public interface AccessControlContext {
     * @throws java.lang.IllegalArgumentException if accessorResource reference does not exist
     */
    Map<String, Map<String, Set<ResourcePermission>>> getEffectiveGlobalResourcePermissionsMap(Resource accessorResource);
-
-   /**
-    * Returns the list of names of all resource classes defined in the system
-    *
-    * @return a list of string resource class names
-    */
-   List<String> getResourceClassNames();
-
-   /**
-    * Returns the list of all resource permission names defined for the specified resource class name,
-    * including the applicable system permissions as well as any custom permissions
-    *
-    * @param resourceClassName the resource class name for which the permissions should be retrieved
-    * @return a list of string permission names
-    * @throws java.lang.IllegalArgumentException if no resource class of resourceClassName exists
-    */
-   List<String> getResourcePermissionNames(String resourceClassName);
 }
