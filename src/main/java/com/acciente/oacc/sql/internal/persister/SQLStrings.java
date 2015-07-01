@@ -41,8 +41,11 @@ public class SQLStrings implements Serializable {
    public final String SQL_findInDomain_DomainID_BY_ResourceDomainName;
    public final String SQL_findInDomain_ResourceDomainName_BY_ResourceID;
    public final String SQL_findInDomain_DescendantResourceDomainName_BY_ResourceDomainName;
+   public final String SQL_findInDomain_DescendantResourceDomainID_BY_DomainID_ORDERBY_DomainLevel;
    public final String SQL_createInDomain_WITH_ResourceDomainName;
    public final String SQL_createInDomain_WITH_ResourceDomainName_ParentDomainID;
+   public final String SQL_removeInDomain_BY_DomainID;
+   public final String SQL_removeInDomain_withDescendants_BY_DomainID;
 
    // GrantDomainCreatePermissionSys
    public final String SQL_findInGrantDomainCreatePermissionSys_SysPermissionID_IsWithGrant_InheritLevel_BY_AccessorID;
@@ -67,6 +70,8 @@ public class SQLStrings implements Serializable {
    public final String SQL_createInGrantDomainPermissionSys_WITH_AccessorID_GrantorID_AccessedDomainID_IsWithGrant_SysPermissionID;
    public final String SQL_updateInGrantDomainPermissionSys_SET_GrantorID_IsWithGrant_BY_AccessorID_AccessedDomainID_SysPermissionID;
    public final String SQL_removeInGrantDomainPermissionSys_BY_AccessorID;
+   public final String SQL_removeInGrantDomainPermissionSys_BY_AccessedDomainID;
+   public final String SQL_removeInGrantDomainPermissionSys_withDescendants_BY_AccessedDomainID;
    public final String SQL_removeInGrantDomainPermissionSys_BY_AccessorID_AccessedDomainID;
    public final String SQL_removeInGrantDomainPermissionSys_BY_AccessorID_AccessedDomainID_SysPermissionID;
 
@@ -98,6 +103,7 @@ public class SQLStrings implements Serializable {
 
    // Resource
    public final String SQL_findInResource_COUNTResourceID_BY_ResourceClassID_DomainID;
+   public final String SQL_findInResource_COUNTResourceID_BY_DomainID;
    public final String SQL_createInResource_WITH_ResourceID_ResourceClassID_DomainID;
    public final String SQL_removeInResource_BY_ResourceID;
    public final String SQL_findInResource_ResourceId_BY_ResourceID;
@@ -111,6 +117,8 @@ public class SQLStrings implements Serializable {
    public final String SQL_createInGrantResourceCreatePermissionSys_WITH_AccessorID_GrantorID_AccessedDomainID_IsWithGrant_ResourceClassID_SysPermissionId;
    public final String SQL_updateInGrantResourceCreatePermissionSys_SET_GrantorID_IsWithGrant_BY__AccessorID_AccessedDomainID_ResourceClassID_SysPermissionId;
    public final String SQL_removeInGrantResourceCreatePermissionSys_BY_AccessorID;
+   public final String SQL_removeInGrantResourceCreatePermissionSys_BY_AccessedDomainId;
+   public final String SQL_removeInGrantResourceCreatePermissionSys_withDescendants_BY_AccessedDomainId;
    public final String SQL_removeInGrantResourceCreatePermissionSys_BY_AccessorID_AccessedDomainID_ResourceClassID;
    public final String SQL_removeInGrantResourceCreatePermissionSys_BY_AccessorID_AccessedDomainID_ResourceClassID_SysPermissionID;
    // GrantResourceCreatePermissionPostCreateSys
@@ -121,6 +129,8 @@ public class SQLStrings implements Serializable {
    public final String SQL_createInGrantResourceCreatePermissionPostCreateSys_WITH_AccessorID_GrantorID_AccessedDomainID_IsWithGrant_PostCreateIsWithGrant_ResourceClassID_PostCreateSysPermissionID;
    public final String SQL_updateInGrantResourceCreatePermissionPostCreateSys_SET_GrantorID_IsWithGrant_PostCreateIsWithGrant_BY_AccessorID_AccessedDomainID_ResourceClassID_PostCreateSysPermissionID;
    public final String SQL_removeInGrantResourceCreatePermissionPostCreateSys_BY_AccessorID;
+   public final String SQL_removeInGrantResourceCreatePermissionPostCreateSys_BY_AccessedDomainID;
+   public final String SQL_removeInGrantResourceCreatePermissionPostCreateSys_withDescendants_BY_AccessedDomainID;
    public final String SQL_removeInGrantResourceCreatePermissionPostCreateSys_BY_AccessorID_AccessedDomainID_ResourceClassID;
    public final String SQL_removeInGrantResourceCreatePermissionPostCreateSys_BY_AccessorID_AccessedDomainID_ResourceClassID_PostCreateSysPermissionID;
    // GrantResourceCreatePermissionPostCreate
@@ -131,6 +141,8 @@ public class SQLStrings implements Serializable {
    public final String SQL_createInGrantResourceCreatePermissionPostCreate_WITH_AccessorID_GrantorID_AccessedDomainID_IsWithGrant_PostCreateIsWithGrant_ResourceClassID_PostCreatePermissionName;
    public final String SQL_updateInGrantResourceCreatePermissionPostCreate_SET_GrantorID_IsWithGrant_PostCreateIsWithGrant_BY_AccessorID_AccessedDomainID_ResourceClassID_PostCreatePermissionName;
    public final String SQL_removeInGrantResourceCreatePermissionPostCreate_BY_AccessorID;
+   public final String SQL_removeInGrantResourceCreatePermissionPostCreate_BY_AccessedDomainId;
+   public final String SQL_removeInGrantResourceCreatePermissionPostCreate_withDescendants_BY_AccessedDomainId;
    public final String SQL_removeInGrantResourceCreatePermissionPostCreate_BY_AccessorID_AccessedDomainID_ResourceClassID;
    public final String SQL_removeInGrantResourceCreatePermissionPostCreate_BY_AccessorID_AccessedDomainID_ResourceClassID_PostCreatePermissionName;
 
@@ -159,6 +171,8 @@ public class SQLStrings implements Serializable {
    public final String SQL_createInGrantGlobalResourcePermissionSys_WITH_AccessorID_GrantorID_AccessedDomainID_IsWithGrant_ResourceClassID_SysPermissionID;
    public final String SQL_updateInGrantGlobalResourcePermissionSys_SET_GrantorID_IsWithGrant_BY_AccessorID_AccessedDomainID_ResourceClassID_SysPermissionID;
    public final String SQL_removeInGrantGlobalResourcePermissionSys_BY_AccessorID;
+   public final String SQL_removeInGrantGlobalResourcePermissionSys_BY_AccessedDomainId;
+   public final String SQL_removeInGrantGlobalResourcePermissionSys_withDescendants_BY_AccessedDomainId;
    public final String SQL_removeInGrantGlobalResourcePermissionSys_BY_AccessorID_AccessedDomainID_ResourceClassID;
    public final String SQL_removeInGrantGlobalResourcePermissionSys_BY_AccessorID_AccessedDomainID_ResourceClassID_SysPermissionID;
    // GrantGlobalResourcePermission
@@ -169,11 +183,15 @@ public class SQLStrings implements Serializable {
    public final String SQL_createInGrantGlobalResourcePermission_WITH_AccessorID_GrantorID_AccessedDomainID_IsWithGrant_ResourceClassID_PermissionName;
    public final String SQL_updateInGrantGlobalResourcePermission_SET_GrantorID_IsWithGrant_BY_AccessorID_AccessedDomainID_ResourceClassID_PermissionName;
    public final String SQL_removeInGrantGlobalResourcePermission_BY_AccessorID;
+   public final String SQL_removeInGrantGlobalResourcePermission_BY_AccessedDomainId;
+   public final String SQL_removeInGrantGlobalResourcePermission_withDescendants_BY_AccessedDomainId;
    public final String SQL_removeInGrantGlobalResourcePermission_BY_AccessorID_AccessedDomainID_ResourceClassID;
    public final String SQL_removeInGrantGlobalResourcePermission_BY_AccessorID_AccessedDomainID_ResourceClassID_PermissionName;
 
    // Key generators
    public final String SQL_nextResourceID;
+
+   public final SQLDialect sqlDialect;
 
    // resource permissions constants
    private static final ResourcePermission ResourcePermission_INHERIT = ResourcePermissions.getInstance(
@@ -182,11 +200,13 @@ public class SQLStrings implements Serializable {
 
    public static SQLStrings getSQLStrings(String schemaName,
                                           SQLDialect sqlDialect) {
-      return new SQLStrings(schemaName, DialectSpecificSQLGenerator.getInstance(sqlDialect));
+      return new SQLStrings(schemaName, sqlDialect, DialectSpecificSQLGenerator.getInstance(sqlDialect));
    }
 
    private SQLStrings(String schemaName,
+                      SQLDialect sqlDialect,
                       DialectSpecificSQLGenerator dialectSpecificSQLGenerator) {
+      this.sqlDialect = sqlDialect;
       final String withClause = dialectSpecificSQLGenerator.getWithClause();
       final String unionClause = dialectSpecificSQLGenerator.getUnionClause();
       final String schemaNameAndTablePrefix = schemaName != null ? schemaName + ".OAC_" : "OAC_";
@@ -215,7 +235,7 @@ public class SQLStrings implements Serializable {
 
       // recursive query to compute all descendants of a given an domain
       final String SQL_findDescendantsRecursiveInDomain_DomainID_DomainLevel_BY_DomainID
-            = ", S( DomainId, DomainLevel ) AS "
+            = "S( DomainId, DomainLevel ) AS "
             + "( SELECT DomainId, 0 FROM "
             + schemaNameAndTablePrefix
             + "Domain WHERE DomainId = ? " + unionClause + " SELECT Splus1.DomainId, S.DomainLevel + 1 FROM "
@@ -300,6 +320,18 @@ public class SQLStrings implements Serializable {
             + "WHERE Splus1.ParentDomainId IS NOT NULL AND Splus1.ParentDomainId = S.DomainId ) "
             + "SELECT DomainId, DomainName FROM S";
 
+      SQL_findInDomain_DescendantResourceDomainID_BY_DomainID_ORDERBY_DomainLevel
+            = withClause + " S( DomainId, DomainName, DomainLevel ) AS "
+            + "( SELECT DomainId, DomainName, 0 FROM "
+            + schemaNameAndTablePrefix
+            + "Domain WHERE DomainId = ? "
+            + unionClause + " "
+            + "SELECT Splus1.DomainId, Splus1.DomainName, S.DomainLevel + 1 FROM "
+            + schemaNameAndTablePrefix
+            + "Domain Splus1, S "
+            + "WHERE Splus1.ParentDomainId IS NOT NULL AND Splus1.ParentDomainId = S.DomainId ) "
+            + "SELECT DomainId, DomainName FROM S ORDER BY DomainLevel";
+
       SQL_createInDomain_WITH_ResourceDomainName
             = "INSERT INTO "
             + schemaNameAndTablePrefix
@@ -313,6 +345,27 @@ public class SQLStrings implements Serializable {
             + "Domain ( DomainId, DomainName, ParentDomainId ) VALUES ( "
             + dialectSpecificSQLGenerator.nextSequenceValueFragment(schemaNameAndTablePrefix + "DomainId")
             + ", ?, ? )";
+
+      SQL_removeInDomain_BY_DomainID
+            = "DELETE FROM "
+            + schemaNameAndTablePrefix
+            + "Domain WHERE DomainId = ?";
+
+      SQL_removeInDomain_withDescendants_BY_DomainID
+            = (SQLDialect.DB2_10_5.equals(sqlDialect))
+              ? null
+              : (SQLDialect.Oracle_11_2.equals(sqlDialect))
+                ? "DELETE FROM "
+                      + schemaNameAndTablePrefix
+                      + "Domain WHERE DomainId IN ( "
+                      + withClause + " "
+                      + SQL_findDescendantsRecursiveInDomain_DomainID_DomainLevel_BY_DomainID
+                      + "SELECT DomainId FROM S )"
+                : withClause + " "
+                      + SQL_findDescendantsRecursiveInDomain_DomainID_DomainLevel_BY_DomainID
+                      + "DELETE FROM "
+                      + schemaNameAndTablePrefix
+                      + "Domain WHERE DomainId IN ( SELECT DomainId FROM S )";
 
       // GrantDomainCreatePermissionSys
       SQL_findInGrantDomainCreatePermissionSys_SysPermissionID_IsWithGrant_InheritLevel_BY_AccessorID
@@ -434,13 +487,34 @@ public class SQLStrings implements Serializable {
       SQL_updateInGrantDomainPermissionSys_SET_GrantorID_IsWithGrant_BY_AccessorID_AccessedDomainID_SysPermissionID
             = "UPDATE "
             + schemaNameAndTablePrefix
-            + "Grant_DomPerm_Sys SET GrantorResourceId = ?, IsWithGrant = ?"
-            + "wHERE AccessorResourceId = ? AND AccessedDomainId = ? AND SysPermissionId = ?";
+            + "Grant_DomPerm_Sys SET GrantorResourceId = ?, IsWithGrant = ? "
+            + "WHERE AccessorResourceId = ? AND AccessedDomainId = ? AND SysPermissionId = ?";
 
       SQL_removeInGrantDomainPermissionSys_BY_AccessorID
             = "DELETE FROM "
             + schemaNameAndTablePrefix
             + "Grant_DomPerm_Sys WHERE AccessorResourceId = ?";
+
+      SQL_removeInGrantDomainPermissionSys_BY_AccessedDomainID
+            = "DELETE FROM "
+            + schemaNameAndTablePrefix
+            + "Grant_DomPerm_Sys WHERE AccessedDomainId = ?";
+
+      SQL_removeInGrantDomainPermissionSys_withDescendants_BY_AccessedDomainID
+            = (SQLDialect.DB2_10_5.equals(sqlDialect))
+              ? null
+              : (SQLDialect.Oracle_11_2.equals(sqlDialect))
+                ? "DELETE FROM "
+                      + schemaNameAndTablePrefix
+                      + "Grant_DomPerm_Sys WHERE AccessedDomainId IN ( "
+                      + withClause + " "
+                      + SQL_findDescendantsRecursiveInDomain_DomainID_DomainLevel_BY_DomainID
+                      + "SELECT DomainId FROM S )"
+                : withClause + " "
+                      + SQL_findDescendantsRecursiveInDomain_DomainID_DomainLevel_BY_DomainID
+                      + "DELETE FROM "
+                      + schemaNameAndTablePrefix
+                      + "Grant_DomPerm_Sys WHERE AccessedDomainId IN ( SELECT DomainId FROM S )";
 
       SQL_removeInGrantDomainPermissionSys_BY_AccessorID_AccessedDomainID
             = "DELETE FROM "
@@ -463,7 +537,7 @@ public class SQLStrings implements Serializable {
 
       SQL_findInGrantResourcePermissionSys_ResourceID_BY_AccessorID_DomainID_ResourceClassID_SysPermissionID_IsWithGrant
             = SQL_findRecursiveInGrantResourcePermissionSys_AccessorID_InheritLevel_BY_AccessorID
-            + SQL_findDescendantsRecursiveInDomain_DomainID_DomainLevel_BY_DomainID
+            + ", " + SQL_findDescendantsRecursiveInDomain_DomainID_DomainLevel_BY_DomainID
             + "SELECT B.AccessedResourceId ResourceId FROM "
             + schemaNameAndTablePrefix
             + "Grant_ResPerm_Sys B JOIN "
@@ -487,7 +561,7 @@ public class SQLStrings implements Serializable {
 
       SQL_findInGrantGlobalResourcePermissionSys_ResourceID_BY_AccessorID_DomainID_ResourceClassID_SysPermissionID_IsWithGrant
             = SQL_findRecursiveInGrantResourcePermissionSys_AccessorID_InheritLevel_BY_AccessorID
-            + SQL_findDescendantsRecursiveInDomain_DomainID_DomainLevel_BY_DomainID
+            + ", " + SQL_findDescendantsRecursiveInDomain_DomainID_DomainLevel_BY_DomainID
             + "SELECT A.ResourceId FROM "
             + schemaNameAndTablePrefix
             + "Resource A "
@@ -509,7 +583,7 @@ public class SQLStrings implements Serializable {
 
       SQL_findInGrantResourcePermission_ResourceID_BY_AccessorID_DomainID_ResourceClassID_PermissionID_IsWithGrant
             = SQL_findRecursiveInGrantResourcePermissionSys_AccessorID_InheritLevel_BY_AccessorID
-            + SQL_findDescendantsRecursiveInDomain_DomainID_DomainLevel_BY_DomainID
+            + ", " + SQL_findDescendantsRecursiveInDomain_DomainID_DomainLevel_BY_DomainID
             + "SELECT B.AccessedResourceId ResourceId FROM "
             + schemaNameAndTablePrefix
             + "Grant_ResPerm B JOIN "
@@ -543,7 +617,7 @@ public class SQLStrings implements Serializable {
 
       SQL_findInGrantGlobalResourcePermission_ResourceID_BY_AccessorID_DomainID_ResourceClassID_PermissionID_IsWithGrant_ResourceClassID
             = SQL_findRecursiveInGrantResourcePermissionSys_AccessorID_InheritLevel_BY_AccessorID
-            + SQL_findDescendantsRecursiveInDomain_DomainID_DomainLevel_BY_DomainID
+            + ", " + SQL_findDescendantsRecursiveInDomain_DomainID_DomainLevel_BY_DomainID
             + ", R( DomainId, DomainLevel ) AS "
             // this sub query is the starting set for the domain recursion, it returns all the direct
             // resources domains that the accessor has the specified system permission on
@@ -590,7 +664,7 @@ public class SQLStrings implements Serializable {
 
       SQL_findInGrantDomainPermissionSys_ResourceID_BY_AccessorID_DomainID_SysPermissionID_IsWithGrant_ResourceClassID
             = SQL_findRecursiveInGrantResourcePermissionSys_AccessorID_InheritLevel_BY_AccessorID
-            + SQL_findDescendantsRecursiveInDomain_DomainID_DomainLevel_BY_DomainID
+            + ", " + SQL_findDescendantsRecursiveInDomain_DomainID_DomainLevel_BY_DomainID
             + ", R( DomainId, DomainLevel ) AS "
             // this sub query is the starting set for the domain recursion, it returns all the direct
             // resources domains that the accessor has the specified system permission on (currently super-user)
@@ -630,6 +704,13 @@ public class SQLStrings implements Serializable {
             = "SELECT COUNT( ResourceId ) COUNTResourceID FROM "
             + schemaNameAndTablePrefix
             + "Resource WHERE ResourceClassId = ? AND DomainId = ?";
+
+      SQL_findInResource_COUNTResourceID_BY_DomainID
+            = withClause + " "
+            + SQL_findDescendantsRecursiveInDomain_DomainID_DomainLevel_BY_DomainID
+            + "SELECT COUNT( ResourceId ) COUNTResourceID FROM "
+            + schemaNameAndTablePrefix
+            + "Resource C JOIN S ON S.DomainId = C.DomainId";
 
       SQL_createInResource_WITH_ResourceID_ResourceClassID_DomainID
             = "INSERT INTO "
@@ -708,6 +789,27 @@ public class SQLStrings implements Serializable {
             + schemaNameAndTablePrefix
             + "Grant_ResCrPerm_Sys WHERE AccessorResourceId = ?";
 
+      SQL_removeInGrantResourceCreatePermissionSys_BY_AccessedDomainId
+            = "DELETE FROM "
+            + schemaNameAndTablePrefix
+            + "Grant_ResCrPerm_Sys WHERE AccessedDomainId = ?";
+
+      SQL_removeInGrantResourceCreatePermissionSys_withDescendants_BY_AccessedDomainId
+            = (SQLDialect.DB2_10_5.equals(sqlDialect))
+              ? null
+              : (SQLDialect.Oracle_11_2.equals(sqlDialect))
+                ? "DELETE FROM "
+                      + schemaNameAndTablePrefix
+                      + "Grant_ResCrPerm_Sys WHERE AccessedDomainId IN ( "
+                      + withClause + " "
+                      + SQL_findDescendantsRecursiveInDomain_DomainID_DomainLevel_BY_DomainID
+                      + "SELECT DomainId FROM S )"
+                : withClause + " "
+                      + SQL_findDescendantsRecursiveInDomain_DomainID_DomainLevel_BY_DomainID
+                      + "DELETE FROM "
+                      + schemaNameAndTablePrefix
+                      + "Grant_ResCrPerm_Sys WHERE AccessedDomainId IN ( SELECT DomainId FROM S )";
+
       SQL_removeInGrantResourceCreatePermissionSys_BY_AccessorID_AccessedDomainID_ResourceClassID
             = "DELETE FROM "
             + schemaNameAndTablePrefix
@@ -779,6 +881,27 @@ public class SQLStrings implements Serializable {
             = "DELETE FROM "
             + schemaNameAndTablePrefix
             + "Grant_ResCrPerm_PostCr_Sys WHERE AccessorResourceId = ?";
+
+      SQL_removeInGrantResourceCreatePermissionPostCreateSys_BY_AccessedDomainID
+            = "DELETE FROM "
+            + schemaNameAndTablePrefix
+            + "Grant_ResCrPerm_PostCr_Sys WHERE AccessedDomainId = ?";
+
+      SQL_removeInGrantResourceCreatePermissionPostCreateSys_withDescendants_BY_AccessedDomainID
+            = (SQLDialect.DB2_10_5.equals(sqlDialect))
+              ? null
+              : (SQLDialect.Oracle_11_2.equals(sqlDialect))
+                ? "DELETE FROM "
+                      + schemaNameAndTablePrefix
+                      + "Grant_ResCrPerm_PostCr_Sys WHERE AccessedDomainId IN ( "
+                      + withClause + " "
+                      + SQL_findDescendantsRecursiveInDomain_DomainID_DomainLevel_BY_DomainID
+                      + "SELECT DomainId FROM S )"
+                : withClause + " "
+                      + SQL_findDescendantsRecursiveInDomain_DomainID_DomainLevel_BY_DomainID
+                      + "DELETE FROM "
+                      + schemaNameAndTablePrefix
+                      + "Grant_ResCrPerm_PostCr_Sys WHERE AccessedDomainId IN ( SELECT DomainId FROM S )";
 
       SQL_removeInGrantResourceCreatePermissionPostCreateSys_BY_AccessorID_AccessedDomainID_ResourceClassID
             = "DELETE FROM "
@@ -866,6 +989,27 @@ public class SQLStrings implements Serializable {
             = "DELETE FROM "
             + schemaNameAndTablePrefix
             + "Grant_ResCrPerm_PostCr WHERE AccessorResourceId = ?";
+
+      SQL_removeInGrantResourceCreatePermissionPostCreate_BY_AccessedDomainId
+            = "DELETE FROM "
+            + schemaNameAndTablePrefix
+            + "Grant_ResCrPerm_PostCr WHERE AccessedDomainId = ?";
+
+      SQL_removeInGrantResourceCreatePermissionPostCreate_withDescendants_BY_AccessedDomainId
+            = (SQLDialect.DB2_10_5.equals(sqlDialect))
+              ? null
+              : (SQLDialect.Oracle_11_2.equals(sqlDialect))
+                ? "DELETE FROM "
+                      + schemaNameAndTablePrefix
+                      + "Grant_ResCrPerm_PostCr WHERE AccessedDomainId IN ( "
+                      + withClause + " "
+                      + SQL_findDescendantsRecursiveInDomain_DomainID_DomainLevel_BY_DomainID
+                      + "SELECT DomainId FROM S )"
+                : withClause + " "
+                      + SQL_findDescendantsRecursiveInDomain_DomainID_DomainLevel_BY_DomainID
+                      + "DELETE FROM "
+                      + schemaNameAndTablePrefix
+                      + "Grant_ResCrPerm_PostCr WHERE AccessedDomainId IN ( SELECT DomainId FROM S )";
 
       SQL_removeInGrantResourceCreatePermissionPostCreate_BY_AccessorID_AccessedDomainID_ResourceClassID
             = "DELETE FROM "
@@ -1046,6 +1190,27 @@ public class SQLStrings implements Serializable {
             + schemaNameAndTablePrefix
             + "Grant_Global_ResPerm_Sys WHERE AccessorResourceId = ?";
 
+      SQL_removeInGrantGlobalResourcePermissionSys_BY_AccessedDomainId
+            = "DELETE FROM "
+            + schemaNameAndTablePrefix
+            + "Grant_Global_ResPerm_Sys WHERE AccessedDomainId = ?";
+
+      SQL_removeInGrantGlobalResourcePermissionSys_withDescendants_BY_AccessedDomainId
+            = (SQLDialect.DB2_10_5.equals(sqlDialect))
+              ? null
+              : (SQLDialect.Oracle_11_2.equals(sqlDialect))
+                ? "DELETE FROM "
+                      + schemaNameAndTablePrefix
+                      + "Grant_Global_ResPerm_Sys WHERE AccessedDomainId IN ( "
+                      + withClause + " "
+                      + SQL_findDescendantsRecursiveInDomain_DomainID_DomainLevel_BY_DomainID
+                      + "SELECT DomainId FROM S )"
+                : withClause + " "
+                      + SQL_findDescendantsRecursiveInDomain_DomainID_DomainLevel_BY_DomainID
+                      + "DELETE FROM "
+                      + schemaNameAndTablePrefix
+                      + "Grant_Global_ResPerm_Sys WHERE AccessedDomainId IN ( SELECT DomainId FROM S )";
+
       SQL_removeInGrantGlobalResourcePermissionSys_BY_AccessorID_AccessedDomainID_ResourceClassID
             = "DELETE FROM "
             + schemaNameAndTablePrefix
@@ -1130,6 +1295,27 @@ public class SQLStrings implements Serializable {
             = "DELETE FROM "
             + schemaNameAndTablePrefix
             + "Grant_Global_ResPerm WHERE AccessorResourceId = ?";
+
+      SQL_removeInGrantGlobalResourcePermission_BY_AccessedDomainId
+            = "DELETE FROM "
+            + schemaNameAndTablePrefix
+            + "Grant_Global_ResPerm WHERE AccessedDomainId = ?";
+
+      SQL_removeInGrantGlobalResourcePermission_withDescendants_BY_AccessedDomainId
+            = (SQLDialect.DB2_10_5.equals(sqlDialect))
+              ? null
+              : (SQLDialect.Oracle_11_2.equals(sqlDialect))
+                ? "DELETE FROM "
+                      + schemaNameAndTablePrefix
+                      + "Grant_Global_ResPerm WHERE AccessedDomainId IN ( "
+                      + withClause + " "
+                      + SQL_findDescendantsRecursiveInDomain_DomainID_DomainLevel_BY_DomainID
+                      + "SELECT DomainId FROM S )"
+                : withClause + " "
+                      + SQL_findDescendantsRecursiveInDomain_DomainID_DomainLevel_BY_DomainID
+                      + "DELETE FROM "
+                      + schemaNameAndTablePrefix
+                      + "Grant_Global_ResPerm WHERE AccessedDomainId IN ( SELECT DomainId FROM S )";
 
       SQL_removeInGrantGlobalResourcePermission_BY_AccessorID_AccessedDomainID_ResourceClassID
             = "DELETE FROM "

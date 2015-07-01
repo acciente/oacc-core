@@ -96,5 +96,7 @@ public class SQLAccessControlSystemInitializer {
       statement.executeUpdate();
       statement.setLong(1, DomainPermissions.getInstance(DomainPermissions.CREATE_CHILD_DOMAIN).getSystemPermissionId());
       statement.executeUpdate();
+      statement.setLong(1, DomainPermissions.getInstance(DomainPermissions.DELETE).getSystemPermissionId());
+      statement.executeUpdate();
    }
 }

@@ -18,11 +18,14 @@
 package com.acciente.oacc.sql.internal.persister;
 
 import com.acciente.oacc.Resource;
+import com.acciente.oacc.sql.SQLDialect;
 import com.acciente.oacc.sql.internal.persister.id.DomainId;
 import com.acciente.oacc.sql.internal.persister.id.Id;
 
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 public class DomainPersister extends Persister {
@@ -146,6 +149,61 @@ public class DomainPersister extends Persister {
          statement.setString(1, resourceDomainName);
          statement.setResourceDomainId(2, parentResourceDomainId);
          assertOneRowInserted(statement.executeUpdate());
+      }
+      catch (SQLException e) {
+         throw new RuntimeException(e);
+      }
+      finally {
+         closeStatement(statement);
+      }
+   }
+
+   public void deleteDomain(SQLConnection connection,
+                            Id<DomainId> domainId) {
+      SQLStatement statement = null;
+
+      try {
+         // chose strategy to perform recursive delete based on sql dialect
+         if (sqlStrings.sqlDialect == SQLDialect.DB2_10_5) {
+            // DB2 doesn't support recursive deletion, so we have to remove domain's children first
+
+            // get descendant domain Ids
+            statement = connection.prepareStatement(sqlStrings.SQL_findInDomain_DescendantResourceDomainID_BY_DomainID_ORDERBY_DomainLevel);
+            statement.setResourceDomainId(1, domainId);
+            SQLResult resultSet = statement.executeQuery();
+
+            List<Id> descendantDomainIds = new ArrayList<>();
+
+            while (resultSet.next()) {
+               final Id<DomainId> descendantDomainId = resultSet.getResourceDomainId("DomainId");
+
+               if (!domainId.equals(descendantDomainId)) {
+                  descendantDomainIds.add(descendantDomainId);
+               }
+            }
+
+            // delete descendant domains (in reverse order of domainLevel, to preserve FK constraints)
+            statement = connection.prepareStatement(sqlStrings.SQL_removeInDomain_BY_DomainID);
+
+            for (int i=descendantDomainIds.size()-1; i >= 0; i--) {
+               statement.setResourceDomainId(1, descendantDomainIds.get(i));
+               assertOneRowUpdated(statement.executeUpdate());
+            }
+
+            // finally, drop out and delete the originally specified domain with the same prepared statement
+         }
+         else {
+            // prepare the standard recursive delete statement of domain and its children
+            statement = connection.prepareStatement(sqlStrings.SQL_removeInDomain_withDescendants_BY_DomainID);
+         }
+
+         statement.setResourceDomainId(1, domainId);
+
+         final int rowCount = statement.executeUpdate();
+
+         if (rowCount < 1) {
+            throw new IllegalStateException("Security table data update, 1 or more rows expected, got: " + rowCount);
+         }
       }
       catch (SQLException e) {
          throw new RuntimeException(e);

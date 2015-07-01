@@ -168,11 +168,26 @@ public class TestAccessControlBase {
       return systemAccessControlContext.createResource(generateResourceClass(false, true), generateDomain());
    }
 
-   protected static void grantDomainCreatePermission(Resource accessorResource) {
+   protected static void grantDomainPermission(Resource accessorResource, String domainName, DomainPermission... domainPermissions) {
+      authenticateSystemAccessControlContext();
+      Set<DomainPermission> domainPermissionsSet = new HashSet<>();
+
+      for (DomainPermission domainPermission : domainPermissions) {
+         domainPermissionsSet.add(domainPermission);
+      }
+
+      systemAccessControlContext.setDomainPermissions(accessorResource, domainName, domainPermissionsSet);
+   }
+
+   protected static void grantDomainCreatePermission(Resource accessorResource, DomainPermission... domainPermissions) {
       authenticateSystemAccessControlContext();
       Set<DomainCreatePermission> domainCreatePermissions = new HashSet<>();
       domainCreatePermissions.add(DomainCreatePermissions.getInstance(DomainCreatePermissions.CREATE,
                                                                       false));
+
+      for (DomainPermission domainPermission : domainPermissions) {
+         domainCreatePermissions.add(DomainCreatePermissions.getInstance(domainPermission));
+      }
 
       systemAccessControlContext.setDomainCreatePermissions(accessorResource, domainCreatePermissions);
    }

@@ -159,6 +159,7 @@ public class TestSQLAccessControlSystemInitializer {
       final DomainCreatePermission sysDomainCreatePermission_Create = DomainCreatePermissions.getInstance(
             DomainCreatePermissions.CREATE);
       final DomainPermission sysDomainPermission_CreateChildDomain = DomainPermissions.getInstance(DomainPermissions.CREATE_CHILD_DOMAIN);
+      final DomainPermission sysDomainPermission_Delete = DomainPermissions.getInstance(DomainPermissions.DELETE);
 
       OACC_Grant_DomCreatePerm_PostCreate_Sys createSysDomainSuperUserPermission
             = new OACC_Grant_DomCreatePerm_PostCreate_Sys.Builder(sysResource.getResourceID(),
@@ -183,11 +184,19 @@ public class TestSQLAccessControlSystemInitializer {
             .grantorResourceID(sysResource.getResourceID())
             .build();
 
-      assertThat(OACC_Grant_DomCreatePerm_PostCreate_Sys.Finder.getNumberOfRows(con, Constants.DB_SCHEMA), is(2));
+      OACC_Grant_DomCreatePerm_PostCreate_Sys createSysDomainDeletePermission
+            = new OACC_Grant_DomCreatePerm_PostCreate_Sys.Builder(sysResource.getResourceID(),
+            sysDomainPermission_Delete.getSystemPermissionId())
+            .postCreateIsWithGrant(true)
+            .isWithGrant(true)
+            .grantorResourceID(sysResource.getResourceID())
+            .build();
+
+      assertThat(OACC_Grant_DomCreatePerm_PostCreate_Sys.Finder.getNumberOfRows(con, Constants.DB_SCHEMA), is(3));
       final List<OACC_Grant_DomCreatePerm_PostCreate_Sys> createPostCreatePermissions
             = OACC_Grant_DomCreatePerm_PostCreate_Sys.Finder.findByAccessorID(con, Constants.DB_SCHEMA, sysResource.getResourceID());
-      assertThat(createPostCreatePermissions.size(), is(2));
-      assertThat(createPostCreatePermissions, hasItems(createSysDomainSuperUserPermission, createSysDomainCreateChildPermission));
+      assertThat(createPostCreatePermissions.size(), is(3));
+      assertThat(createPostCreatePermissions, hasItems(createSysDomainSuperUserPermission, createSysDomainCreateChildPermission, createSysDomainDeletePermission));
 
       assertThat(OACC_Grant_DomCreatePerm_Sys.Finder.getNumberOfRows(con, Constants.DB_SCHEMA), is(1));
       final List<OACC_Grant_DomCreatePerm_Sys> createSysPermissions

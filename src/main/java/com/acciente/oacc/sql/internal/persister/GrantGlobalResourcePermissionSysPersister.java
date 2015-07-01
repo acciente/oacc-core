@@ -20,13 +20,16 @@ package com.acciente.oacc.sql.internal.persister;
 import com.acciente.oacc.Resource;
 import com.acciente.oacc.ResourcePermission;
 import com.acciente.oacc.ResourcePermissions;
+import com.acciente.oacc.sql.SQLDialect;
 import com.acciente.oacc.sql.internal.persister.id.DomainId;
 import com.acciente.oacc.sql.internal.persister.id.Id;
 import com.acciente.oacc.sql.internal.persister.id.ResourceClassId;
 
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -346,9 +349,60 @@ public class GrantGlobalResourcePermissionSysPersister extends Persister {
 
       SQLStatement statement = null;
       try {
-         // revoke any existing system permissions this accessor has to this domain + resource class
+         // revoke any existing system permissions this accessor has to any domain + resource class
          statement = connection.prepareStatement(sqlStrings.SQL_removeInGrantGlobalResourcePermissionSys_BY_AccessorID);
          statement.setResourceId(1, accessorResource);
+         statement.executeUpdate();
+      }
+      catch (SQLException e) {
+         throw new RuntimeException(e);
+      }
+      finally {
+         closeStatement(statement);
+      }
+   }
+
+   public void removeAllGlobalSysPermissions(SQLConnection connection,
+                                             Id<DomainId> accessedDomainId) {
+
+      SQLStatement statement = null;
+      try {
+         // chose strategy to perform recursive delete based on sql dialect
+         if (sqlStrings.sqlDialect == SQLDialect.DB2_10_5) {
+            // DB2 doesn't support recursive deletion, so we have to remove domain's children's accessors first
+
+            // get descendant domain Ids
+            statement = connection.prepareStatement(sqlStrings.SQL_findInDomain_DescendantResourceDomainID_BY_DomainID_ORDERBY_DomainLevel);
+            statement.setResourceDomainId(1, accessedDomainId);
+            SQLResult resultSet = statement.executeQuery();
+
+            List<Id> descendantDomainIds = new ArrayList<>();
+
+            while (resultSet.next()) {
+               final Id<DomainId> descendantDomainId = resultSet.getResourceDomainId("DomainId");
+
+               if (!accessedDomainId.equals(descendantDomainId)) {
+                  descendantDomainIds.add(descendantDomainId);
+               }
+            }
+
+            // delete descendant domains' accessors (in reverse order of domainLevel, to preserve FK constraints)
+            statement = connection.prepareStatement(sqlStrings.SQL_removeInGrantGlobalResourcePermissionSys_BY_AccessedDomainId);
+
+            for (int i=descendantDomainIds.size()-1; i >= 0; i--) {
+               statement.setResourceDomainId(1, descendantDomainIds.get(i));
+               statement.executeUpdate();
+            }
+
+            // finally, drop out and delete for the originally specified domain with the same prepared statement
+         }
+         else {
+            // prepare the standard recursive delete statement for domain and its children
+            statement = connection.prepareStatement(sqlStrings.SQL_removeInGrantGlobalResourcePermissionSys_withDescendants_BY_AccessedDomainId);
+         }
+
+         // revoke any existing system permissions any accessor has to this domain + any resource class
+         statement.setResourceDomainId(1, accessedDomainId);
          statement.executeUpdate();
       }
       catch (SQLException e) {

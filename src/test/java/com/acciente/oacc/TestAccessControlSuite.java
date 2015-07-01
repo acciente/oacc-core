@@ -39,6 +39,7 @@ public class TestAccessControlSuite  {
       suite.addTest(new JUnit4TestAdapter(TestAccessControl_createResourceClass.class));
       suite.addTest(new JUnit4TestAdapter(TestAccessControl_createResourcePermission.class));
       suite.addTest(new JUnit4TestAdapter(TestAccessControl_customAuthenticationProvider.class));
+      suite.addTest(new JUnit4TestAdapter(TestAccessControl_deleteDomain.class));
       suite.addTest(new JUnit4TestAdapter(TestAccessControl_deleteResource.class));
       suite.addTest(new JUnit4TestAdapter(TestAccessControl_getAccessorResourcesByResourcePermissions.class));
       suite.addTest(new JUnit4TestAdapter(TestAccessControl_getAuthenticatedResource.class));

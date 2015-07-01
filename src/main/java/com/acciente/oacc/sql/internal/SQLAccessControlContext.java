@@ -62,6 +62,7 @@ import java.io.Serializable;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -95,6 +96,10 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
          = DomainPermissions.getInstance(DomainPermissions.CREATE_CHILD_DOMAIN, false);
    private static final DomainPermission DomainPermission_CREATE_CHILD_DOMAIN_GRANT
          = DomainPermissions.getInstance(DomainPermissions.CREATE_CHILD_DOMAIN, true);
+   private static final DomainPermission DomainPermission_DELETE
+         = DomainPermissions.getInstance(DomainPermissions.DELETE, false);
+   private static final DomainPermission DomainPermission_DELETE_GRANT
+         = DomainPermissions.getInstance(DomainPermissions.DELETE, true);
    private static final DomainPermission DomainPermission_SUPER_USER
          = DomainPermissions.getInstance(DomainPermissions.SUPER_USER, false);
    private static final DomainPermission DomainPermission_SUPER_USER_GRANT
@@ -676,6 +681,62 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
                                       newDomainPermissions,
                                       true);
       }
+   }
+
+   @Override
+   public boolean deleteDomain(String domainName) {
+      SQLConnection connection = null;
+
+      __assertAuthenticated();
+      __assertDomainSpecified(domainName);
+
+      try {
+         connection = __getConnection();
+
+         return __deleteDomain(connection, domainName);
+      }
+      finally {
+         __closeConnection(connection);
+      }
+
+   }
+
+   private boolean __deleteDomain(SQLConnection connection, String domainName) {
+      // short-circuit out of this call if the specified resource does not exist
+      final Id<DomainId> domainId = domainPersister.getResourceDomainId(connection, domainName);
+      if (domainId == null) {
+         return false;
+      }
+
+      // check for authorization
+      if (!__hasDomainPermissions(connection,
+                                  sessionResource,
+                                  domainName,
+                                  Collections.singleton(DomainPermission_DELETE))) {
+         throw NotAuthorizedException.newInstanceForDomainPermissions(sessionResource,
+                                                                      domainName,
+                                                                      DomainPermission_DELETE);
+      }
+
+      // check if the domain is empty (=domain must not contain any resources, and none in any descendant domains)
+      if (resourcePersister.getResourceCountForDomain(connection, domainId) > 0) {
+         throw new IllegalArgumentException("Deleting a domain ("
+                                                  + domainName
+                                                  + ") that contains resources directly or in a descendant domain is invalid");
+      }
+
+      // remove any permissions the obsolete resource has as an accessor resource
+      grantDomainPermissionSysPersister.removeAllDomainSysPermissions(connection, domainId);
+      grantResourceCreatePermissionPostCreatePersister.removeAllResourceCreatePostCreatePermissions(connection, domainId);
+      grantResourceCreatePermissionPostCreateSysPersister.removeAllResourceCreatePostCreateSysPermissions(connection, domainId);
+      grantResourceCreatePermissionSysPersister.removeAllResourceCreateSysPermissions(connection, domainId);
+      grantGlobalResourcePermissionPersister.removeAllGlobalResourcePermissions(connection, domainId);
+      grantGlobalResourcePermissionSysPersister.removeAllGlobalSysPermissions(connection, domainId);
+
+      // remove the domain
+      domainPersister.deleteDomain(connection, domainId);
+
+      return true;
    }
 
    @Override

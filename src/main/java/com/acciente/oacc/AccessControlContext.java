@@ -1008,6 +1008,21 @@ public interface AccessControlContext {
    void createDomain(String domainName, String parentDomainName);
 
    /**
+    * Deletes the specified domain (and any nested child domains).
+    * <p/>
+    * Note this method performs a cascading delete of any permissions any resource has as an accessor resource to
+    * this domain or to a resource class-domain tuple, before the specified domain is itself deleted.
+    *
+    * @param domainName a string domain name
+    * @return <strong>true</strong> if the domain was deleted as a result of this call,
+    *         <strong>false</strong> if the specified domain did not exist
+    * @throws java.lang.IllegalArgumentException       if the specified domain contains any resources
+    * @throws com.acciente.oacc.NotAuthorizedException if the session resource is not authorized to delete the
+    *                                                  specified domain
+    */
+   boolean deleteDomain(String domainName);
+
+   /**
     * Creates a new resource of the specified resource class within the specified domain.
     * <p/>
     * Note that a custom {@link AuthenticationProvider} implementation is required to support

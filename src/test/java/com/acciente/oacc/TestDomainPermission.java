@@ -28,7 +28,8 @@ import static org.junit.Assert.fail;
 public class TestDomainPermission {
    @Test
    public void getSysPermissionNames() {
-      assertThat(DomainPermissions.getSysPermissionNames().size(), is(2));
+      assertThat(DomainPermissions.getSysPermissionNames().size(), is(3));
+      assertThat(DomainPermissions.getSysPermissionNames(), hasItem(DomainPermissions.DELETE));
       assertThat(DomainPermissions.getSysPermissionNames(), hasItem(DomainPermissions.CREATE_CHILD_DOMAIN));
       assertThat(DomainPermissions.getSysPermissionNames(), hasItem(DomainPermissions.SUPER_USER));
    }

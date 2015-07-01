@@ -29,9 +29,12 @@ public class DomainPermissions {
    private static final SysPermission SYSPERMISSION_CREATE_CHILD_DOMAIN = new SysPermission(-302,
                                                                                             "*CREATE-CHILD-DOMAIN");
    public static final  String        CREATE_CHILD_DOMAIN               = SYSPERMISSION_CREATE_CHILD_DOMAIN.getPermissionName();
+   private static final SysPermission SYSPERMISSION_DELETE              = new SysPermission(-303,
+                                                                                            "*DELETE");
+   public static final  String        DELETE                            = SYSPERMISSION_DELETE.getPermissionName();
 
    public static List<String> getSysPermissionNames() {
-      return Arrays.asList(SUPER_USER, CREATE_CHILD_DOMAIN);
+      return Arrays.asList(SUPER_USER, CREATE_CHILD_DOMAIN, DELETE);
    }
 
    public static String getSysPermissionName(long systemPermissionId) {
@@ -40,6 +43,9 @@ public class DomainPermissions {
       }
       else if (systemPermissionId == SYSPERMISSION_CREATE_CHILD_DOMAIN.getSystemPermissionId()) {
          return SYSPERMISSION_CREATE_CHILD_DOMAIN.getPermissionName();
+      }
+      else if (systemPermissionId == SYSPERMISSION_DELETE.getSystemPermissionId()) {
+         return SYSPERMISSION_DELETE.getPermissionName();
       }
       else {
          throw new IllegalArgumentException("Invalid system permission ID: " + systemPermissionId);
@@ -215,6 +221,9 @@ public class DomainPermissions {
          }
          else if (SYSPERMISSION_CREATE_CHILD_DOMAIN.getPermissionName().equals(permissionName)) {
             return SYSPERMISSION_CREATE_CHILD_DOMAIN;
+         }
+         else if (SYSPERMISSION_DELETE.getPermissionName().equals(permissionName)) {
+            return SYSPERMISSION_DELETE;
          }
          else {
             throw new IllegalArgumentException("Invalid system permission name: " + permissionName);

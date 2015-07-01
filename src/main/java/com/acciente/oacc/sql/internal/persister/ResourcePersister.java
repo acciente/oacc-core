@@ -92,7 +92,7 @@ public class ResourcePersister extends Persister {
          statement = connection.prepareStatement(sqlStrings.SQL_removeInResource_BY_ResourceID);
          statement.setResourceId(1, resource);
 
-         assertOneRowInserted(statement.executeUpdate());
+         assertOneRowUpdated(statement.executeUpdate());
       }
       catch (SQLException e) {
          throw new RuntimeException(e);
@@ -148,6 +148,35 @@ public class ResourcePersister extends Persister {
          resultSet.close();
 
          return newResourceId;
+      }
+      catch (SQLException e) {
+         throw new RuntimeException(e);
+      }
+      finally {
+         closeStatement(statement);
+      }
+   }
+
+   public int getResourceCountForDomain(SQLConnection connection,
+                                        Id<DomainId> resourceDomainId) {
+      SQLStatement statement = null;
+
+      try {
+         SQLResult resultSet;
+
+         statement = connection.prepareStatement(sqlStrings.SQL_findInResource_COUNTResourceID_BY_DomainID);
+         statement.setResourceDomainId(1, resourceDomainId);
+         resultSet = statement.executeQuery();
+
+         if (!resultSet.next()) {
+            throw new IllegalArgumentException("Could not read resource count for domain: " + resourceDomainId);
+         }
+
+         final int count = resultSet.getInteger("COUNTResourceID");
+
+         resultSet.close();
+
+         return count;
       }
       catch (SQLException e) {
          throw new RuntimeException(e);
