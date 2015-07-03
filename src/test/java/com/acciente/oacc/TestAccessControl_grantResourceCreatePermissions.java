@@ -1538,7 +1538,7 @@ public class TestAccessControl_grantResourceCreatePermissions extends TestAccess
             fail("granting resource create permission with the name of an existing permission that differs in case only should have failed for case-insensitive databases");
          }
          catch (IllegalArgumentException e) {
-            assertThat(e.getMessage().toLowerCase(), containsString("does not exist"));
+            assertThat(e.getMessage().toLowerCase(), containsString("is not defined for resource class"));
          }
          try {
             accessControlContext.grantResourceCreatePermissions(accessorResource,
@@ -1549,7 +1549,7 @@ public class TestAccessControl_grantResourceCreatePermissions extends TestAccess
             fail("granting resource create permission with the name of an existing permission that differs in case only should have failed for case-insensitive databases");
          }
          catch (IllegalArgumentException e) {
-            assertThat(e.getMessage().toLowerCase(), containsString("does not exist"));
+            assertThat(e.getMessage().toLowerCase(), containsString("is not defined for resource class"));
          }
       }
    }
