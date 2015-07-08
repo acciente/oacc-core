@@ -5661,33 +5661,6 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       return resources;
    }
 
-   private Set<Resource> getResourcesByResourcePermissionsAndDomain(String resourceClassName,
-                                                                    String domainName,
-                                                                    Set<ResourcePermission> resourcePermissions) {
-      SQLConnection connection = null;
-
-      __assertAuthenticated();
-      __assertResourceClassSpecified(resourceClassName);
-      __assertDomainSpecified(domainName);
-      __assertPermissionsSpecified(resourcePermissions);
-      __assertPermissionsSetNotEmpty(resourcePermissions);
-
-      try {
-         connection = __getConnection();
-
-         resourceClassName = resourceClassName.trim();
-
-         return __getResourcesByPermissionsAndDomain(connection,
-                                                     sessionResource,
-                                                     resourceClassName,
-                                                     domainName,
-                                                     resourcePermissions);
-      }
-      finally {
-         __closeConnection(connection);
-      }
-   }
-
    @Override
    public Set<Resource> getResourcesByResourcePermissionsAndDomain(Resource accessorResource,
                                                                    String resourceClassName,
@@ -5715,37 +5688,6 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
                                                      resourceClassName,
                                                      domainName,
                                                      resourcePermissions);
-      }
-      finally {
-         __closeConnection(connection);
-      }
-   }
-
-   private Set<Resource> getResourcesByResourcePermissionsAndDomain(String resourceClassName,
-                                                                    String domainName,
-                                                                    ResourcePermission resourcePermission,
-                                                                    ResourcePermission... resourcePermissions) {
-      SQLConnection connection = null;
-
-      __assertAuthenticated();
-      __assertResourceClassSpecified(resourceClassName);
-      __assertDomainSpecified(domainName);
-      __assertPermissionSpecified(resourcePermission);
-      __assertVarargPermissionsSpecified(resourcePermissions);
-
-      final Set<ResourcePermission> requestedResourcePermissions
-            = __getSetWithoutNullsOrDuplicates(resourcePermission, resourcePermissions);
-
-      try {
-         connection = __getConnection();
-
-         resourceClassName = resourceClassName.trim();
-
-         return __getResourcesByPermissionsAndDomain(connection,
-                                                     sessionResource,
-                                                     resourceClassName,
-                                                     domainName,
-                                                     requestedResourcePermissions);
       }
       finally {
          __closeConnection(connection);
