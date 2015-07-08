@@ -243,9 +243,12 @@ public class TestAccessControl_revokeResourcePermissions extends TestAccessContr
       grantorResourcePermissions.add(ResourcePermissions.getInstance(customPermissionName, true));
 
       accessControlContext.setResourcePermissions(grantorResource, accessedResource, grantorResourcePermissions);
-      assertThat(accessControlContext.getEffectiveResourcePermissions(grantorResource, accessedResource), is(grantorResourcePermissions));
+      assertThat(accessControlContext.getEffectiveResourcePermissions(grantorResource, accessedResource), is(
+            grantorResourcePermissions));
 
       // authenticate grantor resource
+      grantQueryPermission(grantorResource, accessorResource);
+      grantQueryPermission(grantorResource, accessorResource2);
       accessControlContext.authenticate(grantorResource, PasswordCredentials.newInstance(password));
 
       // revoke permissions as grantor and verify
@@ -297,6 +300,7 @@ public class TestAccessControl_revokeResourcePermissions extends TestAccessContr
             grantorResourcePermissions));
 
       // authenticate grantor resource
+      grantQueryPermission(grantorResource, accessorResource);
       accessControlContext.authenticate(grantorResource, PasswordCredentials.newInstance(password));
 
       // revoke permissions as grantor and verify
@@ -362,6 +366,8 @@ public class TestAccessControl_revokeResourcePermissions extends TestAccessContr
             grantorResourcePermissions));
 
       // authenticate grantor resource
+      grantQueryPermission(grantorResource, accessorResource);
+      grantQueryPermission(grantorResource, accessorResource2);
       accessControlContext.authenticate(grantorResource, PasswordCredentials.newInstance(password));
 
       // revoke permissions as grantor and verify
@@ -475,6 +481,8 @@ public class TestAccessControl_revokeResourcePermissions extends TestAccessContr
                  is(grantorResourcePermissions));
 
       // authenticate grantor resource
+      grantQueryPermission(grantorResource, accessorResource);
+      grantQueryPermission(grantorResource, accessorResource2);
       accessControlContext.authenticate(grantorResource, PasswordCredentials.newInstance(password));
 
       // revoke permissions as grantor and verify
@@ -530,6 +538,8 @@ public class TestAccessControl_revokeResourcePermissions extends TestAccessContr
                  is(grantorResourcePermissions));
 
       // authenticate grantor resource
+      grantQueryPermission(grantorResource, accessorResource);
+      grantQueryPermission(grantorResource, accessorResource2);
       accessControlContext.authenticate(grantorResource, PasswordCredentials.newInstance(password));
 
       // revoke permissions as grantor and verify
@@ -583,6 +593,8 @@ public class TestAccessControl_revokeResourcePermissions extends TestAccessContr
                  is(grantorResourcePermissions));
 
       // authenticate grantor resource
+      grantQueryPermission(grantorResource, accessorResource);
+      grantQueryPermission(grantorResource, accessorResource2);
       accessControlContext.authenticate(grantorResource, PasswordCredentials.newInstance(password));
 
       // revoke permissions as grantor and verify

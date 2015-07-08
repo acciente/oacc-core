@@ -47,6 +47,7 @@ public class TestAccessControl_getEffectiveDomainPermissions extends TestAccessC
       final Resource accessorResource = generateUnauthenticatableResource();
 
       generateResourceAndAuthenticate();
+      grantQueryPermission(accessControlContext.getSessionResource(), accessorResource);
 
       final Map<String,Set<DomainPermission>> allDomainPermissions = accessControlContext.getEffectiveDomainPermissionsMap(accessorResource);
       assertThat(allDomainPermissions.isEmpty(), is(true));
@@ -345,6 +346,104 @@ public class TestAccessControl_getEffectiveDomainPermissions extends TestAccessC
       final Set<DomainPermission> domainPermissions_post2 = accessControlContext.getEffectiveDomainPermissions(accessorResource, domainName2);
       assertThat(domainPermissions_post2, is(domainPermissions_pre2));
 
+   }
+
+   @Test
+   public void getEffectiveDomainPermissions_withoutQueryAuthorization_shouldFailAsAuthenticated() {
+      authenticateSystemResource();
+      final DomainPermission domCreatePerm_child
+            = DomainPermissions.getInstance(DomainPermissions.CREATE_CHILD_DOMAIN);
+
+      final String domainName1 = generateDomain();
+
+      // set domain create permissions
+      Resource accessorResource = generateAuthenticatableResource(generateUniquePassword());
+      Set<DomainPermission> domainPermissions_pre1 = new HashSet<>();
+      domainPermissions_pre1.add(domCreatePerm_child);
+      accessControlContext.setDomainPermissions(accessorResource, domainName1, domainPermissions_pre1);
+
+      // authenticate without query authorization
+      generateResourceAndAuthenticate();
+
+      // get domain create permissions and verify
+      try {
+         accessControlContext.getEffectiveDomainPermissionsMap(accessorResource);
+         fail("getting effective domain permissions without query authorization should have failed");
+      }
+      catch (NotAuthorizedException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("is not authorized to query resource"));
+      }
+      try {
+         accessControlContext.getEffectiveDomainPermissions(accessorResource, domainName1);
+         fail("getting effective domain permissions without query authorization should have failed");
+      }
+      catch (NotAuthorizedException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("is not authorized to query resource"));
+      }
+   }
+
+   @Test
+   public void getEffectiveDomainPermissions_withImplicitQueryAuthorization_shouldSucceedAsAuthenticated() {
+      authenticateSystemResource();
+      final DomainPermission domCreatePerm_child
+            = DomainPermissions.getInstance(DomainPermissions.CREATE_CHILD_DOMAIN);
+
+      final String domainName1 = generateDomain();
+
+      // set domain create permissions
+      Resource accessorResource = generateAuthenticatableResource(generateUniquePassword());
+      Set<DomainPermission> domainPermissions_pre1 = new HashSet<>();
+      domainPermissions_pre1.add(domCreatePerm_child);
+      accessControlContext.setDomainPermissions(accessorResource, domainName1, domainPermissions_pre1);
+
+      // authenticate with implicit query authorization
+      final char[] password = generateUniquePassword();
+      Resource authenticatableResource = generateAuthenticatableResource(password);
+      accessControlContext.grantResourcePermissions(authenticatableResource,
+                                                    accessorResource,
+                                                    ResourcePermissions.getInstance(ResourcePermissions.IMPERSONATE));
+      accessControlContext.authenticate(authenticatableResource, PasswordCredentials.newInstance(password));
+
+      // get domain create permissions and verify
+      final Map<String,Set<DomainPermission>> allDomainPermissions
+            = accessControlContext.getEffectiveDomainPermissionsMap(accessorResource);
+      assertThat(allDomainPermissions.size(), is(1));
+      assertThat(allDomainPermissions.get(domainName1), is(domainPermissions_pre1));
+
+      final Set<DomainPermission> domainPermissions_post
+            = accessControlContext.getEffectiveDomainPermissions(accessorResource, domainName1);
+      assertThat(domainPermissions_post, is(domainPermissions_pre1));
+   }
+
+   @Test
+   public void getEffectiveDomainPermissions_withQueryAuthorization_shouldSucceedAsAuthenticated() {
+      authenticateSystemResource();
+      final DomainPermission domCreatePerm_child
+            = DomainPermissions.getInstance(DomainPermissions.CREATE_CHILD_DOMAIN);
+
+      final String domainName1 = generateDomain();
+
+      // set domain create permissions
+      Resource accessorResource = generateAuthenticatableResource(generateUniquePassword());
+      Set<DomainPermission> domainPermissions_pre1 = new HashSet<>();
+      domainPermissions_pre1.add(domCreatePerm_child);
+      accessControlContext.setDomainPermissions(accessorResource, domainName1, domainPermissions_pre1);
+
+      // authenticate with implicit query authorization
+      final char[] password = generateUniquePassword();
+      Resource authenticatableResource = generateAuthenticatableResource(password);
+      grantQueryPermission(authenticatableResource, accessorResource);
+      accessControlContext.authenticate(authenticatableResource, PasswordCredentials.newInstance(password));
+
+      // get domain create permissions and verify
+      final Map<String,Set<DomainPermission>> allDomainPermissions
+            = accessControlContext.getEffectiveDomainPermissionsMap(accessorResource);
+      assertThat(allDomainPermissions.size(), is(1));
+      assertThat(allDomainPermissions.get(domainName1), is(domainPermissions_pre1));
+
+      final Set<DomainPermission> domainPermissions_post
+            = accessControlContext.getEffectiveDomainPermissions( accessorResource, domainName1);
+      assertThat(domainPermissions_post, is(domainPermissions_pre1));
    }
 
    @Test

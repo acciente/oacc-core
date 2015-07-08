@@ -151,21 +151,46 @@ public class TestAccessControlBase {
 
    protected static Resource generateAuthenticatableResource(char[] password) {
       authenticateSystemAccessControlContext();
-      return systemAccessControlContext.createResource(generateResourceClass(true, false),
-                                                       generateDomain(),
+      final String resourceClassName = generateResourceClass(true, false);
+      final String domainName = generateDomain();
+      systemAccessControlContext.grantGlobalResourcePermissions(SYS_RESOURCE,
+                                                                resourceClassName,
+                                                                domainName,
+                                                                ResourcePermissions
+                                                                      .getInstance(ResourcePermissions.QUERY));
+      return systemAccessControlContext.createResource(resourceClassName,
+                                                       domainName,
                                                        PasswordCredentials.newInstance(password));
    }
 
    protected static Resource generateAuthenticatableResource(char[] password, String domainName) {
       authenticateSystemAccessControlContext();
-      return systemAccessControlContext.createResource(generateResourceClass(true, false),
+      final String resourceClassName = generateResourceClass(true, false);
+      systemAccessControlContext.grantGlobalResourcePermissions(SYS_RESOURCE,
+                                                                resourceClassName,
+                                                                domainName,
+                                                                ResourcePermissions.getInstance(ResourcePermissions.QUERY));
+      return systemAccessControlContext.createResource(resourceClassName,
                                                        domainName,
                                                        PasswordCredentials.newInstance(password));
    }
 
    protected static Resource generateUnauthenticatableResource() {
       authenticateSystemAccessControlContext();
-      return systemAccessControlContext.createResource(generateResourceClass(false, true), generateDomain());
+      final String resourceClassName = generateResourceClass(false, true);
+      final String domainName = generateDomain();
+      systemAccessControlContext.grantGlobalResourcePermissions(SYS_RESOURCE,
+                                                                resourceClassName,
+                                                                domainName,
+                                                                ResourcePermissions.getInstance(ResourcePermissions.QUERY));
+      return systemAccessControlContext.createResource(resourceClassName, domainName);
+   }
+
+   protected static void grantQueryPermission(Resource accessorResource,
+                                              Resource queriedResource) {
+      systemAccessControlContext.grantResourcePermissions(accessorResource,
+                                                          queriedResource,
+                                                          ResourcePermissions.getInstance(ResourcePermissions.QUERY));
    }
 
    protected static void grantDomainPermission(Resource accessorResource, String domainName, DomainPermission... domainPermissions) {

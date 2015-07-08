@@ -122,6 +122,7 @@ public class TestAccessControl_revokeDomainCreatePermissions extends TestAccessC
                  is(domainCreatePermissions_pre));
 
       // revoke the domain create permissions as grantor and verify
+      grantQueryPermission(grantorResource, accessorResource);
       accessControlContext.authenticate(grantorResource, PasswordCredentials.newInstance(password));
       accessControlContext.revokeDomainCreatePermissions(accessorResource,
                                                          domCreatePerm_superuser,
@@ -134,6 +135,7 @@ public class TestAccessControl_revokeDomainCreatePermissions extends TestAccessC
 
       // test set-based version
       Resource accessorResource2 = generateUnauthenticatableResource();
+      grantQueryPermission(grantorResource, accessorResource2);
       accessControlContext.setDomainCreatePermissions(accessorResource2,
                                                       domainCreatePermissions_pre);
 
@@ -184,6 +186,7 @@ public class TestAccessControl_revokeDomainCreatePermissions extends TestAccessC
       assertThat(accessControlContext.getEffectiveDomainCreatePermissions(accessorResource).isEmpty(), is(true));
 
       // revoke the domain create permissions as grantor
+      grantQueryPermission(grantorResource, accessorResource);
       accessControlContext.authenticate(grantorResource, PasswordCredentials.newInstance(password));
       accessControlContext.revokeDomainCreatePermissions(accessorResource,
                                                          domCreatePerm_superuser,
@@ -352,6 +355,8 @@ public class TestAccessControl_revokeDomainCreatePermissions extends TestAccessC
                  is(domainCreatePermissions_pre));
 
       // revoke the domain create permissions as grantor
+      grantQueryPermission(grantorResource, accessorResource);
+      grantQueryPermission(grantorResource, accessorResource2);
       accessControlContext.authenticate(grantorResource, PasswordCredentials.newInstance(password));
       accessControlContext.revokeDomainCreatePermissions(accessorResource,
                                                          domCreatePerm_superuser,
@@ -532,6 +537,7 @@ public class TestAccessControl_revokeDomainCreatePermissions extends TestAccessC
                  is(domainCreatePermissions_pre));
 
       // revoke the domain create permissions as grantor
+      grantQueryPermission(grantorResource, accessorResource);
       accessControlContext.authenticate(grantorResource, PasswordCredentials.newInstance(password));
       accessControlContext.revokeDomainCreatePermissions(accessorResource,
                                                          domCreatePerm_superuser,
@@ -544,6 +550,7 @@ public class TestAccessControl_revokeDomainCreatePermissions extends TestAccessC
 
       // test set-based version
       Resource accessorResource2 = generateUnauthenticatableResource();
+      grantQueryPermission(grantorResource, accessorResource2);
       accessControlContext.setDomainCreatePermissions(accessorResource2,
                                                       domainCreatePermissions_pre);
 
@@ -599,6 +606,7 @@ public class TestAccessControl_revokeDomainCreatePermissions extends TestAccessC
                  is(domainCreatePermissions_pre));
 
       // revoke the domain create permissions as grantor
+      grantQueryPermission(grantorResource, accessorResource);
       accessControlContext.authenticate(grantorResource, PasswordCredentials.newInstance(password));
       accessControlContext.revokeDomainCreatePermissions(accessorResource,
                                                          domCreatePerm_superuser_withGrant,
@@ -611,6 +619,7 @@ public class TestAccessControl_revokeDomainCreatePermissions extends TestAccessC
 
       // test set-based version
       Resource accessorResource2 = generateUnauthenticatableResource();
+      grantQueryPermission(grantorResource, accessorResource2);
       accessControlContext.setDomainCreatePermissions(accessorResource2,
                                                       domainCreatePermissions_pre);
 
@@ -667,6 +676,7 @@ public class TestAccessControl_revokeDomainCreatePermissions extends TestAccessC
                  is(domainCreatePermissions_pre));
 
       // revoke the domain create permissions as grantor
+      grantQueryPermission(grantorResource, accessorResource);
       accessControlContext.authenticate(grantorResource, PasswordCredentials.newInstance(password));
       accessControlContext.revokeDomainCreatePermissions(accessorResource,
                                                          domCreatePerm_superuser,
@@ -679,6 +689,7 @@ public class TestAccessControl_revokeDomainCreatePermissions extends TestAccessC
 
       // test set-based version
       Resource accessorResource2 = generateUnauthenticatableResource();
+      grantQueryPermission(grantorResource, accessorResource2);
       accessControlContext.setDomainCreatePermissions(accessorResource2,
                                                       domainCreatePermissions_pre);
 

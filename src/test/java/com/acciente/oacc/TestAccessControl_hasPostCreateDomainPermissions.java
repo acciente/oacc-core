@@ -145,6 +145,100 @@ public class TestAccessControl_hasPostCreateDomainPermissions extends TestAccess
    }
 
    @Test
+   public void hasPostCreateDomainPermissions_withoutQueryAuthorization_shouldFailAsAuthenticated() {
+      authenticateSystemResource();
+
+      final char[] password = generateUniquePassword();
+      final Resource authenticatableResource = generateAuthenticatableResource(password);
+      final Resource accessorResource = generateAuthenticatableResource(generateUniquePassword());
+
+      // setup create permissions
+      grantDomainAndChildCreatePermission(accessorResource);
+
+      // authenticate resource without query authorization
+      accessControlContext.authenticate(authenticatableResource, PasswordCredentials.newInstance(password));
+
+      // verify
+      try {
+         accessControlContext.hasPostCreateDomainPermissions(accessorResource,
+                                                             DomainPermissions
+                                                                   .getInstance(DomainPermissions.CREATE_CHILD_DOMAIN));
+         fail("checking post-create domain permissions without query authorization should have failed");
+      }
+      catch (NotAuthorizedException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("is not authorized to query resource"));
+      }
+
+      try {
+         accessControlContext.hasPostCreateDomainPermissions(accessorResource,
+                                                             setOf(DomainPermissions
+                                                                         .getInstance(DomainPermissions.CREATE_CHILD_DOMAIN)));
+         fail("checking post-create domain permissions without query authorization should have failed");
+      }
+      catch (NotAuthorizedException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("is not authorized to query resource"));
+      }
+   }
+
+   @Test
+   public void hasPostCreateDomainPermissions_withImplicitQueryAuthorization_shouldSucceedAsAuthenticated() {
+      authenticateSystemResource();
+
+      final char[] password = generateUniquePassword();
+      final Resource authenticatableResource = generateAuthenticatableResource(password);
+      final Resource accessorResource = generateAuthenticatableResource(generateUniquePassword());
+
+      // setup create permissions
+      grantDomainAndChildCreatePermission(accessorResource);
+
+      // authenticate resource with implicit query authorization
+      accessControlContext.grantResourcePermissions(authenticatableResource,
+                                                    accessorResource,
+                                                    ResourcePermissions.getInstance(ResourcePermissions.IMPERSONATE));
+      accessControlContext.authenticate(authenticatableResource, PasswordCredentials.newInstance(password));
+
+      // verify
+      if (!accessControlContext.hasPostCreateDomainPermissions(accessorResource,
+                                                               DomainPermissions
+                                                                     .getInstance(DomainPermissions.CREATE_CHILD_DOMAIN))) {
+         fail("checking post-create domain permissions with implicit query authorization should have succeeded");
+      }
+      if (!accessControlContext.hasPostCreateDomainPermissions(accessorResource,
+                                                               setOf(DomainPermissions
+                                                                           .getInstance(DomainPermissions.CREATE_CHILD_DOMAIN)))) {
+         fail("checking post-create domain permissions with implicit query authorization should have succeeded");
+      }
+   }
+
+   @Test
+   public void hasPostCreateDomainPermissions_withQueryAuthorization_shouldSucceedAsAuthenticated() {
+      authenticateSystemResource();
+
+      final char[] password = generateUniquePassword();
+      final Resource authenticatableResource = generateAuthenticatableResource(password);
+      final Resource accessorResource = generateAuthenticatableResource(generateUniquePassword());
+
+      // setup create permissions
+      grantDomainAndChildCreatePermission(accessorResource);
+
+      // authenticate resource with query authorization
+      grantQueryPermission(authenticatableResource, accessorResource);
+      accessControlContext.authenticate(authenticatableResource, PasswordCredentials.newInstance(password));
+
+      // verify
+      if (!accessControlContext.hasPostCreateDomainPermissions(accessorResource,
+                                                               DomainPermissions
+                                                                     .getInstance(DomainPermissions.CREATE_CHILD_DOMAIN))) {
+         fail("checking post-create domain permissions with query authorization should have succeeded");
+      }
+      if (!accessControlContext.hasPostCreateDomainPermissions(accessorResource,
+                                                               setOf(DomainPermissions
+                                                                           .getInstance(DomainPermissions.CREATE_CHILD_DOMAIN)))) {
+         fail("checking post-create domain permissions with query authorization should have succeeded");
+      }
+   }
+
+   @Test
    public void hasPostCreateDomainPermissions_direct_succeedsAsAuthenticatedResource() {
       authenticateSystemResource();
 

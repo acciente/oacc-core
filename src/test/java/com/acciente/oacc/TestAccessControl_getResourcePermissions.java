@@ -45,6 +45,8 @@ public class TestAccessControl_getResourcePermissions extends TestAccessControlB
 
       final Resource accessorResource = generateUnauthenticatableResource();
       final Resource accessedResource = generateUnauthenticatableResource();
+      grantQueryPermission(accessControlContext.getSessionResource(), accessorResource);
+
       final Set<ResourcePermission> resourcePermissions
             = accessControlContext.getResourcePermissions(accessorResource, accessedResource);
       assertThat(resourcePermissions.isEmpty(), is(true));
@@ -86,6 +88,7 @@ public class TestAccessControl_getResourcePermissions extends TestAccessControlB
 
       // authenticate new resource
       generateResourceAndAuthenticate();
+      grantQueryPermission(accessControlContext.getSessionResource(), accessorResource);
 
       // verify as authenticated resource
       final Set<ResourcePermission> permissions_post
@@ -131,14 +134,16 @@ public class TestAccessControl_getResourcePermissions extends TestAccessControlB
             = setOf(ResourcePermissions.getInstance(inheritedPermissionName, true));
 
       accessControlContext.setResourcePermissions(donorResource, accessedResource, donorResourcePermissions);
-      assertThat(accessControlContext.getResourcePermissions(donorResource, accessedResource), is(donorResourcePermissions));
+      assertThat(accessControlContext.getResourcePermissions(donorResource, accessedResource), is(
+            donorResourcePermissions));
 
       // inherit from donor
       Set<ResourcePermission> inheritResourcePermissions
             = setOf(ResourcePermissions.getInstance(ResourcePermissions.INHERIT));
 
       accessControlContext.setResourcePermissions(accessorResource, donorResource, inheritResourcePermissions);
-      assertThat(accessControlContext.getResourcePermissions(accessorResource, donorResource), is(inheritResourcePermissions));
+      assertThat(accessControlContext.getResourcePermissions(accessorResource, donorResource), is(
+            inheritResourcePermissions));
 
       // verify
       assertThat(accessControlContext.getResourcePermissions(accessorResource, accessedResource).isEmpty(), is(true));
@@ -160,8 +165,13 @@ public class TestAccessControl_getResourcePermissions extends TestAccessControlB
       Set<ResourcePermission> globalResourcePermissions = new HashSet<>();
       globalResourcePermissions.add(ResourcePermissions.getInstance(directGlobalPermissionName));
 
-      accessControlContext.setGlobalResourcePermissions(accessorResource, resourceClassName, accessedDomain, globalResourcePermissions);
-      assertThat(accessControlContext.getEffectiveGlobalResourcePermissions(accessorResource, resourceClassName, accessedDomain), is(globalResourcePermissions));
+      accessControlContext.setGlobalResourcePermissions(accessorResource,
+                                                        resourceClassName,
+                                                        accessedDomain,
+                                                        globalResourcePermissions);
+      assertThat(accessControlContext.getEffectiveGlobalResourcePermissions(accessorResource,
+                                                                            resourceClassName,
+                                                                            accessedDomain), is(globalResourcePermissions));
 
       // verify
       final Set<ResourcePermission> permissions_post = accessControlContext.getResourcePermissions(accessorResource, accessedResource);
@@ -187,8 +197,13 @@ public class TestAccessControl_getResourcePermissions extends TestAccessControlB
       Set<ResourcePermission> domainInheritedGlobalResourcePermissions = new HashSet<>();
       domainInheritedGlobalResourcePermissions.add(ResourcePermissions.getInstance(domainInheritedGlobalPermissionName));
 
-      accessControlContext.setGlobalResourcePermissions(accessorResource, resourceClassName, parentDomain, domainInheritedGlobalResourcePermissions);
-      assertThat(accessControlContext.getEffectiveGlobalResourcePermissions(accessorResource, resourceClassName, parentDomain), is(domainInheritedGlobalResourcePermissions));
+      accessControlContext.setGlobalResourcePermissions(accessorResource,
+                                                        resourceClassName,
+                                                        parentDomain,
+                                                        domainInheritedGlobalResourcePermissions);
+      assertThat(accessControlContext.getEffectiveGlobalResourcePermissions(accessorResource,
+                                                                            resourceClassName,
+                                                                            parentDomain), is(domainInheritedGlobalResourcePermissions));
 
       // verify
       final Set<ResourcePermission> permissions_post = accessControlContext.getResourcePermissions(accessorResource, accessedResource);
@@ -252,6 +267,85 @@ public class TestAccessControl_getResourcePermissions extends TestAccessControlB
       // verify
       final Set<ResourcePermission> permissions_post = accessControlContext.getResourcePermissions(accessorResource, accessedResource);
       assertThat(permissions_post, is(directPermissions));
+   }
+
+   @Test
+   public void getResourcePermissions_withoutQueryAuthorization_shouldFailAsAuthenticated() {
+      authenticateSystemResource();
+      final String resourceClassName = generateResourceClass(false, false);
+      final String customPermissionName = generateResourceClassPermission(resourceClassName);
+      final Resource accessorResource = generateUnauthenticatableResource();
+      final Resource accessedResource = accessControlContext.createResource(resourceClassName, generateDomain());
+      assertThat(accessControlContext.getResourcePermissions(accessorResource, accessedResource).isEmpty(), is(true));
+
+      Set<ResourcePermission> permissions_pre
+            = setOf(ResourcePermissions.getInstance(ResourcePermissions.INHERIT),
+                    ResourcePermissions.getInstance(customPermissionName));
+      accessControlContext.setResourcePermissions(accessorResource, accessedResource, permissions_pre);
+
+      // authenticate without query authorization
+      generateResourceAndAuthenticate();
+
+      // verify as authenticated resource
+      try {
+         accessControlContext.getResourcePermissions(accessorResource, accessedResource);
+         fail("getting resource permissions without query authorization should have failed");
+      }
+      catch (NotAuthorizedException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("is not authorized to query resource"));
+      }
+   }
+
+   @Test
+   public void getResourcePermissions_withImplicitQueryAuthorization_shouldSucceedAsAuthenticated() {
+      authenticateSystemResource();
+      final String resourceClassName = generateResourceClass(false, false);
+      final String customPermissionName = generateResourceClassPermission(resourceClassName);
+      final Resource accessorResource = generateAuthenticatableResource(generateUniquePassword());
+      final Resource accessedResource = accessControlContext.createResource(resourceClassName, generateDomain());
+      assertThat(accessControlContext.getResourcePermissions(accessorResource, accessedResource).isEmpty(), is(true));
+
+      Set<ResourcePermission> permissions_pre
+            = setOf(ResourcePermissions.getInstance(ResourcePermissions.INHERIT),
+                    ResourcePermissions.getInstance(customPermissionName));
+      accessControlContext.setResourcePermissions(accessorResource, accessedResource, permissions_pre);
+
+      // authenticate with implicit query authorization
+      final char[] password = generateUniquePassword();
+      final Resource authenticatableResource = generateAuthenticatableResource(password);
+      accessControlContext.grantResourcePermissions(authenticatableResource,
+                                                    accessorResource,
+                                                    ResourcePermissions.getInstance(ResourcePermissions.IMPERSONATE));
+      accessControlContext.authenticate(authenticatableResource, PasswordCredentials.newInstance(password));
+
+      // verify as authenticated resource
+      final Set<ResourcePermission> permissions_post
+            = accessControlContext.getResourcePermissions(accessorResource, accessedResource);
+      assertThat(permissions_post, is(permissions_pre));
+   }
+
+   @Test
+   public void getResourcePermissions_withQueryAuthorization_shouldSucceedAsAuthenticated() {
+      authenticateSystemResource();
+      final String resourceClassName = generateResourceClass(false, false);
+      final String customPermissionName = generateResourceClassPermission(resourceClassName);
+      final Resource accessorResource = generateUnauthenticatableResource();
+      final Resource accessedResource = accessControlContext.createResource(resourceClassName, generateDomain());
+      assertThat(accessControlContext.getResourcePermissions(accessorResource, accessedResource).isEmpty(), is(true));
+
+      Set<ResourcePermission> permissions_pre
+            = setOf(ResourcePermissions.getInstance(ResourcePermissions.INHERIT),
+                    ResourcePermissions.getInstance(customPermissionName));
+      accessControlContext.setResourcePermissions(accessorResource, accessedResource, permissions_pre);
+
+      // authenticate with query authorization
+      generateResourceAndAuthenticate();
+      grantQueryPermission(accessControlContext.getSessionResource(), accessorResource);
+
+      // verify as authenticated resource
+      final Set<ResourcePermission> permissions_post
+            = accessControlContext.getResourcePermissions(accessorResource, accessedResource);
+      assertThat(permissions_post, is(permissions_pre));
    }
 
    @Test

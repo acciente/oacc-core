@@ -148,6 +148,109 @@ public class TestAccessControl_assertDomainCreatePermissions extends TestAccessC
    }
 
    @Test
+   public void assertDomainCreatePermissions_withoutQueryAuthorization_shouldFailAsAuthenticated() {
+      authenticateSystemResource();
+
+      final char[] password = generateUniquePassword();
+      final Resource authenticatableResource = generateAuthenticatableResource(password);
+      final Resource accessorResource = generateAuthenticatableResource(password);
+
+      // setup create permissions
+      grantDomainAndChildCreatePermission(accessorResource);
+
+      // authenticate accessor/creator resource
+      accessControlContext.authenticate(authenticatableResource, PasswordCredentials.newInstance(password));
+
+      // verify
+      try {
+         accessControlContext
+               .assertDomainCreatePermissions(accessorResource,
+                                              DomainCreatePermissions
+                                                    .getInstance(DomainPermissions
+                                                                       .getInstance(DomainPermissions.CREATE_CHILD_DOMAIN)));
+         fail("asserting domain create permissions without query authorization should have failed");
+      }
+      catch (NotAuthorizedException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("is not authorized to query resource"));
+      }
+
+      try {
+         accessControlContext
+               .assertDomainCreatePermissions(accessorResource,
+                                              setOf(DomainCreatePermissions
+                                                          .getInstance(DomainPermissions
+                                                                             .getInstance(DomainPermissions.CREATE_CHILD_DOMAIN))));
+         fail("asserting domain create permissions without query authorization should have failed");
+      }
+      catch (NotAuthorizedException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("is not authorized to query resource"));
+      }
+   }
+
+   @Test
+   public void assertDomainCreatePermissions_withImplicitQueryAuthorization_shouldSucceedAsAuthenticated() {
+      authenticateSystemResource();
+
+      final char[] password = generateUniquePassword();
+      final Resource authenticatableResource = generateAuthenticatableResource(password);
+      final Resource accessorResource = generateAuthenticatableResource(generateUniquePassword());
+
+      // setup create permissions
+      grantDomainAndChildCreatePermission(accessorResource);
+      // setup implicit query permission (=impersonate)
+      accessControlContext.grantResourcePermissions(authenticatableResource,
+                                                    accessorResource,
+                                                    ResourcePermissions.getInstance(ResourcePermissions.IMPERSONATE));
+
+      // authenticate accessor/creator resource
+      accessControlContext.authenticate(authenticatableResource, PasswordCredentials.newInstance(password));
+
+      // verify
+      accessControlContext
+            .assertDomainCreatePermissions(accessorResource,
+                                           DomainCreatePermissions
+                                                 .getInstance(DomainPermissions
+                                                                    .getInstance(DomainPermissions.CREATE_CHILD_DOMAIN)));
+
+      accessControlContext
+            .assertDomainCreatePermissions(accessorResource,
+                                           setOf(DomainCreatePermissions
+                                                       .getInstance(DomainPermissions
+                                                                          .getInstance(DomainPermissions.CREATE_CHILD_DOMAIN))));
+   }
+
+   @Test
+   public void assertDomainCreatePermissions_withQueryAuthorization_shouldSucceedAsAuthenticated() {
+      authenticateSystemResource();
+
+      final char[] password = generateUniquePassword();
+      final Resource authenticatableResource = generateAuthenticatableResource(password);
+      final Resource accessorResource = generateAuthenticatableResource(generateUniquePassword());
+
+      // setup query permission
+      grantQueryPermission(authenticatableResource, accessorResource);
+
+      // setup create permissions
+      grantDomainAndChildCreatePermission(accessorResource);
+
+      // authenticate accessor/creator resource
+      accessControlContext.authenticate(authenticatableResource, PasswordCredentials.newInstance(password));
+
+      // verify
+      accessControlContext
+            .assertDomainCreatePermissions(accessorResource,
+                                           DomainCreatePermissions
+                                                 .getInstance(DomainPermissions
+                                                                    .getInstance(DomainPermissions.CREATE_CHILD_DOMAIN)));
+
+      accessControlContext
+            .assertDomainCreatePermissions(accessorResource,
+                                           setOf(DomainCreatePermissions
+                                                       .getInstance(DomainPermissions
+                                                                          .getInstance(DomainPermissions.CREATE_CHILD_DOMAIN))));
+   }
+
+   @Test
    public void assertDomainCreatePermissions_direct_succeedsAsAuthenticatedResource() {
       authenticateSystemResource();
 

@@ -51,6 +51,8 @@ public class TestAccessControl_getEffectiveGlobalResourcePermissions extends Tes
       generateResourceAndAuthenticate();
 
       final Resource accessorResource = generateUnauthenticatableResource();
+      grantQueryPermission(accessControlContext.getSessionResource(), accessorResource);
+
       final Map<String, Map<String, Set<ResourcePermission>>> allGlobalPermissions
             = accessControlContext.getEffectiveGlobalResourcePermissionsMap(accessorResource);
       assertThat(allGlobalPermissions.isEmpty(), is(true));
@@ -127,6 +129,7 @@ public class TestAccessControl_getEffectiveGlobalResourcePermissions extends Tes
                                                         permissions_pre);
 
       // authenticate grantor resource
+      grantQueryPermission(grantorResource, accessorResource);
       accessControlContext.authenticate(grantorResource, PasswordCredentials.newInstance(password));
 
       // verify
@@ -229,7 +232,8 @@ public class TestAccessControl_getEffectiveGlobalResourcePermissions extends Tes
 
       // verify
       Set<ResourcePermission> permissions_expected
-            = setOf(ResourcePermissions.getInstance(ResourcePermissions.DELETE, true),
+            = setOf(ResourcePermissions.getInstance(ResourcePermissions.QUERY, true),
+                    ResourcePermissions.getInstance(ResourcePermissions.DELETE, true),
                     ResourcePermissions.getInstance(ResourcePermissions.INHERIT, true),
                     ResourcePermissions.getInstance(ResourcePermissions.IMPERSONATE, true),
                     ResourcePermissions.getInstance(ResourcePermissions.RESET_CREDENTIALS, true),
@@ -249,7 +253,8 @@ public class TestAccessControl_getEffectiveGlobalResourcePermissions extends Tes
       assertThat(permissions_post_all.get(domainName).get(accessControlContext
                                                                 .getResourceClassInfoByResource(accessorResource)
                                                                 .getResourceClassName()),
-                 is(setOf(ResourcePermissions.getInstance(ResourcePermissions.DELETE, true),
+                 is(setOf(ResourcePermissions.getInstance(ResourcePermissions.QUERY, true),
+                          ResourcePermissions.getInstance(ResourcePermissions.DELETE, true),
                           ResourcePermissions.getInstance(ResourcePermissions.INHERIT, true))));
    }
 
@@ -384,6 +389,157 @@ public class TestAccessControl_getEffectiveGlobalResourcePermissions extends Tes
       assertThat(allGlobalResourcePermissions.get(parentDomain).size(), is(1));
       assertThat(allGlobalResourcePermissions.get(childDomain).get(resourceClassName), is(childResourcePermissions_expected));
       assertThat(allGlobalResourcePermissions.get(childDomain).size(), is(1));
+   }
+
+   @Test
+   public void getEffectiveGlobalResourcePermissions_withoutQueryAuthorization_shouldFailAsAuthenticated() {
+      authenticateSystemResource();
+      final String resourceClassName = generateResourceClass(true, false);
+      final String customPermissionName = generateResourceClassPermission(resourceClassName);
+      final char[] password = generateUniquePassword();
+      final Resource grantorResource = generateAuthenticatableResource(password);
+      final Resource accessorResource = generateAuthenticatableResource(generateUniquePassword());
+      final String grantorDomainName = accessControlContext.getDomainNameByResource(grantorResource);
+      assertThat(accessControlContext.getEffectiveGlobalResourcePermissionsMap(accessorResource).isEmpty(), is(true));
+
+      Set<ResourcePermission> grantorResourcePermissions = new HashSet<>();
+      grantorResourcePermissions.add(ResourcePermissions.getInstance(ResourcePermissions.IMPERSONATE, true));
+      grantorResourcePermissions.add(ResourcePermissions.getInstance(customPermissionName, true));
+
+      Set<ResourcePermission> permissions_pre = new HashSet<>();
+      permissions_pre.add(ResourcePermissions.getInstance(ResourcePermissions.IMPERSONATE));
+      permissions_pre.add(ResourcePermissions.getInstance(customPermissionName));
+
+      // setup grantor permissions
+      accessControlContext.setGlobalResourcePermissions(grantorResource,
+                                                        resourceClassName,
+                                                        grantorDomainName,
+                                                        grantorResourcePermissions);
+      assertThat(accessControlContext.getEffectiveGlobalResourcePermissions(grantorResource,
+                                                                            resourceClassName,
+                                                                            grantorDomainName),
+                 is(grantorResourcePermissions));
+      accessControlContext.setGlobalResourcePermissions(accessorResource,
+                                                        resourceClassName,
+                                                        grantorDomainName,
+                                                        permissions_pre);
+
+      // authenticate without query authorization
+      accessControlContext.authenticate(grantorResource, PasswordCredentials.newInstance(password));
+
+      // verify
+      try {
+         accessControlContext.getEffectiveGlobalResourcePermissions(accessorResource, resourceClassName, grantorDomainName);
+         fail("getting effective global permissions without query authorization should have failed");
+      }
+      catch (NotAuthorizedException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("is not authorized to query resource"));
+      }
+      try {
+         accessControlContext.getEffectiveGlobalResourcePermissionsMap(accessorResource);
+         fail("getting effective global permissions without query authorization should have failed");
+      }
+      catch (NotAuthorizedException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("is not authorized to query resource"));
+      }
+   }
+   @Test
+   public void getEffectiveGlobalResourcePermissions_withImplicitQueryAuthorization_shouldSucceedAsAuthenticated() {
+      authenticateSystemResource();
+      final String resourceClassName = generateResourceClass(true, false);
+      final String customPermissionName = generateResourceClassPermission(resourceClassName);
+      final char[] password = generateUniquePassword();
+      final Resource grantorResource = generateAuthenticatableResource(password);
+      final Resource accessorResource = generateAuthenticatableResource(generateUniquePassword());
+      final String grantorDomainName = accessControlContext.getDomainNameByResource(grantorResource);
+      assertThat(accessControlContext.getEffectiveGlobalResourcePermissionsMap(accessorResource).isEmpty(), is(true));
+
+      Set<ResourcePermission> grantorResourcePermissions = new HashSet<>();
+      grantorResourcePermissions.add(ResourcePermissions.getInstance(ResourcePermissions.IMPERSONATE, true));
+      grantorResourcePermissions.add(ResourcePermissions.getInstance(customPermissionName, true));
+
+      Set<ResourcePermission> permissions_pre = new HashSet<>();
+      permissions_pre.add(ResourcePermissions.getInstance(ResourcePermissions.IMPERSONATE));
+      permissions_pre.add(ResourcePermissions.getInstance(customPermissionName));
+
+      // setup grantor permissions
+      accessControlContext.setGlobalResourcePermissions(grantorResource,
+                                                        resourceClassName,
+                                                        grantorDomainName,
+                                                        grantorResourcePermissions);
+      assertThat(accessControlContext.getEffectiveGlobalResourcePermissions(grantorResource,
+                                                                            resourceClassName,
+                                                                            grantorDomainName),
+                 is(grantorResourcePermissions));
+      accessControlContext.setGlobalResourcePermissions(accessorResource,
+                                                        resourceClassName,
+                                                        grantorDomainName,
+                                                        permissions_pre);
+
+      // authenticate with implicit query authorization
+      accessControlContext.grantResourcePermissions(grantorResource,
+                                                    accessorResource,
+                                                    ResourcePermissions.getInstance(ResourcePermissions.IMPERSONATE));
+      accessControlContext.authenticate(grantorResource, PasswordCredentials.newInstance(password));
+
+      // verify
+      final Set<ResourcePermission> permissions_post_specific
+            = accessControlContext.getEffectiveGlobalResourcePermissions(accessorResource, resourceClassName, grantorDomainName);
+      assertThat(permissions_post_specific, is(permissions_pre));
+
+      final Map<String, Map<String, Set<ResourcePermission>>> permissions_post_all
+            = accessControlContext.getEffectiveGlobalResourcePermissionsMap(accessorResource);
+      assertThat(permissions_post_all.size(), is(1));
+      assertThat(permissions_post_all.get(grantorDomainName).size(), is(1));
+      assertThat(permissions_post_all.get(grantorDomainName).get(resourceClassName), is(permissions_pre));
+   }
+   @Test
+   public void getEffectiveGlobalResourcePermissions_withQueryAuthorization_shouldSucceedAsAuthenticated() {
+      authenticateSystemResource();
+      final String resourceClassName = generateResourceClass(true, false);
+      final String customPermissionName = generateResourceClassPermission(resourceClassName);
+      final char[] password = generateUniquePassword();
+      final Resource grantorResource = generateAuthenticatableResource(password);
+      final Resource accessorResource = generateAuthenticatableResource(generateUniquePassword());
+      final String grantorDomainName = accessControlContext.getDomainNameByResource(grantorResource);
+      assertThat(accessControlContext.getEffectiveGlobalResourcePermissionsMap(accessorResource).isEmpty(), is(true));
+
+      Set<ResourcePermission> grantorResourcePermissions = new HashSet<>();
+      grantorResourcePermissions.add(ResourcePermissions.getInstance(ResourcePermissions.IMPERSONATE, true));
+      grantorResourcePermissions.add(ResourcePermissions.getInstance(customPermissionName, true));
+
+      Set<ResourcePermission> permissions_pre = new HashSet<>();
+      permissions_pre.add(ResourcePermissions.getInstance(ResourcePermissions.IMPERSONATE));
+      permissions_pre.add(ResourcePermissions.getInstance(customPermissionName));
+
+      // setup grantor permissions
+      accessControlContext.setGlobalResourcePermissions(grantorResource,
+                                                        resourceClassName,
+                                                        grantorDomainName,
+                                                        grantorResourcePermissions);
+      assertThat(accessControlContext.getEffectiveGlobalResourcePermissions(grantorResource,
+                                                                            resourceClassName,
+                                                                            grantorDomainName),
+                 is(grantorResourcePermissions));
+      accessControlContext.setGlobalResourcePermissions(accessorResource,
+                                                        resourceClassName,
+                                                        grantorDomainName,
+                                                        permissions_pre);
+
+      // authenticate with implicit query authorization
+      grantQueryPermission(grantorResource, accessorResource);
+      accessControlContext.authenticate(grantorResource, PasswordCredentials.newInstance(password));
+
+      // verify
+      final Set<ResourcePermission> permissions_post_specific
+            = accessControlContext.getEffectiveGlobalResourcePermissions(accessorResource, resourceClassName, grantorDomainName);
+      assertThat(permissions_post_specific, is(permissions_pre));
+
+      final Map<String, Map<String, Set<ResourcePermission>>> permissions_post_all
+            = accessControlContext.getEffectiveGlobalResourcePermissionsMap(accessorResource);
+      assertThat(permissions_post_all.size(), is(1));
+      assertThat(permissions_post_all.get(grantorDomainName).size(), is(1));
+      assertThat(permissions_post_all.get(grantorDomainName).get(resourceClassName), is(permissions_pre));
    }
 
    @Test

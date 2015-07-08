@@ -208,6 +208,163 @@ public class TestAccessControl_assertResourceCreatePermissions extends TestAcces
    }
 
    @Test
+   public void assertResourceCreatePermissions_withoutQueryAuthorization_shouldFailAsAuthenticated() {
+      authenticateSystemResource();
+
+      final char[] password = generateUniquePassword();
+      final Resource authenticatableResource = generateAuthenticatableResource(password);
+      final Resource accessorResource = generateAuthenticatableResource(generateUniquePassword());
+      final String accessorDomainName = accessControlContext.getDomainNameByResource(accessorResource);
+      final String resourceClassName = generateResourceClass(false, false);
+
+      // setup create permissions
+      final String customPermissionName_accessorDomain = generateResourceClassPermission(resourceClassName);
+      final ResourcePermission customPermission_forAccessorDomain
+            = ResourcePermissions.getInstance(customPermissionName_accessorDomain);
+      final ResourceCreatePermission customCreatePermission_accessorDomain_withGrant
+            = ResourceCreatePermissions.getInstance(customPermission_forAccessorDomain, true);
+      final ResourceCreatePermission createPermission_withGrant
+            = ResourceCreatePermissions.getInstance(ResourceCreatePermissions.CREATE, true);
+
+      grantResourceCreatePermission(accessorResource,
+                                    resourceClassName,
+                                    accessorDomainName,
+                                    createPermission_withGrant,
+                                    customCreatePermission_accessorDomain_withGrant);
+
+      // verify permissions
+      final Set<ResourceCreatePermission> allResourceCreatePermissionsForAccessorDomain
+            = accessControlContext.getEffectiveResourceCreatePermissions(accessorResource, resourceClassName, accessorDomainName);
+      assertThat(allResourceCreatePermissionsForAccessorDomain,
+                 is(setOf(createPermission_withGrant, customCreatePermission_accessorDomain_withGrant)));
+
+      // authenticate resource without query authorization
+      accessControlContext.authenticate(authenticatableResource, PasswordCredentials.newInstance(password));
+
+      // verify
+      try {
+         accessControlContext
+               .assertResourceCreatePermissions(accessorResource,
+                                                resourceClassName,
+                                                accessorDomainName,
+                                                customCreatePermission_accessorDomain_withGrant);
+         fail("asserting resource create permissions without query authorization should have failed");
+      }
+      catch (NotAuthorizedException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("is not authorized to query resource"));
+      }
+      try {
+         accessControlContext
+               .assertResourceCreatePermissions(accessorResource,
+                                                resourceClassName,
+                                                accessorDomainName,
+                                                setOf(customCreatePermission_accessorDomain_withGrant));
+         fail("asserting resource create permissions without query authorization should have failed");
+      }
+      catch (NotAuthorizedException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("is not authorized to query resource"));
+      }
+   }
+
+   @Test
+   public void assertResourceCreatePermissions_withImplicitQueryAuthorization_shouldSucceedAsAuthenticated() {
+      authenticateSystemResource();
+
+      final char[] password = generateUniquePassword();
+      final Resource authenticatableResource = generateAuthenticatableResource(password);
+      final Resource accessorResource = generateAuthenticatableResource(generateUniquePassword());
+      final String accessorDomainName = accessControlContext.getDomainNameByResource(accessorResource);
+      final String resourceClassName = generateResourceClass(false, false);
+
+      // setup create permissions
+      final String customPermissionName_accessorDomain = generateResourceClassPermission(resourceClassName);
+      final ResourcePermission customPermission_forAccessorDomain
+            = ResourcePermissions.getInstance(customPermissionName_accessorDomain);
+      final ResourceCreatePermission customCreatePermission_accessorDomain_withGrant
+            = ResourceCreatePermissions.getInstance(customPermission_forAccessorDomain, true);
+      final ResourceCreatePermission createPermission_withGrant
+            = ResourceCreatePermissions.getInstance(ResourceCreatePermissions.CREATE, true);
+
+      grantResourceCreatePermission(accessorResource,
+                                    resourceClassName,
+                                    accessorDomainName,
+                                    createPermission_withGrant,
+                                    customCreatePermission_accessorDomain_withGrant);
+
+      // verify permissions
+      final Set<ResourceCreatePermission> allResourceCreatePermissionsForAccessorDomain
+            = accessControlContext.getEffectiveResourceCreatePermissions(accessorResource, resourceClassName, accessorDomainName);
+      assertThat(allResourceCreatePermissionsForAccessorDomain,
+                 is(setOf(createPermission_withGrant, customCreatePermission_accessorDomain_withGrant)));
+
+      // authenticate resource with implicit query authorization
+      accessControlContext.grantResourcePermissions(authenticatableResource,
+                                                    accessorResource,
+                                                    ResourcePermissions.getInstance(ResourcePermissions.IMPERSONATE));
+      accessControlContext.authenticate(authenticatableResource, PasswordCredentials.newInstance(password));
+
+      // verify
+      accessControlContext
+            .assertResourceCreatePermissions(accessorResource,
+                                             resourceClassName,
+                                             accessorDomainName,
+                                             customCreatePermission_accessorDomain_withGrant);
+      accessControlContext
+            .assertResourceCreatePermissions(accessorResource,
+                                             resourceClassName,
+                                             accessorDomainName,
+                                             setOf(customCreatePermission_accessorDomain_withGrant));
+   }
+
+   @Test
+   public void assertResourceCreatePermissions_withQueryAuthorization_shouldSucceedAsAuthenticated() {
+      authenticateSystemResource();
+
+      final char[] password = generateUniquePassword();
+      final Resource authenticatableResource = generateAuthenticatableResource(password);
+      final Resource accessorResource = generateAuthenticatableResource(generateUniquePassword());
+      final String accessorDomainName = accessControlContext.getDomainNameByResource(accessorResource);
+      final String resourceClassName = generateResourceClass(false, false);
+
+      // setup create permissions
+      final String customPermissionName_accessorDomain = generateResourceClassPermission(resourceClassName);
+      final ResourcePermission customPermission_forAccessorDomain
+            = ResourcePermissions.getInstance(customPermissionName_accessorDomain);
+      final ResourceCreatePermission customCreatePermission_accessorDomain_withGrant
+            = ResourceCreatePermissions.getInstance(customPermission_forAccessorDomain, true);
+      final ResourceCreatePermission createPermission_withGrant
+            = ResourceCreatePermissions.getInstance(ResourceCreatePermissions.CREATE, true);
+
+      grantResourceCreatePermission(accessorResource,
+                                    resourceClassName,
+                                    accessorDomainName,
+                                    createPermission_withGrant,
+                                    customCreatePermission_accessorDomain_withGrant);
+
+      // verify permissions
+      final Set<ResourceCreatePermission> allResourceCreatePermissionsForAccessorDomain
+            = accessControlContext.getEffectiveResourceCreatePermissions(accessorResource, resourceClassName, accessorDomainName);
+      assertThat(allResourceCreatePermissionsForAccessorDomain,
+                 is(setOf(createPermission_withGrant, customCreatePermission_accessorDomain_withGrant)));
+
+      // authenticate resource with query authorization
+      grantQueryPermission(authenticatableResource, accessorResource);
+      accessControlContext.authenticate(authenticatableResource, PasswordCredentials.newInstance(password));
+
+      // verify
+      accessControlContext
+            .assertResourceCreatePermissions(accessorResource,
+                                             resourceClassName,
+                                             accessorDomainName,
+                                             customCreatePermission_accessorDomain_withGrant);
+      accessControlContext
+            .assertResourceCreatePermissions(accessorResource,
+                                             resourceClassName,
+                                             accessorDomainName,
+                                             setOf(customCreatePermission_accessorDomain_withGrant));
+   }
+
+   @Test
    public void assertResourceCreatePermissions_direct_succeedsAsAuthenticatedResource() {
       authenticateSystemResource();
 

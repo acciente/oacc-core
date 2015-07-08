@@ -128,6 +128,8 @@ public class TestAccessControl_deleteResource extends TestAccessControlBase {
       catch (IllegalArgumentException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("could not determine resource class for resource"));
       }
+      // ensure even system resource doesn't have any authorization on the deleted resource
+      grantQueryPermission(authenticatedResource, SYS_RESOURCE);
       try {
          accessControlContext.assertResourcePermissions(SYS_RESOURCE,
                                                         resource,
@@ -230,6 +232,8 @@ public class TestAccessControl_deleteResource extends TestAccessControlBase {
       catch (IllegalArgumentException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("could not determine resource class for resource"));
       }
+      // ensure even system resource doesn't have any authorization on the deleted resource
+      grantQueryPermission(authenticatedResource, SYS_RESOURCE);
       try {
          accessControlContext.assertResourcePermissions(SYS_RESOURCE,
                                                         impersonatedResource,

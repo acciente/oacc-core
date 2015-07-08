@@ -242,8 +242,9 @@ public class TestAccessControl_hasDomainCreatePermissions extends TestAccessCont
       Set<DomainCreatePermission> domainCreatePermissions
             = setOf(DomainCreatePermissions.getInstance(DomainCreatePermissions.CREATE,
                                                         false),
-                    DomainCreatePermissions.getInstance(DomainPermissions.getInstance(DomainPermissions.CREATE_CHILD_DOMAIN,
-                                                                                      false)),
+                    DomainCreatePermissions.getInstance(DomainPermissions
+                                                              .getInstance(DomainPermissions.CREATE_CHILD_DOMAIN,
+                                                                           false)),
                     DomainCreatePermissions.getInstance(DomainPermissions.getInstance(DomainPermissions.SUPER_USER,
                                                                                       false)));
 
@@ -458,7 +459,8 @@ public class TestAccessControl_hasDomainCreatePermissions extends TestAccessCont
       // setup accessor domain create permissions
       Set<DomainCreatePermission> accessorPermissions
             = setOf(DomainCreatePermissions.getInstance(DomainCreatePermissions.CREATE, true),
-                    DomainCreatePermissions.getInstance(DomainPermissions.getInstance(accessorPermissionName_createChild, false),
+                    DomainCreatePermissions.getInstance(DomainPermissions
+                                                              .getInstance(accessorPermissionName_createChild, false),
                                                         false));
 
       accessControlContext.setDomainCreatePermissions(accessorResource, accessorPermissions);
@@ -475,7 +477,9 @@ public class TestAccessControl_hasDomainCreatePermissions extends TestAccessCont
       if (!accessControlContext
             .hasDomainCreatePermissions(accessorResource,
                                         DomainCreatePermissions
-                                              .getInstance(DomainPermissions.getInstance(accessorPermissionName_createChild, true),
+                                              .getInstance(DomainPermissions.getInstance(
+                                                    accessorPermissionName_createChild,
+                                                    true),
                                                            true))) {
          fail("checking inherited domain create permission with different granting rights should have succeeded for authenticated resource");
       }
@@ -727,6 +731,117 @@ public class TestAccessControl_hasDomainCreatePermissions extends TestAccessCont
                                         setOf(DomainCreatePermissions
                                                     .getInstance(DomainPermissions.getInstance(donorPermissionName_createDomain))))) {
          fail("checking domain create permission inherited with empty intermediary level should have succeeded for authenticated resource");
+      }
+   }
+
+   @Test
+   public void hasDomainCreatePermissions_withoutQueryAuthorization_shouldFailAsAuthenticated() {
+      authenticateSystemResource();
+
+      final char[] password = generateUniquePassword();
+      final Resource authenticatableResource = generateAuthenticatableResource(password);
+      final Resource accessorResource = generateAuthenticatableResource(password);
+
+      // setup create permissions
+      grantDomainAndChildCreatePermission(accessorResource);
+
+      // authenticate accessor/creator resource
+      accessControlContext.authenticate(authenticatableResource, PasswordCredentials.newInstance(password));
+
+      // verify
+      try {
+         accessControlContext
+               .hasDomainCreatePermissions(accessorResource,
+                                           DomainCreatePermissions
+                                                 .getInstance(DomainPermissions
+                                                                    .getInstance(DomainPermissions.CREATE_CHILD_DOMAIN)));
+         fail("checking domain create permissions without query authorization should have failed");
+      }
+      catch (NotAuthorizedException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("is not authorized to query resource"));
+      }
+
+      try {
+         accessControlContext
+               .hasDomainCreatePermissions(accessorResource,
+                                           setOf(DomainCreatePermissions
+                                                       .getInstance(DomainPermissions
+                                                                          .getInstance(DomainPermissions.CREATE_CHILD_DOMAIN))));
+         fail("checking domain create permissions without query authorization should have failed");
+      }
+      catch (NotAuthorizedException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("is not authorized to query resource"));
+      }
+   }
+
+   @Test
+   public void hasDomainCreatePermissions_withImplicitQueryAuthorization_shouldSucceedAsAuthenticated() {
+      authenticateSystemResource();
+
+      final char[] password = generateUniquePassword();
+      final Resource authenticatableResource = generateAuthenticatableResource(password);
+      final Resource accessorResource = generateAuthenticatableResource(generateUniquePassword());
+
+      // setup create permissions
+      grantDomainAndChildCreatePermission(accessorResource);
+      // setup implicit query permission (=impersonate)
+      accessControlContext.grantResourcePermissions(authenticatableResource,
+                                                    accessorResource,
+                                                    ResourcePermissions.getInstance(ResourcePermissions.IMPERSONATE));
+
+      // authenticate accessor/creator resource
+      accessControlContext.authenticate(authenticatableResource, PasswordCredentials.newInstance(password));
+
+      // verify
+      if (!accessControlContext
+            .hasDomainCreatePermissions(accessorResource,
+                                        DomainCreatePermissions
+                                              .getInstance(DomainPermissions
+                                                                 .getInstance(DomainPermissions.CREATE_CHILD_DOMAIN)))) {
+         fail("checking domain create permissions with implicit query authorization should have succeeded");
+      }
+
+      if (!accessControlContext
+            .hasDomainCreatePermissions(accessorResource,
+                                        setOf(DomainCreatePermissions
+                                                    .getInstance(DomainPermissions
+                                                                       .getInstance(DomainPermissions.CREATE_CHILD_DOMAIN))))) {
+         fail("checking domain create permissions with implicit query authorization should have succeeded");
+      }
+   }
+
+   @Test
+   public void hasDomainCreatePermissions_withQueryAuthorization_shouldSucceedAsAuthenticated() {
+      authenticateSystemResource();
+
+      final char[] password = generateUniquePassword();
+      final Resource authenticatableResource = generateAuthenticatableResource(password);
+      final Resource accessorResource = generateAuthenticatableResource(generateUniquePassword());
+
+      // setup query permission
+      grantQueryPermission(authenticatableResource, accessorResource);
+
+      // setup create permissions
+      grantDomainAndChildCreatePermission(accessorResource);
+
+      // authenticate accessor/creator resource
+      accessControlContext.authenticate(authenticatableResource, PasswordCredentials.newInstance(password));
+
+      // verify
+      if (!accessControlContext
+            .hasDomainCreatePermissions(accessorResource,
+                                           DomainCreatePermissions
+                                                 .getInstance(DomainPermissions
+                                                                    .getInstance(DomainPermissions.CREATE_CHILD_DOMAIN)))) {
+         fail("checking domain create permissions with query authorization should have succeeded");
+      }
+
+      if (!accessControlContext
+            .hasDomainCreatePermissions(accessorResource,
+                                           setOf(DomainCreatePermissions
+                                                       .getInstance(DomainPermissions
+                                                                          .getInstance(DomainPermissions.CREATE_CHILD_DOMAIN))))) {
+         fail("checking domain create permissions with query authorization should have succeeded");
       }
    }
 

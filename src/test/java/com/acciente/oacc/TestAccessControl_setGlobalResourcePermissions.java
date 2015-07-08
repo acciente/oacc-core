@@ -166,9 +166,12 @@ public class TestAccessControl_setGlobalResourcePermissions extends TestAccessCo
                                                         resourceClassName,
                                                         domainName,
                                                         grantorResourcePermissions);
-      assertThat(accessControlContext.getEffectiveGlobalResourcePermissions(grantorResource, resourceClassName, domainName), is(grantorResourcePermissions));
+      assertThat(accessControlContext.getEffectiveGlobalResourcePermissions(grantorResource,
+                                                                            resourceClassName,
+                                                                            domainName), is(grantorResourcePermissions));
 
       // authenticate grantor resource
+      grantQueryPermission(grantorResource, accessorResource);
       accessControlContext.authenticate(grantorResource, PasswordCredentials.newInstance(password));
 
       // set global permissions as grantor and verify
@@ -248,11 +251,17 @@ public class TestAccessControl_setGlobalResourcePermissions extends TestAccessCo
       Set<ResourcePermission> grantorPermissions = new HashSet<>();
       grantorPermissions.add(ResourcePermissions.getInstance(grantedPermissionName, true));
 
-      accessControlContext.setGlobalResourcePermissions(grantorResource, resourceClassName, domainName, grantorPermissions);
-      assertThat(accessControlContext.getEffectiveGlobalResourcePermissions(grantorResource, resourceClassName, domainName),
+      accessControlContext.setGlobalResourcePermissions(grantorResource,
+                                                        resourceClassName,
+                                                        domainName,
+                                                        grantorPermissions);
+      assertThat(accessControlContext.getEffectiveGlobalResourcePermissions(grantorResource,
+                                                                            resourceClassName,
+                                                                            domainName),
                  is(grantorPermissions));
 
       // authenticate grantor resource
+      grantQueryPermission(grantorResource, accessorResource);
       accessControlContext.authenticate(grantorResource, PasswordCredentials.newInstance(password));
 
       // set permissions as grantor and verify
@@ -295,11 +304,16 @@ public class TestAccessControl_setGlobalResourcePermissions extends TestAccessCo
       Set<ResourcePermission> grantorPermissions = new HashSet<>();
       grantorPermissions.add(ResourcePermissions.getInstance(grantedPermissionName, true));
 
-      accessControlContext.setGlobalResourcePermissions(grantorResource, resourceClassName, domainName, grantorPermissions);
-      assertThat(accessControlContext.getEffectiveGlobalResourcePermissions(grantorResource, resourceClassName, domainName),
+      accessControlContext.setGlobalResourcePermissions(grantorResource,
+                                                        resourceClassName,
+                                                        domainName,
+                                                        grantorPermissions);
+      assertThat(accessControlContext.getEffectiveGlobalResourcePermissions(grantorResource, resourceClassName,
+                                                                            domainName),
                  is(grantorPermissions));
 
       // authenticate grantor resource
+      grantQueryPermission(grantorResource, accessorResource);
       accessControlContext.authenticate(grantorResource, PasswordCredentials.newInstance(password));
 
       // set permissions as grantor and verify
@@ -338,11 +352,17 @@ public class TestAccessControl_setGlobalResourcePermissions extends TestAccessCo
       Set<ResourcePermission> grantorResourcePermissions = new HashSet<>();
       grantorResourcePermissions.add(ResourcePermissions.getInstance(grantedPermissionName, true));
 
-      accessControlContext.setGlobalResourcePermissions(grantorResource, resourceClassName, domainName, grantorResourcePermissions);
-      assertThat(accessControlContext.getEffectiveGlobalResourcePermissions(grantorResource, resourceClassName, domainName),
+      accessControlContext.setGlobalResourcePermissions(grantorResource,
+                                                        resourceClassName,
+                                                        domainName,
+                                                        grantorResourcePermissions);
+      assertThat(accessControlContext.getEffectiveGlobalResourcePermissions(grantorResource,
+                                                                            resourceClassName,
+                                                                            domainName),
                  is(grantorResourcePermissions));
 
       // authenticate grantor resource
+      grantQueryPermission(grantorResource, accessorResource);
       accessControlContext.authenticate(grantorResource, PasswordCredentials.newInstance(password));
 
       // set permissions as grantor and verify
@@ -431,6 +451,7 @@ public class TestAccessControl_setGlobalResourcePermissions extends TestAccessCo
                  is(grantorResourcePermissions));
 
       // authenticate grantor resource
+      grantQueryPermission(grantorResource, accessorResource);
       accessControlContext.authenticate(grantorResource, PasswordCredentials.newInstance(password));
 
       // set permissions as grantor and verify

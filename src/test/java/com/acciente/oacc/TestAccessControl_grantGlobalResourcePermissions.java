@@ -218,10 +218,13 @@ public class TestAccessControl_grantGlobalResourcePermissions extends TestAccess
                                                         resourceClassName,
                                                         domainName,
                                                         grantorResourcePermissions);
-      assertThat(accessControlContext.getEffectiveGlobalResourcePermissions(grantorResource, resourceClassName, domainName),
+      assertThat(accessControlContext.getEffectiveGlobalResourcePermissions(grantorResource,
+                                                                            resourceClassName,
+                                                                            domainName),
                  is(grantorResourcePermissions));
 
       // authenticate grantor resource
+      grantQueryPermission(grantorResource, accessorResource);
       accessControlContext.authenticate(grantorResource, PasswordCredentials.newInstance(password));
 
       // grant global permissions as grantor and verify
@@ -237,6 +240,7 @@ public class TestAccessControl_grantGlobalResourcePermissions extends TestAccess
 
       // test set-based version
       final Resource accessorResource2 = generateUnauthenticatableResource();
+      grantQueryPermission(grantorResource, accessorResource2);
       assertThat(accessControlContext.getEffectiveGlobalResourcePermissionsMap(accessorResource2).isEmpty(), is(true));
 
       accessControlContext.grantGlobalResourcePermissions(accessorResource2,
@@ -401,6 +405,7 @@ public class TestAccessControl_grantGlobalResourcePermissions extends TestAccess
                  is(grantorResourcePermissions));
 
       // authenticate grantor resource
+      grantQueryPermission(grantorResource, accessorResource);
       accessControlContext.authenticate(grantorResource, PasswordCredentials.newInstance(password));
 
       // grant permissions as grantor and verify
@@ -415,6 +420,7 @@ public class TestAccessControl_grantGlobalResourcePermissions extends TestAccess
 
       // test set-based version
       final Resource accessorResource2 = generateUnauthenticatableResource();
+      grantQueryPermission(grantorResource, accessorResource2);
       accessControlContext.setGlobalResourcePermissions(accessorResource2,
                                                         resourceClassName,
                                                         domainName,
@@ -539,6 +545,7 @@ public class TestAccessControl_grantGlobalResourcePermissions extends TestAccess
                  is(grantorResourcePermissions));
 
       // authenticate grantor resource
+      grantQueryPermission(grantorResource, accessorResource);
       accessControlContext.authenticate(grantorResource, PasswordCredentials.newInstance(password));
 
       // grant permissions as grantor and verify
@@ -556,6 +563,7 @@ public class TestAccessControl_grantGlobalResourcePermissions extends TestAccess
 
       // test set-based version
       final Resource accessorResource2 = generateUnauthenticatableResource();
+      grantQueryPermission(grantorResource, accessorResource2);
       accessControlContext.setGlobalResourcePermissions(accessorResource2,
                                                         resourceClassName,
                                                         domainName,

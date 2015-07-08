@@ -319,10 +319,14 @@ public class TestAccessControl_revokeGlobalResourcePermissions extends TestAcces
                                                         resourceClassName,
                                                         domainName,
                                                         grantorResourcePermissions);
-      assertThat(accessControlContext.getEffectiveGlobalResourcePermissions(grantorResource, resourceClassName, domainName),
+      assertThat(accessControlContext.getEffectiveGlobalResourcePermissions(grantorResource,
+                                                                            resourceClassName,
+                                                                            domainName),
                  is(grantorResourcePermissions));
 
       // authenticate grantor resource
+      grantQueryPermission(grantorResource, accessorResource);
+      grantQueryPermission(grantorResource, accessorResource2);
       accessControlContext.authenticate(grantorResource, PasswordCredentials.newInstance(password));
 
       // revoke global permissions as grantor and verify
@@ -451,6 +455,8 @@ public class TestAccessControl_revokeGlobalResourcePermissions extends TestAcces
                  is(grantorResourcePermissions));
 
       // authenticate grantor resource
+      grantQueryPermission(grantorResource, accessorResource);
+      grantQueryPermission(grantorResource, accessorResource2);
       accessControlContext.authenticate(grantorResource, PasswordCredentials.newInstance(password));
 
       // revoke global permissions as grantor and verify
@@ -573,7 +579,9 @@ public class TestAccessControl_revokeGlobalResourcePermissions extends TestAcces
                                                         resourceClassName,
                                                         domainName,
                                                         accessorPermissions_pre);
-      assertThat(accessControlContext.getEffectiveGlobalResourcePermissions(accessorResource, resourceClassName, domainName),
+      assertThat(accessControlContext.getEffectiveGlobalResourcePermissions(accessorResource,
+                                                                            resourceClassName,
+                                                                            domainName),
                  is(accessorPermissions_pre));
 
       final Resource accessorResource2 = generateUnauthenticatableResource();
@@ -591,10 +599,14 @@ public class TestAccessControl_revokeGlobalResourcePermissions extends TestAcces
                                                         resourceClassName,
                                                         domainName,
                                                         grantorResourcePermissions);
-      assertThat(accessControlContext.getEffectiveGlobalResourcePermissions(grantorResource, resourceClassName, domainName),
+      assertThat(accessControlContext.getEffectiveGlobalResourcePermissions(grantorResource,
+                                                                            resourceClassName,
+                                                                            domainName),
                  is(grantorResourcePermissions));
 
       // authenticate grantor resource
+      grantQueryPermission(grantorResource, accessorResource);
+      grantQueryPermission(grantorResource, accessorResource2);
       accessControlContext.authenticate(grantorResource, PasswordCredentials.newInstance(password));
 
       // revoke permissions as grantor and verify
@@ -664,6 +676,8 @@ public class TestAccessControl_revokeGlobalResourcePermissions extends TestAcces
                  is(grantorResourcePermissions));
 
       // authenticate grantor resource
+      grantQueryPermission(grantorResource, accessorResource);
+      grantQueryPermission(grantorResource, accessorResource2);
       accessControlContext.authenticate(grantorResource, PasswordCredentials.newInstance(password));
 
       // revoke permissions as grantor and verify
@@ -730,6 +744,8 @@ public class TestAccessControl_revokeGlobalResourcePermissions extends TestAcces
                  is(grantorResourcePermissions));
 
       // authenticate grantor resource
+      grantQueryPermission(grantorResource, accessorResource);
+      grantQueryPermission(grantorResource, accessorResource2);
       accessControlContext.authenticate(grantorResource, PasswordCredentials.newInstance(password));
 
       // revoke permissions as grantor and verify
@@ -896,6 +912,8 @@ public class TestAccessControl_revokeGlobalResourcePermissions extends TestAcces
                  is(grantorResourcePermissions));
 
       // authenticate grantor resource
+      grantQueryPermission(grantorResource, accessorResource);
+      grantQueryPermission(grantorResource, accessorResource2);
       accessControlContext.authenticate(grantorResource, PasswordCredentials.newInstance(password));
 
       // revoke permissions and verify

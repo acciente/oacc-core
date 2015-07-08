@@ -42,6 +42,7 @@ public class TestAccessControl_getEffectiveDomainCreatePermissions extends TestA
       final Resource accessorResource = generateUnauthenticatableResource();
 
       generateResourceAndAuthenticate();
+      grantQueryPermission(accessControlContext.getSessionResource(), accessorResource);
 
       Set<DomainCreatePermission> domainCreatePermissions = accessControlContext.getEffectiveDomainCreatePermissions(accessorResource);
       assertThat(domainCreatePermissions.isEmpty(), is(true));
@@ -132,9 +133,11 @@ public class TestAccessControl_getEffectiveDomainCreatePermissions extends TestA
       Set<DomainCreatePermission> accessorPermissions = new HashSet<>();
       accessorPermissions.add(DomainCreatePermissions.getInstance(DomainCreatePermissions.CREATE, true));
       accessorPermissions.add(DomainCreatePermissions
-                                    .getInstance(DomainPermissions.getInstance(accessorPermissionName_createChild, false), false));
+                                    .getInstance(DomainPermissions.getInstance(accessorPermissionName_createChild,
+                                                                               false), false));
       accessorPermissions.add(DomainCreatePermissions
-                                    .getInstance(DomainPermissions.getInstance(accessorPermissionName_superUser, true), true));
+                                    .getInstance(DomainPermissions.getInstance(accessorPermissionName_superUser, true),
+                                                 true));
 
       accessControlContext.setDomainCreatePermissions(accessorResource, accessorPermissions);
       assertThat(accessControlContext.getEffectiveDomainCreatePermissions(accessorResource), is(accessorPermissions));
@@ -150,9 +153,11 @@ public class TestAccessControl_getEffectiveDomainCreatePermissions extends TestA
       Set<DomainCreatePermission> permissions_expected = new HashSet<>();
       permissions_expected.add(DomainCreatePermissions.getInstance(DomainCreatePermissions.CREATE, true));
       permissions_expected.add(DomainCreatePermissions
-                                     .getInstance(DomainPermissions.getInstance(accessorPermissionName_createChild, true), true));
+                                     .getInstance(DomainPermissions.getInstance(accessorPermissionName_createChild,
+                                                                                true), true));
       permissions_expected.add(DomainCreatePermissions
-                                     .getInstance(DomainPermissions.getInstance(accessorPermissionName_superUser, true), true));
+                                     .getInstance(DomainPermissions.getInstance(accessorPermissionName_superUser, true),
+                                                  true));
 
       final Set<DomainCreatePermission> permissions_post
             = accessControlContext.getEffectiveDomainCreatePermissions(accessorResource);
@@ -172,8 +177,12 @@ public class TestAccessControl_getEffectiveDomainCreatePermissions extends TestA
       // setup donor 1 domain create permissions
       Set<DomainCreatePermission> donor1Permissions = new HashSet<>();
       donor1Permissions.add(DomainCreatePermissions.getInstance(DomainCreatePermissions.CREATE));
-      donor1Permissions.add(DomainCreatePermissions.getInstance(DomainPermissions.getInstance(donorPermissionName_superUser, false), true));
-      donor1Permissions.add(DomainCreatePermissions.getInstance(DomainPermissions.getInstance(donorPermissionName_createChild, true), false));
+      donor1Permissions.add(DomainCreatePermissions.getInstance(DomainPermissions.getInstance(
+            donorPermissionName_superUser,
+            false), true));
+      donor1Permissions.add(DomainCreatePermissions.getInstance(DomainPermissions.getInstance(
+            donorPermissionName_createChild,
+            true), false));
 
       accessControlContext.setDomainCreatePermissions(donor1Resource, donor1Permissions);
       assertThat(accessControlContext.getEffectiveDomainCreatePermissions(donor1Resource), is(donor1Permissions));
@@ -181,8 +190,12 @@ public class TestAccessControl_getEffectiveDomainCreatePermissions extends TestA
       // setup donor 2 domain create permissions
       Set<DomainCreatePermission> donor2Permissions = new HashSet<>();
       donor2Permissions.add(DomainCreatePermissions.getInstance(DomainCreatePermissions.CREATE));
-      donor2Permissions.add(DomainCreatePermissions.getInstance(DomainPermissions.getInstance(donorPermissionName_superUser, true), true));
-      donor2Permissions.add(DomainCreatePermissions.getInstance(DomainPermissions.getInstance(donorPermissionName_createChild, false), true));
+      donor2Permissions.add(DomainCreatePermissions.getInstance(DomainPermissions.getInstance(
+            donorPermissionName_superUser,
+            true), true));
+      donor2Permissions.add(DomainCreatePermissions.getInstance(DomainPermissions.getInstance(
+            donorPermissionName_createChild,
+            false), true));
 
       accessControlContext.setDomainCreatePermissions(donor2Resource, donor2Permissions);
       assertThat(accessControlContext.getEffectiveDomainCreatePermissions(donor2Resource), is(donor2Permissions));
@@ -208,7 +221,8 @@ public class TestAccessControl_getEffectiveDomainCreatePermissions extends TestA
       Set<DomainCreatePermission> permissions_expected = new HashSet<>();
       permissions_expected.add(DomainCreatePermissions.getInstance(DomainCreatePermissions.CREATE));
       permissions_expected.add(DomainCreatePermissions
-                                     .getInstance(DomainPermissions.getInstance(donorPermissionName_superUser, true), true));
+                                     .getInstance(DomainPermissions.getInstance(donorPermissionName_superUser, true),
+                                                  true));
       permissions_expected.add(DomainCreatePermissions
                                      .getInstance(DomainPermissions.getInstance(donorPermissionName_createChild, false), true));
       permissions_expected.add(DomainCreatePermissions
@@ -243,10 +257,12 @@ public class TestAccessControl_getEffectiveDomainCreatePermissions extends TestA
       Set<DomainCreatePermission> inheritorPermissions = new HashSet<>();
       inheritorPermissions.add(DomainCreatePermissions.getInstance(DomainCreatePermissions.CREATE));
       inheritorPermissions.add(DomainCreatePermissions
-                                     .getInstance(DomainPermissions.getInstance(inheritorPermissionName_superUser, false),
+                                     .getInstance(DomainPermissions.getInstance(inheritorPermissionName_superUser,
+                                                                                false),
                                                   true));
       inheritorPermissions.add(DomainCreatePermissions
-                                     .getInstance(DomainPermissions.getInstance(inheritorPermissionName_createDomain, true),
+                                     .getInstance(DomainPermissions.getInstance(inheritorPermissionName_createDomain,
+                                                                                true),
                                                   false));
 
       accessControlContext.setDomainCreatePermissions(inheritorResource, inheritorPermissions);
@@ -278,11 +294,14 @@ public class TestAccessControl_getEffectiveDomainCreatePermissions extends TestA
       Set<DomainCreatePermission> permissions_expected = new HashSet<>();
       permissions_expected.add(DomainCreatePermissions.getInstance(DomainCreatePermissions.CREATE));
       permissions_expected.add(DomainCreatePermissions
-                                     .getInstance(DomainPermissions.getInstance(donorPermissionName_superUser, true), true));
+                                     .getInstance(DomainPermissions.getInstance(donorPermissionName_superUser, true),
+                                                  true));
       permissions_expected.add(DomainCreatePermissions
-                                     .getInstance(DomainPermissions.getInstance(accessorPermissionName_createDomain, true), false));
+                                     .getInstance(DomainPermissions.getInstance(accessorPermissionName_createDomain,
+                                                                                true), false));
       permissions_expected.add(DomainCreatePermissions
-                                     .getInstance(DomainPermissions.getInstance(accessorPermissionName_createDomain, false), true));
+                                     .getInstance(DomainPermissions.getInstance(accessorPermissionName_createDomain,
+                                                                                false), true));
 
       final Set<DomainCreatePermission> permissions_post
             = accessControlContext.getEffectiveDomainCreatePermissions(accessorResource);
@@ -302,7 +321,8 @@ public class TestAccessControl_getEffectiveDomainCreatePermissions extends TestA
       // setup donor domain create permissions
       Set<DomainCreatePermission> donorPermissions = new HashSet<>();
       donorPermissions.add(DomainCreatePermissions.getInstance(DomainCreatePermissions.CREATE));
-      donorPermissions.add(DomainCreatePermissions.getInstance(DomainPermissions.getInstance(donorPermissionName_superUser)));
+      donorPermissions.add(DomainCreatePermissions.getInstance(DomainPermissions.getInstance(
+            donorPermissionName_superUser)));
 
       accessControlContext.setDomainCreatePermissions(donorResource, donorPermissions);
       assertThat(accessControlContext.getEffectiveDomainCreatePermissions(donorResource), is(donorPermissions));
@@ -334,12 +354,108 @@ public class TestAccessControl_getEffectiveDomainCreatePermissions extends TestA
 
       Set<DomainCreatePermission> permissions_expected = new HashSet<>();
       permissions_expected.add(DomainCreatePermissions.getInstance(DomainCreatePermissions.CREATE));
-      permissions_expected.add(DomainCreatePermissions.getInstance(DomainPermissions.getInstance(donorPermissionName_superUser)));
-      permissions_expected.add(DomainCreatePermissions.getInstance(DomainPermissions.getInstance(accessorPermissionName_createDomain), true));
+      permissions_expected.add(DomainCreatePermissions.getInstance(DomainPermissions.getInstance(
+            donorPermissionName_superUser)));
+      permissions_expected.add(DomainCreatePermissions.getInstance(DomainPermissions.getInstance(
+            accessorPermissionName_createDomain), true));
 
       final Set<DomainCreatePermission> permissions_post
             = accessControlContext.getEffectiveDomainCreatePermissions(accessorResource);
       assertThat(permissions_post, is(permissions_expected));
+   }
+
+   @Test
+   public void getEffectiveDomainCreatePermissions_withoutQueryAuthorization_shouldFailAsAuthenticated() {
+      authenticateSystemResource();
+      final DomainCreatePermission domCreatePerm_superuser
+            = DomainCreatePermissions.getInstance(DomainPermissions.getInstance(DomainPermissions.SUPER_USER));
+      final DomainCreatePermission domCreatePerm_create_withGrant
+            = DomainCreatePermissions.getInstance(DomainCreatePermissions.CREATE, true);
+      final DomainCreatePermission domCreatePerm_child
+            = DomainCreatePermissions.getInstance(DomainPermissions.getInstance(DomainPermissions.CREATE_CHILD_DOMAIN),
+                                                  false);
+
+      // set domain create permissions
+      Resource accessorResource = generateAuthenticatableResource(generateUniquePassword());
+      Set<DomainCreatePermission> domainCreatePermissions_pre = new HashSet();
+      domainCreatePermissions_pre.add(domCreatePerm_superuser);
+      domainCreatePermissions_pre.add(domCreatePerm_create_withGrant);
+      domainCreatePermissions_pre.add(domCreatePerm_child);
+      accessControlContext.setDomainCreatePermissions(accessorResource, domainCreatePermissions_pre);
+
+      // authenticate without query authorization
+      generateResourceAndAuthenticate();
+
+      // get domain create permissions and verify
+      try {
+         accessControlContext.getEffectiveDomainCreatePermissions(accessorResource);
+         fail("getting effective domain create permissions without query authorization should have failed");
+      }
+      catch (NotAuthorizedException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("is not authorized to query resource"));
+      }
+   }
+
+   @Test
+   public void getEffectiveDomainCreatePermissions_withImplicitQueryAuthorization_shouldSucceedAsAuthenticated() {
+      authenticateSystemResource();
+      final DomainCreatePermission domCreatePerm_superuser
+            = DomainCreatePermissions.getInstance(DomainPermissions.getInstance(DomainPermissions.SUPER_USER));
+      final DomainCreatePermission domCreatePerm_create_withGrant
+            = DomainCreatePermissions.getInstance(DomainCreatePermissions.CREATE, true);
+      final DomainCreatePermission domCreatePerm_child
+            = DomainCreatePermissions.getInstance(DomainPermissions.getInstance(DomainPermissions.CREATE_CHILD_DOMAIN),
+                                                  false);
+
+      // set domain create permissions
+      Resource accessorResource = generateAuthenticatableResource(generateUniquePassword());
+      Set<DomainCreatePermission> domainCreatePermissions_pre = new HashSet();
+      domainCreatePermissions_pre.add(domCreatePerm_superuser);
+      domainCreatePermissions_pre.add(domCreatePerm_create_withGrant);
+      domainCreatePermissions_pre.add(domCreatePerm_child);
+      accessControlContext.setDomainCreatePermissions(accessorResource, domainCreatePermissions_pre);
+
+      // authenticate with implicit query authorization
+      final char[] password = generateUniquePassword();
+      final Resource authenticatableResource = generateAuthenticatableResource(password);
+      accessControlContext.grantResourcePermissions(authenticatableResource,
+                                                    accessorResource,
+                                                    ResourcePermissions.getInstance(ResourcePermissions.IMPERSONATE));
+      accessControlContext.authenticate(authenticatableResource, PasswordCredentials.newInstance(password));
+
+      // get domain create permissions and verify
+      final Set<DomainCreatePermission> domainCreatePermissions_post = accessControlContext.getEffectiveDomainCreatePermissions(accessorResource);
+      assertThat(domainCreatePermissions_post, is(domainCreatePermissions_pre));
+   }
+
+   @Test
+   public void getEffectiveDomainCreatePermissions_withQueryAuthorization_shouldSucceedAsAuthenticated() {
+      authenticateSystemResource();
+      final DomainCreatePermission domCreatePerm_superuser
+            = DomainCreatePermissions.getInstance(DomainPermissions.getInstance(DomainPermissions.SUPER_USER));
+      final DomainCreatePermission domCreatePerm_create_withGrant
+            = DomainCreatePermissions.getInstance(DomainCreatePermissions.CREATE, true);
+      final DomainCreatePermission domCreatePerm_child
+            = DomainCreatePermissions.getInstance(DomainPermissions.getInstance(DomainPermissions.CREATE_CHILD_DOMAIN),
+                                                  false);
+
+      // set domain create permissions
+      Resource accessorResource = generateAuthenticatableResource(generateUniquePassword());
+      Set<DomainCreatePermission> domainCreatePermissions_pre = new HashSet();
+      domainCreatePermissions_pre.add(domCreatePerm_superuser);
+      domainCreatePermissions_pre.add(domCreatePerm_create_withGrant);
+      domainCreatePermissions_pre.add(domCreatePerm_child);
+      accessControlContext.setDomainCreatePermissions(accessorResource, domainCreatePermissions_pre);
+
+      // authenticate with query authorization
+      final char[] password = generateUniquePassword();
+      final Resource authenticatableResource = generateAuthenticatableResource(password);
+      grantQueryPermission(authenticatableResource, accessorResource);
+      accessControlContext.authenticate(authenticatableResource, PasswordCredentials.newInstance(password));
+
+      // get domain create permissions and verify
+      final Set<DomainCreatePermission> domainCreatePermissions_post = accessControlContext.getEffectiveDomainCreatePermissions(accessorResource);
+      assertThat(domainCreatePermissions_post, is(domainCreatePermissions_pre));
    }
 
    @Test

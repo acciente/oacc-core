@@ -42,6 +42,7 @@ public class TestAccessControl_getDomainCreatePermissions extends TestAccessCont
       final Resource accessorResource = generateUnauthenticatableResource();
 
       generateResourceAndAuthenticate();
+      grantQueryPermission(accessControlContext.getSessionResource(), accessorResource);
 
       Set<DomainCreatePermission> domainCreatePermissions = accessControlContext.getDomainCreatePermissions(accessorResource);
       assertThat(domainCreatePermissions.isEmpty(), is(true));
@@ -65,6 +66,100 @@ public class TestAccessControl_getDomainCreatePermissions extends TestAccessCont
       domainCreatePermissions_pre.add(domCreatePerm_create_withGrant);
       domainCreatePermissions_pre.add(domCreatePerm_child);
       accessControlContext.setDomainCreatePermissions(accessorResource, domainCreatePermissions_pre);
+
+      // get domain create permissions and verify
+      final Set<DomainCreatePermission> domainCreatePermissions_post = accessControlContext.getDomainCreatePermissions(accessorResource);
+      assertThat(domainCreatePermissions_post, is(domainCreatePermissions_pre));
+   }
+
+   @Test
+   public void getDomainCreatePermissions_withoutQueryAuthorization_shouldFailAsAuthenticated() {
+      authenticateSystemResource();
+      final DomainCreatePermission domCreatePerm_superuser
+            = DomainCreatePermissions.getInstance(DomainPermissions.getInstance(DomainPermissions.SUPER_USER));
+      final DomainCreatePermission domCreatePerm_create_withGrant
+            = DomainCreatePermissions.getInstance(DomainCreatePermissions.CREATE, true);
+      final DomainCreatePermission domCreatePerm_child
+            = DomainCreatePermissions.getInstance(DomainPermissions.getInstance(DomainPermissions.CREATE_CHILD_DOMAIN),
+                                                  false);
+
+      // set domain create permissions
+      Resource accessorResource = generateAuthenticatableResource(generateUniquePassword());
+      Set<DomainCreatePermission> domainCreatePermissions_pre = new HashSet();
+      domainCreatePermissions_pre.add(domCreatePerm_superuser);
+      domainCreatePermissions_pre.add(domCreatePerm_create_withGrant);
+      domainCreatePermissions_pre.add(domCreatePerm_child);
+      accessControlContext.setDomainCreatePermissions(accessorResource, domainCreatePermissions_pre);
+
+      // authenticate without query authorization
+      generateResourceAndAuthenticate();
+
+      // get domain create permissions and verify
+      try {
+         accessControlContext.getDomainCreatePermissions(accessorResource);
+         fail("getting domain create permissions without query authorization should have failed");
+      }
+      catch (NotAuthorizedException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("is not authorized to query resource"));
+      }
+   }
+
+   @Test
+   public void getDomainCreatePermissions_withImplicitQueryAuthorization_shouldSucceedAsAuthenticated() {
+      authenticateSystemResource();
+      final DomainCreatePermission domCreatePerm_superuser
+            = DomainCreatePermissions.getInstance(DomainPermissions.getInstance(DomainPermissions.SUPER_USER));
+      final DomainCreatePermission domCreatePerm_create_withGrant
+            = DomainCreatePermissions.getInstance(DomainCreatePermissions.CREATE, true);
+      final DomainCreatePermission domCreatePerm_child
+            = DomainCreatePermissions.getInstance(DomainPermissions.getInstance(DomainPermissions.CREATE_CHILD_DOMAIN),
+                                                  false);
+
+      // set domain create permissions
+      Resource accessorResource = generateAuthenticatableResource(generateUniquePassword());
+      Set<DomainCreatePermission> domainCreatePermissions_pre = new HashSet();
+      domainCreatePermissions_pre.add(domCreatePerm_superuser);
+      domainCreatePermissions_pre.add(domCreatePerm_create_withGrant);
+      domainCreatePermissions_pre.add(domCreatePerm_child);
+      accessControlContext.setDomainCreatePermissions(accessorResource, domainCreatePermissions_pre);
+
+      // authenticate with implicit query authorization
+      final char[] password = generateUniquePassword();
+      Resource authenticatableResource = generateAuthenticatableResource(password);
+      accessControlContext.grantResourcePermissions(authenticatableResource,
+                                                    accessorResource,
+                                                    ResourcePermissions.getInstance(ResourcePermissions.IMPERSONATE));
+      accessControlContext.authenticate(authenticatableResource, PasswordCredentials.newInstance(password));
+
+      // get domain create permissions and verify
+      final Set<DomainCreatePermission> domainCreatePermissions_post = accessControlContext.getDomainCreatePermissions(accessorResource);
+      assertThat(domainCreatePermissions_post, is(domainCreatePermissions_pre));
+   }
+
+   @Test
+   public void getDomainCreatePermissions_withQueryAuthorization_shouldSucceedAsAuthenticated() {
+      authenticateSystemResource();
+      final DomainCreatePermission domCreatePerm_superuser
+            = DomainCreatePermissions.getInstance(DomainPermissions.getInstance(DomainPermissions.SUPER_USER));
+      final DomainCreatePermission domCreatePerm_create_withGrant
+            = DomainCreatePermissions.getInstance(DomainCreatePermissions.CREATE, true);
+      final DomainCreatePermission domCreatePerm_child
+            = DomainCreatePermissions.getInstance(DomainPermissions.getInstance(DomainPermissions.CREATE_CHILD_DOMAIN),
+                                                  false);
+
+      // set domain create permissions
+      Resource accessorResource = generateAuthenticatableResource(generateUniquePassword());
+      Set<DomainCreatePermission> domainCreatePermissions_pre = new HashSet();
+      domainCreatePermissions_pre.add(domCreatePerm_superuser);
+      domainCreatePermissions_pre.add(domCreatePerm_create_withGrant);
+      domainCreatePermissions_pre.add(domCreatePerm_child);
+      accessControlContext.setDomainCreatePermissions(accessorResource, domainCreatePermissions_pre);
+
+      // authenticate with query authorization
+      final char[] password = generateUniquePassword();
+      Resource authenticatableResource = generateAuthenticatableResource(password);
+      grantQueryPermission(authenticatableResource, accessorResource);
+      accessControlContext.authenticate(authenticatableResource, PasswordCredentials.newInstance(password));
 
       // get domain create permissions and verify
       final Set<DomainCreatePermission> domainCreatePermissions_post = accessControlContext.getDomainCreatePermissions(accessorResource);

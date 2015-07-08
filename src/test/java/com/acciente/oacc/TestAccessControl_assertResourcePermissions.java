@@ -133,6 +133,100 @@ public class TestAccessControl_assertResourcePermissions extends TestAccessContr
    }
 
    @Test
+   public void assertResourcePermissions_withoutQueryAuthorization_shouldFailAsAuthenticated() {
+      authenticateSystemResource();
+
+      final char[] password = generateUniquePassword();
+      final Resource authenticatableResource = generateAuthenticatableResource(password);
+      final Resource accessorResource = generateAuthenticatableResource(generateUniquePassword());
+      final Resource accessedResource = generateUnauthenticatableResource();
+      final String accessedResourceClassName
+            = accessControlContext.getResourceClassInfoByResource(accessedResource).getResourceClassName();
+
+      // setup direct permissions
+      final String customPermissionName = generateResourceClassPermission(accessedResourceClassName);
+      final ResourcePermission customPermission = ResourcePermissions.getInstance(customPermissionName);
+      accessControlContext.setResourcePermissions(accessorResource,
+                                                  accessedResource,
+                                                  setOf(customPermission));
+
+      // authenticate resource without query authorization
+      accessControlContext.authenticate(authenticatableResource, PasswordCredentials.newInstance(password));
+
+      // verify
+      try {
+         accessControlContext.assertResourcePermissions(accessorResource, accessedResource, customPermission);
+         fail("asserting resource permissions without query authorization should have failed");
+      }
+      catch (NotAuthorizedException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("is not authorized to query resource"));
+      }
+      try {
+         accessControlContext.assertResourcePermissions(accessorResource, accessedResource, setOf(customPermission));
+         fail("asserting resource permissions without query authorization should have failed");
+      }
+      catch (NotAuthorizedException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("is not authorized to query resource"));
+      }
+   }
+
+   @Test
+   public void assertResourcePermissions_withImplicitQueryAuthorization_shouldSucceedAsAuthenticated() {
+      authenticateSystemResource();
+
+      final char[] password = generateUniquePassword();
+      final Resource authenticatableResource = generateAuthenticatableResource(password);
+      final Resource accessorResource = generateAuthenticatableResource(generateUniquePassword());
+      final Resource accessedResource = generateUnauthenticatableResource();
+      final String accessedResourceClassName
+            = accessControlContext.getResourceClassInfoByResource(accessedResource).getResourceClassName();
+
+      // setup direct permissions
+      final String customPermissionName = generateResourceClassPermission(accessedResourceClassName);
+      final ResourcePermission customPermission = ResourcePermissions.getInstance(customPermissionName);
+      accessControlContext.setResourcePermissions(accessorResource,
+                                                  accessedResource,
+                                                  setOf(customPermission));
+
+      // authenticate resource with implicit query authorization
+      accessControlContext.grantResourcePermissions(authenticatableResource,
+                                                    accessorResource,
+                                                    ResourcePermissions.getInstance(ResourcePermissions.IMPERSONATE));
+      accessControlContext.authenticate(authenticatableResource, PasswordCredentials.newInstance(password));
+
+      // verify
+      accessControlContext.assertResourcePermissions(accessorResource, accessedResource, customPermission);
+      accessControlContext.assertResourcePermissions(accessorResource, accessedResource, setOf(customPermission));
+   }
+
+   @Test
+   public void assertResourcePermissions_withQueryAuthorization_shouldSucceedAsAuthenticated() {
+      authenticateSystemResource();
+
+      final char[] password = generateUniquePassword();
+      final Resource authenticatableResource = generateAuthenticatableResource(password);
+      final Resource accessorResource = generateAuthenticatableResource(generateUniquePassword());
+      final Resource accessedResource = generateUnauthenticatableResource();
+      final String accessedResourceClassName
+            = accessControlContext.getResourceClassInfoByResource(accessedResource).getResourceClassName();
+
+      // setup direct permissions
+      final String customPermissionName = generateResourceClassPermission(accessedResourceClassName);
+      final ResourcePermission customPermission = ResourcePermissions.getInstance(customPermissionName);
+      accessControlContext.setResourcePermissions(accessorResource,
+                                                  accessedResource,
+                                                  setOf(customPermission));
+
+      // authenticate resource with query authorization
+      grantQueryPermission(authenticatableResource, accessorResource);
+      accessControlContext.authenticate(authenticatableResource, PasswordCredentials.newInstance(password));
+
+      // verify
+      accessControlContext.assertResourcePermissions(accessorResource, accessedResource, customPermission);
+      accessControlContext.assertResourcePermissions(accessorResource, accessedResource, setOf(customPermission));
+   }
+
+   @Test
    public void assertResourcePermissions_direct_succeedsAsAuthenticatedResource() {
       authenticateSystemResource();
 

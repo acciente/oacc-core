@@ -139,9 +139,11 @@ public class TestAccessControl_grantResourcePermissions extends TestAccessContro
 
       // setup grantor permissions
       accessControlContext.setResourcePermissions(grantorResource, accessedResource, grantorResourcePermissions);
-      assertThat(accessControlContext.getEffectiveResourcePermissions(grantorResource, accessedResource), is(grantorResourcePermissions));
+      assertThat(accessControlContext.getEffectiveResourcePermissions(grantorResource, accessedResource), is(
+            grantorResourcePermissions));
 
       // authenticate grantor resource
+      grantQueryPermission(grantorResource, accessorResource);
       accessControlContext.authenticate(grantorResource, PasswordCredentials.newInstance(password));
 
       // grant permissions as grantor and verify
@@ -159,6 +161,7 @@ public class TestAccessControl_grantResourcePermissions extends TestAccessContro
 
       // test set-based version
       final Resource accessorResource2 = generateUnauthenticatableResource();
+      grantQueryPermission(grantorResource, accessorResource2);
       assertThat(accessControlContext.getEffectiveResourcePermissions(accessorResource2, accessedResource).isEmpty(), is(true));
 
       accessControlContext.grantResourcePermissions(accessorResource2,
@@ -202,6 +205,8 @@ public class TestAccessControl_grantResourcePermissions extends TestAccessContro
                                                   accessedResource,
                                                   setOf(ResourcePermissions.getInstance(ResourcePermissions.INHERIT)));
       // authenticate grantor resource
+      grantQueryPermission(grantorResource, accessorResource);
+      grantQueryPermission(grantorResource, accessorResource2);
       accessControlContext.authenticate(grantorResource, PasswordCredentials.newInstance(password));
 
       // grant permissions as grantor and verify
@@ -339,6 +344,8 @@ public class TestAccessControl_grantResourcePermissions extends TestAccessContro
                                                         globalResourcePermissions);
 
       // authenticate grantor resource
+      grantQueryPermission(grantorResource, accessorResource);
+      grantQueryPermission(grantorResource, accessorResource2);
       accessControlContext.authenticate(grantorResource, PasswordCredentials.newInstance(password));
 
       // grant permissions as grantor and verify
@@ -430,6 +437,8 @@ public class TestAccessControl_grantResourcePermissions extends TestAccessContro
                                                         globalResourcePermissions);
 
       // authenticate grantor resource
+      grantQueryPermission(grantorResource, accessorResource);
+      grantQueryPermission(grantorResource, accessorResource2);
       accessControlContext.authenticate(grantorResource, PasswordCredentials.newInstance(password));
 
       // grant permissions as grantor and verify
@@ -543,6 +552,8 @@ public class TestAccessControl_grantResourcePermissions extends TestAccessContro
             grantorResourcePermissions));
 
       // authenticate grantor resource
+      grantQueryPermission(grantorResource, accessorResource);
+      grantQueryPermission(grantorResource, accessorResource2);
       accessControlContext.authenticate(grantorResource, PasswordCredentials.newInstance(password));
 
       // grant permissions as grantor and verify
@@ -650,6 +661,8 @@ public class TestAccessControl_grantResourcePermissions extends TestAccessContro
             grantorResourcePermissions));
 
       // authenticate grantor resource
+      grantQueryPermission(grantorResource, accessorResource);
+      grantQueryPermission(grantorResource, accessorResource2);
       accessControlContext.authenticate(grantorResource, PasswordCredentials.newInstance(password));
 
       // grant permissions as grantor and verify

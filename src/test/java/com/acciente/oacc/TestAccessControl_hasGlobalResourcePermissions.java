@@ -123,6 +123,133 @@ public class TestAccessControl_hasGlobalResourcePermissions extends TestAccessCo
    }
 
    @Test
+   public void hasGlobalResourcePermissions_withoutQueryAuthorization_shouldFailAsAuthenticated() {
+      authenticateSystemResource();
+
+      final char[] password = generateUniquePassword();
+      final Resource authenticatableResource = generateAuthenticatableResource(password);
+      final Resource accessorResource = generateAuthenticatableResource(generateUniquePassword());
+      final String accessorDomainName = accessControlContext.getDomainNameByResource(accessorResource);
+      final String resourceClassName = generateResourceClass(false, false);
+
+      // setup global permissions
+      final String customPermissionName_accessorDomain = generateResourceClassPermission(resourceClassName);
+      final ResourcePermission customPermission_forAccessorDomain
+            = ResourcePermissions.getInstance(customPermissionName_accessorDomain);
+
+      accessControlContext.setGlobalResourcePermissions(accessorResource,
+                                                        resourceClassName,
+                                                        accessorDomainName,
+                                                        setOf(customPermission_forAccessorDomain));
+
+      // authenticate resource without query authorization
+      accessControlContext.authenticate(authenticatableResource, PasswordCredentials.newInstance(password));
+
+      // verify
+      try {
+         accessControlContext.hasGlobalResourcePermissions(accessorResource,
+                                                           resourceClassName,
+                                                           accessorDomainName,
+                                                           customPermission_forAccessorDomain);
+         fail("checking global permissions without query authorization should have failed");
+      }
+      catch (NotAuthorizedException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("is not authorized to query resource"));
+      }
+
+      try {
+         accessControlContext.hasGlobalResourcePermissions(accessorResource,
+                                                           resourceClassName,
+                                                           accessorDomainName,
+                                                           setOf(customPermission_forAccessorDomain));
+         fail("checking global permissions without query authorization should have failed");
+      }
+      catch (NotAuthorizedException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("is not authorized to query resource"));
+      }
+   }
+
+   @Test
+   public void hasGlobalResourcePermissions_withImplicitQueryAuthorization_shouldSucceedAsAuthenticated() {
+      authenticateSystemResource();
+
+      final char[] password = generateUniquePassword();
+      final Resource authenticatableResource = generateAuthenticatableResource(password);
+      final Resource accessorResource = generateAuthenticatableResource(generateUniquePassword());
+      final String accessorDomainName = accessControlContext.getDomainNameByResource(accessorResource);
+      final String resourceClassName = generateResourceClass(false, false);
+
+      // setup global permissions
+      final String customPermissionName_accessorDomain = generateResourceClassPermission(resourceClassName);
+      final ResourcePermission customPermission_forAccessorDomain
+            = ResourcePermissions.getInstance(customPermissionName_accessorDomain);
+
+      accessControlContext.setGlobalResourcePermissions(accessorResource,
+                                                        resourceClassName,
+                                                        accessorDomainName,
+                                                        setOf(customPermission_forAccessorDomain));
+
+      // authenticate accessor resource with implicit query authorization
+      accessControlContext.grantResourcePermissions(authenticatableResource,
+                                                    accessorResource,
+                                                    ResourcePermissions.getInstance(ResourcePermissions.IMPERSONATE));
+      accessControlContext.authenticate(authenticatableResource, PasswordCredentials.newInstance(password));
+
+      // verify
+      if (!accessControlContext.hasGlobalResourcePermissions(accessorResource,
+                                                             resourceClassName,
+                                                             accessorDomainName,
+                                                             customPermission_forAccessorDomain)) {
+         fail("checking global permissions with implicit query authorization should have succeeded");
+      }
+      if (!accessControlContext.hasGlobalResourcePermissions(accessorResource,
+                                                             resourceClassName,
+                                                             accessorDomainName,
+                                                             setOf(customPermission_forAccessorDomain))) {
+         fail("checking global permissions with implicit query authorization should have succeeded");
+      }
+   }
+
+   @Test
+   public void hasGlobalResourcePermissions_withQueryAuthorization_shouldSucceedAsAuthenticated() {
+      authenticateSystemResource();
+
+      final char[] password = generateUniquePassword();
+      final Resource authenticatableResource = generateAuthenticatableResource(password);
+      final Resource accessorResource = generateAuthenticatableResource(generateUniquePassword());
+      final String accessorDomainName = accessControlContext.getDomainNameByResource(accessorResource);
+      final String resourceClassName = generateResourceClass(false, false);
+
+      // setup global permissions
+      final String customPermissionName_accessorDomain = generateResourceClassPermission(resourceClassName);
+      final ResourcePermission customPermission_forAccessorDomain
+            = ResourcePermissions.getInstance(customPermissionName_accessorDomain);
+
+      accessControlContext.setGlobalResourcePermissions(accessorResource,
+                                                        resourceClassName,
+                                                        accessorDomainName,
+                                                        setOf(customPermission_forAccessorDomain));
+
+      // authenticate accessor resource with query authorization
+      grantQueryPermission(authenticatableResource, accessorResource);
+      accessControlContext.authenticate(authenticatableResource, PasswordCredentials.newInstance(password));
+
+      // verify
+      if (!accessControlContext.hasGlobalResourcePermissions(accessorResource,
+                                                             resourceClassName,
+                                                             accessorDomainName,
+                                                             customPermission_forAccessorDomain)) {
+         fail("checking global permissions with query authorization should have succeeded");
+      }
+      if (!accessControlContext.hasGlobalResourcePermissions(accessorResource,
+                                                             resourceClassName,
+                                                             accessorDomainName,
+                                                             setOf(customPermission_forAccessorDomain))) {
+         fail("checking global permissions with query authorization should have succeeded");
+      }
+   }
+
+   @Test
    public void hasGlobalResourcePermissions_direct_succeedsAsAuthenticatedResource() {
       authenticateSystemResource();
 

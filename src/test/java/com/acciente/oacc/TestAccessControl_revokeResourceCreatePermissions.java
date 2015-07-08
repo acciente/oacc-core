@@ -135,6 +135,7 @@ public class TestAccessControl_revokeResourceCreatePermissions extends TestAcces
                  is(grantorPermissions));
 
       // now authenticate as the granterResource
+      grantQueryPermission(grantorResource, accessorResource);
       accessControlContext.authenticate(grantorResource, PasswordCredentials.newInstance(password));
 
       // revoke create permissions and verify
@@ -153,6 +154,7 @@ public class TestAccessControl_revokeResourceCreatePermissions extends TestAcces
 
       // test set-based version
       final Resource accessorResource2 = generateUnauthenticatableResource();
+      grantQueryPermission(grantorResource, accessorResource2);
       accessControlContext.setResourceCreatePermissions(accessorResource2, resourceClassName, domainName, resourceCreatePermissions_pre);
       assertThat(accessControlContext.getEffectiveResourceCreatePermissions(accessorResource2,
                                                                             resourceClassName,
@@ -203,6 +205,7 @@ public class TestAccessControl_revokeResourceCreatePermissions extends TestAcces
                  is(grantorPermissions));
 
       // now authenticate as the granterResource
+      grantQueryPermission(grantorResource, accessorResource);
       accessControlContext.authenticate(grantorResource, PasswordCredentials.newInstance(password));
 
       // revoke create permissions and verify
@@ -321,7 +324,9 @@ public class TestAccessControl_revokeResourceCreatePermissions extends TestAcces
       Set<ResourceCreatePermission> resourceCreatePermissions_pre
             = setOf(createPerm_create_withGrant, createPerm_inherit_withGrant);
 
-      accessControlContext.setResourceCreatePermissions(accessorResource, resourceClassName, domainName, resourceCreatePermissions_pre);
+      accessControlContext.setResourceCreatePermissions(accessorResource, resourceClassName,
+                                                        domainName,
+                                                        resourceCreatePermissions_pre);
       assertThat(accessControlContext.getEffectiveResourceCreatePermissions(accessorResource,
                                                                             resourceClassName,
                                                                             domainName),
@@ -341,6 +346,7 @@ public class TestAccessControl_revokeResourceCreatePermissions extends TestAcces
                  is(grantorPermissions));
 
       // now authenticate as the granterResource
+      grantQueryPermission(grantorResource, accessorResource);
       accessControlContext.authenticate(grantorResource, PasswordCredentials.newInstance(password));
 
       // revoke create permissions and verify
@@ -423,6 +429,7 @@ public class TestAccessControl_revokeResourceCreatePermissions extends TestAcces
                  is(grantorPermissions));
 
       // now authenticate as the granterResource
+      grantQueryPermission(grantorResource, accessorResource);
       accessControlContext.authenticate(grantorResource, PasswordCredentials.newInstance(password));
 
       // revoke create permissions and verify
@@ -436,6 +443,7 @@ public class TestAccessControl_revokeResourceCreatePermissions extends TestAcces
 
       // test set-based versions
       final Resource accessorResource2 = generateUnauthenticatableResource();
+      grantQueryPermission(grantorResource, accessorResource2);
       accessControlContext.setResourceCreatePermissions(accessorResource2,
                                                         resourceClassName,
                                                         domainName,
@@ -733,9 +741,12 @@ public class TestAccessControl_revokeResourceCreatePermissions extends TestAcces
       // set up grantor
       Set<ResourceCreatePermission> grantorPermissions
             = setOf(createPerm_create_withGrant,
-                    ResourceCreatePermissions.getInstance(ResourcePermissions.getInstance(grantedPermissionName1, true), true),
-                    ResourceCreatePermissions.getInstance(ResourcePermissions.getInstance(grantedPermissionName2, true), true),
-                    ResourceCreatePermissions.getInstance(ResourcePermissions.getInstance(grantedPermissionName3, true), true),
+                    ResourceCreatePermissions.getInstance(ResourcePermissions.getInstance(grantedPermissionName1, true),
+                                                          true),
+                    ResourceCreatePermissions.getInstance(ResourcePermissions.getInstance(grantedPermissionName2, true),
+                                                          true),
+                    ResourceCreatePermissions.getInstance(ResourcePermissions.getInstance(grantedPermissionName3, true),
+                                                          true),
                     ResourceCreatePermissions.getInstance(ResourcePermissions.getInstance(grantedPermissionName4, true), true));
 
       accessControlContext.setResourceCreatePermissions(grantorResource,
@@ -746,6 +757,8 @@ public class TestAccessControl_revokeResourceCreatePermissions extends TestAcces
                  is(grantorPermissions));
 
       // now authenticate as the granterResource
+      grantQueryPermission(grantorResource, accessorResource);
+      grantQueryPermission(grantorResource, accessorResource2);
       accessControlContext.authenticate(grantorResource, PasswordCredentials.newInstance(password));
 
       // revoke create permissions and verify
@@ -822,8 +835,10 @@ public class TestAccessControl_revokeResourceCreatePermissions extends TestAcces
       // set up grantor
       Set<ResourceCreatePermission> grantorPermissions
             = setOf(createPerm_create_withGrant,
-                    ResourceCreatePermissions.getInstance(ResourcePermissions.getInstance(grantedPermissionName1, true), true),
-                    ResourceCreatePermissions.getInstance(ResourcePermissions.getInstance(grantedPermissionName2, true), true),
+                    ResourceCreatePermissions.getInstance(ResourcePermissions.getInstance(grantedPermissionName1, true),
+                                                          true),
+                    ResourceCreatePermissions.getInstance(ResourcePermissions.getInstance(grantedPermissionName2, true),
+                                                          true),
                     ResourceCreatePermissions.getInstance(ResourcePermissions.getInstance(grantedPermissionName3, true), true));
 
       accessControlContext.setResourceCreatePermissions(grantorResource,
@@ -834,6 +849,8 @@ public class TestAccessControl_revokeResourceCreatePermissions extends TestAcces
                  is(grantorPermissions));
 
       // now authenticate as the granterResource
+      grantQueryPermission(grantorResource, accessorResource);
+      grantQueryPermission(grantorResource, accessorResource2);
       accessControlContext.authenticate(grantorResource, PasswordCredentials.newInstance(password));
 
       // revoke create permissions and verify
@@ -906,8 +923,10 @@ public class TestAccessControl_revokeResourceCreatePermissions extends TestAcces
       // set up grantor
       Set<ResourceCreatePermission> grantorPermissions
             = setOf(createPerm_create_withGrant,
-                    ResourceCreatePermissions.getInstance(ResourcePermissions.getInstance(grantedPermissionName1, true), true),
-                    ResourceCreatePermissions.getInstance(ResourcePermissions.getInstance(grantedPermissionName2, true), true),
+                    ResourceCreatePermissions.getInstance(ResourcePermissions.getInstance(grantedPermissionName1, true),
+                                                          true),
+                    ResourceCreatePermissions.getInstance(ResourcePermissions.getInstance(grantedPermissionName2, true),
+                                                          true),
                     ResourceCreatePermissions.getInstance(ResourcePermissions.getInstance(grantedPermissionName3, true), true));
 
       accessControlContext.setResourceCreatePermissions(grantorResource,
@@ -920,6 +939,8 @@ public class TestAccessControl_revokeResourceCreatePermissions extends TestAcces
                  is(grantorPermissions));
 
       // now authenticate as the granterResource
+      grantQueryPermission(grantorResource, accessorResource);
+      grantQueryPermission(grantorResource, accessorResource2);
       accessControlContext.authenticate(grantorResource, PasswordCredentials.newInstance(password));
 
       // revoke create permissions and verify

@@ -122,6 +122,8 @@ public class TestAccessControl_revokeDomainPermissions extends TestAccessControl
       assertThat(grantorPermissions_post, is(grantorPermissions_pre));
 
       // revoke domainPermissions as the authenticatable resource and verify
+      grantQueryPermission(authenticatableResource, accessorResource);
+      grantQueryPermission(authenticatableResource, accessorResource2);
       accessControlContext.authenticate(authenticatableResource, PasswordCredentials.newInstance(password));
       accessControlContext.revokeDomainPermissions(accessorResource,
                                                    domainName,
@@ -304,6 +306,8 @@ public class TestAccessControl_revokeDomainPermissions extends TestAccessControl
       assertThat(grantorPermissions_post, is(grantorPermissions_pre));
 
       // revoke domainPermissions as the authenticatable resource and verify
+      grantQueryPermission(authenticatableResource, accessorResource);
+      grantQueryPermission(authenticatableResource, accessorResource2);
       accessControlContext.authenticate(authenticatableResource, PasswordCredentials.newInstance(password));
       accessControlContext.revokeDomainPermissions(accessorResource,
                                                    domainName,
@@ -415,6 +419,8 @@ public class TestAccessControl_revokeDomainPermissions extends TestAccessControl
       assertThat(grantorPermissions_post, is(grantorPermissions_pre));
 
       // revoke domainPermissions as the authenticatable resource and verify
+      grantQueryPermission(authenticatableResource, accessorResource);
+      grantQueryPermission(authenticatableResource, accessorResource2);
       accessControlContext.authenticate(authenticatableResource, PasswordCredentials.newInstance(password));
       accessControlContext.revokeDomainPermissions(accessorResource,
                                                    domainName,
@@ -477,6 +483,8 @@ public class TestAccessControl_revokeDomainPermissions extends TestAccessControl
       assertThat(grantorPermissions_post, is(grantorPermissions_pre));
 
       // revoke domainPermissions as the authenticatable resource and verify
+      grantQueryPermission(authenticatableResource, accessorResource);
+      grantQueryPermission(authenticatableResource, accessorResource2);
       accessControlContext.authenticate(authenticatableResource, PasswordCredentials.newInstance(password));
       accessControlContext.revokeDomainPermissions(accessorResource,
                                                    domainName,
@@ -538,6 +546,8 @@ public class TestAccessControl_revokeDomainPermissions extends TestAccessControl
       assertThat(grantorPermissions_post, is(grantorPermissions_pre));
 
       // revoke domainPermissions as the authenticatable resource and verify
+      grantQueryPermission(authenticatableResource, accessorResource);
+      grantQueryPermission(authenticatableResource, accessorResource2);
       accessControlContext.authenticate(authenticatableResource, PasswordCredentials.newInstance(password));
       accessControlContext.revokeDomainPermissions(accessorResource,
                                                    domainName,
@@ -599,6 +609,8 @@ public class TestAccessControl_revokeDomainPermissions extends TestAccessControl
       assertThat(domainPermissions_post, is(domainPermissions_granter));
 
       // revoke domainPermissions as the authenticatable resource and verify
+      grantQueryPermission(authenticatableResource, accessorResource);
+      grantQueryPermission(authenticatableResource, accessorResource2);
       accessControlContext.authenticate(authenticatableResource, PasswordCredentials.newInstance(password));
       accessControlContext.revokeDomainPermissions(accessorResource,
                                                    domainName,

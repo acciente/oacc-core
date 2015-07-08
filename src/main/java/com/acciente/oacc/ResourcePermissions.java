@@ -31,9 +31,11 @@ public class ResourcePermissions {
    public static final  String        RESET_CREDENTIALS               = SYSPERMISSION_RESET_CREDENTIALS.getPermissionName();
    private static final SysPermission SYSPERMISSION_DELETE            = new SysPermission(-104, "*DELETE");
    public static final  String        DELETE                          = SYSPERMISSION_DELETE.getPermissionName();
+   private static final SysPermission SYSPERMISSION_QUERY             = new SysPermission(-105, "*QUERY");
+   public static final  String        QUERY                           = SYSPERMISSION_QUERY.getPermissionName();
 
    public static List<String> getSysPermissionNames() {
-      return Arrays.asList(INHERIT, IMPERSONATE, RESET_CREDENTIALS, DELETE);
+      return Arrays.asList(INHERIT, IMPERSONATE, RESET_CREDENTIALS, DELETE, QUERY);
    }
 
    public static String getSysPermissionName(long systemPermissionId) {
@@ -48,6 +50,9 @@ public class ResourcePermissions {
       }
       else if (systemPermissionId == SYSPERMISSION_DELETE.getSystemPermissionId()) {
          return SYSPERMISSION_DELETE.getPermissionName();
+      }
+      else if (systemPermissionId == SYSPERMISSION_QUERY.getSystemPermissionId()) {
+         return SYSPERMISSION_QUERY.getPermissionName();
       }
       else {
          throw new IllegalArgumentException("Invalid system permission ID: " + systemPermissionId);
@@ -236,6 +241,9 @@ public class ResourcePermissions {
          }
          else if (SYSPERMISSION_DELETE.getPermissionName().equals(systemPermissionName)) {
             return SYSPERMISSION_DELETE;
+         }
+         else if (SYSPERMISSION_QUERY.getPermissionName().equals(systemPermissionName)) {
+            return SYSPERMISSION_QUERY;
          }
          else {
             throw new IllegalArgumentException("Invalid system permission name: " + systemPermissionName);

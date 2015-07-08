@@ -125,6 +125,108 @@ public class TestAccessControl_hasResourcePermissions extends TestAccessControlB
    }
 
    @Test
+   public void hasResourcePermissions_withoutQueryAuthorization_shouldFailAsAuthenticated() {
+      authenticateSystemResource();
+
+      final char[] password = generateUniquePassword();
+      final Resource authenticatableResource = generateAuthenticatableResource(password);
+      final Resource accessorResource = generateAuthenticatableResource(generateUniquePassword());
+      final Resource accessedResource = generateUnauthenticatableResource();
+      final String accessedResourceClassName
+            = accessControlContext.getResourceClassInfoByResource(accessedResource).getResourceClassName();
+
+      // setup direct permissions
+      final String customPermissionName = generateResourceClassPermission(accessedResourceClassName);
+      final ResourcePermission customPermission = ResourcePermissions.getInstance(customPermissionName);
+      accessControlContext.setResourcePermissions(accessorResource,
+                                                  accessedResource,
+                                                  setOf(customPermission));
+
+      // authenticate resource without query authorization
+      accessControlContext.authenticate(authenticatableResource, PasswordCredentials.newInstance(password));
+
+      // verify
+      try {
+         accessControlContext.hasResourcePermissions(accessorResource, accessedResource, customPermission);
+         fail("checking resource permissions without query authorization should have failed");
+      }
+      catch (NotAuthorizedException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("is not authorized to query resource"));
+      }
+      try {
+         accessControlContext.hasResourcePermissions(accessorResource, accessedResource, setOf(customPermission));
+         fail("checking resource permissions without query authorization should have failed");
+      }
+      catch (NotAuthorizedException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("is not authorized to query resource"));
+      }
+   }
+
+   @Test
+   public void hasResourcePermissions_withImplicitQueryAuthorization_shouldSucceedAsAuthenticated() {
+      authenticateSystemResource();
+
+      final char[] password = generateUniquePassword();
+      final Resource authenticatableResource = generateAuthenticatableResource(password);
+      final Resource accessorResource = generateAuthenticatableResource(generateUniquePassword());
+      final Resource accessedResource = generateUnauthenticatableResource();
+      final String accessedResourceClassName
+            = accessControlContext.getResourceClassInfoByResource(accessedResource).getResourceClassName();
+
+      // setup direct permissions
+      final String customPermissionName = generateResourceClassPermission(accessedResourceClassName);
+      final ResourcePermission customPermission = ResourcePermissions.getInstance(customPermissionName);
+      accessControlContext.setResourcePermissions(accessorResource,
+                                                  accessedResource,
+                                                  setOf(customPermission));
+
+      // authenticate resource with implicit query authorization
+      accessControlContext.grantResourcePermissions(authenticatableResource,
+                                                    accessorResource,
+                                                    ResourcePermissions.getInstance(ResourcePermissions.IMPERSONATE));
+      accessControlContext.authenticate(authenticatableResource, PasswordCredentials.newInstance(password));
+
+      // verify
+      if (!accessControlContext.hasResourcePermissions(accessorResource, accessedResource, customPermission)) {
+         fail("checking resource permissions with implicit query authorization should have succeeded");
+      }
+      if (!accessControlContext.hasResourcePermissions(accessorResource, accessedResource, setOf(customPermission))) {
+         fail("checking resource permissions with implicit query authorization should have succeeded");
+      }
+   }
+
+   @Test
+   public void hasResourcePermissions_withQueryAuthorization_shouldSucceedAsAuthenticated() {
+      authenticateSystemResource();
+
+      final char[] password = generateUniquePassword();
+      final Resource authenticatableResource = generateAuthenticatableResource(password);
+      final Resource accessorResource = generateAuthenticatableResource(generateUniquePassword());
+      final Resource accessedResource = generateUnauthenticatableResource();
+      final String accessedResourceClassName
+            = accessControlContext.getResourceClassInfoByResource(accessedResource).getResourceClassName();
+
+      // setup direct permissions
+      final String customPermissionName = generateResourceClassPermission(accessedResourceClassName);
+      final ResourcePermission customPermission = ResourcePermissions.getInstance(customPermissionName);
+      accessControlContext.setResourcePermissions(accessorResource,
+                                                  accessedResource,
+                                                  setOf(customPermission));
+
+      // authenticate resource with query authorization
+      grantQueryPermission(authenticatableResource, accessorResource);
+      accessControlContext.authenticate(authenticatableResource, PasswordCredentials.newInstance(password));
+
+      // verify
+      if (!accessControlContext.hasResourcePermissions(accessorResource, accessedResource, customPermission)) {
+         fail("checking resource permissions with query authorization should have succeeded");
+      }
+      if (!accessControlContext.hasResourcePermissions(accessorResource, accessedResource, setOf(customPermission))) {
+         fail("checking resource permissions with query authorization should have succeeded");
+      }
+   }
+
+   @Test
    public void hasResourcePermissions_direct_succeedsAsAuthenticatedResource() {
       authenticateSystemResource();
 

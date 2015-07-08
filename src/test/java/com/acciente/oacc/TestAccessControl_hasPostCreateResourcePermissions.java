@@ -131,6 +131,168 @@ public class TestAccessControl_hasPostCreateResourcePermissions extends TestAcce
    }
 
    @Test
+   public void hasPostCreateResourcePermissions_withoutQueryAuthorization_shouldFailAsAuthenticated() {
+      authenticateSystemResource();
+
+      final char[] password = generateUniquePassword();
+      final Resource authenticatableResource = generateAuthenticatableResource(password);
+      final Resource accessorResource = generateAuthenticatableResource(generateUniquePassword());
+      final String accessorDomainName = accessControlContext.getDomainNameByResource(accessorResource);
+      final String resourceClassName = generateResourceClass(false, false);
+
+      // setup create permissions
+      final String customPermissionName_accessorDomain = generateResourceClassPermission(resourceClassName);
+      final ResourcePermission customPermission_forAccessorDomain
+            = ResourcePermissions.getInstance(customPermissionName_accessorDomain);
+      final ResourceCreatePermission customCreatePermission_accessorDomain_withGrant
+            = ResourceCreatePermissions.getInstance(customPermission_forAccessorDomain, true);
+      final ResourceCreatePermission createPermission_withGrant
+            = ResourceCreatePermissions.getInstance(ResourceCreatePermissions.CREATE, true);
+
+      grantResourceCreatePermission(accessorResource,
+                                    resourceClassName,
+                                    accessorDomainName,
+                                    createPermission_withGrant,
+                                    customCreatePermission_accessorDomain_withGrant);
+
+      // verify permissions
+      final Set<ResourceCreatePermission> allResourceCreatePermissionsForAccessorDomain
+            = accessControlContext.getEffectiveResourceCreatePermissions(accessorResource, resourceClassName, accessorDomainName);
+      assertThat(allResourceCreatePermissionsForAccessorDomain,
+                 is(setOf(createPermission_withGrant, customCreatePermission_accessorDomain_withGrant)));
+
+      // authenticate resource without query authorization
+      accessControlContext.authenticate(authenticatableResource, PasswordCredentials.newInstance(password));
+
+      // verify
+      try {
+         accessControlContext.hasPostCreateResourcePermissions(accessorResource,
+                                                               resourceClassName,
+                                                               accessorDomainName,
+                                                               customPermission_forAccessorDomain);
+         fail("checking post-create resource permissions without query authorization should have failed");
+      }
+      catch (NotAuthorizedException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("is not authorized to query resource"));
+      }
+
+      try {
+         accessControlContext.hasPostCreateResourcePermissions(accessorResource,
+                                                               resourceClassName,
+                                                               accessorDomainName,
+                                                               setOf(customPermission_forAccessorDomain));
+         fail("checking post-create resource permissions without query authorization should have failed");
+      }
+      catch (NotAuthorizedException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("is not authorized to query resource"));
+      }
+   }
+
+   @Test
+   public void hasPostCreateResourcePermissions_withImplicitQueryAuthorization_shouldSucceedAsAuthenticated() {
+      authenticateSystemResource();
+
+      final char[] password = generateUniquePassword();
+      final Resource authenticatableResource = generateAuthenticatableResource(password);
+      final Resource accessorResource = generateAuthenticatableResource(generateUniquePassword());
+      final String accessorDomainName = accessControlContext.getDomainNameByResource(accessorResource);
+      final String resourceClassName = generateResourceClass(false, false);
+
+      // setup create permissions
+      final String customPermissionName_accessorDomain = generateResourceClassPermission(resourceClassName);
+      final ResourcePermission customPermission_forAccessorDomain
+            = ResourcePermissions.getInstance(customPermissionName_accessorDomain);
+      final ResourceCreatePermission customCreatePermission_accessorDomain_withGrant
+            = ResourceCreatePermissions.getInstance(customPermission_forAccessorDomain, true);
+      final ResourceCreatePermission createPermission_withGrant
+            = ResourceCreatePermissions.getInstance(ResourceCreatePermissions.CREATE, true);
+
+      grantResourceCreatePermission(accessorResource,
+                                    resourceClassName,
+                                    accessorDomainName,
+                                    createPermission_withGrant,
+                                    customCreatePermission_accessorDomain_withGrant);
+
+      // verify permissions
+      final Set<ResourceCreatePermission> allResourceCreatePermissionsForAccessorDomain
+            = accessControlContext.getEffectiveResourceCreatePermissions(accessorResource,
+                                                                         resourceClassName,
+                                                                         accessorDomainName);
+      assertThat(allResourceCreatePermissionsForAccessorDomain,
+                 is(setOf(createPermission_withGrant, customCreatePermission_accessorDomain_withGrant)));
+
+      // authenticate resource with implicit query authorization
+      accessControlContext.grantResourcePermissions(authenticatableResource,
+                                                    accessorResource,
+                                                    ResourcePermissions.getInstance(ResourcePermissions.IMPERSONATE));
+      accessControlContext.authenticate(authenticatableResource, PasswordCredentials.newInstance(password));
+
+      // verify
+      if (!accessControlContext.hasPostCreateResourcePermissions(accessorResource,
+                                                                 resourceClassName,
+                                                                 accessorDomainName,
+                                                                 customPermission_forAccessorDomain)) {
+         fail("checking post-create resource permissions with implicit query authorization should have succeeded");
+      }
+      if (!accessControlContext.hasPostCreateResourcePermissions(accessorResource,
+                                                                 resourceClassName,
+                                                                 accessorDomainName,
+                                                                 setOf(customPermission_forAccessorDomain))) {
+         fail("checking post-create resource permissions with implicit query authorization should have succeeded");
+      }
+   }
+
+   @Test
+   public void hasPostCreateResourcePermissions_withQueryAuthorization_shouldSucceedAsAuthenticated() {
+      authenticateSystemResource();
+
+      final char[] password = generateUniquePassword();
+      final Resource authenticatableResource = generateAuthenticatableResource(password);
+      final Resource accessorResource = generateAuthenticatableResource(generateUniquePassword());
+      final String accessorDomainName = accessControlContext.getDomainNameByResource(accessorResource);
+      final String resourceClassName = generateResourceClass(false, false);
+
+      // setup create permissions
+      final String customPermissionName_accessorDomain = generateResourceClassPermission(resourceClassName);
+      final ResourcePermission customPermission_forAccessorDomain
+            = ResourcePermissions.getInstance(customPermissionName_accessorDomain);
+      final ResourceCreatePermission customCreatePermission_accessorDomain_withGrant
+            = ResourceCreatePermissions.getInstance(customPermission_forAccessorDomain, true);
+      final ResourceCreatePermission createPermission_withGrant
+            = ResourceCreatePermissions.getInstance(ResourceCreatePermissions.CREATE, true);
+
+      grantResourceCreatePermission(accessorResource,
+                                    resourceClassName,
+                                    accessorDomainName,
+                                    createPermission_withGrant,
+                                    customCreatePermission_accessorDomain_withGrant);
+
+      // verify permissions
+      final Set<ResourceCreatePermission> allResourceCreatePermissionsForAccessorDomain
+            = accessControlContext.getEffectiveResourceCreatePermissions(accessorResource, resourceClassName, accessorDomainName);
+      assertThat(allResourceCreatePermissionsForAccessorDomain,
+                 is(setOf(createPermission_withGrant, customCreatePermission_accessorDomain_withGrant)));
+
+      // authenticate resource with query authorization
+      grantQueryPermission(authenticatableResource, accessorResource);
+      accessControlContext.authenticate(authenticatableResource, PasswordCredentials.newInstance(password));
+
+      // verify
+      if (!accessControlContext.hasPostCreateResourcePermissions(accessorResource,
+                                                                 resourceClassName,
+                                                                 accessorDomainName,
+                                                                 customPermission_forAccessorDomain)) {
+         fail("checking post-create resource permissions with query authorization should have succeeded");
+      }
+      if (!accessControlContext.hasPostCreateResourcePermissions(accessorResource,
+                                                                 resourceClassName,
+                                                                 accessorDomainName,
+                                                                 setOf(customPermission_forAccessorDomain))) {
+         fail("checking post-create resource permissions with query authorization should have succeeded");
+      }
+   }
+
+   @Test
    public void hasPostCreateResourcePermissions_direct_succeedsAsAuthenticatedResource() {
       authenticateSystemResource();
 

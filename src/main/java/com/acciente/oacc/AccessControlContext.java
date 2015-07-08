@@ -179,7 +179,10 @@ public interface AccessControlContext {
     *                                                  if no domain of domainName exists
     * @throws com.acciente.oacc.NotAuthorizedException if the accessor resource <strong>does not</strong> have the
     *                                                  specified domain permissions, or
-    *                                                  if the accessor resource does not exist
+    *                                                  if the session resource is not the accessor resource and
+    *                                                  the session resource does not have query authorization on
+    *                                                  the accessor resource (explicitly via QUERY or implicitly via
+    *                                                  IMPERSONATE permissions)
     */
    void assertDomainPermissions(Resource accessorResource,
                                 String domainName,
@@ -200,7 +203,10 @@ public interface AccessControlContext {
     *                                                  if no domain of domainName exists
     * @throws com.acciente.oacc.NotAuthorizedException if the accessor resource <strong>does not</strong> have the
     *                                                  specified domain permissions, or
-    *                                                  if the accessor resource does not exist
+    *                                                  if the session resource is not the accessor resource and
+    *                                                  the session resource does not have query authorization on
+    *                                                  the accessor resource (explicitly via QUERY or implicitly via
+    *                                                  IMPERSONATE permissions)
     */
    void assertDomainPermissions(Resource accessorResource,
                                 String domainName,
@@ -221,6 +227,10 @@ public interface AccessControlContext {
     *          <strong>false</strong> otherwise or if the accessor resource does not exist
     * @throws java.lang.IllegalArgumentException if the accessorResource does not exist, or
     *                                            if no domain of domainName exists
+    * @throws com.acciente.oacc.NotAuthorizedException if the session resource is not the accessor resource and
+    *                                                  the session resource does not have query authorization on
+    *                                                  the accessor resource (explicitly via QUERY or implicitly via
+    *                                                  IMPERSONATE permissions)
     */
    boolean hasDomainPermissions(Resource accessorResource,
                                 String domainName,
@@ -241,6 +251,10 @@ public interface AccessControlContext {
     *          <strong>false</strong> otherwise or if the accessor resource does not exist
     * @throws java.lang.IllegalArgumentException if the accessorResource does not exist, or
     *                                            if no domain of domainName exists
+    * @throws com.acciente.oacc.NotAuthorizedException if the session resource is not the accessor resource and
+    *                                                  the session resource does not have query authorization on
+    *                                                  the accessor resource (explicitly via QUERY or implicitly via
+    *                                                  IMPERSONATE permissions)
     */
    boolean hasDomainPermissions(Resource accessorResource,
                                 String domainName,
@@ -256,7 +270,10 @@ public interface AccessControlContext {
     * @throws IllegalArgumentException                 if the accessorResource does not exist
     * @throws com.acciente.oacc.NotAuthorizedException if the accessor resource <strong>does not</strong> have the
     *                                                  specified domain create permissions, or
-    *                                                  if the accessor resource does not exist
+    *                                                  if the session resource is not the accessor resource and
+    *                                                  the session resource does not have query authorization on
+    *                                                  the accessor resource (explicitly via QUERY or implicitly via
+    *                                                  IMPERSONATE permissions)
     */
    void assertDomainCreatePermissions(Resource accessorResource,
                                       Set<DomainCreatePermission> domainCreatePermissions);
@@ -271,7 +288,10 @@ public interface AccessControlContext {
     * @throws IllegalArgumentException                 if the accessorResource does not exist
     * @throws com.acciente.oacc.NotAuthorizedException if the accessor resource <strong>does not</strong> have the
     *                                                  specified domain create permissions, or
-    *                                                  if the accessor resource does not exist
+    *                                                  if the session resource is not the accessor resource and
+    *                                                  the session resource does not have query authorization on
+    *                                                  the accessor resource (explicitly via QUERY or implicitly via
+    *                                                  IMPERSONATE permissions)
     */
    void assertDomainCreatePermissions(Resource accessorResource,
                                       DomainCreatePermission domainCreatePermission,
@@ -283,9 +303,13 @@ public interface AccessControlContext {
     *
     * @param accessorResource        the resource on which access is being checked
     * @param domainCreatePermissions the domain create permissions to be checked
-    * @throws IllegalArgumentException if the accessorResource does not exist
     * @return  <strong>true</strong> if the accessor resource has the specified domain create permissions,
     *          <strong>false</strong> otherwise
+    * @throws IllegalArgumentException if the accessorResource does not exist
+    * @throws com.acciente.oacc.NotAuthorizedException if the session resource is not the accessor resource and
+    *                                                  the session resource does not have query authorization on
+    *                                                  the accessor resource (explicitly via QUERY or implicitly via
+    *                                                  IMPERSONATE permissions)
     */
    boolean hasDomainCreatePermissions(Resource accessorResource,
                                       Set<DomainCreatePermission> domainCreatePermissions);
@@ -297,9 +321,13 @@ public interface AccessControlContext {
     * @param accessorResource        the resource on which access is being checked
     * @param domainCreatePermission  the domain create permission to be checked
     * @param domainCreatePermissions the other (optional) domain create permissions to be checked
-    * @throws IllegalArgumentException if the accessorResource does not exist
     * @return  <strong>true</strong> if the accessor resource has the specified domain create permissions,
     *          <strong>false</strong> otherwise
+    * @throws IllegalArgumentException if the accessorResource does not exist
+    * @throws com.acciente.oacc.NotAuthorizedException if the session resource is not the accessor resource and
+    *                                                  the session resource does not have query authorization on
+    *                                                  the accessor resource (explicitly via QUERY or implicitly via
+    *                                                  IMPERSONATE permissions)
     */
    boolean hasDomainCreatePermissions(Resource accessorResource,
                                       DomainCreatePermission domainCreatePermission,
@@ -315,7 +343,11 @@ public interface AccessControlContext {
     * @param domainPermissions the permissions to be checked
     * @throws IllegalArgumentException                 if the accessorResource does not exist
     * @throws com.acciente.oacc.NotAuthorizedException if the accessor resource would <strong>not</strong> receive the
-    *                                                  specified permissions after creating a domain
+    *                                                  specified permissions after creating a domain, or
+    *                                                  if the session resource is not the accessor resource and
+    *                                                  the session resource does not have query authorization on
+    *                                                  the accessor resource (explicitly via QUERY or implicitly via
+    *                                                  IMPERSONATE permissions)
     */
    void assertPostCreateDomainPermissions(Resource accessorResource,
                                           Set<DomainPermission> domainPermissions);
@@ -331,7 +363,11 @@ public interface AccessControlContext {
     * @param domainPermissions the other (optional) permissions to be checked
     * @throws IllegalArgumentException                 if the accessorResource does not exist
     * @throws com.acciente.oacc.NotAuthorizedException if the accessor resource would <strong>not</strong> receive the
-    *                                                  specified permissions after creating a domain
+    *                                                  specified permissions after creating a domain, or
+    *                                                  if the session resource is not the accessor resource and
+    *                                                  the session resource does not have query authorization on
+    *                                                  the accessor resource (explicitly via QUERY or implicitly via
+    *                                                  IMPERSONATE permissions)
     */
    void assertPostCreateDomainPermissions(Resource accessorResource,
                                           DomainPermission domainPermission,
@@ -345,8 +381,12 @@ public interface AccessControlContext {
     *
     * @param accessorResource  the resource requesting the access
     * @param domainPermissions the permissions to be checked
-    * @throws IllegalArgumentException if the accessorResource does not exist
     * @return <strong>true</strong> if the accessor resource would receive the specified permissions after creating a domain
+    * @throws IllegalArgumentException if the accessorResource does not exist
+    * @throws com.acciente.oacc.NotAuthorizedException if the session resource is not the accessor resource and
+    *                                                  the session resource does not have query authorization on
+    *                                                  the accessor resource (explicitly via QUERY or implicitly via
+    *                                                  IMPERSONATE permissions)
     */
    boolean hasPostCreateDomainPermissions(Resource accessorResource,
                                           Set<DomainPermission> domainPermissions);
@@ -360,8 +400,12 @@ public interface AccessControlContext {
     * @param accessorResource  the resource requesting the access
     * @param domainPermission  the permission to be checked
     * @param domainPermissions the other (optional) permissions to be checked
-    * @throws IllegalArgumentException if the accessorResource does not exist
     * @return <strong>true</strong> if the accessor resource would receive the specified permissions after creating a domain
+    * @throws IllegalArgumentException if the accessorResource does not exist
+    * @throws com.acciente.oacc.NotAuthorizedException if the session resource is not the accessor resource and
+    *                                                  the session resource does not have query authorization on
+    *                                                  the accessor resource (explicitly via QUERY or implicitly via
+    *                                                  IMPERSONATE permissions)
     */
    boolean hasPostCreateDomainPermissions(Resource accessorResource,
                                           DomainPermission domainPermission,
@@ -383,7 +427,11 @@ public interface AccessControlContext {
     *                                            if no domain of domainName exists
     * @throws com.acciente.oacc.NotAuthorizedException if the accessor resource <strong>does not</strong> have the
     *                                                  specified global permissions, or
-    *                                                  if the accessor resource does not exist
+    *                                                  if the accessor resource does not exist, or
+    *                                                  if the session resource is not the accessor resource and
+    *                                                  the session resource does not have query authorization on
+    *                                                  the accessor resource (explicitly via QUERY or implicitly via
+    *                                                  IMPERSONATE permissions)
     */
    void assertGlobalResourcePermissions(Resource accessorResource,
                                         String resourceClassName,
@@ -407,7 +455,10 @@ public interface AccessControlContext {
     *                                            if no domain of domainName exists
     * @throws com.acciente.oacc.NotAuthorizedException if the accessor resource <strong>does not</strong> have the
     *                                                  specified global permissions, or
-    *                                                  if the accessor resource does not exist
+    *                                                  if the session resource is not the accessor resource and
+    *                                                  the session resource does not have query authorization on
+    *                                                  the accessor resource (explicitly via QUERY or implicitly via
+    *                                                  IMPERSONATE permissions)
     */
    void assertGlobalResourcePermissions(Resource accessorResource,
                                         String resourceClassName,
@@ -431,6 +482,10 @@ public interface AccessControlContext {
     *                                            if no resource class of resourceClassName exists, or
     *                                            if any resourcePermission is invalid for the resource class, or
     *                                            if no domain of domainName exists
+    * @throws com.acciente.oacc.NotAuthorizedException if the session resource is not the accessor resource and
+    *                                                  the session resource does not have query authorization on
+    *                                                  the accessor resource (explicitly via QUERY or implicitly via
+    *                                                  IMPERSONATE permissions)
     */
    boolean hasGlobalResourcePermissions(Resource accessorResource,
                                         String resourceClassName,
@@ -454,6 +509,10 @@ public interface AccessControlContext {
     *                                            if no resource class of resourceClassName exists, or
     *                                            if any resourcePermission is invalid for the resource class, or
     *                                            if no domain of domainName exists
+    * @throws com.acciente.oacc.NotAuthorizedException if the session resource is not the accessor resource and
+    *                                                  the session resource does not have query authorization on
+    *                                                  the accessor resource (explicitly via QUERY or implicitly via
+    *                                                  IMPERSONATE permissions)
     */
    boolean hasGlobalResourcePermissions(Resource accessorResource,
                                         String resourceClassName,
@@ -473,7 +532,11 @@ public interface AccessControlContext {
     * @throws java.lang.IllegalArgumentException if the accessorResource or the accessedResource does not exist, or
     *                                            if any resourcePermission is invalid for the resource class of accessedResource
     * @throws com.acciente.oacc.NotAuthorizedException if the accessor resource <strong>does not</strong> have the
-    *                                                  specified permissions
+    *                                                  specified permissions, or
+    *                                                  if the session resource is not the accessor resource and
+    *                                                  the session resource does not have query authorization on
+    *                                                  the accessor resource (explicitly via QUERY or implicitly via
+    *                                                  IMPERSONATE permissions)
     */
    void assertResourcePermissions(Resource accessorResource,
                                   Resource accessedResource,
@@ -492,7 +555,11 @@ public interface AccessControlContext {
     * @throws java.lang.IllegalArgumentException if the accessorResource or the accessedResource does not exist, or
     *                                            if any resourcePermission is invalid for the resource class of accessedResource
     * @throws com.acciente.oacc.NotAuthorizedException if the accessor resource <strong>does not</strong> have the
-    *                                                  specified permissions
+    *                                                  specified permissions, or
+    *                                                  if the session resource is not the accessor resource and
+    *                                                  the session resource does not have query authorization on
+    *                                                  the accessor resource (explicitly via QUERY or implicitly via
+    *                                                  IMPERSONATE permissions)
     */
    void assertResourcePermissions(Resource accessorResource,
                                   Resource accessedResource,
@@ -511,6 +578,10 @@ public interface AccessControlContext {
     * @return <strong>true</strong> if the accessor resource has the specified permissions
     * @throws java.lang.IllegalArgumentException if the accessorResource or the accessedResource does not exist, or
     *                                            if any resourcePermission is invalid for the resource class of accessedResource
+    * @throws com.acciente.oacc.NotAuthorizedException if the session resource is not the accessor resource and
+    *                                                  the session resource does not have query authorization on
+    *                                                  the accessor resource (explicitly via QUERY or implicitly via
+    *                                                  IMPERSONATE permissions)
     */
    boolean hasResourcePermissions(Resource accessorResource,
                                   Resource accessedResource,
@@ -529,6 +600,10 @@ public interface AccessControlContext {
     * @return <strong>true</strong> if the accessor resource has the specified permissions
     * @throws java.lang.IllegalArgumentException if the accessorResource or the accessedResource does not exist, or
     *                                            if any resourcePermission is invalid for the resource class of accessedResource
+    * @throws com.acciente.oacc.NotAuthorizedException if the session resource is not the accessor resource and
+    *                                                  the session resource does not have query authorization on
+    *                                                  the accessor resource (explicitly via QUERY or implicitly via
+    *                                                  IMPERSONATE permissions)
     */
    boolean hasResourcePermissions(Resource accessorResource,
                                   Resource accessedResource,
@@ -552,7 +627,10 @@ public interface AccessControlContext {
     * @throws com.acciente.oacc.NotAuthorizedException if the accessor resource does <strong>not</strong> have the
     *                                                  specified resource create permissions for the specified class
     *                                                  in the specified domain, or
-    *                                                  if the accessor resource does not exist
+    *                                                  if the session resource is not the accessor resource and
+    *                                                  the session resource does not have query authorization on
+    *                                                  the accessor resource (explicitly via QUERY or implicitly via
+    *                                                  IMPERSONATE permissions)
     */
    void assertResourceCreatePermissions(Resource accessorResource,
                                         String resourceClassName,
@@ -577,7 +655,10 @@ public interface AccessControlContext {
     * @throws com.acciente.oacc.NotAuthorizedException if the accessor resource does <strong>not</strong> have the
     *                                                  specified resource create permissions for the specified class
     *                                                  in the specified domain, or
-    *                                                  if the accessor resource does not exist
+    *                                                  if the session resource is not the accessor resource and
+    *                                                  the session resource does not have query authorization on
+    *                                                  the accessor resource (explicitly via QUERY or implicitly via
+    *                                                  IMPERSONATE permissions)
     */
    void assertResourceCreatePermissions(Resource accessorResource,
                                         String resourceClassName,
@@ -602,6 +683,10 @@ public interface AccessControlContext {
     *                                            if no resource class of resourceClassName exists, or
     *                                            if any resourceCreatePermission is invalid for the resource class, or
     *                                            if no domain of domainName exists
+    * @throws com.acciente.oacc.NotAuthorizedException if the session resource is not the accessor resource and
+    *                                                  the session resource does not have query authorization on
+    *                                                  the accessor resource (explicitly via QUERY or implicitly via
+    *                                                  IMPERSONATE permissions)
     */
    boolean hasResourceCreatePermissions(Resource accessorResource,
                                         String resourceClassName,
@@ -626,6 +711,10 @@ public interface AccessControlContext {
     *                                            if no resource class of resourceClassName exists, or
     *                                            if any resourceCreatePermission is invalid for the resource class, or
     *                                            if no domain of domainName exists
+    * @throws com.acciente.oacc.NotAuthorizedException if the session resource is not the accessor resource and
+    *                                                  the session resource does not have query authorization on
+    *                                                  the accessor resource (explicitly via QUERY or implicitly via
+    *                                                  IMPERSONATE permissions)
     */
    boolean hasResourceCreatePermissions(Resource accessorResource,
                                         String resourceClassName,
@@ -650,7 +739,10 @@ public interface AccessControlContext {
     * @throws com.acciente.oacc.NotAuthorizedException if the accessor resource would <strong>not</strong> receive the
     *                                                  specified permissions after creating a resource of the specified
     *                                                  class in the specified domain, or
-    *                                                  if the accessor resource does not exist
+    *                                                  if the session resource is not the accessor resource and
+    *                                                  the session resource does not have query authorization on
+    *                                                  the accessor resource (explicitly via QUERY or implicitly via
+    *                                                  IMPERSONATE permissions)
     */
    void assertPostCreateResourcePermissions(Resource accessorResource,
                                             String resourceClassName,
@@ -675,7 +767,10 @@ public interface AccessControlContext {
     * @throws com.acciente.oacc.NotAuthorizedException if the accessor resource would <strong>not</strong> receive the
     *                                                  specified permissions after creating a resource of the specified
     *                                                  class in the specified domain, or
-    *                                                  if the accessor resource does not exist
+    *                                                  if the session resource is not the accessor resource and
+    *                                                  the session resource does not have query authorization on
+    *                                                  the accessor resource (explicitly via QUERY or implicitly via
+    *                                                  IMPERSONATE permissions)
     */
    void assertPostCreateResourcePermissions(Resource accessorResource,
                                             String resourceClassName,
@@ -700,6 +795,10 @@ public interface AccessControlContext {
     *                                            if no resource class of resourceClassName exists, or
     *                                            if no domain of domainName exists, or
     *                                            if any resourcePermission is invalid for the resource class
+    * @throws com.acciente.oacc.NotAuthorizedException if the session resource is not the accessor resource and
+    *                                                  the session resource does not have query authorization on
+    *                                                  the accessor resource (explicitly via QUERY or implicitly via
+    *                                                  IMPERSONATE permissions)
     */
    boolean hasPostCreateResourcePermissions(Resource accessorResource,
                                             String resourceClassName,
@@ -724,6 +823,10 @@ public interface AccessControlContext {
     *                                            if no resource class of resourceClassName exists, or
     *                                            if no domain of domainName exists, or
     *                                            if any resourcePermission is invalid for the resource class
+    * @throws com.acciente.oacc.NotAuthorizedException if the session resource is not the accessor resource and
+    *                                                  the session resource does not have query authorization on
+    *                                                  the accessor resource (explicitly via QUERY or implicitly via
+    *                                                  IMPERSONATE permissions)
     */
    boolean hasPostCreateResourcePermissions(Resource accessorResource,
                                             String resourceClassName,
@@ -737,11 +840,6 @@ public interface AccessControlContext {
     * <p/>
     * The method takes into account direct, inherited and global permissions, as well as
     * resources that are reachable as a result of SUPER-USER permissions.
-    * <p/>
-    * Note that the current session resource must either be the specified accessor resource, or
-    * the current session resource must have DELETE, IMPERSONATE, INHERIT or RESET-CREDENTIALS permissions to
-    * the specified accessor resource, or must have SUPER-USER permission to the (parent-) domain
-    * of the specified accessor resource, otherwise an exception is thrown.
     *
     * @param accessorResource    the resource relative to which the set of accessible resources is computed
     * @param resourceClassName   a string resource class name
@@ -751,8 +849,9 @@ public interface AccessControlContext {
     *                                            if no resource class of resourceClassName exists, or
     *                                            if any resourcePermission is invalid for the specified resource class
     * @throws com.acciente.oacc.NotAuthorizedException if the session resource is not the accessor resource and
-    *                                                  the session resource does not have either IMPERSONATE, INHERIT
-    *                                                  or RESET-CREDENTIALS permissions on the accessor resource
+    *                                                  the session resource does not have query authorization on
+    *                                                  the accessor resource (explicitly via QUERY or implicitly via
+    *                                                  IMPERSONATE permissions)
     */
    Set<Resource> getResourcesByResourcePermissions(Resource accessorResource,
                                                    String resourceClassName,
@@ -764,11 +863,6 @@ public interface AccessControlContext {
     * <p/>
     * The method takes into account direct, inherited and global permissions, as well as
     * resources that are reachable as a result of SUPER-USER permissions.
-    * <p/>
-    * Note that the current session resource must either be the specified accessor resource, or
-    * the current session resource must have DELETE, IMPERSONATE, INHERIT or RESET-CREDENTIALS permissions to
-    * the specified accessor resource, or must have SUPER-USER permission to the (parent-) domain
-    * of the specified accessor resource, otherwise an exception is thrown.
     *
     * @param accessorResource    the resource relative to which the set of accessible resources is computed
     * @param resourceClassName   a string resource class name
@@ -779,8 +873,9 @@ public interface AccessControlContext {
     *                                            if no resource class of resourceClassName exists, or
     *                                            if any resourcePermission is invalid for the specified resource class
     * @throws com.acciente.oacc.NotAuthorizedException if the session resource is not the accessor resource and
-    *                                                  the session resource does not have either IMPERSONATE, INHERIT
-    *                                                  or RESET-CREDENTIALS permissions on the accessor resource
+    *                                                  the session resource does not have query authorization on
+    *                                                  the accessor resource (explicitly via QUERY or implicitly via
+    *                                                  IMPERSONATE permissions)
     */
    Set<Resource> getResourcesByResourcePermissions(Resource accessorResource,
                                                    String resourceClassName,
@@ -794,11 +889,6 @@ public interface AccessControlContext {
     * <p/>
     * The method takes into account direct, inherited and global permissions, as well as
     * resources that are reachable as a result of SUPER-USER permissions.
-    * <p/>
-    * Note that the current session resource must either be the specified accessor resource, or
-    * the current session resource must have DELETE, IMPERSONATE, INHERIT or RESET-CREDENTIALS permissions to
-    * the specified accessor resource, or must have SUPER-USER permission to the (parent-) domain
-    * of the specified accessor resource, otherwise an exception is thrown.
     *
     * @param accessorResource    the resource relative to which the set of accessible resources is computed
     * @param resourceClassName   a string resource class name
@@ -810,8 +900,9 @@ public interface AccessControlContext {
     *                                            if no domain of domainName exists, or
     *                                            if any resourcePermission is invalid for the specified resource class
     * @throws com.acciente.oacc.NotAuthorizedException if the session resource is not the accessor resource and
-    *                                                  the session resource does not have either IMPERSONATE, INHERIT
-    *                                                  or RESET-CREDENTIALS permissions on the accessor resource
+    *                                                  the session resource does not have query authorization on
+    *                                                  the accessor resource (explicitly via QUERY or implicitly via
+    *                                                  IMPERSONATE permissions)
     */
    Set<Resource> getResourcesByResourcePermissionsAndDomain(Resource accessorResource,
                                                             String resourceClassName,
@@ -825,11 +916,6 @@ public interface AccessControlContext {
     * <p/>
     * The method takes into account direct, inherited and global permissions, as well as
     * resources that are reachable as a result of SUPER-USER permissions.
-    * <p/>
-    * Note that the current session resource must either be the specified accessor resource, or
-    * the current session resource must have DELETE, IMPERSONATE, INHERIT or RESET-CREDENTIALS permissions to
-    * the specified accessor resource, or must have SUPER-USER permission to the (parent-) domain
-    * of the specified accessor resource, otherwise an exception is thrown.
     *
     * @param accessorResource    the resource relative to which the set of accessible resources is computed
     * @param resourceClassName   a string resource class name
@@ -842,8 +928,9 @@ public interface AccessControlContext {
     *                                            if no domain of domainName exists, or
     *                                            if any resourcePermission is invalid for the specified resource class
     * @throws com.acciente.oacc.NotAuthorizedException if the session resource is not the accessor resource and
-    *                                                  the session resource does not have either IMPERSONATE, INHERIT
-    *                                                  or RESET-CREDENTIALS permissions on the accessor resource
+    *                                                  the session resource does not have query authorization on
+    *                                                  the accessor resource (explicitly via QUERY or implicitly via
+    *                                                  IMPERSONATE permissions)
     */
    Set<Resource> getResourcesByResourcePermissionsAndDomain(Resource accessorResource,
                                                             String resourceClassName,
@@ -866,6 +953,10 @@ public interface AccessControlContext {
     * @throws java.lang.IllegalArgumentException if accessorResource does not exist, or
     *                                            if no resource class of resourceClassName exists, or
     *                                            if any resourcePermission is invalid for the specified resource class
+    * @throws com.acciente.oacc.NotAuthorizedException if the session resource is not the accessed resource and
+    *                                                  the session resource does not have query authorization on
+    *                                                  the accessed resource (explicitly via QUERY or implicitly via
+    *                                                  IMPERSONATE permissions)
     */
    Set<Resource> getAccessorResourcesByResourcePermissions(Resource accessedResource,
                                                            String resourceClassName,
@@ -887,6 +978,10 @@ public interface AccessControlContext {
     * @throws java.lang.IllegalArgumentException if accessorResource does not exist, or
     *                                            if no resource class of resourceClassName exists, or
     *                                            if any resourcePermission is invalid for the specified resource class
+    * @throws com.acciente.oacc.NotAuthorizedException if the session resource is not the accessed resource and
+    *                                                  the session resource does not have query authorization on
+    *                                                  the accessed resource (explicitly via QUERY or implicitly via
+    *                                                  IMPERSONATE permissions)
     */
    Set<Resource> getAccessorResourcesByResourcePermissions(Resource accessedResource,
                                                            String resourceClassName,
@@ -1228,6 +1323,10 @@ public interface AccessControlContext {
     * @param accessorResource the accessor resource relative which permissions should be returned
     * @return a set of direct domain create permission the accessor resource has
     * @throws java.lang.IllegalArgumentException if accessorResource reference does not exist
+    * @throws com.acciente.oacc.NotAuthorizedException if the session resource is not the accessor resource and
+    *                                                  the session resource does not have query authorization on
+    *                                                  the accessor resource (explicitly via QUERY or implicitly via
+    *                                                  IMPERSONATE permissions)
     */
    Set<DomainCreatePermission> getDomainCreatePermissions(Resource accessorResource);
 
@@ -1238,6 +1337,10 @@ public interface AccessControlContext {
     * @param accessorResource the accessor resource relative which permissions should be returned
     * @return a set of effective domain create permission the accessor resource has
     * @throws java.lang.IllegalArgumentException if accessorResource reference does not exist
+    * @throws com.acciente.oacc.NotAuthorizedException if the session resource is not the accessor resource and
+    *                                                  the session resource does not have query authorization on
+    *                                                  the accessor resource (explicitly via QUERY or implicitly via
+    *                                                  IMPERSONATE permissions)
     */
    Set<DomainCreatePermission> getEffectiveDomainCreatePermissions(Resource accessorResource);
 
@@ -1380,6 +1483,10 @@ public interface AccessControlContext {
     * @return the set of all direct domain permission the accessor resource has to the domain
     * @throws java.lang.IllegalArgumentException if accessorResource reference does not exist, or
     *                                            if no domain of domainName exists
+    * @throws com.acciente.oacc.NotAuthorizedException if the session resource is not the accessor resource and
+    *                                                  the session resource does not have query authorization on
+    *                                                  the accessor resource (explicitly via QUERY or implicitly via
+    *                                                  IMPERSONATE permissions)
     */
    Set<DomainPermission> getDomainPermissions(Resource accessorResource,
                                               String domainName);
@@ -1395,6 +1502,10 @@ public interface AccessControlContext {
     * @param accessorResource the accessor resource relative which permissions should be returned
     * @return the sets of direct domain permission the accessor resource has to any domain, mapped by domain name
     * @throws java.lang.IllegalArgumentException if accessorResource reference does not exist
+    * @throws com.acciente.oacc.NotAuthorizedException if the session resource is not the accessor resource and
+    *                                                  the session resource does not have query authorization on
+    *                                                  the accessor resource (explicitly via QUERY or implicitly via
+    *                                                  IMPERSONATE permissions)
     */
    Map<String, Set<DomainPermission>> getDomainPermissionsMap(Resource accessorResource);
 
@@ -1413,6 +1524,10 @@ public interface AccessControlContext {
     * @return the set of all effective domain permission the accessor resource has to the domain
     * @throws java.lang.IllegalArgumentException if accessorResource reference does not exist, or
     *                                            if no domain of domainName exists
+    * @throws com.acciente.oacc.NotAuthorizedException if the session resource is not the accessor resource and
+    *                                                  the session resource does not have query authorization on
+    *                                                  the accessor resource (explicitly via QUERY or implicitly via
+    *                                                  IMPERSONATE permissions)
     */
    Set<DomainPermission> getEffectiveDomainPermissions(Resource accessorResource,
                                                        String domainName);
@@ -1429,6 +1544,10 @@ public interface AccessControlContext {
     * @param accessorResource the accessor resource relative which permissions should be returned
     * @return the sets of effective domain permission the accessor resource has to any domain, mapped by domain name
     * @throws java.lang.IllegalArgumentException if accessorResource reference does not exist
+    * @throws com.acciente.oacc.NotAuthorizedException if the session resource is not the accessor resource and
+    *                                                  the session resource does not have query authorization on
+    *                                                  the accessor resource (explicitly via QUERY or implicitly via
+    *                                                  IMPERSONATE permissions)
     */
    Map<String, Set<DomainPermission>> getEffectiveDomainPermissionsMap(Resource accessorResource);
 
@@ -1667,6 +1786,10 @@ public interface AccessControlContext {
     * @throws java.lang.IllegalArgumentException if accessorResource reference does not exist, or
     *                                            if no resource class of resourceClassName exists, or
     *                                            if no domain of domainName exists
+    * @throws com.acciente.oacc.NotAuthorizedException if the session resource is not the accessor resource and
+    *                                                  the session resource does not have query authorization on
+    *                                                  the accessor resource (explicitly via QUERY or implicitly via
+    *                                                  IMPERSONATE permissions)
     */
    Set<ResourceCreatePermission> getResourceCreatePermissions(Resource accessorResource,
                                                               String resourceClassName,
@@ -1689,6 +1812,10 @@ public interface AccessControlContext {
     * @throws java.lang.IllegalArgumentException if accessorResource reference does not exist, or
     *                                            if no resource class of resourceClassName exists, or
     *                                            if no domain of domainName exists
+    * @throws com.acciente.oacc.NotAuthorizedException if the session resource is not the accessor resource and
+    *                                                  the session resource does not have query authorization on
+    *                                                  the accessor resource (explicitly via QUERY or implicitly via
+    *                                                  IMPERSONATE permissions)
     */
    Set<ResourceCreatePermission> getEffectiveResourceCreatePermissions(Resource accessorResource,
                                                                        String resourceClassName,
@@ -1712,6 +1839,10 @@ public interface AccessControlContext {
     * @param accessorResource the accessor resource relative which permissions should be returned
     * @return a map of maps of direct resource create permissions, keyed by domain name and resource class name
     * @throws java.lang.IllegalArgumentException if accessorResource reference does not exist
+    * @throws com.acciente.oacc.NotAuthorizedException if the session resource is not the accessor resource and
+    *                                                  the session resource does not have query authorization on
+    *                                                  the accessor resource (explicitly via QUERY or implicitly via
+    *                                                  IMPERSONATE permissions)
     */
    Map<String, Map<String, Set<ResourceCreatePermission>>> getResourceCreatePermissionsMap(Resource accessorResource);
 
@@ -1733,6 +1864,10 @@ public interface AccessControlContext {
     * @param accessorResource the accessor resource relative which permissions should be returned
     * @return a map of maps of effective resource create permissions, keyed by domain name and resource class name
     * @throws java.lang.IllegalArgumentException if accessorResource reference does not exist
+    * @throws com.acciente.oacc.NotAuthorizedException if the session resource is not the accessor resource and
+    *                                                  the session resource does not have query authorization on
+    *                                                  the accessor resource (explicitly via QUERY or implicitly via
+    *                                                  IMPERSONATE permissions)
     */
    Map<String, Map<String, Set<ResourceCreatePermission>>> getEffectiveResourceCreatePermissionsMap(Resource accessorResource);
 
@@ -1884,6 +2019,10 @@ public interface AccessControlContext {
     * @param accessedResource the resource on which the privileges were granted
     * @return a set of direct resource permissions
     * @throws java.lang.IllegalArgumentException if accessorResource or accessedResource does not exist
+    * @throws com.acciente.oacc.NotAuthorizedException if the session resource is not the accessor resource and
+    *                                                  the session resource does not have query authorization on
+    *                                                  the accessor resource (explicitly via QUERY or implicitly via
+    *                                                  IMPERSONATE permissions)
     */
    Set<ResourcePermission> getResourcePermissions(Resource accessorResource,
                                                   Resource accessedResource);
@@ -1899,6 +2038,10 @@ public interface AccessControlContext {
     * @param accessedResource the resource on which the privileges were granted
     * @return a set of effective resource permissions
     * @throws java.lang.IllegalArgumentException if accessorResource or accessedResource does not exist
+    * @throws com.acciente.oacc.NotAuthorizedException if the session resource is not the accessor resource and
+    *                                                  the session resource does not have query authorization on
+    *                                                  the accessor resource (explicitly via QUERY or implicitly via
+    *                                                  IMPERSONATE permissions)
     */
    Set<ResourcePermission> getEffectiveResourcePermissions(Resource accessorResource,
                                                            Resource accessedResource);
@@ -2107,6 +2250,10 @@ public interface AccessControlContext {
     * @throws java.lang.IllegalArgumentException if accessorResource reference does not exist, or
     *                                            if no resource class of resourceClassName exists, or
     *                                            if no domain of domainName exists
+    * @throws com.acciente.oacc.NotAuthorizedException if the session resource is not the accessor resource and
+    *                                                  the session resource does not have query authorization on
+    *                                                  the accessor resource (explicitly via QUERY or implicitly via
+    *                                                  IMPERSONATE permissions)
     */
    Set<ResourcePermission> getGlobalResourcePermissions(Resource accessorResource,
                                                         String resourceClassName,
@@ -2128,6 +2275,10 @@ public interface AccessControlContext {
     * @throws java.lang.IllegalArgumentException if accessorResource reference does not exist, or
     *                                            if no resource class of resourceClassName exists, or
     *                                            if no domain of domainName exists
+    * @throws com.acciente.oacc.NotAuthorizedException if the session resource is not the accessor resource and
+    *                                                  the session resource does not have query authorization on
+    *                                                  the accessor resource (explicitly via QUERY or implicitly via
+    *                                                  IMPERSONATE permissions)
     */
    Set<ResourcePermission> getEffectiveGlobalResourcePermissions(Resource accessorResource,
                                                                  String resourceClassName,
@@ -2149,6 +2300,10 @@ public interface AccessControlContext {
     * @return a map of maps of all direct global resource permissions the accessor resource has, keyed
     *         by domain name and resource class name
     * @throws java.lang.IllegalArgumentException if accessorResource reference does not exist
+    * @throws com.acciente.oacc.NotAuthorizedException if the session resource is not the accessor resource and
+    *                                                  the session resource does not have query authorization on
+    *                                                  the accessor resource (explicitly via QUERY or implicitly via
+    *                                                  IMPERSONATE permissions)
     */
    Map<String, Map<String, Set<ResourcePermission>>> getGlobalResourcePermissionsMap(Resource accessorResource);
 
@@ -2168,6 +2323,10 @@ public interface AccessControlContext {
     * @return a map of maps of all effective global resource permissions the accessor resource has, keyed
     *         by domain name and resource class name
     * @throws java.lang.IllegalArgumentException if accessorResource reference does not exist
+    * @throws com.acciente.oacc.NotAuthorizedException if the session resource is not the accessor resource and
+    *                                                  the session resource does not have query authorization on
+    *                                                  the accessor resource (explicitly via QUERY or implicitly via
+    *                                                  IMPERSONATE permissions)
     */
    Map<String, Map<String, Set<ResourcePermission>>> getEffectiveGlobalResourcePermissionsMap(Resource accessorResource);
 }

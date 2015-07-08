@@ -90,6 +90,7 @@ public class TestAccessControl_setDomainPermissions extends TestAccessControlBas
       domainPermissions_pre.add(domPerm_child_withGrant);
       assertThat(domainPermissions_pre, is(not(domainPermissions_granter)));
 
+      grantQueryPermission(authenticatableResource, accessorResource);
       accessControlContext.authenticate(authenticatableResource, PasswordCredentials.newInstance(password));
       accessControlContext.setDomainPermissions(accessorResource, domainName, domainPermissions_pre);
 
@@ -137,6 +138,7 @@ public class TestAccessControl_setDomainPermissions extends TestAccessControlBas
       domainPermissions_pre.add(domCreatePerm_child);
       assertThat(domainPermissions_pre, is(not(domainPermissions_granter)));
 
+      grantQueryPermission(authenticatableResource, accessorResource);
       accessControlContext.authenticate(authenticatableResource, PasswordCredentials.newInstance(password));
       accessControlContext.setDomainPermissions(accessorResource, domainName, domainPermissions_pre);
       domainPermissions_post = accessControlContext.getDomainPermissions(accessorResource, domainName);
@@ -206,9 +208,11 @@ public class TestAccessControl_setDomainPermissions extends TestAccessControlBas
       grantorPermissions.add(DomainPermissions.getInstance(grantedPermissionName, true));
 
       accessControlContext.setDomainPermissions(grantorResource, domainName, grantorPermissions);
-      assertThat(accessControlContext.getEffectiveDomainPermissions(grantorResource, domainName), is(grantorPermissions));
+      assertThat(accessControlContext.getEffectiveDomainPermissions(grantorResource, domainName),
+                 is(grantorPermissions));
 
       // authenticate grantor resource
+      grantQueryPermission(grantorResource, accessorResource);
       accessControlContext.authenticate(grantorResource, PasswordCredentials.newInstance(password));
 
       // set permissions as grantor and verify
@@ -253,6 +257,7 @@ public class TestAccessControl_setDomainPermissions extends TestAccessControlBas
       assertThat(accessControlContext.getEffectiveDomainPermissions(grantorResource, domainName), is(grantorPermissions));
 
       // authenticate grantor resource
+      grantQueryPermission(grantorResource, accessorResource);
       accessControlContext.authenticate(grantorResource, PasswordCredentials.newInstance(password));
 
       // set permissions as grantor and verify
@@ -293,6 +298,7 @@ public class TestAccessControl_setDomainPermissions extends TestAccessControlBas
       assertThat(accessControlContext.getEffectiveDomainPermissions(grantorResource, domainName), is(grantorPermissions));
 
       // authenticate grantor resource
+      grantQueryPermission(grantorResource, accessorResource);
       accessControlContext.authenticate(grantorResource, PasswordCredentials.newInstance(password));
 
       // set permissions as grantor and verify
@@ -374,6 +380,7 @@ public class TestAccessControl_setDomainPermissions extends TestAccessControlBas
       assertThat(accessControlContext.getEffectiveDomainPermissions(grantorResource, domainName), is(grantorPermissions));
 
       // authenticate grantor resource
+      grantQueryPermission(grantorResource, accessorResource);
       accessControlContext.authenticate(grantorResource, PasswordCredentials.newInstance(password));
 
       // set permissions as grantor and verify
