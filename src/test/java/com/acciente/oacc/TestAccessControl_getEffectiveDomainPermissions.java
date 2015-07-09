@@ -311,6 +311,10 @@ public class TestAccessControl_getEffectiveDomainPermissions extends TestAccessC
             = DomainPermissions.getInstance(DomainPermissions.CREATE_CHILD_DOMAIN);
       final DomainPermission domCreatePerm_child_withGrant
             = DomainPermissions.getInstance(DomainPermissions.CREATE_CHILD_DOMAIN, true);
+      final DomainPermission domCreatePerm_delete
+            = DomainPermissions.getInstance(DomainPermissions.DELETE);
+      final DomainPermission domCreatePerm_delete_withGrant
+            = DomainPermissions.getInstance(DomainPermissions.DELETE, true);
 
       final String domainName1 = generateDomain();
       final String domainName2 = generateDomain();
@@ -322,7 +326,8 @@ public class TestAccessControl_getEffectiveDomainPermissions extends TestAccessC
       accessControlContext.setDomainPermissions(accessorResource, domainName1, domainPermissions_pre1);
 
       Set<DomainPermission> domainPermissions_expectedSuperUser = setOf(domCreatePerm_superuser_withGrant,
-                                                                        domCreatePerm_child_withGrant);
+                                                                        domCreatePerm_child_withGrant,
+                                                                        domCreatePerm_delete_withGrant);
 
       // get domain create permissions and verify
       final Map<String,Set<DomainPermission>> allDomainPermissions = accessControlContext.getEffectiveDomainPermissionsMap(accessorResource);

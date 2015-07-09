@@ -62,6 +62,13 @@ public class TestAccessControl_assertDomainCreatePermissions extends TestAccessC
                                                                                true));
       accessControlContext
             .assertDomainCreatePermissions(SYS_RESOURCE,
+                                           DomainCreatePermissions.getInstance(DomainPermissions.getInstance(DomainPermissions.DELETE)));
+      accessControlContext
+            .assertDomainCreatePermissions(SYS_RESOURCE,
+                                           DomainCreatePermissions.getInstance(DomainPermissions.getInstance(DomainPermissions.DELETE),
+                                                                               true));
+      accessControlContext
+            .assertDomainCreatePermissions(SYS_RESOURCE,
                                            DomainCreatePermissions.getInstance(DomainCreatePermissions.CREATE),
                                            DomainCreatePermissions.getInstance(DomainCreatePermissions.CREATE, true));
 

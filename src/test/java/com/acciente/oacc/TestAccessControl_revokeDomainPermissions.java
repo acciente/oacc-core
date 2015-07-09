@@ -87,10 +87,10 @@ public class TestAccessControl_revokeDomainPermissions extends TestAccessControl
    @Test
    public void revokeDomainPermissions_validAsAuthorized() {
       authenticateSystemResource();
-      final DomainPermission domPerm_superuser_withGrant
-            = DomainPermissions.getInstance(DomainPermissions.SUPER_USER, true);
-      final DomainPermission domPerm_superuser
-            = DomainPermissions.getInstance(DomainPermissions.SUPER_USER);
+      final DomainPermission domPerm_delete_withGrant
+            = DomainPermissions.getInstance(DomainPermissions.DELETE, true);
+      final DomainPermission domPerm_delete
+            = DomainPermissions.getInstance(DomainPermissions.DELETE);
       final DomainPermission domPerm_child_withGrant
             = DomainPermissions.getInstance(DomainPermissions.CREATE_CHILD_DOMAIN, true);
 
@@ -102,7 +102,7 @@ public class TestAccessControl_revokeDomainPermissions extends TestAccessControl
       final String domainName = generateDomain();
 
       // setup accessor permissions
-      final Set<DomainPermission> accessorPermissions_pre = setOf(domPerm_child_withGrant, domPerm_superuser);
+      final Set<DomainPermission> accessorPermissions_pre = setOf(domPerm_child_withGrant, domPerm_delete);
       accessControlContext.setDomainPermissions(accessorResource,
                                                 domainName,
                                                 accessorPermissions_pre);
@@ -114,7 +114,7 @@ public class TestAccessControl_revokeDomainPermissions extends TestAccessControl
       assertThat(accessControlContext.getDomainPermissions(accessorResource2, domainName), is(accessorPermissions_pre));
 
       // grant domain permissions
-      final Set<DomainPermission> grantorPermissions_pre = setOf(domPerm_superuser_withGrant, domPerm_child_withGrant);
+      final Set<DomainPermission> grantorPermissions_pre = setOf(domPerm_delete_withGrant, domPerm_child_withGrant);
       accessControlContext.setDomainPermissions(authenticatableResource, domainName, grantorPermissions_pre);
 
       Set<DomainPermission> grantorPermissions_post;
@@ -127,7 +127,7 @@ public class TestAccessControl_revokeDomainPermissions extends TestAccessControl
       accessControlContext.authenticate(authenticatableResource, PasswordCredentials.newInstance(password));
       accessControlContext.revokeDomainPermissions(accessorResource,
                                                    domainName,
-                                                   domPerm_superuser,
+                                                   domPerm_delete,
                                                    domPerm_child_withGrant);
 
       grantorPermissions_post = accessControlContext.getEffectiveDomainPermissions(accessorResource, domainName);
@@ -136,7 +136,7 @@ public class TestAccessControl_revokeDomainPermissions extends TestAccessControl
       // test set-based version
       accessControlContext.revokeDomainPermissions(accessorResource2,
                                                    domainName,
-                                                   setOf(domPerm_superuser,
+                                                   setOf(domPerm_delete,
                                                          domPerm_child_withGrant));
 
       assertThat(accessControlContext.getEffectiveDomainPermissions(accessorResource2, domainName).isEmpty(), is(true));
@@ -270,10 +270,10 @@ public class TestAccessControl_revokeDomainPermissions extends TestAccessControl
    @Test
    public void revokeDomainPermissions_revokeSubsetOfPermissions() {
       authenticateSystemResource();
-      final DomainPermission domPerm_superuser_withGrant
-            = DomainPermissions.getInstance(DomainPermissions.SUPER_USER, true);
-      final DomainPermission domPerm_superuser
-            = DomainPermissions.getInstance(DomainPermissions.SUPER_USER);
+      final DomainPermission domPerm_delete_withGrant
+            = DomainPermissions.getInstance(DomainPermissions.DELETE, true);
+      final DomainPermission domPerm_delete
+            = DomainPermissions.getInstance(DomainPermissions.DELETE);
       final DomainPermission domPerm_child_withGrant
             = DomainPermissions.getInstance(DomainPermissions.CREATE_CHILD_DOMAIN, true);
 
@@ -286,7 +286,7 @@ public class TestAccessControl_revokeDomainPermissions extends TestAccessControl
 
       // setup accessor permissions
       final Set<DomainPermission> accessorPermissions_pre = setOf(domPerm_child_withGrant,
-                                                                  domPerm_superuser);
+                                                                  domPerm_delete);
       accessControlContext.setDomainPermissions(accessorResource,
                                                 domainName,
                                                 accessorPermissions_pre);
@@ -298,7 +298,7 @@ public class TestAccessControl_revokeDomainPermissions extends TestAccessControl
                                                 accessorPermissions_pre);
 
       // grant domain permissions
-      final Set<DomainPermission> grantorPermissions_pre = setOf(domPerm_superuser_withGrant, domPerm_child_withGrant);
+      final Set<DomainPermission> grantorPermissions_pre = setOf(domPerm_delete_withGrant, domPerm_child_withGrant);
       accessControlContext.setDomainPermissions(authenticatableResource, domainName, grantorPermissions_pre);
 
       Set<DomainPermission> grantorPermissions_post;
@@ -311,7 +311,7 @@ public class TestAccessControl_revokeDomainPermissions extends TestAccessControl
       accessControlContext.authenticate(authenticatableResource, PasswordCredentials.newInstance(password));
       accessControlContext.revokeDomainPermissions(accessorResource,
                                                    domainName,
-                                                   domPerm_superuser);
+                                                   domPerm_delete);
 
       grantorPermissions_post = accessControlContext.getEffectiveDomainPermissions(accessorResource, domainName);
       assertThat(grantorPermissions_post, is(setOf(domPerm_child_withGrant)));
@@ -321,7 +321,7 @@ public class TestAccessControl_revokeDomainPermissions extends TestAccessControl
                  is(accessorPermissions_pre));
       accessControlContext.revokeDomainPermissions(accessorResource2,
                                                    domainName,
-                                                   setOf(domPerm_superuser));
+                                                   setOf(domPerm_delete));
 
       grantorPermissions_post = accessControlContext.getEffectiveDomainPermissions(accessorResource2, domainName);
       assertThat(grantorPermissions_post, is(setOf(domPerm_child_withGrant)));
@@ -383,10 +383,10 @@ public class TestAccessControl_revokeDomainPermissions extends TestAccessControl
    @Test
    public void revokeDomainPermissions_identicalPermissions_shouldSucceedAsAuthorized() {
       authenticateSystemResource();
-      final DomainPermission domPerm_superuser_withGrant
-            = DomainPermissions.getInstance(DomainPermissions.SUPER_USER, true);
-      final DomainPermission domPerm_superuser
-            = DomainPermissions.getInstance(DomainPermissions.SUPER_USER);
+      final DomainPermission domPerm_delete_withGrant
+            = DomainPermissions.getInstance(DomainPermissions.DELETE, true);
+      final DomainPermission domPerm_delete
+            = DomainPermissions.getInstance(DomainPermissions.DELETE);
       final DomainPermission domPerm_child_withGrant
             = DomainPermissions.getInstance(DomainPermissions.CREATE_CHILD_DOMAIN, true);
 
@@ -399,7 +399,7 @@ public class TestAccessControl_revokeDomainPermissions extends TestAccessControl
 
       // setup accessor permissions
       final Set<DomainPermission> accessorPermissions_pre = setOf(domPerm_child_withGrant,
-                                                                  domPerm_superuser);
+                                                                  domPerm_delete);
       accessControlContext.setDomainPermissions(accessorResource,
                                                 domainName,
                                                 accessorPermissions_pre);
@@ -411,7 +411,7 @@ public class TestAccessControl_revokeDomainPermissions extends TestAccessControl
                                                 accessorPermissions_pre);
 
       // grant domain permissions
-      final Set<DomainPermission> grantorPermissions_pre = setOf(domPerm_superuser_withGrant, domPerm_child_withGrant);
+      final Set<DomainPermission> grantorPermissions_pre = setOf(domPerm_delete_withGrant, domPerm_child_withGrant);
       accessControlContext.setDomainPermissions(authenticatableResource, domainName, grantorPermissions_pre);
 
       Set<DomainPermission> grantorPermissions_post;
@@ -424,7 +424,7 @@ public class TestAccessControl_revokeDomainPermissions extends TestAccessControl
       accessControlContext.authenticate(authenticatableResource, PasswordCredentials.newInstance(password));
       accessControlContext.revokeDomainPermissions(accessorResource,
                                                    domainName,
-                                                   domPerm_superuser,
+                                                   domPerm_delete,
                                                    domPerm_child_withGrant);
 
       grantorPermissions_post = accessControlContext.getEffectiveDomainPermissions(accessorResource, domainName);
@@ -436,7 +436,7 @@ public class TestAccessControl_revokeDomainPermissions extends TestAccessControl
 
       accessControlContext.revokeDomainPermissions(accessorResource2,
                                                    domainName,
-                                                   setOf(domPerm_superuser,
+                                                   setOf(domPerm_delete,
                                                          domPerm_child_withGrant));
 
       assertThat(accessControlContext.getEffectiveDomainPermissions(accessorResource2, domainName).isEmpty(), is(true));
@@ -445,10 +445,10 @@ public class TestAccessControl_revokeDomainPermissions extends TestAccessControl
    @Test
    public void revokeDomainPermissions_lesserGrantingRightPermissions_shouldSucceedAsAuthorized() {
       authenticateSystemResource();
-      final DomainPermission domPerm_superuser_withGrant
-            = DomainPermissions.getInstance(DomainPermissions.SUPER_USER, true);
-      final DomainPermission domPerm_superuser
-            = DomainPermissions.getInstance(DomainPermissions.SUPER_USER);
+      final DomainPermission domPerm_delete_withGrant
+            = DomainPermissions.getInstance(DomainPermissions.DELETE, true);
+      final DomainPermission domPerm_delete
+            = DomainPermissions.getInstance(DomainPermissions.DELETE);
       final DomainPermission domPerm_child_withGrant
             = DomainPermissions.getInstance(DomainPermissions.CREATE_CHILD_DOMAIN, true);
       final DomainPermission domPerm_child
@@ -463,7 +463,7 @@ public class TestAccessControl_revokeDomainPermissions extends TestAccessControl
 
       // setup accessor permissions
       final Set<DomainPermission> accessorPermissions_pre = setOf(domPerm_child,
-                                                                  domPerm_superuser);
+                                                                  domPerm_delete);
       accessControlContext.setDomainPermissions(accessorResource,
                                                 domainName,
                                                 accessorPermissions_pre);
@@ -475,7 +475,7 @@ public class TestAccessControl_revokeDomainPermissions extends TestAccessControl
                                                 accessorPermissions_pre);
 
       // grant domain permissions
-      final Set<DomainPermission> grantorPermissions_pre = setOf(domPerm_superuser_withGrant, domPerm_child_withGrant);
+      final Set<DomainPermission> grantorPermissions_pre = setOf(domPerm_delete_withGrant, domPerm_child_withGrant);
       accessControlContext.setDomainPermissions(authenticatableResource, domainName, grantorPermissions_pre);
 
       Set<DomainPermission> grantorPermissions_post;
@@ -488,7 +488,7 @@ public class TestAccessControl_revokeDomainPermissions extends TestAccessControl
       accessControlContext.authenticate(authenticatableResource, PasswordCredentials.newInstance(password));
       accessControlContext.revokeDomainPermissions(accessorResource,
                                                    domainName,
-                                                   domPerm_superuser_withGrant,
+                                                   domPerm_delete_withGrant,
                                                    domPerm_child_withGrant);
 
       grantorPermissions_post = accessControlContext.getEffectiveDomainPermissions(accessorResource, domainName);
@@ -499,7 +499,7 @@ public class TestAccessControl_revokeDomainPermissions extends TestAccessControl
                  is( accessorPermissions_pre));
       accessControlContext.revokeDomainPermissions(accessorResource2,
                                                    domainName,
-                                                   setOf(domPerm_superuser_withGrant,
+                                                   setOf(domPerm_delete_withGrant,
                                                          domPerm_child_withGrant));
       assertThat(accessControlContext.getEffectiveDomainPermissions(accessorResource2, domainName).isEmpty(), is(true));
    }
@@ -507,10 +507,10 @@ public class TestAccessControl_revokeDomainPermissions extends TestAccessControl
    @Test
    public void revokeDomainPermissions_greaterGrantingRightPermissions_shouldSucceedAsAuthorized() {
       authenticateSystemResource();
-      final DomainPermission domPerm_superuser_withGrant
-            = DomainPermissions.getInstance(DomainPermissions.SUPER_USER, true);
-      final DomainPermission domPerm_superuser
-            = DomainPermissions.getInstance(DomainPermissions.SUPER_USER);
+      final DomainPermission domPerm_delete_withGrant
+            = DomainPermissions.getInstance(DomainPermissions.DELETE, true);
+      final DomainPermission domPerm_delete
+            = DomainPermissions.getInstance(DomainPermissions.DELETE);
       final DomainPermission domPerm_child_withGrant
             = DomainPermissions.getInstance(DomainPermissions.CREATE_CHILD_DOMAIN, true);
       final DomainPermission domPerm_child
@@ -526,7 +526,7 @@ public class TestAccessControl_revokeDomainPermissions extends TestAccessControl
 
       // setup accessor permissions
       final Set<DomainPermission> accessorPermissions_pre = setOf(domPerm_child_withGrant,
-                                                                  domPerm_superuser_withGrant);
+                                                                  domPerm_delete_withGrant);
       accessControlContext.setDomainPermissions(accessorResource,
                                                 domainName,
                                                 accessorPermissions_pre);
@@ -538,7 +538,7 @@ public class TestAccessControl_revokeDomainPermissions extends TestAccessControl
                                                 accessorPermissions_pre);
 
       // grant domain permissions
-      final Set<DomainPermission> grantorPermissions_pre = setOf(domPerm_superuser_withGrant, domPerm_child_withGrant);
+      final Set<DomainPermission> grantorPermissions_pre = setOf(domPerm_delete_withGrant, domPerm_child_withGrant);
       accessControlContext.setDomainPermissions(authenticatableResource, domainName, grantorPermissions_pre);
 
       Set<DomainPermission> grantorPermissions_post;
@@ -551,7 +551,7 @@ public class TestAccessControl_revokeDomainPermissions extends TestAccessControl
       accessControlContext.authenticate(authenticatableResource, PasswordCredentials.newInstance(password));
       accessControlContext.revokeDomainPermissions(accessorResource,
                                                    domainName,
-                                                   domPerm_superuser,
+                                                   domPerm_delete,
                                                    domPerm_child);
 
       grantorPermissions_post = accessControlContext.getEffectiveDomainPermissions(accessorResource, domainName);
@@ -562,7 +562,7 @@ public class TestAccessControl_revokeDomainPermissions extends TestAccessControl
                  is(accessorPermissions_pre));
       accessControlContext.revokeDomainPermissions(accessorResource2,
                                                    domainName,
-                                                   setOf(domPerm_superuser,
+                                                   setOf(domPerm_delete,
                                                          domPerm_child));
       assertThat(accessControlContext.getEffectiveDomainPermissions(accessorResource2, domainName).isEmpty(), is(true));
    }

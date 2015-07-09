@@ -40,7 +40,7 @@ public class TestAccessControl_assertDomainPermissions extends TestAccessControl
       final Set<DomainPermission> allDomainPermissions
             = accessControlContext.getEffectiveDomainPermissions(SYS_RESOURCE, domainName);
 
-      assertThat(allDomainPermissions.size(), is(2));
+      assertThat(allDomainPermissions.size(), is(3));
 
       // verify
       accessControlContext.assertDomainPermissions(SYS_RESOURCE,
@@ -71,6 +71,22 @@ public class TestAccessControl_assertDomainPermissions extends TestAccessControl
                                                    domainName,
                                                    setOf(DomainPermissions
                                                                .getInstance(DomainPermissions.CREATE_CHILD_DOMAIN,
+                                                                            true)));
+      accessControlContext.assertDomainPermissions(SYS_RESOURCE,
+                                                   domainName,
+                                                   DomainPermissions.getInstance(DomainPermissions.DELETE));
+      accessControlContext.assertDomainPermissions(SYS_RESOURCE,
+                                                   domainName,
+                                                   setOf(DomainPermissions
+                                                               .getInstance(DomainPermissions.DELETE)));
+      accessControlContext.assertDomainPermissions(SYS_RESOURCE,
+                                                   domainName,
+                                                   DomainPermissions.getInstance(DomainPermissions.DELETE,
+                                                                                 true));
+      accessControlContext.assertDomainPermissions(SYS_RESOURCE,
+                                                   domainName,
+                                                   setOf(DomainPermissions
+                                                               .getInstance(DomainPermissions.DELETE,
                                                                             true)));
 
       accessControlContext.assertDomainPermissions(SYS_RESOURCE,
@@ -129,6 +145,25 @@ public class TestAccessControl_assertDomainPermissions extends TestAccessControl
                                                       domainName,
                                                       setOf(DomainPermissions
                                                                   .getInstance(DomainPermissions.CREATE_CHILD_DOMAIN)));
+         fail("asserting domain permission for accessor resource when none exist should have failed");
+      }
+      catch (NotAuthorizedException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("does not have domain permission"));
+      }
+      try {
+         accessControlContext.assertDomainPermissions(accessorResource,
+                                                      domainName,
+                                                      DomainPermissions.getInstance(DomainPermissions.DELETE));
+         fail("asserting domain permission for accessor resource when none exist should have failed");
+      }
+      catch (NotAuthorizedException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("does not have domain permission"));
+      }
+      try {
+         accessControlContext.assertDomainPermissions(accessorResource,
+                                                      domainName,
+                                                      setOf(DomainPermissions
+                                                                  .getInstance(DomainPermissions.DELETE)));
          fail("asserting domain permission for accessor resource when none exist should have failed");
       }
       catch (NotAuthorizedException e) {
@@ -406,6 +441,10 @@ public class TestAccessControl_assertDomainPermissions extends TestAccessControl
             = DomainPermissions.getInstance(DomainPermissions.CREATE_CHILD_DOMAIN);
       final DomainPermission domPerm_child_withGrant
             = DomainPermissions.getInstance(DomainPermissions.CREATE_CHILD_DOMAIN, true);
+      final DomainPermission domPerm_delete
+            = DomainPermissions.getInstance(DomainPermissions.DELETE);
+      final DomainPermission domPerm_delete_withGrant
+            = DomainPermissions.getInstance(DomainPermissions.DELETE, true);
 
       // set super-user domain permission
       final char[] password = generateUniquePassword();
@@ -430,12 +469,16 @@ public class TestAccessControl_assertDomainPermissions extends TestAccessControl
                                                    domainName1,
                                                    domPerm_child_withGrant,
                                                    domPerm_child,
+                                                   domPerm_delete,
+                                                   domPerm_delete_withGrant,
                                                    domPerm_superuser_withGrant,
                                                    domPerm_superuser);
       accessControlContext.assertDomainPermissions(accessorResource,
                                                    domainName1,
                                                    setOf(domPerm_child_withGrant,
                                                          domPerm_child,
+                                                         domPerm_delete,
+                                                         domPerm_delete_withGrant,
                                                          domPerm_superuser_withGrant,
                                                          domPerm_superuser));
    }

@@ -62,6 +62,17 @@ public class TestAccessControl_hasDomainCreatePermissions extends TestAccessCont
       }
       if (!accessControlContext
             .hasDomainCreatePermissions(SYS_RESOURCE,
+                                        DomainCreatePermissions.getInstance(DomainPermissions.getInstance(DomainPermissions.DELETE)))) {
+         fail("checking implicit domain create permission should have succeeded for system resource");
+      }
+      if (!accessControlContext
+            .hasDomainCreatePermissions(SYS_RESOURCE,
+                                        DomainCreatePermissions.getInstance(DomainPermissions.getInstance(DomainPermissions.DELETE),
+                                                                            true))) {
+         fail("checking implicit domain create permission with grant should have succeeded for system resource");
+      }
+      if (!accessControlContext
+            .hasDomainCreatePermissions(SYS_RESOURCE,
                                         DomainCreatePermissions.getInstance(DomainPermissions.getInstance(DomainPermissions.SUPER_USER)))) {
          fail("checking implicit domain create permission should have succeeded for system resource");
       }

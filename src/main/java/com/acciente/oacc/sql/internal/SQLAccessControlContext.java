@@ -1511,9 +1511,10 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
    }
 
    private static Set<DomainPermission> __getApplicableDomainPermissions() {
-      Set<DomainPermission> superDomainPermissions = new HashSet<>(2);
+      Set<DomainPermission> superDomainPermissions = new HashSet<>(3);
       superDomainPermissions.add(DomainPermission_SUPER_USER_GRANT);
       superDomainPermissions.add(DomainPermission_CREATE_CHILD_DOMAIN_GRANT);
+      superDomainPermissions.add(DomainPermission_DELETE_GRANT);
 
       return superDomainPermissions;
    }

@@ -71,10 +71,10 @@ public class TestAccessControl_grantDomainPermissions extends TestAccessControlB
    @Test
    public void grantDomainPermissions_validAsAuthorized() {
       authenticateSystemResource();
-      final DomainPermission domPerm_superuser_withGrant
-            = DomainPermissions.getInstance(DomainPermissions.SUPER_USER, true);
-      final DomainPermission domPerm_superuser
-            = DomainPermissions.getInstance(DomainPermissions.SUPER_USER);
+      final DomainPermission domPerm_delete_withGrant
+            = DomainPermissions.getInstance(DomainPermissions.DELETE, true);
+      final DomainPermission domPerm_delete
+            = DomainPermissions.getInstance(DomainPermissions.DELETE);
       final DomainPermission domPerm_child_withGrant
             = DomainPermissions.getInstance(DomainPermissions.CREATE_CHILD_DOMAIN, true);
 
@@ -83,7 +83,7 @@ public class TestAccessControl_grantDomainPermissions extends TestAccessControlB
       // set up an authenticatable resource
       final char[] password = generateUniquePassword();
       final Resource authenticatableResource = generateAuthenticatableResource(password);
-      final Set<DomainPermission> domainPermissions_granter = setOf(domPerm_superuser_withGrant,
+      final Set<DomainPermission> domainPermissions_granter = setOf(domPerm_delete_withGrant,
                                                                     domPerm_child_withGrant);
 
       // grant domain permissions and verify
@@ -102,10 +102,10 @@ public class TestAccessControl_grantDomainPermissions extends TestAccessControlB
       accessControlContext.authenticate(authenticatableResource, PasswordCredentials.newInstance(password));
       accessControlContext.grantDomainPermissions(accessorResource,
                                                   domainName,
-                                                  domPerm_superuser,
+                                                  domPerm_delete,
                                                   domPerm_child_withGrant);
 
-      Set<DomainPermission> domainPermissions_expected = setOf(domPerm_superuser, domPerm_child_withGrant);
+      Set<DomainPermission> domainPermissions_expected = setOf(domPerm_delete, domPerm_child_withGrant);
       assertThat(domainPermissions_expected, is(not(domainPermissions_granter)));
       domainPermissions_post = accessControlContext.getDomainPermissions(accessorResource, domainName);
       assertThat(domainPermissions_post, is(domainPermissions_expected));
@@ -116,7 +116,7 @@ public class TestAccessControl_grantDomainPermissions extends TestAccessControlB
       assertThat(accessControlContext.getEffectiveDomainPermissionsMap(accessorResource2).isEmpty(), is(true));
       accessControlContext.grantDomainPermissions(accessorResource2,
                                                   domainName,
-                                                  setOf(domPerm_superuser,
+                                                  setOf(domPerm_delete,
                                                         domPerm_child_withGrant));
 
       assertThat(accessControlContext.getDomainPermissions(accessorResource2, domainName),
@@ -184,10 +184,10 @@ public class TestAccessControl_grantDomainPermissions extends TestAccessControlB
    @Test
    public void grantDomainPermissions_addPermission() {
       authenticateSystemResource();
-      final DomainPermission domPerm_superuser_withGrant
-            = DomainPermissions.getInstance(DomainPermissions.SUPER_USER, true);
-      final DomainPermission domPerm_superuser
-            = DomainPermissions.getInstance(DomainPermissions.SUPER_USER);
+      final DomainPermission domPerm_delete_withGrant
+            = DomainPermissions.getInstance(DomainPermissions.DELETE, true);
+      final DomainPermission domPerm_delete
+            = DomainPermissions.getInstance(DomainPermissions.DELETE);
       final DomainPermission domPerm_child_withGrant
             = DomainPermissions.getInstance(DomainPermissions.CREATE_CHILD_DOMAIN, true);
 
@@ -204,7 +204,7 @@ public class TestAccessControl_grantDomainPermissions extends TestAccessControlB
                  is(setOf(domPerm_child_withGrant)));
 
       // grant domain permissions and verify
-      final Set<DomainPermission> domainPermissions_granter = setOf(domPerm_superuser_withGrant,
+      final Set<DomainPermission> domainPermissions_granter = setOf(domPerm_delete_withGrant,
                                                                     domPerm_child_withGrant);
 
       accessControlContext.setDomainPermissions(authenticatableResource, domainName, domainPermissions_granter);
@@ -216,9 +216,9 @@ public class TestAccessControl_grantDomainPermissions extends TestAccessControlB
       // grant domainPermissions as the authenticatable resource and verify
       grantQueryPermission(authenticatableResource, accessorResource);
       accessControlContext.authenticate(authenticatableResource, PasswordCredentials.newInstance(password));
-      accessControlContext.grantDomainPermissions(accessorResource, domainName, domPerm_superuser);
+      accessControlContext.grantDomainPermissions(accessorResource, domainName, domPerm_delete);
 
-      Set<DomainPermission> domainPermissions_expected = setOf(domPerm_superuser, domPerm_child_withGrant);
+      Set<DomainPermission> domainPermissions_expected = setOf(domPerm_delete, domPerm_child_withGrant);
       assertThat(domainPermissions_expected, is(not(domainPermissions_granter)));
       domainPermissions_post = accessControlContext.getDomainPermissions(accessorResource, domainName);
       assertThat(domainPermissions_post, is(domainPermissions_expected));
@@ -230,7 +230,7 @@ public class TestAccessControl_grantDomainPermissions extends TestAccessControlB
       assertThat(accessControlContext.getEffectiveDomainPermissionsMap(accessorResource2).get(domainName),
                  is(setOf(domPerm_child_withGrant)));
 
-      accessControlContext.grantDomainPermissions(accessorResource2, domainName, setOf(domPerm_superuser));
+      accessControlContext.grantDomainPermissions(accessorResource2, domainName, setOf(domPerm_delete));
       assertThat(accessControlContext.getDomainPermissions(accessorResource2, domainName),
                  is(domainPermissions_expected));
    }

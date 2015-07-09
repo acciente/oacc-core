@@ -40,7 +40,7 @@ public class TestAccessControl_hasDomainPermissions extends TestAccessControlBas
       final Set<DomainPermission> allDomainPermissions
             = accessControlContext.getEffectiveDomainPermissions(SYS_RESOURCE, domainName);
 
-      assertThat(allDomainPermissions.size(), is(2));
+      assertThat(allDomainPermissions.size(), is(3));
 
       // verify
       if (!accessControlContext.hasDomainPermissions(SYS_RESOURCE,
@@ -86,6 +86,29 @@ public class TestAccessControl_hasDomainPermissions extends TestAccessControlBas
                                                                  .getInstance(DomainPermissions.CREATE_CHILD_DOMAIN,
                                                                               true)))) {
          fail("checking CREATE_CHILD_DOMAIN /G domain permission should have succeeded for system resource");
+      }
+      if (!accessControlContext.hasDomainPermissions(SYS_RESOURCE,
+                                                     domainName,
+                                                     DomainPermissions.getInstance(DomainPermissions.DELETE))) {
+         fail("checking DELETE domain permission should have succeeded for system resource");
+      }
+      if (!accessControlContext.hasDomainPermissions(SYS_RESOURCE,
+                                                     domainName,
+                                                     setOf(DomainPermissions
+                                                                 .getInstance(DomainPermissions.DELETE)))) {
+         fail("checking DELETE domain permission should have succeeded for system resource");
+      }
+      if (!accessControlContext.hasDomainPermissions(SYS_RESOURCE,
+                                                     domainName,
+                                                     DomainPermissions.getInstance(DomainPermissions.DELETE, true))) {
+         fail("checking DELETE /G domain permission should have succeeded for system resource");
+      }
+      if (!accessControlContext.hasDomainPermissions(SYS_RESOURCE,
+                                                     domainName,
+                                                     setOf(DomainPermissions
+                                                                 .getInstance(DomainPermissions.DELETE,
+                                                                              true)))) {
+         fail("checking DELETE /G domain permission should have succeeded for system resource");
       }
       if (!accessControlContext.hasDomainPermissions(SYS_RESOURCE,
                                                      domainName,
@@ -139,7 +162,19 @@ public class TestAccessControl_hasDomainPermissions extends TestAccessControlBas
       }
       if (accessControlContext.hasDomainPermissions(accessorResource,
                                                     domainName,
+                                                    DomainPermissions.getInstance(DomainPermissions.DELETE))) {
+         fail("checking domain permission for accessor resource when none exist should have failed");
+      }
+      if (accessControlContext.hasDomainPermissions(accessorResource,
+                                                    domainName,
+                                                    setOf(DomainPermissions
+                                                                .getInstance(DomainPermissions.DELETE)))) {
+         fail("checking domain permission for accessor resource when none exist should have failed");
+      }
+      if (accessControlContext.hasDomainPermissions(accessorResource,
+                                                    domainName,
                                                     DomainPermissions.getInstance(DomainPermissions.CREATE_CHILD_DOMAIN),
+                                                    DomainPermissions.getInstance(DomainPermissions.DELETE),
                                                     DomainPermissions.getInstance(DomainPermissions.SUPER_USER))) {
          fail("checking multiple domain permission for accessor resource when none exist should have failed");
       }
@@ -328,6 +363,10 @@ public class TestAccessControl_hasDomainPermissions extends TestAccessControlBas
             = DomainPermissions.getInstance(DomainPermissions.CREATE_CHILD_DOMAIN);
       final DomainPermission domPerm_child_withGrant
             = DomainPermissions.getInstance(DomainPermissions.CREATE_CHILD_DOMAIN, true);
+      final DomainPermission domPerm_delete
+            = DomainPermissions.getInstance(DomainPermissions.DELETE);
+      final DomainPermission domPerm_delete_withGrant
+            = DomainPermissions.getInstance(DomainPermissions.DELETE, true);
 
       // set super-user domain permission
       final char[] password = generateUniquePassword();
@@ -357,6 +396,8 @@ public class TestAccessControl_hasDomainPermissions extends TestAccessControlBas
                                                      domainName1,
                                                      domPerm_child_withGrant,
                                                      domPerm_child,
+                                                     domPerm_delete,
+                                                     domPerm_delete_withGrant,
                                                      domPerm_superuser_withGrant,
                                                      domPerm_superuser)) {
          fail("checking all implicit domain permission should have succeeded for authenticated resource");
@@ -365,6 +406,8 @@ public class TestAccessControl_hasDomainPermissions extends TestAccessControlBas
                                                      domainName1,
                                                      setOf(domPerm_child_withGrant,
                                                            domPerm_child,
+                                                           domPerm_delete,
+                                                           domPerm_delete_withGrant,
                                                            domPerm_superuser_withGrant,
                                                            domPerm_superuser))) {
          fail("checking all implicit domain permission should have succeeded for authenticated resource");

@@ -57,10 +57,10 @@ public class TestAccessControl_setDomainPermissions extends TestAccessControlBas
    @Test
    public void setDomainPermissions_validAsAuthorized() {
       authenticateSystemResource();
-      final DomainPermission domPerm_superuser_withGrant
-            = DomainPermissions.getInstance(DomainPermissions.SUPER_USER, true);
-      final DomainPermission domPerm_superuser
-            = DomainPermissions.getInstance(DomainPermissions.SUPER_USER);
+      final DomainPermission domPerm_delete_withGrant
+            = DomainPermissions.getInstance(DomainPermissions.DELETE, true);
+      final DomainPermission domPerm_delete
+            = DomainPermissions.getInstance(DomainPermissions.DELETE);
       final DomainPermission domPerm_child_withGrant
             = DomainPermissions.getInstance(DomainPermissions.CREATE_CHILD_DOMAIN, true);
 
@@ -71,7 +71,7 @@ public class TestAccessControl_setDomainPermissions extends TestAccessControlBas
       final Resource authenticatableResource = generateAuthenticatableResource(password);
 
       final Set<DomainPermission> domainPermissions_granter = new HashSet<>();
-      domainPermissions_granter.add(domPerm_superuser_withGrant);
+      domainPermissions_granter.add(domPerm_delete_withGrant);
       domainPermissions_granter.add(domPerm_child_withGrant);
 
       // set domain permissions and verify
@@ -86,7 +86,7 @@ public class TestAccessControl_setDomainPermissions extends TestAccessControlBas
       assertThat(accessControlContext.getEffectiveDomainPermissionsMap(accessorResource).isEmpty(), is(true));
 
       Set<DomainPermission> domainPermissions_pre = new HashSet<>();
-      domainPermissions_pre.add(domPerm_superuser);
+      domainPermissions_pre.add(domPerm_delete);
       domainPermissions_pre.add(domPerm_child_withGrant);
       assertThat(domainPermissions_pre, is(not(domainPermissions_granter)));
 

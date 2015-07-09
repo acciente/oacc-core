@@ -45,6 +45,11 @@ public class TestAccessControl_assertPostCreateDomainPermissions extends TestAcc
                                                              DomainPermissions.getInstance(DomainPermissions.CREATE_CHILD_DOMAIN,
                                                                                            true));
       accessControlContext.assertPostCreateDomainPermissions(SYS_RESOURCE,
+                                                             DomainPermissions.getInstance(DomainPermissions.DELETE));
+      accessControlContext.assertPostCreateDomainPermissions(SYS_RESOURCE,
+                                                             DomainPermissions.getInstance(DomainPermissions.DELETE,
+                                                                                           true));
+      accessControlContext.assertPostCreateDomainPermissions(SYS_RESOURCE,
                                                              DomainPermissions.getInstance(DomainPermissions.SUPER_USER));
       accessControlContext.assertPostCreateDomainPermissions(SYS_RESOURCE,
                                                              DomainPermissions.getInstance(DomainPermissions.SUPER_USER,
@@ -63,6 +68,13 @@ public class TestAccessControl_assertPostCreateDomainPermissions extends TestAcc
       accessControlContext.assertPostCreateDomainPermissions(SYS_RESOURCE,
                                                              setOf(DomainPermissions
                                                                          .getInstance(DomainPermissions.CREATE_CHILD_DOMAIN,
+                                                                                      true)));
+      accessControlContext.assertPostCreateDomainPermissions(SYS_RESOURCE,
+                                                             setOf(DomainPermissions
+                                                                         .getInstance(DomainPermissions.DELETE)));
+      accessControlContext.assertPostCreateDomainPermissions(SYS_RESOURCE,
+                                                             setOf(DomainPermissions
+                                                                         .getInstance(DomainPermissions.DELETE,
                                                                                       true)));
       accessControlContext.assertPostCreateDomainPermissions(SYS_RESOURCE,
                                                              setOf(DomainPermissions
@@ -431,6 +443,13 @@ public class TestAccessControl_assertPostCreateDomainPermissions extends TestAcc
                                                              DomainPermissions
                                                                    .getInstance(DomainPermissions.CREATE_CHILD_DOMAIN,
                                                                                 true));
+      accessControlContext.assertPostCreateDomainPermissions(accessorResource,
+                                                             DomainPermissions
+                                                                   .getInstance(DomainPermissions.DELETE));
+      accessControlContext.assertPostCreateDomainPermissions(accessorResource,
+                                                             DomainPermissions
+                                                                   .getInstance(DomainPermissions.DELETE,
+                                                                                true));
 
       accessControlContext.assertPostCreateDomainPermissions(accessorResource,
                                                              setOf(DomainPermissions
@@ -445,6 +464,13 @@ public class TestAccessControl_assertPostCreateDomainPermissions extends TestAcc
       accessControlContext.assertPostCreateDomainPermissions(accessorResource,
                                                              setOf(DomainPermissions
                                                                          .getInstance(DomainPermissions.CREATE_CHILD_DOMAIN,
+                                                                                      true)));
+      accessControlContext.assertPostCreateDomainPermissions(accessorResource,
+                                                             setOf(DomainPermissions
+                                                                         .getInstance(DomainPermissions.DELETE)));
+      accessControlContext.assertPostCreateDomainPermissions(accessorResource,
+                                                             setOf(DomainPermissions
+                                                                         .getInstance(DomainPermissions.DELETE,
                                                                                       true)));
    }
 
