@@ -172,37 +172,30 @@ public class DomainPersister extends Persister {
             statement.setResourceDomainId(1, domainId);
             SQLResult resultSet = statement.executeQuery();
 
-            List<Id> descendantDomainIds = new ArrayList<>();
+            List<Id<DomainId>> descendantDomainIds = new ArrayList<>();
 
             while (resultSet.next()) {
-               final Id<DomainId> descendantDomainId = resultSet.getResourceDomainId("DomainId");
-
-               if (!domainId.equals(descendantDomainId)) {
-                  descendantDomainIds.add(descendantDomainId);
-               }
+               descendantDomainIds.add(resultSet.getResourceDomainId("DomainId"));
             }
 
-            // delete descendant domains (in reverse order of domainLevel, to preserve FK constraints)
+            // delete descendant domains one at a time, in reverse order of domainLevel, to preserve FK constraints
             statement = connection.prepareStatement(sqlStrings.SQL_removeInDomain_BY_DomainID);
 
             for (int i=descendantDomainIds.size()-1; i >= 0; i--) {
                statement.setResourceDomainId(1, descendantDomainIds.get(i));
                assertOneRowUpdated(statement.executeUpdate());
             }
-
-            // finally, drop out and delete the originally specified domain with the same prepared statement
          }
          else {
             // prepare the standard recursive delete statement of domain and its children
             statement = connection.prepareStatement(sqlStrings.SQL_removeInDomain_withDescendants_BY_DomainID);
-         }
+            statement.setResourceDomainId(1, domainId);
 
-         statement.setResourceDomainId(1, domainId);
+            final int rowCount = statement.executeUpdate();
 
-         final int rowCount = statement.executeUpdate();
-
-         if (rowCount < 1) {
-            throw new IllegalStateException("Security table data update, 1 or more rows expected, got: " + rowCount);
+            if (rowCount < 1) {
+               throw new IllegalStateException("Security table data update, 1 or more rows expected, got: " + rowCount);
+            }
          }
       }
       catch (SQLException e) {

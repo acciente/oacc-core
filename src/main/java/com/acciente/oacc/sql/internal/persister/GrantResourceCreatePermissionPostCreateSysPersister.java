@@ -326,34 +326,28 @@ public class GrantResourceCreatePermissionPostCreateSysPersister extends Persist
             statement.setResourceDomainId(1, accessedDomainId);
             SQLResult resultSet = statement.executeQuery();
 
-            List<Id> descendantDomainIds = new ArrayList<>();
+            List<Id<DomainId>> descendantDomainIds = new ArrayList<>();
 
             while (resultSet.next()) {
-               final Id<DomainId> descendantDomainId = resultSet.getResourceDomainId("DomainId");
-
-               if (!accessedDomainId.equals(descendantDomainId)) {
-                  descendantDomainIds.add(descendantDomainId);
-               }
+               descendantDomainIds.add(resultSet.getResourceDomainId("DomainId"));
             }
 
-            // delete descendant domains' accessors (in reverse order of domainLevel, to preserve FK constraints)
+            // delete domains' accessors (in reverse order of domainLevel, to preserve FK constraints)
             statement = connection.prepareStatement(sqlStrings.SQL_removeInGrantResourceCreatePermissionPostCreateSys_BY_AccessedDomainID);
 
             for (int i=descendantDomainIds.size()-1; i >= 0; i--) {
                statement.setResourceDomainId(1, descendantDomainIds.get(i));
                statement.executeUpdate();
             }
-
-            // finally, drop out and delete for the originally specified domain with the same prepared statement
          }
          else {
             // prepare the standard recursive delete statement for domain and its children
             statement = connection.prepareStatement(sqlStrings.SQL_removeInGrantResourceCreatePermissionPostCreateSys_withDescendants_BY_AccessedDomainID);
-         }
 
-         // revoke any existing post-create system permissions any accessor has to this domain + any resource class
-         statement.setResourceDomainId(1, accessedDomainId);
-         statement.executeUpdate();
+            // revoke any existing post-create system permissions any accessor has to this domain + any resource class
+            statement.setResourceDomainId(1, accessedDomainId);
+            statement.executeUpdate();
+         }
       }
       catch (SQLException e) {
          throw new RuntimeException(e);
