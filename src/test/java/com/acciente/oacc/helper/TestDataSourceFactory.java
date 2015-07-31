@@ -17,7 +17,7 @@
  */
 package com.acciente.oacc.helper;
 
-import com.acciente.oacc.sql.SQLDialect;
+import com.acciente.oacc.sql.SQLType;
 
 import javax.sql.DataSource;
 import java.io.InputStream;
@@ -28,16 +28,17 @@ import java.util.Properties;
 public class TestDataSourceFactory {
    private static DataSource dataSource;
    private static Boolean    isDatabaseCaseSensitive;
-   private static SQLDialect sqlDialect;
+   private static SQLType    sqlType;
 
    public static final String PROP_DATA_SOURCE_CLASS = "dataSourceClass";
-   public static final String PROP_SQL_DIALECT       = "sqlDialect";
+   public static final String PROP_SQL_TYPE          = "sqlType";
 
    static {
       try {
          final String dbConfigFilename = System.getProperty("dbconfig");
          if (dbConfigFilename == null) {
-            throw new RuntimeException("system property 'dbconfig' not specified; please specify VM parameter with -Ddbconfig=<filename> (example: -Ddbconfig=dbconfig_postgresql.properties)");
+            throw new RuntimeException(
+                  "system property 'dbconfig' not specified; please specify VM parameter with -Ddbconfig=<filename> (example: -Ddbconfig=dbconfig_postgresql.properties)");
          }
 
          final ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
@@ -51,14 +52,14 @@ public class TestDataSourceFactory {
          final Class<?> dataSourceClass = Class.forName(properties.getProperty(PROP_DATA_SOURCE_CLASS));
          final DataSource vendorSpecificDataSource = (DataSource) dataSourceClass.newInstance();
 
-         final String sqlDialectName = properties.getProperty(PROP_SQL_DIALECT);
-         if (sqlDialectName==null) {
-            throw new RuntimeException("no sqlDialect property specified in database configuration property file");
+         final String sqlTypeName = properties.getProperty(PROP_SQL_TYPE);
+         if (sqlTypeName==null) {
+            throw new RuntimeException("no sqlType property specified in database configuration property file");
          }
-         sqlDialect = SQLDialect.valueOf(sqlDialectName);
+         sqlType = SQLType.valueOf(sqlTypeName);
 
          for (String propertyName : properties.stringPropertyNames()) {
-            if (!(PROP_DATA_SOURCE_CLASS.equals(propertyName) || PROP_SQL_DIALECT.equals(propertyName))) {
+            if (!(PROP_DATA_SOURCE_CLASS.equals(propertyName) || PROP_SQL_TYPE.equals(propertyName))) {
                setDataSourceProperty(vendorSpecificDataSource, propertyName, properties.getProperty(propertyName));
             }
          }
@@ -94,8 +95,8 @@ public class TestDataSourceFactory {
       setMethod.invoke(vendorSpecificDataSource, valueAsString==null ? valueAsInteger : valueAsString);
    }
 
-   public static SQLDialect getSQLDialect() {
-      return sqlDialect;
+   public static SQLType getSQLType() {
+      return sqlType;
    }
 
    public static DataSource getDataSource() {

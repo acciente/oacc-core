@@ -21,6 +21,7 @@ import com.acciente.oacc.helper.Constants;
 import com.acciente.oacc.helper.TestDataSourceFactory;
 import com.acciente.oacc.sql.SQLAccessControlContextFactory;
 import com.acciente.oacc.sql.SQLDialect;
+import com.acciente.oacc.sql.SQLType;
 import com.acciente.oacc.sql.internal.SQLPasswordAuthenticationProvider;
 import org.junit.After;
 import org.junit.Before;
@@ -59,18 +60,19 @@ public class TestAccessControl_customAuthenticationProvider extends TestAccessCo
       authenticateSystemAccessControlContext();
       systemAccessControlContext.setDomainPermissions(adminResource,
                                                       adminDomain,
-                                                      setOf(DomainPermissions.getInstance(DomainPermissions.SUPER_USER)));
+                                                      setOf(DomainPermissions
+                                                                  .getInstance(DomainPermissions.SUPER_USER)));
       systemAccessControlContext.unauthenticate();
 
-      SQLDialect sqlDialect = TestDataSourceFactory.getSQLDialect();
+      SQLType sqlType = TestDataSourceFactory.getSQLType();
       DataSource dataSource = TestDataSourceFactory.getDataSource();
       customAccessControlContext
             = SQLAccessControlContextFactory.getAccessControlContext(dataSource,
                                                                      Constants.DB_SCHEMA,
-                                                                     sqlDialect,
+                                                                     sqlType,
                                                                      new CustomAuthenticationProvider(dataSource,
                                                                                                       Constants.DB_SCHEMA,
-                                                                                                      sqlDialect));
+                                                                                                      sqlType.getSqlDialect()));
    }
 
    @After

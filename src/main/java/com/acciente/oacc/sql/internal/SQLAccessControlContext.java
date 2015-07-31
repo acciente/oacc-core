@@ -34,8 +34,7 @@ import com.acciente.oacc.ResourceCreatePermissions;
 import com.acciente.oacc.ResourcePermission;
 import com.acciente.oacc.ResourcePermissions;
 import com.acciente.oacc.Resources;
-import com.acciente.oacc.sql.SQLDialect;
-import com.acciente.oacc.sql.internal.persister.CommonGrantResourcePermissionPersister;
+import com.acciente.oacc.sql.SQLType;
 import com.acciente.oacc.sql.internal.persister.DomainPersister;
 import com.acciente.oacc.sql.internal.persister.GrantDomainCreatePermissionPostCreateSysPersister;
 import com.acciente.oacc.sql.internal.persister.GrantDomainCreatePermissionSysPersister;
@@ -49,6 +48,7 @@ import com.acciente.oacc.sql.internal.persister.GrantResourcePermissionPersister
 import com.acciente.oacc.sql.internal.persister.GrantResourcePermissionSysPersister;
 import com.acciente.oacc.sql.internal.persister.NonRecursiveDomainPersister;
 import com.acciente.oacc.sql.internal.persister.NonRecursiveGrantResourcePermissionPersister;
+import com.acciente.oacc.sql.internal.persister.RecursiveDomainPersister;
 import com.acciente.oacc.sql.internal.persister.RecursiveGrantResourcePermissionPersister;
 import com.acciente.oacc.sql.internal.persister.ResourceClassPermissionPersister;
 import com.acciente.oacc.sql.internal.persister.ResourceClassPersister;
@@ -149,28 +149,28 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
 
    public static AccessControlContext getAccessControlContext(Connection connection,
                                                               String schemaName,
-                                                              SQLDialect sqlDialect) {
-      return new SQLAccessControlContext(connection, schemaName, sqlDialect);
+                                                              SQLType sqlType) {
+      return new SQLAccessControlContext(connection, schemaName, sqlType);
    }
 
    public static AccessControlContext getAccessControlContext(DataSource dataSource,
                                                               String schemaName,
-                                                              SQLDialect sqlDialect) {
-      return new SQLAccessControlContext(dataSource, schemaName, sqlDialect);
+                                                              SQLType sqlType) {
+      return new SQLAccessControlContext(dataSource, schemaName, sqlType);
    }
 
    public static AccessControlContext getAccessControlContext(Connection connection,
                                                               String schemaName,
-                                                              SQLDialect sqlDialect,
+                                                              SQLType sqlType,
                                                               AuthenticationProvider authenticationProvider) {
-      return new SQLAccessControlContext(connection, schemaName, sqlDialect, authenticationProvider);
+      return new SQLAccessControlContext(connection, schemaName, sqlType, authenticationProvider);
    }
 
    public static AccessControlContext getAccessControlContext(DataSource dataSource,
                                                               String schemaName,
-                                                              SQLDialect sqlDialect,
+                                                              SQLType sqlType,
                                                               AuthenticationProvider authenticationProvider) {
-      return new SQLAccessControlContext(dataSource, schemaName, sqlDialect, authenticationProvider);
+      return new SQLAccessControlContext(dataSource, schemaName, sqlType, authenticationProvider);
    }
 
    public static void preSerialize(AccessControlContext accessControlContext) {
@@ -196,20 +196,20 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
 
    private SQLAccessControlContext(Connection connection,
                                    String schemaName,
-                                   SQLDialect sqlDialect) {
-      this(schemaName, sqlDialect);
+                                   SQLType sqlType) {
+      this(schemaName, sqlType);
       this.connection = connection;
       // use the built-in authentication provider when no custom implementation is provided
       this.authenticationProvider
-            = new SQLPasswordAuthenticationProvider(connection, schemaName, sqlDialect);
+            = new SQLPasswordAuthenticationProvider(connection, schemaName, sqlType.getSqlDialect());
       this.hasDefaultAuthenticationProvider = true;
    }
 
    private SQLAccessControlContext(Connection connection,
                                    String schemaName,
-                                   SQLDialect sqlDialect,
+                                   SQLType sqlType,
                                    AuthenticationProvider authenticationProvider) {
-      this(schemaName, sqlDialect);
+      this(schemaName, sqlType);
       this.connection = connection;
       this.authenticationProvider = authenticationProvider;
       this.hasDefaultAuthenticationProvider = false;
@@ -217,59 +217,91 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
 
    private SQLAccessControlContext(DataSource dataSource,
                                    String schemaName,
-                                   SQLDialect sqlDialect) {
-      this(schemaName, sqlDialect);
+                                   SQLType sqlType) {
+      this(schemaName, sqlType);
       this.dataSource = dataSource;
       // use the built-in authentication provider when no custom implementation is provided
       this.authenticationProvider
-            = new SQLPasswordAuthenticationProvider(dataSource, schemaName, sqlDialect);
+            = new SQLPasswordAuthenticationProvider(dataSource, schemaName, sqlType.getSqlDialect());
       this.hasDefaultAuthenticationProvider = true;
    }
 
    private SQLAccessControlContext(DataSource dataSource,
                                    String schemaName,
-                                   SQLDialect sqlDialect,
+                                   SQLType sqlType,
                                    AuthenticationProvider authenticationProvider) {
-      this(schemaName, sqlDialect);
+      this(schemaName, sqlType);
       this.dataSource = dataSource;
       this.authenticationProvider = authenticationProvider;
       this.hasDefaultAuthenticationProvider = false;
    }
 
    private SQLAccessControlContext(String schemaName,
-                                   SQLDialect sqlDialect) {
+                                   SQLType sqlType) {
       // generate all the SQLs the persisters need based on the database dialect
-      SQLStrings sqlStrings = SQLStrings.getSQLStrings(schemaName, sqlDialect);
+      SQLStrings sqlStrings = SQLStrings.getSQLStrings(schemaName, sqlType.getSqlDialect());
 
       // setup persisters
-      resourceClassPersister
-            = new ResourceClassPersister(sqlStrings);
-      resourceClassPermissionPersister
-            = new ResourceClassPermissionPersister(sqlStrings);
-      grantDomainCreatePermissionSysPersister
-            = new GrantDomainCreatePermissionSysPersister(sqlStrings);
-      grantDomainCreatePermissionPostCreateSysPersister
-            = new GrantDomainCreatePermissionPostCreateSysPersister(sqlStrings);
-      grantDomainPermissionSysPersister
-            = new GrantDomainPermissionSysPersister(sqlStrings);
-      domainPersister
-            = new NonRecursiveDomainPersister(sqlStrings);
-      resourcePersister
-            = new ResourcePersister(sqlStrings);
-      grantResourceCreatePermissionSysPersister
-            = new GrantResourceCreatePermissionSysPersister(sqlStrings);
-      grantResourceCreatePermissionPostCreateSysPersister
-            = new GrantResourceCreatePermissionPostCreateSysPersister(sqlStrings);
-      grantResourceCreatePermissionPostCreatePersister
-            = new GrantResourceCreatePermissionPostCreatePersister(sqlStrings);
-      grantResourcePermissionSysPersister
-            = new GrantResourcePermissionSysPersister(sqlStrings);
-      grantGlobalResourcePermissionSysPersister
-            = new GrantGlobalResourcePermissionSysPersister(sqlStrings);
-      grantResourcePermissionPersister
-            = new NonRecursiveGrantResourcePermissionPersister(sqlStrings);
-      grantGlobalResourcePermissionPersister
-            = new GrantGlobalResourcePermissionPersister(sqlStrings);
+      if (sqlType.isRecursionCompatible()) {
+         resourceClassPersister
+               = new ResourceClassPersister(sqlStrings);
+         resourceClassPermissionPersister
+               = new ResourceClassPermissionPersister(sqlStrings);
+         grantDomainCreatePermissionSysPersister
+               = new GrantDomainCreatePermissionSysPersister(sqlStrings);
+         grantDomainCreatePermissionPostCreateSysPersister
+               = new GrantDomainCreatePermissionPostCreateSysPersister(sqlStrings);
+         grantDomainPermissionSysPersister
+               = new GrantDomainPermissionSysPersister(sqlStrings);
+         domainPersister
+               = new RecursiveDomainPersister(sqlStrings);
+         resourcePersister
+               = new ResourcePersister(sqlStrings);
+         grantResourceCreatePermissionSysPersister
+               = new GrantResourceCreatePermissionSysPersister(sqlStrings);
+         grantResourceCreatePermissionPostCreateSysPersister
+               = new GrantResourceCreatePermissionPostCreateSysPersister(sqlStrings);
+         grantResourceCreatePermissionPostCreatePersister
+               = new GrantResourceCreatePermissionPostCreatePersister(sqlStrings);
+         grantResourcePermissionSysPersister
+               = new GrantResourcePermissionSysPersister(sqlStrings);
+         grantGlobalResourcePermissionSysPersister
+               = new GrantGlobalResourcePermissionSysPersister(sqlStrings);
+         grantResourcePermissionPersister
+               = new RecursiveGrantResourcePermissionPersister(sqlStrings);
+         grantGlobalResourcePermissionPersister
+               = new GrantGlobalResourcePermissionPersister(sqlStrings);
+      }
+      else {
+         resourceClassPersister
+               = new ResourceClassPersister(sqlStrings);
+         resourceClassPermissionPersister
+               = new ResourceClassPermissionPersister(sqlStrings);
+         grantDomainCreatePermissionSysPersister
+               = new GrantDomainCreatePermissionSysPersister(sqlStrings);
+         grantDomainCreatePermissionPostCreateSysPersister
+               = new GrantDomainCreatePermissionPostCreateSysPersister(sqlStrings);
+         grantDomainPermissionSysPersister
+               = new GrantDomainPermissionSysPersister(sqlStrings);
+         domainPersister
+               = new NonRecursiveDomainPersister(sqlStrings);
+         resourcePersister
+               = new ResourcePersister(sqlStrings);
+         grantResourceCreatePermissionSysPersister
+               = new GrantResourceCreatePermissionSysPersister(sqlStrings);
+         grantResourceCreatePermissionPostCreateSysPersister
+               = new GrantResourceCreatePermissionPostCreateSysPersister(sqlStrings);
+         grantResourceCreatePermissionPostCreatePersister
+               = new GrantResourceCreatePermissionPostCreatePersister(sqlStrings);
+         grantResourcePermissionSysPersister
+               = new GrantResourcePermissionSysPersister(sqlStrings);
+         grantGlobalResourcePermissionSysPersister
+               = new GrantGlobalResourcePermissionSysPersister(sqlStrings);
+         grantResourcePermissionPersister
+               = new NonRecursiveGrantResourcePermissionPersister(sqlStrings);
+         grantGlobalResourcePermissionPersister
+               = new GrantGlobalResourcePermissionPersister(sqlStrings);
+      }
    }
 
    private void __preSerialize() {
