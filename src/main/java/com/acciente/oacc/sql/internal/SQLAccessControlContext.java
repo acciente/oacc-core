@@ -35,6 +35,7 @@ import com.acciente.oacc.ResourcePermission;
 import com.acciente.oacc.ResourcePermissions;
 import com.acciente.oacc.Resources;
 import com.acciente.oacc.sql.SQLDialect;
+import com.acciente.oacc.sql.internal.persister.CommonGrantResourcePermissionPersister;
 import com.acciente.oacc.sql.internal.persister.DomainPersister;
 import com.acciente.oacc.sql.internal.persister.GrantDomainCreatePermissionPostCreateSysPersister;
 import com.acciente.oacc.sql.internal.persister.GrantDomainCreatePermissionSysPersister;
@@ -46,6 +47,9 @@ import com.acciente.oacc.sql.internal.persister.GrantResourceCreatePermissionPos
 import com.acciente.oacc.sql.internal.persister.GrantResourceCreatePermissionSysPersister;
 import com.acciente.oacc.sql.internal.persister.GrantResourcePermissionPersister;
 import com.acciente.oacc.sql.internal.persister.GrantResourcePermissionSysPersister;
+import com.acciente.oacc.sql.internal.persister.NonRecursiveDomainPersister;
+import com.acciente.oacc.sql.internal.persister.NonRecursiveGrantResourcePermissionPersister;
+import com.acciente.oacc.sql.internal.persister.RecursiveGrantResourcePermissionPersister;
 import com.acciente.oacc.sql.internal.persister.ResourceClassPermissionPersister;
 import com.acciente.oacc.sql.internal.persister.ResourceClassPersister;
 import com.acciente.oacc.sql.internal.persister.ResourcePersister;
@@ -249,7 +253,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       grantDomainPermissionSysPersister
             = new GrantDomainPermissionSysPersister(sqlStrings);
       domainPersister
-            = new DomainPersister(sqlStrings);
+            = new NonRecursiveDomainPersister(sqlStrings);
       resourcePersister
             = new ResourcePersister(sqlStrings);
       grantResourceCreatePermissionSysPersister
@@ -263,7 +267,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       grantGlobalResourcePermissionSysPersister
             = new GrantGlobalResourcePermissionSysPersister(sqlStrings);
       grantResourcePermissionPersister
-            = new GrantResourcePermissionPersister(sqlStrings);
+            = new NonRecursiveGrantResourcePermissionPersister(sqlStrings);
       grantGlobalResourcePermissionPersister
             = new GrantGlobalResourcePermissionPersister(sqlStrings);
    }
