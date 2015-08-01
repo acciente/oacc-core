@@ -18,170 +18,32 @@
 package com.acciente.oacc.sql.internal.persister;
 
 import com.acciente.oacc.DomainCreatePermission;
-import com.acciente.oacc.DomainCreatePermissions;
 import com.acciente.oacc.Resource;
 
-import java.sql.SQLException;
-import java.util.HashSet;
+import java.io.Serializable;
 import java.util.Set;
 
-public class GrantDomainCreatePermissionSysPersister extends Persister {
-   private final SQLStrings sqlStrings;
+public interface GrantDomainCreatePermissionSysPersister {
+   Set<DomainCreatePermission> getDomainCreateSysPermissionsIncludeInherited(SQLConnection connection,
+                                                                             Resource accessorResource);
 
-   public GrantDomainCreatePermissionSysPersister(SQLStrings sqlStrings) {
-      this.sqlStrings = sqlStrings;
-   }
+   Set<DomainCreatePermission> getDomainCreateSysPermissions(SQLConnection connection,
+                                                             Resource accessorResource);
 
-   public Set<DomainCreatePermission> getDomainCreateSysPermissionsIncludeInherited(SQLConnection connection,
-                                                                                    Resource accessorResource) {
-      SQLStatement statement = null;
+   void addDomainCreateSysPermissions(SQLConnection connection,
+                                      Resource accessorResource,
+                                      Resource grantorResource,
+                                      Set<DomainCreatePermission> domainCreatePermissions);
 
-      try {
-         statement = connection.prepareStatement(sqlStrings.SQL_findInGrantDomainCreatePermissionSys_SysPermissionID_IsWithGrant_InheritLevel_BY_AccessorID);
-         statement.setResourceId(1, accessorResource);
-         SQLResult resultSet = statement.executeQuery();
+   void updateDomainCreateSysPermissions(SQLConnection connection,
+                                         Resource accessorResource,
+                                         Resource grantorResource,
+                                         Set<DomainCreatePermission> domainCreatePermissions);
 
-         // first collect the create permissions that this resource has to domains
-         Set<DomainCreatePermission> domainCreatePermissions = new HashSet<>();
-         while (resultSet.next()) {
-            domainCreatePermissions
-                  .add(DomainCreatePermissions.getInstance(resultSet.getDomainCreateSysPermissionName("SysPermissionId"),
-                                                           resultSet.getBoolean("IsWithGrant"),
-                                                           resultSet.getInteger("InheritLevel")));
-         }
-         resultSet.close();
+   void removeDomainCreateSysPermissions(SQLConnection connection,
+                                         Resource accessorResource);
 
-         return domainCreatePermissions;
-      }
-      catch (SQLException e) {
-         throw new RuntimeException(e);
-      }
-      finally {
-         closeStatement(statement);
-      }
-   }
-
-   public Set<DomainCreatePermission> getDomainCreateSysPermissions(SQLConnection connection,
-                                                                    Resource accessorResource) {
-      SQLStatement statement = null;
-
-      try {
-         statement = connection.prepareStatement(sqlStrings.SQL_findInGrantDomainCreatePermissionSys_withoutInheritance_SysPermissionID_BY_AccessorID);
-         statement.setResourceId(1, accessorResource);
-         SQLResult resultSet = statement.executeQuery();
-
-         // first collect the create permissions that this resource has to domains directly
-         Set<DomainCreatePermission> domainCreatePermissions = new HashSet<>();
-         while (resultSet.next()) {
-            domainCreatePermissions
-                  .add(DomainCreatePermissions.getInstance(resultSet.getDomainCreateSysPermissionName("SysPermissionId"),
-                                                           resultSet.getBoolean("IsWithGrant"),
-                                                           0));
-         }
-         resultSet.close();
-
-         return domainCreatePermissions;
-      }
-      catch (SQLException e) {
-         throw new RuntimeException(e);
-      }
-      finally {
-         closeStatement(statement);
-      }
-   }
-
-   public void addDomainCreateSysPermissions(SQLConnection connection,
-                                             Resource accessorResource,
-                                             Resource grantorResource,
-                                             Set<DomainCreatePermission> domainCreatePermissions) {
-      SQLStatement statement = null;
-
-      try {
-         statement = connection.prepareStatement(sqlStrings.SQL_createInGrantDomainCreatePermissionSys_WITH_AccessorID_GrantorID_IsWithGrant_SysPermissionID);
-         for (DomainCreatePermission domainCreatePermission : domainCreatePermissions) {
-            if (domainCreatePermission.isSystemPermission()) {
-               statement.setResourceId(1, accessorResource);
-               statement.setResourceId(2, grantorResource);
-               statement.setBoolean(3, domainCreatePermission.isWithGrant());
-               statement.setDomainCreateSystemPermissionId(4, domainCreatePermission.getSystemPermissionId());
-
-               assertOneRowInserted(statement.executeUpdate());
-            }
-         }
-      }
-      catch (SQLException e) {
-         throw new RuntimeException(e);
-      }
-      finally {
-         closeStatement(statement);
-      }
-   }
-
-   public void updateDomainCreateSysPermissions(SQLConnection connection,
-                                                Resource accessorResource,
-                                                Resource grantorResource,
-                                                Set<DomainCreatePermission> domainCreatePermissions) {
-      SQLStatement statement = null;
-
-      try {
-         statement = connection.prepareStatement(sqlStrings.SQL_updateInGrantDomainCreatePermissionSys_SET_GrantorID_IsWithGrant_BY_AccessorID_SysPermissionID);
-         for (DomainCreatePermission domainCreatePermission : domainCreatePermissions) {
-            if (domainCreatePermission.isSystemPermission()) {
-               statement.setResourceId(1, grantorResource);
-               statement.setBoolean(2, domainCreatePermission.isWithGrant());
-               statement.setResourceId(3, accessorResource);
-               statement.setDomainCreateSystemPermissionId(4, domainCreatePermission.getSystemPermissionId());
-
-               assertOneRowUpdated(statement.executeUpdate());
-            }
-         }
-      }
-      catch (SQLException e) {
-         throw new RuntimeException(e);
-      }
-      finally {
-         closeStatement(statement);
-      }
-   }
-
-   public void removeDomainCreateSysPermissions(SQLConnection connection,
-                                                Resource accessorResource) {
-      SQLStatement statement = null;
-
-      try {
-         statement = connection.prepareStatement(sqlStrings.SQL_removeInGrantDomainCreatePermissionSys_BY_AccessorID);
-         statement.setResourceId(1, accessorResource);
-         statement.executeUpdate();
-      }
-      catch (SQLException e) {
-         throw new RuntimeException(e);
-      }
-      finally {
-         closeStatement(statement);
-      }
-   }
-
-   public void removeDomainCreateSysPermissions(SQLConnection connection,
-                                                Resource accessorResource,
-                                                Set<DomainCreatePermission> domainCreatePermissions) {
-      SQLStatement statement = null;
-
-      try {
-         statement = connection.prepareStatement(sqlStrings.SQL_removeInGrantDomainCreatePermissionSys_BY_AccessorID_SysPermissionID);
-         for (DomainCreatePermission domainCreatePermission : domainCreatePermissions) {
-            if (domainCreatePermission.isSystemPermission()) {
-               statement.setResourceId(1, accessorResource);
-               statement.setDomainCreateSystemPermissionId(2, domainCreatePermission.getSystemPermissionId());
-
-               assertOneRowUpdated(statement.executeUpdate());
-            }
-         }
-      }
-      catch (SQLException e) {
-         throw new RuntimeException(e);
-      }
-      finally {
-         closeStatement(statement);
-      }
-   }
+   void removeDomainCreateSysPermissions(SQLConnection connection,
+                                         Resource accessorResource,
+                                         Set<DomainCreatePermission> domainCreatePermissions);
 }

@@ -104,7 +104,7 @@ public class NonRecursiveGrantResourcePermissionPersister extends CommonGrantRes
          // has the specified permission to in each of the descendant domains
          SQLResult resultSet;
          Set<Resource> resources = new HashSet<>();
-         statement = connection.prepareStatement(sqlStrings.SQL_findInGrantResourcePermission_ResourceID_BY_AccessorID_DomainID_ResourceClassID_PermissionID_IsWithGrant);
+         statement = connection.prepareStatement(sqlStrings.SQL_findInGrantResourcePermission_withoutInheritance_ResourceID_BY_AccessorID_DomainID_ResourceClassID_PermissionID_IsWithGrant);
 
          for (Id<ResourceId> accessorResourceId : accessorResourceIds) {
             for (Id<DomainId> descendantDomainId : descendantDomainIds) {

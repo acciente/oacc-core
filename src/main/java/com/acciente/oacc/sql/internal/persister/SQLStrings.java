@@ -26,36 +26,41 @@ import java.io.Serializable;
 public class SQLStrings implements Serializable {
    // SQL string constants
 
-   // ResourceClass
+   // ResourceClass - common
    public final String SQL_findInResourceClass_ResourceClassID_BY_ResourceClassName;
    public final String SQL_findInResourceClass_ResourceClassID_ResourceClassName_IsAuthenticatable_IsUnauthenticatedCreateAllowed_BY_ResourceClassName;
    public final String SQL_findInResourceClass_ResourceClassID_ResourceClassName_IsAuthenticatable_IsUnauthenticatedCreateAllowed_BY_ResourceID;
    public final String SQL_findInResourceClass_ResourceClassName_BY_ALL;
    public final String SQL_createInResourceClass_WITH_ResourceClassName_IsAuthenticatable_IsUnauthenticatedCreateAllowed;
-   // ResourceClassPermission
+
+   // ResourceClassPermission - common
    public final String SQL_findInResourceClassPermission_PermissionID_BY_ResourceClassID_PermissionName;
    public final String SQL_findInResourceClassPermission_PermissionName_BY_ResourceClassName;
    public final String SQL_createInResourceClassPermission_WITH_ResourceClassID_PermissionName;
 
-   // Domain
+   // Domain - common
    public final String SQL_findInDomain_DomainID_BY_ResourceDomainName;
    public final String SQL_findInDomain_ResourceDomainName_BY_ResourceID;
-   public final String SQL_findInDomain_DescendantResourceDomainName_BY_ResourceDomainName;
-   public final String SQL_findInDomain_DescendantResourceDomainID_BY_DomainID_ORDERBY_DomainLevel;
-   public final String SQL_findInDomain_DirectDescendantResourceDomainName_BY_ResourceDomainName;
-   public final String SQL_findInDomain_DirectDescendantResourceDomainName_BY_DomainID;
    public final String SQL_createInDomain_WITH_ResourceDomainName;
    public final String SQL_createInDomain_WITH_ResourceDomainName_ParentDomainID;
    public final String SQL_removeInDomain_BY_DomainID;
    public final String SQL_removeInDomain_withDescendants_BY_DomainID;
+   // Domain - recursive
+   public final String SQL_findInDomain_DescendantResourceDomainName_BY_ResourceDomainName;
+   public final String SQL_findInDomain_DescendantResourceDomainID_BY_DomainID_ORDERBY_DomainLevel;
+   // Domain - non-recursive
+   public final String SQL_findInDomain_DirectDescendantResourceDomainName_BY_ResourceDomainName;
+   public final String SQL_findInDomain_DirectDescendantResourceDomainName_BY_DomainID;
 
-   // GrantDomainCreatePermissionSys
-   public final String SQL_findInGrantDomainCreatePermissionSys_SysPermissionID_IsWithGrant_InheritLevel_BY_AccessorID;
+   // GrantDomainCreatePermissionSys - common
    public final String SQL_findInGrantDomainCreatePermissionSys_withoutInheritance_SysPermissionID_BY_AccessorID;
-   public final String SQL_removeInGrantDomainCreatePermissionSys_BY_AccessorID;
-   public final String SQL_removeInGrantDomainCreatePermissionSys_BY_AccessorID_SysPermissionID;
    public final String SQL_createInGrantDomainCreatePermissionSys_WITH_AccessorID_GrantorID_IsWithGrant_SysPermissionID;
    public final String SQL_updateInGrantDomainCreatePermissionSys_SET_GrantorID_IsWithGrant_BY_AccessorID_SysPermissionID;
+   public final String SQL_removeInGrantDomainCreatePermissionSys_BY_AccessorID;
+   public final String SQL_removeInGrantDomainCreatePermissionSys_BY_AccessorID_SysPermissionID;
+   // GrantDomainCreatePermissionSys - recursive
+   public final String SQL_findInGrantDomainCreatePermissionSys_SysPermissionID_IsWithGrant_InheritLevel_BY_AccessorID;
+
    // GrantDomainCreatePermissionPostCreateSys
    public final String SQL_findInGrantDomainCreatePermissionPostCreateSys_PostCreateSysPermissionID_PostCreateIsWithGrant_IsWithGrant_InheritLevel_BY_AccessorID;
    public final String SQL_findInGrantDomainCreatePermissionPostCreateSys_withoutInheritance_PostCreateSysPermissionID_PostCreateIsWithGrant_IsWithGrant_BY_AccessorID;
@@ -80,17 +85,12 @@ public class SQLStrings implements Serializable {
    // GrantResourcePermissionSys
    public final String SQL_findInGrantResourcePermissionSys_ResourceID_BY_AccessorID_ResourceClassID_SysPermissionID_IsWithGrant;
    public final String SQL_findInGrantResourcePermissionSys_ResourceID_BY_AccessorID_DomainID_ResourceClassID_SysPermissionID_IsWithGrant;
+   // GrantResourcePermissionSys - non-recursive
    public final String SQL_findInGrantResourcePermissionSys_directInheritance_ResourceID_BY_AccessorID;
 
    // GrantGlobalResourcePermissionSys
    public final String SQL_findInGrantGlobalResourcePermissionSys_ResourceID_BY_AccessorID_ResourceClassID_SysPermissionID_IsWithGrant;
    public final String SQL_findInGrantGlobalResourcePermissionSys_ResourceID_BY_AccessorID_DomainID_ResourceClassID_SysPermissionID_IsWithGrant;
-
-   // GrantResourcePermission
-   public final String SQL_findInGrantResourcePermission_ResourceID_BY_AccessorID_ResourceClassID_PermissionID_IsWithGrant;
-   public final String SQL_findInGrantResourcePermission_ResourceID_BY_AccessorID_DomainID_ResourceClassID_PermissionID_IsWithGrant;
-   public final String SQL_findInGrantResourcePermission_withoutInheritance_ResourceID_BY_AccessorID_ResourceClassID_PermissionID_IsWithGrant;
-   public final String SQL_findInGrantResourcePermission_withoutInheritance_ResourceID_BY_AccessorID_DomainID_ResourceClassID_PermissionID_IsWithGrant;
 
    // GrantGlobalResourcePermission
    public final String SQL_findInGrantGlobalResourcePermission_ResourceID_BY_AccessorID_ResourceClassID_PermissionID_IsWithGrant_ResourceClassID;
@@ -102,9 +102,6 @@ public class SQLStrings implements Serializable {
 
    // GrantResourcePermissionSys
    public final String SQL_findInGrantResourcePermissionSys_ResourceID_BY_AccessedID_ResourceClassID_SysPermissionID_IsWithGrant;
-
-   // GrantResourcePermission
-   public final String SQL_findInGrantResourcePermission_ResourceID_BY_AccessedID_ResourceClassID_PermissionID_IsWithGrant;
 
    // Resource
    public final String SQL_findInResource_COUNTResourceID_BY_ResourceClassID_DomainID;
@@ -159,14 +156,21 @@ public class SQLStrings implements Serializable {
    public final String SQL_removeInGrantResourcePermissionSys_BY_AccessorID_OR_AccessedID;
    public final String SQL_removeInGrantResourcePermissionSys_BY_AccessorID_AccessedID;
    public final String SQL_removeInGrantResourcePermissionSys_BY_AccessorID_AccessedID_ResourceClassID_SysPermissionID;
-   // GrantResourcePermission
-   public final String SQL_findInGrantResourcePermission_ResourceClassName_PermissionName_IsWithGrant_InheritLevel_BY_AccessorID_AccessedID;
+   // GrantResourcePermission - common
+   public final String SQL_findInGrantResourcePermission_ResourceID_BY_AccessedID_ResourceClassID_PermissionID_IsWithGrant;
    public final String SQL_findInGrantResourcePermission_withoutInheritance_ResourceClassName_PermissionName_IsWithGrant_BY_AccessorID_AccessedID;
    public final String SQL_createInGrantResourcePermission_WITH_AccessorID_GrantorID_AccessedID_IsWithGrant_ResourceClassID_PermissionName;
    public final String SQL_updateInGrantResourcePermission_SET_GrantorID_IsWithGrant_BY_AccessorID_AccessedID_ResourceClassID_PermissionName;
    public final String SQL_removeInGrantResourcePermission_BY_AccessorID_OR_AccessedID;
    public final String SQL_removeInGrantResourcePermission_BY_AccessorID_AccessedID;
    public final String SQL_removeInGrantResourcePermission_BY_AccessorID_AccessedID_ResourceClassID_PermissionName;
+   // GrantResourcePermission - recursive
+   public final String SQL_findInGrantResourcePermission_ResourceClassName_PermissionName_IsWithGrant_InheritLevel_BY_AccessorID_AccessedID;
+   public final String SQL_findInGrantResourcePermission_ResourceID_BY_AccessorID_ResourceClassID_PermissionID_IsWithGrant;
+   public final String SQL_findInGrantResourcePermission_ResourceID_BY_AccessorID_DomainID_ResourceClassID_PermissionID_IsWithGrant;
+   // GrantResourcePermission - non-recursive
+   public final String SQL_findInGrantResourcePermission_withoutInheritance_ResourceID_BY_AccessorID_ResourceClassID_PermissionID_IsWithGrant;
+   public final String SQL_findInGrantResourcePermission_withoutInheritance_ResourceID_BY_AccessorID_DomainID_ResourceClassID_PermissionID_IsWithGrant;
 
    // GrantGlobalResourcePermissionSys
    public final String SQL_findInGrantGlobalResourcePermissionSys_SysPermissionID_IsWithGrant_InheritLevel_DomainLevel_BY_AccessorID_AccessedDomainID_ResourceClassID;
@@ -299,7 +303,7 @@ public class SQLStrings implements Serializable {
             + dialectSpecificSQLGenerator.nextSequenceValueFragment(schemaNameAndTablePrefix + "PermissionId")
             + ", ? )";
 
-      // Domain
+      // Domain - common
       SQL_findInDomain_DomainID_BY_ResourceDomainName
             = "SELECT DomainId FROM "
             + schemaNameAndTablePrefix
@@ -311,44 +315,6 @@ public class SQLStrings implements Serializable {
             + "Domain WHERE DomainId = ( SELECT DomainId FROM "
             + schemaNameAndTablePrefix
             + "Resource WHERE ResourceId = ? )";
-
-      // recursive query to return all descendants domain names of the specified domain names
-      SQL_findInDomain_DescendantResourceDomainName_BY_ResourceDomainName
-            = withClause + " S( DomainId, DomainName, DomainLevel ) AS "
-            + "( SELECT DomainId, DomainName, 0 FROM "
-            + schemaNameAndTablePrefix
-            + "Domain WHERE DomainName = ? "
-            + unionClause + " "
-            + "SELECT Splus1.DomainId, Splus1.DomainName, S.DomainLevel + 1 FROM "
-            + schemaNameAndTablePrefix
-            + "Domain Splus1, S "
-            + "WHERE Splus1.ParentDomainId IS NOT NULL AND Splus1.ParentDomainId = S.DomainId ) "
-            + "SELECT DomainId, DomainName FROM S";
-
-      SQL_findInDomain_DescendantResourceDomainID_BY_DomainID_ORDERBY_DomainLevel
-            = withClause + " S( DomainId, DomainName, DomainLevel ) AS "
-            + "( SELECT DomainId, DomainName, 0 FROM "
-            + schemaNameAndTablePrefix
-            + "Domain WHERE DomainId = ? "
-            + unionClause + " "
-            + "SELECT Splus1.DomainId, Splus1.DomainName, S.DomainLevel + 1 FROM "
-            + schemaNameAndTablePrefix
-            + "Domain Splus1, S "
-            + "WHERE Splus1.ParentDomainId IS NOT NULL AND Splus1.ParentDomainId = S.DomainId ) "
-            + "SELECT DomainId, DomainName FROM S ORDER BY DomainLevel";
-
-      // non-recursive query to return only direct (first-level) descendants domain names of the specified domain
-      SQL_findInDomain_DirectDescendantResourceDomainName_BY_ResourceDomainName
-            = "SELECT d1.DomainId, d1.DomainName FROM "
-            + schemaNameAndTablePrefix
-            + "Domain d0 JOIN "
-            + schemaNameAndTablePrefix
-            + "Domain d1 on d1.ParentDomainId=d0.DomainId WHERE d0.DomainName = ?";
-
-      SQL_findInDomain_DirectDescendantResourceDomainName_BY_DomainID
-            = "SELECT DomainId, DomainName FROM "
-            + schemaNameAndTablePrefix
-            + "Domain WHERE ParentDomainId = ?";
 
       SQL_createInDomain_WITH_ResourceDomainName
             = "INSERT INTO "
@@ -385,14 +351,47 @@ public class SQLStrings implements Serializable {
                       + schemaNameAndTablePrefix
                       + "Domain WHERE DomainId IN ( SELECT DomainId FROM S )";
 
-      // GrantDomainCreatePermissionSys
-      SQL_findInGrantDomainCreatePermissionSys_SysPermissionID_IsWithGrant_InheritLevel_BY_AccessorID
-            = SQL_findRecursiveInGrantResourcePermissionSys_AccessorID_InheritLevel_BY_AccessorID
-            + "SELECT A.SysPermissionId, A.IsWithGrant, N.InheritLevel FROM "
+      // Domain - recursive
+      // recursive query to return all descendants domain names of the specified domain names
+      SQL_findInDomain_DescendantResourceDomainName_BY_ResourceDomainName
+            = withClause + " S( DomainId, DomainName, DomainLevel ) AS "
+            + "( SELECT DomainId, DomainName, 0 FROM "
             + schemaNameAndTablePrefix
-            + "Grant_DomCrPerm_Sys A "
-            + "JOIN N ON N.AccessorResourceId = A.AccessorResourceId ";
+            + "Domain WHERE DomainName = ? "
+            + unionClause + " "
+            + "SELECT Splus1.DomainId, Splus1.DomainName, S.DomainLevel + 1 FROM "
+            + schemaNameAndTablePrefix
+            + "Domain Splus1, S "
+            + "WHERE Splus1.ParentDomainId IS NOT NULL AND Splus1.ParentDomainId = S.DomainId ) "
+            + "SELECT DomainId, DomainName FROM S";
 
+      SQL_findInDomain_DescendantResourceDomainID_BY_DomainID_ORDERBY_DomainLevel
+            = withClause + " S( DomainId, DomainName, DomainLevel ) AS "
+            + "( SELECT DomainId, DomainName, 0 FROM "
+            + schemaNameAndTablePrefix
+            + "Domain WHERE DomainId = ? "
+            + unionClause + " "
+            + "SELECT Splus1.DomainId, Splus1.DomainName, S.DomainLevel + 1 FROM "
+            + schemaNameAndTablePrefix
+            + "Domain Splus1, S "
+            + "WHERE Splus1.ParentDomainId IS NOT NULL AND Splus1.ParentDomainId = S.DomainId ) "
+            + "SELECT DomainId, DomainName FROM S ORDER BY DomainLevel";
+
+      // Domain - non-recursive
+      // non-recursive query to return only direct (first-level) descendants domain names of the specified domain
+      SQL_findInDomain_DirectDescendantResourceDomainName_BY_ResourceDomainName
+            = "SELECT d1.DomainId, d1.DomainName FROM "
+            + schemaNameAndTablePrefix
+            + "Domain d0 JOIN "
+            + schemaNameAndTablePrefix
+            + "Domain d1 on d1.ParentDomainId=d0.DomainId WHERE d0.DomainName = ?";
+
+      SQL_findInDomain_DirectDescendantResourceDomainName_BY_DomainID
+            = "SELECT DomainId, DomainName FROM "
+            + schemaNameAndTablePrefix
+            + "Domain WHERE ParentDomainId = ?";
+
+      // GrantDomainCreatePermissionSys - common
       SQL_findInGrantDomainCreatePermissionSys_withoutInheritance_SysPermissionID_BY_AccessorID
             = "SELECT A.SysPermissionId, A.IsWithGrant FROM "
             + schemaNameAndTablePrefix
@@ -420,6 +419,14 @@ public class SQLStrings implements Serializable {
             = "DELETE FROM "
             + schemaNameAndTablePrefix
             + "Grant_DomCrPerm_Sys WHERE AccessorResourceId = ? AND SysPermissionId = ?";
+
+      // GrantDomainCreatePermissionSys - recursive
+      SQL_findInGrantDomainCreatePermissionSys_SysPermissionID_IsWithGrant_InheritLevel_BY_AccessorID
+            = SQL_findRecursiveInGrantResourcePermissionSys_AccessorID_InheritLevel_BY_AccessorID
+            + "SELECT A.SysPermissionId, A.IsWithGrant, N.InheritLevel FROM "
+            + schemaNameAndTablePrefix
+            + "Grant_DomCrPerm_Sys A "
+            + "JOIN N ON N.AccessorResourceId = A.AccessorResourceId ";
 
       // GrantDomainCreatePermissionPostCreateSys
       SQL_findInGrantDomainCreatePermissionPostCreateSys_PostCreateSysPermissionID_PostCreateIsWithGrant_IsWithGrant_InheritLevel_BY_AccessorID
@@ -598,38 +605,6 @@ public class SQLStrings implements Serializable {
             + "JOIN S ON S.DomainId = B.AccessedDomainId "
             + "WHERE B.ResourceClassId = ? AND B.SysPermissionId = ? AND ( ? IN ( 0, B.IsWithGrant ) ) )";
 
-      SQL_findInGrantResourcePermission_ResourceID_BY_AccessorID_ResourceClassID_PermissionID_IsWithGrant
-            = SQL_findRecursiveInGrantResourcePermissionSys_AccessorID_InheritLevel_BY_AccessorID
-            + "SELECT B.AccessedResourceId ResourceId FROM "
-            + schemaNameAndTablePrefix
-            + "Grant_ResPerm B "
-            + "JOIN N ON N.AccessorResourceId = B.AccessorResourceId "
-            + "WHERE B.ResourceClassId = ? AND B.PermissionId = ? AND ( ? IN ( 0, B.IsWithGrant ) )";
-
-      SQL_findInGrantResourcePermission_ResourceID_BY_AccessorID_DomainID_ResourceClassID_PermissionID_IsWithGrant
-            = SQL_findRecursiveInGrantResourcePermissionSys_AccessorID_InheritLevel_BY_AccessorID
-            + ", " + SQL_findDescendantsRecursiveInDomain_DomainID_DomainLevel_BY_DomainID
-            + "SELECT B.AccessedResourceId ResourceId FROM "
-            + schemaNameAndTablePrefix
-            + "Grant_ResPerm B JOIN "
-            + schemaNameAndTablePrefix
-            + "Resource C ON C.ResourceId = B.AccessedResourceId "
-            + "JOIN N ON N.AccessorResourceId = B.AccessorResourceId "
-            + "JOIN S ON S.DomainId = C.DomainId "
-            + "WHERE B.ResourceClassId = ? AND B.PermissionId = ? AND ( ? IN ( 0, B.IsWithGrant ) )";
-
-      SQL_findInGrantResourcePermission_withoutInheritance_ResourceID_BY_AccessorID_ResourceClassID_PermissionID_IsWithGrant
-            = "SELECT AccessedResourceId ResourceId FROM "
-            + schemaNameAndTablePrefix
-            + "Grant_ResPerm "
-            + "WHERE AccessorResourceId = ? AND ResourceClassId = ? AND PermissionId = ? AND ( ? IN ( 0, IsWithGrant ) )";
-
-      SQL_findInGrantResourcePermission_withoutInheritance_ResourceID_BY_AccessorID_DomainID_ResourceClassID_PermissionID_IsWithGrant
-            = "SELECT AccessedResourceId ResourceId FROM "
-            + schemaNameAndTablePrefix
-            + "Grant_ResPerm "
-            + "WHERE AccessorResourceId = ? AND DomainId = ? AND ResourceClassId = ? PermissionId = ? AND ( ? IN ( 0, IsWithGrant ) )";
-
       SQL_findInGrantGlobalResourcePermission_ResourceID_BY_AccessorID_ResourceClassID_PermissionID_IsWithGrant_ResourceClassID
             = SQL_findRecursiveInGrantResourcePermissionSys_AccessorID_InheritLevel_BY_AccessorID
             + ", R( DomainId, DomainLevel ) AS "
@@ -729,12 +704,6 @@ public class SQLStrings implements Serializable {
             + schemaNameAndTablePrefix
             + "Grant_ResPerm_Sys "
             + "WHERE AccessedResourceId = ? AND ResourceClassId = ? AND SysPermissionId = ? AND ( ? IN ( 0, IsWithGrant ) )";
-
-      SQL_findInGrantResourcePermission_ResourceID_BY_AccessedID_ResourceClassID_PermissionID_IsWithGrant
-            = "SELECT AccessorResourceId ResourceId FROM "
-            + schemaNameAndTablePrefix
-            + "Grant_ResPerm "
-            + "WHERE AccessedResourceId = ? AND ResourceClassId = ? AND PermissionId = ? AND ( ? IN ( 0, IsWithGrant ) )";
 
       // Resource: finder methods used by getSingletonResource()
       SQL_findInResource_COUNTResourceID_BY_ResourceClassID_DomainID
@@ -1107,18 +1076,12 @@ public class SQLStrings implements Serializable {
             + schemaNameAndTablePrefix
             + "Grant_ResPerm_Sys WHERE AccessorResourceId = ? AND AccessedResourceId = ? AND ResourceClassId = ? AND SysPermissionId = ?";
 
-      // GrantResourcePermission
-      SQL_findInGrantResourcePermission_ResourceClassName_PermissionName_IsWithGrant_InheritLevel_BY_AccessorID_AccessedID
-            = SQL_findRecursiveInGrantResourcePermissionSys_AccessorID_InheritLevel_BY_AccessorID
-            + "SELECT C.ResourceClassName, B.PermissionName, A.IsWithGrant, N.InheritLevel FROM "
+      // GrantResourcePermission - common
+      SQL_findInGrantResourcePermission_ResourceID_BY_AccessedID_ResourceClassID_PermissionID_IsWithGrant
+            = "SELECT AccessorResourceId ResourceId FROM "
             + schemaNameAndTablePrefix
-            + "Grant_ResPerm A JOIN "
-            + schemaNameAndTablePrefix
-            + "ResourceClassPermission B ON B.ResourceClassId = A.ResourceClassId AND B.PermissionId = A.PermissionId JOIN "
-            + schemaNameAndTablePrefix
-            + "ResourceClass C ON C.ResourceClassId = A.ResourceClassId "
-            + "JOIN N ON N.AccessorResourceId = A.AccessorResourceId "
-            + "WHERE A.AccessedResourceId = ?";
+            + "Grant_ResPerm "
+            + "WHERE AccessedResourceId = ? AND ResourceClassId = ? AND PermissionId = ? AND ( ? IN ( 0, IsWithGrant ) )";
 
       SQL_findInGrantResourcePermission_withoutInheritance_ResourceClassName_PermissionName_IsWithGrant_BY_AccessorID_AccessedID
             = "SELECT C.ResourceClassName, B.PermissionName, A.IsWithGrant FROM "
@@ -1164,6 +1127,54 @@ public class SQLStrings implements Serializable {
             + "SELECT A.PermissionId FROM "
             + schemaNameAndTablePrefix
             + "ResourceClassPermission A WHERE A.ResourceClassId = ResourceClassId AND A.PermissionName = ? )";
+
+      // GrantResourcePermission - recursive
+      SQL_findInGrantResourcePermission_ResourceID_BY_AccessorID_ResourceClassID_PermissionID_IsWithGrant
+            = SQL_findRecursiveInGrantResourcePermissionSys_AccessorID_InheritLevel_BY_AccessorID
+            + "SELECT B.AccessedResourceId ResourceId FROM "
+            + schemaNameAndTablePrefix
+            + "Grant_ResPerm B "
+            + "JOIN N ON N.AccessorResourceId = B.AccessorResourceId "
+            + "WHERE B.ResourceClassId = ? AND B.PermissionId = ? AND ( ? IN ( 0, B.IsWithGrant ) )";
+
+      SQL_findInGrantResourcePermission_ResourceID_BY_AccessorID_DomainID_ResourceClassID_PermissionID_IsWithGrant
+            = SQL_findRecursiveInGrantResourcePermissionSys_AccessorID_InheritLevel_BY_AccessorID
+            + ", " + SQL_findDescendantsRecursiveInDomain_DomainID_DomainLevel_BY_DomainID
+            + "SELECT B.AccessedResourceId ResourceId FROM "
+            + schemaNameAndTablePrefix
+            + "Grant_ResPerm B JOIN "
+            + schemaNameAndTablePrefix
+            + "Resource C ON C.ResourceId = B.AccessedResourceId "
+            + "JOIN N ON N.AccessorResourceId = B.AccessorResourceId "
+            + "JOIN S ON S.DomainId = C.DomainId "
+            + "WHERE B.ResourceClassId = ? AND B.PermissionId = ? AND ( ? IN ( 0, B.IsWithGrant ) )";
+
+      SQL_findInGrantResourcePermission_ResourceClassName_PermissionName_IsWithGrant_InheritLevel_BY_AccessorID_AccessedID
+            = SQL_findRecursiveInGrantResourcePermissionSys_AccessorID_InheritLevel_BY_AccessorID
+            + "SELECT C.ResourceClassName, B.PermissionName, A.IsWithGrant, N.InheritLevel FROM "
+            + schemaNameAndTablePrefix
+            + "Grant_ResPerm A JOIN "
+            + schemaNameAndTablePrefix
+            + "ResourceClassPermission B ON B.ResourceClassId = A.ResourceClassId AND B.PermissionId = A.PermissionId JOIN "
+            + schemaNameAndTablePrefix
+            + "ResourceClass C ON C.ResourceClassId = A.ResourceClassId "
+            + "JOIN N ON N.AccessorResourceId = A.AccessorResourceId "
+            + "WHERE A.AccessedResourceId = ?";
+
+      // GrantResourcePermission - non-recursive
+      SQL_findInGrantResourcePermission_withoutInheritance_ResourceID_BY_AccessorID_ResourceClassID_PermissionID_IsWithGrant
+            = "SELECT AccessedResourceId ResourceId FROM "
+            + schemaNameAndTablePrefix
+            + "Grant_ResPerm "
+            + "WHERE AccessorResourceId = ? AND ResourceClassId = ? AND PermissionId = ? AND ( ? IN ( 0, IsWithGrant ) )";
+
+      SQL_findInGrantResourcePermission_withoutInheritance_ResourceID_BY_AccessorID_DomainID_ResourceClassID_PermissionID_IsWithGrant
+            = "SELECT A.AccessedResourceId ResourceId FROM "
+            + schemaNameAndTablePrefix
+            + "Grant_ResPerm A JOIN "
+            + schemaNameAndTablePrefix
+            + "Resource B ON A.AccessedResourceId=B.ResourceId "
+            + "WHERE A.AccessorResourceId = ? AND B.DomainId = ? AND A.ResourceClassId = ? AND A.PermissionId = ? AND ( ? IN ( 0, A.IsWithGrant ) )";
 
       // GrantGlobalResourcePermissionSys
       SQL_findInGrantGlobalResourcePermissionSys_SysPermissionID_IsWithGrant_InheritLevel_DomainLevel_BY_AccessorID_AccessedDomainID_ResourceClassID
