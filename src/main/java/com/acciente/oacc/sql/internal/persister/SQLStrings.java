@@ -61,13 +61,14 @@ public class SQLStrings implements Serializable {
    // GrantDomainCreatePermissionSys - recursive
    public final String SQL_findInGrantDomainCreatePermissionSys_SysPermissionID_IsWithGrant_InheritLevel_BY_AccessorID;
 
-   // GrantDomainCreatePermissionPostCreateSys
-   public final String SQL_findInGrantDomainCreatePermissionPostCreateSys_PostCreateSysPermissionID_PostCreateIsWithGrant_IsWithGrant_InheritLevel_BY_AccessorID;
+   // GrantDomainCreatePermissionPostCreateSys - common
    public final String SQL_findInGrantDomainCreatePermissionPostCreateSys_withoutInheritance_PostCreateSysPermissionID_PostCreateIsWithGrant_IsWithGrant_BY_AccessorID;
    public final String SQL_removeInGrantDomainCreatePermissionPostCreateSys_BY_AccessorID;
    public final String SQL_removeInGrantDomainCreatePermissionPostCreateSys_BY_AccessorID_PostCreateSysPermissionID;
    public final String SQL_createInGrantDomainCreatePermissionPostCreateSys_WITH_AccessorID_GrantorID_IsWithGrant_PostCreateIsWithGrant_PostCreateSysPermissionID;
    public final String SQL_updateInGrantDomainCreatePermissionPostCreateSys_SET_GrantorID_IsWithGrant_PostCreateIsWithGrant_BY_AccessorID_PostCreateSysPermissionID;
+   // GrantDomainCreatePermissionPostCreateSys - recursive
+   public final String SQL_findInGrantDomainCreatePermissionPostCreateSys_PostCreateSysPermissionID_PostCreateIsWithGrant_IsWithGrant_InheritLevel_BY_AccessorID;
 
    // GrantDomainPermissionSys
    public final String SQL_findInGrantDomainPermissionSys_SysPermissionID_IsWithGrant_InheritLevel_DomainLevel_BY_AccessorID_DomainID;
@@ -428,14 +429,7 @@ public class SQLStrings implements Serializable {
             + "Grant_DomCrPerm_Sys A "
             + "JOIN N ON N.AccessorResourceId = A.AccessorResourceId ";
 
-      // GrantDomainCreatePermissionPostCreateSys
-      SQL_findInGrantDomainCreatePermissionPostCreateSys_PostCreateSysPermissionID_PostCreateIsWithGrant_IsWithGrant_InheritLevel_BY_AccessorID
-            = SQL_findRecursiveInGrantResourcePermissionSys_AccessorID_InheritLevel_BY_AccessorID
-            + "SELECT A.PostCreateSysPermissionId, A.PostCreateIsWithGrant, A.IsWithGrant, N.InheritLevel FROM "
-            + schemaNameAndTablePrefix
-            + "Grant_DomCrPerm_PostCr_Sys A "
-            + "JOIN N ON N.AccessorResourceId = A.AccessorResourceId ";
-
+      // GrantDomainCreatePermissionPostCreateSys - common
       SQL_findInGrantDomainCreatePermissionPostCreateSys_withoutInheritance_PostCreateSysPermissionID_PostCreateIsWithGrant_IsWithGrant_BY_AccessorID
             = "SELECT A.PostCreateSysPermissionId, A.PostCreateIsWithGrant, A.IsWithGrant FROM "
             + schemaNameAndTablePrefix
@@ -463,6 +457,14 @@ public class SQLStrings implements Serializable {
             = "DELETE FROM "
             + schemaNameAndTablePrefix
             + "Grant_DomCrPerm_PostCr_Sys WHERE AccessorResourceId = ? AND PostCreateSysPermissionId = ?";
+
+      // GrantDomainCreatePermissionPostCreateSys - recursive
+      SQL_findInGrantDomainCreatePermissionPostCreateSys_PostCreateSysPermissionID_PostCreateIsWithGrant_IsWithGrant_InheritLevel_BY_AccessorID
+            = SQL_findRecursiveInGrantResourcePermissionSys_AccessorID_InheritLevel_BY_AccessorID
+            + "SELECT A.PostCreateSysPermissionId, A.PostCreateIsWithGrant, A.IsWithGrant, N.InheritLevel FROM "
+            + schemaNameAndTablePrefix
+            + "Grant_DomCrPerm_PostCr_Sys A "
+            + "JOIN N ON N.AccessorResourceId = A.AccessorResourceId ";
 
       // GrantDomainPermissionSys
       SQL_findInGrantDomainPermissionSys_SysPermissionID_IsWithGrant_InheritLevel_DomainLevel_BY_AccessorID_DomainID
