@@ -35,7 +35,6 @@ import com.acciente.oacc.ResourcePermission;
 import com.acciente.oacc.ResourcePermissions;
 import com.acciente.oacc.Resources;
 import com.acciente.oacc.sql.SQLType;
-import com.acciente.oacc.sql.internal.persister.CommonGrantDomainCreatePermissionPostCreateSysPersister;
 import com.acciente.oacc.sql.internal.persister.DomainPersister;
 import com.acciente.oacc.sql.internal.persister.GrantDomainCreatePermissionPostCreateSysPersister;
 import com.acciente.oacc.sql.internal.persister.GrantDomainCreatePermissionSysPersister;
@@ -50,10 +49,12 @@ import com.acciente.oacc.sql.internal.persister.GrantResourcePermissionSysPersis
 import com.acciente.oacc.sql.internal.persister.NonRecursiveDomainPersister;
 import com.acciente.oacc.sql.internal.persister.NonRecursiveGrantDomainCreatePermissionPostCreateSysPersister;
 import com.acciente.oacc.sql.internal.persister.NonRecursiveGrantDomainCreatePermissionSysPersister;
+import com.acciente.oacc.sql.internal.persister.NonRecursiveGrantDomainPermissionSysPersister;
 import com.acciente.oacc.sql.internal.persister.NonRecursiveGrantResourcePermissionPersister;
 import com.acciente.oacc.sql.internal.persister.RecursiveDomainPersister;
 import com.acciente.oacc.sql.internal.persister.RecursiveGrantDomainCreatePermissionPostCreateSysPersister;
 import com.acciente.oacc.sql.internal.persister.RecursiveGrantDomainCreatePermissionSysPersister;
+import com.acciente.oacc.sql.internal.persister.RecursiveGrantDomainPermissionSysPersister;
 import com.acciente.oacc.sql.internal.persister.RecursiveGrantResourcePermissionPersister;
 import com.acciente.oacc.sql.internal.persister.ResourceClassPermissionPersister;
 import com.acciente.oacc.sql.internal.persister.ResourceClassPersister;
@@ -258,7 +259,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
          grantDomainCreatePermissionPostCreateSysPersister
                = new RecursiveGrantDomainCreatePermissionPostCreateSysPersister(sqlStrings);
          grantDomainPermissionSysPersister
-               = new GrantDomainPermissionSysPersister(sqlStrings);
+               = new RecursiveGrantDomainPermissionSysPersister(sqlStrings);
          domainPersister
                = new RecursiveDomainPersister(sqlStrings);
          resourcePersister
@@ -284,7 +285,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
          grantDomainCreatePermissionPostCreateSysPersister
                = new NonRecursiveGrantDomainCreatePermissionPostCreateSysPersister(sqlStrings);
          grantDomainPermissionSysPersister
-               = new GrantDomainPermissionSysPersister(sqlStrings);
+               = new NonRecursiveGrantDomainPermissionSysPersister(sqlStrings);
          domainPersister
                = new NonRecursiveDomainPersister(sqlStrings);
          resourcePersister

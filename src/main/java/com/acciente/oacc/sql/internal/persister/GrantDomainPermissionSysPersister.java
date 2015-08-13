@@ -18,397 +18,62 @@
 package com.acciente.oacc.sql.internal.persister;
 
 import com.acciente.oacc.DomainPermission;
-import com.acciente.oacc.DomainPermissions;
 import com.acciente.oacc.Resource;
-import com.acciente.oacc.sql.SQLDialect;
 import com.acciente.oacc.sql.internal.persister.id.DomainId;
 import com.acciente.oacc.sql.internal.persister.id.Id;
 import com.acciente.oacc.sql.internal.persister.id.ResourceClassId;
 
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-public class GrantDomainPermissionSysPersister extends Persister {
-   private final SQLStrings sqlStrings;
+public interface GrantDomainPermissionSysPersister {
+   Set<Resource> getResourcesByDomainSuperUserPermission(SQLConnection connection,
+                                                         Resource accessorResource,
+                                                         Id<ResourceClassId> resourceClassId);
 
-   public static final DomainPermission DOMAIN_PERMISSION_SUPER_USER = DomainPermissions.getInstance(DomainPermissions.SUPER_USER);
+   Set<Resource> getResourcesByDomainSuperUserPermission(SQLConnection connection,
+                                                         Resource accessorResource,
+                                                         Id<ResourceClassId> resourceClassId,
+                                                         Id<DomainId> resourceDomainId);
 
-   public GrantDomainPermissionSysPersister(SQLStrings sqlStrings) {
-      this.sqlStrings = sqlStrings;
-   }
+   Set<DomainPermission> getDomainSysPermissionsIncludeInherited(SQLConnection connection,
+                                                                 Resource accessorResource,
+                                                                 Id<DomainId> resourceDomainId);
 
-   public Set<Resource> getResourcesByDomainSuperUserPermission(SQLConnection connection,
-                                                                Resource accessorResource,
-                                                                Id<ResourceClassId> resourceClassId) {
-      SQLStatement statement = null;
-      try {
-         // get the list of objects of the specified type that the session has access to via domain super user permissions
-         SQLResult resultSet;
-         Set<Resource> resources = new HashSet<>();
+   Set<DomainPermission> getDomainSysPermissions(SQLConnection connection,
+                                                 Resource accessorResource,
+                                                 Id<DomainId> resourceDomainId);
 
-         statement = connection.prepareStatement(sqlStrings.SQL_findInGrantDomainPermissionSys_ResourceID_BY_AccessorID_SysPermissionID_IsWithGrant_ResourceClassID);
-         statement.setResourceId(1, accessorResource);
-         statement.setDomainSystemPermissionId(2, DOMAIN_PERMISSION_SUPER_USER.getSystemPermissionId());
-         statement.setBoolean(3, false);
-         statement.setResourceClassId(4, resourceClassId);
-         resultSet = statement.executeQuery();
+   Map<String, Set<DomainPermission>> getDomainSysPermissionsIncludeInherited(SQLConnection connection,
+                                                                              Resource accessorResource);
 
-         while (resultSet.next()) {
-            resources.add(resultSet.getResource("ResourceId"));
-         }
-         resultSet.close();
+   Map<String, Set<DomainPermission>> getDomainSysPermissions(SQLConnection connection,
+                                                              Resource accessorResource);
 
-         return resources;
-      }
-      catch (SQLException e) {
-         throw new RuntimeException(e);
-      }
-      finally {
-         closeStatement(statement);
-      }
-   }
+   void addDomainSysPermissions(SQLConnection connection,
+                                Resource accessorResource,
+                                Resource grantorResource,
+                                Id<DomainId> resourceDomainId,
+                                Set<DomainPermission> requestedDomainPermissions);
 
-   public Set<Resource> getResourcesByDomainSuperUserPermission(SQLConnection connection,
-                                                                Resource accessorResource,
-                                                                Id<ResourceClassId> resourceClassId,
-                                                                Id<DomainId> resourceDomainId) {
-      SQLStatement statement = null;
-      try {
-         // get the list of objects of the specified type that the session has access to via domain super user permissions
-         SQLResult resultSet;
-         Set<Resource> resources = new HashSet<>();
+   void updateDomainSysPermissions(SQLConnection connection,
+                                   Resource accessorResource,
+                                   Resource grantorResource,
+                                   Id<DomainId> resourceDomainId,
+                                   Set<DomainPermission> requestedDomainPermissions);
 
-         statement = connection.prepareStatement(sqlStrings.SQL_findInGrantDomainPermissionSys_ResourceID_BY_AccessorID_DomainID_SysPermissionID_IsWithGrant_ResourceClassID);
-         statement.setResourceId(1, accessorResource);
-         statement.setResourceDomainId(2, resourceDomainId);
-         statement.setDomainSystemPermissionId(3, DOMAIN_PERMISSION_SUPER_USER.getSystemPermissionId());
-         statement.setBoolean(4, false);
-         statement.setResourceClassId(5, resourceClassId);
-         resultSet = statement.executeQuery();
+   void removeAllDomainSysPermissions(SQLConnection connection,
+                                      Resource accessorResource);
 
-         while (resultSet.next()) {
-            resources.add(resultSet.getResource("ResourceId"));
-         }
-         resultSet.close();
+   void removeAllDomainSysPermissions(SQLConnection connection,
+                                      Id<DomainId> domainId);
 
-         return resources;
-      }
-      catch (SQLException e) {
-         throw new RuntimeException(e);
-      }
-      finally {
-         closeStatement(statement);
-      }
-   }
+   void removeDomainSysPermissions(SQLConnection connection,
+                                   Resource accessorResource,
+                                   Id<DomainId> resourceDomainId);
 
-   public Set<DomainPermission> getDomainSysPermissionsIncludeInherited(SQLConnection connection,
-                                                                        Resource accessorResource,
-                                                                        Id<DomainId> resourceDomainId) {
-      SQLStatement statement = null;
-
-      try {
-         statement = connection.prepareStatement(sqlStrings.SQL_findInGrantDomainPermissionSys_SysPermissionID_IsWithGrant_InheritLevel_DomainLevel_BY_AccessorID_DomainID);
-         statement.setResourceId(1, accessorResource);
-         statement.setResourceDomainId(2, resourceDomainId);
-         SQLResult resultSet = statement.executeQuery();
-
-         // first collect the create permissions that this resource has to domains
-         Set<DomainPermission> domainPermissions = new HashSet<>();
-         while (resultSet.next()) {
-            // on the domains only pre-defined system permissions are expected
-            domainPermissions
-                  .add(DomainPermissions.getInstance(resultSet.getDomainSysPermissionName("SysPermissionId"),
-                                                     resultSet.getBoolean("IsWithGrant"),
-                                                     resultSet.getInteger("InheritLevel"),
-                                                     resultSet.getInteger("DomainLevel")));
-         }
-         resultSet.close();
-
-         return domainPermissions;
-      }
-      catch (SQLException e) {
-         throw new RuntimeException(e);
-      }
-      finally {
-         closeStatement(statement);
-      }
-   }
-
-   public Set<DomainPermission> getDomainSysPermissions(SQLConnection connection,
-                                                        Resource accessorResource,
-                                                        Id<DomainId> resourceDomainId) {
-      SQLStatement statement = null;
-
-      try {
-         statement = connection.prepareStatement(sqlStrings.SQL_findInGrantDomainPermissionSys_withoutInheritance_SysPermissionID_IsWithGrant_BY_AccessorID_DomainID);
-         statement.setResourceId(1, accessorResource);
-         statement.setResourceDomainId(2, resourceDomainId);
-         SQLResult resultSet = statement.executeQuery();
-
-         // collect the create permissions that this resource has to the domain directly
-         Set<DomainPermission> domainPermissions = new HashSet<>();
-         while (resultSet.next()) {
-            // on the domains only pre-defined system permissions are expected
-            domainPermissions
-                  .add(DomainPermissions.getInstance(resultSet.getDomainSysPermissionName("SysPermissionId"),
-                                                     resultSet.getBoolean("IsWithGrant"),
-                                                     0,
-                                                     0));
-         }
-         resultSet.close();
-
-         return domainPermissions;
-      }
-      catch (SQLException e) {
-         throw new RuntimeException(e);
-      }
-      finally {
-         closeStatement(statement);
-      }
-   }
-
-   public Map<String, Set<DomainPermission>> getDomainSysPermissionsIncludeInherited(SQLConnection connection,
-                                                                                     Resource accessorResource) {
-      SQLStatement statement = null;
-
-      try {
-         // collect the create permissions that this resource has to each domain
-         statement = connection.prepareStatement(sqlStrings.SQL_findInGrantDomainPermissionSys_ResourceDomainName_SysPermissionID_IsWithGrant_InheritLevel_DomainLevel_BY_AccessorID);
-         statement.setResourceId(1, accessorResource);
-         SQLResult resultSet = statement.executeQuery();
-
-         final Map<String, Set<DomainPermission>> domainPermissionsMap = new HashMap<>();
-
-         while (resultSet.next()) {
-            final String resourceDomainName = resultSet.getString("DomainName");
-
-            Set<DomainPermission> domainPermissions = domainPermissionsMap.get(resourceDomainName);
-
-            if (domainPermissions == null) {
-               domainPermissionsMap.put(resourceDomainName,
-                                        domainPermissions = new HashSet<>());
-            }
-
-            // on the domains only pre-defined system permissions are expected
-            domainPermissions
-                  .add(DomainPermissions.getInstance(resultSet.getDomainSysPermissionName("SysPermissionId"),
-                                                     resultSet.getBoolean("IsWithGrant"),
-                                                     resultSet.getInteger("InheritLevel"),
-                                                     resultSet.getInteger("DomainLevel")));
-         }
-         resultSet.close();
-
-         return domainPermissionsMap;
-      }
-      catch (SQLException e) {
-         throw new RuntimeException(e);
-      }
-      finally {
-         closeStatement(statement);
-      }
-   }
-   public Map<String, Set<DomainPermission>> getDomainSysPermissions(SQLConnection connection,
-                                                                     Resource accessorResource) {
-      SQLStatement statement = null;
-
-      try {
-         // collect the create permissions that this resource has to each domain
-         statement = connection.prepareStatement(sqlStrings.SQL_findInGrantDomainPermissionSys_withoutInheritance_ResourceDomainName_SysPermissionID_IsWithGrant_BY_AccessorID);
-         statement.setResourceId(1, accessorResource);
-         SQLResult resultSet = statement.executeQuery();
-
-         final Map<String, Set<DomainPermission>> domainPermissionsMap = new HashMap<>();
-
-         while (resultSet.next()) {
-            final String resourceDomainName = resultSet.getString("DomainName");
-
-            Set<DomainPermission> domainPermissions = domainPermissionsMap.get(resourceDomainName);
-
-            if (domainPermissions == null) {
-               domainPermissionsMap.put(resourceDomainName,
-                                        domainPermissions = new HashSet<>());
-            }
-
-            // on the domains only pre-defined system permissions are expected
-            domainPermissions
-                  .add(DomainPermissions.getInstance(resultSet.getDomainSysPermissionName("SysPermissionId"),
-                                                     resultSet.getBoolean("IsWithGrant"),
-                                                     0,
-                                                     0));
-         }
-         resultSet.close();
-
-         return domainPermissionsMap;
-      }
-      catch (SQLException e) {
-         throw new RuntimeException(e);
-      }
-      finally {
-         closeStatement(statement);
-      }
-   }
-
-   public void addDomainSysPermissions(SQLConnection connection,
-                                       Resource accessorResource,
-                                       Resource grantorResource,
-                                       Id<DomainId> resourceDomainId,
-                                       Set<DomainPermission> requestedDomainPermissions) {
-      SQLStatement statement = null;
-
-      try {
-         statement = connection.prepareStatement(sqlStrings.SQL_createInGrantDomainPermissionSys_WITH_AccessorID_GrantorID_AccessedDomainID_IsWithGrant_SysPermissionID);
-
-         for (DomainPermission domainPermission : requestedDomainPermissions) {
-            statement.setResourceId(1, accessorResource);
-            statement.setResourceId(2, grantorResource);
-            statement.setResourceDomainId(3, resourceDomainId);
-            statement.setBoolean(4, domainPermission.isWithGrant());
-            statement.setDomainSystemPermissionId(5, domainPermission.getSystemPermissionId());
-
-            assertOneRowInserted(statement.executeUpdate());
-         }
-      }
-      catch (SQLException e) {
-         throw new RuntimeException(e);
-      }
-      finally {
-         closeStatement(statement);
-      }
-   }
-
-   public void updateDomainSysPermissions(SQLConnection connection,
-                                          Resource accessorResource,
-                                          Resource grantorResource,
-                                          Id<DomainId> resourceDomainId,
-                                          Set<DomainPermission> requestedDomainPermissions) {
-      SQLStatement statement = null;
-
-      try {
-         statement = connection.prepareStatement(sqlStrings.SQL_updateInGrantDomainPermissionSys_SET_GrantorID_IsWithGrant_BY_AccessorID_AccessedDomainID_SysPermissionID);
-
-         for (DomainPermission domainPermission : requestedDomainPermissions) {
-            statement.setResourceId(1, grantorResource);
-            statement.setBoolean(2, domainPermission.isWithGrant());
-            statement.setResourceId(3, accessorResource);
-            statement.setResourceDomainId(4, resourceDomainId);
-            statement.setDomainSystemPermissionId(5, domainPermission.getSystemPermissionId());
-
-            assertOneRowUpdated(statement.executeUpdate());
-         }
-      }
-      catch (SQLException e) {
-         throw new RuntimeException(e);
-      }
-      finally {
-         closeStatement(statement);
-      }
-   }
-
-   public void removeAllDomainSysPermissions(SQLConnection connection,
-                                             Resource accessorResource) {
-      SQLStatement statement = null;
-
-      try {
-         statement = connection.prepareStatement(sqlStrings.SQL_removeInGrantDomainPermissionSys_BY_AccessorID);
-         statement.setResourceId(1, accessorResource);
-         statement.executeUpdate();
-      }
-      catch (SQLException e) {
-         throw new RuntimeException(e);
-      }
-      finally {
-         closeStatement(statement);
-      }
-   }
-
-   public void removeAllDomainSysPermissions(SQLConnection connection,
-                                             Id<DomainId> domainId) {
-      SQLStatement statement = null;
-
-      try {
-         // chose strategy to perform recursive delete based on sql dialect
-         if (sqlStrings.sqlDialect == SQLDialect.DB2_10_5) {
-            // DB2 doesn't support recursive deletion, so we have to remove domain's children's accessors first
-
-            // get descendant domain Ids
-            statement = connection.prepareStatement(sqlStrings.SQL_findInDomain_DescendantResourceDomainID_BY_DomainID_ORDERBY_DomainLevel);
-            statement.setResourceDomainId(1, domainId);
-            SQLResult resultSet = statement.executeQuery();
-
-            List<Id<DomainId>> descendantDomainIds = new ArrayList<>();
-
-            while (resultSet.next()) {
-               descendantDomainIds.add(resultSet.getResourceDomainId("DomainId"));
-            }
-
-            // delete domains' accessors (in reverse order of domainLevel, to preserve FK constraints)
-            statement = connection.prepareStatement(sqlStrings.SQL_removeInGrantDomainPermissionSys_BY_AccessedDomainID);
-
-            for (int i=descendantDomainIds.size()-1; i >= 0; i--) {
-               statement.setResourceDomainId(1, descendantDomainIds.get(i));
-               statement.executeUpdate();
-            }
-         }
-         else {
-            // prepare the standard recursive delete statement for domain and its children
-            statement = connection.prepareStatement(sqlStrings.SQL_removeInGrantDomainPermissionSys_withDescendants_BY_AccessedDomainID);
-            statement.setResourceDomainId(1, domainId);
-            statement.executeUpdate();
-         }
-      }
-      catch (SQLException e) {
-         throw new RuntimeException(e);
-      }
-      finally {
-         closeStatement(statement);
-      }
-   }
-
-   public void removeDomainSysPermissions(SQLConnection connection,
-                                          Resource accessorResource,
-                                          Id<DomainId> resourceDomainId) {
-      SQLStatement statement = null;
-
-      try {
-         statement = connection.prepareStatement(sqlStrings.SQL_removeInGrantDomainPermissionSys_BY_AccessorID_AccessedDomainID);
-         statement.setResourceId(1, accessorResource);
-         statement.setResourceDomainId(2, resourceDomainId);
-         statement.executeUpdate();
-      }
-      catch (SQLException e) {
-         throw new RuntimeException(e);
-      }
-      finally {
-         closeStatement(statement);
-      }
-   }
-
-   public void removeDomainSysPermissions(SQLConnection connection,
-                                          Resource accessorResource,
-                                          Id<DomainId> resourceDomainId,
-                                          Set<DomainPermission> requestedDomainPermissions) {
-      SQLStatement statement = null;
-
-      try {
-         statement = connection.prepareStatement(sqlStrings.SQL_removeInGrantDomainPermissionSys_BY_AccessorID_AccessedDomainID_SysPermissionID);
-         for (DomainPermission domainPermission : requestedDomainPermissions) {
-            statement.setResourceId(1, accessorResource);
-            statement.setResourceDomainId(2, resourceDomainId);
-            statement.setDomainSystemPermissionId(3, domainPermission.getSystemPermissionId());
-
-            assertOneRowUpdated(statement.executeUpdate());
-         }
-      }
-      catch (SQLException e) {
-         throw new RuntimeException(e);
-      }
-      finally {
-         closeStatement(statement);
-      }
-   }
+   void removeDomainSysPermissions(SQLConnection connection,
+                                   Resource accessorResource,
+                                   Id<DomainId> resourceDomainId,
+                                   Set<DomainPermission> requestedDomainPermissions);
 }

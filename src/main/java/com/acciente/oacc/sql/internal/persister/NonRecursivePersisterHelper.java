@@ -100,4 +100,75 @@ public class NonRecursivePersisterHelper {
 
       return allDomainIds;
    }
+
+   protected static Set<String> getDescendantDomainNames(SQLStrings sqlStrings,
+                                                         SQLConnection connection,
+                                                         String parentDomainName) throws SQLException {
+      SQLStatement statement = null;
+      Set<String> allDomainNames = new HashSet<>();
+      allDomainNames.add(parentDomainName);
+      Set<String> previousDomainNames = new HashSet<>(allDomainNames);
+
+      try {
+         statement = connection.prepareStatement(sqlStrings.SQL_findInDomain_DirectDescendantResourceDomainName_BY_ResourceDomainName);
+
+         while (!previousDomainNames.isEmpty()) {
+            Set<String> newestDomainNames = new HashSet<>();
+
+            for (String domainName : previousDomainNames) {
+               statement.setString(1, domainName);
+               SQLResult resultSet = statement.executeQuery();
+
+               while (resultSet.next()) {
+                  newestDomainNames.add(resultSet.getString("DomainName"));
+               }
+               resultSet.close();
+            }
+            allDomainNames.addAll(newestDomainNames);
+            previousDomainNames = newestDomainNames;
+         }
+      }
+      catch (SQLException e) {
+         throw new RuntimeException(e);
+      }
+      finally {
+         Persister.closeStatement(statement);
+      }
+
+      return allDomainNames;
+   }
+
+   protected static Set<Id<DomainId>> getAncestorDomainIds(SQLStrings sqlStrings,
+                                                           SQLConnection connection,
+                                                           Id<DomainId> domainId) throws SQLException {
+      SQLStatement statement = null;
+      Set<Id<DomainId>> ancestorDomainIds = new HashSet<>();
+      ancestorDomainIds.add(domainId);
+      int previousSize = 0;
+
+      try {
+         statement = connection.prepareStatement(sqlStrings.SQL_findInDomain_ParentResourceDomainName_BY_DomainID);
+         Id<DomainId> parentDomainId = domainId;
+
+         while (previousSize < ancestorDomainIds.size()) {
+            previousSize = ancestorDomainIds.size();
+            statement.setResourceDomainId(1, parentDomainId);
+            SQLResult resultSet = statement.executeQuery();
+
+            if (resultSet.next()) {
+               parentDomainId = resultSet.getResourceDomainId("DomainId");
+               ancestorDomainIds.add(parentDomainId);
+            }
+            resultSet.close();
+         }
+      }
+      catch (SQLException e) {
+         throw new RuntimeException(e);
+      }
+      finally {
+         Persister.closeStatement(statement);
+      }
+
+      return ancestorDomainIds;
+   }
 }
