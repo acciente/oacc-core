@@ -35,6 +35,7 @@ import com.acciente.oacc.ResourcePermission;
 import com.acciente.oacc.ResourcePermissions;
 import com.acciente.oacc.Resources;
 import com.acciente.oacc.sql.SQLType;
+import com.acciente.oacc.sql.internal.persister.CommonResourcePersister;
 import com.acciente.oacc.sql.internal.persister.DomainPersister;
 import com.acciente.oacc.sql.internal.persister.GrantDomainCreatePermissionPostCreateSysPersister;
 import com.acciente.oacc.sql.internal.persister.GrantDomainCreatePermissionSysPersister;
@@ -51,11 +52,13 @@ import com.acciente.oacc.sql.internal.persister.NonRecursiveGrantDomainCreatePer
 import com.acciente.oacc.sql.internal.persister.NonRecursiveGrantDomainCreatePermissionSysPersister;
 import com.acciente.oacc.sql.internal.persister.NonRecursiveGrantDomainPermissionSysPersister;
 import com.acciente.oacc.sql.internal.persister.NonRecursiveGrantResourcePermissionPersister;
+import com.acciente.oacc.sql.internal.persister.NonRecursiveResourcePersister;
 import com.acciente.oacc.sql.internal.persister.RecursiveDomainPersister;
 import com.acciente.oacc.sql.internal.persister.RecursiveGrantDomainCreatePermissionPostCreateSysPersister;
 import com.acciente.oacc.sql.internal.persister.RecursiveGrantDomainCreatePermissionSysPersister;
 import com.acciente.oacc.sql.internal.persister.RecursiveGrantDomainPermissionSysPersister;
 import com.acciente.oacc.sql.internal.persister.RecursiveGrantResourcePermissionPersister;
+import com.acciente.oacc.sql.internal.persister.RecursiveResourcePersister;
 import com.acciente.oacc.sql.internal.persister.ResourceClassPermissionPersister;
 import com.acciente.oacc.sql.internal.persister.ResourceClassPersister;
 import com.acciente.oacc.sql.internal.persister.ResourcePersister;
@@ -263,7 +266,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
          domainPersister
                = new RecursiveDomainPersister(sqlStrings);
          resourcePersister
-               = new ResourcePersister(sqlStrings);
+               = new RecursiveResourcePersister(sqlStrings);
          grantResourceCreatePermissionSysPersister
                = new GrantResourceCreatePermissionSysPersister(sqlStrings);
          grantResourceCreatePermissionPostCreateSysPersister
@@ -289,7 +292,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
          domainPersister
                = new NonRecursiveDomainPersister(sqlStrings);
          resourcePersister
-               = new ResourcePersister(sqlStrings);
+               = new NonRecursiveResourcePersister(sqlStrings);
          grantResourceCreatePermissionSysPersister
                = new GrantResourceCreatePermissionSysPersister(sqlStrings);
          grantResourceCreatePermissionPostCreateSysPersister
@@ -762,7 +765,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       }
 
       // check if the domain is empty (=domain must not contain any resources, and none in any descendant domains)
-      if (resourcePersister.getResourceCountForDomain(connection, domainId) > 0) {
+      if (!resourcePersister.isDomainEmpty(connection, domainId)) {
          throw new IllegalArgumentException("Deleting a domain ("
                                                   + domainName
                                                   + ") that contains resources directly or in a descendant domain is invalid");

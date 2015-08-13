@@ -106,14 +106,17 @@ public class SQLStrings implements Serializable {
    // GrantResourcePermissionSys
    public final String SQL_findInGrantResourcePermissionSys_ResourceID_BY_AccessedID_ResourceClassID_SysPermissionID_IsWithGrant;
 
-   // Resource
+   // Resource - common
    public final String SQL_findInResource_COUNTResourceID_BY_ResourceClassID_DomainID;
-   public final String SQL_findInResource_COUNTResourceID_BY_DomainID;
    public final String SQL_createInResource_WITH_ResourceID_ResourceClassID_DomainID;
    public final String SQL_removeInResource_BY_ResourceID;
    public final String SQL_findInResource_ResourceId_BY_ResourceID;
    public final String SQL_findInResource_DomainID_BY_ResourceID;
    public final String SQL_findInResource_withoutInheritance_ResourceId_BY_ResourceClassID_DomainID;
+   // Resource - recursive
+   public final String SQL_findInResource_COUNTResourceID_BY_DomainID;
+   // Resource - non-recursive
+   public final String SQL_findInResource_withoutInheritance_COUNTResourceID_BY_DomainID;
 
    // GrantResourceCreatePermissionSys
    public final String SQL_findInGrantResourceCreatePermissionSys_SysPermissionId_IsWithGrant_InheritLevel_DomainLevel_BY_AccessorID_AccessedDomainID_ResourceClassID;
@@ -726,18 +729,11 @@ public class SQLStrings implements Serializable {
             + "Grant_ResPerm_Sys "
             + "WHERE AccessedResourceId = ? AND ResourceClassId = ? AND SysPermissionId = ? AND ( ? IN ( 0, IsWithGrant ) )";
 
-      // Resource: finder methods used by getSingletonResource()
+      // Resource - common
       SQL_findInResource_COUNTResourceID_BY_ResourceClassID_DomainID
             = "SELECT COUNT( ResourceId ) COUNTResourceID FROM "
             + schemaNameAndTablePrefix
             + "Resource WHERE ResourceClassId = ? AND DomainId = ?";
-
-      SQL_findInResource_COUNTResourceID_BY_DomainID
-            = withClause + " "
-            + SQL_findDescendantsRecursiveInDomain_DomainID_DomainLevel_BY_DomainID
-            + "SELECT COUNT( ResourceId ) COUNTResourceID FROM "
-            + schemaNameAndTablePrefix
-            + "Resource C JOIN S ON S.DomainId = C.DomainId";
 
       SQL_createInResource_WITH_ResourceID_ResourceClassID_DomainID
             = "INSERT INTO "
@@ -747,7 +743,6 @@ public class SQLStrings implements Serializable {
       SQL_removeInResource_BY_ResourceID
             = "DELETE FROM " + schemaNameAndTablePrefix + "Resource WHERE ResourceId = ?";
 
-      // Resource
       SQL_findInResource_ResourceId_BY_ResourceID
             = "SELECT ResourceId FROM " + schemaNameAndTablePrefix + "Resource WHERE ResourceId = ?";
 
@@ -756,6 +751,20 @@ public class SQLStrings implements Serializable {
 
       SQL_findInResource_withoutInheritance_ResourceId_BY_ResourceClassID_DomainID
             = "SELECT ResourceId FROM " + schemaNameAndTablePrefix + "Resource WHERE ResourceClassId = ? AND DomainId = ?";
+
+      // Resource - recursive
+      SQL_findInResource_COUNTResourceID_BY_DomainID
+            = withClause + " "
+            + SQL_findDescendantsRecursiveInDomain_DomainID_DomainLevel_BY_DomainID
+            + "SELECT COUNT( ResourceId ) COUNTResourceID FROM "
+            + schemaNameAndTablePrefix
+            + "Resource C JOIN S ON S.DomainId = C.DomainId";
+
+      // Resource - non-recursive
+      SQL_findInResource_withoutInheritance_COUNTResourceID_BY_DomainID
+            = "SELECT COUNT( ResourceId ) COUNTResourceID FROM "
+            + schemaNameAndTablePrefix
+            + "Resource WHERE DomainId = ?";
 
       // GrantResourceCreatePermissionSys
       SQL_findInGrantResourceCreatePermissionSys_SysPermissionId_IsWithGrant_InheritLevel_DomainLevel_BY_AccessorID_AccessedDomainID_ResourceClassID
