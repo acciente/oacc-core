@@ -243,20 +243,23 @@ public class TestAccessControl_getEffectiveResourceCreatePermissions extends Tes
       assertThat(parentResourceCreatePermissions_post, is(parentResourceCreatePermissions_pre));
 
       final Set<ResourceCreatePermission> childResourceCreatePermissions_post
-            = accessControlContext.getEffectiveResourceCreatePermissions(accessorResource, resourceClassName, childDomainName);
+            = accessControlContext.getEffectiveResourceCreatePermissions(accessorResource,
+                                                                         resourceClassName,
+                                                                         childDomainName);
       assertThat(childResourceCreatePermissions_post, is(childResourceCreatePermissions_expected));
 
       final Map<String, Map<String, Set<ResourceCreatePermission>>> allCreatePermissions
             = accessControlContext.getEffectiveResourceCreatePermissionsMap(accessorResource);
       assertThat(allCreatePermissions.size(), is(2));
-      final Map<String, Set<ResourceCreatePermission>> createPermsByResourceClass_customDomain
+      final Map<String, Set<ResourceCreatePermission>> createPermsByResourceClass_parentDomain
             = allCreatePermissions.get(parentDomainName);
-      assertThat(createPermsByResourceClass_customDomain.size(), is(1));
-      assertThat(createPermsByResourceClass_customDomain.get(resourceClassName), is(parentResourceCreatePermissions_pre));
-      final Map<String, Set<ResourceCreatePermission>> createPermsByResourceClass_sysDomain
+      assertThat(createPermsByResourceClass_parentDomain.size(), is(1));
+      assertThat(createPermsByResourceClass_parentDomain.get(resourceClassName),
+                 is(parentResourceCreatePermissions_pre));
+      final Map<String, Set<ResourceCreatePermission>> createPermsByResourceClass_childDomain
             = allCreatePermissions.get(childDomainName);
-      assertThat(createPermsByResourceClass_sysDomain.size(), is(1));
-      assertThat(createPermsByResourceClass_sysDomain.get(resourceClassName), is(childResourceCreatePermissions_expected));
+      assertThat(createPermsByResourceClass_childDomain.size(), is(1));
+      assertThat(createPermsByResourceClass_childDomain.get(resourceClassName), is(childResourceCreatePermissions_expected));
    }
 
    @Test
