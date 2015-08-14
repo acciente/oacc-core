@@ -144,18 +144,19 @@ public class SQLStrings implements Serializable {
    public final String SQL_findInGrantResourceCreatePermissionPostCreateSys_PostCreateSysPermissionID_PostCreateIsWithGrant_IsWithGrant_InheritLevel_DomainLevel_BY_AccessorID_AccessedDomainID_ResourceClassID;
    public final String SQL_findInGrantResourceCreatePermissionPostCreateSys_ResourceDomainName_ResourceClassName_PostCreateSysPermissionID_PostCreateIsWithGrant_IsWithGrant_InheritLevel_DomainLevel_BY_AccessorID;
    public final String SQL_removeInGrantResourceCreatePermissionPostCreateSys_withDescendants_BY_AccessedDomainID;
-   // GrantResourceCreatePermissionPostCreate
-   public final String SQL_findInGrantResourceCreatePermissionPostCreate_ResourceClassName_PostCreatePermissionName_PostCreateIsWithGrant_IsWithGrant_InheritLevel_DomainLevel_BY_AccessorID_AccessedDomainID_ResourceClassID;
+   // GrantResourceCreatePermissionPostCreate - common
    public final String SQL_findInGrantResourceCreatePermissionPostCreate_withoutInheritance_PostCreatePermissionName_PostCreateIsWithGrant_IsWithGrant_BY_AccessorID_AccessedDomainID_ResourceClassID;
-   public final String SQL_findInGrantResourceCreatePermissionPostCreate_ResourceDomainName_ResourceClassName_PostCreatePermissionName_PostCreateIsWithGrant_IsWithGrant_InheritLevel_DomainLevel_BY_AccessorID;
    public final String SQL_findInGrantResourceCreatePermissionPostCreate_withoutInheritance_ResourceDomainName_ResourceClassName_PostCreatePermissionName_PostCreateIsWithGrant_IsWithGrant_BY_AccessorID;
    public final String SQL_createInGrantResourceCreatePermissionPostCreate_WITH_AccessorID_GrantorID_AccessedDomainID_IsWithGrant_PostCreateIsWithGrant_ResourceClassID_PostCreatePermissionName;
    public final String SQL_updateInGrantResourceCreatePermissionPostCreate_SET_GrantorID_IsWithGrant_PostCreateIsWithGrant_BY_AccessorID_AccessedDomainID_ResourceClassID_PostCreatePermissionName;
    public final String SQL_removeInGrantResourceCreatePermissionPostCreate_BY_AccessorID;
    public final String SQL_removeInGrantResourceCreatePermissionPostCreate_BY_AccessedDomainId;
-   public final String SQL_removeInGrantResourceCreatePermissionPostCreate_withDescendants_BY_AccessedDomainId;
    public final String SQL_removeInGrantResourceCreatePermissionPostCreate_BY_AccessorID_AccessedDomainID_ResourceClassID;
    public final String SQL_removeInGrantResourceCreatePermissionPostCreate_BY_AccessorID_AccessedDomainID_ResourceClassID_PostCreatePermissionName;
+   // GrantResourceCreatePermissionPostCreate - recursive
+   public final String SQL_findInGrantResourceCreatePermissionPostCreate_ResourceClassName_PostCreatePermissionName_PostCreateIsWithGrant_IsWithGrant_InheritLevel_DomainLevel_BY_AccessorID_AccessedDomainID_ResourceClassID;
+   public final String SQL_findInGrantResourceCreatePermissionPostCreate_ResourceDomainName_ResourceClassName_PostCreatePermissionName_PostCreateIsWithGrant_IsWithGrant_InheritLevel_DomainLevel_BY_AccessorID;
+   public final String SQL_removeInGrantResourceCreatePermissionPostCreate_withDescendants_BY_AccessedDomainId;
 
    // GrantResourcePermissionSys
    public final String SQL_findInGrantResourcePermissionSys_ResourceClassName_SysPermissionID_IsWithGrant_InheritLevel_BY_AccessorID_AccessedID;
@@ -956,21 +957,7 @@ public class SQLStrings implements Serializable {
                       + schemaNameAndTablePrefix
                       + "Grant_ResCrPerm_PostCr_Sys WHERE AccessedDomainId IN ( SELECT DomainId FROM S )";
 
-      // GrantResourceCreatePermissionPostCreate
-      SQL_findInGrantResourceCreatePermissionPostCreate_ResourceClassName_PostCreatePermissionName_PostCreateIsWithGrant_IsWithGrant_InheritLevel_DomainLevel_BY_AccessorID_AccessedDomainID_ResourceClassID
-            = SQL_findRecursiveInGrantResourcePermissionSys_AccessorID_InheritLevel_BY_AccessorID
-            + SQL_findAncestorsRecursiveInDomain_DomainID_DomainLevel_BY_DomainID
-            + "SELECT C.ResourceClassName, B.PermissionName PostCreatePermissionName, A.PostCreateIsWithGrant, A.IsWithGrant, N.InheritLevel, R.DomainLevel FROM "
-            + schemaNameAndTablePrefix
-            + "Grant_ResCrPerm_PostCr A JOIN "
-            + schemaNameAndTablePrefix
-            + "ResourceClassPermission B ON B.ResourceClassId = A.ResourceClassId AND B.PermissionId = A.PostCreatePermissionId JOIN "
-            + schemaNameAndTablePrefix
-            + "ResourceClass C ON C.ResourceClassId = A.ResourceClassId "
-            + "JOIN N ON N.AccessorResourceId = A.AccessorResourceId "
-            + "JOIN R ON R.DomainId = A.AccessedDomainId "
-            + "WHERE A.ResourceClassId = ?";
-
+      // GrantResourceCreatePermissionPostCreate - common
       SQL_findInGrantResourceCreatePermissionPostCreate_withoutInheritance_PostCreatePermissionName_PostCreateIsWithGrant_IsWithGrant_BY_AccessorID_AccessedDomainID_ResourceClassID
             = "SELECT B.PermissionName PostCreatePermissionName, A.PostCreateIsWithGrant, A.IsWithGrant FROM "
             + schemaNameAndTablePrefix
@@ -978,26 +965,6 @@ public class SQLStrings implements Serializable {
             + schemaNameAndTablePrefix
             + "ResourceClassPermission B ON B.ResourceClassId = A.ResourceClassId AND B.PermissionId = A.PostCreatePermissionId "
             + "WHERE A.AccessorResourceId = ? AND A.AccessedDomainId = ? AND A.ResourceClassId = ?";
-
-      SQL_findInGrantResourceCreatePermissionPostCreate_ResourceDomainName_ResourceClassName_PostCreatePermissionName_PostCreateIsWithGrant_IsWithGrant_InheritLevel_DomainLevel_BY_AccessorID
-            = SQL_findRecursiveInGrantResourcePermissionSys_AccessorID_InheritLevel_BY_AccessorID
-            + ", P( AccessedDomainId, ResourceClassId, PostCreatePermissionId, PostCreateIsWithGrant, IsWithGrant, InheritLevel, DomainLevel ) AS "
-            + "( SELECT A.AccessedDomainId, A.ResourceClassId, A.PostCreatePermissionId, A.PostCreateIsWithGrant, A.IsWithGrant, N.InheritLevel, 0 FROM "
-            + schemaNameAndTablePrefix
-            + "Grant_ResCrPerm_PostCr A "
-            + "JOIN N ON N.AccessorResourceId = A.AccessorResourceId "
-            + unionClause + " "
-            + "SELECT Pplus1.DomainId, P.ResourceClassId, P.PostCreatePermissionId, P.PostCreateIsWithGrant, P.IsWithGrant, P.InheritLevel, P.DomainLevel + 1 FROM "
-            + schemaNameAndTablePrefix
-            + "Domain Pplus1, P "
-            + "WHERE Pplus1.ParentDomainId IS NOT NULL AND Pplus1.ParentDomainId = P.AccessedDomainId ) "
-            + "SELECT D.DomainName, C.ResourceClassName, B.PermissionName PostCreatePermissionName, P.PostCreateIsWithGrant, P.IsWithGrant, P.InheritLevel, P.DomainLevel FROM P JOIN "
-            + schemaNameAndTablePrefix
-            + "ResourceClassPermission B ON B.ResourceClassId = P.ResourceClassId AND B.PermissionId = P.PostCreatePermissionId JOIN "
-            + schemaNameAndTablePrefix
-            + "ResourceClass C ON C.ResourceClassId = P.ResourceClassId JOIN "
-            + schemaNameAndTablePrefix
-            + "Domain D ON D.DomainId = P.AccessedDomainId";
 
       SQL_findInGrantResourceCreatePermissionPostCreate_withoutInheritance_ResourceDomainName_ResourceClassName_PostCreatePermissionName_PostCreateIsWithGrant_IsWithGrant_BY_AccessorID
             = "SELECT D.DomainName, C.ResourceClassName, B.PermissionName PostCreatePermissionName, A.PostCreateIsWithGrant, A.IsWithGrant FROM "
@@ -1038,6 +1005,54 @@ public class SQLStrings implements Serializable {
             + schemaNameAndTablePrefix
             + "Grant_ResCrPerm_PostCr WHERE AccessedDomainId = ?";
 
+      SQL_removeInGrantResourceCreatePermissionPostCreate_BY_AccessorID_AccessedDomainID_ResourceClassID
+            = "DELETE FROM "
+            + schemaNameAndTablePrefix
+            + "Grant_ResCrPerm_PostCr WHERE AccessorResourceId = ? AND AccessedDomainId = ? AND ResourceClassId = ?";
+
+      SQL_removeInGrantResourceCreatePermissionPostCreate_BY_AccessorID_AccessedDomainID_ResourceClassID_PostCreatePermissionName
+            = "DELETE FROM "
+            + schemaNameAndTablePrefix
+            + "Grant_ResCrPerm_PostCr WHERE AccessorResourceId = ? AND AccessedDomainId = ? AND ResourceClassId = ? AND PostCreatePermissionId = ( "
+            + "SELECT A.PermissionId FROM "
+            + schemaNameAndTablePrefix
+            + "ResourceClassPermission A WHERE A.ResourceClassId = ResourceClassId AND A.PermissionName = ? )";
+
+      // GrantResourceCreatePermissionPostCreate - recursive
+      SQL_findInGrantResourceCreatePermissionPostCreate_ResourceClassName_PostCreatePermissionName_PostCreateIsWithGrant_IsWithGrant_InheritLevel_DomainLevel_BY_AccessorID_AccessedDomainID_ResourceClassID
+            = SQL_findRecursiveInGrantResourcePermissionSys_AccessorID_InheritLevel_BY_AccessorID
+            + SQL_findAncestorsRecursiveInDomain_DomainID_DomainLevel_BY_DomainID
+            + "SELECT C.ResourceClassName, B.PermissionName PostCreatePermissionName, A.PostCreateIsWithGrant, A.IsWithGrant, N.InheritLevel, R.DomainLevel FROM "
+            + schemaNameAndTablePrefix
+            + "Grant_ResCrPerm_PostCr A JOIN "
+            + schemaNameAndTablePrefix
+            + "ResourceClassPermission B ON B.ResourceClassId = A.ResourceClassId AND B.PermissionId = A.PostCreatePermissionId JOIN "
+            + schemaNameAndTablePrefix
+            + "ResourceClass C ON C.ResourceClassId = A.ResourceClassId "
+            + "JOIN N ON N.AccessorResourceId = A.AccessorResourceId "
+            + "JOIN R ON R.DomainId = A.AccessedDomainId "
+            + "WHERE A.ResourceClassId = ?";
+
+      SQL_findInGrantResourceCreatePermissionPostCreate_ResourceDomainName_ResourceClassName_PostCreatePermissionName_PostCreateIsWithGrant_IsWithGrant_InheritLevel_DomainLevel_BY_AccessorID
+            = SQL_findRecursiveInGrantResourcePermissionSys_AccessorID_InheritLevel_BY_AccessorID
+            + ", P( AccessedDomainId, ResourceClassId, PostCreatePermissionId, PostCreateIsWithGrant, IsWithGrant, InheritLevel, DomainLevel ) AS "
+            + "( SELECT A.AccessedDomainId, A.ResourceClassId, A.PostCreatePermissionId, A.PostCreateIsWithGrant, A.IsWithGrant, N.InheritLevel, 0 FROM "
+            + schemaNameAndTablePrefix
+            + "Grant_ResCrPerm_PostCr A "
+            + "JOIN N ON N.AccessorResourceId = A.AccessorResourceId "
+            + unionClause + " "
+            + "SELECT Pplus1.DomainId, P.ResourceClassId, P.PostCreatePermissionId, P.PostCreateIsWithGrant, P.IsWithGrant, P.InheritLevel, P.DomainLevel + 1 FROM "
+            + schemaNameAndTablePrefix
+            + "Domain Pplus1, P "
+            + "WHERE Pplus1.ParentDomainId IS NOT NULL AND Pplus1.ParentDomainId = P.AccessedDomainId ) "
+            + "SELECT D.DomainName, C.ResourceClassName, B.PermissionName PostCreatePermissionName, P.PostCreateIsWithGrant, P.IsWithGrant, P.InheritLevel, P.DomainLevel FROM P JOIN "
+            + schemaNameAndTablePrefix
+            + "ResourceClassPermission B ON B.ResourceClassId = P.ResourceClassId AND B.PermissionId = P.PostCreatePermissionId JOIN "
+            + schemaNameAndTablePrefix
+            + "ResourceClass C ON C.ResourceClassId = P.ResourceClassId JOIN "
+            + schemaNameAndTablePrefix
+            + "Domain D ON D.DomainId = P.AccessedDomainId";
+
       SQL_removeInGrantResourceCreatePermissionPostCreate_withDescendants_BY_AccessedDomainId
             = (SQLDialect.DB2_10_5.equals(sqlDialect))
               ? null
@@ -1053,19 +1068,6 @@ public class SQLStrings implements Serializable {
                       + "DELETE FROM "
                       + schemaNameAndTablePrefix
                       + "Grant_ResCrPerm_PostCr WHERE AccessedDomainId IN ( SELECT DomainId FROM S )";
-
-      SQL_removeInGrantResourceCreatePermissionPostCreate_BY_AccessorID_AccessedDomainID_ResourceClassID
-            = "DELETE FROM "
-            + schemaNameAndTablePrefix
-            + "Grant_ResCrPerm_PostCr WHERE AccessorResourceId = ? AND AccessedDomainId = ? AND ResourceClassId = ?";
-
-      SQL_removeInGrantResourceCreatePermissionPostCreate_BY_AccessorID_AccessedDomainID_ResourceClassID_PostCreatePermissionName
-            = "DELETE FROM "
-            + schemaNameAndTablePrefix
-            + "Grant_ResCrPerm_PostCr WHERE AccessorResourceId = ? AND AccessedDomainId = ? AND ResourceClassId = ? AND PostCreatePermissionId = ( "
-            + "SELECT A.PermissionId FROM "
-            + schemaNameAndTablePrefix
-            + "ResourceClassPermission A WHERE A.ResourceClassId = ResourceClassId AND A.PermissionName = ? )";
 
       // ResourceSysPermission
       SQL_findInGrantResourcePermissionSys_ResourceClassName_SysPermissionID_IsWithGrant_InheritLevel_BY_AccessorID_AccessedID
