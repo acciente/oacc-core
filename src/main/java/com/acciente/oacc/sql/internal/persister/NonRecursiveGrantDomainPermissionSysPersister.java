@@ -26,8 +26,10 @@ import com.acciente.oacc.sql.internal.persister.id.ResourceClassId;
 import com.acciente.oacc.sql.internal.persister.id.ResourceId;
 
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -66,9 +68,10 @@ public class NonRecursiveGrantDomainPermissionSysPersister extends CommonGrantDo
          // then get all the descendants of the directly accessible domains
          final Set<Id<DomainId>> accessibleDomainIds = new HashSet<>();
          for (Id<DomainId> directDomainId : directDomainIds) {
-            accessibleDomainIds.addAll(NonRecursivePersisterHelper.getDescendantDomainIds(sqlStrings,
-                                                                                          connection,
-                                                                                          directDomainId));
+            accessibleDomainIds
+                  .addAll(NonRecursivePersisterHelper.getDescendantDomainIdsOrderedByAscendingLevel(sqlStrings,
+                                                                                                    connection,
+                                                                                                    directDomainId));
          }
 
          // now get resources of the specified class that the session has access to via domain super user permissions
@@ -127,15 +130,17 @@ public class NonRecursiveGrantDomainPermissionSysPersister extends CommonGrantDo
          // then get all the descendants of the directly accessible domains
          final Set<Id<DomainId>> accessibleDomainIds = new HashSet<>();
          for (Id<DomainId> directDomainId : directDomainIds) {
-            accessibleDomainIds.addAll(NonRecursivePersisterHelper.getDescendantDomainIds(sqlStrings,
-                                                                                          connection,
-                                                                                          directDomainId));
+            accessibleDomainIds
+                  .addAll(NonRecursivePersisterHelper.getDescendantDomainIdsOrderedByAscendingLevel(sqlStrings,
+                                                                                                    connection,
+                                                                                                    directDomainId));
          }
 
          // also get the descendents of the specified domain
-         final Set<Id<DomainId>> descendantDomainIds = NonRecursivePersisterHelper.getDescendantDomainIds(sqlStrings,
-                                                                                                          connection,
-                                                                                                          resourceDomainId);
+         final Set<Id<DomainId>> descendantDomainIds
+               = NonRecursivePersisterHelper.getDescendantDomainIdsOrderedByAscendingLevel(sqlStrings,
+                                                                                           connection,
+                                                                                           resourceDomainId);
 
          // next, filter the accessible domains by the specified sub-domains
          accessibleDomainIds.retainAll(descendantDomainIds);
@@ -254,7 +259,7 @@ public class NonRecursiveGrantDomainPermissionSysPersister extends CommonGrantDo
          }
 
          // then apply each domain's direct permissions to all its descendants
-         // !! DON'T UPDATE THE PERMISSION-MAP WHILE ITERATING OVER ITS KEY-SET !!
+         // !! DON'T UPDATE THE PERMISSION-MAP WHILE ITERATING OVER ITS KEY-SET !! (get a copy of the key-set instead)
          Set<String> directDomainNames = new HashSet<>(domainPermissionsMap.keySet());
          for (String directDomainName : directDomainNames) {
             Set<String> descendentDomains = NonRecursivePersisterHelper.getDescendantDomainNames(sqlStrings,
@@ -269,7 +274,9 @@ public class NonRecursiveGrantDomainPermissionSysPersister extends CommonGrantDo
                   domainPermissionsMap.put(descendentDomain, domainPermissions);
                }
 
-               domainPermissions.addAll(domainPermissionsMap.get(directDomainName));
+               if (!descendentDomain.equals(directDomainName)) {
+                  domainPermissions.addAll(domainPermissionsMap.get(directDomainName));
+               }
             }
          }
 
@@ -282,4 +289,32 @@ public class NonRecursiveGrantDomainPermissionSysPersister extends CommonGrantDo
          closeStatement(statement);
       }
    }
+
+   @Override
+   public void removeAllDomainSysPermissions(SQLConnection connection, Id<DomainId> domainId) {
+      SQLStatement statement = null;
+
+      try {
+         // get descendant domain Ids
+         List<Id<DomainId>> descendantDomainIds
+               = new ArrayList<>(NonRecursivePersisterHelper.getDescendantDomainIdsOrderedByAscendingLevel(sqlStrings,
+                                                                                                           connection,
+                                                                                                           domainId));
+
+         // delete domains' accessors (in reverse order of domainLevel, to preserve FK constraints)
+         statement = connection.prepareStatement(sqlStrings.SQL_removeInGrantDomainPermissionSys_BY_AccessedDomainID);
+
+         for (int i=descendantDomainIds.size()-1; i >= 0; i--) {
+            statement.setResourceDomainId(1, descendantDomainIds.get(i));
+            statement.executeUpdate();
+         }
+      }
+      catch (SQLException e) {
+         throw new RuntimeException(e);
+      }
+      finally {
+         closeStatement(statement);
+      }
+   }
+
 }

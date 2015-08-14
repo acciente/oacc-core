@@ -36,9 +36,10 @@ public class NonRecursiveResourcePersister extends CommonResourcePersister {
          boolean isEmpty = true;
          SQLResult resultSet;
 
-         final Set<Id<DomainId>> descendantDomainIds = NonRecursivePersisterHelper.getDescendantDomainIds(sqlStrings,
-                                                                                                          connection,
-                                                                                                          domainId);
+         final Set<Id<DomainId>> descendantDomainIds
+               = NonRecursivePersisterHelper.getDescendantDomainIdsOrderedByAscendingLevel(sqlStrings,
+                                                                                           connection,
+                                                                                           domainId);
 
          statement = connection.prepareStatement(sqlStrings.SQL_findInResource_withoutInheritance_COUNTResourceID_BY_DomainID);
          for (Id<DomainId> descendantDomainId : descendantDomainIds) {

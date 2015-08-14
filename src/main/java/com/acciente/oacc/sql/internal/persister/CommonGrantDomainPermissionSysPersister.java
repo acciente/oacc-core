@@ -25,10 +25,8 @@ import com.acciente.oacc.sql.internal.persister.id.Id;
 import com.acciente.oacc.sql.internal.persister.id.ResourceClassId;
 
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -214,37 +212,7 @@ public abstract class CommonGrantDomainPermissionSysPersister extends Persister 
    }
 
    @Override
-   public void removeAllDomainSysPermissions(SQLConnection connection,
-                                             Id<DomainId> domainId) {
-      SQLStatement statement = null;
-
-      try {
-         // get descendant domain Ids
-         statement = connection.prepareStatement(sqlStrings.SQL_findInDomain_DescendantResourceDomainID_BY_DomainID_ORDERBY_DomainLevel);
-         statement.setResourceDomainId(1, domainId);
-         SQLResult resultSet = statement.executeQuery();
-
-         List<Id<DomainId>> descendantDomainIds = new ArrayList<>();
-
-         while (resultSet.next()) {
-            descendantDomainIds.add(resultSet.getResourceDomainId("DomainId"));
-         }
-
-         // delete domains' accessors (in reverse order of domainLevel, to preserve FK constraints)
-         statement = connection.prepareStatement(sqlStrings.SQL_removeInGrantDomainPermissionSys_BY_AccessedDomainID);
-
-         for (int i=descendantDomainIds.size()-1; i >= 0; i--) {
-            statement.setResourceDomainId(1, descendantDomainIds.get(i));
-            statement.executeUpdate();
-         }
-      }
-      catch (SQLException e) {
-         throw new RuntimeException(e);
-      }
-      finally {
-         closeStatement(statement);
-      }
-   }
+   public abstract void removeAllDomainSysPermissions(SQLConnection connection, Id<DomainId> domainId) ;
 
    @Override
    public void removeDomainSysPermissions(SQLConnection connection,

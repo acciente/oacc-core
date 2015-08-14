@@ -98,7 +98,9 @@ public class NonRecursiveGrantResourcePermissionPersister extends CommonGrantRes
 
          // then get all the descendants of the specified domain
          final Set<Id<DomainId>> descendantDomainIds
-               = NonRecursivePersisterHelper.getDescendantDomainIds(sqlStrings, connection, resourceDomainId);
+               = NonRecursivePersisterHelper.getDescendantDomainIdsOrderedByAscendingLevel(sqlStrings,
+                                                                                           connection,
+                                                                                           resourceDomainId);
 
          // now accumulate the objects of the specified type that each (inherited) accessor
          // has the specified permission to in each of the descendant domains

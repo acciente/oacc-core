@@ -100,16 +100,10 @@ public class NonRecursiveDomainPersister extends CommonDomainPersister {
 
       try {
          // get descendant domain Ids
-         statement = connection
-               .prepareStatement(sqlStrings.SQL_findInDomain_DescendantResourceDomainID_BY_DomainID_ORDERBY_DomainLevel);
-         statement.setResourceDomainId(1, domainId);
-         SQLResult resultSet = statement.executeQuery();
-
-         List<Id<DomainId>> descendantDomainIds = new ArrayList<>();
-
-         while (resultSet.next()) {
-            descendantDomainIds.add(resultSet.getResourceDomainId("DomainId"));
-         }
+         List<Id<DomainId>> descendantDomainIds
+               = new ArrayList<>(NonRecursivePersisterHelper.getDescendantDomainIdsOrderedByAscendingLevel(sqlStrings,
+                                                                                                           connection,
+                                                                                                           domainId));
 
          // delete descendant domains one at a time, in reverse order of domainLevel, to preserve FK constraints
          statement = connection.prepareStatement(sqlStrings.SQL_removeInDomain_BY_DomainID);

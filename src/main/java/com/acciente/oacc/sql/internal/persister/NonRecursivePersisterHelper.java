@@ -24,6 +24,7 @@ import com.acciente.oacc.sql.internal.persister.id.ResourceId;
 
 import java.sql.SQLException;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Set;
 
 public class NonRecursivePersisterHelper {
@@ -64,11 +65,11 @@ public class NonRecursivePersisterHelper {
       return allAccessorResourceIds;
    }
 
-   protected static Set<Id<DomainId>> getDescendantDomainIds(SQLStrings sqlStrings,
-                                                             SQLConnection connection,
-                                                             Id<DomainId> parentDomainId) throws SQLException {
+   protected static Set<Id<DomainId>> getDescendantDomainIdsOrderedByAscendingLevel(SQLStrings sqlStrings,
+                                                                                    SQLConnection connection,
+                                                                                    Id<DomainId> parentDomainId) throws SQLException {
       SQLStatement statement = null;
-      Set<Id<DomainId>> allDomainIds = new HashSet<>();
+      Set<Id<DomainId>> allDomainIds = new LinkedHashSet<>();
       allDomainIds.add(parentDomainId);
       Set<Id<DomainId>> previousDomainIds = new HashSet<>(allDomainIds);
 
