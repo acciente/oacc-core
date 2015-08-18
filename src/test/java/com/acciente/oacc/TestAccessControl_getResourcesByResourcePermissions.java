@@ -816,6 +816,81 @@ public class TestAccessControl_getResourcesByResourcePermissions extends TestAcc
    }
 
    @Test
+   public void getResourcesByResourcePermissions_domainInherited_systemPermission_validAsAuthenticated() {
+      authenticateSystemResource();
+
+      final char[] password = generateUniquePassword();
+      final Resource accessorResource = generateAuthenticatableResource(password);
+
+      final String parentDomain = generateDomain();
+      final String childDomain1 = generateChildDomain(parentDomain);
+      final String childDomain2 = generateChildDomain(parentDomain);
+      final String queriedResourceClass = generateResourceClass(false, false);
+      final String queriedPermission = ResourcePermissions.QUERY;
+      final String unqueriedPermissionName = generateResourceClassPermission(queriedResourceClass);
+      final Resource resource_parentDomain = accessControlContext.createResource(queriedResourceClass, parentDomain);
+      final Resource resource_childDomain1 = accessControlContext.createResource(queriedResourceClass, childDomain1);
+      final Resource resource_childDomain2 = accessControlContext.createResource(queriedResourceClass, childDomain2);
+
+      final String unqueriedDomain = generateDomain();
+      final String unqueriedResourceClass = generateResourceClass(false, false);
+      accessControlContext.createResourcePermission(unqueriedResourceClass, unqueriedPermissionName);
+      final Resource resource_unqueriedClassChildDomain1
+            = accessControlContext.createResource(unqueriedResourceClass, childDomain1);
+      final Resource resource_unqueriedClassUnqueriedDomain
+            = accessControlContext.createResource(unqueriedResourceClass, unqueriedDomain);
+
+      // set global permission for accessor
+      accessControlContext.setGlobalResourcePermissions(accessorResource,
+                                                        queriedResourceClass,
+                                                        parentDomain,
+                                                        setOf(ResourcePermissions.getInstance(queriedPermission)));
+      accessControlContext.setGlobalResourcePermissions(accessorResource,
+                                                        queriedResourceClass,
+                                                        childDomain2,
+                                                        setOf(ResourcePermissions.getInstance(unqueriedPermissionName)));
+      accessControlContext.setGlobalResourcePermissions(accessorResource,
+                                                        unqueriedResourceClass,
+                                                        childDomain1,
+                                                        setOf(ResourcePermissions.getInstance(unqueriedPermissionName)));
+
+      // verify as system resource
+      final Set<Resource> expectedResources_anyDomain = setOf(resource_parentDomain,
+                                                              resource_childDomain1,
+                                                              resource_childDomain2);
+
+      Set<Resource> resourcesByAccessorAndPermission
+            = accessControlContext.getResourcesByResourcePermissions(accessorResource,
+                                                                     queriedResourceClass,
+                                                                     ResourcePermissions.getInstance(queriedPermission));
+      assertThat(resourcesByAccessorAndPermission, is(expectedResources_anyDomain));
+
+      resourcesByAccessorAndPermission
+            = accessControlContext.getResourcesByResourcePermissions(accessorResource,
+                                                                     queriedResourceClass,
+                                                                     setOf(ResourcePermissions
+                                                                                 .getInstance(queriedPermission)));
+      assertThat(resourcesByAccessorAndPermission, is(expectedResources_anyDomain));
+
+      // authenticate as accessor and verify
+      accessControlContext.authenticate(accessorResource, PasswordCredentials.newInstance(password));
+
+      Set<Resource> resourcesByPermission
+            = accessControlContext.getResourcesByResourcePermissions(accessorResource,
+                                                                     queriedResourceClass,
+                                                                     ResourcePermissions.getInstance(queriedPermission));
+      assertThat(resourcesByPermission, is(expectedResources_anyDomain));
+
+      resourcesByPermission
+            = accessControlContext.getResourcesByResourcePermissions(accessorResource,
+                                                                     queriedResourceClass,
+                                                                     setOf(ResourcePermissions
+                                                                                 .getInstance(queriedPermission)));
+      assertThat(resourcesByPermission, is(expectedResources_anyDomain));
+
+   }
+
+   @Test
    public void getResourcesByResourcePermissions_superUser_validAsAuthenticated() {
       authenticateSystemResource();
 
