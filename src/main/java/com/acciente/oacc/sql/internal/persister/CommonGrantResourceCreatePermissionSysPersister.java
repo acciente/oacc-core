@@ -20,16 +20,13 @@ package com.acciente.oacc.sql.internal.persister;
 import com.acciente.oacc.Resource;
 import com.acciente.oacc.ResourceCreatePermission;
 import com.acciente.oacc.ResourceCreatePermissions;
-import com.acciente.oacc.sql.SQLDialect;
 import com.acciente.oacc.sql.internal.persister.id.DomainId;
 import com.acciente.oacc.sql.internal.persister.id.Id;
 import com.acciente.oacc.sql.internal.persister.id.ResourceClassId;
 
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -86,9 +83,7 @@ public abstract class CommonGrantResourceCreatePermissionSysPersister extends Pe
 
             permissionsForResourceClass.add(
                   ResourceCreatePermissions.getInstance(resultSet.getResourceCreateSysPermissionName("SysPermissionId"),
-                                                        resultSet.getBoolean("IsWithGrant"),
-                                                        0,
-                                                        0));
+                                                        resultSet.getBoolean("IsWithGrant")));
          }
          resultSet.close();
 

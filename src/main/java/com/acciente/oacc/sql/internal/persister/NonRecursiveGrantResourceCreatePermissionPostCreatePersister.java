@@ -74,9 +74,7 @@ public class NonRecursiveGrantResourceCreatePermissionPostCreatePersister extend
                                                           resultSet.getBoolean("PostCreateIsWithGrant"));
 
                   resourceCreatePermissions.add(ResourceCreatePermissions.getInstance(resourcePermission,
-                                                                                      resultSet.getBoolean("IsWithGrant"),
-                                                                                      0,
-                                                                                      0));
+                                                                                      resultSet.getBoolean("IsWithGrant")));
                }
                resultSet.close();
             }
@@ -136,9 +134,7 @@ public class NonRecursiveGrantResourceCreatePermissionPostCreatePersister extend
                                                        resultSet.getBoolean("PostCreateIsWithGrant"));
 
                permissionsForResourceClass.add(ResourceCreatePermissions.getInstance(resourcePermission,
-                                                                                     resultSet.getBoolean("IsWithGrant"),
-                                                                                     0,
-                                                                                     0));
+                                                                                     resultSet.getBoolean("IsWithGrant")));
             }
             resultSet.close();
          }

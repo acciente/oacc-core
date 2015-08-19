@@ -52,7 +52,7 @@ public class RecursiveGrantResourceCreatePermissionPostCreatePersister extends C
          Set<ResourceCreatePermission> resourceCreatePermissions = new HashSet<>();
 
          // collect the non-system permissions the accessor has to the specified resource class
-         statement = connection.prepareStatement(sqlStrings.SQL_findInGrantResourceCreatePermissionPostCreate_ResourceClassName_PostCreatePermissionName_PostCreateIsWithGrant_IsWithGrant_InheritLevel_DomainLevel_BY_AccessorID_AccessedDomainID_ResourceClassID);
+         statement = connection.prepareStatement(sqlStrings.SQL_findInGrantResourceCreatePermissionPostCreate_ResourceClassName_PostCreatePermissionName_PostCreateIsWithGrant_IsWithGrant_BY_AccessorID_AccessedDomainID_ResourceClassID);
          statement.setResourceId(1, accessorResource);
          statement.setResourceDomainId(2, resourceDomainId);
          statement.setResourceClassId(3, resourceClassId);
@@ -67,9 +67,7 @@ public class RecursiveGrantResourceCreatePermissionPostCreatePersister extends C
 
             resourceCreatePermissions
                   .add(ResourceCreatePermissions.getInstance(resourcePermission,
-                                                             resultSet.getBoolean("IsWithGrant"),
-                                                             resultSet.getInteger("InheritLevel"),
-                                                             resultSet.getInteger("DomainLevel")));
+                                                             resultSet.getBoolean("IsWithGrant")));
          }
          resultSet.close();
 
@@ -94,7 +92,7 @@ public class RecursiveGrantResourceCreatePermissionPostCreatePersister extends C
          SQLResult resultSet;
 
          // collect the non-system permissions that the accessor has and add it to createALLPermissionsMap
-         statement = connection.prepareStatement(sqlStrings.SQL_findInGrantResourceCreatePermissionPostCreate_ResourceDomainName_ResourceClassName_PostCreatePermissionName_PostCreateIsWithGrant_IsWithGrant_InheritLevel_DomainLevel_BY_AccessorID);
+         statement = connection.prepareStatement(sqlStrings.SQL_findInGrantResourceCreatePermissionPostCreate_ResourceDomainName_ResourceClassName_PostCreatePermissionName_PostCreateIsWithGrant_IsWithGrant_BY_AccessorID);
          statement.setResourceId(1, accessorResource);
          resultSet = statement.executeQuery();
 
@@ -124,9 +122,7 @@ public class RecursiveGrantResourceCreatePermissionPostCreatePersister extends C
 
             permissionsForResourceClass
                   .add(ResourceCreatePermissions.getInstance(resourcePermission,
-                                                             resultSet.getBoolean("IsWithGrant"),
-                                                             resultSet.getInteger("InheritLevel"),
-                                                             resultSet.getInteger("DomainLevel")));
+                                                             resultSet.getBoolean("IsWithGrant")));
          }
          resultSet.close();
 

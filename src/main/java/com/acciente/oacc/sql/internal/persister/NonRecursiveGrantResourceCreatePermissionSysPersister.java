@@ -29,9 +29,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.ListIterator;
 import java.util.Map;
 import java.util.Set;
 
@@ -71,9 +69,7 @@ public class NonRecursiveGrantResourceCreatePermissionSysPersister extends Commo
                while (resultSet.next()) {
                   resourceCreatePermissions
                         .add(ResourceCreatePermissions.getInstance(resultSet.getResourceCreateSysPermissionName("SysPermissionId"),
-                                                                   resultSet.getBoolean("IsWithGrant"),
-                                                                   0,
-                                                                   0));
+                                                                   resultSet.getBoolean("IsWithGrant")));
                }
                resultSet.close();
             }
@@ -128,11 +124,8 @@ public class NonRecursiveGrantResourceCreatePermissionSysPersister extends Commo
                }
 
                permissionsForResourceClass.add(
-                     ResourceCreatePermissions.getInstance(resultSet
-                                                                 .getResourceCreateSysPermissionName("SysPermissionId"),
-                                                           resultSet.getBoolean("IsWithGrant"),
-                                                           0,
-                                                           0));
+                     ResourceCreatePermissions.getInstance(resultSet.getResourceCreateSysPermissionName("SysPermissionId"),
+                                                           resultSet.getBoolean("IsWithGrant")));
             }
             resultSet.close();
          }

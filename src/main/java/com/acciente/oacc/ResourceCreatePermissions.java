@@ -48,14 +48,7 @@ public class ResourceCreatePermissions {
     * @return a resource create permission
     */
    public static ResourceCreatePermission getInstance(String sysPermissionName, boolean withGrant) {
-      return new ResourceCreatePermissionImpl(sysPermissionName, withGrant, 0, 0);
-   }
-
-   public static ResourceCreatePermission getInstance(String sysPermissionName,
-                                                      boolean withGrant,
-                                                      int inheritLevel,
-                                                      int domainLevel) {
-      return new ResourceCreatePermissionImpl(sysPermissionName, withGrant, inheritLevel, domainLevel);
+      return new ResourceCreatePermissionImpl(sysPermissionName, withGrant);
    }
 
    /**
@@ -66,23 +59,16 @@ public class ResourceCreatePermissions {
     * @return a resource create permission
     */
    public static ResourceCreatePermission getInstance(String sysPermissionName) {
-      return new ResourceCreatePermissionImpl(sysPermissionName, false, 0, 0);
+      return new ResourceCreatePermissionImpl(sysPermissionName, false);
    }
 
    public static ResourceCreatePermission getInstance(ResourcePermission postCreateResourcePermission) {
-      return new ResourceCreatePermissionImpl(postCreateResourcePermission, false, 0, 0);
+      return new ResourceCreatePermissionImpl(postCreateResourcePermission, false);
    }
 
    public static ResourceCreatePermission getInstance(ResourcePermission postCreateResourcePermission,
                                                       boolean withGrant) {
-      return new ResourceCreatePermissionImpl(postCreateResourcePermission, withGrant, 0, 0);
-   }
-
-   public static ResourceCreatePermission getInstance(ResourcePermission postCreateResourcePermission,
-                                                      boolean withGrant,
-                                                      int inheritLevel,
-                                                      int domainLevel) {
-      return new ResourceCreatePermissionImpl(postCreateResourcePermission, withGrant, inheritLevel, domainLevel);
+      return new ResourceCreatePermissionImpl(postCreateResourcePermission, withGrant);
    }
 
    private static class ResourceCreatePermissionImpl implements ResourceCreatePermission, Serializable {
@@ -91,33 +77,23 @@ public class ResourceCreatePermissions {
       private final String             sysPermissionName;
       private final ResourcePermission postCreateResourcePermission;
       private final boolean            withGrant;
-      private final int                inheritLevel;
-      private final int                domainLevel;
 
       private ResourceCreatePermissionImpl(String sysPermissionName,
-                                           boolean withGrant,
-                                           int inheritLevel,
-                                           int domainLevel) {
+                                           boolean withGrant) {
          SysPermission sysPermission = getSysPermission(sysPermissionName);
 
          this.systemPermissionId = sysPermission.getSystemPermissionId();
          this.sysPermissionName = sysPermission.getPermissionName();
          this.postCreateResourcePermission = null;
          this.withGrant = withGrant;
-         this.inheritLevel = inheritLevel;
-         this.domainLevel = domainLevel;
       }
 
       private ResourceCreatePermissionImpl(ResourcePermission postCreateResourcePermission,
-                                           boolean withGrant,
-                                           int inheritLevel,
-                                           int domainLevel) {
+                                           boolean withGrant) {
          this.systemPermissionId = 0;
          this.sysPermissionName = null;
          this.postCreateResourcePermission = postCreateResourcePermission;
          this.withGrant = withGrant;
-         this.inheritLevel = inheritLevel;
-         this.domainLevel = domainLevel;
       }
 
       @Override
@@ -180,14 +156,6 @@ public class ResourceCreatePermissions {
          }
 
          return this.postCreateResourcePermission.equalsIgnoreGrant(other.getPostCreateResourcePermission());
-      }
-
-      public int getInheritLevel() {
-         return inheritLevel;
-      }
-
-      public int getDomainLevel() {
-         return domainLevel;
       }
 
       @Override
@@ -262,15 +230,11 @@ public class ResourceCreatePermissions {
       public String toString() {
          if (postCreateResourcePermission == null) {
             return "*CREATE[]"
-                  + (withGrant ? " /G" : "")
-                  + (inheritLevel != 0 ? " /I:" + inheritLevel : "")
-                  + (domainLevel != 0 ? " /D:" + domainLevel : "");
+                  + (withGrant ? " /G" : "");
          }
          else {
             return "*CREATE[" + postCreateResourcePermission.toString() + "]"
-                  + (withGrant ? " /G" : "")
-                  + (inheritLevel != 0 ? " /I:" + inheritLevel : "")
-                  + (domainLevel != 0 ? " /D:" + domainLevel : "");
+                  + (withGrant ? " /G" : "");
          }
       }
 

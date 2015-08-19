@@ -22,7 +22,6 @@ import com.acciente.oacc.ResourceCreatePermission;
 import com.acciente.oacc.ResourceCreatePermissions;
 import com.acciente.oacc.ResourcePermission;
 import com.acciente.oacc.ResourcePermissions;
-import com.acciente.oacc.sql.SQLDialect;
 import com.acciente.oacc.sql.internal.persister.id.DomainId;
 import com.acciente.oacc.sql.internal.persister.id.Id;
 import com.acciente.oacc.sql.internal.persister.id.ResourceClassId;
@@ -74,9 +73,7 @@ public class NonRecursiveGrantResourceCreatePermissionPostCreateSysPersister ext
                                                           resultSet.getBoolean("PostCreateIsWithGrant"));
 
                   resourceCreatePermissions.add(ResourceCreatePermissions.getInstance(resourcePermission,
-                                                                                      resultSet.getBoolean("IsWithGrant"),
-                                                                                      0,
-                                                                                      0));
+                                                                                      resultSet.getBoolean("IsWithGrant")));
                }
                resultSet.close();
             }
@@ -135,9 +132,7 @@ public class NonRecursiveGrantResourceCreatePermissionPostCreateSysPersister ext
                                                        resultSet.getBoolean("PostCreateIsWithGrant"));
 
                permissionsForResourceClass.add(ResourceCreatePermissions.getInstance(resourcePermission,
-                                                                                     resultSet.getBoolean("IsWithGrant"),
-                                                                                     0,
-                                                                                     0));
+                                                                                     resultSet.getBoolean("IsWithGrant")));
             }
             resultSet.close();
          }
