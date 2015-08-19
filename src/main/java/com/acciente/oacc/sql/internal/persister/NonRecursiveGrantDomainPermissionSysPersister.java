@@ -200,9 +200,7 @@ public class NonRecursiveGrantDomainPermissionSysPersister extends CommonGrantDo
                   // on the domains only pre-defined system permissions are expected
                   domainPermissions
                         .add(DomainPermissions.getInstance(resultSet.getDomainSysPermissionName("SysPermissionId"),
-                                                           resultSet.getBoolean("IsWithGrant"),
-                                                           0,
-                                                           0));
+                                                           resultSet.getBoolean("IsWithGrant")));
                }
                resultSet.close();
             }
@@ -251,9 +249,7 @@ public class NonRecursiveGrantDomainPermissionSysPersister extends CommonGrantDo
                // on the domains only pre-defined system permissions are expected
                domainPermissions
                      .add(DomainPermissions.getInstance(resultSet.getDomainSysPermissionName("SysPermissionId"),
-                                                        resultSet.getBoolean("IsWithGrant"),
-                                                        0,
-                                                        0));
+                                                        resultSet.getBoolean("IsWithGrant")));
             }
             resultSet.close();
          }

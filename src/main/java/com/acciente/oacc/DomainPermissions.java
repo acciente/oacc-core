@@ -60,41 +60,27 @@ public class DomainPermissions {
       return new DomainPermissionImpl(sysPermissionName, withGrant);
    }
 
-   public static DomainPermission getInstance(String sysPermissionName,
-                                              boolean withGrant,
-                                              int inheritLevel,
-                                              int domainLevel) {
-      return new DomainPermissionImpl(sysPermissionName, withGrant, inheritLevel, domainLevel);
-   }
-
    private static class DomainPermissionImpl implements DomainPermission, Serializable {
       // permission data
       private final long    systemPermissionId;
       private final String  permissionName;
       private final boolean withGrant;
-      private final int     inheritLevel;
-      private final int     domainLevel;
 
       // simpler and preferred factories to create a domain permission
 
       private DomainPermissionImpl(String sysPermissionName) {
-         this(sysPermissionName, false, 0, 0);
-      }
-
-      private DomainPermissionImpl(String sysPermissionName, boolean withGrant) {
-         this(sysPermissionName, withGrant, 0, 0);
+         this(sysPermissionName, false);
       }
 
       // constructor used when creating domain permissions from a syspermission id (typically read from a db)
 
-      private DomainPermissionImpl(String sysPermissionName, boolean withGrant, int inheritLevel, int domainLevel) {
+      private DomainPermissionImpl(String sysPermissionName,
+                                   boolean withGrant) {
          SysPermission sysPermission = getSysPermission(sysPermissionName);
 
          this.systemPermissionId = sysPermission.getSystemPermissionId();
          this.permissionName = sysPermission.getPermissionName();
          this.withGrant = withGrant;
-         this.inheritLevel = inheritLevel;
-         this.domainLevel = domainLevel;
       }
 
       @Override
@@ -132,14 +118,6 @@ public class DomainPermissions {
          }
 
          return permissionName.equals(other.getPermissionName());
-      }
-
-      public int getInheritLevel() {
-         return inheritLevel;
-      }
-
-      public int getDomainLevel() {
-         return domainLevel;
       }
 
       // equals() and hashCode()
@@ -194,16 +172,12 @@ public class DomainPermissions {
       public String toString() {
          if (isSystemPermission()) {
             return "DOMAIN:SYS:" + permissionName
-                  + (withGrant ? " /G" : "")
-                  + (inheritLevel != 0 ? " /I:" + inheritLevel : "")
-                  + (domainLevel != 0 ? " /D:" + domainLevel : "");
+                  + (withGrant ? " /G" : "");
          }
          else {
             // USR: for user-defined
             return "DOMAIN:" + permissionName
-                  + (withGrant ? " /G" : "")
-                  + (inheritLevel != 0 ? " /I:" + inheritLevel : "")
-                  + (domainLevel != 0 ? " /D:" + domainLevel : "");
+                  + (withGrant ? " /G" : "");
          }
       }
 

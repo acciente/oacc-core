@@ -111,7 +111,7 @@ public class RecursiveGrantDomainPermissionSysPersister extends CommonGrantDomai
       SQLStatement statement = null;
 
       try {
-         statement = connection.prepareStatement(sqlStrings.SQL_findInGrantDomainPermissionSys_SysPermissionID_IsWithGrant_InheritLevel_DomainLevel_BY_AccessorID_DomainID);
+         statement = connection.prepareStatement(sqlStrings.SQL_findInGrantDomainPermissionSys_SysPermissionID_IsWithGrant_BY_AccessorID_DomainID);
          statement.setResourceId(1, accessorResource);
          statement.setResourceDomainId(2, resourceDomainId);
          SQLResult resultSet = statement.executeQuery();
@@ -122,9 +122,7 @@ public class RecursiveGrantDomainPermissionSysPersister extends CommonGrantDomai
             // on the domains only pre-defined system permissions are expected
             domainPermissions
                   .add(DomainPermissions.getInstance(resultSet.getDomainSysPermissionName("SysPermissionId"),
-                                                     resultSet.getBoolean("IsWithGrant"),
-                                                     resultSet.getInteger("InheritLevel"),
-                                                     resultSet.getInteger("DomainLevel")));
+                                                     resultSet.getBoolean("IsWithGrant")));
          }
          resultSet.close();
 
@@ -145,7 +143,7 @@ public class RecursiveGrantDomainPermissionSysPersister extends CommonGrantDomai
 
       try {
          // collect the create permissions that this resource has to each domain
-         statement = connection.prepareStatement(sqlStrings.SQL_findInGrantDomainPermissionSys_ResourceDomainName_SysPermissionID_IsWithGrant_InheritLevel_DomainLevel_BY_AccessorID);
+         statement = connection.prepareStatement(sqlStrings.SQL_findInGrantDomainPermissionSys_ResourceDomainName_SysPermissionID_IsWithGrant_BY_AccessorID);
          statement.setResourceId(1, accessorResource);
          SQLResult resultSet = statement.executeQuery();
 
@@ -164,9 +162,7 @@ public class RecursiveGrantDomainPermissionSysPersister extends CommonGrantDomai
             // on the domains only pre-defined system permissions are expected
             domainPermissions
                   .add(DomainPermissions.getInstance(resultSet.getDomainSysPermissionName("SysPermissionId"),
-                                                     resultSet.getBoolean("IsWithGrant"),
-                                                     resultSet.getInteger("InheritLevel"),
-                                                     resultSet.getInteger("DomainLevel")));
+                                                     resultSet.getBoolean("IsWithGrant")));
          }
          resultSet.close();
 

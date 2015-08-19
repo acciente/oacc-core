@@ -83,8 +83,8 @@ public class SQLStrings implements Serializable {
    // GrantDomainPermissionSys - recursive
    public final String SQL_findInGrantDomainPermissionSys_ResourceID_BY_AccessorID_SysPermissionID_IsWithGrant_ResourceClassID;
    public final String SQL_findInGrantDomainPermissionSys_ResourceID_BY_AccessorID_DomainID_SysPermissionID_IsWithGrant_ResourceClassID;
-   public final String SQL_findInGrantDomainPermissionSys_SysPermissionID_IsWithGrant_InheritLevel_DomainLevel_BY_AccessorID_DomainID;
-   public final String SQL_findInGrantDomainPermissionSys_ResourceDomainName_SysPermissionID_IsWithGrant_InheritLevel_DomainLevel_BY_AccessorID;
+   public final String SQL_findInGrantDomainPermissionSys_SysPermissionID_IsWithGrant_BY_AccessorID_DomainID;
+   public final String SQL_findInGrantDomainPermissionSys_ResourceDomainName_SysPermissionID_IsWithGrant_BY_AccessorID;
    public final String SQL_removeInGrantDomainPermissionSys_withDescendants_BY_AccessedDomainID;
    // GrantDomainPermissionSys - non-recursive
    public final String SQL_findInGrantDomainPermissionSys_withoutInheritance_ResourceDomainId_BY_AccessorID_SysPermissionID_IsWithGrant;
@@ -582,28 +582,28 @@ public class SQLStrings implements Serializable {
             + "JOIN S ON S.DomainId = A.DomainId "
             + "WHERE A.ResourceClassId = ?";
 
-      SQL_findInGrantDomainPermissionSys_SysPermissionID_IsWithGrant_InheritLevel_DomainLevel_BY_AccessorID_DomainID
+      SQL_findInGrantDomainPermissionSys_SysPermissionID_IsWithGrant_BY_AccessorID_DomainID
             = SQL_findRecursiveInGrantResourcePermissionSys_AccessorID_InheritLevel_BY_AccessorID
             + SQL_findAncestorsRecursiveInDomain_DomainID_DomainLevel_BY_DomainID
-            + "SELECT A.SysPermissionId, A.IsWithGrant, N.InheritLevel, R.DomainLevel FROM "
+            + "SELECT A.SysPermissionId, A.IsWithGrant FROM "
             + schemaNameAndTablePrefix
             + "Grant_DomPerm_Sys A "
             + "JOIN N ON N.AccessorResourceId = A.AccessorResourceId "
             + "JOIN R ON R.DomainId = A.AccessedDomainId ";
 
-      SQL_findInGrantDomainPermissionSys_ResourceDomainName_SysPermissionID_IsWithGrant_InheritLevel_DomainLevel_BY_AccessorID
+      SQL_findInGrantDomainPermissionSys_ResourceDomainName_SysPermissionID_IsWithGrant_BY_AccessorID
             = SQL_findRecursiveInGrantResourcePermissionSys_AccessorID_InheritLevel_BY_AccessorID
-            + ", P( AccessedDomainId, SysPermissionId, IsWithGrant, InheritLevel, DomainLevel ) AS "
-            + "( SELECT A.AccessedDomainId, A.SysPermissionId, A.IsWithGrant, N.InheritLevel, 0 FROM "
+            + ", P( AccessedDomainId, SysPermissionId, IsWithGrant ) AS "
+            + "( SELECT A.AccessedDomainId, A.SysPermissionId, A.IsWithGrant FROM "
             + schemaNameAndTablePrefix
             + "Grant_DomPerm_Sys A "
             + "JOIN N ON N.AccessorResourceId = A.AccessorResourceId "
             + unionClause + " "
-            + "SELECT Pplus1.DomainId, P.SysPermissionId, P.IsWithGrant, P.InheritLevel, P.DomainLevel + 1 FROM "
+            + "SELECT Pplus1.DomainId, P.SysPermissionId, P.IsWithGrant FROM "
             + schemaNameAndTablePrefix
             + "Domain Pplus1, P "
             + "WHERE Pplus1.ParentDomainId IS NOT NULL AND Pplus1.ParentDomainId = P.AccessedDomainId ) "
-            + "SELECT B.DomainName, P.SysPermissionId, P.IsWithGrant, P.InheritLevel, P.DomainLevel FROM P JOIN "
+            + "SELECT B.DomainName, P.SysPermissionId, P.IsWithGrant FROM P JOIN "
             + schemaNameAndTablePrefix
             + "Domain B ON B.DomainId = P.AccessedDomainId";
 
