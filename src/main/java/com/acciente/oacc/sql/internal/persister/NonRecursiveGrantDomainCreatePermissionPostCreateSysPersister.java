@@ -57,8 +57,7 @@ public class NonRecursiveGrantDomainCreatePermissionPostCreateSysPersister exten
                                 .getInstance(DomainPermissions
                                                    .getInstance(resultSet.getDomainSysPermissionName("PostCreateSysPermissionId"),
                                                                 resultSet.getBoolean("PostCreateIsWithGrant")),
-                                             resultSet.getBoolean("IsWithGrant"),
-                                             0));
+                                             resultSet.getBoolean("IsWithGrant")));
             }
             resultSet.close();
          }

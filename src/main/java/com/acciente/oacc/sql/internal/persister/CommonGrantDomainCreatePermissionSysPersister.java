@@ -51,8 +51,7 @@ public abstract class CommonGrantDomainCreatePermissionSysPersister extends Pers
          while (resultSet.next()) {
             domainCreatePermissions
                   .add(DomainCreatePermissions.getInstance(resultSet.getDomainCreateSysPermissionName("SysPermissionId"),
-                                                           resultSet.getBoolean("IsWithGrant"),
-                                                           0));
+                                                           resultSet.getBoolean("IsWithGrant")));
          }
          resultSet.close();
 

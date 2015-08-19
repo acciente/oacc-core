@@ -37,7 +37,7 @@ public class RecursiveGrantDomainCreatePermissionPostCreateSysPersister extends 
       SQLStatement statement = null;
 
       try {
-         statement = connection.prepareStatement(sqlStrings.SQL_findInGrantDomainCreatePermissionPostCreateSys_PostCreateSysPermissionID_PostCreateIsWithGrant_IsWithGrant_InheritLevel_BY_AccessorID);
+         statement = connection.prepareStatement(sqlStrings.SQL_findInGrantDomainCreatePermissionPostCreateSys_PostCreateSysPermissionID_PostCreateIsWithGrant_IsWithGrant_BY_AccessorID);
          statement.setResourceId(1, accessorResource);
          SQLResult resultSet = statement.executeQuery();
 
@@ -49,8 +49,7 @@ public class RecursiveGrantDomainCreatePermissionPostCreateSysPersister extends 
                              .getInstance(DomainPermissions
                                                 .getInstance(resultSet.getDomainSysPermissionName("PostCreateSysPermissionId"),
                                                              resultSet.getBoolean("PostCreateIsWithGrant")),
-                                          resultSet.getBoolean("IsWithGrant"),
-                                          resultSet.getInteger("InheritLevel")));
+                                          resultSet.getBoolean("IsWithGrant")));
          }
          resultSet.close();
 

@@ -52,10 +52,8 @@ public class NonRecursiveGrantDomainCreatePermissionSysPersister extends CommonG
 
             while (resultSet.next()) {
                domainCreatePermissions
-                     .add(DomainCreatePermissions.getInstance(resultSet
-                                                                    .getDomainCreateSysPermissionName("SysPermissionId"),
-                                                              resultSet.getBoolean("IsWithGrant"),
-                                                              0));
+                     .add(DomainCreatePermissions.getInstance(resultSet.getDomainCreateSysPermissionName("SysPermissionId"),
+                                                              resultSet.getBoolean("IsWithGrant")));
             }
             resultSet.close();
          }

@@ -36,7 +36,7 @@ public class RecursiveGrantDomainCreatePermissionSysPersister extends CommonGran
       SQLStatement statement = null;
 
       try {
-         statement = connection.prepareStatement(sqlStrings.SQL_findInGrantDomainCreatePermissionSys_SysPermissionID_IsWithGrant_InheritLevel_BY_AccessorID);
+         statement = connection.prepareStatement(sqlStrings.SQL_findInGrantDomainCreatePermissionSys_SysPermissionID_IsWithGrant_BY_AccessorID);
          statement.setResourceId(1, accessorResource);
          SQLResult resultSet = statement.executeQuery();
 
@@ -46,8 +46,7 @@ public class RecursiveGrantDomainCreatePermissionSysPersister extends CommonGran
             domainCreatePermissions
                   .add(DomainCreatePermissions.getInstance(resultSet
                                                                  .getDomainCreateSysPermissionName("SysPermissionId"),
-                                                           resultSet.getBoolean("IsWithGrant"),
-                                                           resultSet.getInteger("InheritLevel")));
+                                                           resultSet.getBoolean("IsWithGrant")));
          }
          resultSet.close();
 
