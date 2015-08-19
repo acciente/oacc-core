@@ -59,7 +59,7 @@ public class NonRecursiveGrantResourceCreatePermissionPostCreateSysPersister ext
          // now collect the sys-permissions any accessor resource has to the specified domain or its ancestors
          SQLResult resultSet;
          Set<ResourceCreatePermission> resourceCreatePermissions = new HashSet<>();
-         statement = connection.prepareStatement(sqlStrings.SQL_findInGrantResourceCreatePermissionPostCreateSys_PostCreateSysPermissionID_PostCreateIsWithGrant_IsWithGrant_InheritLevel_DomainLevel_BY_AccessorID_AccessedDomainID_ResourceClassID);
+         statement = connection.prepareStatement(sqlStrings.SQL_findInGrantResourceCreatePermissionPostCreateSys_withoutInheritance_PostCreateSysPermissionID_PostCreateIsWithGrant_IsWithGrant_BY_AccessorID_AccessedDomainID_ResourceClassID);
 
          for (Id<ResourceId> accessorResourceId : accessorResourceIds) {
             for (Id<DomainId> domainId : ancestorDomainIds) {
