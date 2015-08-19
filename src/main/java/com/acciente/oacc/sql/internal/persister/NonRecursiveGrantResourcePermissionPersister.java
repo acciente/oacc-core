@@ -154,11 +154,8 @@ public class NonRecursiveGrantResourcePermissionPersister extends CommonGrantRes
             resultSet = statement.executeQuery();
 
             while (resultSet.next()) {
-               resourcePermissions.add(ResourcePermissions.getInstance(
-                     resultSet.getString("PermissionName"),
-                     resultSet.getBoolean("IsWithGrant"),
-                     0,
-                     0 /* zero since domain level does not apply in context of direct permissions */));
+               resourcePermissions.add(ResourcePermissions.getInstance(resultSet.getString("PermissionName"),
+                                                                       resultSet.getBoolean("IsWithGrant")));
             }
             resultSet.close();
          }
@@ -172,5 +169,4 @@ public class NonRecursiveGrantResourcePermissionPersister extends CommonGrantRes
          closeStatement(statement);
       }
    }
-
 }

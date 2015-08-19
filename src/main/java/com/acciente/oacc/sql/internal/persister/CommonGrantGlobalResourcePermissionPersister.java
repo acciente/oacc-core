@@ -20,17 +20,14 @@ package com.acciente.oacc.sql.internal.persister;
 import com.acciente.oacc.Resource;
 import com.acciente.oacc.ResourcePermission;
 import com.acciente.oacc.ResourcePermissions;
-import com.acciente.oacc.sql.SQLDialect;
 import com.acciente.oacc.sql.internal.persister.id.DomainId;
 import com.acciente.oacc.sql.internal.persister.id.Id;
 import com.acciente.oacc.sql.internal.persister.id.ResourceClassId;
 import com.acciente.oacc.sql.internal.persister.id.ResourcePermissionId;
 
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -80,11 +77,8 @@ public abstract class CommonGrantGlobalResourcePermissionPersister extends Persi
          resultSet = statement.executeQuery();
 
          while (resultSet.next()) {
-            resourcePermissions.add(ResourcePermissions.getInstance(
-                  resultSet.getString("PermissionName"),
-                  resultSet.getBoolean("IsWithGrant"),
-                  0,
-                  0));
+            resourcePermissions.add(ResourcePermissions.getInstance(resultSet.getString("PermissionName"),
+                                                                    resultSet.getBoolean("IsWithGrant")));
          }
          resultSet.close();
 
@@ -134,11 +128,8 @@ public abstract class CommonGrantGlobalResourcePermissionPersister extends Persi
                                                 resourcePermissionsForResourceClass = new HashSet<>());
             }
 
-            resourcePermissionsForResourceClass.add(ResourcePermissions.getInstance(
-                  resultSet.getString("PermissionName"),
-                  resultSet.getBoolean("IsWithGrant"),
-                  0,
-                  0));
+            resourcePermissionsForResourceClass.add(ResourcePermissions.getInstance(resultSet.getString("PermissionName"),
+                                                                                    resultSet.getBoolean("IsWithGrant")));
          }
          resultSet.close();
 

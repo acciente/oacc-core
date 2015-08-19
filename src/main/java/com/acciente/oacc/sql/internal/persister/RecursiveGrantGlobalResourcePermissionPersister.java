@@ -130,18 +130,15 @@ public class RecursiveGrantGlobalResourcePermissionPersister extends CommonGrant
          SQLResult resultSet;
          Set<ResourcePermission> resourcePermissions = new HashSet<>();
 
-         statement = connection.prepareStatement(sqlStrings.SQL_findInGrantGlobalResourcePermission_PermissionName_IsWithGrant_InheritLevel_DomainLevel_BY_AccessorID_AccessedDomainID_ResourceClassID);
+         statement = connection.prepareStatement(sqlStrings.SQL_findInGrantGlobalResourcePermission_PermissionName_IsWithGrant_BY_AccessorID_AccessedDomainID_ResourceClassID);
          statement.setResourceId(1, accessorResource);
          statement.setResourceDomainId(2, resourceDomainId);
          statement.setResourceClassId(3, resourceClassId);
          resultSet = statement.executeQuery();
 
          while (resultSet.next()) {
-            resourcePermissions.add(ResourcePermissions.getInstance(
-                  resultSet.getString("PermissionName"),
-                  resultSet.getBoolean("IsWithGrant"),
-                  resultSet.getInteger("InheritLevel"),
-                  resultSet.getInteger("DomainLevel")));
+            resourcePermissions.add(ResourcePermissions.getInstance(resultSet.getString("PermissionName"),
+                                                                    resultSet.getBoolean("IsWithGrant")));
          }
          resultSet.close();
 
@@ -164,7 +161,7 @@ public class RecursiveGrantGlobalResourcePermissionPersister extends CommonGrant
          SQLResult resultSet;
          final Map<String, Map<String, Set<ResourcePermission>>> globalPermissionsMap = new HashMap<>();
 
-         statement = connection.prepareStatement(sqlStrings.SQL_findInGrantGlobalResourcePermission_ResourceDomainName_ResourceClassName_PermissionName_IsWithGrant_InheritLevel_DomainLevel_BY_AccessorID);
+         statement = connection.prepareStatement(sqlStrings.SQL_findInGrantGlobalResourcePermission_ResourceDomainName_ResourceClassName_PermissionName_IsWithGrant_BY_AccessorID);
          statement.setResourceId(1, accessorResource);
          resultSet = statement.executeQuery();
 
@@ -187,11 +184,8 @@ public class RecursiveGrantGlobalResourcePermissionPersister extends CommonGrant
                                                 resourcePermissionsForResourceClass = new HashSet<>());
             }
 
-            resourcePermissionsForResourceClass.add(ResourcePermissions.getInstance(
-                  resultSet.getString("PermissionName"),
-                  resultSet.getBoolean("IsWithGrant"),
-                  resultSet.getInteger("InheritLevel"),
-                  resultSet.getInteger("DomainLevel")));
+            resourcePermissionsForResourceClass.add(ResourcePermissions.getInstance(resultSet.getString("PermissionName"),
+                                                                                    resultSet.getBoolean("IsWithGrant")));
          }
          resultSet.close();
 

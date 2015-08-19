@@ -108,10 +108,7 @@ public abstract class CommonGrantResourcePermissionSysPersister extends Persiste
          while (resultSet.next()) {
             resourcePermissions
                   .add(ResourcePermissions.getInstance(resultSet.getResourceSysPermissionName("SysPermissionId"),
-                                                       resultSet.getBoolean("IsWithGrant"),
-                                                       0,
-                                                       // inherit level doesn't apply to direct permissions
-                                                       0 /* zero since domain level does not apply in context of direct permissions */));
+                                                       resultSet.getBoolean("IsWithGrant")));
          }
          resultSet.close();
 

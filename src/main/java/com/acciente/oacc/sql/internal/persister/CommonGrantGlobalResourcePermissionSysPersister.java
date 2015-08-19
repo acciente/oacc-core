@@ -75,9 +75,7 @@ public abstract class CommonGrantGlobalResourcePermissionSysPersister extends Pe
 
          while (resultSet.next()) {
             resourcePermissions.add(ResourcePermissions.getInstance(resultSet.getResourceSysPermissionName("SysPermissionId"),
-                                                                    resultSet.getBoolean("IsWithGrant"),
-                                                                    0,
-                                                                    0));
+                                                                    resultSet.getBoolean("IsWithGrant")));
          }
          resultSet.close();
 
@@ -129,9 +127,7 @@ public abstract class CommonGrantGlobalResourcePermissionSysPersister extends Pe
 
             resourcePermissionsForResourceClass
                   .add(ResourcePermissions.getInstance(resultSet.getResourceSysPermissionName("SysPermissionId"),
-                                                       resultSet.getBoolean("IsWithGrant"),
-                                                       0,
-                                                       0));
+                                                       resultSet.getBoolean("IsWithGrant")));
          }
          resultSet.close();
 

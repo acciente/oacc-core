@@ -120,17 +120,15 @@ public class RecursiveGrantResourcePermissionSysPersister extends CommonGrantRes
          Set<ResourcePermission> resourcePermissions = new HashSet<>();
 
          // collect the system permissions that the accessor this resource has to the accessor resource
-         statement = connection.prepareStatement(sqlStrings.SQL_findInGrantResourcePermissionSys_ResourceClassName_SysPermissionID_IsWithGrant_InheritLevel_BY_AccessorID_AccessedID);
+         statement = connection.prepareStatement(sqlStrings.SQL_findInGrantResourcePermissionSys_ResourceClassName_SysPermissionID_IsWithGrant_BY_AccessorID_AccessedID);
          statement.setResourceId(1, accessorResource);
          statement.setResourceId(2, accessedResource);
          resultSet = statement.executeQuery();
 
          while (resultSet.next()) {
-            resourcePermissions.add(ResourcePermissions.getInstance(resultSet.getResourceSysPermissionName(
-                                                                          "SysPermissionId"),
-                                                                    resultSet.getBoolean("IsWithGrant"),
-                                                                    resultSet.getInteger("InheritLevel"),
-                                                                    0 /* zero since domain level does not apply in context of direct permissions */));
+            resourcePermissions
+                  .add(ResourcePermissions.getInstance(resultSet.getResourceSysPermissionName("SysPermissionId"),
+                                                       resultSet.getBoolean("IsWithGrant")));
          }
          resultSet.close();
 

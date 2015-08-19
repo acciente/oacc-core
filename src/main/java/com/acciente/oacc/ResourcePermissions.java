@@ -67,33 +67,18 @@ public class ResourcePermissions {
       return new ResourcePermissionImpl(permissionName, withGrant);
    }
 
-   public static ResourcePermission getInstance(String permissionName,
-                                                boolean withGrant,
-                                                int inheritLevel,
-                                                int domainLevel) {
-      return new ResourcePermissionImpl(permissionName, withGrant, inheritLevel, domainLevel);
-   }
-
    private static class ResourcePermissionImpl implements ResourcePermission, Serializable {
       // permission data
       private final long    systemPermissionId;
       private final String  permissionName;
       private final boolean withGrant;
-      private final int     inheritLevel;
-      private final int     domainLevel;
 
       private ResourcePermissionImpl(String permissionName) {
-         this(permissionName, false, 0, 0);
-      }
-
-      private ResourcePermissionImpl(String permissionName, boolean withGrant) {
-         this(permissionName, withGrant, 0, 0);
+         this(permissionName, false);
       }
 
       private ResourcePermissionImpl(String permissionName,
-                                     boolean withGrant,
-                                     int inheritLevel,
-                                     int domainLevel) {
+                                     boolean withGrant) {
          assertPermissionNameSpecified(permissionName);
 
          permissionName = permissionName.trim();
@@ -110,8 +95,6 @@ public class ResourcePermissions {
          }
 
          this.withGrant = withGrant;
-         this.inheritLevel = inheritLevel;
-         this.domainLevel = domainLevel;
       }
 
       @Override
@@ -149,14 +132,6 @@ public class ResourcePermissions {
          }
 
          return this.equalsIgnoreGrant(other);
-      }
-
-      public int getInheritLevel() {
-         return inheritLevel;
-      }
-
-      public int getDomainLevel() {
-         return domainLevel;
       }
 
       @Override
@@ -208,9 +183,7 @@ public class ResourcePermissions {
       @Override
       public String toString() {
          return (isSystemPermission() ? "SYS:" + permissionName : permissionName)
-               + (withGrant ? " /G" : "")
-               + (inheritLevel != 0 ? " /I:" + inheritLevel : "")
-               + (domainLevel != 0 ? " /D:" + domainLevel : "");
+               + (withGrant ? " /G" : "");
       }
 
       // private helper methods

@@ -20,7 +20,6 @@ package com.acciente.oacc.sql.internal.persister;
 import com.acciente.oacc.Resource;
 import com.acciente.oacc.ResourcePermission;
 import com.acciente.oacc.ResourcePermissions;
-import com.acciente.oacc.sql.SQLDialect;
 import com.acciente.oacc.sql.internal.persister.id.DomainId;
 import com.acciente.oacc.sql.internal.persister.id.Id;
 import com.acciente.oacc.sql.internal.persister.id.ResourceClassId;
@@ -226,9 +225,7 @@ public class NonRecursiveGrantGlobalResourcePermissionPersister extends CommonGr
 
                while (resultSet.next()) {
                   resourcePermissions.add(ResourcePermissions.getInstance(resultSet.getString("PermissionName"),
-                                                                          resultSet.getBoolean("IsWithGrant"),
-                                                                          0,
-                                                                          0));
+                                                                          resultSet.getBoolean("IsWithGrant")));
                }
                resultSet.close();
             }
@@ -283,9 +280,7 @@ public class NonRecursiveGrantGlobalResourcePermissionPersister extends CommonGr
 
                permissionsForResourceClass
                      .add(ResourcePermissions.getInstance(resultSet.getString("PermissionName"),
-                                                          resultSet.getBoolean("IsWithGrant"),
-                                                          0,
-                                                          0));
+                                                          resultSet.getBoolean("IsWithGrant")));
             }
             resultSet.close();
          }

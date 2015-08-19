@@ -109,11 +109,8 @@ public abstract class CommonGrantResourcePermissionPersister extends Persister i
          resultSet = statement.executeQuery();
 
          while (resultSet.next()) {
-            resourcePermissions.add(ResourcePermissions.getInstance(
-                  resultSet.getString("PermissionName"),
-                  resultSet.getBoolean("IsWithGrant"),
-                  0, // inherit level does not apply to direct permissions
-                  0 /* zero since domain level does not apply in context of direct permissions */));
+            resourcePermissions.add(ResourcePermissions.getInstance(resultSet.getString("PermissionName"),
+                                                                    resultSet.getBoolean("IsWithGrant")));
          }
          resultSet.close();
 

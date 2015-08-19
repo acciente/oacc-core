@@ -223,9 +223,7 @@ public class NonRecursiveGrantGlobalResourcePermissionSysPersister extends Commo
                while (resultSet.next()) {
                   resourcePermissions
                         .add(ResourcePermissions.getInstance(resultSet.getResourceSysPermissionName("SysPermissionId"),
-                                                             resultSet.getBoolean("IsWithGrant"),
-                                                             0,
-                                                             0));
+                                                             resultSet.getBoolean("IsWithGrant")));
                }
                resultSet.close();
             }
@@ -279,9 +277,7 @@ public class NonRecursiveGrantGlobalResourcePermissionSysPersister extends Commo
 
                permissionsForResourceClass
                      .add(ResourcePermissions.getInstance(resultSet.getResourceSysPermissionName("SysPermissionId"),
-                                                          resultSet.getBoolean("IsWithGrant"),
-                                                          0,
-                                                          0));
+                                                          resultSet.getBoolean("IsWithGrant")));
             }
             resultSet.close();
          }

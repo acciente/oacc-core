@@ -127,18 +127,15 @@ public class RecursiveGrantGlobalResourcePermissionSysPersister extends CommonGr
          SQLResult resultSet;
          Set<ResourcePermission> resourcePermissions = new HashSet<>();
 
-         statement = connection.prepareStatement(sqlStrings.SQL_findInGrantGlobalResourcePermissionSys_SysPermissionID_IsWithGrant_InheritLevel_DomainLevel_BY_AccessorID_AccessedDomainID_ResourceClassID);
+         statement = connection.prepareStatement(sqlStrings.SQL_findInGrantGlobalResourcePermissionSys_SysPermissionID_IsWithGrant_BY_AccessorID_AccessedDomainID_ResourceClassID);
          statement.setResourceId(1, accessorResource);
          statement.setResourceDomainId(2, resourceDomainId);
          statement.setResourceClassId(3, resourceClassId);
          resultSet = statement.executeQuery();
 
          while (resultSet.next()) {
-            resourcePermissions.add(ResourcePermissions.getInstance(resultSet.getResourceSysPermissionName(
-                                                                          "SysPermissionId"),
-                                                                    resultSet.getBoolean("IsWithGrant"),
-                                                                    resultSet.getInteger("InheritLevel"),
-                                                                    resultSet.getInteger("DomainLevel")));
+            resourcePermissions.add(ResourcePermissions.getInstance(resultSet.getResourceSysPermissionName("SysPermissionId"),
+                                                                    resultSet.getBoolean("IsWithGrant")));
          }
          resultSet.close();
 
@@ -161,7 +158,7 @@ public class RecursiveGrantGlobalResourcePermissionSysPersister extends CommonGr
          SQLResult resultSet;
          Map<String, Map<String, Set<ResourcePermission>>> globalSysPermissionsMap = new HashMap<>();
 
-         statement = connection.prepareStatement(sqlStrings.SQL_findInGrantGlobalResourcePermissionSys_ResourceDomainName_ResourceClassName_SysPermissionID_IsWithGrant_InheritLevel_DomainLevel_BY_AccessorID);
+         statement = connection.prepareStatement(sqlStrings.SQL_findInGrantGlobalResourcePermissionSys_ResourceDomainName_ResourceClassName_SysPermissionID_IsWithGrant_BY_AccessorID);
          statement.setResourceId(1, accessorResource);
          resultSet = statement.executeQuery();
 
@@ -184,11 +181,9 @@ public class RecursiveGrantGlobalResourcePermissionSysPersister extends CommonGr
                                                 resourcePermissionsForResourceClass = new HashSet<>());
             }
 
-            resourcePermissionsForResourceClass.add(ResourcePermissions.getInstance(resultSet.getResourceSysPermissionName(
-                                                                                          "SysPermissionId"),
-                                                                                    resultSet.getBoolean("IsWithGrant"),
-                                                                                    resultSet.getInteger("InheritLevel"),
-                                                                                    resultSet.getInteger("DomainLevel")));
+            resourcePermissionsForResourceClass
+                  .add(ResourcePermissions.getInstance(resultSet.getResourceSysPermissionName("SysPermissionId"),
+                                                       resultSet.getBoolean("IsWithGrant")));
          }
          resultSet.close();
 
