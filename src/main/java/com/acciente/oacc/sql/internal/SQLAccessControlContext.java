@@ -35,12 +35,12 @@ import com.acciente.oacc.ResourcePermission;
 import com.acciente.oacc.ResourcePermissions;
 import com.acciente.oacc.Resources;
 import com.acciente.oacc.sql.SQLType;
+import com.acciente.oacc.sql.internal.persister.CommonGrantGlobalResourcePermissionPersister;
 import com.acciente.oacc.sql.internal.persister.CommonGrantGlobalResourcePermissionSysPersister;
 import com.acciente.oacc.sql.internal.persister.DomainPersister;
 import com.acciente.oacc.sql.internal.persister.GrantDomainCreatePermissionPostCreateSysPersister;
 import com.acciente.oacc.sql.internal.persister.GrantDomainCreatePermissionSysPersister;
 import com.acciente.oacc.sql.internal.persister.GrantDomainPermissionSysPersister;
-import com.acciente.oacc.sql.internal.persister.GrantGlobalResourcePermissionPersister;
 import com.acciente.oacc.sql.internal.persister.GrantResourceCreatePermissionPostCreatePersister;
 import com.acciente.oacc.sql.internal.persister.GrantResourceCreatePermissionPostCreateSysPersister;
 import com.acciente.oacc.sql.internal.persister.GrantResourceCreatePermissionSysPersister;
@@ -50,6 +50,7 @@ import com.acciente.oacc.sql.internal.persister.NonRecursiveDomainPersister;
 import com.acciente.oacc.sql.internal.persister.NonRecursiveGrantDomainCreatePermissionPostCreateSysPersister;
 import com.acciente.oacc.sql.internal.persister.NonRecursiveGrantDomainCreatePermissionSysPersister;
 import com.acciente.oacc.sql.internal.persister.NonRecursiveGrantDomainPermissionSysPersister;
+import com.acciente.oacc.sql.internal.persister.NonRecursiveGrantGlobalResourcePermissionPersister;
 import com.acciente.oacc.sql.internal.persister.NonRecursiveGrantGlobalResourcePermissionSysPersister;
 import com.acciente.oacc.sql.internal.persister.NonRecursiveGrantResourceCreatePermissionPostCreatePersister;
 import com.acciente.oacc.sql.internal.persister.NonRecursiveGrantResourceCreatePermissionPostCreateSysPersister;
@@ -61,6 +62,7 @@ import com.acciente.oacc.sql.internal.persister.RecursiveDomainPersister;
 import com.acciente.oacc.sql.internal.persister.RecursiveGrantDomainCreatePermissionPostCreateSysPersister;
 import com.acciente.oacc.sql.internal.persister.RecursiveGrantDomainCreatePermissionSysPersister;
 import com.acciente.oacc.sql.internal.persister.RecursiveGrantDomainPermissionSysPersister;
+import com.acciente.oacc.sql.internal.persister.RecursiveGrantGlobalResourcePermissionPersister;
 import com.acciente.oacc.sql.internal.persister.RecursiveGrantGlobalResourcePermissionSysPersister;
 import com.acciente.oacc.sql.internal.persister.RecursiveGrantResourceCreatePermissionPostCreatePersister;
 import com.acciente.oacc.sql.internal.persister.RecursiveGrantResourceCreatePermissionPostCreateSysPersister;
@@ -163,7 +165,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
    private final GrantResourcePermissionSysPersister                 grantResourcePermissionSysPersister;
    private final CommonGrantGlobalResourcePermissionSysPersister     grantGlobalResourcePermissionSysPersister;
    private final GrantResourcePermissionPersister                    grantResourcePermissionPersister;
-   private final GrantGlobalResourcePermissionPersister              grantGlobalResourcePermissionPersister;
+   private final CommonGrantGlobalResourcePermissionPersister        grantGlobalResourcePermissionPersister;
 
    public static AccessControlContext getAccessControlContext(Connection connection,
                                                               String schemaName,
@@ -198,14 +200,16 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       }
    }
 
-   public static void postDeserialize(AccessControlContext accessControlContext, Connection connection) {
+   public static void postDeserialize(AccessControlContext accessControlContext,
+                                      Connection connection) {
       if (accessControlContext instanceof SQLAccessControlContext) {
          SQLAccessControlContext sqlAccessControlContext = (SQLAccessControlContext) accessControlContext;
          sqlAccessControlContext.__postDeserialize(connection);
       }
    }
 
-   public static void postDeserialize(AccessControlContext accessControlContext, DataSource dataSource) {
+   public static void postDeserialize(AccessControlContext accessControlContext,
+                                      DataSource dataSource) {
       if (accessControlContext instanceof SQLAccessControlContext) {
          SQLAccessControlContext sqlAccessControlContext = (SQLAccessControlContext) accessControlContext;
          sqlAccessControlContext.__postDeserialize(dataSource);
@@ -289,7 +293,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
          grantResourcePermissionPersister
                = new RecursiveGrantResourcePermissionPersister(sqlStrings);
          grantGlobalResourcePermissionPersister
-               = new GrantGlobalResourcePermissionPersister(sqlStrings);
+               = new RecursiveGrantGlobalResourcePermissionPersister(sqlStrings);
       }
       else {
          grantDomainCreatePermissionSysPersister
@@ -315,7 +319,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
          grantResourcePermissionPersister
                = new NonRecursiveGrantResourcePermissionPersister(sqlStrings);
          grantGlobalResourcePermissionPersister
-               = new GrantGlobalResourcePermissionPersister(sqlStrings);
+               = new NonRecursiveGrantGlobalResourcePermissionPersister(sqlStrings);
       }
    }
 

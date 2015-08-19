@@ -19,446 +19,66 @@ package com.acciente.oacc.sql.internal.persister;
 
 import com.acciente.oacc.Resource;
 import com.acciente.oacc.ResourcePermission;
-import com.acciente.oacc.ResourcePermissions;
-import com.acciente.oacc.sql.SQLDialect;
 import com.acciente.oacc.sql.internal.persister.id.DomainId;
 import com.acciente.oacc.sql.internal.persister.id.Id;
 import com.acciente.oacc.sql.internal.persister.id.ResourceClassId;
 import com.acciente.oacc.sql.internal.persister.id.ResourcePermissionId;
 
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-public class GrantGlobalResourcePermissionPersister extends Persister {
-   private final SQLStrings sqlStrings;
+public interface GrantGlobalResourcePermissionPersister {
+   Set<Resource> getResourcesByGlobalResourcePermission(SQLConnection connection,
+                                                        Resource accessorResource,
+                                                        Id<ResourceClassId> resourceClassId,
+                                                        ResourcePermission resourcePermission,
+                                                        Id<ResourcePermissionId> resourcePermissionId);
 
-   public GrantGlobalResourcePermissionPersister(SQLStrings sqlStrings) {
-      this.sqlStrings = sqlStrings;
-   }
+   Set<Resource> getResourcesByGlobalResourcePermission(SQLConnection connection,
+                                                        Resource accessorResource,
+                                                        Id<ResourceClassId> resourceClassId,
+                                                        Id<DomainId> resourceDomainId,
+                                                        ResourcePermission resourcePermission,
+                                                        Id<ResourcePermissionId> resourcePermissionId);
 
-   public Set<Resource> getResourcesByGlobalResourcePermission(SQLConnection connection,
-                                                               Resource accessorResource,
-                                                               Id<ResourceClassId> resourceClassId,
-                                                               ResourcePermission resourcePermission,
-                                                               Id<ResourcePermissionId> resourcePermissionId) {
-      if (resourcePermission.isSystemPermission()) {
-         throw new IllegalArgumentException("Permission: " + resourcePermission + " is not a non-system permission");
-      }
+   Set<ResourcePermission> getGlobalResourcePermissionsIncludeInherited(SQLConnection connection,
+                                                                        Resource accessorResource,
+                                                                        Id<ResourceClassId> resourceClassId,
+                                                                        Id<DomainId> resourceDomainId);
 
-      SQLStatement statement = null;
-      try {
-         // get the list of objects of the specified type that the session has access to via global permissions
-         SQLResult resultSet;
-         Set<Resource> resources = new HashSet<>();
+   Set<ResourcePermission> getGlobalResourcePermissions(SQLConnection connection,
+                                                        Resource accessorResource,
+                                                        Id<ResourceClassId> resourceClassId,
+                                                        Id<DomainId> resourceDomainId);
 
-         statement = connection.prepareStatement(sqlStrings.SQL_findInGrantGlobalResourcePermission_ResourceID_BY_AccessorID_ResourceClassID_PermissionID_IsWithGrant_ResourceClassID);
-         statement.setResourceId(1, accessorResource);
-         statement.setResourceClassId(2, resourceClassId);
-         statement.setResourcePermissionId(3, resourcePermissionId);
-         statement.setBoolean(4, resourcePermission.isWithGrant());
-         statement.setResourceClassId(5, resourceClassId);
-         resultSet = statement.executeQuery();
+   Map<String, Map<String, Set<ResourcePermission>>> getGlobalResourcePermissionsIncludeInherited(SQLConnection connection,
+                                                                                                  Resource accessorResource);
 
-         while (resultSet.next()) {
-            resources.add(resultSet.getResource("ResourceId"));
-         }
-         resultSet.close();
+   Map<String, Map<String, Set<ResourcePermission>>> getGlobalResourcePermissions(SQLConnection connection,
+                                                                                  Resource accessorResource);
 
-         return resources;
-      }
-      catch (SQLException e) {
-         throw new RuntimeException(e);
-      }
-      finally {
-         closeStatement(statement);
-      }
-   }
+   void addGlobalResourcePermissions(SQLConnection connection,
+                                     Resource accessorResource,
+                                     Id<ResourceClassId> accessedResourceClassId,
+                                     Id<DomainId> accessedResourceDomainId,
+                                     Set<ResourcePermission> requestedResourcePermissions,
+                                     Resource grantorResource);
 
-   public Set<Resource> getResourcesByGlobalResourcePermission(SQLConnection connection,
-                                                               Resource accessorResource,
-                                                               Id<ResourceClassId> resourceClassId,
-                                                               Id<DomainId> resourceDomainId,
-                                                               ResourcePermission resourcePermission,
-                                                               Id<ResourcePermissionId> resourcePermissionId) {
-      if (resourcePermission.isSystemPermission()) {
-         throw new IllegalArgumentException("Permission: " + resourcePermission + " is not a non-system permission");
-      }
+   void updateGlobalResourcePermissions(SQLConnection connection,
+                                        Resource accessorResource,
+                                        Id<ResourceClassId> accessedResourceClassId,
+                                        Id<DomainId> accessedResourceDomainId,
+                                        Set<ResourcePermission> requestedResourcePermissions,
+                                        Resource grantorResource);
 
-      SQLStatement statement = null;
-      try {
-         // get the list of objects of the specified type that the session has access to via global permissions
-         SQLResult resultSet;
-         Set<Resource> resources = new HashSet<>();
+   void removeAllGlobalResourcePermissions(SQLConnection connection,
+                                           Resource accessorResource);
 
-         statement = connection.prepareStatement(sqlStrings.SQL_findInGrantGlobalResourcePermission_ResourceID_BY_AccessorID_DomainID_ResourceClassID_PermissionID_IsWithGrant_ResourceClassID);
-         statement.setResourceId(1, accessorResource);
-         statement.setResourceDomainId(2, resourceDomainId);
-         statement.setResourceClassId(3, resourceClassId);
-         statement.setResourcePermissionId(4, resourcePermissionId);
-         statement.setBoolean(5, resourcePermission.isWithGrant());
-         statement.setResourceClassId(6, resourceClassId);
-         resultSet = statement.executeQuery();
+   void removeAllGlobalResourcePermissions(SQLConnection connection,
+                                           Id<DomainId> accessedDomainId);
 
-         while (resultSet.next()) {
-            resources.add(resultSet.getResource("ResourceId"));
-         }
-         resultSet.close();
-
-         return resources;
-      }
-      catch (SQLException e) {
-         throw new RuntimeException(e);
-      }
-      finally {
-         closeStatement(statement);
-      }
-   }
-
-   public Set<ResourcePermission> getGlobalResourcePermissionsIncludeInherited(SQLConnection connection,
-                                                                               Resource accessorResource,
-                                                                               Id<ResourceClassId> resourceClassId,
-                                                                               Id<DomainId> resourceDomainId) {
-      SQLStatement statement = null;
-      try {
-         // collect the system permissions that the accessor has to the accessed resource
-         SQLResult resultSet;
-         Set<ResourcePermission> resourcePermissions = new HashSet<>();
-
-         statement = connection.prepareStatement(sqlStrings.SQL_findInGrantGlobalResourcePermission_PermissionName_IsWithGrant_InheritLevel_DomainLevel_BY_AccessorID_AccessedDomainID_ResourceClassID);
-         statement.setResourceId(1, accessorResource);
-         statement.setResourceDomainId(2, resourceDomainId);
-         statement.setResourceClassId(3, resourceClassId);
-         resultSet = statement.executeQuery();
-
-         while (resultSet.next()) {
-            resourcePermissions.add(ResourcePermissions.getInstance(
-                  resultSet.getString("PermissionName"),
-                  resultSet.getBoolean("IsWithGrant"),
-                  resultSet.getInteger("InheritLevel"),
-                  resultSet.getInteger("DomainLevel")));
-         }
-         resultSet.close();
-
-         return resourcePermissions;
-      }
-      catch (SQLException e) {
-         throw new RuntimeException(e);
-      }
-      finally {
-         closeStatement(statement);
-      }
-   }
-
-   public Set<ResourcePermission> getGlobalResourcePermissions(SQLConnection connection,
-                                                               Resource accessorResource,
-                                                               Id<ResourceClassId> resourceClassId,
-                                                               Id<DomainId> resourceDomainId) {
-      SQLStatement statement = null;
-      try {
-         // collect the system permissions that the accessor has to the accessed resource directly
-         SQLResult resultSet;
-         Set<ResourcePermission> resourcePermissions = new HashSet<>();
-
-         statement = connection.prepareStatement(sqlStrings.SQL_findInGrantGlobalResourcePermission_withoutInheritance_PermissionName_IsWithGrant_BY_AccessorID_AccessedDomainID_ResourceClassID);
-         statement.setResourceId(1, accessorResource);
-         statement.setResourceDomainId(2, resourceDomainId);
-         statement.setResourceClassId(3, resourceClassId);
-         resultSet = statement.executeQuery();
-
-         while (resultSet.next()) {
-            resourcePermissions.add(ResourcePermissions.getInstance(
-                  resultSet.getString("PermissionName"),
-                  resultSet.getBoolean("IsWithGrant"),
-                  0,
-                  0));
-         }
-         resultSet.close();
-
-         return resourcePermissions;
-      }
-      catch (SQLException e) {
-         throw new RuntimeException(e);
-      }
-      finally {
-         closeStatement(statement);
-      }
-   }
-
-   public Map<String, Map<String, Set<ResourcePermission>>> getGlobalResourcePermissionsIncludeInherited(SQLConnection connection,
-                                                                                                         Resource accessorResource) {
-      SQLStatement statement = null;
-      try {
-         // collect the non-system permissions that the accessor has
-         SQLResult resultSet;
-         final Map<String, Map<String, Set<ResourcePermission>>> globalPermissionsMap = new HashMap<>();
-
-         statement = connection.prepareStatement(sqlStrings.SQL_findInGrantGlobalResourcePermission_ResourceDomainName_ResourceClassName_PermissionName_IsWithGrant_InheritLevel_DomainLevel_BY_AccessorID);
-         statement.setResourceId(1, accessorResource);
-         resultSet = statement.executeQuery();
-
-         while (resultSet.next()) {
-            final String resourceDomainName;
-            final String resourceClassName;
-            Map<String, Set<ResourcePermission>> permissionsForResourceDomain;
-            Set<ResourcePermission> resourcePermissionsForResourceClass;
-
-            resourceDomainName = resultSet.getString("DomainName");
-            resourceClassName = resultSet.getString("ResourceClassName");
-
-            if ((permissionsForResourceDomain = globalPermissionsMap.get(resourceDomainName)) == null) {
-               globalPermissionsMap.put(resourceDomainName,
-                                        permissionsForResourceDomain = new HashMap<>());
-            }
-
-            if ((resourcePermissionsForResourceClass = permissionsForResourceDomain.get(resourceClassName)) == null) {
-               permissionsForResourceDomain.put(resourceClassName,
-                                                resourcePermissionsForResourceClass = new HashSet<>());
-            }
-
-            resourcePermissionsForResourceClass.add(ResourcePermissions.getInstance(
-                  resultSet.getString("PermissionName"),
-                  resultSet.getBoolean("IsWithGrant"),
-                  resultSet.getInteger("InheritLevel"),
-                  resultSet.getInteger("DomainLevel")));
-         }
-         resultSet.close();
-
-         return globalPermissionsMap;
-      }
-      catch (SQLException e) {
-         throw new RuntimeException(e);
-      }
-      finally {
-         closeStatement(statement);
-      }
-   }
-
-   public Map<String, Map<String, Set<ResourcePermission>>> getGlobalResourcePermissions(SQLConnection connection,
-                                                                                         Resource accessorResource) {
-      SQLStatement statement = null;
-      try {
-         // collect the non-system permissions that the accessor has
-         SQLResult resultSet;
-         final Map<String, Map<String, Set<ResourcePermission>>> globalPermissionsMap = new HashMap<>();
-
-         statement = connection.prepareStatement(sqlStrings.SQL_findInGrantGlobalResourcePermission_withoutInheritance_ResourceDomainName_ResourceClassName_PermissionName_IsWithGrant_BY_AccessorID);
-         statement.setResourceId(1, accessorResource);
-         resultSet = statement.executeQuery();
-
-         while (resultSet.next()) {
-            final String resourceDomainName;
-            final String resourceClassName;
-            Map<String, Set<ResourcePermission>> permissionsForResourceDomain;
-            Set<ResourcePermission> resourcePermissionsForResourceClass;
-
-            resourceDomainName = resultSet.getString("DomainName");
-            resourceClassName = resultSet.getString("ResourceClassName");
-
-            if ((permissionsForResourceDomain = globalPermissionsMap.get(resourceDomainName)) == null) {
-               globalPermissionsMap.put(resourceDomainName,
-                                        permissionsForResourceDomain = new HashMap<>());
-            }
-
-            if ((resourcePermissionsForResourceClass = permissionsForResourceDomain.get(resourceClassName)) == null) {
-               permissionsForResourceDomain.put(resourceClassName,
-                                                resourcePermissionsForResourceClass = new HashSet<>());
-            }
-
-            resourcePermissionsForResourceClass.add(ResourcePermissions.getInstance(
-                  resultSet.getString("PermissionName"),
-                  resultSet.getBoolean("IsWithGrant"),
-                  0,
-                  0));
-         }
-         resultSet.close();
-
-         return globalPermissionsMap;
-      }
-      catch (SQLException e) {
-         throw new RuntimeException(e);
-      }
-      finally {
-         closeStatement(statement);
-      }
-   }
-
-   public void addGlobalResourcePermissions(SQLConnection connection,
-                                            Resource accessorResource,
-                                            Id<ResourceClassId> accessedResourceClassId,
-                                            Id<DomainId> accessedResourceDomainId,
-                                            Set<ResourcePermission> requestedResourcePermissions,
-                                            Resource grantorResource) {
-      SQLStatement statement = null;
-      try {
-         // add the new non-system permissions
-         statement = connection.prepareStatement(sqlStrings.SQL_createInGrantGlobalResourcePermission_WITH_AccessorID_GrantorID_AccessedDomainID_IsWithGrant_ResourceClassID_PermissionName);
-         for (ResourcePermission resourcePermission : requestedResourcePermissions) {
-            if (!resourcePermission.isSystemPermission()) {
-               statement.setResourceId(1, accessorResource);
-               statement.setResourceId(2, grantorResource);
-               statement.setResourceDomainId(3, accessedResourceDomainId);
-               statement.setBoolean(4, resourcePermission.isWithGrant());
-               statement.setResourceClassId(5, accessedResourceClassId);
-               statement.setString(6, resourcePermission.getPermissionName());
-
-               assertOneRowInserted(statement.executeUpdate());
-            }
-         }
-      }
-      catch (SQLException e) {
-         throw new RuntimeException(e);
-      }
-      finally {
-         closeStatement(statement);
-      }
-   }
-
-   public void updateGlobalResourcePermissions(SQLConnection connection,
-                                               Resource accessorResource,
-                                               Id<ResourceClassId> accessedResourceClassId,
-                                               Id<DomainId> accessedResourceDomainId,
-                                               Set<ResourcePermission> requestedResourcePermissions,
-                                               Resource grantorResource) {
-      SQLStatement statement = null;
-      try {
-         // add the new non-system permissions
-         statement = connection.prepareStatement(sqlStrings.SQL_updateInGrantGlobalResourcePermission_SET_GrantorID_IsWithGrant_BY_AccessorID_AccessedDomainID_ResourceClassID_PermissionName);
-         for (ResourcePermission resourcePermission : requestedResourcePermissions) {
-            if (!resourcePermission.isSystemPermission()) {
-               statement.setResourceId(1, grantorResource);
-               statement.setBoolean(2, resourcePermission.isWithGrant());
-               statement.setResourceId(3, accessorResource);
-               statement.setResourceDomainId(4, accessedResourceDomainId);
-               statement.setResourceClassId(5, accessedResourceClassId);
-               statement.setString(6, resourcePermission.getPermissionName());
-
-               assertOneRowUpdated(statement.executeUpdate());
-            }
-         }
-      }
-      catch (SQLException e) {
-         throw new RuntimeException(e);
-      }
-      finally {
-         closeStatement(statement);
-      }
-   }
-
-   public void removeAllGlobalResourcePermissions(SQLConnection connection,
-                                                  Resource accessorResource) {
-
-      SQLStatement statement = null;
-      try {
-         // revoke any existing non-system permissions this accessor has to any domain + resource class
-         statement = connection.prepareStatement(sqlStrings.SQL_removeInGrantGlobalResourcePermission_BY_AccessorID);
-         statement.setResourceId(1, accessorResource);
-         statement.executeUpdate();
-      }
-      catch (SQLException e) {
-         throw new RuntimeException(e);
-      }
-      finally {
-         closeStatement(statement);
-      }
-   }
-
-   public void removeAllGlobalResourcePermissions(SQLConnection connection,
-                                                  Id<DomainId> accessedDomainId) {
-
-      SQLStatement statement = null;
-      try {
-         // chose strategy to perform recursive delete based on sql dialect
-         if (sqlStrings.sqlDialect == SQLDialect.DB2_10_5) {
-            // DB2 doesn't support recursive deletion, so we have to remove domain's children's accessors first
-
-            // get descendant domain Ids
-            statement = connection.prepareStatement(sqlStrings.SQL_findInDomain_DescendantResourceDomainID_BY_DomainID_ORDERBY_DomainLevel);
-            statement.setResourceDomainId(1, accessedDomainId);
-            SQLResult resultSet = statement.executeQuery();
-
-            List<Id<DomainId>> descendantDomainIds = new ArrayList<>();
-
-            while (resultSet.next()) {
-               descendantDomainIds.add(resultSet.getResourceDomainId("DomainId"));
-            }
-
-            // delete domains' accessors (in reverse order of domainLevel, to preserve FK constraints)
-            statement = connection.prepareStatement(sqlStrings.SQL_removeInGrantGlobalResourcePermission_BY_AccessedDomainId);
-
-            for (int i=descendantDomainIds.size()-1; i >= 0; i--) {
-               statement.setResourceDomainId(1, descendantDomainIds.get(i));
-               statement.executeUpdate();
-            }
-         }
-         else {
-            // prepare the standard recursive delete statement for domain and its children
-            statement = connection.prepareStatement(sqlStrings.SQL_removeInGrantGlobalResourcePermission_withDescendants_BY_AccessedDomainId);
-
-            // revoke any existing non-system permissions any accessor has to this domain + any resource class
-            statement.setResourceDomainId(1, accessedDomainId);
-            statement.executeUpdate();
-         }
-      }
-      catch (SQLException e) {
-         throw new RuntimeException(e);
-      }
-      finally {
-         closeStatement(statement);
-      }
-   }
-
-   public void removeGlobalResourcePermissions(SQLConnection connection,
-                                               Resource accessorResource,
-                                               Id<ResourceClassId> accessedResourceClassId,
-                                               Id<DomainId> accessedResourceDomainId) {
-
-      SQLStatement statement = null;
-      try {
-         // revoke any existing non-system permissions this accessor has to this domain + resource class
-         statement = connection.prepareStatement(sqlStrings.SQL_removeInGrantGlobalResourcePermission_BY_AccessorID_AccessedDomainID_ResourceClassID);
-         statement.setResourceId(1, accessorResource);
-         statement.setResourceDomainId(2, accessedResourceDomainId);
-         statement.setResourceClassId(3, accessedResourceClassId);
-         statement.executeUpdate();
-      }
-      catch (SQLException e) {
-         throw new RuntimeException(e);
-      }
-      finally {
-         closeStatement(statement);
-      }
-   }
-
-   public void removeGlobalResourcePermissions(SQLConnection connection,
-                                               Resource accessorResource,
-                                               Id<ResourceClassId> accessedResourceClassId,
-                                               Id<DomainId> accessedResourceDomainId,
-                                               Set<ResourcePermission> requestedResourcePermissions) {
-      SQLStatement statement = null;
-      try {
-         // remove the specified non-system permissions
-         statement = connection.prepareStatement(sqlStrings.SQL_removeInGrantGlobalResourcePermission_BY_AccessorID_AccessedDomainID_ResourceClassID_PermissionName);
-         for (ResourcePermission resourcePermission : requestedResourcePermissions) {
-            if (!resourcePermission.isSystemPermission()) {
-               statement.setResourceId(1, accessorResource);
-               statement.setResourceDomainId(2, accessedResourceDomainId);
-               statement.setResourceClassId(3, accessedResourceClassId);
-               statement.setString(4, resourcePermission.getPermissionName());
-
-               assertOneRowUpdated(statement.executeUpdate());
-            }
-         }
-      }
-      catch (SQLException e) {
-         throw new RuntimeException(e);
-      }
-      finally {
-         closeStatement(statement);
-      }
-   }
+   void removeGlobalResourcePermissions(SQLConnection connection,
+                                        Resource accessorResource,
+                                        Id<ResourceClassId> accessedResourceClassId,
+                                        Id<DomainId> accessedResourceDomainId);
 }
