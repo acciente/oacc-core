@@ -18,10 +18,8 @@
 package com.acciente.oacc.sql.internal.persister;
 
 import com.acciente.oacc.Resource;
-import com.acciente.oacc.ResourceCreatePermission;
 import com.acciente.oacc.ResourcePermission;
 import com.acciente.oacc.ResourcePermissions;
-import com.acciente.oacc.sql.SQLDialect;
 import com.acciente.oacc.sql.internal.persister.id.DomainId;
 import com.acciente.oacc.sql.internal.persister.id.Id;
 import com.acciente.oacc.sql.internal.persister.id.ResourceClassId;
@@ -29,6 +27,7 @@ import com.acciente.oacc.sql.internal.persister.id.ResourceId;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -55,10 +54,10 @@ public class NonRecursiveGrantGlobalResourcePermissionSysPersister extends Commo
          final Set<Id<ResourceId>> accessorResourceIds
                = NonRecursivePersisterHelper.getInheritedAccessorResourceIds(sqlStrings, connection, accessorResource);
 
-         // now accumulate the objects of the specified type that each (inherited) accessor has the specified permission to
+         // second, get all the domains the accessors directly have the specified global permission to
          SQLResult resultSet;
-         Set<Resource> resources = new HashSet<>();
-         statement = connection.prepareStatement(sqlStrings.SQL_findInGrantGlobalResourcePermissionSys_withoutInheritance_ResourceID_BY_AccessorID_ResourceClassID_SysPermissionID_IsWithGrant);
+         Set<Id<DomainId>> directGlobalDomains = new HashSet<>();
+         statement = connection.prepareStatement(sqlStrings.SQL_findInGrantGlobalResourcePermissionSys_withoutInheritance_ResourceDomainID_BY_AccessorID_ResourceClassID_SysPermissionID_IsWithGrant);
 
          for (Id<ResourceId> accessorResourceId : accessorResourceIds) {
             statement.setResourceId(1, accessorResourceId);
@@ -68,9 +67,30 @@ public class NonRecursiveGrantGlobalResourcePermissionSysPersister extends Commo
             resultSet = statement.executeQuery();
 
             while (resultSet.next()) {
-               resources.add(resultSet.getResource("ResourceId"));
+               directGlobalDomains.add(resultSet.getResourceDomainId("DomainId"));
             }
             resultSet.close();
+         }
+
+         // then get all resources of the specified class for each of the direct domain's descendants
+         Set<Resource> resources = new HashSet<>();
+         statement = connection.prepareStatement(sqlStrings.SQL_findInResource_withoutInheritance_ResourceId_BY_ResourceClassID_DomainID);
+
+         for (Id<DomainId> directDomainId: directGlobalDomains) {
+            Set<Id<DomainId>> descendentDomainIds
+                  = NonRecursivePersisterHelper.getDescendantDomainIdsOrderedByAscendingLevel(sqlStrings,
+                                                                                              connection,
+                                                                                              directDomainId);
+            for (Id<DomainId> descendentDomainId : descendentDomainIds) {
+               statement.setResourceClassId(1, resourceClassId);
+               statement.setResourceDomainId(2, descendentDomainId);
+               resultSet = statement.executeQuery();
+
+               while (resultSet.next()) {
+                  resources.add(resultSet.getResource("ResourceId"));
+               }
+               resultSet.close();
+            }
          }
 
          return resources;
@@ -99,32 +119,68 @@ public class NonRecursiveGrantGlobalResourcePermissionSysPersister extends Commo
          final Set<Id<ResourceId>> accessorResourceIds
                = NonRecursivePersisterHelper.getInheritedAccessorResourceIds(sqlStrings, connection, accessorResource);
 
-         // then get all the descendants of the specified domain
-         final Set<Id<DomainId>> descendantDomainIds
+         // second, get all the domains the accessors directly have the specified global permission to
+         SQLResult resultSet;
+         Set<Id<DomainId>> directGlobalDomains = new HashSet<>();
+         statement = connection.prepareStatement(sqlStrings.SQL_findInGrantGlobalResourcePermissionSys_withoutInheritance_ResourceDomainID_BY_AccessorID_ResourceClassID_SysPermissionID_IsWithGrant);
+
+         for (Id<ResourceId> accessorResourceId : accessorResourceIds) {
+            statement.setResourceId(1, accessorResourceId);
+            statement.setResourceClassId(2, resourceClassId);
+            statement.setResourceSystemPermissionId(3, resourcePermission.getSystemPermissionId());
+            statement.setBoolean(4, resourcePermission.isWithGrant());
+            resultSet = statement.executeQuery();
+
+            while (resultSet.next()) {
+               directGlobalDomains.add(resultSet.getResourceDomainId("DomainId"));
+            }
+            resultSet.close();
+         }
+
+         Set<Id<DomainId>> requestedAncestorDomainIds
+               = NonRecursivePersisterHelper.getAncestorDomainIds(sqlStrings, connection, resourceDomainId);
+         Set<Id<DomainId>> requestedDescendentDomainIds
                = NonRecursivePersisterHelper.getDescendantDomainIdsOrderedByAscendingLevel(sqlStrings,
                                                                                            connection,
                                                                                            resourceDomainId);
+         Set<Id<DomainId>> effectiveDomainIds = Collections.emptySet();
 
-         // now accumulate the objects of the specified type that each (inherited) accessor
-         // has the specified permission to in each of the descendant domains
-         SQLResult resultSet;
-         Set<Resource> resources = new HashSet<>();
-         statement = connection.prepareStatement(sqlStrings.SQL_findInGrantGlobalResourcePermissionSys_ResourceID_BY_AccessorID_DomainID_ResourceClassID_SysPermissionID_IsWithGrant);
-
-         for (Id<ResourceId> accessorResourceId : accessorResourceIds) {
-            for (Id<DomainId> descendantDomainId : descendantDomainIds) {
-               statement.setResourceId(1, accessorResourceId);
-               statement.setResourceDomainId(2, descendantDomainId);
-               statement.setResourceClassId(3, resourceClassId);
-               statement.setResourceSystemPermissionId(4, resourcePermission.getSystemPermissionId());
-               statement.setBoolean(5, resourcePermission.isWithGrant());
-               resultSet = statement.executeQuery();
-
-               while (resultSet.next()) {
-                  resources.add(resultSet.getResource("ResourceId"));
-               }
-               resultSet.close();
+         // let's see if we have global permissions on an ancestor of the requested domain, first
+         for (Id<DomainId> directDomainId: directGlobalDomains) {
+            if (requestedAncestorDomainIds.contains(directDomainId)) {
+               // because we have global permissions on an ancestor of the requested domain,
+               // we have access to all resources of any sub-domain of the requested domain
+               effectiveDomainIds = requestedDescendentDomainIds;
+               break;
             }
+         }
+
+         if (effectiveDomainIds.isEmpty()){
+            // we did not have global permission on an ancestor of the requested domain, so let's
+            // find the highest level sub-domain of the requested domain to which we have global permission
+            for (Id<DomainId> requestedDescendentDomainId : requestedDescendentDomainIds) {
+               if (directGlobalDomains.contains(requestedDescendentDomainId)) {
+                  effectiveDomainIds
+                        = NonRecursivePersisterHelper.getDescendantDomainIdsOrderedByAscendingLevel(sqlStrings,
+                                                                                                    connection,
+                                                                                                    requestedDescendentDomainId);
+                  break;
+               }
+            }
+         }
+
+         // now let's collect all the resources for those sub-domains to which we effectively have global permissions
+         Set<Resource> resources = new HashSet<>();
+         statement = connection.prepareStatement(sqlStrings.SQL_findInResource_withoutInheritance_ResourceId_BY_ResourceClassID_DomainID);
+         for (Id<DomainId> effectiveDomainId : effectiveDomainIds) {
+            statement.setResourceClassId(1, resourceClassId);
+            statement.setResourceDomainId(2, effectiveDomainId);
+            resultSet = statement.executeQuery();
+
+            while (resultSet.next()) {
+               resources.add(resultSet.getResource("ResourceId"));
+            }
+            resultSet.close();
          }
 
          return resources;
@@ -165,11 +221,11 @@ public class NonRecursiveGrantGlobalResourcePermissionSysPersister extends Commo
                resultSet = statement.executeQuery();
 
                while (resultSet.next()) {
-                  resourcePermissions.add(ResourcePermissions.getInstance(resultSet.getResourceSysPermissionName(
-                                                                                "SysPermissionId"),
-                                                                          resultSet.getBoolean("IsWithGrant"),
-                                                                          0,
-                                                                          0));
+                  resourcePermissions
+                        .add(ResourcePermissions.getInstance(resultSet.getResourceSysPermissionName("SysPermissionId"),
+                                                             resultSet.getBoolean("IsWithGrant"),
+                                                             0,
+                                                             0));
                }
                resultSet.close();
             }

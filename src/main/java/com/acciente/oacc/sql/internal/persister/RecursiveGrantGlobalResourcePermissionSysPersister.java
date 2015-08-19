@@ -53,11 +53,12 @@ public class RecursiveGrantGlobalResourcePermissionSysPersister extends CommonGr
          Set<Resource> resources = new HashSet<>();
 
          // get the list of objects of the specified type that the session has access to via global permissions
-         statement = connection.prepareStatement(sqlStrings.SQL_findInGrantGlobalResourcePermissionSys_ResourceID_BY_AccessorID_ResourceClassID_SysPermissionID_IsWithGrant);
+         statement = connection.prepareStatement(sqlStrings.SQL_findInGrantGlobalResourcePermissionSys_ResourceID_BY_AccessorID_ResourceClassID_SysPermissionID_IsWithGrant_ResourceClassID);
          statement.setResourceId(1, accessorResource);
          statement.setResourceClassId(2, resourceClassId);
          statement.setResourceSystemPermissionId(3, resourcePermission.getSystemPermissionId());
          statement.setBoolean(4, resourcePermission.isWithGrant());
+         statement.setResourceClassId(5, resourceClassId);
          resultSet = statement.executeQuery();
 
          while (resultSet.next()) {
@@ -91,12 +92,13 @@ public class RecursiveGrantGlobalResourcePermissionSysPersister extends CommonGr
          SQLResult resultSet;
          Set<Resource> resources = new HashSet<>();
 
-         statement = connection.prepareStatement(sqlStrings.SQL_findInGrantGlobalResourcePermissionSys_ResourceID_BY_AccessorID_DomainID_ResourceClassID_SysPermissionID_IsWithGrant);
+         statement = connection.prepareStatement(sqlStrings.SQL_findInGrantGlobalResourcePermissionSys_ResourceID_BY_AccessorID_DomainID_ResourceClassID_SysPermissionID_IsWithGrant_ResourceClassID);
          statement.setResourceId(1, accessorResource);
          statement.setResourceDomainId(2, resourceDomainId);
          statement.setResourceClassId(3, resourceClassId);
          statement.setResourceSystemPermissionId(4, resourcePermission.getSystemPermissionId());
          statement.setBoolean(5, resourcePermission.isWithGrant());
+         statement.setResourceClassId(6, resourceClassId);
          resultSet = statement.executeQuery();
 
          while (resultSet.next()) {
