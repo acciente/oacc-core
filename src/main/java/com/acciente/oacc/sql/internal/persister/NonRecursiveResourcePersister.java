@@ -17,6 +17,7 @@
  */
 package com.acciente.oacc.sql.internal.persister;
 
+import com.acciente.oacc.sql.SQLType;
 import com.acciente.oacc.sql.internal.persister.id.DomainId;
 import com.acciente.oacc.sql.internal.persister.id.Id;
 
@@ -24,8 +25,9 @@ import java.sql.SQLException;
 import java.util.Set;
 
 public class NonRecursiveResourcePersister extends CommonResourcePersister {
-   public NonRecursiveResourcePersister(SQLStrings sqlStrings) {
-      super(sqlStrings);
+   public NonRecursiveResourcePersister(SQLType sqlType,
+                                        SQLStrings sqlStrings) {
+      super(sqlType, sqlStrings);
    }
 
    @Override

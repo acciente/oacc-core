@@ -17,6 +17,7 @@
  */
 package com.acciente.oacc.sql.internal.persister;
 
+import com.acciente.oacc.sql.SQLType;
 import com.acciente.oacc.sql.internal.persister.id.DomainId;
 import com.acciente.oacc.sql.internal.persister.id.Id;
 
@@ -28,8 +29,9 @@ import java.util.List;
 import java.util.Set;
 
 public class NonRecursiveDomainPersister extends CommonDomainPersister {
-   public NonRecursiveDomainPersister(SQLStrings sqlStrings) {
-      super(sqlStrings);
+   public NonRecursiveDomainPersister(SQLType sqlType,
+                                      SQLStrings sqlStrings) {
+      super(sqlType, sqlStrings);
    }
 
    @Override

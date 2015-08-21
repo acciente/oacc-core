@@ -20,6 +20,7 @@ package com.acciente.oacc.sql.internal.persister;
 import com.acciente.oacc.Resource;
 import com.acciente.oacc.ResourcePermission;
 import com.acciente.oacc.ResourcePermissions;
+import com.acciente.oacc.sql.SQLType;
 import com.acciente.oacc.sql.internal.persister.id.DomainId;
 import com.acciente.oacc.sql.internal.persister.id.Id;
 import com.acciente.oacc.sql.internal.persister.id.ResourceClassId;
@@ -31,9 +32,12 @@ import java.util.Map;
 import java.util.Set;
 
 public abstract class CommonGrantGlobalResourcePermissionSysPersister extends Persister implements GrantGlobalResourcePermissionSysPersister {
+   protected final SQLType    sqlType;
    protected final SQLStrings sqlStrings;
 
-   public CommonGrantGlobalResourcePermissionSysPersister(SQLStrings sqlStrings) {
+   public CommonGrantGlobalResourcePermissionSysPersister(SQLType sqlType,
+                                                          SQLStrings sqlStrings) {
+      this.sqlType = sqlType;
       this.sqlStrings = sqlStrings;
    }
 

@@ -17,14 +17,16 @@
  */
 package com.acciente.oacc.sql.internal.persister;
 
+import com.acciente.oacc.sql.SQLType;
 import com.acciente.oacc.sql.internal.persister.id.DomainId;
 import com.acciente.oacc.sql.internal.persister.id.Id;
 
 import java.sql.SQLException;
 
 public class RecursiveResourcePersister extends CommonResourcePersister {
-   public RecursiveResourcePersister(SQLStrings sqlStrings) {
-      super(sqlStrings);
+   public RecursiveResourcePersister(SQLType sqlType,
+                                     SQLStrings sqlStrings) {
+      super(sqlType, sqlStrings);
    }
 
    @Override

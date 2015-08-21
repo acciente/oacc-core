@@ -20,15 +20,19 @@ package com.acciente.oacc.sql.internal.persister;
 import com.acciente.oacc.DomainCreatePermission;
 import com.acciente.oacc.DomainCreatePermissions;
 import com.acciente.oacc.Resource;
+import com.acciente.oacc.sql.SQLType;
 
 import java.sql.SQLException;
 import java.util.HashSet;
 import java.util.Set;
 
 public abstract class CommonGrantDomainCreatePermissionSysPersister extends Persister implements GrantDomainCreatePermissionSysPersister {
+   protected final SQLType    sqlType;
    protected final SQLStrings sqlStrings;
 
-   public CommonGrantDomainCreatePermissionSysPersister(SQLStrings sqlStrings) {
+   public CommonGrantDomainCreatePermissionSysPersister(SQLType sqlType,
+                                                        SQLStrings sqlStrings) {
+      this.sqlType = sqlType;
       this.sqlStrings = sqlStrings;
    }
 
@@ -42,7 +46,8 @@ public abstract class CommonGrantDomainCreatePermissionSysPersister extends Pers
       SQLStatement statement = null;
 
       try {
-         statement = connection.prepareStatement(sqlStrings.SQL_findInGrantDomainCreatePermissionSys_withoutInheritance_SysPermissionID_BY_AccessorID);
+         statement = connection
+               .prepareStatement(sqlStrings.SQL_findInGrantDomainCreatePermissionSys_withoutInheritance_SysPermissionID_BY_AccessorID);
          statement.setResourceId(1, accessorResource);
          SQLResult resultSet = statement.executeQuery();
 

@@ -18,6 +18,7 @@
 package com.acciente.oacc.sql.internal.persister;
 
 import com.acciente.oacc.Resource;
+import com.acciente.oacc.sql.SQLType;
 import com.acciente.oacc.sql.internal.persister.id.DomainId;
 import com.acciente.oacc.sql.internal.persister.id.Id;
 import com.acciente.oacc.sql.internal.persister.id.ResourceClassId;
@@ -26,9 +27,12 @@ import com.acciente.oacc.sql.internal.persister.id.ResourceId;
 import java.sql.SQLException;
 
 public abstract class CommonResourcePersister extends Persister implements ResourcePersister {
+   protected final SQLType    sqlType;
    protected final SQLStrings sqlStrings;
 
-   public CommonResourcePersister(SQLStrings sqlStrings) {
+   public CommonResourcePersister(SQLType sqlType,
+                                  SQLStrings sqlStrings) {
+      this.sqlType = sqlType;
       this.sqlStrings = sqlStrings;
    }
 

@@ -20,6 +20,7 @@ package com.acciente.oacc.sql.internal.persister;
 import com.acciente.oacc.Resource;
 import com.acciente.oacc.ResourceCreatePermission;
 import com.acciente.oacc.ResourceCreatePermissions;
+import com.acciente.oacc.sql.SQLType;
 import com.acciente.oacc.sql.internal.persister.id.DomainId;
 import com.acciente.oacc.sql.internal.persister.id.Id;
 import com.acciente.oacc.sql.internal.persister.id.ResourceClassId;
@@ -31,9 +32,12 @@ import java.util.Map;
 import java.util.Set;
 
 public abstract class CommonGrantResourceCreatePermissionSysPersister extends Persister implements GrantResourceCreatePermissionSysPersister {
+   protected final SQLType    sqlType;
    protected final SQLStrings sqlStrings;
 
-   public CommonGrantResourceCreatePermissionSysPersister(SQLStrings sqlStrings) {
+   public CommonGrantResourceCreatePermissionSysPersister(SQLType sqlType,
+                                                          SQLStrings sqlStrings) {
+      this.sqlType = sqlType;
       this.sqlStrings = sqlStrings;
    }
 
@@ -44,9 +48,8 @@ public abstract class CommonGrantResourceCreatePermissionSysPersister extends Pe
                                                                                                  Id<DomainId> resourceDomainId);
 
    @Override
-   public abstract
-   Map<String, Map<String, Set<ResourceCreatePermission>>> getResourceCreateSysPermissionsIncludeInherited(SQLConnection connection,
-                                                                                                           Resource accessorResource);
+   public abstract Map<String, Map<String, Set<ResourceCreatePermission>>> getResourceCreateSysPermissionsIncludeInherited(SQLConnection connection,
+                                                                                                                           Resource accessorResource);
 
    @Override
    public Map<String, Map<String, Set<ResourceCreatePermission>>> getResourceCreateSysPermissions(SQLConnection connection,

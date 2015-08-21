@@ -261,65 +261,65 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
    private SQLAccessControlContext(String schemaName,
                                    SQLType sqlType) {
       // generate all the SQLs the persisters need based on the database dialect
-      SQLStrings sqlStrings = SQLStrings.getSQLStrings(schemaName, sqlType.getSqlDialect());
+      SQLStrings sqlStrings = SQLStrings.getSQLStrings(schemaName, sqlType);
 
       // setup persisters
       resourceClassPersister
-            = new ResourceClassPersister(sqlStrings);
+            = new ResourceClassPersister(sqlType, sqlStrings);
       resourceClassPermissionPersister
-            = new ResourceClassPermissionPersister(sqlStrings);
+            = new ResourceClassPermissionPersister(sqlType, sqlStrings);
 
       if (sqlType.isRecursionCompatible()) {
          grantDomainCreatePermissionSysPersister
-               = new RecursiveGrantDomainCreatePermissionSysPersister(sqlStrings);
+               = new RecursiveGrantDomainCreatePermissionSysPersister(sqlType, sqlStrings);
          grantDomainCreatePermissionPostCreateSysPersister
-               = new RecursiveGrantDomainCreatePermissionPostCreateSysPersister(sqlStrings);
+               = new RecursiveGrantDomainCreatePermissionPostCreateSysPersister(sqlType, sqlStrings);
          grantDomainPermissionSysPersister
-               = new RecursiveGrantDomainPermissionSysPersister(sqlStrings);
+               = new RecursiveGrantDomainPermissionSysPersister(sqlType, sqlStrings);
          domainPersister
-               = new RecursiveDomainPersister(sqlStrings);
+               = new RecursiveDomainPersister(sqlType, sqlStrings);
          resourcePersister
-               = new RecursiveResourcePersister(sqlStrings);
+               = new RecursiveResourcePersister(sqlType, sqlStrings);
          grantResourceCreatePermissionSysPersister
-               = new RecursiveGrantResourceCreatePermissionSysPersister(sqlStrings);
+               = new RecursiveGrantResourceCreatePermissionSysPersister(sqlType, sqlStrings);
          grantResourceCreatePermissionPostCreateSysPersister
-               = new RecursiveGrantResourceCreatePermissionPostCreateSysPersister(sqlStrings);
+               = new RecursiveGrantResourceCreatePermissionPostCreateSysPersister(sqlType, sqlStrings);
          grantResourceCreatePermissionPostCreatePersister
-               = new RecursiveGrantResourceCreatePermissionPostCreatePersister(sqlStrings);
+               = new RecursiveGrantResourceCreatePermissionPostCreatePersister(sqlType, sqlStrings);
          grantResourcePermissionSysPersister
-               = new RecursiveGrantResourcePermissionSysPersister(sqlStrings);
+               = new RecursiveGrantResourcePermissionSysPersister(sqlType, sqlStrings);
          grantGlobalResourcePermissionSysPersister
-               = new RecursiveGrantGlobalResourcePermissionSysPersister(sqlStrings);
+               = new RecursiveGrantGlobalResourcePermissionSysPersister(sqlType, sqlStrings);
          grantResourcePermissionPersister
-               = new RecursiveGrantResourcePermissionPersister(sqlStrings);
+               = new RecursiveGrantResourcePermissionPersister(sqlType, sqlStrings);
          grantGlobalResourcePermissionPersister
-               = new RecursiveGrantGlobalResourcePermissionPersister(sqlStrings);
+               = new RecursiveGrantGlobalResourcePermissionPersister(sqlType, sqlStrings);
       }
       else {
          grantDomainCreatePermissionSysPersister
-               = new NonRecursiveGrantDomainCreatePermissionSysPersister(sqlStrings);
+               = new NonRecursiveGrantDomainCreatePermissionSysPersister(sqlType, sqlStrings);
          grantDomainCreatePermissionPostCreateSysPersister
-               = new NonRecursiveGrantDomainCreatePermissionPostCreateSysPersister(sqlStrings);
+               = new NonRecursiveGrantDomainCreatePermissionPostCreateSysPersister(sqlType, sqlStrings);
          grantDomainPermissionSysPersister
-               = new NonRecursiveGrantDomainPermissionSysPersister(sqlStrings);
+               = new NonRecursiveGrantDomainPermissionSysPersister(sqlType, sqlStrings);
          domainPersister
-               = new NonRecursiveDomainPersister(sqlStrings);
+               = new NonRecursiveDomainPersister(sqlType, sqlStrings);
          resourcePersister
-               = new NonRecursiveResourcePersister(sqlStrings);
+               = new NonRecursiveResourcePersister(sqlType, sqlStrings);
          grantResourceCreatePermissionSysPersister
-               = new NonRecursiveGrantResourceCreatePermissionSysPersister(sqlStrings);
+               = new NonRecursiveGrantResourceCreatePermissionSysPersister(sqlType, sqlStrings);
          grantResourceCreatePermissionPostCreateSysPersister
-               = new NonRecursiveGrantResourceCreatePermissionPostCreateSysPersister(sqlStrings);
+               = new NonRecursiveGrantResourceCreatePermissionPostCreateSysPersister(sqlType, sqlStrings);
          grantResourceCreatePermissionPostCreatePersister
-               = new NonRecursiveGrantResourceCreatePermissionPostCreatePersister(sqlStrings);
+               = new NonRecursiveGrantResourceCreatePermissionPostCreatePersister(sqlType, sqlStrings);
          grantResourcePermissionSysPersister
-               = new NonRecursiveGrantResourcePermissionSysPersister(sqlStrings);
+               = new NonRecursiveGrantResourcePermissionSysPersister(sqlType, sqlStrings);
          grantGlobalResourcePermissionSysPersister
-               = new NonRecursiveGrantGlobalResourcePermissionSysPersister(sqlStrings);
+               = new NonRecursiveGrantGlobalResourcePermissionSysPersister(sqlType, sqlStrings);
          grantResourcePermissionPersister
-               = new NonRecursiveGrantResourcePermissionPersister(sqlStrings);
+               = new NonRecursiveGrantResourcePermissionPersister(sqlType, sqlStrings);
          grantGlobalResourcePermissionPersister
-               = new NonRecursiveGrantGlobalResourcePermissionPersister(sqlStrings);
+               = new NonRecursiveGrantGlobalResourcePermissionPersister(sqlType, sqlStrings);
       }
    }
 

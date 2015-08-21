@@ -23,6 +23,7 @@ import com.acciente.oacc.ResourceCreatePermissions;
 import com.acciente.oacc.ResourcePermission;
 import com.acciente.oacc.ResourcePermissions;
 import com.acciente.oacc.sql.SQLDialect;
+import com.acciente.oacc.sql.SQLType;
 import com.acciente.oacc.sql.internal.persister.id.DomainId;
 import com.acciente.oacc.sql.internal.persister.id.Id;
 import com.acciente.oacc.sql.internal.persister.id.ResourceClassId;
@@ -36,8 +37,9 @@ import java.util.Map;
 import java.util.Set;
 
 public class RecursiveGrantResourceCreatePermissionPostCreatePersister extends CommonGrantResourceCreatePermissionPostCreatePersister {
-   public RecursiveGrantResourceCreatePermissionPostCreatePersister(SQLStrings sqlStrings) {
-      super(sqlStrings);
+   public RecursiveGrantResourceCreatePermissionPostCreatePersister(SQLType sqlType,
+                                                                    SQLStrings sqlStrings) {
+      super(sqlType, sqlStrings);
    }
 
    @Override
@@ -142,7 +144,7 @@ public class RecursiveGrantResourceCreatePermissionPostCreatePersister extends C
       SQLStatement statement = null;
       try {
          // chose strategy to perform recursive delete based on sql dialect
-         if (sqlStrings.sqlDialect == SQLDialect.DB2_10_5) {
+         if (sqlStrings.getSqlDialect() == SQLDialect.DB2_10_5) {
             // DB2 doesn't support recursive deletion, so we have to remove domain's children's accessors first
 
             // get descendant domain Ids

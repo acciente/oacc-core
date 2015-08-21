@@ -18,6 +18,7 @@
 package com.acciente.oacc.sql.internal.persister;
 
 import com.acciente.oacc.sql.SQLDialect;
+import com.acciente.oacc.sql.SQLType;
 import com.acciente.oacc.sql.internal.persister.id.DomainId;
 import com.acciente.oacc.sql.internal.persister.id.Id;
 
@@ -28,8 +29,9 @@ import java.util.List;
 import java.util.Set;
 
 public class RecursiveDomainPersister extends CommonDomainPersister {
-   public RecursiveDomainPersister(SQLStrings sqlStrings) {
-      super(sqlStrings);
+   public RecursiveDomainPersister(SQLType sqlType,
+                                   SQLStrings sqlStrings) {
+      super(sqlType, sqlStrings);
    }
 
    @Override
@@ -67,7 +69,7 @@ public class RecursiveDomainPersister extends CommonDomainPersister {
 
       try {
          // chose strategy to perform recursive delete based on sql dialect
-         if (sqlStrings.sqlDialect == SQLDialect.DB2_10_5) {
+         if (sqlStrings.getSqlDialect() == SQLDialect.DB2_10_5) {
             // DB2 doesn't support recursive deletion, so we have to remove domain's children first
 
             // get descendant domain Ids
