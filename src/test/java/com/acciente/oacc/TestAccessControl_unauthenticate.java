@@ -17,7 +17,7 @@
  */
 package com.acciente.oacc;
 
-import com.acciente.oacc.helper.Constants;
+import com.acciente.oacc.helper.TestConfigLoader;
 import org.junit.Test;
 
 import static org.hamcrest.CoreMatchers.containsString;
@@ -29,7 +29,7 @@ public class TestAccessControl_unauthenticate extends TestAccessControlBase {
    @Test
    public void unauthenticate_authenticatedSystemUser() {
       accessControlContext.authenticate(getSystemResource(),
-                                        PasswordCredentials.newInstance(Constants.OACC_ROOT_PWD));
+                                        PasswordCredentials.newInstance(TestConfigLoader.getOaccRootPassword()));
 
       assertThat(accessControlContext.getAuthenticatedResource(), is(SYS_RESOURCE));
       assertThat(accessControlContext.getSessionResource(), is(SYS_RESOURCE));

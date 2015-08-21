@@ -25,13 +25,17 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Properties;
 
-public class TestDataSourceFactory {
+public class TestConfigLoader {
    private static DataSource dataSource;
    private static Boolean    isDatabaseCaseSensitive;
    private static SQLType    sqlType;
+   private static String     databaseSchema;
+   private static char[]     oaccRootPwd;
 
    public static final String PROP_DATA_SOURCE_CLASS = "dataSourceClass";
    public static final String PROP_SQL_TYPE          = "sqlType";
+   public static final String PROP_DB_SCHEMA         = "dbSchema";
+   public static final String PROP_OACC_ROOT_PWD     = "oaccRootPwd";
 
    static {
       try {
@@ -59,11 +63,19 @@ public class TestDataSourceFactory {
          sqlType = SQLType.valueOf(sqlTypeName);
 
          for (String propertyName : properties.stringPropertyNames()) {
-            if (!(PROP_DATA_SOURCE_CLASS.equals(propertyName) || PROP_SQL_TYPE.equals(propertyName))) {
+            if (!(PROP_DATA_SOURCE_CLASS.equals(propertyName)
+                  || PROP_SQL_TYPE.equals(propertyName)
+                  || PROP_DB_SCHEMA.equals(propertyName)
+                  || PROP_OACC_ROOT_PWD.equals(propertyName))) {
                setDataSourceProperty(vendorSpecificDataSource, propertyName, properties.getProperty(propertyName));
             }
          }
          dataSource = vendorSpecificDataSource;
+         databaseSchema = properties.getProperty(PROP_DB_SCHEMA);
+         if (properties.getProperty(PROP_OACC_ROOT_PWD) != null)
+         {
+            oaccRootPwd = properties.getProperty(PROP_OACC_ROOT_PWD).toCharArray();
+         }
          isDatabaseCaseSensitive = CaseSensitiveChecker.isDatabaseCaseSensitive(dataSource);
       }
       catch (Exception e) {
@@ -101,6 +113,14 @@ public class TestDataSourceFactory {
 
    public static DataSource getDataSource() {
       return dataSource;
+   }
+
+   public static String getDatabaseSchema() {
+      return databaseSchema;
+   }
+
+   public static char[] getOaccRootPassword() {
+      return oaccRootPwd;
    }
 
    public static boolean isDatabaseCaseSensitive() {

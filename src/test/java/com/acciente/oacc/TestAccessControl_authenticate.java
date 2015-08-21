@@ -17,7 +17,7 @@
  */
 package com.acciente.oacc;
 
-import com.acciente.oacc.helper.Constants;
+import com.acciente.oacc.helper.TestConfigLoader;
 import org.junit.Test;
 
 import java.sql.SQLException;
@@ -33,7 +33,7 @@ public class TestAccessControl_authenticate extends TestAccessControlBase {
    @Test
    public void authenticateSystemUser_validPwd_shouldSucceed() {
       accessControlContext.authenticate(SYS_RESOURCE,
-                                        PasswordCredentials.newInstance(Constants.OACC_ROOT_PWD));
+                                        PasswordCredentials.newInstance(TestConfigLoader.getOaccRootPassword()));
       assertThat(accessControlContext.getAuthenticatedResource(), is(SYS_RESOURCE));
       assertThat(accessControlContext.getSessionResource(), is(SYS_RESOURCE));
 
@@ -43,10 +43,10 @@ public class TestAccessControl_authenticate extends TestAccessControlBase {
    @Test
    public void authenticateSystemUser_reAuthenticate_shouldSucceed() {
       accessControlContext.authenticate(SYS_RESOURCE,
-                                        PasswordCredentials.newInstance(Constants.OACC_ROOT_PWD));
+                                        PasswordCredentials.newInstance(TestConfigLoader.getOaccRootPassword()));
       // authenticate again
       accessControlContext.authenticate(SYS_RESOURCE,
-                                        PasswordCredentials.newInstance(Constants.OACC_ROOT_PWD));
+                                        PasswordCredentials.newInstance(TestConfigLoader.getOaccRootPassword()));
       assertThat(accessControlContext.getAuthenticatedResource(), is(SYS_RESOURCE));
       assertThat(accessControlContext.getSessionResource(), is(SYS_RESOURCE));
    }
@@ -54,14 +54,14 @@ public class TestAccessControl_authenticate extends TestAccessControlBase {
    @Test
    public void authenticateSystemUser_reAuthenticateAfterImpersonate_shouldSucceed() {
       accessControlContext.authenticate(SYS_RESOURCE,
-                                        PasswordCredentials.newInstance(Constants.OACC_ROOT_PWD));
+                                        PasswordCredentials.newInstance(TestConfigLoader.getOaccRootPassword()));
 
       // impersonate
       accessControlContext.impersonate(generateAuthenticatableResource(generateUniquePassword()));
 
       // authenticate again
       accessControlContext.authenticate(SYS_RESOURCE,
-                                        PasswordCredentials.newInstance(Constants.OACC_ROOT_PWD));
+                                        PasswordCredentials.newInstance(TestConfigLoader.getOaccRootPassword()));
       assertThat(accessControlContext.getAuthenticatedResource(), is(SYS_RESOURCE));
       assertThat(accessControlContext.getSessionResource(), is(SYS_RESOURCE));
    }
@@ -96,7 +96,7 @@ public class TestAccessControl_authenticate extends TestAccessControlBase {
 
    @Test
    public void authenticate_whitespaceAndCaseSensitivePasswords() {
-      final String oaccRootPwd = new String(Constants.OACC_ROOT_PWD);
+      final String oaccRootPwd = new String(TestConfigLoader.getOaccRootPassword());
       final String oaccRootPwd_whitespaced = " " + oaccRootPwd + "\t";
       final String oaccRootPwd_mixedCase
             = oaccRootPwd.toLowerCase().substring(0, oaccRootPwd.length()/2)

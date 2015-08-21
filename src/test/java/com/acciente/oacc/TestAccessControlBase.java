@@ -17,9 +17,8 @@
  */
 package com.acciente.oacc;
 
-import com.acciente.oacc.helper.Constants;
 import com.acciente.oacc.helper.SQLAccessControlSystemResetUtil;
-import com.acciente.oacc.helper.TestDataSourceFactory;
+import com.acciente.oacc.helper.TestConfigLoader;
 import com.acciente.oacc.sql.SQLAccessControlContextFactory;
 import com.acciente.oacc.sql.SQLType;
 import org.junit.After;
@@ -40,20 +39,20 @@ public class TestAccessControlBase {
    private static   boolean              isDBCaseSensitive;
 
    static {
-      sqlType = TestDataSourceFactory.getSQLType();
-      dataSource = TestDataSourceFactory.getDataSource();
-      isDBCaseSensitive = TestDataSourceFactory.isDatabaseCaseSensitive();
+      sqlType = TestConfigLoader.getSQLType();
+      dataSource = TestConfigLoader.getDataSource();
+      isDBCaseSensitive = TestConfigLoader.isDatabaseCaseSensitive();
       systemAccessControlContext
-            = SQLAccessControlContextFactory.getAccessControlContext(dataSource, Constants.DB_SCHEMA, sqlType);
+            = SQLAccessControlContextFactory.getAccessControlContext(dataSource, TestConfigLoader.getDatabaseSchema(), sqlType);
    }
 
    protected AccessControlContext accessControlContext;
 
    @Before
    public void setUpTest() throws Exception {
-      SQLAccessControlSystemResetUtil.resetOACC(dataSource, Constants.DB_SCHEMA, Constants.OACC_ROOT_PWD);
+      SQLAccessControlSystemResetUtil.resetOACC(dataSource, TestConfigLoader.getDatabaseSchema(), TestConfigLoader.getOaccRootPassword());
       accessControlContext
-            = SQLAccessControlContextFactory.getAccessControlContext(dataSource, Constants.DB_SCHEMA, sqlType);
+            = SQLAccessControlContextFactory.getAccessControlContext(dataSource, TestConfigLoader.getDatabaseSchema(), sqlType);
    }
 
    @After
@@ -112,12 +111,12 @@ public class TestAccessControlBase {
 
    protected static void authenticateSystemAccessControlContext() {
       systemAccessControlContext.authenticate(SYS_RESOURCE,
-                                              PasswordCredentials.newInstance(Constants.OACC_ROOT_PWD));
+                                              PasswordCredentials.newInstance(TestConfigLoader.getOaccRootPassword()));
    }
 
    protected void authenticateSystemResource() {
       accessControlContext.authenticate(SYS_RESOURCE,
-                                        PasswordCredentials.newInstance(Constants.OACC_ROOT_PWD));
+                                        PasswordCredentials.newInstance(TestConfigLoader.getOaccRootPassword()));
    }
 
    public static String generateUniqueDomainName() {

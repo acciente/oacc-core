@@ -17,7 +17,7 @@
  */
 package com.acciente.oacc;
 
-import com.acciente.oacc.helper.Constants;
+import com.acciente.oacc.helper.TestConfigLoader;
 import org.junit.Test;
 
 import java.util.Set;
@@ -32,12 +32,12 @@ public class TestAccessControl_setCredentials extends TestAccessControlBase {
       authenticateSystemResource();
 
       // update credentials and verify
-      final char[] newPwd = (Constants.OACC_ROOT_PWD + "_modified").toCharArray();
+      final char[] newPwd = (TestConfigLoader.getOaccRootPassword() + "_modified").toCharArray();
       accessControlContext.setCredentials(getSystemResource(), PasswordCredentials.newInstance(newPwd));
       accessControlContext.unauthenticate();
       try {
          accessControlContext.authenticate(getSystemResource(),
-                                           PasswordCredentials.newInstance(Constants.OACC_ROOT_PWD));
+                                           PasswordCredentials.newInstance(TestConfigLoader.getOaccRootPassword()));
          fail("authenticating with old credentials should have failed");
       }
       catch (IncorrectCredentialsException e) {
@@ -46,7 +46,7 @@ public class TestAccessControl_setCredentials extends TestAccessControlBase {
       accessControlContext.authenticate(getSystemResource(), PasswordCredentials.newInstance(newPwd));
 
       // update credentials and verify
-      final char[] intermediatePwd = (Constants.OACC_ROOT_PWD + "_intermediate").toCharArray();
+      final char[] intermediatePwd = (TestConfigLoader.getOaccRootPassword() + "_intermediate").toCharArray();
       accessControlContext.setCredentials(getSystemResource(), PasswordCredentials.newInstance(intermediatePwd));
       try {
          accessControlContext.authenticate(getSystemResource(), PasswordCredentials.newInstance(newPwd));
@@ -57,7 +57,7 @@ public class TestAccessControl_setCredentials extends TestAccessControlBase {
       }
       try {
          accessControlContext.authenticate(getSystemResource(),
-                                           PasswordCredentials.newInstance(Constants.OACC_ROOT_PWD));
+                                           PasswordCredentials.newInstance(TestConfigLoader.getOaccRootPassword()));
          fail("authenticating with old credentials should have failed");
       }
       catch (IncorrectCredentialsException e) {
@@ -67,7 +67,7 @@ public class TestAccessControl_setCredentials extends TestAccessControlBase {
 
       // optional: reset to original password
       accessControlContext.setCredentials(getSystemResource(),
-                                          PasswordCredentials.newInstance(Constants.OACC_ROOT_PWD));
+                                          PasswordCredentials.newInstance(TestConfigLoader.getOaccRootPassword()));
    }
 
    @Test

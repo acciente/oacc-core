@@ -17,8 +17,7 @@
  */
 package com.acciente.oacc;
 
-import com.acciente.oacc.helper.Constants;
-import com.acciente.oacc.helper.TestDataSourceFactory;
+import com.acciente.oacc.helper.TestConfigLoader;
 import com.acciente.oacc.sql.SQLAccessControlContextFactory;
 import com.acciente.oacc.sql.SQLDialect;
 import com.acciente.oacc.sql.SQLType;
@@ -64,14 +63,15 @@ public class TestAccessControl_customAuthenticationProvider extends TestAccessCo
                                                                   .getInstance(DomainPermissions.SUPER_USER)));
       systemAccessControlContext.unauthenticate();
 
-      SQLType sqlType = TestDataSourceFactory.getSQLType();
-      DataSource dataSource = TestDataSourceFactory.getDataSource();
+      SQLType sqlType = TestConfigLoader.getSQLType();
+      DataSource dataSource = TestConfigLoader.getDataSource();
       customAccessControlContext
             = SQLAccessControlContextFactory.getAccessControlContext(dataSource,
-                                                                     Constants.DB_SCHEMA,
+                                                                     TestConfigLoader.getDatabaseSchema(),
                                                                      sqlType,
                                                                      new CustomAuthenticationProvider(dataSource,
-                                                                                                      Constants.DB_SCHEMA,
+                                                                                                      TestConfigLoader
+                                                                                                            .getDatabaseSchema(),
                                                                                                       sqlType.getSqlDialect()));
    }
 
@@ -85,7 +85,7 @@ public class TestAccessControl_customAuthenticationProvider extends TestAccessCo
       Resource systemAuthResource = getSystemResource();
       try {
          customAccessControlContext.authenticate(systemAuthResource,
-                                                 PasswordCredentials.newInstance(Constants.OACC_ROOT_PWD));
+                                                 PasswordCredentials.newInstance(TestConfigLoader.getOaccRootPassword()));
          fail("authenticating as system resource should have failed for custom authentication provider");
       }
       catch (IllegalArgumentException e) {

@@ -17,8 +17,7 @@
  */
 package com.acciente.oacc;
 
-import com.acciente.oacc.helper.Constants;
-import com.acciente.oacc.helper.TestDataSourceFactory;
+import com.acciente.oacc.helper.TestConfigLoader;
 import com.acciente.oacc.sql.internal.SQLAccessControlContext;
 import org.junit.Assert;
 import org.junit.Test;
@@ -57,7 +56,7 @@ public class TestAccessControl_serialize extends TestAccessControlBase {
    public void serialize_withPreSerialization_shouldSucceed() throws IOException, ClassNotFoundException {
       Resource systemAuthResource = getSystemResource();
       accessControlContext.authenticate(systemAuthResource,
-                                        PasswordCredentials.newInstance(Constants.OACC_ROOT_PWD));
+                                        PasswordCredentials.newInstance(TestConfigLoader.getOaccRootPassword()));
       Assert.assertThat(accessControlContext.getAuthenticatedResource(), is(systemAuthResource));
 
       if (accessControlContext instanceof SQLAccessControlContext) {
@@ -94,14 +93,15 @@ public class TestAccessControl_serialize extends TestAccessControlBase {
          }
 
          // call postDeserialize()
-         SQLAccessControlContext.postDeserialize(deserializedAccessControlContext, TestDataSourceFactory.getDataSource());
+         SQLAccessControlContext.postDeserialize(deserializedAccessControlContext, TestConfigLoader.getDataSource());
 
          // verify state hasn't changed
          Assert.assertThat(deserializedAccessControlContext.getAuthenticatedResource(), is(systemAuthResource));
 
          // verify it's still usable
          deserializedAccessControlContext.authenticate(systemAuthResource,
-                                                       PasswordCredentials.newInstance(Constants.OACC_ROOT_PWD));
+                                                       PasswordCredentials.newInstance(TestConfigLoader
+                                                                                             .getOaccRootPassword()));
       }
    }
 }

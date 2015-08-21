@@ -22,10 +22,10 @@ import com.acciente.oacc.DomainCreatePermission;
 import com.acciente.oacc.DomainCreatePermissions;
 import com.acciente.oacc.DomainPermission;
 import com.acciente.oacc.DomainPermissions;
-import com.acciente.oacc.helper.Constants;
 import com.acciente.oacc.helper.OACC_Domain;
 import com.acciente.oacc.helper.OACC_Grant_DomCreatePerm_PostCreate_Sys;
 import com.acciente.oacc.helper.OACC_Grant_DomCreatePerm_Sys;
+import com.acciente.oacc.helper.OACC_Grant_DomPerm_Sys;
 import com.acciente.oacc.helper.OACC_Grant_Global_ResPerm;
 import com.acciente.oacc.helper.OACC_Grant_Global_ResPerm_Sys;
 import com.acciente.oacc.helper.OACC_Grant_ResCreatePerm;
@@ -33,12 +33,11 @@ import com.acciente.oacc.helper.OACC_Grant_ResCreatePerm_PostCreate_Sys;
 import com.acciente.oacc.helper.OACC_Grant_ResPerm;
 import com.acciente.oacc.helper.OACC_Grant_ResPerm_Sys;
 import com.acciente.oacc.helper.OACC_Resource;
-import com.acciente.oacc.helper.OACC_ResourceClassPermission;
-import com.acciente.oacc.helper.OACC_Grant_DomPerm_Sys;
 import com.acciente.oacc.helper.OACC_ResourceClass;
+import com.acciente.oacc.helper.OACC_ResourceClassPermission;
 import com.acciente.oacc.helper.OACC_ResourcePassword;
 import com.acciente.oacc.helper.SQLAccessControlSystemResetUtil;
-import com.acciente.oacc.helper.TestDataSourceFactory;
+import com.acciente.oacc.helper.TestConfigLoader;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.Test;
@@ -56,7 +55,7 @@ public class TestSQLAccessControlSystemInitializer {
 
    static {
       try {
-         con = TestDataSourceFactory.getDataSource().getConnection();
+         con = TestConfigLoader.getDataSource().getConnection();
       }
       catch (SQLException e) {
          throw new RuntimeException(e);
@@ -70,36 +69,36 @@ public class TestSQLAccessControlSystemInitializer {
 
    @Before
    public void setUp() throws Exception {
-      SQLAccessControlSystemResetUtil.deleteAllOACCData(con, Constants.DB_SCHEMA);
+      SQLAccessControlSystemResetUtil.deleteAllOACCData(con, TestConfigLoader.getDatabaseSchema());
 
-      assertThat(OACC_Domain.Finder.getNumberOfRows(con, Constants.DB_SCHEMA), is(0));
-      assertThat(OACC_Resource.Finder.getNumberOfRows(con, Constants.DB_SCHEMA), is(0));
-      assertThat(OACC_ResourceClass.Finder.getNumberOfRows(con, Constants.DB_SCHEMA), is(0));
-      assertThat(OACC_ResourceClassPermission.Finder.getNumberOfRows(con, Constants.DB_SCHEMA), is(0));
+      assertThat(OACC_Domain.Finder.getNumberOfRows(con, TestConfigLoader.getDatabaseSchema()), is(0));
+      assertThat(OACC_Resource.Finder.getNumberOfRows(con, TestConfigLoader.getDatabaseSchema()), is(0));
+      assertThat(OACC_ResourceClass.Finder.getNumberOfRows(con, TestConfigLoader.getDatabaseSchema()), is(0));
+      assertThat(OACC_ResourceClassPermission.Finder.getNumberOfRows(con, TestConfigLoader.getDatabaseSchema()), is(0));
 
-      assertThat(OACC_Grant_DomPerm_Sys.Finder.getNumberOfRows(con, Constants.DB_SCHEMA), is(0));
-      assertThat(OACC_Grant_ResPerm.Finder.getNumberOfRows(con, Constants.DB_SCHEMA), is(0));
-      assertThat(OACC_Grant_ResPerm_Sys.Finder.getNumberOfRows(con, Constants.DB_SCHEMA), is(0));
-      assertThat(OACC_Grant_Global_ResPerm.Finder.getNumberOfRows(con, Constants.DB_SCHEMA), is(0));
-      assertThat(OACC_Grant_Global_ResPerm_Sys.Finder.getNumberOfRows(con, Constants.DB_SCHEMA), is(0));
+      assertThat(OACC_Grant_DomPerm_Sys.Finder.getNumberOfRows(con, TestConfigLoader.getDatabaseSchema()), is(0));
+      assertThat(OACC_Grant_ResPerm.Finder.getNumberOfRows(con, TestConfigLoader.getDatabaseSchema()), is(0));
+      assertThat(OACC_Grant_ResPerm_Sys.Finder.getNumberOfRows(con, TestConfigLoader.getDatabaseSchema()), is(0));
+      assertThat(OACC_Grant_Global_ResPerm.Finder.getNumberOfRows(con, TestConfigLoader.getDatabaseSchema()), is(0));
+      assertThat(OACC_Grant_Global_ResPerm_Sys.Finder.getNumberOfRows(con, TestConfigLoader.getDatabaseSchema()), is(0));
 
-      assertThat(OACC_Grant_DomCreatePerm_PostCreate_Sys.Finder.getNumberOfRows(con, Constants.DB_SCHEMA), is(0));
-      assertThat(OACC_Grant_ResCreatePerm.Finder.getNumberOfRows(con, Constants.DB_SCHEMA), is(0));
-      assertThat(OACC_Grant_ResCreatePerm_PostCreate_Sys.Finder.getNumberOfRows(con, Constants.DB_SCHEMA), is(0));
+      assertThat(OACC_Grant_DomCreatePerm_PostCreate_Sys.Finder.getNumberOfRows(con, TestConfigLoader.getDatabaseSchema()), is(0));
+      assertThat(OACC_Grant_ResCreatePerm.Finder.getNumberOfRows(con, TestConfigLoader.getDatabaseSchema()), is(0));
+      assertThat(OACC_Grant_ResCreatePerm_PostCreate_Sys.Finder.getNumberOfRows(con, TestConfigLoader.getDatabaseSchema()), is(0));
    }
 
    @Test
    public void initializeOACC() throws SQLException, InterruptedException {
-      SQLAccessControlSystemInitializer.initializeOACC(con, Constants.DB_SCHEMA, Constants.OACC_ROOT_PWD);
+      SQLAccessControlSystemInitializer.initializeOACC(con, TestConfigLoader.getDatabaseSchema(), TestConfigLoader.getOaccRootPassword());
       assertThatOACCIsInInitializedState();
    }
 
    @Test
    public void reInitializeOACC() throws SQLException, InterruptedException {
-      SQLAccessControlSystemInitializer.initializeOACC(con, Constants.DB_SCHEMA, Constants.OACC_ROOT_PWD);
+      SQLAccessControlSystemInitializer.initializeOACC(con, TestConfigLoader.getDatabaseSchema(), TestConfigLoader.getOaccRootPassword());
       assertThatOACCIsInInitializedState();
 
-      SQLAccessControlSystemInitializer.initializeOACC(con, Constants.DB_SCHEMA, Constants.OACC_ROOT_PWD);
+      SQLAccessControlSystemInitializer.initializeOACC(con, TestConfigLoader.getDatabaseSchema(), TestConfigLoader.getOaccRootPassword());
       assertThatOACCIsInInitializedState();
    }
 
@@ -108,8 +107,8 @@ public class TestSQLAccessControlSystemInitializer {
       OACC_Domain sysDomain = new OACC_Domain.Builder(0L)
             .domainName(AccessControlContext.SYSTEM_DOMAIN)
             .build();
-      assertThat(OACC_Domain.Finder.getNumberOfRows(con, Constants.DB_SCHEMA), is(1));
-      assertThat(OACC_Domain.Finder.findByID(con, Constants.DB_SCHEMA, 0), is(sysDomain));
+      assertThat(OACC_Domain.Finder.getNumberOfRows(con, TestConfigLoader.getDatabaseSchema()), is(1));
+      assertThat(OACC_Domain.Finder.findByID(con, TestConfigLoader.getDatabaseSchema(), 0), is(sysDomain));
 
       // verify system-resourceClass
       OACC_ResourceClass sysResourceClass = new OACC_ResourceClass.Builder(0L)
@@ -117,23 +116,23 @@ public class TestSQLAccessControlSystemInitializer {
             .isAuthenticatable(true)
             .isUnauthenticatedCreateAllowed(false)
             .build();
-      assertThat(OACC_ResourceClass.Finder.getNumberOfRows(con, Constants.DB_SCHEMA), is(1));
-      assertThat(OACC_ResourceClass.Finder.findByID(con, Constants.DB_SCHEMA, 0), is(sysResourceClass));
+      assertThat(OACC_ResourceClass.Finder.getNumberOfRows(con, TestConfigLoader.getDatabaseSchema()), is(1));
+      assertThat(OACC_ResourceClass.Finder.findByID(con, TestConfigLoader.getDatabaseSchema(), 0), is(sysResourceClass));
 
       // verify system-resource
       OACC_Resource sysResource = new OACC_Resource.Builder(0L)
             .resourceClassID(sysResourceClass.getResourceClassID())
             .domainID(sysDomain.getDomainID())
             .build();
-      assertThat(OACC_Resource.Finder.getNumberOfRows(con, Constants.DB_SCHEMA), is(1));
-      assertThat(OACC_Resource.Finder.findByID(con, Constants.DB_SCHEMA, 0), is(sysResource));
+      assertThat(OACC_Resource.Finder.getNumberOfRows(con, TestConfigLoader.getDatabaseSchema()), is(1));
+      assertThat(OACC_Resource.Finder.findByID(con, TestConfigLoader.getDatabaseSchema(), 0), is(sysResource));
 
       // verify system-resource password
       OACC_ResourcePassword sysResourcePassword = new OACC_ResourcePassword.Builder(0L)
-            .password_plaintext(Constants.OACC_ROOT_PWD)
+            .password_plaintext(TestConfigLoader.getOaccRootPassword())
             .build();
-      assertThat(OACC_ResourcePassword.Finder.getNumberOfRows(con, Constants.DB_SCHEMA), is(1));
-      assertThat(OACC_ResourcePassword.Finder.findByID(con, Constants.DB_SCHEMA, 0), is(sysResourcePassword));
+      assertThat(OACC_ResourcePassword.Finder.getNumberOfRows(con, TestConfigLoader.getDatabaseSchema()), is(1));
+      assertThat(OACC_ResourcePassword.Finder.findByID(con, TestConfigLoader.getDatabaseSchema(), 0), is(sysResourcePassword));
 
       // verify system-resource's permissions on system-domain
       final DomainPermission sysDomainPermission_SuperUser = DomainPermissions.getInstance(DomainPermissions.SUPER_USER);
@@ -146,12 +145,12 @@ public class TestSQLAccessControlSystemInitializer {
             .grantorResourceID(sysResource.getResourceID())
             .build();
 
-      assertThat(OACC_Grant_DomPerm_Sys.Finder.getNumberOfRows(con, Constants.DB_SCHEMA), is(1));
+      assertThat(OACC_Grant_DomPerm_Sys.Finder.getNumberOfRows(con, TestConfigLoader.getDatabaseSchema()), is(1));
       final List<OACC_Grant_DomPerm_Sys> permissions
             = OACC_Grant_DomPerm_Sys.Finder.findByAccessorIDAndAccessedID(con,
-            Constants.DB_SCHEMA,
-            sysResource.getResourceID(),
-            sysDomain.getDomainID());
+                                                                          TestConfigLoader.getDatabaseSchema(),
+                                                                          sysResource.getResourceID(),
+                                                                          sysDomain.getDomainID());
       assertThat(permissions.size(), is(1));
       assertThat(permissions, hasItems(sysDomainSuperUserPermission));
 
@@ -192,28 +191,28 @@ public class TestSQLAccessControlSystemInitializer {
             .grantorResourceID(sysResource.getResourceID())
             .build();
 
-      assertThat(OACC_Grant_DomCreatePerm_PostCreate_Sys.Finder.getNumberOfRows(con, Constants.DB_SCHEMA), is(3));
+      assertThat(OACC_Grant_DomCreatePerm_PostCreate_Sys.Finder.getNumberOfRows(con, TestConfigLoader.getDatabaseSchema()), is(3));
       final List<OACC_Grant_DomCreatePerm_PostCreate_Sys> createPostCreatePermissions
-            = OACC_Grant_DomCreatePerm_PostCreate_Sys.Finder.findByAccessorID(con, Constants.DB_SCHEMA, sysResource.getResourceID());
+            = OACC_Grant_DomCreatePerm_PostCreate_Sys.Finder.findByAccessorID(con, TestConfigLoader.getDatabaseSchema(), sysResource.getResourceID());
       assertThat(createPostCreatePermissions.size(), is(3));
       assertThat(createPostCreatePermissions, hasItems(createSysDomainSuperUserPermission, createSysDomainCreateChildPermission, createSysDomainDeletePermission));
 
-      assertThat(OACC_Grant_DomCreatePerm_Sys.Finder.getNumberOfRows(con, Constants.DB_SCHEMA), is(1));
+      assertThat(OACC_Grant_DomCreatePerm_Sys.Finder.getNumberOfRows(con, TestConfigLoader.getDatabaseSchema()), is(1));
       final List<OACC_Grant_DomCreatePerm_Sys> createSysPermissions
-            = OACC_Grant_DomCreatePerm_Sys.Finder.findByAccessorID(con, Constants.DB_SCHEMA, sysResource.getResourceID());
+            = OACC_Grant_DomCreatePerm_Sys.Finder.findByAccessorID(con, TestConfigLoader.getDatabaseSchema(), sysResource.getResourceID());
       assertThat(createSysPermissions.size(), is(1));
       assertThat(createSysPermissions, hasItems(createSysDomainCreatePermission));
 
       // verify all other tables are empty
-      assertThat(OACC_ResourceClassPermission.Finder.getNumberOfRows(con, Constants.DB_SCHEMA), is(0));
+      assertThat(OACC_ResourceClassPermission.Finder.getNumberOfRows(con, TestConfigLoader.getDatabaseSchema()), is(0));
 
-      assertThat(OACC_Grant_ResPerm.Finder.getNumberOfRows(con, Constants.DB_SCHEMA), is(0));
-      assertThat(OACC_Grant_ResPerm_Sys.Finder.getNumberOfRows(con, Constants.DB_SCHEMA), is(0));
-      assertThat(OACC_Grant_Global_ResPerm.Finder.getNumberOfRows(con, Constants.DB_SCHEMA), is(0));
-      assertThat(OACC_Grant_Global_ResPerm_Sys.Finder.getNumberOfRows(con, Constants.DB_SCHEMA), is(0));
+      assertThat(OACC_Grant_ResPerm.Finder.getNumberOfRows(con, TestConfigLoader.getDatabaseSchema()), is(0));
+      assertThat(OACC_Grant_ResPerm_Sys.Finder.getNumberOfRows(con, TestConfigLoader.getDatabaseSchema()), is(0));
+      assertThat(OACC_Grant_Global_ResPerm.Finder.getNumberOfRows(con, TestConfigLoader.getDatabaseSchema()), is(0));
+      assertThat(OACC_Grant_Global_ResPerm_Sys.Finder.getNumberOfRows(con, TestConfigLoader.getDatabaseSchema()), is(0));
 
-      assertThat(OACC_Grant_ResCreatePerm.Finder.getNumberOfRows(con, Constants.DB_SCHEMA), is(0));
-      assertThat(OACC_Grant_ResCreatePerm_PostCreate_Sys.Finder.getNumberOfRows(con, Constants.DB_SCHEMA), is(0));
+      assertThat(OACC_Grant_ResCreatePerm.Finder.getNumberOfRows(con, TestConfigLoader.getDatabaseSchema()), is(0));
+      assertThat(OACC_Grant_ResCreatePerm_PostCreate_Sys.Finder.getNumberOfRows(con, TestConfigLoader.getDatabaseSchema()), is(0));
    }
 
 

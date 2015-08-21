@@ -27,13 +27,13 @@ public class CaseSensitiveChecker {
    private static final String SENTINEL_VALUE__lower  = "test_domain_case_sensitivity";
    private static final String SENTINEL_VALUE__UPPER  = SENTINEL_VALUE__lower.toUpperCase();
    private static final String INSERT_SENTINEL_VALUE  = "INSERT INTO "
-         + DbBase.getSchemaAndTableNamePrefix(Constants.DB_SCHEMA)
+         + DbBase.getSchemaAndTableNamePrefix(TestConfigLoader.getDatabaseSchema())
          + "Domain (DomainID, DomainName) VALUES (?, ?)";
    private static final String SELECT_SENTINEL_VALUES = "SELECT DomainID, DomainName FROM "
-         + DbBase.getSchemaAndTableNamePrefix(Constants.DB_SCHEMA)
+         + DbBase.getSchemaAndTableNamePrefix(TestConfigLoader.getDatabaseSchema())
          + "Domain WHERE DomainName = ?";
    private static final String DELETE_SENTINEL_VALUES = "DELETE FROM "
-         + DbBase.getSchemaAndTableNamePrefix(Constants.DB_SCHEMA)
+         + DbBase.getSchemaAndTableNamePrefix(TestConfigLoader.getDatabaseSchema())
          + "Domain WHERE DomainName = ? OR DomainName = ?";
 
    public static boolean isDatabaseCaseSensitive(DataSource dataSource) throws SQLException {
