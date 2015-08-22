@@ -20,7 +20,7 @@ package com.acciente.oacc.sql.internal.persister;
 import com.acciente.oacc.DomainCreatePermission;
 import com.acciente.oacc.DomainCreatePermissions;
 import com.acciente.oacc.Resource;
-import com.acciente.oacc.sql.SQLType;
+import com.acciente.oacc.sql.SQLProfile;
 import com.acciente.oacc.sql.internal.persister.id.Id;
 import com.acciente.oacc.sql.internal.persister.id.ResourceId;
 
@@ -29,9 +29,9 @@ import java.util.HashSet;
 import java.util.Set;
 
 public class NonRecursiveGrantDomainCreatePermissionSysPersister extends CommonGrantDomainCreatePermissionSysPersister {
-   public NonRecursiveGrantDomainCreatePermissionSysPersister(SQLType sqlType,
+   public NonRecursiveGrantDomainCreatePermissionSysPersister(SQLProfile sqlProfile,
                                                               SQLStrings sqlStrings) {
-      super(sqlType, sqlStrings);
+      super(sqlProfile, sqlStrings);
    }
 
    @Override

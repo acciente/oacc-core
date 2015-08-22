@@ -21,16 +21,16 @@ import com.acciente.oacc.DomainCreatePermission;
 import com.acciente.oacc.DomainCreatePermissions;
 import com.acciente.oacc.DomainPermissions;
 import com.acciente.oacc.Resource;
-import com.acciente.oacc.sql.SQLType;
+import com.acciente.oacc.sql.SQLProfile;
 
 import java.sql.SQLException;
 import java.util.HashSet;
 import java.util.Set;
 
 public class RecursiveGrantDomainCreatePermissionPostCreateSysPersister extends CommonGrantDomainCreatePermissionPostCreateSysPersister {
-   public RecursiveGrantDomainCreatePermissionPostCreateSysPersister(SQLType sqlType,
+   public RecursiveGrantDomainCreatePermissionPostCreateSysPersister(SQLProfile sqlProfile,
                                                                      SQLStrings sqlStrings) {
-      super(sqlType, sqlStrings);
+      super(sqlProfile, sqlStrings);
    }
 
    @Override

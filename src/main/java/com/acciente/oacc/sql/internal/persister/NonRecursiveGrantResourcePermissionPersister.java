@@ -20,7 +20,7 @@ package com.acciente.oacc.sql.internal.persister;
 import com.acciente.oacc.Resource;
 import com.acciente.oacc.ResourcePermission;
 import com.acciente.oacc.ResourcePermissions;
-import com.acciente.oacc.sql.SQLType;
+import com.acciente.oacc.sql.SQLProfile;
 import com.acciente.oacc.sql.internal.persister.id.DomainId;
 import com.acciente.oacc.sql.internal.persister.id.Id;
 import com.acciente.oacc.sql.internal.persister.id.ResourceClassId;
@@ -32,9 +32,9 @@ import java.util.HashSet;
 import java.util.Set;
 
 public class NonRecursiveGrantResourcePermissionPersister extends CommonGrantResourcePermissionPersister {
-   public NonRecursiveGrantResourcePermissionPersister(SQLType sqlType,
+   public NonRecursiveGrantResourcePermissionPersister(SQLProfile sqlProfile,
                                                        SQLStrings sqlStrings) {
-      super(sqlType, sqlStrings);
+      super(sqlProfile, sqlStrings);
    }
 
    @Override

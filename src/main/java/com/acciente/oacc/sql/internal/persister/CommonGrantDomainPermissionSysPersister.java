@@ -20,7 +20,7 @@ package com.acciente.oacc.sql.internal.persister;
 import com.acciente.oacc.DomainPermission;
 import com.acciente.oacc.DomainPermissions;
 import com.acciente.oacc.Resource;
-import com.acciente.oacc.sql.SQLType;
+import com.acciente.oacc.sql.SQLProfile;
 import com.acciente.oacc.sql.internal.persister.id.DomainId;
 import com.acciente.oacc.sql.internal.persister.id.Id;
 import com.acciente.oacc.sql.internal.persister.id.ResourceClassId;
@@ -32,15 +32,15 @@ import java.util.Map;
 import java.util.Set;
 
 public abstract class CommonGrantDomainPermissionSysPersister extends Persister implements GrantDomainPermissionSysPersister {
-   protected final SQLType    sqlType;
+   protected final SQLProfile sqlProfile;
    protected final SQLStrings sqlStrings;
 
    public static final DomainPermission DOMAIN_PERMISSION_SUPER_USER = DomainPermissions
          .getInstance(DomainPermissions.SUPER_USER);
 
-   public CommonGrantDomainPermissionSysPersister(SQLType sqlType,
+   public CommonGrantDomainPermissionSysPersister(SQLProfile sqlProfile,
                                                   SQLStrings sqlStrings) {
-      this.sqlType = sqlType;
+      this.sqlProfile = sqlProfile;
       this.sqlStrings = sqlStrings;
    }
 

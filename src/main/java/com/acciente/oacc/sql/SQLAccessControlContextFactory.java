@@ -27,37 +27,37 @@ import java.sql.Connection;
 public class SQLAccessControlContextFactory {
    public static AccessControlContext getAccessControlContext(Connection connection,
                                                               String schemaName,
-                                                              SQLType sqlType) {
+                                                              SQLProfile sqlProfile) {
       return SQLAccessControlContext.getAccessControlContext(connection,
                                                              schemaName,
-                                                             sqlType);
+                                                             sqlProfile);
    }
 
    public static AccessControlContext getAccessControlContext(DataSource dataSource,
                                                               String schemaName,
-                                                              SQLType sqlType) {
+                                                              SQLProfile sqlProfile) {
       return SQLAccessControlContext.getAccessControlContext(dataSource,
                                                              schemaName,
-                                                             sqlType);
+                                                             sqlProfile);
    }
 
    public static AccessControlContext getAccessControlContext(Connection connection,
                                                               String schemaName,
-                                                              SQLType sqlType,
+                                                              SQLProfile sqlProfile,
                                                               AuthenticationProvider authenticationProvider) {
       return SQLAccessControlContext.getAccessControlContext(connection,
                                                              schemaName,
-                                                             sqlType,
+                                                             sqlProfile,
                                                              authenticationProvider);
    }
 
    public static AccessControlContext getAccessControlContext(DataSource dataSource,
                                                               String schemaName,
-                                                              SQLType sqlType,
+                                                              SQLProfile sqlProfile,
                                                               AuthenticationProvider authenticationProvider) {
       return SQLAccessControlContext.getAccessControlContext(dataSource,
                                                              schemaName,
-                                                             sqlType,
+                                                             sqlProfile,
                                                              authenticationProvider);
    }
 

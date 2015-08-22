@@ -20,7 +20,7 @@ package com.acciente.oacc;
 import com.acciente.oacc.helper.SQLAccessControlSystemResetUtil;
 import com.acciente.oacc.helper.TestConfigLoader;
 import com.acciente.oacc.sql.SQLAccessControlContextFactory;
-import com.acciente.oacc.sql.SQLType;
+import com.acciente.oacc.sql.SQLProfile;
 import org.junit.After;
 import org.junit.Before;
 
@@ -33,26 +33,32 @@ import java.util.Set;
 public class TestAccessControlBase {
    public static final Resource SYS_RESOURCE = Resources.getInstance(0);
 
-   private static   SQLType              sqlType;
+   private static   SQLProfile           sqlProfile;
    private static   DataSource           dataSource;
    protected static AccessControlContext systemAccessControlContext;
    private static   boolean              isDBCaseSensitive;
 
    static {
-      sqlType = TestConfigLoader.getSQLType();
+      sqlProfile = TestConfigLoader.getSQLProfile();
       dataSource = TestConfigLoader.getDataSource();
       isDBCaseSensitive = TestConfigLoader.isDatabaseCaseSensitive();
       systemAccessControlContext
-            = SQLAccessControlContextFactory.getAccessControlContext(dataSource, TestConfigLoader.getDatabaseSchema(), sqlType);
+            = SQLAccessControlContextFactory.getAccessControlContext(dataSource,
+                                                                     TestConfigLoader.getDatabaseSchema(),
+                                                                     sqlProfile);
    }
 
    protected AccessControlContext accessControlContext;
 
    @Before
    public void setUpTest() throws Exception {
-      SQLAccessControlSystemResetUtil.resetOACC(dataSource, TestConfigLoader.getDatabaseSchema(), TestConfigLoader.getOaccRootPassword());
+      SQLAccessControlSystemResetUtil.resetOACC(dataSource,
+                                                TestConfigLoader.getDatabaseSchema(),
+                                                TestConfigLoader.getOaccRootPassword());
       accessControlContext
-            = SQLAccessControlContextFactory.getAccessControlContext(dataSource, TestConfigLoader.getDatabaseSchema(), sqlType);
+            = SQLAccessControlContextFactory.getAccessControlContext(dataSource,
+                                                                     TestConfigLoader.getDatabaseSchema(),
+                                                                     sqlProfile);
    }
 
    @After

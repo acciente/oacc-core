@@ -18,24 +18,20 @@
 package com.acciente.oacc.sql.internal.persister;
 
 import com.acciente.oacc.Resource;
-import com.acciente.oacc.sql.SQLDialect;
-import com.acciente.oacc.sql.SQLType;
+import com.acciente.oacc.sql.SQLProfile;
 import com.acciente.oacc.sql.internal.persister.id.DomainId;
 import com.acciente.oacc.sql.internal.persister.id.Id;
 
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 public abstract class CommonDomainPersister extends Persister implements DomainPersister {
-   protected final SQLType    sqlType;
+   protected final SQLProfile sqlProfile;
    protected final SQLStrings sqlStrings;
 
-   public CommonDomainPersister(SQLType sqlType,
+   public CommonDomainPersister(SQLProfile sqlProfile,
                                 SQLStrings sqlStrings) {
-      this.sqlType = sqlType;
+      this.sqlProfile = sqlProfile;
       this.sqlStrings = sqlStrings;
    }
 

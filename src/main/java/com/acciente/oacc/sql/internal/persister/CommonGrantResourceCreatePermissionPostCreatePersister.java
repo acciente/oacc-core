@@ -22,7 +22,7 @@ import com.acciente.oacc.ResourceCreatePermission;
 import com.acciente.oacc.ResourceCreatePermissions;
 import com.acciente.oacc.ResourcePermission;
 import com.acciente.oacc.ResourcePermissions;
-import com.acciente.oacc.sql.SQLType;
+import com.acciente.oacc.sql.SQLProfile;
 import com.acciente.oacc.sql.internal.persister.id.DomainId;
 import com.acciente.oacc.sql.internal.persister.id.Id;
 import com.acciente.oacc.sql.internal.persister.id.ResourceClassId;
@@ -34,12 +34,12 @@ import java.util.Map;
 import java.util.Set;
 
 public abstract class CommonGrantResourceCreatePermissionPostCreatePersister extends Persister implements GrantResourceCreatePermissionPostCreatePersister {
-   protected final SQLType    sqlType;
+   protected final SQLProfile sqlProfile;
    protected final SQLStrings sqlStrings;
 
-   public CommonGrantResourceCreatePermissionPostCreatePersister(SQLType sqlType,
+   public CommonGrantResourceCreatePermissionPostCreatePersister(SQLProfile sqlProfile,
                                                                  SQLStrings sqlStrings) {
-      this.sqlType = sqlType;
+      this.sqlProfile = sqlProfile;
       this.sqlStrings = sqlStrings;
    }
 

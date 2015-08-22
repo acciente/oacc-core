@@ -21,7 +21,7 @@ import com.acciente.oacc.Resource;
 import com.acciente.oacc.ResourcePermission;
 import com.acciente.oacc.ResourcePermissions;
 import com.acciente.oacc.sql.SQLDialect;
-import com.acciente.oacc.sql.SQLType;
+import com.acciente.oacc.sql.SQLProfile;
 import com.acciente.oacc.sql.internal.persister.id.DomainId;
 import com.acciente.oacc.sql.internal.persister.id.Id;
 import com.acciente.oacc.sql.internal.persister.id.ResourceClassId;
@@ -35,9 +35,9 @@ import java.util.Map;
 import java.util.Set;
 
 public class RecursiveGrantGlobalResourcePermissionSysPersister extends CommonGrantGlobalResourcePermissionSysPersister {
-   public RecursiveGrantGlobalResourcePermissionSysPersister(SQLType sqlType,
+   public RecursiveGrantGlobalResourcePermissionSysPersister(SQLProfile sqlProfile,
                                                              SQLStrings sqlStrings) {
-      super(sqlType, sqlStrings);
+      super(sqlProfile, sqlStrings);
    }
 
    @Override

@@ -18,7 +18,7 @@
 package com.acciente.oacc.sql.internal.persister;
 
 import com.acciente.oacc.Resource;
-import com.acciente.oacc.sql.SQLType;
+import com.acciente.oacc.sql.SQLProfile;
 import com.acciente.oacc.sql.internal.ResourceClassInternalInfo;
 import com.acciente.oacc.sql.internal.persister.id.Id;
 import com.acciente.oacc.sql.internal.persister.id.ResourceClassId;
@@ -28,12 +28,12 @@ import java.util.LinkedList;
 import java.util.List;
 
 public class ResourceClassPersister extends Persister {
-   protected final SQLType    sqlType;
+   protected final SQLProfile sqlProfile;
    private final   SQLStrings sqlStrings;
 
-   public ResourceClassPersister(SQLType sqlType,
+   public ResourceClassPersister(SQLProfile sqlProfile,
                                  SQLStrings sqlStrings) {
-      this.sqlType = sqlType;
+      this.sqlProfile = sqlProfile;
       this.sqlStrings = sqlStrings;
    }
 

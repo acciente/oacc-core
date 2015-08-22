@@ -20,19 +20,19 @@ package com.acciente.oacc.sql.internal.persister;
 import com.acciente.oacc.DomainCreatePermission;
 import com.acciente.oacc.DomainCreatePermissions;
 import com.acciente.oacc.Resource;
-import com.acciente.oacc.sql.SQLType;
+import com.acciente.oacc.sql.SQLProfile;
 
 import java.sql.SQLException;
 import java.util.HashSet;
 import java.util.Set;
 
 public abstract class CommonGrantDomainCreatePermissionSysPersister extends Persister implements GrantDomainCreatePermissionSysPersister {
-   protected final SQLType    sqlType;
+   protected final SQLProfile sqlProfile;
    protected final SQLStrings sqlStrings;
 
-   public CommonGrantDomainCreatePermissionSysPersister(SQLType sqlType,
+   public CommonGrantDomainCreatePermissionSysPersister(SQLProfile sqlProfile,
                                                         SQLStrings sqlStrings) {
-      this.sqlType = sqlType;
+      this.sqlProfile = sqlProfile;
       this.sqlStrings = sqlStrings;
    }
 

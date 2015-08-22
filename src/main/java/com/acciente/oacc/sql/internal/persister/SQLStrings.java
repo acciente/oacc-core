@@ -20,7 +20,7 @@ package com.acciente.oacc.sql.internal.persister;
 import com.acciente.oacc.ResourcePermission;
 import com.acciente.oacc.ResourcePermissions;
 import com.acciente.oacc.sql.SQLDialect;
-import com.acciente.oacc.sql.SQLType;
+import com.acciente.oacc.sql.SQLProfile;
 
 import java.io.Serializable;
 
@@ -216,21 +216,23 @@ public class SQLStrings implements Serializable {
    // Key generators
    public final String SQL_nextResourceID;
 
-   private final SQLType sqlType;
+   private final SQLProfile sqlProfile;
 
    // resource permissions constants
    private static final ResourcePermission ResourcePermission_INHERIT = ResourcePermissions.getInstance(
          ResourcePermissions.INHERIT,
          false);
 
-   public static SQLStrings getSQLStrings(String schemaName, SQLType sqlType) {
-      return new SQLStrings(schemaName, sqlType, DialectSpecificSQLGenerator.getInstance(sqlType.getSqlDialect()));
+   public static SQLStrings getSQLStrings(String schemaName,
+                                          SQLProfile sqlProfile) {
+      return new SQLStrings(schemaName, sqlProfile, DialectSpecificSQLGenerator.getInstance(sqlProfile
+                                                                                                  .getSqlDialect()));
    }
 
    private SQLStrings(String schemaName,
-                      SQLType sqlType,
+                      SQLProfile sqlProfile,
                       DialectSpecificSQLGenerator dialectSpecificSQLGenerator) {
-      this.sqlType = sqlType;
+      this.sqlProfile = sqlProfile;
       final String withClause = dialectSpecificSQLGenerator.getWithClause();
       final String unionClause = dialectSpecificSQLGenerator.getUnionClause();
       final String schemaNameAndTablePrefix = schemaName != null ? schemaName + ".OAC_" : "OAC_";
@@ -377,9 +379,9 @@ public class SQLStrings implements Serializable {
             + "SELECT DomainId, DomainName FROM S ORDER BY DomainLevel";
 
       SQL_removeInDomain_withDescendants_BY_DomainID
-            = (SQLDialect.DB2_10_5.equals(sqlType.getSqlDialect()))
+            = (SQLDialect.DB2_10_5.equals(sqlProfile.getSqlDialect()))
               ? null
-              : (SQLDialect.Oracle_11_2.equals(sqlType.getSqlDialect()))
+              : (SQLDialect.Oracle_11_2.equals(sqlProfile.getSqlDialect()))
                 ? "DELETE FROM "
                       + schemaNameAndTablePrefix
                       + "Domain WHERE DomainId IN ( "
@@ -608,9 +610,9 @@ public class SQLStrings implements Serializable {
             + "Domain B ON B.DomainId = P.AccessedDomainId";
 
       SQL_removeInGrantDomainPermissionSys_withDescendants_BY_AccessedDomainID
-            = (SQLDialect.DB2_10_5.equals(sqlType.getSqlDialect()))
+            = (SQLDialect.DB2_10_5.equals(sqlProfile.getSqlDialect()))
               ? null
-              : (SQLDialect.Oracle_11_2.equals(sqlType.getSqlDialect()))
+              : (SQLDialect.Oracle_11_2.equals(sqlProfile.getSqlDialect()))
                 ? "DELETE FROM "
                       + schemaNameAndTablePrefix
                       + "Grant_DomPerm_Sys WHERE AccessedDomainId IN ( "
@@ -753,9 +755,9 @@ public class SQLStrings implements Serializable {
             + "Domain C ON C.DomainId = P.AccessedDomainId";
 
       SQL_removeInGrantResourceCreatePermissionSys_withDescendants_BY_AccessedDomainId
-            = (SQLDialect.DB2_10_5.equals(sqlType.getSqlDialect()))
+            = (SQLDialect.DB2_10_5.equals(sqlProfile.getSqlDialect()))
               ? null
-              : (SQLDialect.Oracle_11_2.equals(sqlType.getSqlDialect()))
+              : (SQLDialect.Oracle_11_2.equals(sqlProfile.getSqlDialect()))
                 ? "DELETE FROM "
                       + schemaNameAndTablePrefix
                       + "Grant_ResCrPerm_Sys WHERE AccessedDomainId IN ( "
@@ -847,9 +849,9 @@ public class SQLStrings implements Serializable {
             + "Domain C ON C.DomainId = P.AccessedDomainId";
 
       SQL_removeInGrantResourceCreatePermissionPostCreateSys_withDescendants_BY_AccessedDomainID
-            = (SQLDialect.DB2_10_5.equals(sqlType.getSqlDialect()))
+            = (SQLDialect.DB2_10_5.equals(sqlProfile.getSqlDialect()))
               ? null
-              : (SQLDialect.Oracle_11_2.equals(sqlType.getSqlDialect()))
+              : (SQLDialect.Oracle_11_2.equals(sqlProfile.getSqlDialect()))
                 ? "DELETE FROM "
                       + schemaNameAndTablePrefix
                       + "Grant_ResCrPerm_PostCr_Sys WHERE AccessedDomainId IN ( "
@@ -959,9 +961,9 @@ public class SQLStrings implements Serializable {
             + "Domain D ON D.DomainId = P.AccessedDomainId";
 
       SQL_removeInGrantResourceCreatePermissionPostCreate_withDescendants_BY_AccessedDomainId
-            = (SQLDialect.DB2_10_5.equals(sqlType.getSqlDialect()))
+            = (SQLDialect.DB2_10_5.equals(sqlProfile.getSqlDialect()))
               ? null
-              : (SQLDialect.Oracle_11_2.equals(sqlType.getSqlDialect()))
+              : (SQLDialect.Oracle_11_2.equals(sqlProfile.getSqlDialect()))
                 ? "DELETE FROM "
                       + schemaNameAndTablePrefix
                       + "Grant_ResCrPerm_PostCr WHERE AccessedDomainId IN ( "
@@ -1288,9 +1290,9 @@ public class SQLStrings implements Serializable {
             + "Domain C ON C.DomainId = P.AccessedDomainId";
 
       SQL_removeInGrantGlobalResourcePermissionSys_withDescendants_BY_AccessedDomainId
-            = (SQLDialect.DB2_10_5.equals(sqlType.getSqlDialect()))
+            = (SQLDialect.DB2_10_5.equals(sqlProfile.getSqlDialect()))
               ? null
-              : (SQLDialect.Oracle_11_2.equals(sqlType.getSqlDialect()))
+              : (SQLDialect.Oracle_11_2.equals(sqlProfile.getSqlDialect()))
                 ? "DELETE FROM "
                       + schemaNameAndTablePrefix
                       + "Grant_Global_ResPerm_Sys WHERE AccessedDomainId IN ( "
@@ -1451,9 +1453,9 @@ public class SQLStrings implements Serializable {
             + "Domain D ON D.DomainId = P.AccessedDomainId";
 
       SQL_removeInGrantGlobalResourcePermission_withDescendants_BY_AccessedDomainId
-            = (SQLDialect.DB2_10_5.equals(sqlType.getSqlDialect()))
+            = (SQLDialect.DB2_10_5.equals(sqlProfile.getSqlDialect()))
               ? null
-              : (SQLDialect.Oracle_11_2.equals(sqlType.getSqlDialect()))
+              : (SQLDialect.Oracle_11_2.equals(sqlProfile.getSqlDialect()))
                 ? "DELETE FROM "
                       + schemaNameAndTablePrefix
                       + "Grant_Global_ResPerm WHERE AccessedDomainId IN ( "
@@ -1478,11 +1480,11 @@ public class SQLStrings implements Serializable {
             = dialectSpecificSQLGenerator.nextSequenceValueStatement(schemaNameAndTablePrefix + "ResourceId");
    }
 
-   public SQLType getSqlType() {
-      return sqlType;
+   public SQLProfile getSqlProfile() {
+      return sqlProfile;
    }
 
    public SQLDialect getSqlDialect() {
-      return sqlType.getSqlDialect();
+      return sqlProfile.getSqlDialect();
    }
 }

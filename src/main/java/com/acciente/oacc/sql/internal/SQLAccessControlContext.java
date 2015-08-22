@@ -34,7 +34,7 @@ import com.acciente.oacc.ResourceCreatePermissions;
 import com.acciente.oacc.ResourcePermission;
 import com.acciente.oacc.ResourcePermissions;
 import com.acciente.oacc.Resources;
-import com.acciente.oacc.sql.SQLType;
+import com.acciente.oacc.sql.SQLProfile;
 import com.acciente.oacc.sql.internal.persister.CommonGrantGlobalResourcePermissionPersister;
 import com.acciente.oacc.sql.internal.persister.CommonGrantGlobalResourcePermissionSysPersister;
 import com.acciente.oacc.sql.internal.persister.DomainPersister;
@@ -169,28 +169,28 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
 
    public static AccessControlContext getAccessControlContext(Connection connection,
                                                               String schemaName,
-                                                              SQLType sqlType) {
-      return new SQLAccessControlContext(connection, schemaName, sqlType);
+                                                              SQLProfile sqlProfile) {
+      return new SQLAccessControlContext(connection, schemaName, sqlProfile);
    }
 
    public static AccessControlContext getAccessControlContext(DataSource dataSource,
                                                               String schemaName,
-                                                              SQLType sqlType) {
-      return new SQLAccessControlContext(dataSource, schemaName, sqlType);
+                                                              SQLProfile sqlProfile) {
+      return new SQLAccessControlContext(dataSource, schemaName, sqlProfile);
    }
 
    public static AccessControlContext getAccessControlContext(Connection connection,
                                                               String schemaName,
-                                                              SQLType sqlType,
+                                                              SQLProfile sqlProfile,
                                                               AuthenticationProvider authenticationProvider) {
-      return new SQLAccessControlContext(connection, schemaName, sqlType, authenticationProvider);
+      return new SQLAccessControlContext(connection, schemaName, sqlProfile, authenticationProvider);
    }
 
    public static AccessControlContext getAccessControlContext(DataSource dataSource,
                                                               String schemaName,
-                                                              SQLType sqlType,
+                                                              SQLProfile sqlProfile,
                                                               AuthenticationProvider authenticationProvider) {
-      return new SQLAccessControlContext(dataSource, schemaName, sqlType, authenticationProvider);
+      return new SQLAccessControlContext(dataSource, schemaName, sqlProfile, authenticationProvider);
    }
 
    public static void preSerialize(AccessControlContext accessControlContext) {
@@ -218,20 +218,20 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
 
    private SQLAccessControlContext(Connection connection,
                                    String schemaName,
-                                   SQLType sqlType) {
-      this(schemaName, sqlType);
+                                   SQLProfile sqlProfile) {
+      this(schemaName, sqlProfile);
       this.connection = connection;
       // use the built-in authentication provider when no custom implementation is provided
       this.authenticationProvider
-            = new SQLPasswordAuthenticationProvider(connection, schemaName, sqlType.getSqlDialect());
+            = new SQLPasswordAuthenticationProvider(connection, schemaName, sqlProfile.getSqlDialect());
       this.hasDefaultAuthenticationProvider = true;
    }
 
    private SQLAccessControlContext(Connection connection,
                                    String schemaName,
-                                   SQLType sqlType,
+                                   SQLProfile sqlProfile,
                                    AuthenticationProvider authenticationProvider) {
-      this(schemaName, sqlType);
+      this(schemaName, sqlProfile);
       this.connection = connection;
       this.authenticationProvider = authenticationProvider;
       this.hasDefaultAuthenticationProvider = false;
@@ -239,87 +239,87 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
 
    private SQLAccessControlContext(DataSource dataSource,
                                    String schemaName,
-                                   SQLType sqlType) {
-      this(schemaName, sqlType);
+                                   SQLProfile sqlProfile) {
+      this(schemaName, sqlProfile);
       this.dataSource = dataSource;
       // use the built-in authentication provider when no custom implementation is provided
       this.authenticationProvider
-            = new SQLPasswordAuthenticationProvider(dataSource, schemaName, sqlType.getSqlDialect());
+            = new SQLPasswordAuthenticationProvider(dataSource, schemaName, sqlProfile.getSqlDialect());
       this.hasDefaultAuthenticationProvider = true;
    }
 
    private SQLAccessControlContext(DataSource dataSource,
                                    String schemaName,
-                                   SQLType sqlType,
+                                   SQLProfile sqlProfile,
                                    AuthenticationProvider authenticationProvider) {
-      this(schemaName, sqlType);
+      this(schemaName, sqlProfile);
       this.dataSource = dataSource;
       this.authenticationProvider = authenticationProvider;
       this.hasDefaultAuthenticationProvider = false;
    }
 
    private SQLAccessControlContext(String schemaName,
-                                   SQLType sqlType) {
+                                   SQLProfile sqlProfile) {
       // generate all the SQLs the persisters need based on the database dialect
-      SQLStrings sqlStrings = SQLStrings.getSQLStrings(schemaName, sqlType);
+      SQLStrings sqlStrings = SQLStrings.getSQLStrings(schemaName, sqlProfile);
 
       // setup persisters
       resourceClassPersister
-            = new ResourceClassPersister(sqlType, sqlStrings);
+            = new ResourceClassPersister(sqlProfile, sqlStrings);
       resourceClassPermissionPersister
-            = new ResourceClassPermissionPersister(sqlType, sqlStrings);
+            = new ResourceClassPermissionPersister(sqlProfile, sqlStrings);
 
-      if (sqlType.isRecursionCompatible()) {
+      if (sqlProfile.isRecursionSupported()) {
          grantDomainCreatePermissionSysPersister
-               = new RecursiveGrantDomainCreatePermissionSysPersister(sqlType, sqlStrings);
+               = new RecursiveGrantDomainCreatePermissionSysPersister(sqlProfile, sqlStrings);
          grantDomainCreatePermissionPostCreateSysPersister
-               = new RecursiveGrantDomainCreatePermissionPostCreateSysPersister(sqlType, sqlStrings);
+               = new RecursiveGrantDomainCreatePermissionPostCreateSysPersister(sqlProfile, sqlStrings);
          grantDomainPermissionSysPersister
-               = new RecursiveGrantDomainPermissionSysPersister(sqlType, sqlStrings);
+               = new RecursiveGrantDomainPermissionSysPersister(sqlProfile, sqlStrings);
          domainPersister
-               = new RecursiveDomainPersister(sqlType, sqlStrings);
+               = new RecursiveDomainPersister(sqlProfile, sqlStrings);
          resourcePersister
-               = new RecursiveResourcePersister(sqlType, sqlStrings);
+               = new RecursiveResourcePersister(sqlProfile, sqlStrings);
          grantResourceCreatePermissionSysPersister
-               = new RecursiveGrantResourceCreatePermissionSysPersister(sqlType, sqlStrings);
+               = new RecursiveGrantResourceCreatePermissionSysPersister(sqlProfile, sqlStrings);
          grantResourceCreatePermissionPostCreateSysPersister
-               = new RecursiveGrantResourceCreatePermissionPostCreateSysPersister(sqlType, sqlStrings);
+               = new RecursiveGrantResourceCreatePermissionPostCreateSysPersister(sqlProfile, sqlStrings);
          grantResourceCreatePermissionPostCreatePersister
-               = new RecursiveGrantResourceCreatePermissionPostCreatePersister(sqlType, sqlStrings);
+               = new RecursiveGrantResourceCreatePermissionPostCreatePersister(sqlProfile, sqlStrings);
          grantResourcePermissionSysPersister
-               = new RecursiveGrantResourcePermissionSysPersister(sqlType, sqlStrings);
+               = new RecursiveGrantResourcePermissionSysPersister(sqlProfile, sqlStrings);
          grantGlobalResourcePermissionSysPersister
-               = new RecursiveGrantGlobalResourcePermissionSysPersister(sqlType, sqlStrings);
+               = new RecursiveGrantGlobalResourcePermissionSysPersister(sqlProfile, sqlStrings);
          grantResourcePermissionPersister
-               = new RecursiveGrantResourcePermissionPersister(sqlType, sqlStrings);
+               = new RecursiveGrantResourcePermissionPersister(sqlProfile, sqlStrings);
          grantGlobalResourcePermissionPersister
-               = new RecursiveGrantGlobalResourcePermissionPersister(sqlType, sqlStrings);
+               = new RecursiveGrantGlobalResourcePermissionPersister(sqlProfile, sqlStrings);
       }
       else {
          grantDomainCreatePermissionSysPersister
-               = new NonRecursiveGrantDomainCreatePermissionSysPersister(sqlType, sqlStrings);
+               = new NonRecursiveGrantDomainCreatePermissionSysPersister(sqlProfile, sqlStrings);
          grantDomainCreatePermissionPostCreateSysPersister
-               = new NonRecursiveGrantDomainCreatePermissionPostCreateSysPersister(sqlType, sqlStrings);
+               = new NonRecursiveGrantDomainCreatePermissionPostCreateSysPersister(sqlProfile, sqlStrings);
          grantDomainPermissionSysPersister
-               = new NonRecursiveGrantDomainPermissionSysPersister(sqlType, sqlStrings);
+               = new NonRecursiveGrantDomainPermissionSysPersister(sqlProfile, sqlStrings);
          domainPersister
-               = new NonRecursiveDomainPersister(sqlType, sqlStrings);
+               = new NonRecursiveDomainPersister(sqlProfile, sqlStrings);
          resourcePersister
-               = new NonRecursiveResourcePersister(sqlType, sqlStrings);
+               = new NonRecursiveResourcePersister(sqlProfile, sqlStrings);
          grantResourceCreatePermissionSysPersister
-               = new NonRecursiveGrantResourceCreatePermissionSysPersister(sqlType, sqlStrings);
+               = new NonRecursiveGrantResourceCreatePermissionSysPersister(sqlProfile, sqlStrings);
          grantResourceCreatePermissionPostCreateSysPersister
-               = new NonRecursiveGrantResourceCreatePermissionPostCreateSysPersister(sqlType, sqlStrings);
+               = new NonRecursiveGrantResourceCreatePermissionPostCreateSysPersister(sqlProfile, sqlStrings);
          grantResourceCreatePermissionPostCreatePersister
-               = new NonRecursiveGrantResourceCreatePermissionPostCreatePersister(sqlType, sqlStrings);
+               = new NonRecursiveGrantResourceCreatePermissionPostCreatePersister(sqlProfile, sqlStrings);
          grantResourcePermissionSysPersister
-               = new NonRecursiveGrantResourcePermissionSysPersister(sqlType, sqlStrings);
+               = new NonRecursiveGrantResourcePermissionSysPersister(sqlProfile, sqlStrings);
          grantGlobalResourcePermissionSysPersister
-               = new NonRecursiveGrantGlobalResourcePermissionSysPersister(sqlType, sqlStrings);
+               = new NonRecursiveGrantGlobalResourcePermissionSysPersister(sqlProfile, sqlStrings);
          grantResourcePermissionPersister
-               = new NonRecursiveGrantResourcePermissionPersister(sqlType, sqlStrings);
+               = new NonRecursiveGrantResourcePermissionPersister(sqlProfile, sqlStrings);
          grantGlobalResourcePermissionPersister
-               = new NonRecursiveGrantGlobalResourcePermissionPersister(sqlType, sqlStrings);
+               = new NonRecursiveGrantGlobalResourcePermissionPersister(sqlProfile, sqlStrings);
       }
    }
 

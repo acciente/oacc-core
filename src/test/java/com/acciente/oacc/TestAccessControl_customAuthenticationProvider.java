@@ -20,7 +20,7 @@ package com.acciente.oacc;
 import com.acciente.oacc.helper.TestConfigLoader;
 import com.acciente.oacc.sql.SQLAccessControlContextFactory;
 import com.acciente.oacc.sql.SQLDialect;
-import com.acciente.oacc.sql.SQLType;
+import com.acciente.oacc.sql.SQLProfile;
 import com.acciente.oacc.sql.internal.SQLPasswordAuthenticationProvider;
 import org.junit.After;
 import org.junit.Before;
@@ -63,16 +63,16 @@ public class TestAccessControl_customAuthenticationProvider extends TestAccessCo
                                                                   .getInstance(DomainPermissions.SUPER_USER)));
       systemAccessControlContext.unauthenticate();
 
-      SQLType sqlType = TestConfigLoader.getSQLType();
+      SQLProfile sqlProfile = TestConfigLoader.getSQLProfile();
       DataSource dataSource = TestConfigLoader.getDataSource();
       customAccessControlContext
             = SQLAccessControlContextFactory.getAccessControlContext(dataSource,
                                                                      TestConfigLoader.getDatabaseSchema(),
-                                                                     sqlType,
+                                                                     sqlProfile,
                                                                      new CustomAuthenticationProvider(dataSource,
                                                                                                       TestConfigLoader
                                                                                                             .getDatabaseSchema(),
-                                                                                                      sqlType.getSqlDialect()));
+                                                                                                      sqlProfile.getSqlDialect()));
    }
 
    @After

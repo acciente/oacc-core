@@ -89,7 +89,7 @@ public class TestSQLAccessControlContext extends TestSQLAccessControlContextBase
          throws SQLException {
       Connection connection = DriverManager.getConnection(dbUrl, dbUser, dbPwd);
       SQLAccessControlSystemResetUtil.resetOACC(connection, dbSchema, oaccRootPwd);
-      return SQLAccessControlContextFactory.getAccessControlContext(connection, dbSchema, SQLType.DB2_10_5_RECURSIVE);
+      return SQLAccessControlContextFactory.getAccessControlContext(connection, dbSchema, SQLProfile.DB2_10_5_RECURSIVE);
    }
 
    private static void authSysResource(final AccessControlContext accessControlContext) {
