@@ -379,9 +379,8 @@ public class SQLStrings implements Serializable {
             + "SELECT DomainId, DomainName FROM S ORDER BY DomainLevel";
 
       SQL_removeInDomain_withDescendants_BY_DomainID
-            = (SQLDialect.DB2_10_5.equals(sqlProfile.getSqlDialect()))
-              ? null
-              : (SQLDialect.Oracle_11_2.equals(sqlProfile.getSqlDialect()))
+            = sqlProfile.isRecursiveDeleteSupported()
+              ? (SQLDialect.Oracle_11_2.equals(sqlProfile.getSqlDialect()))
                 ? "DELETE FROM "
                       + schemaNameAndTablePrefix
                       + "Domain WHERE DomainId IN ( "
@@ -392,7 +391,8 @@ public class SQLStrings implements Serializable {
                       + SQL_findDescendantsRecursiveInDomain_DomainID_BY_DomainID
                       + "DELETE FROM "
                       + schemaNameAndTablePrefix
-                      + "Domain WHERE DomainId IN ( SELECT DomainId FROM S )";
+                      + "Domain WHERE DomainId IN ( SELECT DomainId FROM S )"
+              : null;
 
       // Domain - non-recursive
       // non-recursive query to return only direct (first-level) descendants domain names of the specified domain
@@ -610,9 +610,8 @@ public class SQLStrings implements Serializable {
             + "Domain B ON B.DomainId = P.AccessedDomainId";
 
       SQL_removeInGrantDomainPermissionSys_withDescendants_BY_AccessedDomainID
-            = (SQLDialect.DB2_10_5.equals(sqlProfile.getSqlDialect()))
-              ? null
-              : (SQLDialect.Oracle_11_2.equals(sqlProfile.getSqlDialect()))
+            = sqlProfile.isRecursiveDeleteSupported()
+              ? (SQLDialect.Oracle_11_2.equals(sqlProfile.getSqlDialect()))
                 ? "DELETE FROM "
                       + schemaNameAndTablePrefix
                       + "Grant_DomPerm_Sys WHERE AccessedDomainId IN ( "
@@ -623,7 +622,8 @@ public class SQLStrings implements Serializable {
                       + SQL_findDescendantsRecursiveInDomain_DomainID_BY_DomainID
                       + "DELETE FROM "
                       + schemaNameAndTablePrefix
-                      + "Grant_DomPerm_Sys WHERE AccessedDomainId IN ( SELECT DomainId FROM S )";
+                      + "Grant_DomPerm_Sys WHERE AccessedDomainId IN ( SELECT DomainId FROM S )"
+              : null;
 
       // GrantDomainPermissionSys - non-recursive
       SQL_findInGrantDomainPermissionSys_withoutInheritance_ResourceDomainId_BY_AccessorID_SysPermissionID_IsWithGrant
@@ -755,9 +755,8 @@ public class SQLStrings implements Serializable {
             + "Domain C ON C.DomainId = P.AccessedDomainId";
 
       SQL_removeInGrantResourceCreatePermissionSys_withDescendants_BY_AccessedDomainId
-            = (SQLDialect.DB2_10_5.equals(sqlProfile.getSqlDialect()))
-              ? null
-              : (SQLDialect.Oracle_11_2.equals(sqlProfile.getSqlDialect()))
+            = sqlProfile.isRecursiveDeleteSupported()
+              ? (SQLDialect.Oracle_11_2.equals(sqlProfile.getSqlDialect()))
                 ? "DELETE FROM "
                       + schemaNameAndTablePrefix
                       + "Grant_ResCrPerm_Sys WHERE AccessedDomainId IN ( "
@@ -768,7 +767,8 @@ public class SQLStrings implements Serializable {
                       + SQL_findDescendantsRecursiveInDomain_DomainID_BY_DomainID
                       + "DELETE FROM "
                       + schemaNameAndTablePrefix
-                      + "Grant_ResCrPerm_Sys WHERE AccessedDomainId IN ( SELECT DomainId FROM S )";
+                      + "Grant_ResCrPerm_Sys WHERE AccessedDomainId IN ( SELECT DomainId FROM S )"
+              : null;
 
       // GrantResourceCreatePermissionPostCreateSys - common
       SQL_findInGrantResourceCreatePermissionPostCreateSys_withoutInheritance_PostCreateSysPermissionID_PostCreateIsWithGrant_IsWithGrant_BY_AccessorID_AccessedDomainID_ResourceClassID
@@ -849,9 +849,8 @@ public class SQLStrings implements Serializable {
             + "Domain C ON C.DomainId = P.AccessedDomainId";
 
       SQL_removeInGrantResourceCreatePermissionPostCreateSys_withDescendants_BY_AccessedDomainID
-            = (SQLDialect.DB2_10_5.equals(sqlProfile.getSqlDialect()))
-              ? null
-              : (SQLDialect.Oracle_11_2.equals(sqlProfile.getSqlDialect()))
+            = sqlProfile.isRecursiveDeleteSupported()
+              ? (SQLDialect.Oracle_11_2.equals(sqlProfile.getSqlDialect()))
                 ? "DELETE FROM "
                       + schemaNameAndTablePrefix
                       + "Grant_ResCrPerm_PostCr_Sys WHERE AccessedDomainId IN ( "
@@ -862,7 +861,8 @@ public class SQLStrings implements Serializable {
                       + SQL_findDescendantsRecursiveInDomain_DomainID_BY_DomainID
                       + "DELETE FROM "
                       + schemaNameAndTablePrefix
-                      + "Grant_ResCrPerm_PostCr_Sys WHERE AccessedDomainId IN ( SELECT DomainId FROM S )";
+                      + "Grant_ResCrPerm_PostCr_Sys WHERE AccessedDomainId IN ( SELECT DomainId FROM S )"
+              : null;
 
       // GrantResourceCreatePermissionPostCreate - common
       SQL_findInGrantResourceCreatePermissionPostCreate_withoutInheritance_PostCreatePermissionName_PostCreateIsWithGrant_IsWithGrant_BY_AccessorID_AccessedDomainID_ResourceClassID
@@ -961,9 +961,8 @@ public class SQLStrings implements Serializable {
             + "Domain D ON D.DomainId = P.AccessedDomainId";
 
       SQL_removeInGrantResourceCreatePermissionPostCreate_withDescendants_BY_AccessedDomainId
-            = (SQLDialect.DB2_10_5.equals(sqlProfile.getSqlDialect()))
-              ? null
-              : (SQLDialect.Oracle_11_2.equals(sqlProfile.getSqlDialect()))
+            = sqlProfile.isRecursiveDeleteSupported()
+              ? (SQLDialect.Oracle_11_2.equals(sqlProfile.getSqlDialect()))
                 ? "DELETE FROM "
                       + schemaNameAndTablePrefix
                       + "Grant_ResCrPerm_PostCr WHERE AccessedDomainId IN ( "
@@ -974,7 +973,8 @@ public class SQLStrings implements Serializable {
                       + SQL_findDescendantsRecursiveInDomain_DomainID_BY_DomainID
                       + "DELETE FROM "
                       + schemaNameAndTablePrefix
-                      + "Grant_ResCrPerm_PostCr WHERE AccessedDomainId IN ( SELECT DomainId FROM S )";
+                      + "Grant_ResCrPerm_PostCr WHERE AccessedDomainId IN ( SELECT DomainId FROM S )"
+              : null;
 
       // GrantResourcePermissionSys - common
       SQL_findInGrantResourcePermissionSys_withoutInheritance_ResourceClassName_SysPermissionID_IsWithGrant_BY_AccessorID_AccessedID
@@ -1290,9 +1290,8 @@ public class SQLStrings implements Serializable {
             + "Domain C ON C.DomainId = P.AccessedDomainId";
 
       SQL_removeInGrantGlobalResourcePermissionSys_withDescendants_BY_AccessedDomainId
-            = (SQLDialect.DB2_10_5.equals(sqlProfile.getSqlDialect()))
-              ? null
-              : (SQLDialect.Oracle_11_2.equals(sqlProfile.getSqlDialect()))
+            = sqlProfile.isRecursiveDeleteSupported()
+              ? (SQLDialect.Oracle_11_2.equals(sqlProfile.getSqlDialect()))
                 ? "DELETE FROM "
                       + schemaNameAndTablePrefix
                       + "Grant_Global_ResPerm_Sys WHERE AccessedDomainId IN ( "
@@ -1303,7 +1302,8 @@ public class SQLStrings implements Serializable {
                       + SQL_findDescendantsRecursiveInDomain_DomainID_BY_DomainID
                       + "DELETE FROM "
                       + schemaNameAndTablePrefix
-                      + "Grant_Global_ResPerm_Sys WHERE AccessedDomainId IN ( SELECT DomainId FROM S )";
+                      + "Grant_Global_ResPerm_Sys WHERE AccessedDomainId IN ( SELECT DomainId FROM S )"
+              : null;
 
       // GrantGlobalResourcePermissionSys - non-recursive
       SQL_findInGrantGlobalResourcePermissionSys_withoutInheritance_ResourceDomainID_BY_AccessorID_ResourceClassID_SysPermissionID_IsWithGrant
@@ -1453,9 +1453,8 @@ public class SQLStrings implements Serializable {
             + "Domain D ON D.DomainId = P.AccessedDomainId";
 
       SQL_removeInGrantGlobalResourcePermission_withDescendants_BY_AccessedDomainId
-            = (SQLDialect.DB2_10_5.equals(sqlProfile.getSqlDialect()))
-              ? null
-              : (SQLDialect.Oracle_11_2.equals(sqlProfile.getSqlDialect()))
+            = sqlProfile.isRecursiveDeleteSupported()
+              ? (SQLDialect.Oracle_11_2.equals(sqlProfile.getSqlDialect()))
                 ? "DELETE FROM "
                       + schemaNameAndTablePrefix
                       + "Grant_Global_ResPerm WHERE AccessedDomainId IN ( "
@@ -1466,7 +1465,8 @@ public class SQLStrings implements Serializable {
                       + SQL_findDescendantsRecursiveInDomain_DomainID_BY_DomainID
                       + "DELETE FROM "
                       + schemaNameAndTablePrefix
-                      + "Grant_Global_ResPerm WHERE AccessedDomainId IN ( SELECT DomainId FROM S )";
+                      + "Grant_Global_ResPerm WHERE AccessedDomainId IN ( SELECT DomainId FROM S )"
+              : null;
 
       // GrantGlobalResourcePermission - non-recursive
       SQL_findInGrantGlobalResourcePermission_withoutInheritance_ResourceDomainID_BY_AccessorID_ResourceClassID_PermissionID_IsWithGrant

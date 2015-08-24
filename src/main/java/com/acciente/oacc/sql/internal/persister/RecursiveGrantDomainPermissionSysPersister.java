@@ -20,7 +20,6 @@ package com.acciente.oacc.sql.internal.persister;
 import com.acciente.oacc.DomainPermission;
 import com.acciente.oacc.DomainPermissions;
 import com.acciente.oacc.Resource;
-import com.acciente.oacc.sql.SQLDialect;
 import com.acciente.oacc.sql.SQLProfile;
 import com.acciente.oacc.sql.internal.persister.id.DomainId;
 import com.acciente.oacc.sql.internal.persister.id.Id;
@@ -184,9 +183,15 @@ public class RecursiveGrantDomainPermissionSysPersister extends CommonGrantDomai
       SQLStatement statement = null;
 
       try {
-         // chose strategy to perform recursive delete based on sql dialect
-         if (sqlStrings.getSqlDialect() == SQLDialect.DB2_10_5) {
-            // DB2 doesn't support recursive deletion, so we have to use a different implementation
+         // chose strategy to perform recursive delete based on sql profile
+         if (sqlProfile.isRecursiveDeleteSupported()) {
+            // prepare the standard recursive delete statement for domain and its children
+            statement = connection.prepareStatement(sqlStrings.SQL_removeInGrantDomainPermissionSys_withDescendants_BY_AccessedDomainID);
+            statement.setResourceDomainId(1, domainId);
+            statement.executeUpdate();
+         }
+         else {
+            // DBMS doesn't support recursive deletion, so we have to use a different implementation
 
             // get descendant domain Ids
             statement = connection.prepareStatement(sqlStrings.SQL_findInDomain_DescendantResourceDomainID_BY_DomainID_ORDERBY_DomainLevel);
@@ -206,12 +211,6 @@ public class RecursiveGrantDomainPermissionSysPersister extends CommonGrantDomai
                statement.setResourceDomainId(1, descendantDomainIds.get(i));
                statement.executeUpdate();
             }
-         }
-         else {
-            // prepare the standard recursive delete statement for domain and its children
-            statement = connection.prepareStatement(sqlStrings.SQL_removeInGrantDomainPermissionSys_withDescendants_BY_AccessedDomainID);
-            statement.setResourceDomainId(1, domainId);
-            statement.executeUpdate();
          }
       }
       catch (SQLException e) {

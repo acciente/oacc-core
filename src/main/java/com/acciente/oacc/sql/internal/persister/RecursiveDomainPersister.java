@@ -17,7 +17,6 @@
  */
 package com.acciente.oacc.sql.internal.persister;
 
-import com.acciente.oacc.sql.SQLDialect;
 import com.acciente.oacc.sql.SQLProfile;
 import com.acciente.oacc.sql.internal.persister.id.DomainId;
 import com.acciente.oacc.sql.internal.persister.id.Id;
@@ -68,9 +67,20 @@ public class RecursiveDomainPersister extends CommonDomainPersister {
       SQLStatement statement = null;
 
       try {
-         // chose strategy to perform recursive delete based on sql dialect
-         if (sqlStrings.getSqlDialect() == SQLDialect.DB2_10_5) {
-            // DB2 doesn't support recursive deletion, so we have to remove domain's children first
+         // chose strategy to perform recursive delete based on sql profile
+         if (sqlProfile.isRecursiveDeleteSupported()) {
+            // prepare the standard recursive delete statement of domain and its children
+            statement = connection.prepareStatement(sqlStrings.SQL_removeInDomain_withDescendants_BY_DomainID);
+            statement.setResourceDomainId(1, domainId);
+
+            final int rowCount = statement.executeUpdate();
+
+            if (rowCount < 1) {
+               throw new IllegalStateException("Security table data update, 1 or more rows expected, got: " + rowCount);
+            }
+         }
+         else {
+            // DBMS doesn't support recursive deletion, so we have to remove domain's children first
 
             // get descendant domain Ids
             statement = connection.prepareStatement(sqlStrings.SQL_findInDomain_DescendantResourceDomainID_BY_DomainID_ORDERBY_DomainLevel);
@@ -89,17 +99,6 @@ public class RecursiveDomainPersister extends CommonDomainPersister {
             for (int i=descendantDomainIds.size()-1; i >= 0; i--) {
                statement.setResourceDomainId(1, descendantDomainIds.get(i));
                assertOneRowUpdated(statement.executeUpdate());
-            }
-         }
-         else {
-            // prepare the standard recursive delete statement of domain and its children
-            statement = connection.prepareStatement(sqlStrings.SQL_removeInDomain_withDescendants_BY_DomainID);
-            statement.setResourceDomainId(1, domainId);
-
-            final int rowCount = statement.executeUpdate();
-
-            if (rowCount < 1) {
-               throw new IllegalStateException("Security table data update, 1 or more rows expected, got: " + rowCount);
             }
          }
       }

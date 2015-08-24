@@ -20,7 +20,6 @@ package com.acciente.oacc.sql.internal.persister;
 import com.acciente.oacc.Resource;
 import com.acciente.oacc.ResourcePermission;
 import com.acciente.oacc.ResourcePermissions;
-import com.acciente.oacc.sql.SQLDialect;
 import com.acciente.oacc.sql.SQLProfile;
 import com.acciente.oacc.sql.internal.persister.id.DomainId;
 import com.acciente.oacc.sql.internal.persister.id.Id;
@@ -207,9 +206,17 @@ public class RecursiveGrantGlobalResourcePermissionPersister extends CommonGrant
 
       SQLStatement statement = null;
       try {
-         // chose strategy to perform recursive delete based on sql dialect
-         if (sqlStrings.getSqlDialect() == SQLDialect.DB2_10_5) {
-            // DB2 doesn't support recursive deletion, so we have to remove domain's children's accessors first
+         // chose strategy to perform recursive delete based on sql profile
+         if (sqlProfile.isRecursiveDeleteSupported()) {
+            // prepare the standard recursive delete statement for domain and its children
+            statement = connection.prepareStatement(sqlStrings.SQL_removeInGrantGlobalResourcePermission_withDescendants_BY_AccessedDomainId);
+
+            // revoke any existing non-system permissions any accessor has to this domain + any resource class
+            statement.setResourceDomainId(1, accessedDomainId);
+            statement.executeUpdate();
+         }
+         else {
+            // DBMS doesn't support recursive deletion, so we have to remove domain's children's accessors first
 
             // get descendant domain Ids
             statement = connection.prepareStatement(sqlStrings.SQL_findInDomain_DescendantResourceDomainID_BY_DomainID_ORDERBY_DomainLevel);
@@ -229,14 +236,6 @@ public class RecursiveGrantGlobalResourcePermissionPersister extends CommonGrant
                statement.setResourceDomainId(1, descendantDomainIds.get(i));
                statement.executeUpdate();
             }
-         }
-         else {
-            // prepare the standard recursive delete statement for domain and its children
-            statement = connection.prepareStatement(sqlStrings.SQL_removeInGrantGlobalResourcePermission_withDescendants_BY_AccessedDomainId);
-
-            // revoke any existing non-system permissions any accessor has to this domain + any resource class
-            statement.setResourceDomainId(1, accessedDomainId);
-            statement.executeUpdate();
          }
       }
       catch (SQLException e) {
