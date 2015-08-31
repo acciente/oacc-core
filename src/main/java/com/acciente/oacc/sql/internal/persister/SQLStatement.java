@@ -91,6 +91,10 @@ public class SQLStatement {
       return statement.executeUpdate();
    }
 
+   public SQLResult getGeneratedKeys() throws SQLException {
+      return new SQLResult(statement.getGeneratedKeys());
+   }
+
    void close() throws SQLException {
       statement.close();
    }

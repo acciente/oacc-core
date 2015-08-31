@@ -33,7 +33,6 @@ import com.acciente.oacc.ResourceCreatePermission;
 import com.acciente.oacc.ResourceCreatePermissions;
 import com.acciente.oacc.ResourcePermission;
 import com.acciente.oacc.ResourcePermissions;
-import com.acciente.oacc.Resources;
 import com.acciente.oacc.sql.SQLProfile;
 import com.acciente.oacc.sql.internal.persister.CommonGrantGlobalResourcePermissionPersister;
 import com.acciente.oacc.sql.internal.persister.CommonGrantGlobalResourcePermissionSysPersister;
@@ -78,7 +77,6 @@ import com.acciente.oacc.sql.internal.persister.SQLStrings;
 import com.acciente.oacc.sql.internal.persister.id.DomainId;
 import com.acciente.oacc.sql.internal.persister.id.Id;
 import com.acciente.oacc.sql.internal.persister.id.ResourceClassId;
-import com.acciente.oacc.sql.internal.persister.id.ResourceId;
 import com.acciente.oacc.sql.internal.persister.id.ResourcePermissionId;
 
 import javax.sql.DataSource;
@@ -910,22 +908,13 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
          }
       }
 
-      // generate a resource id for the new resource
-      final Id<ResourceId> newResourceId = resourcePersister.getNextResourceId(connection);
-
-      if (newResourceId == null) {
-         throw new IllegalStateException("Error generating new resource ID");
-      }
-
       // create the new resource
-      resourcePersister.createResource(connection,
-                                       newResourceId,
-                                       Id.<ResourceClassId>from(resourceClassInternalInfo.getResourceClassId()),
-                                       domainId);
+      final Resource newResource = resourcePersister.createResource(connection,
+                                                                    Id.<ResourceClassId>from(resourceClassInternalInfo
+                                                                                                   .getResourceClassId()),
+                                                                    domainId);
 
       // set permissions on the new resource, if applicable
-      final Resource newResource = Resources.getInstance(newResourceId.getValue());
-
       if (newResourcePermissions != null && newResourcePermissions.size() > 0) {
          if (sessionResource != null) {
             __setDirectResourcePermissions(connection,

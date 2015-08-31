@@ -93,6 +93,7 @@ public class SQLStrings implements Serializable {
    // Resource - common
    public final String SQL_findInResource_COUNTResourceID_BY_ResourceClassID_DomainID;
    public final String SQL_createInResource_WITH_ResourceID_ResourceClassID_DomainID;
+   public final String SQL_createInResource_WITH_ResourceClassID_DomainID;
    public final String SQL_removeInResource_BY_ResourceID;
    public final String SQL_findInResource_ResourceId_BY_ResourceID;
    public final String SQL_findInResource_DomainID_BY_ResourceID;
@@ -293,12 +294,17 @@ public class SQLStrings implements Serializable {
             + "ResourceClass WHERE ResourceClassId <> 0";  // <> 0 filters out the SYSOBJECT class
 
       SQL_createInResourceClass_WITH_ResourceClassName_IsAuthenticatable_IsUnauthenticatedCreateAllowed
-            = "INSERT INTO "
-            + schemaNameAndTablePrefix
-            + "ResourceClass ( ResourceClassId, ResourceClassName, IsAuthenticatable, IsUnauthenticatedCreateAllowed ) "
-            + "VALUES ( "
-            + dialectSpecificSQLGenerator.nextSequenceValueFragment(schemaNameAndTablePrefix + "ResourceClassId")
-            + ", ?, ?, ? )";
+            = sqlProfile.isSequenceSupported()
+              ? "INSERT INTO "
+                    + schemaNameAndTablePrefix
+                    + "ResourceClass ( ResourceClassId, ResourceClassName, IsAuthenticatable, IsUnauthenticatedCreateAllowed ) "
+                    + "VALUES ( "
+                    + dialectSpecificSQLGenerator.nextSequenceValueFragment(schemaNameAndTablePrefix + "ResourceClassId")
+                    + ", ?, ?, ? )"
+              : "INSERT INTO "
+                    + schemaNameAndTablePrefix
+                    + "ResourceClass ( ResourceClassName, IsAuthenticatable, IsUnauthenticatedCreateAllowed ) "
+                    + "VALUES ( ?, ?, ? )";
 
       // ResourceClassPermission
       SQL_findInResourceClassPermission_PermissionID_BY_ResourceClassID_PermissionName
@@ -314,11 +320,15 @@ public class SQLStrings implements Serializable {
             + "ResourceClass WHERE ResourceClassName = ? )";
 
       SQL_createInResourceClassPermission_WITH_ResourceClassID_PermissionName
-            = "INSERT INTO "
-            + schemaNameAndTablePrefix
-            + "ResourceClassPermission ( ResourceClassId, PermissionId, PermissionName ) VALUES ( ?, "
-            + dialectSpecificSQLGenerator.nextSequenceValueFragment(schemaNameAndTablePrefix + "PermissionId")
-            + ", ? )";
+            = sqlProfile.isSequenceSupported()
+              ? "INSERT INTO "
+                    + schemaNameAndTablePrefix
+                    + "ResourceClassPermission ( ResourceClassId, PermissionId, PermissionName ) VALUES ( ?, "
+                    + dialectSpecificSQLGenerator.nextSequenceValueFragment(schemaNameAndTablePrefix + "PermissionId")
+                    + ", ? )"
+              : "INSERT INTO "
+                    + schemaNameAndTablePrefix
+                    + "ResourceClassPermission ( ResourceClassId, PermissionName ) VALUES ( ?, ? )";
 
       // Domain - common
       SQL_findInDomain_DomainID_BY_ResourceDomainName
@@ -334,18 +344,26 @@ public class SQLStrings implements Serializable {
             + "Resource WHERE ResourceId = ? )";
 
       SQL_createInDomain_WITH_ResourceDomainName
-            = "INSERT INTO "
-            + schemaNameAndTablePrefix
-            + "Domain ( DomainId, DomainName ) VALUES ( "
-            + dialectSpecificSQLGenerator.nextSequenceValueFragment(schemaNameAndTablePrefix + "DomainId")
-            + ", ? )";
+            = sqlProfile.isSequenceSupported()
+              ? "INSERT INTO "
+                    + schemaNameAndTablePrefix
+                    + "Domain ( DomainId, DomainName ) VALUES ( "
+                    + dialectSpecificSQLGenerator.nextSequenceValueFragment(schemaNameAndTablePrefix + "DomainId")
+                    + ", ? )"
+              : "INSERT INTO "
+                    + schemaNameAndTablePrefix
+                    + "Domain ( DomainName ) VALUES ( ? )";
 
       SQL_createInDomain_WITH_ResourceDomainName_ParentDomainID
-            = "INSERT INTO "
-            + schemaNameAndTablePrefix
-            + "Domain ( DomainId, DomainName, ParentDomainId ) VALUES ( "
-            + dialectSpecificSQLGenerator.nextSequenceValueFragment(schemaNameAndTablePrefix + "DomainId")
-            + ", ?, ? )";
+            = sqlProfile.isSequenceSupported()
+              ? "INSERT INTO "
+                    + schemaNameAndTablePrefix
+                    + "Domain ( DomainId, DomainName, ParentDomainId ) VALUES ( "
+                    + dialectSpecificSQLGenerator.nextSequenceValueFragment(schemaNameAndTablePrefix + "DomainId")
+                    + ", ?, ? )"
+              : "INSERT INTO "
+                    + schemaNameAndTablePrefix
+                    + "Domain ( DomainName, ParentDomainId ) VALUES ( ?, ? )";
 
       SQL_removeInDomain_BY_DomainID
             = "DELETE FROM "
@@ -649,6 +667,11 @@ public class SQLStrings implements Serializable {
             = "INSERT INTO "
             + schemaNameAndTablePrefix
             + "Resource ( ResourceId, ResourceClassId, DomainId ) VALUES ( ?, ?, ? )";
+
+      SQL_createInResource_WITH_ResourceClassID_DomainID
+            = "INSERT INTO "
+            + schemaNameAndTablePrefix
+            + "Resource ( ResourceClassId, DomainId ) VALUES ( ?, ? )";
 
       SQL_removeInResource_BY_ResourceID
             = "DELETE FROM " + schemaNameAndTablePrefix + "Resource WHERE ResourceId = ?";

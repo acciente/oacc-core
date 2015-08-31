@@ -31,6 +31,10 @@ public class SQLConnection {
       return new SQLStatement(connection.prepareStatement(sql));
    }
 
+   public SQLStatement prepareStatement(String sql, String[] generatedKeyColumns) throws SQLException {
+      return new SQLStatement(connection.prepareStatement(sql, generatedKeyColumns));
+   }
+
    public void close() throws SQLException {
       this.connection.close();
    }

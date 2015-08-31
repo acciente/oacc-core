@@ -18,6 +18,7 @@
 package com.acciente.oacc.sql.internal.persister;
 
 import com.acciente.oacc.Resource;
+import com.acciente.oacc.Resources;
 import com.acciente.oacc.sql.SQLProfile;
 import com.acciente.oacc.sql.internal.persister.id.DomainId;
 import com.acciente.oacc.sql.internal.persister.id.Id;
@@ -27,6 +28,8 @@ import com.acciente.oacc.sql.internal.persister.id.ResourceId;
 import java.sql.SQLException;
 
 public abstract class CommonResourcePersister extends Persister implements ResourcePersister {
+   protected static final String[] GENERATED_KEY_COLUMNS = new String[]{"ResourceId"};
+
    protected final SQLProfile sqlProfile;
    protected final SQLStrings sqlStrings;
 
@@ -68,19 +71,49 @@ public abstract class CommonResourcePersister extends Persister implements Resou
    }
 
    @Override
-   public void createResource(SQLConnection connection,
-                              Id<ResourceId> newResourceId,
-                              Id<ResourceClassId> resourceClassId,
-                              Id<DomainId> resourceDomainId) {
+   public Resource createResource(SQLConnection connection,
+                                  Id<ResourceClassId> resourceClassId,
+                                  Id<DomainId> resourceDomainId) {
       SQLStatement statement = null;
 
       try {
-         statement = connection.prepareStatement(sqlStrings.SQL_createInResource_WITH_ResourceID_ResourceClassID_DomainID);
-         statement.setResourceId(1, newResourceId);
-         statement.setResourceClassId(2, resourceClassId);
-         statement.setResourceDomainId(3, resourceDomainId);
+         if (sqlProfile.isSequenceSupported()) {
+            final Id<ResourceId> nextResourceId = getNextResourceId(connection);
+            if (nextResourceId == null) {
+               throw new IllegalStateException("could not retrieve next ResourceId from sequence");
+            }
 
-         assertOneRowInserted(statement.executeUpdate());
+            statement = connection.prepareStatement(sqlStrings.SQL_createInResource_WITH_ResourceID_ResourceClassID_DomainID);
+            statement.setResourceId(1, nextResourceId);
+            statement.setResourceClassId(2, resourceClassId);
+            statement.setResourceDomainId(3, resourceDomainId);
+
+            assertOneRowInserted(statement.executeUpdate());
+            return Resources.getInstance(nextResourceId.getValue());
+         }
+         else {
+            statement = connection.prepareStatement(sqlStrings.SQL_createInResource_WITH_ResourceClassID_DomainID,
+                                                    GENERATED_KEY_COLUMNS);
+            statement.setResourceClassId(1, resourceClassId);
+            statement.setResourceDomainId(2, resourceDomainId);
+
+            assertOneRowInserted(statement.executeUpdate());
+
+            final SQLResult generatedKeys = statement.getGeneratedKeys();
+
+            if (!generatedKeys.next()) {
+               throw new IllegalStateException("could not retrieve auto-generated ResourceId");
+            }
+
+            final Id<ResourceId> nextResourceId = generatedKeys.getNextResourceId(1);
+
+            if (nextResourceId == null) {
+               throw new IllegalStateException("could not retrieve auto-generated ResourceId");
+            }
+            generatedKeys.close();
+
+            return Resources.getInstance(nextResourceId.getValue());
+         }
       }
       catch (SQLException e) {
          throw new RuntimeException(e);

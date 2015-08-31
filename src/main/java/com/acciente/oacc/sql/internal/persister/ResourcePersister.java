@@ -27,10 +27,9 @@ public interface ResourcePersister {
    void verifyResourceExists(SQLConnection connection,
                              Resource resource);
 
-   void createResource(SQLConnection connection,
-                       Id<ResourceId> newResourceId,
-                       Id<ResourceClassId> resourceClassId,
-                       Id<DomainId> resourceDomainId);
+   Resource createResource(SQLConnection connection,
+                           Id<ResourceClassId> resourceClassId,
+                           Id<DomainId> resourceDomainId);
 
    void deleteResource(SQLConnection connection,
                        Resource resource);
