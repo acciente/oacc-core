@@ -58,6 +58,16 @@ public enum SQLProfile {
                                       .recursionSupported(false)
                                       .recursiveDeleteSupported(false)
                                       .sequenceSupported(true)),
+   SQLite_3_8_RECURSIVE(new NamedParameters()
+                              .sqlDialect(SQLDialect.SQLite_3_8)
+                              .recursionSupported(true)
+                              .recursiveDeleteSupported(true)
+                              .sequenceSupported(false)),
+   SQLite_3_8_NON_RECURSIVE(new NamedParameters()
+                                  .sqlDialect(SQLDialect.SQLite_3_8)
+                                  .recursionSupported(false)
+                                  .recursiveDeleteSupported(false)
+                                  .sequenceSupported(false)),
    ;
 
    SQLProfile(NamedParameters namedParameters) {

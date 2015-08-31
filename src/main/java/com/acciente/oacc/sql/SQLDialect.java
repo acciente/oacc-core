@@ -22,4 +22,5 @@ public enum SQLDialect {
    Oracle_11_2,
    PostgreSQL_9_3,
    SQLServer_12_0,
+   SQLite_3_8,
 }

@@ -31,6 +31,7 @@ class DialectSpecificSQLGenerator {
    private static final DialectSpecificSQLGenerator Oracle_11_2    = new DialectSpecificSQLGenerator("WITH", "UNION ALL", "SELECT ", ".NEXTVAL FROM DUAL", "", ".NEXTVAL");
    private static final DialectSpecificSQLGenerator PostgreSQL_9_3 = new DialectSpecificSQLGenerator("WITH RECURSIVE", "UNION ALL", "SELECT nextval('", "')", "nextval('", "')");
    private static final DialectSpecificSQLGenerator SQLServer_12_0 = new DialectSpecificSQLGenerator("WITH", "UNION ALL", "SELECT NEXT VALUE FOR ", "", "NEXT VALUE FOR ", "");
+   private static final DialectSpecificSQLGenerator SQLite_3_8     = new DialectSpecificSQLGenerator("WITH RECURSIVE", "UNION ALL", null, null, null, null);
 
    static DialectSpecificSQLGenerator getInstance(SQLDialect sqlDialect) {
       switch (sqlDialect) {
@@ -42,6 +43,8 @@ class DialectSpecificSQLGenerator {
             return PostgreSQL_9_3;
          case SQLServer_12_0:
             return SQLServer_12_0;
+         case SQLite_3_8:
+            return SQLite_3_8;
          default:
             throw new IllegalArgumentException("Unsupported SQL dialect: " + sqlDialect);
       }
