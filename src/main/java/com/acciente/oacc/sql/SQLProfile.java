@@ -68,6 +68,11 @@ public enum SQLProfile {
                                   .recursionSupported(false)
                                   .recursiveDeleteSupported(false)
                                   .sequenceSupported(false)),
+   MySQL_5_6_NON_RECURSIVE(new NamedParameters()
+                                  .sqlDialect(SQLDialect.MySQL_5_6)
+                                  .recursionSupported(false)
+                                  .recursiveDeleteSupported(false)
+                                  .sequenceSupported(false)),
    ;
 
    SQLProfile(NamedParameters namedParameters) {
