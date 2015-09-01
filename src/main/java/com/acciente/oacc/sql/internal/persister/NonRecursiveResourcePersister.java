@@ -56,7 +56,8 @@ public class NonRecursiveResourcePersister extends CommonResourcePersister {
             resultSet.close();
 
             if (count > 0) {
-               return false;
+               isEmpty =  false;
+               break;
             }
          }
 

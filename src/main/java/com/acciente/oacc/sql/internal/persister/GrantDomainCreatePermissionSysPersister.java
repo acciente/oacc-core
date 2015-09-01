@@ -20,7 +20,6 @@ package com.acciente.oacc.sql.internal.persister;
 import com.acciente.oacc.DomainCreatePermission;
 import com.acciente.oacc.Resource;
 
-import java.io.Serializable;
 import java.util.Set;
 
 public interface GrantDomainCreatePermissionSysPersister {

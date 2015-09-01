@@ -42,7 +42,7 @@ public class NonRecursiveDomainPersister extends CommonDomainPersister {
       try {
          // verify the domain
          if (getResourceDomainId(connection, resourceDomainName) == null) {
-            return Collections.EMPTY_SET;
+            return Collections.emptySet();
          }
 
          Set<String> allDescendantDomainNames = new HashSet<>();

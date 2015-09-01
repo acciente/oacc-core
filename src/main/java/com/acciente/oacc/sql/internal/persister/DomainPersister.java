@@ -21,7 +21,6 @@ import com.acciente.oacc.Resource;
 import com.acciente.oacc.sql.internal.persister.id.DomainId;
 import com.acciente.oacc.sql.internal.persister.id.Id;
 
-import java.io.Serializable;
 import java.util.Set;
 
 public interface DomainPersister {
