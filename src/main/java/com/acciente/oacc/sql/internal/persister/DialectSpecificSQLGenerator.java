@@ -33,6 +33,7 @@ class DialectSpecificSQLGenerator {
    private static final DialectSpecificSQLGenerator SQLServer_12_0 = new DialectSpecificSQLGenerator("WITH", "UNION ALL", "SELECT NEXT VALUE FOR ", "", "NEXT VALUE FOR ", "");
    private static final DialectSpecificSQLGenerator SQLite_3_8     = new DialectSpecificSQLGenerator("WITH RECURSIVE", "UNION ALL", null, null, null, null);
    private static final DialectSpecificSQLGenerator MySQL_5_6      = new DialectSpecificSQLGenerator(null, null, null, null, null, null);
+   private static final DialectSpecificSQLGenerator HSQLDB_2_3     = new DialectSpecificSQLGenerator(null, null, "VALUES NEXT VALUE FOR ", "", "NEXT VALUE FOR ", "");
 
    static DialectSpecificSQLGenerator getInstance(SQLDialect sqlDialect) {
       switch (sqlDialect) {
@@ -48,6 +49,8 @@ class DialectSpecificSQLGenerator {
             return SQLite_3_8;
          case MySQL_5_6:
             return MySQL_5_6;
+         case HSQLDB_2_3:
+            return HSQLDB_2_3;
          default:
             throw new IllegalArgumentException("Unsupported SQL dialect: " + sqlDialect);
       }

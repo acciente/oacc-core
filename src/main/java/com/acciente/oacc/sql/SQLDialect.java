@@ -24,4 +24,5 @@ public enum SQLDialect {
    SQLServer_12_0,
    SQLite_3_8,
    MySQL_5_6,
+   HSQLDB_2_3,
 }

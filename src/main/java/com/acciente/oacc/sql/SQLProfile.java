@@ -73,6 +73,11 @@ public enum SQLProfile {
                                   .recursionSupported(false)
                                   .recursiveDeleteSupported(false)
                                   .sequenceSupported(false)),
+   HSQLDB_2_3_NON_RECURSIVE(new NamedParameters()
+                                      .sqlDialect(SQLDialect.HSQLDB_2_3)
+                                      .recursionSupported(false)
+                                      .recursiveDeleteSupported(false)
+                                      .sequenceSupported(true)),
    ;
 
    SQLProfile(NamedParameters namedParameters) {
