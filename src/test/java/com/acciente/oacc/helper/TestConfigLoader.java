@@ -87,6 +87,7 @@ public class TestConfigLoader {
                                              String propertyName,
                                              String valueAsString) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException {
       Integer valueAsInteger;
+      Boolean valueAsBoolean = null;
 
       try {
          valueAsInteger = Integer.parseInt(valueAsString);
@@ -96,15 +97,30 @@ public class TestConfigLoader {
          valueAsInteger = null;
       }
 
+      if (valueAsInteger == null && valueAsString != null) {
+         final String trimmedAndLowerCasedValue = valueAsString.trim().toLowerCase();
+         if (trimmedAndLowerCasedValue.equals("true")){
+            valueAsBoolean = Boolean.TRUE;
+            valueAsString = null;
+         }
+         else if (trimmedAndLowerCasedValue.equals("false")){
+            valueAsBoolean = Boolean.FALSE;
+            valueAsString = null;
+         }
+      }
+
       final String methodName = "set"
             + propertyName.substring(0, 1).toUpperCase()
             + propertyName.substring(1);
       final Method setMethod
             = vendorSpecificDataSource.getClass().getMethod(methodName,
-                                                            valueAsString == null
+                                                            valueAsInteger != null
                                                             ? int.class
-                                                            : String.class);
-      setMethod.invoke(vendorSpecificDataSource, valueAsString==null ? valueAsInteger : valueAsString);
+                                                            : valueAsBoolean != null
+                                                              ? boolean.class
+                                                              : String.class);
+      setMethod.invoke(vendorSpecificDataSource,
+                       valueAsInteger!=null ? valueAsInteger : valueAsBoolean!=null ? valueAsBoolean : valueAsString);
    }
 
    public static SQLProfile getSQLProfile() {
