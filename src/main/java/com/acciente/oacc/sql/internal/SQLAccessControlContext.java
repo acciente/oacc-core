@@ -34,12 +34,12 @@ import com.acciente.oacc.ResourceCreatePermissions;
 import com.acciente.oacc.ResourcePermission;
 import com.acciente.oacc.ResourcePermissions;
 import com.acciente.oacc.sql.SQLProfile;
-import com.acciente.oacc.sql.internal.persister.CommonGrantGlobalResourcePermissionPersister;
-import com.acciente.oacc.sql.internal.persister.CommonGrantGlobalResourcePermissionSysPersister;
 import com.acciente.oacc.sql.internal.persister.DomainPersister;
 import com.acciente.oacc.sql.internal.persister.GrantDomainCreatePermissionPostCreateSysPersister;
 import com.acciente.oacc.sql.internal.persister.GrantDomainCreatePermissionSysPersister;
 import com.acciente.oacc.sql.internal.persister.GrantDomainPermissionSysPersister;
+import com.acciente.oacc.sql.internal.persister.GrantGlobalResourcePermissionPersister;
+import com.acciente.oacc.sql.internal.persister.GrantGlobalResourcePermissionSysPersister;
 import com.acciente.oacc.sql.internal.persister.GrantResourceCreatePermissionPostCreatePersister;
 import com.acciente.oacc.sql.internal.persister.GrantResourceCreatePermissionPostCreateSysPersister;
 import com.acciente.oacc.sql.internal.persister.GrantResourceCreatePermissionSysPersister;
@@ -161,9 +161,9 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
    private final GrantResourceCreatePermissionPostCreateSysPersister grantResourceCreatePermissionPostCreateSysPersister;
    private final GrantResourceCreatePermissionPostCreatePersister    grantResourceCreatePermissionPostCreatePersister;
    private final GrantResourcePermissionSysPersister                 grantResourcePermissionSysPersister;
-   private final CommonGrantGlobalResourcePermissionSysPersister     grantGlobalResourcePermissionSysPersister;
+   private final GrantGlobalResourcePermissionSysPersister           grantGlobalResourcePermissionSysPersister;
    private final GrantResourcePermissionPersister                    grantResourcePermissionPersister;
-   private final CommonGrantGlobalResourcePermissionPersister        grantGlobalResourcePermissionPersister;
+   private final GrantGlobalResourcePermissionPersister              grantGlobalResourcePermissionPersister;
 
    public static AccessControlContext getAccessControlContext(Connection connection,
                                                               String schemaName,
@@ -198,16 +198,14 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       }
    }
 
-   public static void postDeserialize(AccessControlContext accessControlContext,
-                                      Connection connection) {
+   public static void postDeserialize(AccessControlContext accessControlContext, Connection connection) {
       if (accessControlContext instanceof SQLAccessControlContext) {
          SQLAccessControlContext sqlAccessControlContext = (SQLAccessControlContext) accessControlContext;
          sqlAccessControlContext.__postDeserialize(connection);
       }
    }
 
-   public static void postDeserialize(AccessControlContext accessControlContext,
-                                      DataSource dataSource) {
+   public static void postDeserialize(AccessControlContext accessControlContext, DataSource dataSource) {
       if (accessControlContext instanceof SQLAccessControlContext) {
          SQLAccessControlContext sqlAccessControlContext = (SQLAccessControlContext) accessControlContext;
          sqlAccessControlContext.__postDeserialize(dataSource);

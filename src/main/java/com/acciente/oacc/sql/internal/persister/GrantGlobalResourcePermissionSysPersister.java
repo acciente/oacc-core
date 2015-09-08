@@ -78,4 +78,10 @@ public interface GrantGlobalResourcePermissionSysPersister {
                                    Resource accessorResource,
                                    Id<ResourceClassId> accessedResourceClassId,
                                    Id<DomainId> accessedResourceDomainId);
+
+   void removeGlobalSysPermissions(SQLConnection connection,
+                                   Resource accessorResource,
+                                   Id<ResourceClassId> accessedResourceClassId,
+                                   Id<DomainId> accessedResourceDomainId,
+                                   Set<ResourcePermission> requestedResourcePermissions);
 }

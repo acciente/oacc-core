@@ -257,6 +257,7 @@ public abstract class CommonGrantGlobalResourcePermissionPersister extends Persi
       }
    }
 
+   @Override
    public void removeGlobalResourcePermissions(SQLConnection connection,
                                                Resource accessorResource,
                                                Id<ResourceClassId> accessedResourceClassId,

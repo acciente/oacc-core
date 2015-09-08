@@ -255,6 +255,7 @@ public abstract class CommonGrantGlobalResourcePermissionSysPersister extends Pe
       }
    }
 
+   @Override
    public void removeGlobalSysPermissions(SQLConnection connection,
                                           Resource accessorResource,
                                           Id<ResourceClassId> accessedResourceClassId,
