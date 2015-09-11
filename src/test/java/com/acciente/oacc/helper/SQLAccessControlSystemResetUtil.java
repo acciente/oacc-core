@@ -22,7 +22,10 @@ import com.acciente.oacc.sql.internal.SQLAccessControlSystemInitializer;
 import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class SQLAccessControlSystemResetUtil {
    public static void resetOACC(Connection connection, String dbSchema, char[] oaccRootPwd)
@@ -74,6 +77,46 @@ public class SQLAccessControlSystemResetUtil {
       statement = connection.prepareStatement("DELETE FROM " + schemaNameAndTablePrefix + "ResourceClass");
       statement.executeUpdate();
       statement = connection.prepareStatement("DELETE FROM " + schemaNameAndTablePrefix + "Domain");
-      statement.executeUpdate();
+      try {
+         statement.executeUpdate();
+      }
+      catch (SQLException e) {
+         // some RDBMS don't support deletion of all rows from a table with a self-referential FK constraint,
+         // so let's try to remove each domain's children first
+
+         deleteDomainsIndividually(connection, schemaNameAndTablePrefix);
+      }
+   }
+
+   protected static void deleteDomainsIndividually(Connection connection,
+                                                   String schemaNameAndTablePrefix) throws SQLException {
+      // some RDBMS don't support deletion with a sub-select from the same table,
+      // so let's break this down into an ultra-compatible algorithm:
+      // delete individual childless rows, until no more rows are left
+      try (PreparedStatement selectStatement
+                 = connection.prepareStatement("SELECT DomainID FROM " + schemaNameAndTablePrefix + "Domain WHERE DomainID NOT IN ("
+                                                     + "SELECT ParentDomainID FROM " + schemaNameAndTablePrefix
+                                                     + "Domain WHERE ParentDomainID IS NOT NULL)");
+           PreparedStatement deleteStatement
+                 = connection.prepareStatement("DELETE FROM " + schemaNameAndTablePrefix + "Domain WHERE DomainID = ?")) {
+
+         List<Integer> leafDomainIds;
+         do {
+            // first, find domains without children
+            leafDomainIds = new ArrayList<>();
+            ResultSet resultSet = selectStatement.executeQuery();
+
+            while (resultSet.next()) {
+               leafDomainIds.add(resultSet.getInt("DomainId"));
+            }
+            resultSet.close();
+
+            // then delete those domains without children
+            for (int leafDomainId : leafDomainIds) {
+               deleteStatement.setInt(1, leafDomainId);
+               deleteStatement.executeUpdate();
+            }
+         } while (!leafDomainIds.isEmpty());
+      }
    }
 }
