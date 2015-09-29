@@ -294,7 +294,7 @@ public class SQLStrings implements Serializable {
             + "ResourceClass WHERE ResourceClassId <> 0";  // <> 0 filters out the SYSOBJECT class
 
       SQL_createInResourceClass_WITH_ResourceClassName_IsAuthenticatable_IsUnauthenticatedCreateAllowed
-            = sqlProfile.isSequenceSupported()
+            = sqlProfile.isSequenceEnabled()
               ? "INSERT INTO "
                     + schemaNameAndTablePrefix
                     + "ResourceClass ( ResourceClassId, ResourceClassName, IsAuthenticatable, IsUnauthenticatedCreateAllowed ) "
@@ -320,7 +320,7 @@ public class SQLStrings implements Serializable {
             + "ResourceClass WHERE ResourceClassName = ? )";
 
       SQL_createInResourceClassPermission_WITH_ResourceClassID_PermissionName
-            = sqlProfile.isSequenceSupported()
+            = sqlProfile.isSequenceEnabled()
               ? "INSERT INTO "
                     + schemaNameAndTablePrefix
                     + "ResourceClassPermission ( ResourceClassId, PermissionId, PermissionName ) VALUES ( ?, "
@@ -344,7 +344,7 @@ public class SQLStrings implements Serializable {
             + "Resource WHERE ResourceId = ? )";
 
       SQL_createInDomain_WITH_ResourceDomainName
-            = sqlProfile.isSequenceSupported()
+            = sqlProfile.isSequenceEnabled()
               ? "INSERT INTO "
                     + schemaNameAndTablePrefix
                     + "Domain ( DomainId, DomainName ) VALUES ( "
@@ -355,7 +355,7 @@ public class SQLStrings implements Serializable {
                     + "Domain ( DomainName ) VALUES ( ? )";
 
       SQL_createInDomain_WITH_ResourceDomainName_ParentDomainID
-            = sqlProfile.isSequenceSupported()
+            = sqlProfile.isSequenceEnabled()
               ? "INSERT INTO "
                     + schemaNameAndTablePrefix
                     + "Domain ( DomainId, DomainName, ParentDomainId ) VALUES ( "
@@ -397,7 +397,7 @@ public class SQLStrings implements Serializable {
             + "SELECT DomainId, DomainName FROM S ORDER BY DomainLevel";
 
       SQL_removeInDomain_withDescendants_BY_DomainID
-            = sqlProfile.isRecursiveDeleteSupported()
+            = sqlProfile.isRecursiveDeleteEnabled()
               ? (SQLDialect.Oracle_11_2.equals(sqlProfile.getSqlDialect()))
                 ? "DELETE FROM "
                       + schemaNameAndTablePrefix
@@ -628,7 +628,7 @@ public class SQLStrings implements Serializable {
             + "Domain B ON B.DomainId = P.AccessedDomainId";
 
       SQL_removeInGrantDomainPermissionSys_withDescendants_BY_AccessedDomainID
-            = sqlProfile.isRecursiveDeleteSupported()
+            = sqlProfile.isRecursiveDeleteEnabled()
               ? (SQLDialect.Oracle_11_2.equals(sqlProfile.getSqlDialect()))
                 ? "DELETE FROM "
                       + schemaNameAndTablePrefix
@@ -778,7 +778,7 @@ public class SQLStrings implements Serializable {
             + "Domain C ON C.DomainId = P.AccessedDomainId";
 
       SQL_removeInGrantResourceCreatePermissionSys_withDescendants_BY_AccessedDomainId
-            = sqlProfile.isRecursiveDeleteSupported()
+            = sqlProfile.isRecursiveDeleteEnabled()
               ? (SQLDialect.Oracle_11_2.equals(sqlProfile.getSqlDialect()))
                 ? "DELETE FROM "
                       + schemaNameAndTablePrefix
@@ -872,7 +872,7 @@ public class SQLStrings implements Serializable {
             + "Domain C ON C.DomainId = P.AccessedDomainId";
 
       SQL_removeInGrantResourceCreatePermissionPostCreateSys_withDescendants_BY_AccessedDomainID
-            = sqlProfile.isRecursiveDeleteSupported()
+            = sqlProfile.isRecursiveDeleteEnabled()
               ? (SQLDialect.Oracle_11_2.equals(sqlProfile.getSqlDialect()))
                 ? "DELETE FROM "
                       + schemaNameAndTablePrefix
@@ -984,7 +984,7 @@ public class SQLStrings implements Serializable {
             + "Domain D ON D.DomainId = P.AccessedDomainId";
 
       SQL_removeInGrantResourceCreatePermissionPostCreate_withDescendants_BY_AccessedDomainId
-            = sqlProfile.isRecursiveDeleteSupported()
+            = sqlProfile.isRecursiveDeleteEnabled()
               ? (SQLDialect.Oracle_11_2.equals(sqlProfile.getSqlDialect()))
                 ? "DELETE FROM "
                       + schemaNameAndTablePrefix
@@ -1313,7 +1313,7 @@ public class SQLStrings implements Serializable {
             + "Domain C ON C.DomainId = P.AccessedDomainId";
 
       SQL_removeInGrantGlobalResourcePermissionSys_withDescendants_BY_AccessedDomainId
-            = sqlProfile.isRecursiveDeleteSupported()
+            = sqlProfile.isRecursiveDeleteEnabled()
               ? (SQLDialect.Oracle_11_2.equals(sqlProfile.getSqlDialect()))
                 ? "DELETE FROM "
                       + schemaNameAndTablePrefix
@@ -1476,7 +1476,7 @@ public class SQLStrings implements Serializable {
             + "Domain D ON D.DomainId = P.AccessedDomainId";
 
       SQL_removeInGrantGlobalResourcePermission_withDescendants_BY_AccessedDomainId
-            = sqlProfile.isRecursiveDeleteSupported()
+            = sqlProfile.isRecursiveDeleteEnabled()
               ? (SQLDialect.Oracle_11_2.equals(sqlProfile.getSqlDialect()))
                 ? "DELETE FROM "
                       + schemaNameAndTablePrefix

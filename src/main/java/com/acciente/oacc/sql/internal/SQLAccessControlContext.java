@@ -265,7 +265,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       resourceClassPermissionPersister
             = new ResourceClassPermissionPersister(sqlProfile, sqlStrings);
 
-      if (sqlProfile.isRecursionSupported()) {
+      if (sqlProfile.isRecursiveCTEEnabled()) {
          grantDomainCreatePermissionSysPersister
                = new RecursiveGrantDomainCreatePermissionSysPersister(sqlProfile, sqlStrings);
          grantDomainCreatePermissionPostCreateSysPersister

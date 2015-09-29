@@ -77,7 +77,7 @@ public abstract class CommonResourcePersister extends Persister implements Resou
       SQLStatement statement = null;
 
       try {
-         if (sqlProfile.isSequenceSupported()) {
+         if (sqlProfile.isSequenceEnabled()) {
             final Id<ResourceId> nextResourceId = getNextResourceId(connection);
             if (nextResourceId == null) {
                throw new IllegalStateException("could not retrieve next ResourceId from sequence");

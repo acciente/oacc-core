@@ -68,7 +68,7 @@ public class RecursiveDomainPersister extends CommonDomainPersister {
 
       try {
          // chose strategy to perform recursive delete based on sql profile
-         if (sqlProfile.isRecursiveDeleteSupported()) {
+         if (sqlProfile.isRecursiveDeleteEnabled()) {
             // prepare the standard recursive delete statement of domain and its children
             statement = connection.prepareStatement(sqlStrings.SQL_removeInDomain_withDescendants_BY_DomainID);
             statement.setResourceDomainId(1, domainId);

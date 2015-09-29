@@ -25,86 +25,86 @@ public class SQLProfile implements Serializable {
    public static final SQLProfile DB2_10_5_RECURSIVE =
          new SQLProfile.EnumBldr("DB2_10_5_RECURSIVE")
                .sqlDialect(SQLDialect.DB2_10_5)
-               .recursionSupported(true)
-               .recursiveDeleteSupported(false)
-               .sequenceSupported(true)
+               .recursiveCTEEnabled(true)
+               .recursiveDeleteEnabled(false)
+               .sequenceEnabled(true)
                .build();
    public static final SQLProfile DB2_10_5_NON_RECURSIVE =
          new SQLProfile.EnumBldr("DB2_10_5_NON_RECURSIVE")
                .sqlDialect(SQLDialect.DB2_10_5)
-               .recursionSupported(false)
-               .recursiveDeleteSupported(false)
-               .sequenceSupported(true)
+               .recursiveCTEEnabled(false)
+               .recursiveDeleteEnabled(false)
+               .sequenceEnabled(true)
                .build();
    public static final SQLProfile Oracle_11_2_RECURSIVE =
          new SQLProfile.EnumBldr("Oracle_11_2_RECURSIVE")
                .sqlDialect(SQLDialect.Oracle_11_2)
-               .recursionSupported(true)
-               .recursiveDeleteSupported(true)
-               .sequenceSupported(true)
+               .recursiveCTEEnabled(true)
+               .recursiveDeleteEnabled(true)
+               .sequenceEnabled(true)
                .build();
    public static final SQLProfile Oracle_11_2_NON_RECURSIVE =
          new SQLProfile.EnumBldr("Oracle_11_2_NON_RECURSIVE")
                .sqlDialect(SQLDialect.Oracle_11_2)
-               .recursionSupported(false)
-               .recursiveDeleteSupported(false)
-               .sequenceSupported(true)
+               .recursiveCTEEnabled(false)
+               .recursiveDeleteEnabled(false)
+               .sequenceEnabled(true)
                .build();
    public static final SQLProfile PostgreSQL_9_3_RECURSIVE =
          new SQLProfile.EnumBldr("PostgreSQL_9_3_RECURSIVE")
                .sqlDialect(SQLDialect.PostgreSQL_9_3)
-               .recursionSupported(true)
-               .recursiveDeleteSupported(true)
-               .sequenceSupported(true)
+               .recursiveCTEEnabled(true)
+               .recursiveDeleteEnabled(true)
+               .sequenceEnabled(true)
                .build();
    public static final SQLProfile PostgreSQL_9_3_NON_RECURSIVE =
          new SQLProfile.EnumBldr("PostgreSQL_9_3_NON_RECURSIVE")
                .sqlDialect(SQLDialect.PostgreSQL_9_3)
-               .recursionSupported(false)
-               .recursiveDeleteSupported(false)
-               .sequenceSupported(true)
+               .recursiveCTEEnabled(false)
+               .recursiveDeleteEnabled(false)
+               .sequenceEnabled(true)
                .build();
    public static final SQLProfile SQLServer_12_0_RECURSIVE =
          new SQLProfile.EnumBldr("SQLServer_12_0_RECURSIVE")
                .sqlDialect(SQLDialect.SQLServer_12_0)
-               .recursionSupported(true)
-               .recursiveDeleteSupported(true)
-               .sequenceSupported(true)
+               .recursiveCTEEnabled(true)
+               .recursiveDeleteEnabled(true)
+               .sequenceEnabled(true)
                .build();
    public static final SQLProfile SQLServer_12_0_NON_RECURSIVE =
          new SQLProfile.EnumBldr("SQLServer_12_0_NON_RECURSIVE")
                .sqlDialect(SQLDialect.SQLServer_12_0)
-               .recursionSupported(false)
-               .recursiveDeleteSupported(false)
-               .sequenceSupported(true)
+               .recursiveCTEEnabled(false)
+               .recursiveDeleteEnabled(false)
+               .sequenceEnabled(true)
                .build();
    public static final SQLProfile SQLite_3_8_RECURSIVE =
          new SQLProfile.EnumBldr("SQLite_3_8_RECURSIVE")
                .sqlDialect(SQLDialect.SQLite_3_8)
-               .recursionSupported(true)
-               .recursiveDeleteSupported(true)
-               .sequenceSupported(false)
+               .recursiveCTEEnabled(true)
+               .recursiveDeleteEnabled(true)
+               .sequenceEnabled(false)
                .build();
    public static final SQLProfile SQLite_3_8_NON_RECURSIVE =
          new SQLProfile.EnumBldr("SQLite_3_8_NON_RECURSIVE")
                .sqlDialect(SQLDialect.SQLite_3_8)
-               .recursionSupported(false)
-               .recursiveDeleteSupported(false)
-               .sequenceSupported(false)
+               .recursiveCTEEnabled(false)
+               .recursiveDeleteEnabled(false)
+               .sequenceEnabled(false)
                .build();
    public static final SQLProfile MySQL_5_6_NON_RECURSIVE =
          new SQLProfile.EnumBldr("MySQL_5_6_NON_RECURSIVE")
                .sqlDialect(SQLDialect.MySQL_5_6)
-               .recursionSupported(false)
-               .recursiveDeleteSupported(false)
-               .sequenceSupported(false)
+               .recursiveCTEEnabled(false)
+               .recursiveDeleteEnabled(false)
+               .sequenceEnabled(false)
                .build();
    public static final SQLProfile HSQLDB_2_3_NON_RECURSIVE =
          new SQLProfile.EnumBldr("HSQLDB_2_3_NON_RECURSIVE")
                .sqlDialect(SQLDialect.HSQLDB_2_3)
-               .recursionSupported(false)
-               .recursiveDeleteSupported(false)
-               .sequenceSupported(true)
+               .recursiveCTEEnabled(false)
+               .recursiveDeleteEnabled(false)
+               .sequenceEnabled(true)
                .build();
 
    public static SQLProfile valueOf(String name) {
@@ -114,16 +114,16 @@ public class SQLProfile implements Serializable {
    // attributes of the SQLProfile
    private final String name;
    private final SQLDialect sqlDialect;
-   private final boolean recursionSupported;
-   private final boolean recursiveDeleteSupported;
-   private final boolean sequenceSupported;
+   private final boolean recursiveCTEEnabled;
+   private final boolean recursiveDeleteEnabled;
+   private final boolean sequenceEnabled;
 
    private SQLProfile(EnumBldr enumBldr) {
       this.name = enumBldr.name;
       this.sqlDialect = enumBldr.sqlDialect;
-      this.recursionSupported = enumBldr.recursionSupported;
-      this.recursiveDeleteSupported = enumBldr.recursiveDeleteSupported;
-      this.sequenceSupported = enumBldr.sequenceSupported;
+      this.recursiveCTEEnabled = enumBldr.recursiveCTEEnabled;
+      this.recursiveDeleteEnabled = enumBldr.recursiveDeleteEnabled;
+      this.sequenceEnabled = enumBldr.sequenceEnabled;
    }
 
    public String name() {
@@ -134,19 +134,19 @@ public class SQLProfile implements Serializable {
       return sqlDialect;
    }
 
-   public boolean isRecursionSupported() {
-      return recursionSupported;
+   public boolean isRecursiveCTEEnabled() {
+      return recursiveCTEEnabled;
    }
 
-   public boolean isRecursiveDeleteSupported() {
-      return recursiveDeleteSupported;
+   public boolean isRecursiveDeleteEnabled() {
+      return recursiveDeleteEnabled;
    }
 
-   public boolean isSequenceSupported() {
-      return sequenceSupported;
+   public boolean isSequenceEnabled() {
+      return sequenceEnabled;
    }
 
-   // private pseudo-builder helper
+   // private builder, also provides enum-like capabilities
    private static class EnumBldr {
       // a map of all the SQLProfile values defined here keyed by there associated name
       private static final Map<String, SQLProfile> enumMap = new LinkedHashMap<>();
@@ -154,9 +154,9 @@ public class SQLProfile implements Serializable {
       private final String name;
 
       private SQLDialect sqlDialect;
-      private boolean recursionSupported;
-      private boolean recursiveDeleteSupported;
-      private boolean sequenceSupported;
+      private boolean recursiveCTEEnabled;
+      private boolean recursiveDeleteEnabled;
+      private boolean sequenceEnabled;
 
       private static SQLProfile valueOf(String name) {
          return enumMap.get(name);
@@ -171,18 +171,18 @@ public class SQLProfile implements Serializable {
          return this;
       }
 
-      private EnumBldr recursionSupported(boolean isRecursionSupported) {
-         this.recursionSupported = isRecursionSupported;
+      private EnumBldr recursiveCTEEnabled(boolean recursiveCTEEnabled) {
+         this.recursiveCTEEnabled = recursiveCTEEnabled;
          return this;
       }
 
-      private EnumBldr recursiveDeleteSupported(boolean isRecursiveDeleteSupported) {
-         this.recursiveDeleteSupported = isRecursiveDeleteSupported;
+      private EnumBldr recursiveDeleteEnabled(boolean recursiveDeleteEnabled) {
+         this.recursiveDeleteEnabled = recursiveDeleteEnabled;
          return this;
       }
 
-      private EnumBldr sequenceSupported(boolean isSequenceSupported) {
-         this.sequenceSupported = isSequenceSupported;
+      private EnumBldr sequenceEnabled(boolean sequenceEnabled) {
+         this.sequenceEnabled = sequenceEnabled;
          return this;
       }
 

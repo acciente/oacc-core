@@ -184,7 +184,7 @@ public class RecursiveGrantDomainPermissionSysPersister extends CommonGrantDomai
 
       try {
          // chose strategy to perform recursive delete based on sql profile
-         if (sqlProfile.isRecursiveDeleteSupported()) {
+         if (sqlProfile.isRecursiveDeleteEnabled()) {
             // prepare the standard recursive delete statement for domain and its children
             statement = connection.prepareStatement(sqlStrings.SQL_removeInGrantDomainPermissionSys_withDescendants_BY_AccessedDomainID);
             statement.setResourceDomainId(1, domainId);

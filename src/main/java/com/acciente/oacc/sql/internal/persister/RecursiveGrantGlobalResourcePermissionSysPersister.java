@@ -205,7 +205,7 @@ public class RecursiveGrantGlobalResourcePermissionSysPersister extends CommonGr
       SQLStatement statement = null;
       try {
          // chose strategy to perform recursive delete based on sql profile
-         if (sqlProfile.isRecursiveDeleteSupported()) {
+         if (sqlProfile.isRecursiveDeleteEnabled()) {
             // prepare the standard recursive delete statement for domain and its children
             statement = connection.prepareStatement(sqlStrings.SQL_removeInGrantGlobalResourcePermissionSys_withDescendants_BY_AccessedDomainId);
 
