@@ -31,6 +31,9 @@ OACC persists all security relationships in database tables and currently suppor
 - Microsoft SQL Server 12.0 (2014)
 - Oracle 11g R2
 - PostgreSQL 9.3
+- HSQLDB 2.3
+- MySQL 5.6 / MariaDB 10.0
+- SQLite 3.8
 
 OACC is compatible with Java&#8482; SE 7 (Java&#8482; version 1.7.0), or higher.
 
