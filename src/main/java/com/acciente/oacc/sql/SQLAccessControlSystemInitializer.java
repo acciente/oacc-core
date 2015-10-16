@@ -33,12 +33,12 @@ public class SQLAccessControlSystemInitializer {
 
    public static void main(String args[]) throws SQLException, IOException {
       if (args.length == 0) {
-         System.out.println("Usage: java com.acciente.oacc.SQLAccessControlSystemInitializer"
+         System.out.println("Usage: java com.acciente.oacc.sql.SQLAccessControlSystemInitializer"
                                   + PROP_DbUrl + "=<db-url> "
                                   + PROP_DbUser + "=<db-user> "
                                   + PROP_DbPwd + "=<db-password> "
                                   + PROP_OACCRootPwd + "=<OACC-system-password> "
-                                  + " [ " + PROP_DbUrl + "=<db-schema>]");
+                                  + " [ " + PROP_DbSchema + "=<db-schema>]");
          return;
       }
 
