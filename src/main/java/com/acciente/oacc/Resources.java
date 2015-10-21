@@ -21,19 +21,40 @@ import java.io.Serializable;
 
 public class Resources {
    public static Resource getInstance(long resourceId) {
-      return new ResourceImpl(resourceId);
+      return new ResourceImpl(resourceId, null);
+   }
+
+   public static Resource getInstance(long resourceId, String externalId) {
+      return new ResourceImpl(resourceId, externalId);
+   }
+
+   public static Resource getInstance(String externalId) {
+      return new ResourceImpl(externalId);
    }
 
    private static class ResourceImpl implements Resource, Serializable {
       private final Long resourceId;
+      private final String externalId;
 
-      private ResourceImpl(long resourceId) {
+      private ResourceImpl(long resourceId,
+                           String externalId) {
          this.resourceId = resourceId;
+         this.externalId = externalId;
+      }
+
+      private ResourceImpl(String externalId) {
+         this.resourceId = null;
+         this.externalId = externalId;
       }
 
       @Override
-      public long getId() {
+      public Long getId() {
          return resourceId;
+      }
+
+      @Override
+      public String getExternalId() {
+         return externalId;
       }
 
       @Override
@@ -60,8 +81,23 @@ public class Resources {
       }
 
       @Override
+      /**
+       * desired output:
+       *                    | externalId != null       | externalId == null
+       * -------------------|--------------------------|--------------------
+       * resourceId != null | R(_rId_, extId: _extId_) | R(_rId_)
+       * resourceId == null | R(extId: _extId_)        | R(_rId_, extId: _extId_)
+       */
       public String toString() {
-         return "R(" + Long.toString(resourceId) + ")";
+         if (resourceId != null && externalId == null) {
+            return "R(" + String.valueOf(resourceId) + ")";
+         }
+
+         if (resourceId == null && externalId != null) {
+            return "R(extId: " + externalId + ")";
+         }
+
+         return "R(" + String.valueOf(resourceId) + ", extId: " + externalId + ")";
       }
    }
 }

@@ -18,21 +18,32 @@
 package com.acciente.oacc;
 
 /**
- * A resource is the abstraction for an application object. A resource is created and
- * associated with every object in the application that needs to have access control.
- * All security relationships for the application object are defined using the using
- * its corresponding resource.
+ * A resource is the abstraction for a secured application object.
+ * <p/>
+ * A resource is created and associated with every object in the application that needs to have access control.
+ * All security relationships for the application object are defined via its corresponding resource.
  *
  * To create a new resource use  {@link AccessControlContext#createResource}
  * or one of its variants in {@link AccessControlContext}.
  *
  * To create a Resource instance using a previously persisted resource id use the
- * factory method {@link Resources#getInstance(long)}.
+ * factory method {@link Resources#getInstance(long)}, or one of its siblings.
  */
 public interface Resource {
    /**
-    * @return The id of this resource. This id is typically persisted as an attribute
-    * of the application object that it is associated with.
+    * Get the id of this resource.
+    *
+    * This id is typically persisted as an attribute of the application object that it is associated with.
+    * @return The id of this resource.
     */
-   long getId();
+   Long getId();
+
+   /**
+    * Get the optional external id of this resource.
+    *
+    * The <em>optional</em> external id is any String representation that uniquely identifies a resource from the
+    * application model and can be used as a surrogate to the {@link #getId() id} of this resource.
+    * @return The external id of this resource.
+    */
+   String getExternalId();
 }

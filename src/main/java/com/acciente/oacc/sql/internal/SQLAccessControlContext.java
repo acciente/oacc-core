@@ -111,7 +111,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
    private String   sessionResourceDomainName;
 
    // resource ID constants
-   private static final int SYSTEM_RESOURCE_ID = 0;
+   private static final Long SYSTEM_RESOURCE_ID = Long.valueOf(0);
 
    // domain permissions constants
    private static final DomainPermission DomainPermission_CREATE_CHILD_DOMAIN
@@ -6177,7 +6177,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
    }
 
    private void __assertAuthenticatedAsSystemResource() {
-      if (sessionResource == null || sessionResource.getId() != SYSTEM_RESOURCE_ID) {
+      if (sessionResource == null || !SYSTEM_RESOURCE_ID.equals(sessionResource.getId())) {
          throw NotAuthorizedException.newInstanceForAction(sessionResource,
                                                            "perform operation reserved for the system resource");
       }
