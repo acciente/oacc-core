@@ -70,6 +70,8 @@ public class SQLAccessControlSystemResetUtil {
       statement.executeUpdate();
       statement = connection.prepareStatement("DELETE FROM " + schemaNameAndTablePrefix + "ResourcePassword");
       statement.executeUpdate();
+      statement = connection.prepareStatement("DELETE FROM " + schemaNameAndTablePrefix + "ResourceExternalId");
+      statement.executeUpdate();
       statement = connection.prepareStatement("DELETE FROM " + schemaNameAndTablePrefix + "Resource");
       statement.executeUpdate();
       statement = connection.prepareStatement("DELETE FROM " + schemaNameAndTablePrefix + "ResourceClassPermission");

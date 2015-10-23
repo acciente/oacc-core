@@ -96,8 +96,12 @@ public class SQLStrings implements Serializable {
    public final String SQL_createInResource_WITH_ResourceClassID_DomainID;
    public final String SQL_removeInResource_BY_ResourceID;
    public final String SQL_findInResource_ResourceId_BY_ResourceID;
+   public final String SQL_findInResource_ResourceId_ExternalId_BY_ResourceID;
    public final String SQL_findInResource_DomainID_BY_ResourceID;
    public final String SQL_findInResource_withoutInheritance_ResourceId_BY_ResourceClassID_DomainID;
+   public final String SQL_createInResourceExternalId_WITH_ResourceID_ExternalID;
+   public final String SQL_removeInResourceExternalId_BY_ResourceID;
+   public final String SQL_findInResourceExternalId_ResourceId_ExternalId_BY_ExternalID;
    // Resource - recursive
    public final String SQL_findInResource_COUNTResourceID_BY_DomainID;
    // Resource - non-recursive
@@ -679,11 +683,28 @@ public class SQLStrings implements Serializable {
       SQL_findInResource_ResourceId_BY_ResourceID
             = "SELECT ResourceId FROM " + schemaNameAndTablePrefix + "Resource WHERE ResourceId = ?";
 
+      SQL_findInResource_ResourceId_ExternalId_BY_ResourceID
+            = "SELECT A.ResourceId, B.ExternalId FROM "
+            + schemaNameAndTablePrefix + "Resource A LEFT JOIN "
+            + schemaNameAndTablePrefix + "ResourceExternalId B ON B.ResourceID = A.ResourceID WHERE A.ResourceId = ?";
+
       SQL_findInResource_DomainID_BY_ResourceID
             = "SELECT DomainId FROM " + schemaNameAndTablePrefix + "Resource WHERE ResourceId = ? ";
 
       SQL_findInResource_withoutInheritance_ResourceId_BY_ResourceClassID_DomainID
             = "SELECT ResourceId FROM " + schemaNameAndTablePrefix + "Resource WHERE ResourceClassId = ? AND DomainId = ?";
+
+      SQL_createInResourceExternalId_WITH_ResourceID_ExternalID
+            = "INSERT INTO "
+            + schemaNameAndTablePrefix
+            + "ResourceExternalId ( ResourceId, ExternalId ) VALUES ( ?, ? )";
+
+      SQL_removeInResourceExternalId_BY_ResourceID
+            = "DELETE FROM " + schemaNameAndTablePrefix + "ResourceExternalId WHERE ResourceId = ?";
+
+      SQL_findInResourceExternalId_ResourceId_ExternalId_BY_ExternalID
+            = "SELECT ResourceId, ExternalId FROM "
+            + schemaNameAndTablePrefix + "ResourceExternalId WHERE ExternalId = ?";
 
       // Resource - recursive
       SQL_findInResource_COUNTResourceID_BY_DomainID

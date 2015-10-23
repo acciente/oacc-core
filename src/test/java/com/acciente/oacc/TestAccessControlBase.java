@@ -129,6 +129,10 @@ public class TestAccessControlBase {
       return "d_" + generateUniqueID();
    }
 
+   public static String generateUniqueExternalId() {
+      return "ext_" + generateUniqueID();
+   }
+
    public static String generateUniqueResourceClassName() {
       return "rc_" + generateUniqueID();
    }

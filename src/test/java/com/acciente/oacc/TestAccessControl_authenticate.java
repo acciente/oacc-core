@@ -95,6 +95,42 @@ public class TestAccessControl_authenticate extends TestAccessControlBase {
    }
 
    @Test
+   public void authenticate_withExtId_shouldSucceed() {
+      final String domainName = generateDomain();
+      final String resourceClassName = generateResourceClass(true, true);
+      final String externalId1 = generateUniqueExternalId();
+      final String externalId2 = generateUniqueExternalId();
+      final String externalId3 = generateUniqueExternalId();
+      final Credentials credentials = PasswordCredentials.newInstance(generateUniquePassword());
+
+      // create resources with external id
+      final Resource resource1
+            = accessControlContext.createResource(resourceClassName, domainName, externalId1, credentials);
+      assertThat(resource1, is(not(nullValue())));
+      final Resource resource2
+            = accessControlContext.createResource(resourceClassName, domainName, externalId2, credentials);
+      assertThat(resource2, is(not(nullValue())));
+      final Resource resource3
+            = accessControlContext.createResource(resourceClassName, domainName, externalId3, credentials);
+      assertThat(resource3, is(not(nullValue())));
+
+      // authenticate with external id and verify
+      accessControlContext.authenticate(Resources.getInstance(resource1.getExternalId()), credentials);
+      assertThat(accessControlContext.getAuthenticatedResource(), is(resource1));
+      assertThat(accessControlContext.getSessionResource(), is(resource1));
+
+      // authenticate with resource id and external id and verify
+      accessControlContext.authenticate(Resources.getInstance(resource2.getId(), resource2.getExternalId()), credentials);
+      assertThat(accessControlContext.getAuthenticatedResource(), is(resource2));
+      assertThat(accessControlContext.getSessionResource(), is(resource2));
+
+      // authenticate with resource id and verify
+      accessControlContext.authenticate(Resources.getInstance(resource3.getId()), credentials);
+      assertThat(accessControlContext.getAuthenticatedResource(), is(resource3));
+      assertThat(accessControlContext.getSessionResource(), is(resource3));
+   }
+
+   @Test
    public void authenticate_whitespaceAndCaseSensitivePasswords() {
       final String oaccRootPwd = new String(TestConfigLoader.getOaccRootPassword());
       final String oaccRootPwd_whitespaced = " " + oaccRootPwd + "\t";
@@ -136,6 +172,13 @@ public class TestAccessControl_authenticate extends TestAccessControlBase {
          assertThat(e.getMessage().toLowerCase(), containsString("resource required, none specified"));
       }
       try {
+         accessControlContext.authenticate(Resources.getInstance(null), PasswordCredentials.newInstance(null));
+         fail("authentication of null resource ids should not have succeeded");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("resource id and/or external id"));
+      }
+      try {
          accessControlContext.authenticate(getSystemResource(), null);
          fail("authentication of system resource with null password credentials should not have succeeded");
       }
@@ -159,7 +202,23 @@ public class TestAccessControl_authenticate extends TestAccessControlBase {
          fail("authentication of non-existent resource reference should not have succeeded");
       }
       catch (IllegalArgumentException e) {
-         assertThat(e.getMessage().toLowerCase(), containsString("could not determine resource class for resource"));
+         assertThat(e.getMessage().toLowerCase(), containsString("not found"));
+      }
+      try {
+         accessControlContext.authenticate(Resources.getInstance("invalid"),
+                                           PasswordCredentials.newInstance("any_password".toCharArray()));
+         fail("authentication of non-existent external id reference should not have succeeded");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("not found"));
+      }
+      try {
+         accessControlContext.authenticate(Resources.getInstance(-999L, "invalid"),
+                                           PasswordCredentials.newInstance("any_password".toCharArray()));
+         fail("authentication of mismatched resource and external id reference should not have succeeded");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("not resolve"));
       }
    }
 

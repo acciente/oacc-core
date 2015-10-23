@@ -1125,7 +1125,7 @@ public interface AccessControlContext {
     *
     * @param resourceClassName a string resource class name
     * @param domainName        a string domain name
-    * @return the integer resourceId of the newly created resource
+    * @return the resource reference of the newly created resource
     * @throws java.lang.IllegalArgumentException if no resource class of resourceClassName exists, or
     *                                            if no domain of domainName exists
     * @throws com.acciente.oacc.NotAuthorizedException if the session resource is not authorized to create a new resource
@@ -1141,7 +1141,7 @@ public interface AccessControlContext {
     * @param resourceClassName a string resource class name
     * @param domainName        a string domain name
     * @param credentials       the credentials to authenticate the new resource
-    * @return the integer resourceId of the newly created resource
+    * @return the resource reference of the newly created resource
     * @throws java.lang.IllegalArgumentException if no resource class of resourceClassName exists, or
     *                                            if resource class is not authenticatable, or
     *                                            if no domain of domainName exists
@@ -1151,6 +1151,46 @@ public interface AccessControlContext {
     *                                                  session resource and new resource via permission inheritance
     */
    Resource createResource(String resourceClassName, String domainName, Credentials credentials);
+
+   /**
+    * Creates a new resource of the specified resource class within the specified domain, with the specified external id.
+    * <p/>
+    * Note that a custom {@link AuthenticationProvider} implementation is required to support
+    * creation of an authenticatable resource without providing explicit credentials
+    *
+    * @param resourceClassName a string resource class name
+    * @param domainName        a string domain name
+    * @param externalId        a unique string identifier for the new resource
+    * @return the resource reference of the newly created resource
+    * @throws java.lang.IllegalArgumentException if no resource class of resourceClassName exists, or
+    *                                            if no domain of domainName exists, or
+    *                                            if a resource with externalId already exists
+    * @throws com.acciente.oacc.NotAuthorizedException if the session resource is not authorized to create a new resource
+    *                                                  of the specified resource class in the specified domain
+    * @throws com.acciente.oacc.OaccException          if creating the new resource would introduce a cycle between the
+    *                                                  session resource and new resource via permission inheritance
+    */
+   Resource createResource(String resourceClassName, String domainName, String externalId);
+
+   /**
+    * Creates a new authenticatable resource of the specified resource class within the specified domain, with
+    * the specified external id.
+    *
+    * @param resourceClassName a string resource class name
+    * @param domainName        a string domain name
+    * @param externalId        a unique string identifier for the new resource
+    * @param credentials       the credentials to authenticate the new resource
+    * @return the resource reference of the newly created resource
+    * @throws java.lang.IllegalArgumentException if no resource class of resourceClassName exists, or
+    *                                            if resource class is not authenticatable, or
+    *                                            if no domain of domainName exists, or
+    *                                            if a resource with externalId already exists
+    * @throws com.acciente.oacc.NotAuthorizedException if the session resource is not authorized to create a new resource
+    *                                                  of the specified resource class in the specified domain
+    * @throws com.acciente.oacc.OaccException          if creating the new resource would introduce a cycle between the
+    *                                                  session resource and new resource via permission inheritance
+    */
+   Resource createResource(String resourceClassName, String domainName, String externalId, Credentials credentials);
 
    /**
     * Deletes the specified resource.

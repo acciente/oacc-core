@@ -21,6 +21,8 @@ import org.junit.Test;
 
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.not;
+import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertThat;
 
 public class TestAccessControl_getSessionResource extends TestAccessControlBase {
@@ -67,6 +69,53 @@ public class TestAccessControl_getSessionResource extends TestAccessControlBase 
       // verify
       final Resource authenticatedResource = accessControlContext.getSessionResource();
       assertThat(authenticatedResource, is(impersonatedResource));
+   }
+
+   @Test
+   public void getSessionResource_withExtId() {
+      final String externalId1 = generateUniqueExternalId();
+      final String domainName = generateDomain();
+      final String externalId2 = generateUniqueExternalId();
+      final String resourceClassName = generateResourceClass(true, true);
+      final String externalId3 = generateUniqueExternalId();
+      final Credentials credentials = PasswordCredentials.newInstance(generateUniquePassword());
+
+      // create resources with external id
+      final Resource resource1
+            = accessControlContext.createResource(resourceClassName, domainName, externalId1, credentials);
+      assertThat(resource1, is(not(nullValue())));
+      final Resource resource2
+            = accessControlContext.createResource(resourceClassName, domainName, externalId2, credentials);
+      assertThat(resource2, is(not(nullValue())));
+      final Resource resource3
+            = accessControlContext.createResource(resourceClassName, domainName, externalId3, credentials);
+      assertThat(resource3, is(not(nullValue())));
+
+      Resource sessionResource;
+
+      // authenticate with external id and verify that the authenticated resource is fully resolved
+      accessControlContext.authenticate(Resources.getInstance(resource1.getExternalId()), credentials);
+      sessionResource = accessControlContext.getSessionResource();
+      assertThat(sessionResource, is(resource1));
+      assertThat(sessionResource.getId(), is(resource1.getId()));
+      assertThat(sessionResource.getExternalId(), is(not(nullValue())));
+      assertThat(sessionResource.getExternalId(), is(resource1.getExternalId()));
+
+      // authenticate with resource id and external id and verify that the authenticated resource is fully resolved
+      accessControlContext.authenticate(Resources.getInstance(resource2.getId(), resource2.getExternalId()), credentials);
+      sessionResource = accessControlContext.getSessionResource();
+      assertThat(sessionResource, is(resource2));
+      assertThat(sessionResource.getId(), is(resource2.getId()));
+      assertThat(sessionResource.getExternalId(), is(not(nullValue())));
+      assertThat(sessionResource.getExternalId(), is(resource2.getExternalId()));
+
+      // authenticate with resource id and verify that the authenticated resource is fully resolved
+      accessControlContext.authenticate(Resources.getInstance(resource3.getId()), credentials);
+      sessionResource = accessControlContext.getSessionResource();
+      assertThat(sessionResource, is(resource3));
+      assertThat(sessionResource.getId(), is(resource3.getId()));
+      assertThat(sessionResource.getExternalId(), is(not(nullValue())));
+      assertThat(sessionResource.getExternalId(), is(resource3.getExternalId()));
    }
 
    @Test

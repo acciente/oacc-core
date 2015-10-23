@@ -47,6 +47,11 @@ public class SQLResult {
       return Resources.getInstance(resultSet.getLong(columnLabel));
    }
 
+   public Resource getResource(String resourceIdColumnLabel, String externalIdColumnLabel) throws SQLException {
+      return Resources.getInstance(resultSet.getLong(resourceIdColumnLabel),
+                                   resultSet.getString(externalIdColumnLabel));
+   }
+
    public Id<ResourceId> getNextResourceId(int columnIndex) throws SQLException {
       return Id.from(resultSet.getLong(columnIndex));
    }

@@ -348,6 +348,9 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       __assertResourceSpecified(resource);
       __assertCredentialsSpecified(credentials);
 
+      // we deliberately don't resolve the resource before calling the common handler method, to avoid having
+      // to keep the connection open across a potentially long call to a third-party authenticationProvider or
+      // to avoid having to get a connection twice
       __authenticate(resource, credentials);
    }
 
@@ -355,6 +358,9 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
    public void authenticate(Resource resource) {
       __assertResourceSpecified(resource);
 
+      // we deliberately don't resolve the resource before calling the common handler method, to avoid having
+      // to keep the connection open across a potentially long call to a third-party authenticationProvider or
+      // to avoid having to get a connection twice
       __authenticate(resource, null);
    }
 
@@ -365,6 +371,11 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       final String resourceDomainForResource;
       try {
          connection = __getConnection();
+
+         // resolve the resource here - instead of outside this method - to avoid having
+         // to keep the connection open across a potentially long call to a third-party authenticationProvider or
+         // to avoid having to get a connection twice
+         resource = __resolveResource(connection, resource);
 
          final ResourceClassInternalInfo resourceClassInternalInfo
                = resourceClassPersister.getResourceClassInfoByResourceId(connection, resource);
@@ -801,7 +812,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       try {
          connection = __getConnection();
 
-         return __createResource(connection, resourceClassName, domainName, null);
+         return __createResource(connection, resourceClassName, domainName, null, null);
       }
       finally {
          __closeConnection(connection);
@@ -819,7 +830,45 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       try {
          connection = __getConnection();
 
-         return __createResource(connection, resourceClassName, domainName, credentials);
+         return __createResource(connection, resourceClassName, domainName, null, credentials);
+      }
+      finally {
+         __closeConnection(connection);
+      }
+   }
+
+   @Override
+   public Resource createResource(String resourceClassName,
+                                  String domainName,
+                                  String externalId) {
+      SQLConnection connection = null;
+
+      __assertExternalIdSpecified(externalId);
+
+      try {
+         connection = __getConnection();
+
+         return __createResource(connection, resourceClassName, domainName, externalId, null);
+      }
+      finally {
+         __closeConnection(connection);
+      }
+   }
+
+   @Override
+   public Resource createResource(String resourceClassName,
+                                  String domainName,
+                                  String externalId,
+                                  Credentials credentials) {
+      SQLConnection connection = null;
+
+      __assertExternalIdSpecified(externalId);
+      __assertCredentialsSpecified(credentials);
+
+      try {
+         connection = __getConnection();
+
+         return __createResource(connection, resourceClassName, domainName, externalId, credentials);
       }
       finally {
          __closeConnection(connection);
@@ -829,6 +878,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
    private Resource __createResource(SQLConnection connection,
                                      String resourceClassName,
                                      String domainName,
+                                     String externalId,
                                      Credentials credentials) {
       __assertResourceClassSpecified(resourceClassName);
       __assertDomainSpecified(domainName);
@@ -856,6 +906,11 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
 
       if (domainId == null) {
          throw new IllegalArgumentException("Could not find domain: " + domainName);
+      }
+
+      // check to ensure that the specified external id does not already exist
+      if (externalId != null && resourcePersister.resolveResourceByExternalId(connection, externalId) != null) {
+         throw new IllegalArgumentException("External id is not unique: " + externalId);
       }
 
       // we first check the create permissions
@@ -910,7 +965,8 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       final Resource newResource = resourcePersister.createResource(connection,
                                                                     Id.<ResourceClassId>from(resourceClassInternalInfo
                                                                                                    .getResourceClassId()),
-                                                                    domainId);
+                                                                    domainId,
+                                                                    externalId);
 
       // set permissions on the new resource, if applicable
       if (newResourcePermissions != null && newResourcePermissions.size() > 0) {
@@ -950,6 +1006,8 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       try {
          connection = __getConnection();
 
+         // we deliberately don't resolve the resource before calling the handler method, because the
+         // delete operation should be idempotent and return false if the resource does not resolve/exist
          return __deleteResource(connection, obsoleteResource);
       }
       finally {
@@ -959,11 +1017,13 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
 
    private boolean __deleteResource(SQLConnection connection,
                                     Resource obsoleteResource) {
-      // short-circuit out of this call if the specified resource does not exist
       try {
-         resourcePersister.verifyResourceExists(connection, obsoleteResource);
+         obsoleteResource = __resolveResource(connection, obsoleteResource);
       }
       catch (IllegalArgumentException e) {
+         // short-circuit out of this call if the specified resource does not exist/resolve
+         // NOTE that this will still throw an exception if a resource does not match its
+         // specified external id
          if (e.getMessage().toLowerCase().contains("not found")) {
             return false;
          }
@@ -6052,6 +6112,40 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
 
    // private shared helper methods
 
+   private Resource __resolveResource(SQLConnection connection,
+                                      Resource resource) {
+      final Resource resolvedResource;
+
+      if (resource.getId() != null) {
+         if (resource.getExternalId() != null) {
+            // the resource has both internal and external Ids, so let's see if they match
+            resolvedResource = resourcePersister.resolveResourceByExternalId(connection, resource.getExternalId());
+            if (resolvedResource == null || !resource.equals(resolvedResource)) {
+               throw new IllegalArgumentException("Resource " + resource + "'s id does not resolve to the specified externalId!");
+            }
+         }
+         else {
+            // ensure that we have a valid internal resource id, so we might as well also fully resolve it
+            resolvedResource = resourcePersister.resolveResourceByResourceId(connection, resource);
+            if (resolvedResource == null) {
+               throw new IllegalArgumentException("Resource " + resource + " not found!");
+            }
+         }
+      }
+      else if (resource.getExternalId() != null) {
+         // there is no internal resource Id, so we need to look it up
+         resolvedResource = resourcePersister.resolveResourceByExternalId(connection, resource.getExternalId());
+         if (resolvedResource == null) {
+            throw new IllegalArgumentException("Resource " + resource + " not found!");
+         }
+      }
+      else {
+         throw new IllegalArgumentException("A resource id and/or external id is required, but none were specified");
+      }
+
+      return resolvedResource;
+   }
+
    private List<String> __getApplicableResourcePermissionNames(SQLConnection connection,
                                                                String resourceClassName) {
       return __getApplicableResourcePermissionNames(connection,
@@ -6155,6 +6249,15 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
    private void __assertCredentialsNotSpecified(Credentials credentials) {
       if (credentials != null) {
          throw new IllegalArgumentException("Credentials not supported, but specified for unauthenticatable resource class");
+      }
+   }
+
+   private void __assertExternalIdSpecified(String externalId) {
+      if (externalId == null) {
+         throw new NullPointerException("External id required, none specified");
+      }
+      else if (externalId.trim().isEmpty()) {
+         throw new IllegalArgumentException("External id required, none specified");
       }
    }
 
@@ -6311,7 +6414,8 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
    private void __assertResourceExists(SQLConnection connection,
                                        Resource resource) {
       // look up resource, but only if it's not the session or authenticated resource (which are already known to exist)
-      if (!sessionResource.equals(resource) && !authenticatedResource.equals(resource)) {
+      if ((authenticatedResource == null) ||
+            !(sessionResource.equals(resource) || authenticatedResource.equals(resource))) {
          // the persister method will throw an IllegalArgumentException if the lookup fails
          resourcePersister.verifyResourceExists(connection, resource);
       }

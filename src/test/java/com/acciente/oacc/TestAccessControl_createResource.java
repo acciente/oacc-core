@@ -46,6 +46,24 @@ public class TestAccessControl_createResource extends TestAccessControlBase {
    }
 
    @Test
+   public void createResource_withExtId_validAsSystemResource() {
+      authenticateSystemResource();
+
+      final String domainName = generateDomain();
+      final String resourceClassName = generateResourceClass(false, false);
+      final String externalId = generateUniqueExternalId();
+
+      // create resource and verify
+      final Resource resource = accessControlContext.createResource(resourceClassName, domainName, externalId);
+
+      assertThat(resource, is(not(nullValue())));
+      assertThat(accessControlContext.getDomainNameByResource(resource), is(domainName));
+      final ResourceClassInfo resourceClassInfo = accessControlContext.getResourceClassInfoByResource(resource);
+      assertThat(resourceClassInfo.getResourceClassName(), is(resourceClassName));
+      assertThat(resource.getExternalId(), is(externalId));
+   }
+
+   @Test
    public void createResource_validAsAuthorized() {
       final String domainName = generateDomain();
       final String resourceClassName = generateResourceClass(false, false);
@@ -85,6 +103,37 @@ public class TestAccessControl_createResource extends TestAccessControlBase {
       assertThat(accessControlContext.getDomainNameByResource(resource2), is(domainName));
       final ResourceClassInfo resourceClassInfo2 = accessControlContext.getResourceClassInfoByResource(resource);
       assertThat(resourceClassInfo2.getResourceClassName(), is(resourceClassName));
+   }
+
+   @Test
+   public void createResource_withExtId_validAsAuthorized() {
+      final String domainName = generateDomain();
+      final String resourceClassName = generateResourceClass(false, false);
+      final String externalId = generateUniqueExternalId();
+
+      // set up an authenticatable resource with resource class create permission
+      final Resource authenticatedResource = generateResourceAndAuthenticate();
+      final String permissionName = generateResourceClassPermission(resourceClassName);
+      final ResourcePermission grantedResourcePermission = ResourcePermissions.getInstance(permissionName);
+      grantResourceCreatePermission(authenticatedResource, resourceClassName, domainName, permissionName);
+
+      Set<Resource> resourcesByPermission = accessControlContext.getResourcesByResourcePermissions(authenticatedResource,
+                                                                                                   resourceClassName,
+                                                                                                   grantedResourcePermission);
+      assertThat(resourcesByPermission.isEmpty(), is(true));
+
+      // create resource and verify
+      final Resource resource = accessControlContext.createResource(resourceClassName, domainName, externalId);
+
+      assertThat(resource, is(not(nullValue())));
+      assertThat(resource.getExternalId(), is(externalId));
+      resourcesByPermission = accessControlContext.getResourcesByResourcePermissions(authenticatedResource,
+                                                                                     resourceClassName,
+                                                                                     grantedResourcePermission);
+      assertThat(resourcesByPermission.size(), is(1));
+      assertThat(accessControlContext.getDomainNameByResource(resource), is(domainName));
+      final ResourceClassInfo resourceClassInfo = accessControlContext.getResourceClassInfoByResource(resource);
+      assertThat(resourceClassInfo.getResourceClassName(), is(resourceClassName));
    }
 
    @Test
@@ -156,6 +205,52 @@ public class TestAccessControl_createResource extends TestAccessControlBase {
       final Resource resource = accessControlContext.createResource(resourceClassName, domainName);
 
       assertThat(resource, is(not(nullValue())));
+      // re-authenticate as System Resource (because we don't have the previous credentials) and verify created resource
+      authenticateSystemResource();
+      assertThat(accessControlContext.getDomainNameByResource(resource), is(domainName));
+      final ResourceClassInfo resourceClassInfo = accessControlContext.getResourceClassInfoByResource(resource);
+      assertThat(resourceClassInfo.getResourceClassName(), is(resourceClassName));
+
+      // verify resource created while unauthenticated gets *ALL* available resource class permissions
+      resourcesByPermission = accessControlContext.getResourcesByResourcePermissions(SYS_RESOURCE,
+                                                                                     resourceClassName,
+                                                                                     implicitResourcePermission);
+      assertThat(resourcesByPermission.size(), is(1));
+      resourcesByPermission2 = accessControlContext.getResourcesByResourcePermissions(SYS_RESOURCE,
+                                                                                      resourceClassName,
+                                                                                      implicitResourcePermission2);
+      assertThat(resourcesByPermission2.size(), is(1));
+   }
+
+   @Test
+   public void createResource_withExtId_validAsUnauthenticated() {
+      final String domainName = generateDomain();
+      final String resourceClassName = generateResourceClass(false, true);
+      final String permissionName = generateResourceClassPermission(resourceClassName);
+      final String permissionName2 = generateResourceClassPermission(resourceClassName);
+      final String externalId = generateUniqueExternalId();
+
+      // set up an authenticatable resource with resource class create permission
+      final Resource authenticatedResource = generateResourceAndAuthenticate();
+      grantResourceCreatePermission(authenticatedResource, resourceClassName, domainName);
+
+      final ResourcePermission implicitResourcePermission = ResourcePermissions.getInstance(permissionName);
+      final ResourcePermission implicitResourcePermission2 = ResourcePermissions.getInstance(permissionName2);
+      Set<Resource> resourcesByPermission = accessControlContext.getResourcesByResourcePermissions(authenticatedResource,
+                                                                                                   resourceClassName,
+                                                                                                   implicitResourcePermission);
+      assertThat(resourcesByPermission.isEmpty(), is(true));
+      Set<Resource> resourcesByPermission2 = accessControlContext.getResourcesByResourcePermissions(authenticatedResource,
+                                                                                                    resourceClassName,
+                                                                                                    implicitResourcePermission2);
+      assertThat(resourcesByPermission2.isEmpty(), is(true));
+
+      // create resource while unauthenticated and verify
+      accessControlContext.unauthenticate();
+      final Resource resource = accessControlContext.createResource(resourceClassName, domainName, externalId);
+
+      assertThat(resource, is(not(nullValue())));
+      assertThat(resource.getExternalId(), is(externalId));
       // re-authenticate as System Resource (because we don't have the previous credentials) and verify created resource
       authenticateSystemResource();
       assertThat(accessControlContext.getDomainNameByResource(resource), is(domainName));
@@ -358,11 +453,95 @@ public class TestAccessControl_createResource extends TestAccessControlBase {
    }
 
    @Test
+   public void createResource_duplicateExternalId_shouldFail() {
+      authenticateSystemResource();
+
+      final String domainName1 = generateDomain();
+      final String resourceClassName1 = generateResourceClass(false, false);
+      final String domainName2 = generateDomain();
+      final String resourceClassName2 = generateResourceClass(false, false);
+      final String externalId = generateUniqueExternalId();
+
+      // create resource
+      final Resource resource = accessControlContext.createResource(resourceClassName1, domainName1, externalId);
+      assertThat(resource.getExternalId(), is(externalId));
+
+      // create resource with same external id and verify
+      try {
+         accessControlContext.createResource(resourceClassName2, domainName2, externalId);
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("external id is not unique"));
+      }
+   }
+
+   @Test
+   public void createResource_caseSensitiveConsistent_duplicateExternalId() {
+      authenticateSystemResource();
+
+      final String domainName = generateDomain();
+      final String resourceClassName = generateResourceClass(false, false);
+      final String permissionName = generateUniquePermissionName();
+      final String externalId = generateUniqueExternalId();
+      final String externalId_lower = externalId + "_eee";
+      final String externalId_UPPER = externalId + "_EEE";
+
+      accessControlContext.createResourcePermission(resourceClassName, permissionName);
+
+      // set up an authenticatable resource with resource class create permission
+      // so that we can look up the resources later via that permission
+      final Resource authenticatedResource = generateResourceAndAuthenticate();
+      grantResourceCreatePermission(authenticatedResource, resourceClassName, domainName, permissionName);
+      final ResourcePermission grantedResourcePermission = ResourcePermissions.getInstance(permissionName);
+
+      Set<Resource> resourcesByPermission;
+      resourcesByPermission = accessControlContext.getResourcesByResourcePermissions(authenticatedResource,
+                                                                                     resourceClassName,
+                                                                                     grantedResourcePermission);
+      assertThat(resourcesByPermission.isEmpty(), is(true));
+
+      // check case sensitivity
+      if (isDatabaseCaseSensitive()) {
+         // create resource
+         final Resource resource = accessControlContext.createResource(resourceClassName, domainName, externalId_lower);
+         assertThat(resource.getExternalId(), is(externalId_lower));
+
+         // create resource with same but case-sensitive external id and verify
+         final Resource resource2 = accessControlContext.createResource(resourceClassName, domainName, externalId_UPPER);
+         assertThat(resource2.getExternalId(), is(externalId_UPPER));
+
+         resourcesByPermission = accessControlContext.getResourcesByResourcePermissions(authenticatedResource,
+                                                                                        resourceClassName,
+                                                                                        grantedResourcePermission);
+         assertThat(resourcesByPermission.size(), is(2));
+      }
+      else {
+         // create resource
+         final Resource resource = accessControlContext.createResource(resourceClassName, domainName, externalId_lower);
+         assertThat(resource.getExternalId(), is(externalId));
+
+         // create resource with same but case-insensitive external id and verify
+         try {
+            accessControlContext.createResource(resourceClassName, domainName, externalId_UPPER);
+         }
+         catch (IllegalArgumentException e) {
+            assertThat(e.getMessage().toLowerCase(), containsString("external id is not unique"));
+         }
+
+         resourcesByPermission = accessControlContext.getResourcesByResourcePermissions(authenticatedResource,
+                                                                                        resourceClassName,
+                                                                                        grantedResourcePermission);
+         assertThat(resourcesByPermission.size(), is(1));
+      }
+   }
+
+   @Test
    public void createResource_nulls_shouldFail() {
       authenticateSystemResource();
 
       final String domainName = generateDomain();
       final String resourceClassName = generateResourceClass(false, false);
+      final String externalId = generateUniqueExternalId();
 
       // attempt to create resources with null parameters
       try {
@@ -373,11 +552,34 @@ public class TestAccessControl_createResource extends TestAccessControlBase {
          assertThat(e.getMessage().toLowerCase(), containsString("resource class required"));
       }
       try {
+         accessControlContext.createResource(null, domainName, externalId);
+         fail("creating resource with null resource class name should have failed");
+      }
+      catch (NullPointerException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("resource class required"));
+      }
+
+      try {
          accessControlContext.createResource(resourceClassName, (String) null);
          fail("creating resource with null domain name should have failed");
       }
       catch (NullPointerException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("domain required"));
+      }
+      try {
+         accessControlContext.createResource(resourceClassName, (String) null, externalId);
+         fail("creating resource with null domain name should have failed");
+      }
+      catch (NullPointerException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("domain required"));
+      }
+
+      try {
+         accessControlContext.createResource(resourceClassName, domainName, (String) null);
+         fail("creating resource with null external id should have failed");
+      }
+      catch (NullPointerException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("external id required"));
       }
    }
 
@@ -387,10 +589,18 @@ public class TestAccessControl_createResource extends TestAccessControlBase {
 
       final String domainName = generateDomain();
       final String resourceClassName = generateResourceClass(false, false);
+      final String externalId = generateUniqueExternalId();
 
       // attempt to create resources with empty or whitespace parameters
       try {
          accessControlContext.createResource("", domainName);
+         fail("creating resource with empty resource class name should have failed");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("resource class required"));
+      }
+      try {
+         accessControlContext.createResource("", domainName, externalId);
          fail("creating resource with empty resource class name should have failed");
       }
       catch (IllegalArgumentException e) {
@@ -404,9 +614,23 @@ public class TestAccessControl_createResource extends TestAccessControlBase {
       catch (IllegalArgumentException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("resource class required"));
       }
+      try {
+         accessControlContext.createResource(" \t", domainName, externalId);
+         fail("creating resource with empty resource class name should have failed");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("resource class required"));
+      }
 
       try {
          accessControlContext.createResource(resourceClassName, "");
+         fail("creating resource with empty domain name should have failed");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("domain required"));
+      }
+      try {
+         accessControlContext.createResource(resourceClassName, "", externalId);
          fail("creating resource with empty domain name should have failed");
       }
       catch (IllegalArgumentException e) {
@@ -420,6 +644,28 @@ public class TestAccessControl_createResource extends TestAccessControlBase {
       catch (IllegalArgumentException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("domain required"));
       }
+      try {
+         accessControlContext.createResource(resourceClassName, " \t", externalId);
+         fail("creating resource with empty domain name should have failed");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("domain required"));
+      }
+
+      try {
+         accessControlContext.createResource(resourceClassName, domainName, " \t");
+         fail("creating resource with empty external id should have failed");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("external id required"));
+      }
+      try {
+         accessControlContext.createResource(resourceClassName, domainName, " \t");
+         fail("creating resource with empty external id should have failed");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("external id required"));
+      }
    }
 
    @Test
@@ -428,10 +674,18 @@ public class TestAccessControl_createResource extends TestAccessControlBase {
 
       final String domainName = generateDomain();
       final String resourceClassName = generateResourceClass(false, false);
+      final String externalId = generateUniqueExternalId();
 
       // attempt to create resources with non-existent references to class or domain names
       try {
          accessControlContext.createResource("does_not_exist", domainName);
+         fail("creating resource with non-existent resource class name should fail");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("could not find resource class"));
+      }
+      try {
+         accessControlContext.createResource("does_not_exist", domainName, externalId);
          fail("creating resource with non-existent resource class name should fail");
       }
       catch (IllegalArgumentException e) {
@@ -444,18 +698,34 @@ public class TestAccessControl_createResource extends TestAccessControlBase {
       catch (IllegalArgumentException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("could not find domain"));
       }
+      try {
+         accessControlContext.createResource(resourceClassName, "does_not_exist", externalId);
+         fail("creating resource with non-existent domain name should have failed");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("could not find domain"));
+      }
    }
 
    @Test
    public void createResource_notAuthorized_shouldFail() {
       final String domainName = generateDomain();
       final String resourceClassName = generateResourceClass(false, false);
+      final String externalId = generateUniqueExternalId();
 
       final Resource resource = generateResourceAndAuthenticate();
 
       // attempt to create resource without create-permission authorization
       try {
          accessControlContext.createResource(resourceClassName, domainName);
+         fail("creating resource without authorization should fail");
+      }
+      catch (NotAuthorizedException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString(String.valueOf(resource).toLowerCase()
+                                                                       + " is not authorized to create resource"));
+      }
+      try {
+         accessControlContext.createResource(resourceClassName, domainName, externalId);
          fail("creating resource without authorization should fail");
       }
       catch (NotAuthorizedException e) {

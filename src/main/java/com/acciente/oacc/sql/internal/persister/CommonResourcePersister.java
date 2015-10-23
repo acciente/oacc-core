@@ -73,12 +73,16 @@ public abstract class CommonResourcePersister extends Persister implements Resou
    @Override
    public Resource createResource(SQLConnection connection,
                                   Id<ResourceClassId> resourceClassId,
-                                  Id<DomainId> resourceDomainId) {
+                                  Id<DomainId> resourceDomainId,
+                                  String externalId) {
       SQLStatement statement = null;
 
       try {
+         final Id<ResourceId> nextResourceId;
+
+         // pick the resource creation strategy based on if the database supports sequence generators
          if (sqlProfile.isSequenceEnabled()) {
-            final Id<ResourceId> nextResourceId = getNextResourceId(connection);
+            nextResourceId = getNextResourceId(connection);
             if (nextResourceId == null) {
                throw new IllegalStateException("could not retrieve next ResourceId from sequence");
             }
@@ -89,7 +93,6 @@ public abstract class CommonResourcePersister extends Persister implements Resou
             statement.setResourceDomainId(3, resourceDomainId);
 
             assertOneRowInserted(statement.executeUpdate());
-            return Resources.getInstance(nextResourceId.getValue());
          }
          else {
             statement = connection.prepareStatement(sqlStrings.SQL_createInResource_WITH_ResourceClassID_DomainID,
@@ -105,13 +108,25 @@ public abstract class CommonResourcePersister extends Persister implements Resou
                throw new IllegalStateException("could not retrieve auto-generated ResourceId");
             }
 
-            final Id<ResourceId> nextResourceId = generatedKeys.getNextResourceId(1);
+            nextResourceId = generatedKeys.getNextResourceId(1);
 
             if (nextResourceId == null) {
                throw new IllegalStateException("could not retrieve auto-generated ResourceId");
             }
             generatedKeys.close();
+         }
 
+         // save the new resource's external id, if necessary, and return the new resource
+         if (externalId != null) {
+            statement = connection.prepareStatement(sqlStrings.SQL_createInResourceExternalId_WITH_ResourceID_ExternalID);
+            statement.setResourceId(1, nextResourceId);
+            statement.setString(2, externalId);
+
+            assertOneRowInserted(statement.executeUpdate());
+
+            return Resources.getInstance(nextResourceId.getValue(), externalId);
+         }
+         else {
             return Resources.getInstance(nextResourceId.getValue());
          }
       }
@@ -129,6 +144,12 @@ public abstract class CommonResourcePersister extends Persister implements Resou
       SQLStatement statement = null;
 
       try {
+         // delete the resource's external id mapping, if exists
+         statement = connection.prepareStatement(sqlStrings.SQL_removeInResourceExternalId_BY_ResourceID);
+         statement.setResourceId(1, resource);
+         statement.executeUpdate();
+
+         // delete resource
          statement = connection.prepareStatement(sqlStrings.SQL_removeInResource_BY_ResourceID);
          statement.setResourceId(1, resource);
 
@@ -201,4 +222,71 @@ public abstract class CommonResourcePersister extends Persister implements Resou
 
    @Override
    public abstract boolean isDomainEmpty(SQLConnection connection, Id<DomainId> resourceDomainId);
+
+   @Override
+   public Resource resolveResourceByExternalId(SQLConnection connection,
+                                               String externalId) {
+      SQLStatement statement = null;
+
+      try {
+         SQLResult resultSet;
+
+         statement = connection.prepareStatement(sqlStrings.SQL_findInResourceExternalId_ResourceId_ExternalId_BY_ExternalID);
+         statement.setString(1, externalId);
+         resultSet = statement.executeQuery();
+
+         if (!resultSet.next()) {
+            return null;
+         }
+
+         final Resource resolvedResourceId = resultSet.getResource("ResourceId", "ExternalId");
+
+         // complain if we found more than one resource - external ids are supposed to be globally unique
+         if (resultSet.next()) {
+            throw new IllegalStateException("External id " + externalId + " maps to more than one resource!");
+         }
+
+         return resolvedResourceId;
+      }
+      catch (SQLException e) {
+         throw new RuntimeException(e);
+      }
+      finally {
+         closeStatement(statement);
+      }
+   }
+
+   @Override
+   public Resource resolveResourceByResourceId(SQLConnection connection,
+                                               Resource resource) {
+      SQLStatement statement = null;
+
+      try {
+         SQLResult resultSet;
+
+         statement = connection.prepareStatement(sqlStrings.SQL_findInResource_ResourceId_ExternalId_BY_ResourceID);
+         statement.setResourceId(1, resource);
+         resultSet = statement.executeQuery();
+
+         // complain if we do not find the resource
+         if (!resultSet.next()) {
+            return null;
+         }
+
+         Resource resolvedResource = resultSet.getResource("ResourceId", "ExternalId");
+
+         // complain if we found more than one resource - external ids are supposed to be globally unique
+         if (resultSet.next()) {
+            throw new IllegalStateException("Resource " + resource + " maps to more than one resource!");
+         }
+
+         return resolvedResource;
+      }
+      catch (SQLException e) {
+         throw new RuntimeException(e);
+      }
+      finally {
+         closeStatement(statement);
+      }
+   }
 }

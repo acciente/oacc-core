@@ -21,6 +21,8 @@ import org.junit.Test;
 
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.not;
+import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertThat;
 
 public class TestAccessControl_getAuthenticatedResource extends TestAccessControlBase {
@@ -67,6 +69,53 @@ public class TestAccessControl_getAuthenticatedResource extends TestAccessContro
       // verify
       final Resource authenticatedResource = accessControlContext.getAuthenticatedResource();
       assertThat(authenticatedResource, is(accessorResource));
+   }
+
+   @Test
+   public void getAuthenticatedResource_withExtId() {
+      final String externalId1 = generateUniqueExternalId();
+      final String domainName = generateDomain();
+      final String externalId2 = generateUniqueExternalId();
+      final String resourceClassName = generateResourceClass(true, true);
+      final String externalId3 = generateUniqueExternalId();
+      final Credentials credentials = PasswordCredentials.newInstance(generateUniquePassword());
+
+      // create resources with external id
+      final Resource resource1
+            = accessControlContext.createResource(resourceClassName, domainName, externalId1, credentials);
+      assertThat(resource1, is(not(nullValue())));
+      final Resource resource2
+            = accessControlContext.createResource(resourceClassName, domainName, externalId2, credentials);
+      assertThat(resource2, is(not(nullValue())));
+      final Resource resource3
+            = accessControlContext.createResource(resourceClassName, domainName, externalId3, credentials);
+      assertThat(resource3, is(not(nullValue())));
+
+      Resource authenticatedResource;
+
+      // authenticate with external id and verify that the authenticated resource is fully resolved
+      accessControlContext.authenticate(Resources.getInstance(resource1.getExternalId()), credentials);
+      authenticatedResource = accessControlContext.getAuthenticatedResource();
+      assertThat(authenticatedResource, is(resource1));
+      assertThat(authenticatedResource.getId(), is(resource1.getId()));
+      assertThat(authenticatedResource.getExternalId(), is(not(nullValue())));
+      assertThat(authenticatedResource.getExternalId(), is(resource1.getExternalId()));
+
+      // authenticate with resource id and external id and verify that the authenticated resource is fully resolved
+      accessControlContext.authenticate(Resources.getInstance(resource2.getId(), resource2.getExternalId()), credentials);
+      authenticatedResource = accessControlContext.getAuthenticatedResource();
+      assertThat(authenticatedResource, is(resource2));
+      assertThat(authenticatedResource.getId(), is(resource2.getId()));
+      assertThat(authenticatedResource.getExternalId(), is(not(nullValue())));
+      assertThat(authenticatedResource.getExternalId(), is(resource2.getExternalId()));
+
+      // authenticate with resource id and verify that the authenticated resource is fully resolved
+      accessControlContext.authenticate(Resources.getInstance(resource3.getId()), credentials);
+      authenticatedResource = accessControlContext.getAuthenticatedResource();
+      assertThat(authenticatedResource, is(resource3));
+      assertThat(authenticatedResource.getId(), is(resource3.getId()));
+      assertThat(authenticatedResource.getExternalId(), is(not(nullValue())));
+      assertThat(authenticatedResource.getExternalId(), is(resource3.getExternalId()));
    }
 
    @Test

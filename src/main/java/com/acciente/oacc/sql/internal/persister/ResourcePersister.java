@@ -29,7 +29,8 @@ public interface ResourcePersister {
 
    Resource createResource(SQLConnection connection,
                            Id<ResourceClassId> resourceClassId,
-                           Id<DomainId> resourceDomainId);
+                           Id<DomainId> resourceDomainId,
+                           String externalId);
 
    void deleteResource(SQLConnection connection,
                        Resource resource);
@@ -39,5 +40,12 @@ public interface ResourcePersister {
 
    Id<ResourceId> getNextResourceId(SQLConnection connection);
 
-   boolean isDomainEmpty(SQLConnection connection, Id<DomainId> resourceDomainId);
+   boolean isDomainEmpty(SQLConnection connection,
+                         Id<DomainId> resourceDomainId);
+
+   Resource resolveResourceByExternalId(SQLConnection connection,
+                                        String externalId);
+
+   Resource resolveResourceByResourceId(SQLConnection connection,
+                                        Resource resource);
 }

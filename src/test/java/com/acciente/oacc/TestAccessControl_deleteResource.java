@@ -86,6 +86,61 @@ public class TestAccessControl_deleteResource extends TestAccessControlBase {
    }
 
    @Test
+   public void deleteResource_validAsSystemResource_withExtId() {
+      authenticateSystemResource();
+
+      final String domainName = generateDomain();
+      final String resourceClassName = generateResourceClass(false, false);
+      final String externalId1 = generateUniqueExternalId();
+      final String externalId2 = generateUniqueExternalId();
+      final String externalId3 = generateUniqueExternalId();
+
+      // create resources with external id
+      final Resource resource1 = accessControlContext.createResource(resourceClassName, domainName, externalId1);
+      assertThat(resource1, is(not(nullValue())));
+      final Resource resource2 = accessControlContext.createResource(resourceClassName, domainName, externalId2);
+      assertThat(resource2, is(not(nullValue())));
+      final Resource resource3 = accessControlContext.createResource(resourceClassName, domainName, externalId3);
+      assertThat(resource3, is(not(nullValue())));
+
+      accessControlContext.assertResourcePermissions(SYS_RESOURCE,
+                                                     resource1,
+                                                     ResourcePermissions.getInstance(ResourcePermissions.INHERIT));
+      accessControlContext.assertResourcePermissions(SYS_RESOURCE,
+                                                     resource2,
+                                                     ResourcePermissions.getInstance(ResourcePermissions.INHERIT));
+      accessControlContext.assertResourcePermissions(SYS_RESOURCE,
+                                                     resource3,
+                                                     ResourcePermissions.getInstance(ResourcePermissions.INHERIT));
+
+      Set<Resource> resourcesByPermission
+            = accessControlContext.getResourcesByResourcePermissions(SYS_RESOURCE,
+                                                                     resourceClassName,
+                                                                     ResourcePermissions
+                                                                           .getInstance(ResourcePermissions.INHERIT));
+      assertThat(resourcesByPermission, is(setOf(resource1, resource2, resource3)));
+
+      // delete resource by external id
+      assertThat(accessControlContext.deleteResource(Resources.getInstance(resource1.getExternalId())), is(true));
+
+      // delete resource by external id and resource id
+      assertThat(accessControlContext.deleteResource(Resources.getInstance(resource2.getId(),
+                                                                           resource2.getExternalId())),
+                 is(true));
+
+      // delete resource by resource id
+      assertThat(accessControlContext.deleteResource(Resources.getInstance(resource3.getId())), is(true));
+
+      // verify
+      Set<Resource> resourcesByPermission_postDelete
+            = accessControlContext.getResourcesByResourcePermissions(SYS_RESOURCE,
+                                                                     resourceClassName,
+                                                                     ResourcePermissions
+                                                                           .getInstance(ResourcePermissions.INHERIT));
+      assertThat(resourcesByPermission_postDelete.isEmpty(), is(true));
+   }
+
+   @Test
    public void deleteResource_validAsAuthorized() {
       final String domainName = generateDomain();
       final String resourceClassName = generateResourceClass(false, false);
@@ -445,8 +500,22 @@ public class TestAccessControl_deleteResource extends TestAccessControlBase {
    public void deleteResource_nonExistentReferences_shouldSucceed() {
       authenticateSystemResource();
 
-      // attempt to create resources with non-existent references to class or domain names
+      // attempt to delete resources with non-existent references
       assertThat(accessControlContext.deleteResource(Resources.getInstance(-999L)), is(false));
+      assertThat(accessControlContext.deleteResource(Resources.getInstance("invalid")), is(false));
+   }
+
+   @Test
+   public void deleteResource_nonExistentReferences_shouldFail() {
+      authenticateSystemResource();
+
+      // attempt to delete resource with mis-matched external id reference
+      try {
+         accessControlContext.deleteResource(Resources.getInstance(-999L, "invalid"));
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("not resolve"));
+      }
    }
 
    @Test
