@@ -150,7 +150,7 @@ public class SQLStrings implements Serializable {
    public final String SQL_removeInGrantResourceCreatePermissionPostCreate_withDescendants_BY_AccessedDomainId;
 
    // GrantResourcePermissionSys - common
-   public final String SQL_findInGrantResourcePermissionSys_ResourceID_BY_AccessedID_ResourceClassID_SysPermissionID_IsWithGrant;
+   public final String SQL_findInGrantResourcePermissionSys_ResourceID_ExternalID_BY_AccessedID_ResourceClassID_SysPermissionID_IsWithGrant;
    public final String SQL_findInGrantResourcePermissionSys_withoutInheritance_ResourceClassName_SysPermissionID_IsWithGrant_BY_AccessorID_AccessedID;
    public final String SQL_createInGrantResourcePermissionSys_WITH_AccessorID_GrantorID_AccessedID_IsWithGrant_ResourceClassID_SysPermissionID;
    public final String SQL_updateInGrantResourcePermissionSys_SET_GrantorID_IsWithGrant_BY_AccessorID_AccessedID_ResourceClassID_SysPermissionID;
@@ -167,7 +167,7 @@ public class SQLStrings implements Serializable {
    public final String SQL_findInGrantResourcePermissionSys_withoutInheritance_ResourceID_ExternalID_BY_AccessorID_DomainID_ResourceClassID_SysPermissionID_IsWithGrant;
 
    // GrantResourcePermission - common
-   public final String SQL_findInGrantResourcePermission_ResourceID_BY_AccessedID_ResourceClassID_PermissionID_IsWithGrant;
+   public final String SQL_findInGrantResourcePermission_ResourceID_ExternalID_BY_AccessedID_ResourceClassID_PermissionID_IsWithGrant;
    public final String SQL_findInGrantResourcePermission_withoutInheritance_ResourceClassName_PermissionName_IsWithGrant_BY_AccessorID_AccessedID;
    public final String SQL_createInGrantResourcePermission_WITH_AccessorID_GrantorID_AccessedID_IsWithGrant_ResourceClassID_PermissionName;
    public final String SQL_updateInGrantResourcePermission_SET_GrantorID_IsWithGrant_BY_AccessorID_AccessedID_ResourceClassID_PermissionName;
@@ -659,11 +659,13 @@ public class SQLStrings implements Serializable {
             + "WHERE AccessorResourceId = ? AND SysPermissionId = ? AND ( ? IN ( 0, IsWithGrant ) )";
 
       // Resource: finder methods used getAccessorResourcesByResourcePermission()
-      SQL_findInGrantResourcePermissionSys_ResourceID_BY_AccessedID_ResourceClassID_SysPermissionID_IsWithGrant
-            = "SELECT AccessorResourceId ResourceId FROM "
+      SQL_findInGrantResourcePermissionSys_ResourceID_ExternalID_BY_AccessedID_ResourceClassID_SysPermissionID_IsWithGrant
+            = "SELECT A.AccessorResourceId ResourceId, E.ExternalId FROM "
             + schemaNameAndTablePrefix
-            + "Grant_ResPerm_Sys "
-            + "WHERE AccessedResourceId = ? AND ResourceClassId = ? AND SysPermissionId = ? AND ( ? IN ( 0, IsWithGrant ) )";
+            + "Grant_ResPerm_Sys A LEFT JOIN "
+            + schemaNameAndTablePrefix
+            + "ResourceExternalId E ON E.ResourceId = A.AccessorResourceId "
+            + "WHERE A.AccessedResourceId = ? AND A.ResourceClassId = ? AND A.SysPermissionId = ? AND ( ? IN ( 0, A.IsWithGrant ) )";
 
       // Resource - common
       SQL_findInResource_COUNTResourceID_BY_ResourceClassID_DomainID
@@ -1125,11 +1127,13 @@ public class SQLStrings implements Serializable {
             + "WHERE B.AccessorResourceId = ? AND C.DomainId = ? AND B.ResourceClassId = ? AND B.SysPermissionId = ? AND ( ? IN ( 0, B.IsWithGrant ) )";
 
       // GrantResourcePermission - common
-      SQL_findInGrantResourcePermission_ResourceID_BY_AccessedID_ResourceClassID_PermissionID_IsWithGrant
-            = "SELECT AccessorResourceId ResourceId FROM "
+      SQL_findInGrantResourcePermission_ResourceID_ExternalID_BY_AccessedID_ResourceClassID_PermissionID_IsWithGrant
+            = "SELECT A.AccessorResourceId ResourceId, E.ExternalId FROM "
             + schemaNameAndTablePrefix
-            + "Grant_ResPerm "
-            + "WHERE AccessedResourceId = ? AND ResourceClassId = ? AND PermissionId = ? AND ( ? IN ( 0, IsWithGrant ) )";
+            + "Grant_ResPerm A LEFT JOIN "
+            + schemaNameAndTablePrefix
+            + "ResourceExternalId E ON E.ResourceId = A.AccessorResourceId "
+            + "WHERE A.AccessedResourceId = ? AND A.ResourceClassId = ? AND A.PermissionId = ? AND ( ? IN ( 0, A.IsWithGrant ) )";
 
       SQL_findInGrantResourcePermission_withoutInheritance_ResourceClassName_PermissionName_IsWithGrant_BY_AccessorID_AccessedID
             = "SELECT C.ResourceClassName, B.PermissionName, A.IsWithGrant FROM "

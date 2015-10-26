@@ -67,7 +67,7 @@ public abstract class CommonGrantResourcePermissionSysPersister extends Persiste
          SQLResult resultSet;
          Set<Resource> resources = new HashSet<>();
 
-         statement = connection.prepareStatement(sqlStrings.SQL_findInGrantResourcePermissionSys_ResourceID_BY_AccessedID_ResourceClassID_SysPermissionID_IsWithGrant);
+         statement = connection.prepareStatement(sqlStrings.SQL_findInGrantResourcePermissionSys_ResourceID_ExternalID_BY_AccessedID_ResourceClassID_SysPermissionID_IsWithGrant);
          statement.setResourceId(1, accessedResource);
          statement.setResourceClassId(2, resourceClassId);
          statement.setResourceSystemPermissionId(3, resourcePermission.getSystemPermissionId());
@@ -75,7 +75,7 @@ public abstract class CommonGrantResourcePermissionSysPersister extends Persiste
          resultSet = statement.executeQuery();
 
          while (resultSet.next()) {
-            resources.add(resultSet.getResource("ResourceId"));
+            resources.add(resultSet.getResource("ResourceId", "ExternalId"));
          }
          resultSet.close();
 

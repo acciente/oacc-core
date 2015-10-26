@@ -108,6 +108,72 @@ public class TestAccessControl_getAccessorResourcesByResourcePermissions extends
    }
 
    @Test
+   public void getAccessorResourcesByResourcePermissions_direct_withExtId() {
+      authenticateSystemResource();
+
+      final String externalId = generateUniqueExternalId();
+      final Resource accessorResource = generateUnauthenticatableResourceWithExtId(externalId);
+      final String accessedExternalId = generateUniqueExternalId();
+      final Resource accessedResource = generateUnauthenticatableResourceWithExtId(accessedExternalId);
+      final String accessedResourceClassName
+            = accessControlContext.getResourceClassInfoByResource(accessedResource).getResourceClassName();
+      final String queriedPermissionName = generateResourceClassPermission(accessedResourceClassName);
+      final ResourcePermission queriedPermission = ResourcePermissions.getInstance(queriedPermissionName);
+      final ResourcePermission queriedSysPermission = ResourcePermissions.getInstance(ResourcePermissions.INHERIT);
+      final Set<ResourcePermission> resourcePermissions
+            = setOf(queriedPermission, queriedSysPermission);
+
+      final Resource unqueriedAccessedResource = accessControlContext.createResource(accessedResourceClassName,
+                                                                                     accessControlContext
+                                                                                           .getDomainNameByResource(
+                                                                                                 SYS_RESOURCE));
+      final Resource unqueriedAccessorResource = generateUnauthenticatableResource();
+
+      // set permission between accessor and queried accessed
+      accessControlContext.setResourcePermissions(accessorResource, accessedResource, resourcePermissions);
+
+      // set permission between unqueried accessor and accessed
+      accessControlContext.setResourcePermissions(unqueriedAccessorResource, unqueriedAccessedResource, resourcePermissions);
+
+      // verify
+      Set<Resource> expectedAccessors = setOf(accessorResource);
+
+      // retrieve by non-system permission
+      Set<Resource> accessorsByPermission
+            = accessControlContext.getAccessorResourcesByResourcePermissions(Resources.getInstance(accessedExternalId),
+                                                                             accessedResourceClassName,
+                                                                             queriedPermission);
+      assertThat(accessorsByPermission, is(expectedAccessors));
+      Resource retrievedResource = accessorsByPermission.iterator().next();
+      assertThat(retrievedResource.getExternalId(), is(externalId));
+
+      accessorsByPermission
+            = accessControlContext.getAccessorResourcesByResourcePermissions(accessedResource,
+                                                                             accessedResourceClassName,
+                                                                             setOf(queriedPermission));
+      assertThat(accessorsByPermission, is(expectedAccessors));
+      retrievedResource = accessorsByPermission.iterator().next();
+      assertThat(retrievedResource.getExternalId(), is(externalId));
+
+      // retrieve by system permission
+      accessorsByPermission
+            = accessControlContext.getAccessorResourcesByResourcePermissions(accessedResource,
+                                                                             accessedResourceClassName,
+                                                                             queriedSysPermission);
+      assertThat(accessorsByPermission, is(expectedAccessors));
+      retrievedResource = accessorsByPermission.iterator().next();
+      assertThat(retrievedResource.getExternalId(), is(externalId));
+
+      accessorsByPermission
+            = accessControlContext.getAccessorResourcesByResourcePermissions(Resources.getInstance(accessedExternalId),
+                                                                             accessedResourceClassName,
+                                                                             setOf(queriedSysPermission));
+      assertThat(accessorsByPermission, is(expectedAccessors));
+      retrievedResource = accessorsByPermission.iterator().next();
+      assertThat(retrievedResource.getExternalId(), is(externalId));
+   }
+
+   @Test
    public void getAccessorResourcesByResourcePermissions_direct_validAsAuthorized() {
       authenticateSystemResource();
 
@@ -832,6 +898,16 @@ public class TestAccessControl_getAccessorResourcesByResourcePermissions extends
       catch (NullPointerException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("resource required"));
       }
+      try {
+         accessControlContext.getAccessorResourcesByResourcePermissions(Resources.getInstance(null),
+                                                                        accessedResourceClassName,
+                                                                        ResourcePermissions
+                                                                              .getInstance(queriedPermissionName));
+         fail("getting accessor resources by resource permission with null internal/external resource ids should have failed");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("resource id and/or external id is required"));
+      }
 
       try {
          accessControlContext.getAccessorResourcesByResourcePermissions(accessedResource,
@@ -897,6 +973,16 @@ public class TestAccessControl_getAccessorResourcesByResourcePermissions extends
       }
       catch (NullPointerException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("resource required"));
+      }
+      try {
+         accessControlContext.getAccessorResourcesByResourcePermissions(Resources.getInstance(null),
+                                                                        accessedResourceClassName,
+                                                                        setOf(ResourcePermissions
+                                                                                    .getInstance(queriedPermissionName)));
+         fail("getting accessor resources by resource permission with null internal/external resource ids should have failed");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("resource id and/or external id is required"));
       }
 
       try {
@@ -1076,6 +1162,8 @@ public class TestAccessControl_getAccessorResourcesByResourcePermissions extends
       final Set<ResourcePermission> resourcePermissions
             = setOf(ResourcePermissions.getInstance(queriedPermissionName));
       final Resource invalidResource = Resources.getInstance(-999L);
+      final Resource invalidExternalResource = Resources.getInstance("invalid");
+      final Resource mismatchedExternalResource = Resources.getInstance(-999L, "invalid");
 
       // set permission between accessor and queried accessed
       accessControlContext.setResourcePermissions(accessorResource, accessedResource, resourcePermissions);
@@ -1090,6 +1178,26 @@ public class TestAccessControl_getAccessorResourcesByResourcePermissions extends
       }
       catch (IllegalArgumentException e) {
          assertThat(e.getMessage().toLowerCase(), containsString(String.valueOf(invalidResource).toLowerCase() + " not found"));
+      }
+      try {
+         accessControlContext.getAccessorResourcesByResourcePermissions(invalidExternalResource,
+                                                                        accessedResourceClassName,
+                                                                        ResourcePermissions
+                                                                              .getInstance(queriedPermissionName));
+         fail("getting accessor resources by resource permission with non-existent external accessor resource should have failed");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString(String.valueOf(invalidExternalResource).toLowerCase() + " not found"));
+      }
+      try {
+         accessControlContext.getAccessorResourcesByResourcePermissions(mismatchedExternalResource,
+                                                                        accessedResourceClassName,
+                                                                        ResourcePermissions
+                                                                              .getInstance(queriedPermissionName));
+         fail("getting accessor resources by resource permission with mismatched internal/external resource ids should have failed");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("not resolve"));
       }
 
       try {
@@ -1137,6 +1245,26 @@ public class TestAccessControl_getAccessorResourcesByResourcePermissions extends
       }
       catch (IllegalArgumentException e) {
          assertThat(e.getMessage().toLowerCase(), containsString(String.valueOf(invalidResource).toLowerCase() + " not found"));
+      }
+      try {
+         accessControlContext.getAccessorResourcesByResourcePermissions(invalidExternalResource,
+                                                                        accessedResourceClassName,
+                                                                        setOf(ResourcePermissions
+                                                                                    .getInstance(queriedPermissionName)));
+         fail("getting accessor resources by resource permission with non-existent external accessor resource should have failed");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString(String.valueOf(invalidExternalResource).toLowerCase() + " not found"));
+      }
+      try {
+         accessControlContext.getAccessorResourcesByResourcePermissions(mismatchedExternalResource,
+                                                                        accessedResourceClassName,
+                                                                        setOf(ResourcePermissions
+                                                                                    .getInstance(queriedPermissionName)));
+         fail("getting accessor resources by resource permission with mismatched internal/external resource ids should have failed");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("not resolve"));
       }
 
       try {
