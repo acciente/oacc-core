@@ -128,6 +128,31 @@ public class TestAccessControl_setCredentials extends TestAccessControlBase {
    }
 
    @Test
+   public void setCredentials_withExtId() throws Exception {
+      authenticateSystemResource();
+
+      final char[] password = generateUniquePassword();
+      final String externalId = generateUniqueExternalId();
+      final Resource authenticatableResource = generateAuthenticatableResourceWithExtId(password, externalId);
+
+      // set credentials and verify
+      final char[] newPassword = (password + "_modified").toCharArray();
+      accessControlContext.setCredentials(Resources.getInstance(externalId),
+                                          PasswordCredentials.newInstance(newPassword));
+      accessControlContext.unauthenticate();
+      try {
+         accessControlContext.authenticate(authenticatableResource,
+                                           PasswordCredentials.newInstance(password));
+         fail("authenticating with old credentials should have failed");
+      }
+      catch (IncorrectCredentialsException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("invalid password"));
+      }
+      accessControlContext.authenticate(authenticatableResource,
+                                        PasswordCredentials.newInstance(newPassword));
+   }
+
+   @Test
    public void setCredentials_onUnauthenticatableResource_shouldFail() throws Exception {
       authenticateSystemResource();
 
@@ -392,6 +417,13 @@ public class TestAccessControl_setCredentials extends TestAccessControlBase {
       catch (NullPointerException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("resource required"));
       }
+      try {
+         accessControlContext.setCredentials(Resources.getInstance(null), PasswordCredentials.newInstance(newPwd));
+         fail("setting credentials with null external resource should have failed");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("resource id and/or external id is required"));
+      }
 
       try {
          accessControlContext.setCredentials(getSystemResource(), null);
@@ -413,7 +445,21 @@ public class TestAccessControl_setCredentials extends TestAccessControlBase {
          fail("setting credentials with non-existent resource reference should have failed");
       }
       catch (IllegalArgumentException e) {
-         assertThat(e.getMessage().toLowerCase(), containsString("could not determine resource class for resource"));
+         assertThat(e.getMessage().toLowerCase(), containsString("not found"));
+      }
+      try {
+         accessControlContext.setCredentials(Resources.getInstance("invalid"), PasswordCredentials.newInstance(newPwd));
+         fail("setting credentials with non-existent external resource reference should have failed");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("not found"));
+      }
+      try {
+         accessControlContext.setCredentials(Resources.getInstance(-999L, "invalid"), PasswordCredentials.newInstance(newPwd));
+         fail("setting credentials with mismatched internal/external resource ids should have failed");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("not resolve"));
       }
    }
 }

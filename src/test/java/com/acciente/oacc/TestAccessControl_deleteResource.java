@@ -65,14 +65,14 @@ public class TestAccessControl_deleteResource extends TestAccessControlBase {
          fail("getting domain name for resource after deletion should have failed");
       }
       catch (IllegalArgumentException e) {
-         assertThat(e.getMessage().toLowerCase(), containsString("could not determine domain for resource"));
+         assertThat(e.getMessage().toLowerCase(), containsString("not found"));
       }
       try {
          accessControlContext.getResourceClassInfoByResource(resource);
          fail("getting resource class info for resource after deletion should have failed");
       }
       catch (IllegalArgumentException e) {
-         assertThat(e.getMessage().toLowerCase(), containsString("could not determine resource class for resource"));
+         assertThat(e.getMessage().toLowerCase(), containsString("not found"));
       }
       try {
          accessControlContext.assertResourcePermissions(SYS_RESOURCE,
@@ -174,14 +174,14 @@ public class TestAccessControl_deleteResource extends TestAccessControlBase {
          fail("getting domain name for resource after deletion should have failed");
       }
       catch (IllegalArgumentException e) {
-         assertThat(e.getMessage().toLowerCase(), containsString("could not determine domain for resource"));
+         assertThat(e.getMessage().toLowerCase(), containsString("not found"));
       }
       try {
          accessControlContext.getResourceClassInfoByResource(resource);
          fail("getting resource class info for resource after deletion should have failed");
       }
       catch (IllegalArgumentException e) {
-         assertThat(e.getMessage().toLowerCase(), containsString("could not determine resource class for resource"));
+         assertThat(e.getMessage().toLowerCase(), containsString("not found"));
       }
       // ensure even system resource doesn't have any authorization on the deleted resource
       grantQueryPermission(authenticatedResource, SYS_RESOURCE);
@@ -278,14 +278,14 @@ public class TestAccessControl_deleteResource extends TestAccessControlBase {
          fail("getting domain name for resource after deletion should have failed");
       }
       catch (IllegalArgumentException e) {
-         assertThat(e.getMessage().toLowerCase(), containsString("could not determine domain for resource"));
+         assertThat(e.getMessage().toLowerCase(), containsString("not found"));
       }
       try {
          accessControlContext.getResourceClassInfoByResource(impersonatedResource);
          fail("getting resource class info for resource after deletion should have failed");
       }
       catch (IllegalArgumentException e) {
-         assertThat(e.getMessage().toLowerCase(), containsString("could not determine resource class for resource"));
+         assertThat(e.getMessage().toLowerCase(), containsString("not found"));
       }
       // ensure even system resource doesn't have any authorization on the deleted resource
       grantQueryPermission(authenticatedResource, SYS_RESOURCE);
@@ -354,14 +354,14 @@ public class TestAccessControl_deleteResource extends TestAccessControlBase {
          fail("getting domain name for resource after deletion should have failed");
       }
       catch (IllegalArgumentException e) {
-         assertThat(e.getMessage().toLowerCase(), containsString("could not determine domain for resource"));
+         assertThat(e.getMessage().toLowerCase(), containsString("not found"));
       }
       try {
          accessControlContext.getResourceClassInfoByResource(authenticatedResource);
          fail("getting resource class info for resource after deletion should have failed");
       }
       catch (IllegalArgumentException e) {
-         assertThat(e.getMessage().toLowerCase(), containsString("could not determine resource class for resource"));
+         assertThat(e.getMessage().toLowerCase(), containsString("not found"));
       }
       try {
          accessControlContext.assertResourcePermissions(SYS_RESOURCE,

@@ -43,6 +43,22 @@ public class TestAccessControl_getDomainNameByResource extends TestAccessControl
    }
 
    @Test
+   public void getDomainNameByResource_withExtId() {
+      authenticateSystemResource();
+
+      generateUnauthenticatableResource();
+      final String resourceClassName = generateResourceClass(false, true);
+      final String sysDomainName = accessControlContext.getDomainNameByResource(SYS_RESOURCE);
+      final String externalId = generateUniqueExternalId();
+      accessControlContext.createResource(resourceClassName, sysDomainName, externalId);
+
+      // verify
+      final String domainName = accessControlContext.getDomainNameByResource(Resources.getInstance(externalId));
+      assertThat(domainName, is(not(nullValue())));
+      assertThat(domainName, is(sysDomainName));
+   }
+
+   @Test
    public void getDomainNameByResource_validAsAuthenticated() {
       authenticateSystemResource();
 
@@ -78,7 +94,21 @@ public class TestAccessControl_getDomainNameByResource extends TestAccessControl
          fail("getting domain name by resource for non-existent resource should have failed");
       }
       catch (IllegalArgumentException e) {
-         assertThat(e.getMessage().toLowerCase(), containsString("could not determine domain for resource"));
+         assertThat(e.getMessage().toLowerCase(), containsString("not found"));
+      }
+      try {
+         accessControlContext.getDomainNameByResource(Resources.getInstance("invalid"));
+         fail("getting domain name by resource for non-existent external resource should have failed");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("not found"));
+      }
+      try {
+         accessControlContext.getDomainNameByResource(Resources.getInstance(-999L, "invalid"));
+         fail("getting domain name by resource for mismatched internal/external resource ids should have failed");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("not resolve"));
       }
    }
 
@@ -98,6 +128,13 @@ public class TestAccessControl_getDomainNameByResource extends TestAccessControl
       }
       catch (NullPointerException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("resource required"));
+      }
+      try {
+         accessControlContext.getDomainNameByResource(Resources.getInstance(null));
+         fail("getting resource class info by resource for null internal/external resource ids should have failed");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("resource id and/or external id is required"));
       }
    }
 }

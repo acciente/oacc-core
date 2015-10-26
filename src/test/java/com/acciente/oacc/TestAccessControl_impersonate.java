@@ -37,6 +37,20 @@ public class TestAccessControl_impersonate extends TestAccessControlBase {
    }
 
    @Test
+   public void impersonate_valid_withExtId() {
+      authenticateSystemResource();
+
+      final String externalId = generateUniqueExternalId();
+      final Resource impersonatedResource = generateAuthenticatableResourceWithExtId(generateUniquePassword(),
+                                                                                     externalId);
+
+      accessControlContext.impersonate(Resources.getInstance(externalId));
+      assertThat(accessControlContext.getAuthenticatedResource(), is(SYS_RESOURCE));
+      assertThat(accessControlContext.getSessionResource(), is(impersonatedResource));
+      assertThat(accessControlContext.getSessionResource().getExternalId(), is(externalId));
+   }
+
+   @Test
    public void impersonate_chainedImpersonation_succeedsAsSystemResource() {
       authenticateSystemResource();
 
@@ -294,6 +308,13 @@ public class TestAccessControl_impersonate extends TestAccessControlBase {
       catch (NullPointerException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("resource required"));
       }
+      try {
+         accessControlContext.impersonate(Resources.getInstance(null));
+         fail("calling impersonate with a null external resource reference should have failed");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("resource id and/or external id is required"));
+      }
    }
 
    @Test
@@ -313,6 +334,20 @@ public class TestAccessControl_impersonate extends TestAccessControlBase {
       }
       catch (IllegalArgumentException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("not found"));
+      }
+      try {
+         accessControlContext.impersonate(Resources.getInstance("invalid"));
+         fail("calling impersonate with a non-existent external resource reference should have failed");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("not found"));
+      }
+      try {
+         accessControlContext.impersonate(Resources.getInstance(-999L, "invalid"));
+         fail("calling impersonate with a non-existent external resource reference should have failed");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("not resolve"));
       }
    }
 }

@@ -423,6 +423,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       try {
          connection = __getConnection();
 
+         resource = __resolveResource(connection, resource);
          __assertImpersonatePermission(connection, resource);
 
          // switch the session credentials to the new resource
@@ -510,6 +511,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       try {
          connection = __getConnection();
 
+         resource = __resolveResource(connection, resource);
          resourceClassInfo = resourceClassPersister.getResourceClassInfoByResourceId(connection, resource);
 
          if (!resourceClassInfo.isAuthenticatable()) {
@@ -4661,6 +4663,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
          try {
             connection = __getConnection();
 
+            resource = __resolveResource(connection, resource);
             return domainPersister.getResourceDomainNameByResourceId(connection, resource);
          }
          finally {
@@ -4719,6 +4722,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       try {
          connection = __getConnection();
 
+         resource = __resolveResource(connection, resource);
          final ResourceClassInternalInfo resourceClassInternalInfo
                = resourceClassPersister.getResourceClassInfoByResourceId(connection, resource);
          return new ResourceClassInfo(resourceClassInternalInfo.getResourceClassName(),
@@ -6140,7 +6144,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
          }
       }
       else {
-         throw new IllegalArgumentException("A resource id and/or external id is required, but none were specified");
+         throw new IllegalArgumentException("A resource id and/or external id is required, but neither was specified");
       }
 
       return resolvedResource;

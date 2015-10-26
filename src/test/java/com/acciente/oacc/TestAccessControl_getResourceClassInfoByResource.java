@@ -46,6 +46,27 @@ public class TestAccessControl_getResourceClassInfoByResource extends TestAccess
    }
 
    @Test
+   public void getResourceClassInfoByResource_withExtId() {
+      authenticateSystemResource();
+
+      generateUnauthenticatableResource();
+      final String resourceClassName = generateResourceClass(true, false);
+      final String externalId = generateUniqueExternalId();
+      accessControlContext.createResource(resourceClassName,
+                                          accessControlContext.getDomainNameByResource(SYS_RESOURCE),
+                                          externalId,
+                                          PasswordCredentials.newInstance(generateUniquePassword()));
+
+      // verify
+      final ResourceClassInfo resourceClassInfo
+            = accessControlContext.getResourceClassInfoByResource(Resources.getInstance(externalId));
+      assertThat(resourceClassInfo, is(not(nullValue())));
+      assertThat(resourceClassInfo.getResourceClassName(), is(resourceClassName));
+      assertThat(resourceClassInfo.isAuthenticatable(), is(true));
+      assertThat(resourceClassInfo.isUnauthenticatedCreateAllowed(), is(false));
+   }
+
+   @Test
    public void getResourceClassInfoByResource_validAsAuthenticated() {
       authenticateSystemResource();
 
@@ -85,7 +106,21 @@ public class TestAccessControl_getResourceClassInfoByResource extends TestAccess
          fail("getting resource class info by resource for non-existent resource should have failed");
       }
       catch (IllegalArgumentException e) {
-         assertThat(e.getMessage().toLowerCase(), containsString("could not determine resource class for resource"));
+         assertThat(e.getMessage().toLowerCase(), containsString("not found"));
+      }
+      try {
+         accessControlContext.getResourceClassInfoByResource(Resources.getInstance("invalid"));
+         fail("getting resource class info by resource for non-existent external resource reference should have failed");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("not found"));
+      }
+      try {
+         accessControlContext.getResourceClassInfoByResource(Resources.getInstance(-999L, "invalid"));
+         fail("getting resource class info by resource for mismatched internal/external resource ids should have failed");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("not resolve"));
       }
    }
 
@@ -105,6 +140,13 @@ public class TestAccessControl_getResourceClassInfoByResource extends TestAccess
       }
       catch (NullPointerException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("resource required"));
+      }
+      try {
+         accessControlContext.getResourceClassInfoByResource(Resources.getInstance(null));
+         fail("getting resource class info by resource for null internal/external resource ids should have failed");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("resource id and/or external id is required"));
       }
    }
 }

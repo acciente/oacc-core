@@ -172,6 +172,21 @@ public class TestAccessControlBase {
                                                        PasswordCredentials.newInstance(password));
    }
 
+   protected static Resource generateAuthenticatableResourceWithExtId(char[] password, String externalId) {
+      authenticateSystemAccessControlContext();
+      final String resourceClassName = generateResourceClass(true, false);
+      final String domainName = generateDomain();
+      systemAccessControlContext.grantGlobalResourcePermissions(SYS_RESOURCE,
+                                                                resourceClassName,
+                                                                domainName,
+                                                                ResourcePermissions
+                                                                      .getInstance(ResourcePermissions.QUERY));
+      return systemAccessControlContext.createResource(resourceClassName,
+                                                       domainName,
+                                                       externalId,
+                                                       PasswordCredentials.newInstance(password));
+   }
+
    protected static Resource generateAuthenticatableResource(char[] password, String domainName) {
       authenticateSystemAccessControlContext();
       final String resourceClassName = generateResourceClass(true, false);
