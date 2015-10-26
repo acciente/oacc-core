@@ -49,7 +49,7 @@ public class RecursiveGrantDomainPermissionSysPersister extends CommonGrantDomai
          SQLResult resultSet;
          Set<Resource> resources = new HashSet<>();
 
-         statement = connection.prepareStatement(sqlStrings.SQL_findInGrantDomainPermissionSys_ResourceID_BY_AccessorID_SysPermissionID_IsWithGrant_ResourceClassID);
+         statement = connection.prepareStatement(sqlStrings.SQL_findInGrantDomainPermissionSys_ResourceID_ExternalId_BY_AccessorID_SysPermissionID_IsWithGrant_ResourceClassID);
          statement.setResourceId(1, accessorResource);
          statement.setDomainSystemPermissionId(2, DOMAIN_PERMISSION_SUPER_USER.getSystemPermissionId());
          statement.setBoolean(3, false);
@@ -57,7 +57,7 @@ public class RecursiveGrantDomainPermissionSysPersister extends CommonGrantDomai
          resultSet = statement.executeQuery();
 
          while (resultSet.next()) {
-            resources.add(resultSet.getResource("ResourceId"));
+            resources.add(resultSet.getResource("ResourceId", "ExternalId"));
          }
          resultSet.close();
 
@@ -82,7 +82,7 @@ public class RecursiveGrantDomainPermissionSysPersister extends CommonGrantDomai
          SQLResult resultSet;
          Set<Resource> resources = new HashSet<>();
 
-         statement = connection.prepareStatement(sqlStrings.SQL_findInGrantDomainPermissionSys_ResourceID_BY_AccessorID_DomainID_SysPermissionID_IsWithGrant_ResourceClassID);
+         statement = connection.prepareStatement(sqlStrings.SQL_findInGrantDomainPermissionSys_ResourceID_ExternalID_BY_AccessorID_DomainID_SysPermissionID_IsWithGrant_ResourceClassID);
          statement.setResourceId(1, accessorResource);
          statement.setResourceDomainId(2, resourceDomainId);
          statement.setDomainSystemPermissionId(3, DOMAIN_PERMISSION_SUPER_USER.getSystemPermissionId());
@@ -91,7 +91,7 @@ public class RecursiveGrantDomainPermissionSysPersister extends CommonGrantDomai
          resultSet = statement.executeQuery();
 
          while (resultSet.next()) {
-            resources.add(resultSet.getResource("ResourceId"));
+            resources.add(resultSet.getResource("ResourceId", "ExternalId"));
          }
          resultSet.close();
 

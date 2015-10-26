@@ -95,6 +95,70 @@ public class TestAccessControl_getResourcesByResourcePermissionsAndDomain extend
    }
 
    @Test
+   public void getResourcesByResourcePermissionsAndDomain_direct_withExtId() {
+      authenticateSystemResource();
+
+      final String accessorExternalId = generateUniqueExternalId();
+      final Resource accessorResource = generateUnauthenticatableResourceWithExtId(accessorExternalId);
+      final String resourceClassName = generateResourceClass(false, false);
+      final String permissionName = generateResourceClassPermission(resourceClassName);
+      final ResourcePermission sysPermission = ResourcePermissions.getInstance(ResourcePermissions.QUERY);
+      final String domainName = generateDomain();
+      final String externalId = generateUniqueExternalId();
+      final Resource accessedResource = accessControlContext.createResource(resourceClassName, domainName, externalId);
+      final String sysDomainName = accessControlContext.getDomainNameByResource(SYS_RESOURCE);
+      final Resource accessedSysDomainResource = accessControlContext.createResource(resourceClassName, sysDomainName);
+
+      // set permission between accessor and accessed
+      Set<ResourcePermission> resourcePermissions1 = setOf(ResourcePermissions.getInstance(permissionName), sysPermission);
+      accessControlContext.setResourcePermissions(accessorResource, accessedResource, resourcePermissions1);
+      accessControlContext.setResourcePermissions(accessorResource, accessedSysDomainResource, resourcePermissions1);
+
+      // verify
+      Set<Resource> expectedResources = setOf(accessedResource);
+
+      // retrieve by non-system permission
+      Set<Resource> resourcesByAccessorAndPermissionAndDomain
+            = accessControlContext.getResourcesByResourcePermissionsAndDomain(Resources.getInstance(accessorExternalId),
+                                                                              resourceClassName,
+                                                                              domainName,
+                                                                              ResourcePermissions
+                                                                                    .getInstance(permissionName));
+      assertThat(resourcesByAccessorAndPermissionAndDomain, is(expectedResources));
+      Resource retrievedResource = resourcesByAccessorAndPermissionAndDomain.iterator().next();
+      assertThat(retrievedResource.getExternalId(), is(externalId));
+
+      resourcesByAccessorAndPermissionAndDomain
+            = accessControlContext.getResourcesByResourcePermissionsAndDomain(accessorResource,
+                                                                              resourceClassName,
+                                                                              domainName,
+                                                                              setOf(ResourcePermissions
+                                                                                          .getInstance(permissionName)));
+      assertThat(resourcesByAccessorAndPermissionAndDomain, is(expectedResources));
+      retrievedResource = resourcesByAccessorAndPermissionAndDomain.iterator().next();
+      assertThat(retrievedResource.getExternalId(), is(externalId));
+
+      // retrieve by non-system permission
+      resourcesByAccessorAndPermissionAndDomain
+            = accessControlContext.getResourcesByResourcePermissionsAndDomain(accessorResource,
+                                                                              resourceClassName,
+                                                                              domainName,
+                                                                              sysPermission);
+      assertThat(resourcesByAccessorAndPermissionAndDomain, is(expectedResources));
+      retrievedResource = resourcesByAccessorAndPermissionAndDomain.iterator().next();
+      assertThat(retrievedResource.getExternalId(), is(externalId));
+
+      resourcesByAccessorAndPermissionAndDomain
+            = accessControlContext.getResourcesByResourcePermissionsAndDomain(Resources.getInstance(accessorExternalId),
+                                                                              resourceClassName,
+                                                                              domainName,
+                                                                              setOf(sysPermission));
+      assertThat(resourcesByAccessorAndPermissionAndDomain, is(expectedResources));
+      retrievedResource = resourcesByAccessorAndPermissionAndDomain.iterator().next();
+      assertThat(retrievedResource.getExternalId(), is(externalId));
+   }
+
+   @Test
    public void getResourcesByResourcePermissionsAndDomain_direct_validAsAuthenticated() {
       authenticateSystemResource();
 
@@ -869,6 +933,7 @@ public class TestAccessControl_getResourcesByResourcePermissionsAndDomain extend
                                                                                     .getInstance(queriedPermission));
       assertThat(resourcesByAccessorAndPermissionAndDomain, is(expectedResources_queriedDomain));
 
+
       resourcesByAccessorAndPermissionAndDomain
             = accessControlContext.getResourcesByResourcePermissionsAndDomain(accessorResource,
                                                                               queriedResourceClass,
@@ -895,6 +960,94 @@ public class TestAccessControl_getResourcesByResourcePermissionsAndDomain extend
                                                                               setOf(ResourcePermissions
                                                                                           .getInstance(queriedPermission)));
       assertThat(resourcesByAuthenticatedAccessorAndPermissionAndDomain, is(expectedResources_queriedDomain));
+   }
+
+   @Test
+   public void getResourcesByResourcePermissionsAndDomain_global_withExtId() {
+      authenticateSystemResource();
+
+      final String accessorExternalId = generateUniqueExternalId();
+      final Resource accessorResource = generateUnauthenticatableResourceWithExtId(accessorExternalId);
+
+      final String queriedDomain = generateDomain();
+      final String accessorDomain = accessControlContext.getDomainNameByResource(accessorResource);
+      final String queriedResourceClass = generateResourceClass(false, false);
+      final String queriedPermission = generateResourceClassPermission(queriedResourceClass);
+      final ResourcePermission queriedSysPermission = ResourcePermissions.getInstance(ResourcePermissions.QUERY);
+      final String externalId1 = generateUniqueExternalId();
+      final Resource resource_queriedClassQueriedDomain
+            = accessControlContext.createResource(queriedResourceClass, queriedDomain, externalId1);
+
+      final String unqueriedResourceClass = generateResourceClass(false, false);
+      final String unqueriedResourceClassPermissionName = generateResourceClassPermission(unqueriedResourceClass);
+      final String externalId2 = generateUniqueExternalId();
+      final Resource resource_unqueriedClassQueriedDomain
+            = accessControlContext.createResource(unqueriedResourceClass, queriedDomain, externalId2);
+      final Resource resource_unqueriedClassAccessorDomain
+            = accessControlContext.createResource(unqueriedResourceClass, accessorDomain);
+
+      // set global permission for accessor
+      accessControlContext.setGlobalResourcePermissions(accessorResource,
+                                                        queriedResourceClass,
+                                                        queriedDomain,
+                                                        setOf(queriedSysPermission, ResourcePermissions.getInstance(queriedPermission)));
+      accessControlContext.setGlobalResourcePermissions(accessorResource,
+                                                        queriedResourceClass,
+                                                        accessorDomain,
+                                                        setOf(queriedSysPermission, ResourcePermissions.getInstance(queriedPermission)));
+      accessControlContext.setGlobalResourcePermissions(accessorResource,
+                                                        unqueriedResourceClass,
+                                                        queriedDomain,
+                                                        setOf(queriedSysPermission, ResourcePermissions.getInstance(
+                                                              unqueriedResourceClassPermissionName)));
+      accessControlContext.setGlobalResourcePermissions(accessorResource,
+                                                        unqueriedResourceClass,
+                                                        accessorDomain,
+                                                        setOf(queriedSysPermission, ResourcePermissions.getInstance(
+                                                              unqueriedResourceClassPermissionName)));
+
+      // verify
+      final Set<Resource> expectedResources_queriedDomain = setOf(resource_queriedClassQueriedDomain);
+
+      // retrieve by non-system permission
+      Set<Resource> resourcesByAccessorAndPermissionAndDomain
+            = accessControlContext.getResourcesByResourcePermissionsAndDomain(Resources.getInstance(accessorExternalId),
+                                                                              queriedResourceClass,
+                                                                              queriedDomain,
+                                                                              ResourcePermissions
+                                                                                    .getInstance(queriedPermission));
+      assertThat(resourcesByAccessorAndPermissionAndDomain, is(expectedResources_queriedDomain));
+      Resource retrievedResource = resourcesByAccessorAndPermissionAndDomain.iterator().next();
+      assertThat(retrievedResource.getExternalId(), is(externalId1));
+
+      resourcesByAccessorAndPermissionAndDomain
+            = accessControlContext.getResourcesByResourcePermissionsAndDomain(accessorResource,
+                                                                              queriedResourceClass,
+                                                                              queriedDomain,
+                                                                              setOf(ResourcePermissions
+                                                                                          .getInstance(queriedPermission)));
+      assertThat(resourcesByAccessorAndPermissionAndDomain, is(expectedResources_queriedDomain));
+      retrievedResource = resourcesByAccessorAndPermissionAndDomain.iterator().next();
+      assertThat(retrievedResource.getExternalId(), is(externalId1));
+
+      // retrieve by system permission
+      resourcesByAccessorAndPermissionAndDomain
+            = accessControlContext.getResourcesByResourcePermissionsAndDomain(accessorResource,
+                                                                              queriedResourceClass,
+                                                                              queriedDomain,
+                                                                              queriedSysPermission);
+      assertThat(resourcesByAccessorAndPermissionAndDomain, is(expectedResources_queriedDomain));
+      retrievedResource = resourcesByAccessorAndPermissionAndDomain.iterator().next();
+      assertThat(retrievedResource.getExternalId(), is(externalId1));
+
+      resourcesByAccessorAndPermissionAndDomain
+            = accessControlContext.getResourcesByResourcePermissionsAndDomain(Resources.getInstance(accessorExternalId),
+                                                                              queriedResourceClass,
+                                                                              queriedDomain,
+                                                                              setOf(queriedSysPermission));
+      assertThat(resourcesByAccessorAndPermissionAndDomain, is(expectedResources_queriedDomain));
+      retrievedResource = resourcesByAccessorAndPermissionAndDomain.iterator().next();
+      assertThat(retrievedResource.getExternalId(), is(externalId1));
    }
 
    @Test
@@ -1365,6 +1518,178 @@ public class TestAccessControl_getResourcesByResourcePermissionsAndDomain extend
    }
 
    @Test
+   public void getResourcesByResourcePermissionsAndDomain_superUser_withExtId() {
+      authenticateSystemResource();
+
+      final char[] password = generateUniquePassword();
+      final Resource accessorResource = generateAuthenticatableResource(password);
+
+      final String parentDomain = generateDomain();
+      final String childDomain = generateChildDomain(parentDomain);
+      final String otherDomain = generateDomain();
+      final String queriedResourceClass = generateResourceClass(true, false);
+      final String queriedPermission = generateResourceClassPermission(queriedResourceClass);
+      final String unqueriedPermissionName = generateResourceClassPermission(queriedResourceClass);
+      final String externalId1 = generateUniqueExternalId();
+      final Resource resource_parentDomain
+            = accessControlContext.createResource(queriedResourceClass,
+                                                  parentDomain,
+                                                  externalId1,
+                                                  PasswordCredentials.newInstance(generateUniquePassword()));
+      final String externalId2 = generateUniqueExternalId();
+      final Resource resource_childDomain
+            = accessControlContext.createResource(queriedResourceClass,
+                                                  childDomain,
+                                                  externalId2,
+                                                  PasswordCredentials.newInstance(generateUniquePassword()));
+      final String externalId3 = generateUniqueExternalId();
+      final Resource resource_otherDomain
+            = accessControlContext.createResource(queriedResourceClass,
+                                                  otherDomain,
+                                                  externalId3,
+                                                  PasswordCredentials.newInstance(generateUniquePassword()));
+
+      final String accessorDomain = accessControlContext.getDomainNameByResource(accessorResource);
+      final String accessorChildDomain = generateChildDomain(accessorDomain);
+      final Resource resource_accessorDomain
+            = accessControlContext.createResource(queriedResourceClass, accessorDomain, PasswordCredentials.newInstance(generateUniquePassword()));
+      final Resource resource_accessorChildDomain
+            = accessControlContext.createResource(queriedResourceClass, accessorChildDomain, PasswordCredentials.newInstance(generateUniquePassword()));
+      final String unqueriedDomain = generateDomain();
+      final String unqueriedResourceClass = generateResourceClass(false, false);
+      accessControlContext.createResourcePermission(unqueriedResourceClass, unqueriedPermissionName);
+      final Resource resource_unqueriedClassChildDomain
+            = accessControlContext.createResource(unqueriedResourceClass, childDomain);
+      final Resource resource_unqueriedClassAccessorChildDomain
+            = accessControlContext.createResource(unqueriedResourceClass, accessorChildDomain);
+      final Resource resource_unqueriedClassUnqueriedDomain
+            = accessControlContext.createResource(unqueriedResourceClass, unqueriedDomain);
+      final Resource resource_queriedClassUnqueriedDomain
+            = accessControlContext.createResource(queriedResourceClass, unqueriedDomain, PasswordCredentials.newInstance(generateUniquePassword()));
+
+      // set super-user permission for accessor
+      accessControlContext.setDomainPermissions(accessorResource,
+                                                parentDomain,
+                                                setOf(DomainPermissions.getInstance(DomainPermissions.SUPER_USER)));
+      accessControlContext.setDomainPermissions(accessorResource,
+                                                accessorDomain,
+                                                setOf(DomainPermissions.getInstance(DomainPermissions.SUPER_USER)));
+      accessControlContext.setDomainPermissions(accessorResource,
+                                                otherDomain,
+                                                setOf(DomainPermissions.getInstance(DomainPermissions.SUPER_USER)));
+
+      // verify as system resource
+      final Set<Resource> expectedResources_parentDomain = setOf(resource_parentDomain,
+                                                                 resource_childDomain);
+      final Set<Resource> expectedResources_childDomain = setOf(resource_childDomain);
+      final Set<Resource> expectedResources_otherDomain = setOf(resource_otherDomain);
+
+
+      Set<Resource> resourcesByAccessorAndPermissionAndParentDomain
+            = accessControlContext.getResourcesByResourcePermissionsAndDomain(accessorResource,
+                                                                              queriedResourceClass,
+                                                                              parentDomain,
+                                                                              ResourcePermissions
+                                                                                    .getInstance(queriedPermission));
+      assertThat(resourcesByAccessorAndPermissionAndParentDomain, is(expectedResources_parentDomain));
+      for (Resource retrievedResource : resourcesByAccessorAndPermissionAndParentDomain) {
+         if (retrievedResource.equals(resource_parentDomain)) {
+            assertThat(retrievedResource.getExternalId(), is(externalId1));
+         }
+         else if (retrievedResource.equals(resource_childDomain)) {
+            assertThat(retrievedResource.getExternalId(), is(externalId2));
+         }
+         else {
+            fail("retrieved unexpected resource: " + retrievedResource);
+         }
+      }
+
+      resourcesByAccessorAndPermissionAndParentDomain
+            = accessControlContext.getResourcesByResourcePermissionsAndDomain(accessorResource,
+                                                                              queriedResourceClass,
+                                                                              parentDomain,
+                                                                              setOf(ResourcePermissions
+                                                                                          .getInstance(queriedPermission)));
+      assertThat(resourcesByAccessorAndPermissionAndParentDomain, is(expectedResources_parentDomain));
+      for (Resource retrievedResource : resourcesByAccessorAndPermissionAndParentDomain) {
+         if (retrievedResource.equals(resource_parentDomain)) {
+            assertThat(retrievedResource.getExternalId(), is(externalId1));
+         }
+         else if (retrievedResource.equals(resource_childDomain)) {
+            assertThat(retrievedResource.getExternalId(), is(externalId2));
+         }
+         else {
+            fail("retrieved unexpected resource: " + retrievedResource);
+         }
+      }
+
+      Set<Resource> resourcesByAccessorAndPermissionAndChildDomain
+            = accessControlContext.getResourcesByResourcePermissionsAndDomain(accessorResource,
+                                                                              queriedResourceClass,
+                                                                              childDomain,
+                                                                              ResourcePermissions
+                                                                                    .getInstance(queriedPermission));
+      assertThat(resourcesByAccessorAndPermissionAndChildDomain, is(expectedResources_childDomain));
+      Resource retrievedResource = resourcesByAccessorAndPermissionAndChildDomain.iterator().next();
+      assertThat(retrievedResource.getExternalId(), is(externalId2));
+
+      resourcesByAccessorAndPermissionAndChildDomain
+            = accessControlContext.getResourcesByResourcePermissionsAndDomain(accessorResource,
+                                                                              queriedResourceClass,
+                                                                              childDomain,
+                                                                              setOf(ResourcePermissions
+                                                                                          .getInstance(queriedPermission)));
+      assertThat(resourcesByAccessorAndPermissionAndChildDomain, is(expectedResources_childDomain));
+      retrievedResource = resourcesByAccessorAndPermissionAndChildDomain.iterator().next();
+      assertThat(retrievedResource.getExternalId(), is(externalId2));
+
+      Set<Resource> resourcesByAccessorAndMultiplePermissionsAndChildDomain
+            = accessControlContext.getResourcesByResourcePermissionsAndDomain(accessorResource,
+                                                                              queriedResourceClass,
+                                                                              childDomain,
+                                                                              ResourcePermissions
+                                                                                    .getInstance(ResourcePermissions.IMPERSONATE),
+                                                                              ResourcePermissions
+                                                                                    .getInstance(queriedPermission));
+      assertThat(resourcesByAccessorAndMultiplePermissionsAndChildDomain, is(expectedResources_childDomain));
+      retrievedResource = resourcesByAccessorAndPermissionAndChildDomain.iterator().next();
+      assertThat(retrievedResource.getExternalId(), is(externalId2));
+
+      resourcesByAccessorAndMultiplePermissionsAndChildDomain
+            = accessControlContext.getResourcesByResourcePermissionsAndDomain(accessorResource,
+                                                                              queriedResourceClass,
+                                                                              childDomain,
+                                                                              setOf(ResourcePermissions
+                                                                                          .getInstance(
+                                                                                                ResourcePermissions.IMPERSONATE),
+                                                                                    ResourcePermissions
+                                                                                          .getInstance(queriedPermission)));
+      assertThat(resourcesByAccessorAndMultiplePermissionsAndChildDomain, is(expectedResources_childDomain));
+      retrievedResource = resourcesByAccessorAndPermissionAndChildDomain.iterator().next();
+      assertThat(retrievedResource.getExternalId(), is(externalId2));
+
+      Set<Resource> resourcesByAccessorAndPermissionAndOtherDomain
+            = accessControlContext.getResourcesByResourcePermissionsAndDomain(accessorResource,
+                                                                              queriedResourceClass,
+                                                                              otherDomain,
+                                                                              ResourcePermissions
+                                                                                    .getInstance(queriedPermission));
+      assertThat(resourcesByAccessorAndPermissionAndOtherDomain, is(expectedResources_otherDomain));
+      retrievedResource = resourcesByAccessorAndPermissionAndOtherDomain.iterator().next();
+      assertThat(retrievedResource.getExternalId(), is(externalId3));
+
+      resourcesByAccessorAndPermissionAndOtherDomain
+            = accessControlContext.getResourcesByResourcePermissionsAndDomain(accessorResource,
+                                                                              queriedResourceClass,
+                                                                              otherDomain,
+                                                                              setOf(ResourcePermissions
+                                                                                          .getInstance(queriedPermission)));
+      assertThat(resourcesByAccessorAndPermissionAndOtherDomain, is(expectedResources_otherDomain));
+      retrievedResource = resourcesByAccessorAndPermissionAndOtherDomain.iterator().next();
+      assertThat(retrievedResource.getExternalId(), is(externalId3));
+   }
+
+   @Test
    public void getResourcesByResourcePermissionsAndDomain_whitespaceConsistent() {
       authenticateSystemResource();
 
@@ -1434,6 +1759,16 @@ public class TestAccessControl_getResourcesByResourcePermissionsAndDomain extend
       }
       catch (NullPointerException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("resource required"));
+      }
+      try {
+         accessControlContext.getResourcesByResourcePermissionsAndDomain(Resources.getInstance(null),
+                                                                         resourceClass,
+                                                                         domain,
+                                                                         resourcePermission);
+         fail("getting resources by resource permission with unspecified internal and external accessor resource ids should have failed");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("resource id and/or external id is required"));
       }
 
       try {
@@ -1515,6 +1850,16 @@ public class TestAccessControl_getResourcesByResourcePermissionsAndDomain extend
       }
       catch (NullPointerException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("resource required"));
+      }
+      try {
+         accessControlContext.getResourcesByResourcePermissionsAndDomain(Resources.getInstance(null),
+                                                                         resourceClass,
+                                                                         domain,
+                                                                         setOf(resourcePermission));
+         fail("getting resources by resource permission with unspecified internal and external accessor resource ids should have failed");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("resource id and/or external id is required"));
       }
 
       try {
@@ -1717,6 +2062,8 @@ public class TestAccessControl_getResourcesByResourcePermissionsAndDomain extend
       final char[] password = generateUniquePassword();
       final Resource accessorResource = generateAuthenticatableResource(password);
       final Resource nonExistentResource = Resources.getInstance(-999L);
+      final Resource nonExistentExternalResource = Resources.getInstance("invalid");
+      final Resource mismatchedExternalResource = Resources.getInstance(-999L, "invalid");
       final String domain = generateDomain();
       final String resourceClass = generateResourceClass(false, false);
       final ResourcePermission resourcePermission
@@ -1732,6 +2079,26 @@ public class TestAccessControl_getResourcesByResourcePermissionsAndDomain extend
       }
       catch (IllegalArgumentException e) {
          assertThat(e.getMessage().toLowerCase(), containsString(String.valueOf(nonExistentResource).toLowerCase() + " not found"));
+      }
+      try {
+         accessControlContext.getResourcesByResourcePermissionsAndDomain(nonExistentExternalResource,
+                                                                         resourceClass,
+                                                                         domain,
+                                                                         resourcePermission);
+         fail("getting resources by resource permission with non-existent external accessor resource should have failed");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString(String.valueOf(nonExistentExternalResource).toLowerCase() + " not found"));
+      }
+      try {
+         accessControlContext.getResourcesByResourcePermissionsAndDomain(mismatchedExternalResource,
+                                                                         resourceClass,
+                                                                         domain,
+                                                                         resourcePermission);
+         fail("getting resources by resource permission with mismatched internal/external resource id should have failed");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("not resolve"));
       }
 
       try {
@@ -1788,6 +2155,26 @@ public class TestAccessControl_getResourcesByResourcePermissionsAndDomain extend
       }
       catch (IllegalArgumentException e) {
          assertThat(e.getMessage().toLowerCase(), containsString(String.valueOf(nonExistentResource).toLowerCase() + " not found"));
+      }
+      try {
+         accessControlContext.getResourcesByResourcePermissionsAndDomain(nonExistentExternalResource,
+                                                                         resourceClass,
+                                                                         domain,
+                                                                         setOf(resourcePermission));
+         fail("getting resources by resource permission with non-existent external accessor resource should have failed");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString(String.valueOf(nonExistentExternalResource).toLowerCase() + " not found"));
+      }
+      try {
+         accessControlContext.getResourcesByResourcePermissionsAndDomain(mismatchedExternalResource,
+                                                                         resourceClass,
+                                                                         domain,
+                                                                         setOf(resourcePermission));
+         fail("getting resources by resource permission with mismatched internal/external resource id should have failed");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("not resolve"));
       }
 
       try {

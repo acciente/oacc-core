@@ -195,6 +195,17 @@ public class TestAccessControlBase {
       return systemAccessControlContext.createResource(resourceClassName, domainName);
    }
 
+   protected static Resource generateUnauthenticatableResourceWithExtId(String externalId) {
+      authenticateSystemAccessControlContext();
+      final String resourceClassName = generateResourceClass(false, true);
+      final String domainName = generateDomain();
+      systemAccessControlContext.grantGlobalResourcePermissions(SYS_RESOURCE,
+                                                                resourceClassName,
+                                                                domainName,
+                                                                ResourcePermissions.getInstance(ResourcePermissions.QUERY));
+      return systemAccessControlContext.createResource(resourceClassName, domainName, externalId);
+   }
+
    protected static void grantQueryPermission(Resource accessorResource,
                                               Resource queriedResource) {
       systemAccessControlContext.grantResourcePermissions(accessorResource,

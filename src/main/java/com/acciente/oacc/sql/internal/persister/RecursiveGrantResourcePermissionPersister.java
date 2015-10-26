@@ -52,7 +52,7 @@ public class RecursiveGrantResourcePermissionPersister extends CommonGrantResour
          SQLResult resultSet;
          Set<Resource> resources = new HashSet<>();
 
-         statement = connection.prepareStatement(sqlStrings.SQL_findInGrantResourcePermission_ResourceID_BY_AccessorID_ResourceClassID_PermissionID_IsWithGrant);
+         statement = connection.prepareStatement(sqlStrings.SQL_findInGrantResourcePermission_ResourceID_ExternalID_BY_AccessorID_ResourceClassID_PermissionID_IsWithGrant);
          statement.setResourceId(1, accessorResource);
          statement.setResourceClassId(2, resourceClassId);
          statement.setResourcePermissionId(3, resourcePermissionId);
@@ -60,7 +60,7 @@ public class RecursiveGrantResourcePermissionPersister extends CommonGrantResour
          resultSet = statement.executeQuery();
 
          while (resultSet.next()) {
-            resources.add(resultSet.getResource("ResourceId"));
+            resources.add(resultSet.getResource("ResourceId", "ExternalId"));
          }
          resultSet.close();
 
@@ -92,7 +92,7 @@ public class RecursiveGrantResourcePermissionPersister extends CommonGrantResour
          SQLResult resultSet;
          Set<Resource> resources = new HashSet<>();
 
-         statement = connection.prepareStatement(sqlStrings.SQL_findInGrantResourcePermission_ResourceID_BY_AccessorID_DomainID_ResourceClassID_PermissionID_IsWithGrant);
+         statement = connection.prepareStatement(sqlStrings.SQL_findInGrantResourcePermission_ResourceID_ExternalID_BY_AccessorID_DomainID_ResourceClassID_PermissionID_IsWithGrant);
          statement.setResourceId(1, accessorResource);
          statement.setResourceDomainId(2, resourceDomainId);
          statement.setResourceClassId(3, resourceClassId);
@@ -101,7 +101,7 @@ public class RecursiveGrantResourcePermissionPersister extends CommonGrantResour
          resultSet = statement.executeQuery();
 
          while (resultSet.next()) {
-            resources.add(resultSet.getResource("ResourceId"));
+            resources.add(resultSet.getResource("ResourceId", "ExternalId"));
          }
          resultSet.close();
 

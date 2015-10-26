@@ -56,7 +56,7 @@ public class NonRecursiveGrantResourcePermissionPersister extends CommonGrantRes
          // now accumulate the objects of the specified type that each (inherited) accessor has the specified permission to
          SQLResult resultSet;
          Set<Resource> resources = new HashSet<>();
-         statement = connection.prepareStatement(sqlStrings.SQL_findInGrantResourcePermission_withoutInheritance_ResourceID_BY_AccessorID_ResourceClassID_PermissionID_IsWithGrant);
+         statement = connection.prepareStatement(sqlStrings.SQL_findInGrantResourcePermission_withoutInheritance_ResourceID_ExternalID_BY_AccessorID_ResourceClassID_PermissionID_IsWithGrant);
 
          for (Id<ResourceId> accessorResourceId : accessorResourceIds) {
             statement.setResourceId(1, accessorResourceId);
@@ -66,7 +66,7 @@ public class NonRecursiveGrantResourcePermissionPersister extends CommonGrantRes
             resultSet = statement.executeQuery();
 
             while (resultSet.next()) {
-               resources.add(resultSet.getResource("ResourceId"));
+               resources.add(resultSet.getResource("ResourceId", "ExternalId"));
             }
             resultSet.close();
          }
@@ -107,7 +107,7 @@ public class NonRecursiveGrantResourcePermissionPersister extends CommonGrantRes
          // has the specified permission to in each of the descendant domains
          SQLResult resultSet;
          Set<Resource> resources = new HashSet<>();
-         statement = connection.prepareStatement(sqlStrings.SQL_findInGrantResourcePermission_withoutInheritance_ResourceID_BY_AccessorID_DomainID_ResourceClassID_PermissionID_IsWithGrant);
+         statement = connection.prepareStatement(sqlStrings.SQL_findInGrantResourcePermission_withoutInheritance_ResourceID_ExternalID_BY_AccessorID_DomainID_ResourceClassID_PermissionID_IsWithGrant);
 
          for (Id<ResourceId> accessorResourceId : accessorResourceIds) {
             for (Id<DomainId> descendantDomainId : descendantDomainIds) {
@@ -119,7 +119,7 @@ public class NonRecursiveGrantResourcePermissionPersister extends CommonGrantRes
                resultSet = statement.executeQuery();
 
                while (resultSet.next()) {
-                  resources.add(resultSet.getResource("ResourceId"));
+                  resources.add(resultSet.getResource("ResourceId", "ExternalId"));
                }
                resultSet.close();
             }

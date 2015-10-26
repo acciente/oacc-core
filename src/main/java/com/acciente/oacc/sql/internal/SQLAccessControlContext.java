@@ -5622,7 +5622,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       try {
          connection = __getConnection();
 
-         __assertResourceExists(connection, accessorResource);
+         accessorResource = __resolveResource(connection, accessorResource);
          __assertQueryAuthorization(connection, accessorResource);
 
          resourceClassName = resourceClassName.trim();
@@ -5656,7 +5656,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       try {
          connection = __getConnection();
 
-         __assertResourceExists(connection, accessorResource);
+         accessorResource = __resolveResource(connection, accessorResource);
          __assertQueryAuthorization(connection, accessorResource);
 
          resourceClassName = resourceClassName.trim();
@@ -5781,7 +5781,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       try {
          connection = __getConnection();
 
-         __assertResourceExists(connection, accessorResource);
+         accessorResource = __resolveResource(connection, accessorResource);
          __assertQueryAuthorization(connection, accessorResource);
 
          resourceClassName = resourceClassName.trim();
@@ -5818,7 +5818,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       try {
          connection = __getConnection();
 
-         __assertResourceExists(connection, accessorResource);
+         accessorResource = __resolveResource(connection, accessorResource);
          __assertQueryAuthorization(connection, accessorResource);
 
          resourceClassName = resourceClassName.trim();

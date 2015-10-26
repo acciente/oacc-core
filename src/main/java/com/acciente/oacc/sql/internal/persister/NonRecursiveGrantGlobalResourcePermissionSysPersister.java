@@ -76,7 +76,7 @@ public class NonRecursiveGrantGlobalResourcePermissionSysPersister extends Commo
 
          // then get all resources of the specified class for each of the direct domain's descendants
          Set<Resource> resources = new HashSet<>();
-         statement = connection.prepareStatement(sqlStrings.SQL_findInResource_withoutInheritance_ResourceId_BY_ResourceClassID_DomainID);
+         statement = connection.prepareStatement(sqlStrings.SQL_findInResource_withoutInheritance_ResourceId_ExternalId_BY_ResourceClassID_DomainID);
 
          for (Id<DomainId> directDomainId: directGlobalDomains) {
             Set<Id<DomainId>> descendentDomainIds
@@ -89,7 +89,7 @@ public class NonRecursiveGrantGlobalResourcePermissionSysPersister extends Commo
                resultSet = statement.executeQuery();
 
                while (resultSet.next()) {
-                  resources.add(resultSet.getResource("ResourceId"));
+                  resources.add(resultSet.getResource("ResourceId", "ExternalId"));
                }
                resultSet.close();
             }
@@ -173,14 +173,14 @@ public class NonRecursiveGrantGlobalResourcePermissionSysPersister extends Commo
 
          // now let's collect all the resources for those sub-domains to which we effectively have global permissions
          Set<Resource> resources = new HashSet<>();
-         statement = connection.prepareStatement(sqlStrings.SQL_findInResource_withoutInheritance_ResourceId_BY_ResourceClassID_DomainID);
+         statement = connection.prepareStatement(sqlStrings.SQL_findInResource_withoutInheritance_ResourceId_ExternalId_BY_ResourceClassID_DomainID);
          for (Id<DomainId> effectiveDomainId : effectiveDomainIds) {
             statement.setResourceClassId(1, resourceClassId);
             statement.setResourceDomainId(2, effectiveDomainId);
             resultSet = statement.executeQuery();
 
             while (resultSet.next()) {
-               resources.add(resultSet.getResource("ResourceId"));
+               resources.add(resultSet.getResource("ResourceId", "ExternalId"));
             }
             resultSet.close();
          }
