@@ -257,6 +257,42 @@ public class TestAccessControl_hasResourcePermissions extends TestAccessControlB
    }
 
    @Test
+   public void hasResourcePermissions_direct_withExtId() {
+      authenticateSystemResource();
+
+      final String accessorExternalId = generateUniqueExternalId();
+      final Resource accessorResource = generateUnauthenticatableResourceWithExtId(accessorExternalId);
+      final String accessedExternalId = generateUniqueExternalId();
+      final Resource accessedResource = generateUnauthenticatableResourceWithExtId(accessedExternalId);
+      final String accessedResourceClassName
+            = accessControlContext.getResourceClassInfoByResource(accessedResource).getResourceClassName();
+
+      // setup direct permissions
+      final String customPermissionName = generateResourceClassPermission(accessedResourceClassName);
+      final ResourcePermission customPermission = ResourcePermissions.getInstance(customPermissionName);
+      accessControlContext.setResourcePermissions(accessorResource,
+                                                  accessedResource,
+                                                  setOf(customPermission));
+
+      // verify
+      if (!accessControlContext.hasResourcePermissions(Resources.getInstance(accessorExternalId), accessedResource, customPermission)) {
+         fail("checking direct resource permission for external accessor id should have succeeded");
+      }
+      if (!accessControlContext.hasResourcePermissions(Resources.getInstance(accessorExternalId), accessedResource, setOf(customPermission))) {
+         fail("checking direct resource permission for external accessor id should have succeeded");
+      }
+
+      if (!accessControlContext.hasResourcePermissions(accessorResource,
+                                                       Resources.getInstance(accessedExternalId),
+                                                       customPermission)) {
+         fail("checking direct resource permission for external accessed id should have succeeded");
+      }
+      if (!accessControlContext.hasResourcePermissions(accessorResource, Resources.getInstance(accessedExternalId), setOf(customPermission))) {
+         fail("checking direct resource permission for external accessed id should have succeeded");
+      }
+   }
+
+   @Test
    public void hasResourcePermissions_partialDirect_shouldFailAsAuthenticatedResource() {
       authenticateSystemResource();
 
@@ -715,11 +751,25 @@ public class TestAccessControl_hasResourcePermissions extends TestAccessControlB
          assertThat(e.getMessage().toLowerCase(), containsString("resource required"));
       }
       try {
+         accessControlContext.hasResourcePermissions(Resources.getInstance(null), accessedResource, customPermission);
+         fail("checking resource permission for null internal/external accessor resource references should have failed");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("resource id and/or external id is required"));
+      }
+      try {
          accessControlContext.hasResourcePermissions(accessorResource, (Resource) null, customPermission);
          fail("checking resource permission for null accessed resource reference should have failed");
       }
       catch (NullPointerException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("resource required"));
+      }
+      try {
+         accessControlContext.hasResourcePermissions(accessorResource, Resources.getInstance(null), customPermission);
+         fail("checking resource permission for null internal/external accessed resource references should have failed");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("resource id and/or external id is required"));
       }
       try {
          accessControlContext.hasResourcePermissions(accessorResource, accessedResource, (ResourcePermission) null);
@@ -763,11 +813,25 @@ public class TestAccessControl_hasResourcePermissions extends TestAccessControlB
          assertThat(e.getMessage().toLowerCase(), containsString("resource required"));
       }
       try {
+         accessControlContext.hasResourcePermissions(Resources.getInstance(null), accessedResource, setOf(customPermission));
+         fail("checking resource permission for null internal/external accessor resource references should have failed");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("resource id and/or external id is required"));
+      }
+      try {
          accessControlContext.hasResourcePermissions(accessorResource, (Resource) null, setOf(customPermission));
          fail("checking resource permission for null accessed resource reference should have failed");
       }
       catch (NullPointerException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("resource required"));
+      }
+      try {
+         accessControlContext.hasResourcePermissions(accessedResource, Resources.getInstance(null), customPermission);
+         fail("checking resource permission for null internal/external accessed resource references should have failed");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("resource id and/or external id is required"));
       }
       try {
          accessControlContext.hasResourcePermissions(accessorResource, accessedResource, (Set<ResourcePermission>) null);
@@ -919,6 +983,10 @@ public class TestAccessControl_hasResourcePermissions extends TestAccessControlB
       final Resource accessedResource = generateUnauthenticatableResource();
       final String accessedResourceClassName
             = accessControlContext.getResourceClassInfoByResource(accessedResource).getResourceClassName();
+      final Resource invalidResource = Resources.getInstance(-999L);
+      final Resource invalidExternalResource = Resources.getInstance("invalid");
+      final Resource mismatchedResource = Resources.getInstance(-999L, "invalid");
+      final ResourcePermission invalidPermission = ResourcePermissions.getInstance("invalid_permission");
 
       // setup direct permissions
       final String customPermissionName = generateResourceClassPermission(accessedResourceClassName);
@@ -931,9 +999,6 @@ public class TestAccessControl_hasResourcePermissions extends TestAccessControlB
       accessControlContext.authenticate(accessorResource, PasswordCredentials.newInstance(password));
 
       // verify
-      final Resource invalidResource = Resources.getInstance(-999L);
-      final ResourcePermission invalidPermission = ResourcePermissions.getInstance("invalid_permission");
-
       try {
          accessControlContext.hasResourcePermissions(invalidResource, accessedResource, customPermission);
          fail("checking resource permission for invalid accessor resource reference should have failed");
@@ -942,11 +1007,39 @@ public class TestAccessControl_hasResourcePermissions extends TestAccessControlB
          assertThat(e.getMessage().toLowerCase(), containsString(String.valueOf(invalidResource).toLowerCase() + " not found"));
       }
       try {
+         accessControlContext.hasResourcePermissions(invalidExternalResource, accessedResource, customPermission);
+         fail("checking resource permission for invalid external accessor resource reference should have failed");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString(String.valueOf(invalidExternalResource).toLowerCase() + " not found"));
+      }
+      try {
+         accessControlContext.hasResourcePermissions(mismatchedResource, accessedResource, customPermission);
+         fail("checking resource permission for mismatched internal/external accessor resource references should have failed");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("not resolve"));
+      }
+      try {
          accessControlContext.hasResourcePermissions(accessorResource, invalidResource, customPermission);
          fail("checking resource permission for invalid accessed resource reference should have failed");
       }
       catch (IllegalArgumentException e) {
-         assertThat(e.getMessage().toLowerCase(), containsString("could not determine resource class for resource"));
+         assertThat(e.getMessage().toLowerCase(), containsString(String.valueOf(invalidResource).toLowerCase() + " not found"));
+      }
+      try {
+         accessControlContext.hasResourcePermissions(accessorResource, invalidExternalResource, customPermission);
+         fail("checking resource permission for invalid external accessed resource reference should have failed");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString(String.valueOf(invalidExternalResource).toLowerCase() + " not found"));
+      }
+      try {
+         accessControlContext.hasResourcePermissions(accessorResource, mismatchedResource, customPermission);
+         fail("checking resource permission for mismatched internal/external accessed resource references should have failed");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("not resolve"));
       }
       try {
          accessControlContext.hasResourcePermissions(accessorResource, accessedResource, invalidPermission);
@@ -972,11 +1065,39 @@ public class TestAccessControl_hasResourcePermissions extends TestAccessControlB
          assertThat(e.getMessage().toLowerCase(), containsString(String.valueOf(invalidResource).toLowerCase() + " not found"));
       }
       try {
+         accessControlContext.hasResourcePermissions(invalidExternalResource, accessedResource, setOf(customPermission));
+         fail("checking resource permission for invalid external accessor resource reference should have failed");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString(String.valueOf(invalidExternalResource).toLowerCase() + " not found"));
+      }
+      try {
+         accessControlContext.hasResourcePermissions(mismatchedResource, accessedResource, setOf(customPermission));
+         fail("checking resource permission for mismatched internal/external accessor resource references should have failed");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("not resolve"));
+      }
+      try {
          accessControlContext.hasResourcePermissions(accessorResource, invalidResource, setOf(customPermission));
          fail("checking resource permission for invalid accessed resource reference should have failed");
       }
       catch (IllegalArgumentException e) {
-         assertThat(e.getMessage().toLowerCase(), containsString("could not determine resource class for resource"));
+         assertThat(e.getMessage().toLowerCase(), containsString(String.valueOf(invalidResource).toLowerCase() + " not found"));
+      }
+      try {
+         accessControlContext.hasResourcePermissions(accessorResource, invalidExternalResource, setOf(customPermission));
+         fail("checking resource permission for invalid external accessed resource reference should have failed");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString(String.valueOf(invalidExternalResource).toLowerCase() + " not found"));
+      }
+      try {
+         accessControlContext.hasResourcePermissions(accessorResource, mismatchedResource, setOf(customPermission));
+         fail("checking resource permission for mismatched internal/external accessed resource references should have failed");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("not resolve"));
       }
       try {
          accessControlContext.hasResourcePermissions(accessorResource, accessedResource, setOf(invalidPermission));

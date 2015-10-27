@@ -312,6 +312,42 @@ public class TestAccessControl_hasGlobalResourcePermissions extends TestAccessCo
    }
 
    @Test
+   public void hasGlobalResourcePermissions_direct_withExtId() {
+      authenticateSystemResource();
+
+      final String externalId = generateUniqueExternalId();
+      final Resource accessorResource = generateUnauthenticatableResourceWithExtId(externalId);
+      final String accessorDomainName = accessControlContext.getDomainNameByResource(accessorResource);
+      final String otherDomainName = generateDomain();
+      final String resourceClassName = generateResourceClass(false, false);
+
+      // setup global permissions
+      final String customPermissionName_accessorDomain = generateResourceClassPermission(resourceClassName);
+      final ResourcePermission customPermission_forAccessorDomain
+            = ResourcePermissions.getInstance(customPermissionName_accessorDomain);
+
+      accessControlContext.setGlobalResourcePermissions(accessorResource,
+                                                        resourceClassName,
+                                                        accessorDomainName,
+                                                        setOf(customPermission_forAccessorDomain));
+
+      // verify
+      if (!accessControlContext.hasGlobalResourcePermissions(Resources.getInstance(externalId),
+                                                             resourceClassName,
+                                                             accessorDomainName,
+                                                             customPermission_forAccessorDomain)) {
+         fail("checking direct global resource permission on specified accessor domain should have succeeded for resource with external id");
+      }
+
+      if (!accessControlContext.hasGlobalResourcePermissions(Resources.getInstance(externalId),
+                                                             resourceClassName,
+                                                             accessorDomainName,
+                                                             setOf(customPermission_forAccessorDomain))) {
+         fail("checking direct global resource permission on specified accessor domain should have succeeded for resource with external id");
+      }
+   }
+
+   @Test
    public void hasGlobalResourcePermissions_partialDirect_shouldFailAsAuthenticatedResource() {
       authenticateSystemResource();
 
@@ -1166,6 +1202,16 @@ public class TestAccessControl_hasGlobalResourcePermissions extends TestAccessCo
          assertThat(e.getMessage().toLowerCase(), containsString("resource required"));
       }
       try {
+         accessControlContext.hasGlobalResourcePermissions(Resources.getInstance(null),
+                                                           resourceClassName,
+                                                           domainName,
+                                                           ResourcePermissions.getInstance(customPermissionName));
+         fail("checking global resource permission (by domain) for null internal/external resource references should have failed for system resource");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("resource id and/or external id is required"));
+      }
+      try {
          accessControlContext.hasGlobalResourcePermissions(SYS_RESOURCE,
                                                            null,
                                                            domainName,
@@ -1240,6 +1286,16 @@ public class TestAccessControl_hasGlobalResourcePermissions extends TestAccessCo
       }
       catch (NullPointerException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("resource required"));
+      }
+      try {
+         accessControlContext.hasGlobalResourcePermissions(Resources.getInstance(null),
+                                                           resourceClassName,
+                                                           domainName,
+                                                           setOf(ResourcePermissions.getInstance(customPermissionName)));
+         fail("checking global resource permission (by domain) for null internal/external resource references should have failed for system resource");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("resource id and/or external id is required"));
       }
       try {
          accessControlContext.hasGlobalResourcePermissions(SYS_RESOURCE,
@@ -1388,6 +1444,8 @@ public class TestAccessControl_hasGlobalResourcePermissions extends TestAccessCo
       final String resourceClassName = generateResourceClass(false, false);
       final String customPermissionName = generateResourceClassPermission(resourceClassName);
       final Resource invalidResource = Resources.getInstance(-999L);
+      final Resource invalidExternalResource = Resources.getInstance("invalid");
+      final Resource mismatchedResource = Resources.getInstance(-999L, "invalid");
       final String domainName = generateDomain();
 
       try {
@@ -1399,6 +1457,26 @@ public class TestAccessControl_hasGlobalResourcePermissions extends TestAccessCo
       }
       catch (IllegalArgumentException e) {
          assertThat(e.getMessage().toLowerCase(), containsString(String.valueOf(invalidResource).toLowerCase() + " not found"));
+      }
+      try {
+         accessControlContext.hasGlobalResourcePermissions(invalidExternalResource,
+                                                           resourceClassName,
+                                                           domainName,
+                                                           ResourcePermissions.getInstance(customPermissionName));
+         fail("checking global resource permission (by domain) for invalid external resource reference should have failed for system resource");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString(String.valueOf(invalidExternalResource).toLowerCase() + " not found"));
+      }
+      try {
+         accessControlContext.hasGlobalResourcePermissions(mismatchedResource,
+                                                           resourceClassName,
+                                                           domainName,
+                                                           ResourcePermissions.getInstance(customPermissionName));
+         fail("checking global resource permission (by domain) for mismatched internal/external resource references should have failed for system resource");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("not resolve"));
       }
 
       try {
@@ -1453,6 +1531,26 @@ public class TestAccessControl_hasGlobalResourcePermissions extends TestAccessCo
       }
       catch (IllegalArgumentException e) {
          assertThat(e.getMessage().toLowerCase(), containsString(String.valueOf(invalidResource).toLowerCase() + " not found"));
+      }
+      try {
+         accessControlContext.hasGlobalResourcePermissions(invalidExternalResource,
+                                                           resourceClassName,
+                                                           domainName,
+                                                           setOf(ResourcePermissions.getInstance(customPermissionName)));
+         fail("checking global resource permission (by domain) for invalid external resource reference should have failed for system resource");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString(String.valueOf(invalidExternalResource).toLowerCase() + " not found"));
+      }
+      try {
+         accessControlContext.hasGlobalResourcePermissions(mismatchedResource,
+                                                           resourceClassName,
+                                                           domainName,
+                                                           setOf(ResourcePermissions.getInstance(customPermissionName)));
+         fail("checking global resource permission (by domain) for mismatched internal/external resource references should have failed for system resource");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("not resolve"));
       }
 
       try {

@@ -252,6 +252,32 @@ public class TestAccessControl_assertResourcePermissions extends TestAccessContr
    }
 
    @Test
+   public void assertResourcePermissions_direct_withExtId() {
+      authenticateSystemResource();
+
+      final String accessorExternalId = generateUniqueExternalId();
+      final Resource accessorResource = generateUnauthenticatableResourceWithExtId(accessorExternalId);
+      final String accessedExternalId = generateUniqueExternalId();
+      final Resource accessedResource = generateUnauthenticatableResourceWithExtId(accessedExternalId);
+      final String accessedResourceClassName
+            = accessControlContext.getResourceClassInfoByResource(accessedResource).getResourceClassName();
+
+      // setup direct permissions
+      final String customPermissionName = generateResourceClassPermission(accessedResourceClassName);
+      final ResourcePermission customPermission = ResourcePermissions.getInstance(customPermissionName);
+      accessControlContext.setResourcePermissions(accessorResource,
+                                                  accessedResource,
+                                                  setOf(customPermission));
+
+      // verify
+      accessControlContext.assertResourcePermissions(Resources.getInstance(accessorExternalId), accessedResource, customPermission);
+      accessControlContext.assertResourcePermissions(Resources.getInstance(accessorExternalId), accessedResource, setOf(customPermission));
+
+      accessControlContext.assertResourcePermissions(accessorResource, Resources.getInstance(accessedExternalId), customPermission);
+      accessControlContext.assertResourcePermissions(accessorResource, Resources.getInstance(accessedExternalId), setOf(customPermission));
+   }
+
+   @Test
    public void assertResourcePermissions_partialDirect_shouldFailAsAuthenticatedResource() {
       authenticateSystemResource();
 
@@ -676,30 +702,49 @@ public class TestAccessControl_assertResourcePermissions extends TestAccessContr
       // verify
       try {
          accessControlContext.assertResourcePermissions(null, accessedResource, customPermission);
+         fail("asserting resource permissions with null accessor resource should have failed");
       }
       catch (NullPointerException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("resource required"));
+      }
+      try {
+         accessControlContext.assertResourcePermissions(Resources.getInstance(null), accessedResource, customPermission);
+         fail("asserting resource permissions with null internal/external accessor ids should have failed");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("resource id and/or external id is required"));
       }
       try {
          accessControlContext.assertResourcePermissions(accessorResource, (Resource) null, customPermission);
+         fail("asserting resource permissions with null accessed resource should have failed");
       }
       catch (NullPointerException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("resource required"));
       }
       try {
+         accessControlContext.assertResourcePermissions(accessorResource, Resources.getInstance(null), customPermission);
+         fail("asserting resource permissions with null internal/external accessed ids should have failed");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("resource id and/or external id is required"));
+      }
+      try {
          accessControlContext.assertResourcePermissions(accessorResource, accessedResource, (ResourcePermission) null);
+         fail("asserting resource permissions with null permissions should have failed");
       }
       catch (NullPointerException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("resource permission required"));
       }
       try {
          accessControlContext.assertResourcePermissions(accessorResource, accessedResource, customPermission, null);
+         fail("asserting resource permissions with null vararg array should have failed");
       }
       catch (NullPointerException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("array or a sequence"));
       }
       try {
          accessControlContext.assertResourcePermissions(accessorResource, accessedResource, customPermission, new ResourcePermission[] {null});
+         fail("asserting resource permissions with null permission element should have failed");
       }
       catch (NullPointerException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("without null element"));
@@ -710,6 +755,7 @@ public class TestAccessControl_assertResourcePermissions extends TestAccessContr
                                                         customPermission,
                                                         customPermission2,
                                                         null);
+         fail("asserting resource permissions with null permission element should have failed");
       }
       catch (NullPointerException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("without null element"));
@@ -718,24 +764,42 @@ public class TestAccessControl_assertResourcePermissions extends TestAccessContr
       // test set-based versions
       try {
          accessControlContext.assertResourcePermissions(null, accessedResource, setOf(customPermission));
+         fail("asserting resource permissions with null accessor resource should have failed");
       }
       catch (NullPointerException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("resource required"));
+      }
+      try {
+         accessControlContext.assertResourcePermissions(Resources.getInstance(null), accessedResource, setOf(customPermission));
+         fail("asserting resource permissions with null internal/external accessor ids should have failed");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("resource id and/or external id is required"));
       }
       try {
          accessControlContext.assertResourcePermissions(accessorResource, (Resource) null, setOf(customPermission));
+         fail("asserting resource permissions with null accessed resource should have failed");
       }
       catch (NullPointerException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("resource required"));
       }
       try {
+         accessControlContext.assertResourcePermissions(accessorResource, Resources.getInstance(null), setOf(customPermission));
+         fail("asserting resource permissions with null internal/external accessed ids should have failed");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("resource id and/or external id is required"));
+      }
+      try {
          accessControlContext.assertResourcePermissions(accessorResource, accessedResource, (Set<ResourcePermission>) null);
+         fail("asserting resource permissions with null permission set  should have failed");
       }
       catch (NullPointerException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("permissions required"));
       }
       try {
          accessControlContext.assertResourcePermissions(accessorResource, accessedResource, setOf(customPermission, null));
+         fail("asserting resource permissions with null permission element should have failed");
       }
       catch (NullPointerException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("contains null element"));
@@ -765,6 +829,7 @@ public class TestAccessControl_assertResourcePermissions extends TestAccessContr
       // verify
       try {
          accessControlContext.assertResourcePermissions(accessorResource, accessedResource, Collections.<ResourcePermission>emptySet());
+         fail("asserting resource permissions with empty permission set should have failed");
       }
       catch (IllegalArgumentException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("permissions required"));
@@ -877,22 +942,55 @@ public class TestAccessControl_assertResourcePermissions extends TestAccessContr
 
       // verify
       final Resource invalidResource = Resources.getInstance(-999L);
+      final Resource invalidExternalResource = Resources.getInstance("invalid");
+      final Resource mismatchedResource = Resources.getInstance(-999L, "invalid");
       final ResourcePermission invalidPermission = ResourcePermissions.getInstance("invalid_permission");
 
       try {
          accessControlContext.assertResourcePermissions(invalidResource, accessedResource, customPermission);
+         fail("asserting resource permissions with invalid accessor resource reference should have failed");
       }
       catch (IllegalArgumentException e) {
          assertThat(e.getMessage().toLowerCase(), containsString(String.valueOf(invalidResource).toLowerCase() + " not found"));
       }
       try {
-         accessControlContext.assertResourcePermissions(accessorResource, invalidResource, customPermission);
+         accessControlContext.assertResourcePermissions(invalidExternalResource, accessedResource, customPermission);
+         fail("asserting resource permissions with invalid external accessor resource reference should have failed");
       }
       catch (IllegalArgumentException e) {
-         assertThat(e.getMessage().toLowerCase(), containsString("could not determine resource class for resource"));
+         assertThat(e.getMessage().toLowerCase(), containsString(String.valueOf(invalidExternalResource).toLowerCase() + " not found"));
+      }
+      try {
+         accessControlContext.assertResourcePermissions(mismatchedResource, accessedResource, customPermission);
+         fail("asserting resource permissions with mismatched internal/external accessor ids should have failed");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("not resolve"));
+      }
+      try {
+         accessControlContext.assertResourcePermissions(accessorResource, invalidResource, customPermission);
+         fail("asserting resource permissions with invalid accessed resource reference should have failed");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString(String.valueOf(invalidResource).toLowerCase() + " not found"));
+      }
+      try {
+         accessControlContext.assertResourcePermissions(accessorResource, invalidExternalResource, customPermission);
+         fail("asserting resource permissions with invalid external accessed resource reference should have failed");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString(String.valueOf(invalidExternalResource).toLowerCase() + " not found"));
+      }
+      try {
+         accessControlContext.assertResourcePermissions(accessorResource, mismatchedResource, customPermission);
+         fail("asserting resource permissions with mismatched internal/external accessed ids should have failed");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("not resolve"));
       }
       try {
          accessControlContext.assertResourcePermissions(accessorResource, accessedResource, invalidPermission);
+         fail("asserting resource permissions with invalid permission should have failed");
       }
       catch (IllegalArgumentException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("is not defined for resource class"));
@@ -902,6 +1000,7 @@ public class TestAccessControl_assertResourcePermissions extends TestAccessContr
                                                         accessedResource,
                                                         customPermission,
                                                         invalidPermission);
+         fail("asserting resource permissions with invalid permission element should have failed");
       }
       catch (IllegalArgumentException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("is not defined for resource class"));
@@ -910,18 +1009,49 @@ public class TestAccessControl_assertResourcePermissions extends TestAccessContr
       // test set-based versions
       try {
          accessControlContext.assertResourcePermissions(invalidResource, accessedResource, setOf(customPermission));
+         fail("asserting resource permissions with invalid accessor resource reference should have failed");
       }
       catch (IllegalArgumentException e) {
          assertThat(e.getMessage().toLowerCase(), containsString(String.valueOf(invalidResource).toLowerCase() + " not found"));
       }
       try {
-         accessControlContext.assertResourcePermissions(accessorResource, invalidResource, setOf(customPermission));
+         accessControlContext.assertResourcePermissions(invalidExternalResource, accessedResource, setOf(customPermission));
+         fail("asserting resource permissions with invalid external accessor resource reference should have failed");
       }
       catch (IllegalArgumentException e) {
-         assertThat(e.getMessage().toLowerCase(), containsString("could not determine resource class for resource"));
+         assertThat(e.getMessage().toLowerCase(), containsString(String.valueOf(invalidExternalResource).toLowerCase() + " not found"));
+      }
+      try {
+         accessControlContext.assertResourcePermissions(mismatchedResource, accessedResource, setOf(customPermission));
+         fail("asserting resource permissions with mismatched internal/external accessor ids should have failed");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("not resolve"));
+      }
+      try {
+         accessControlContext.assertResourcePermissions(accessorResource, invalidResource, setOf(customPermission));
+         fail("asserting resource permissions with invalid accessed resource reference should have failed");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString(String.valueOf(invalidResource).toLowerCase() + " not found"));
+      }
+      try {
+         accessControlContext.assertResourcePermissions(accessorResource, invalidExternalResource, customPermission);
+         fail("asserting resource permissions with invalid external accessed resource reference should have failed");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString(String.valueOf(invalidExternalResource).toLowerCase() + " not found"));
+      }
+      try {
+         accessControlContext.assertResourcePermissions(accessorResource, mismatchedResource, customPermission);
+         fail("asserting resource permissions with mismatched internal/external accessed ids should have failed");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("not resolve"));
       }
       try {
          accessControlContext.assertResourcePermissions(accessorResource, accessedResource, setOf(invalidPermission));
+         fail("asserting resource permissions with invalid permission element should have failed");
       }
       catch (IllegalArgumentException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("is not defined for resource class"));
@@ -930,6 +1060,7 @@ public class TestAccessControl_assertResourcePermissions extends TestAccessContr
          accessControlContext.assertResourcePermissions(accessorResource,
                                                         accessedResource,
                                                         setOf(customPermission, invalidPermission));
+         fail("asserting resource permissions with invalid permission element should have failed");
       }
       catch (IllegalArgumentException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("is not defined for resource class"));

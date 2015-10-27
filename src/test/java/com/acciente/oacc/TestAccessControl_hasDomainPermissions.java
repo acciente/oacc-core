@@ -287,6 +287,40 @@ public class TestAccessControl_hasDomainPermissions extends TestAccessControlBas
    }
 
    @Test
+   public void hasDomainPermissions_withExtId() {
+      authenticateSystemResource();
+      final DomainPermission domPerm_superuser
+            = DomainPermissions.getInstance(DomainPermissions.SUPER_USER);
+      final DomainPermission domPerm_child
+            = DomainPermissions.getInstance(DomainPermissions.CREATE_CHILD_DOMAIN);
+      final DomainPermission domPerm_child_withGrant
+            = DomainPermissions.getInstance(DomainPermissions.CREATE_CHILD_DOMAIN, true);
+
+      final String domainName1 = generateDomain();
+      final String domainName2 = generateDomain();
+
+      // set domain permissions
+      final String externalId = generateUniqueExternalId();
+      Resource accessorResource = generateUnauthenticatableResourceWithExtId(externalId);
+      Set<DomainPermission> domainPermissions_pre1 = setOf(domPerm_superuser, domPerm_child);
+      accessControlContext.setDomainPermissions(accessorResource, domainName1, domainPermissions_pre1);
+
+      // get domain create permissions and verify
+      final Map<String,Set<DomainPermission>> allDomainPermissions
+            = accessControlContext.getDomainPermissionsMap(accessorResource);
+      assertThat(allDomainPermissions.size(), is(1));
+      assertThat(allDomainPermissions.get(domainName1), is(domainPermissions_pre1));
+
+      if (!accessControlContext.hasDomainPermissions(Resources.getInstance(externalId), domainName1, domPerm_superuser, domPerm_child)) {
+         fail("checking valid domain permission for system resource should have succeeded");
+      }
+
+      if (!accessControlContext.hasDomainPermissions(Resources.getInstance(externalId), domainName1, setOf(domPerm_child, domPerm_superuser))) {
+         fail("checking valid domain permission for system resource should have succeeded");
+      }
+   }
+
+   @Test
    public void hasDomainPermissions_partiallyValidAsSystemResource() {
       authenticateSystemResource();
       final DomainPermission domPerm_superuser
@@ -816,6 +850,13 @@ public class TestAccessControl_hasDomainPermissions extends TestAccessControlBas
       catch (NullPointerException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("resource required"));
       }
+      try {
+         accessControlContext.hasDomainPermissions(Resources.getInstance(null), domainName, domPerm_superUser);
+         fail("checking domain permissions with null internal/external resource references should have failed");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("resource id and/or external id is required"));
+      }
 
       try {
          accessControlContext.hasDomainPermissions(accessorResource, (String) null, domPerm_superUser);
@@ -866,6 +907,13 @@ public class TestAccessControl_hasDomainPermissions extends TestAccessControlBas
       }
       catch (NullPointerException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("resource required"));
+      }
+      try {
+         accessControlContext.hasDomainPermissions(Resources.getInstance(null), domainName, setOf(domPerm_superUser));
+         fail("checking domain permissions with null internal/external resource references should have failed");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("resource id and/or external id is required"));
       }
 
       try {
@@ -992,20 +1040,50 @@ public class TestAccessControl_hasDomainPermissions extends TestAccessControlBas
       final String domainName = generateDomain();
       final DomainPermission domPerm_superUser = DomainPermissions.getInstance(DomainPermissions.SUPER_USER);
       final Resource invalidResource = Resources.getInstance(-999L);
+      final Resource invalidExternalResource = Resources.getInstance("invalid");
+      final Resource mismatchedResource = Resources.getInstance(-999L, "invalid");
 
       try {
          accessControlContext.hasDomainPermissions(invalidResource, domainName, domPerm_superUser);
-         fail("checking domain permissions with invalid domain name should have failed");
+         fail("checking domain permissions with invalid accessor resource should have failed");
       }
       catch (IllegalArgumentException e) {
          assertThat(e.getMessage().toLowerCase(), containsString(String.valueOf(invalidResource).toLowerCase() + " not found"));
       }
       try {
          accessControlContext.hasDomainPermissions(invalidResource, domainName, setOf(domPerm_superUser));
-         fail("checking domain permissions with invalid domain name should have failed");
+         fail("checking domain permissions with invalid accessor resource should have failed");
       }
       catch (IllegalArgumentException e) {
          assertThat(e.getMessage().toLowerCase(), containsString(String.valueOf(invalidResource).toLowerCase() + " not found"));
+      }
+      try {
+         accessControlContext.hasDomainPermissions(invalidExternalResource, domainName, domPerm_superUser);
+         fail("checking domain permissions with invalid external accessor resource should have failed");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString(String.valueOf(invalidExternalResource).toLowerCase() + " not found"));
+      }
+      try {
+         accessControlContext.hasDomainPermissions(invalidExternalResource, domainName, setOf(domPerm_superUser));
+         fail("checking domain permissions with invalid external accessor resource should have failed");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString(String.valueOf(invalidExternalResource).toLowerCase() + " not found"));
+      }
+      try {
+         accessControlContext.hasDomainPermissions(mismatchedResource, domainName, domPerm_superUser);
+         fail("checking domain permissions with mismatched internal/external resource ids should have failed");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("not resolve"));
+      }
+      try {
+         accessControlContext.hasDomainPermissions(mismatchedResource, domainName, setOf(domPerm_superUser));
+         fail("checking domain permissions with mismatched internal/external resource ids should have failed");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("not resolve"));
       }
 
       try {

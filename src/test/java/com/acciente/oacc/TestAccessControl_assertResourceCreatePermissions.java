@@ -444,6 +444,49 @@ public class TestAccessControl_assertResourceCreatePermissions extends TestAcces
    }
 
    @Test
+   public void assertResourceCreatePermissions_direct_withExtId() {
+      authenticateSystemResource();
+
+      final String externalId = generateUniqueExternalId();
+      final Resource accessorResource = generateUnauthenticatableResourceWithExtId(externalId);
+      final String accessorDomainName = accessControlContext.getDomainNameByResource(accessorResource);
+      final String resourceClassName = generateResourceClass(false, false);
+
+      // setup create permissions
+      final String customPermissionName_accessorDomain = generateResourceClassPermission(resourceClassName);
+      final ResourcePermission customPermission_forAccessorDomain
+            = ResourcePermissions.getInstance(customPermissionName_accessorDomain);
+      final ResourceCreatePermission customCreatePermission_accessorDomain_withGrant
+            = ResourceCreatePermissions.getInstance(customPermission_forAccessorDomain, true);
+      final ResourceCreatePermission createPermission_withGrant
+            = ResourceCreatePermissions.getInstance(ResourceCreatePermissions.CREATE, true);
+
+      grantResourceCreatePermission(accessorResource,
+                                    resourceClassName,
+                                    accessorDomainName,
+                                    createPermission_withGrant,
+                                    customCreatePermission_accessorDomain_withGrant);
+
+      // verify permissions
+      final Set<ResourceCreatePermission> allResourceCreatePermissionsForAccessorDomain
+            = accessControlContext.getEffectiveResourceCreatePermissions(accessorResource, resourceClassName, accessorDomainName);
+      assertThat(allResourceCreatePermissionsForAccessorDomain,
+                 is(setOf(createPermission_withGrant, customCreatePermission_accessorDomain_withGrant)));
+
+      // verify
+      accessControlContext
+            .assertResourceCreatePermissions(Resources.getInstance(externalId),
+                                             resourceClassName,
+                                             accessorDomainName,
+                                             customCreatePermission_accessorDomain_withGrant);
+      accessControlContext
+            .assertResourceCreatePermissions(Resources.getInstance(externalId),
+                                             resourceClassName,
+                                             accessorDomainName,
+                                             setOf(customCreatePermission_accessorDomain_withGrant));
+   }
+
+   @Test
    public void assertResourceCreatePermissions_partialDirect_shouldFailAsAuthenticatedResource() {
       authenticateSystemResource();
 
@@ -1479,6 +1522,18 @@ public class TestAccessControl_assertResourceCreatePermissions extends TestAcces
       }
       try {
          accessControlContext
+               .assertResourceCreatePermissions(Resources.getInstance(null),
+                                                resourceClassName,
+                                                domainName,
+                                                ResourceCreatePermissions
+                                                      .getInstance(ResourcePermissions.getInstance(customPermissionName)));
+         fail("asserting resource create permission (by domain) for null internal/external resource references should have failed for system resource");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("resource id and/or external id is required"));
+      }
+      try {
+         accessControlContext
                .assertResourceCreatePermissions(SYS_RESOURCE,
                                                 null,
                                                 domainName,
@@ -1567,6 +1622,19 @@ public class TestAccessControl_assertResourceCreatePermissions extends TestAcces
       }
       catch (NullPointerException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("resource required"));
+      }
+      try {
+         accessControlContext
+               .assertResourceCreatePermissions(Resources.getInstance(null),
+                                                resourceClassName,
+                                                domainName,
+                                                setOf(ResourceCreatePermissions
+                                                            .getInstance(ResourcePermissions
+                                                                               .getInstance(customPermissionName))));
+         fail("asserting resource create permission (by domain) for null internal/external resource references should have failed for system resource");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("resource id and/or external id is required"));
       }
       try {
          accessControlContext
@@ -1719,6 +1787,8 @@ public class TestAccessControl_assertResourceCreatePermissions extends TestAcces
       final String customPermissionName = generateResourceClassPermission(resourceClassName);
 
       final Resource invalidResource = Resources.getInstance(-999L);
+      final Resource invalidExternalResource = Resources.getInstance("invalid");
+      final Resource mismatchedResource = Resources.getInstance(-999L, "invalid");
       final String domainName = generateDomain();
 
       try {
@@ -1731,6 +1801,28 @@ public class TestAccessControl_assertResourceCreatePermissions extends TestAcces
       }
       catch (IllegalArgumentException e) {
          assertThat(e.getMessage().toLowerCase(), containsString(String.valueOf(invalidResource).toLowerCase() + " not found"));
+      }
+      try {
+         accessControlContext
+               .assertResourceCreatePermissions(invalidExternalResource,
+                                                resourceClassName,
+                                                domainName,
+                                                ResourceCreatePermissions.getInstance(ResourcePermissions.getInstance(customPermissionName)));
+         fail("asserting resource create permission (by domain) for invalid accessor resource reference should have failed for system resource");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString(String.valueOf(invalidExternalResource).toLowerCase() + " not found"));
+      }
+      try {
+         accessControlContext
+               .assertResourceCreatePermissions(mismatchedResource,
+                                                resourceClassName,
+                                                domainName,
+                                                ResourceCreatePermissions.getInstance(ResourcePermissions.getInstance(customPermissionName)));
+         fail("asserting resource create permission (by domain) for mismatched internal/external resource references should have failed for system resource");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("not resolve"));
       }
 
       try {
@@ -1794,6 +1886,32 @@ public class TestAccessControl_assertResourceCreatePermissions extends TestAcces
       }
       catch (IllegalArgumentException e) {
          assertThat(e.getMessage().toLowerCase(), containsString(String.valueOf(invalidResource).toLowerCase() + " not found"));
+      }
+      try {
+         accessControlContext
+               .assertResourceCreatePermissions(invalidExternalResource,
+                                                resourceClassName,
+                                                domainName,
+                                                setOf(ResourceCreatePermissions
+                                                            .getInstance(ResourcePermissions
+                                                                               .getInstance(customPermissionName))));
+         fail("asserting resource create permission (by domain) for invalid accessor resource reference should have failed for system resource");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString(String.valueOf(invalidExternalResource).toLowerCase() + " not found"));
+      }
+      try {
+         accessControlContext
+               .assertResourceCreatePermissions(mismatchedResource,
+                                                resourceClassName,
+                                                domainName,
+                                                setOf(ResourceCreatePermissions
+                                                            .getInstance(ResourcePermissions
+                                                                               .getInstance(customPermissionName))));
+         fail("asserting resource create permission (by domain) for mismatched internal/external resource references should have failed for system resource");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("not resolve"));
       }
 
       try {

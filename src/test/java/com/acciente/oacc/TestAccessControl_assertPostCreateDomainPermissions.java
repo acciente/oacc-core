@@ -259,6 +259,24 @@ public class TestAccessControl_assertPostCreateDomainPermissions extends TestAcc
    }
 
    @Test
+   public void assertPostCreateDomainPermissions_direct_withExtId() {
+      authenticateSystemResource();
+
+      final String externalId = generateUniqueExternalId();
+      final Resource accessorResource = generateUnauthenticatableResourceWithExtId(externalId);
+
+      // setup create permissions
+      grantDomainAndChildCreatePermission(accessorResource);
+
+      // verify
+      accessControlContext.assertPostCreateDomainPermissions(Resources.getInstance(externalId),
+                                                             DomainPermissions.getInstance(DomainPermissions.CREATE_CHILD_DOMAIN));
+
+      accessControlContext.assertPostCreateDomainPermissions(Resources.getInstance(externalId),
+                                                             setOf(DomainPermissions.getInstance(DomainPermissions.CREATE_CHILD_DOMAIN)));
+   }
+
+   @Test
    public void assertPostCreateDomainPermissions_partialDirect_shouldFailAsAuthenticatedResource() {
       authenticateSystemResource();
 
@@ -718,6 +736,13 @@ public class TestAccessControl_assertPostCreateDomainPermissions extends TestAcc
          assertThat(e.getMessage().toLowerCase(), containsString("resource required"));
       }
       try {
+         accessControlContext.assertPostCreateDomainPermissions(Resources.getInstance(null), domainPermission);
+         fail("asserting post-create domain permission with null internal/external resource ids should have failed");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("resource id and/or external id is required"));
+      }
+      try {
          accessControlContext.assertPostCreateDomainPermissions(accessorResource, (DomainPermission) null);
          fail("asserting post-create domain permission with null permission should have failed");
       }
@@ -756,6 +781,13 @@ public class TestAccessControl_assertPostCreateDomainPermissions extends TestAcc
       }
       catch (NullPointerException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("resource required"));
+      }
+      try {
+         accessControlContext.assertPostCreateDomainPermissions(Resources.getInstance(null), setOf(domainPermission));
+         fail("asserting post-create domain permission with null internal/external resource ids should have failed");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("resource id and/or external id is required"));
       }
       try {
          accessControlContext.assertPostCreateDomainPermissions(accessorResource, (Set<DomainPermission>) null);
@@ -837,6 +869,8 @@ public class TestAccessControl_assertPostCreateDomainPermissions extends TestAcc
       authenticateSystemResource();
 
       final Resource invalidResource = Resources.getInstance(-999L);
+      final Resource invalidExternalResource = Resources.getInstance("invalid");
+      final Resource mismatchedResource = Resources.getInstance(-999L, "invalid");
       final DomainPermission domainPermission = DomainPermissions.getInstance(DomainPermissions.CREATE_CHILD_DOMAIN);
 
       try {
@@ -847,11 +881,40 @@ public class TestAccessControl_assertPostCreateDomainPermissions extends TestAcc
          assertThat(e.getMessage().toLowerCase(), containsString(String.valueOf(invalidResource).toLowerCase() + " not found"));
       }
       try {
+         accessControlContext.assertPostCreateDomainPermissions(invalidExternalResource, domainPermission);
+         fail("asserting post-create domain permission with invalid external accessor resource should have failed");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString(String.valueOf(invalidExternalResource).toLowerCase() + " not found"));
+      }
+      try {
+         accessControlContext.assertPostCreateDomainPermissions(mismatchedResource, domainPermission);
+         fail("asserting post-create domain permission with mismatched internal/external resource ids should have failed");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("not resolve"));
+      }
+
+      try {
          accessControlContext.assertPostCreateDomainPermissions(invalidResource, setOf(domainPermission));
          fail("asserting post-create domain permission with invalid accessor resource should have failed");
       }
       catch (IllegalArgumentException e) {
          assertThat(e.getMessage().toLowerCase(), containsString(String.valueOf(invalidResource).toLowerCase() + " not found"));
+      }
+      try {
+         accessControlContext.assertPostCreateDomainPermissions(invalidExternalResource, setOf(domainPermission));
+         fail("asserting post-create domain permission with invalid external accessor resource should have failed");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString(String.valueOf(invalidExternalResource).toLowerCase() + " not found"));
+      }
+      try {
+         accessControlContext.assertPostCreateDomainPermissions(mismatchedResource, setOf(domainPermission));
+         fail("asserting post-create domain permission with mismatched internal/external resource ids should have failed");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("not resolve"));
       }
    }
 }

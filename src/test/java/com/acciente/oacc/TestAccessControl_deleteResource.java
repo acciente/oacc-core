@@ -81,7 +81,7 @@ public class TestAccessControl_deleteResource extends TestAccessControlBase {
          fail("asserting permission on resource after deletion should have failed");
       }
       catch (IllegalArgumentException e) {
-         assertThat(e.getMessage().toLowerCase(), containsString("could not determine resource class for resource"));
+         assertThat(e.getMessage().toLowerCase(), containsString("not found"));
       }
    }
 
@@ -192,7 +192,7 @@ public class TestAccessControl_deleteResource extends TestAccessControlBase {
          fail("asserting permission on resource after deletion should have failed");
       }
       catch (IllegalArgumentException e) {
-         assertThat(e.getMessage().toLowerCase(), containsString("could not determine resource class for resource"));
+         assertThat(e.getMessage().toLowerCase(), containsString("not found"));
       }
    }
 
@@ -296,7 +296,7 @@ public class TestAccessControl_deleteResource extends TestAccessControlBase {
          fail("asserting permission on resource after deletion should have failed");
       }
       catch (IllegalArgumentException e) {
-         assertThat(e.getMessage().toLowerCase(), containsString("could not determine resource class for resource"));
+         assertThat(e.getMessage().toLowerCase(), containsString("not found"));
       }
    }
 
@@ -370,7 +370,7 @@ public class TestAccessControl_deleteResource extends TestAccessControlBase {
          fail("asserting permission on resource after deletion should have failed");
       }
       catch (IllegalArgumentException e) {
-         assertThat(e.getMessage().toLowerCase(), containsString("could not determine resource class for resource"));
+         assertThat(e.getMessage().toLowerCase(), containsString("not found"));
       }
    }
 
@@ -469,7 +469,7 @@ public class TestAccessControl_deleteResource extends TestAccessControlBase {
          fail("asserting permission for resource after deletion should have failed");
       }
       catch (IllegalArgumentException e) {
-         assertThat(e.getMessage().toLowerCase(), containsString("could not determine resource class for resource"));
+         assertThat(e.getMessage().toLowerCase(), containsString("not found"));
       }
       try {
          accessControlContext.assertResourcePermissions(obsoleteResource,
