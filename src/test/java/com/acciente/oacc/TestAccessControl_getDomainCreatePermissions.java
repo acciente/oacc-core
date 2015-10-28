@@ -73,6 +73,32 @@ public class TestAccessControl_getDomainCreatePermissions extends TestAccessCont
    }
 
    @Test
+   public void getDomainCreatePermissions_withExtId() {
+      authenticateSystemResource();
+      final DomainCreatePermission domCreatePerm_superuser
+            = DomainCreatePermissions.getInstance(DomainPermissions.getInstance(DomainPermissions.SUPER_USER));
+      final DomainCreatePermission domCreatePerm_create_withGrant
+            = DomainCreatePermissions.getInstance(DomainCreatePermissions.CREATE, true);
+      final DomainCreatePermission domCreatePerm_child
+            = DomainCreatePermissions.getInstance(DomainPermissions.getInstance(DomainPermissions.CREATE_CHILD_DOMAIN),
+                                                  false);
+
+      // set domain create permissions
+      final String externalId = generateUniqueExternalId();
+      Resource accessorResource = generateUnauthenticatableResourceWithExtId(externalId);
+      Set<DomainCreatePermission> domainCreatePermissions_pre = new HashSet();
+      domainCreatePermissions_pre.add(domCreatePerm_superuser);
+      domainCreatePermissions_pre.add(domCreatePerm_create_withGrant);
+      domainCreatePermissions_pre.add(domCreatePerm_child);
+      accessControlContext.setDomainCreatePermissions(accessorResource, domainCreatePermissions_pre);
+
+      // get domain create permissions and verify
+      final Set<DomainCreatePermission> domainCreatePermissions_post
+            = accessControlContext.getDomainCreatePermissions(Resources.getInstance(externalId));
+      assertThat(domainCreatePermissions_post, is(domainCreatePermissions_pre));
+   }
+
+   @Test
    public void getDomainCreatePermissions_withoutQueryAuthorization_shouldFailAsAuthenticated() {
       authenticateSystemResource();
       final DomainCreatePermission domCreatePerm_superuser
@@ -260,6 +286,13 @@ public class TestAccessControl_getDomainCreatePermissions extends TestAccessCont
       catch (NullPointerException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("resource required"));
       }
+      try {
+         accessControlContext.getDomainCreatePermissions(Resources.getInstance(null));
+         fail("getting domain create permissions for null internal/external resource ids should have failed");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("resource id and/or external id is required"));
+      }
    }
 
    @Test
@@ -267,12 +300,29 @@ public class TestAccessControl_getDomainCreatePermissions extends TestAccessCont
       authenticateSystemResource();
 
       final Resource invalidResource = Resources.getInstance(-999L);
+      final Resource invalidExternalResource = Resources.getInstance("invalid");
+      final Resource mismatchedResource = Resources.getInstance(-999L, "invalid");
+
       try {
          accessControlContext.getDomainCreatePermissions(invalidResource);
          fail("getting domain create permissions with invalid resource reference should have failed");
       }
       catch (IllegalArgumentException e) {
          assertThat(e.getMessage().toLowerCase(), containsString(String.valueOf(invalidResource).toLowerCase() + " not found"));
+      }
+      try {
+         accessControlContext.getDomainCreatePermissions(invalidExternalResource);
+         fail("getting domain create permissions with invalid external resource reference should have failed");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString(String.valueOf(invalidExternalResource).toLowerCase() + " not found"));
+      }
+      try {
+         accessControlContext.getDomainCreatePermissions(mismatchedResource);
+         fail("getting domain create permissions with mismatched internal/external resource references should have failed");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("not resolve"));
       }
    }
 }

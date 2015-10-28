@@ -73,6 +73,32 @@ public class TestAccessControl_getEffectiveDomainCreatePermissions extends TestA
    }
 
    @Test
+   public void getEffectiveDomainCreatePermissions_withExtId() {
+      authenticateSystemResource();
+      final DomainCreatePermission domCreatePerm_superuser
+            = DomainCreatePermissions.getInstance(DomainPermissions.getInstance(DomainPermissions.SUPER_USER));
+      final DomainCreatePermission domCreatePerm_create_withGrant
+            = DomainCreatePermissions.getInstance(DomainCreatePermissions.CREATE, true);
+      final DomainCreatePermission domCreatePerm_child
+            = DomainCreatePermissions.getInstance(DomainPermissions.getInstance(DomainPermissions.CREATE_CHILD_DOMAIN),
+                                                  false);
+
+      // set domain create permissions
+      final String externalId = generateUniqueExternalId();
+      Resource accessorResource = generateUnauthenticatableResourceWithExtId(externalId);
+      Set<DomainCreatePermission> domainCreatePermissions_pre = new HashSet();
+      domainCreatePermissions_pre.add(domCreatePerm_superuser);
+      domainCreatePermissions_pre.add(domCreatePerm_create_withGrant);
+      domainCreatePermissions_pre.add(domCreatePerm_child);
+      accessControlContext.setDomainCreatePermissions(accessorResource, domainCreatePermissions_pre);
+
+      // get domain create permissions and verify
+      final Set<DomainCreatePermission> domainCreatePermissions_post
+            = accessControlContext.getEffectiveDomainCreatePermissions(Resources.getInstance(externalId));
+      assertThat(domainCreatePermissions_post, is(domainCreatePermissions_pre));
+   }
+
+   @Test
    public void getEffectiveDomainCreatePermissions_inheritSysPermissionWithDifferentGrantingRights_shouldSucceedAsAuthorized() {
       authenticateSystemResource();
       final char[] password = generateUniquePassword();
@@ -464,9 +490,17 @@ public class TestAccessControl_getEffectiveDomainCreatePermissions extends TestA
 
       try {
          accessControlContext.getEffectiveDomainCreatePermissions(null);
+         fail("getting effective domain create permissions with null accessor resource reference should have failed");
       }
       catch (NullPointerException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("resource required"));
+      }
+      try {
+         accessControlContext.getEffectiveDomainCreatePermissions(Resources.getInstance(null));
+         fail("getting effective domain create permissions with null internal/external resource ids should have failed");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("resource id and/or external id is required"));
       }
    }
 
@@ -475,12 +509,29 @@ public class TestAccessControl_getEffectiveDomainCreatePermissions extends TestA
       authenticateSystemResource();
 
       final Resource invalidResource = Resources.getInstance(-999L);
+      final Resource invalidExternalResource = Resources.getInstance("invalid");
+      final Resource mismatchedResource = Resources.getInstance(-999L, "invalid");
+
       try {
          accessControlContext.getEffectiveDomainCreatePermissions(invalidResource);
          fail("getting effective domain create permissions with invalid resource reference should have failed");
       }
       catch (IllegalArgumentException e) {
          assertThat(e.getMessage().toLowerCase(), containsString(String.valueOf(invalidResource).toLowerCase() + " not found"));
+      }
+      try {
+         accessControlContext.getEffectiveDomainCreatePermissions(invalidExternalResource);
+         fail("getting effective domain create permissions with invalid external resource reference should have failed");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString(String.valueOf(invalidExternalResource).toLowerCase() + " not found"));
+      }
+      try {
+         accessControlContext.getEffectiveDomainCreatePermissions(mismatchedResource);
+         fail("getting effective domain create permissions with mismatched internal/external resource references should have failed");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("not resolve"));
       }
    }
 }

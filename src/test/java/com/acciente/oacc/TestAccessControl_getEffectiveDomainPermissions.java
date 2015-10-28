@@ -114,6 +114,36 @@ public class TestAccessControl_getEffectiveDomainPermissions extends TestAccessC
    }
 
    @Test
+   public void getEffectiveDomainPermissions_withExtId() {
+      authenticateSystemResource();
+      final DomainPermission domCreatePerm_child
+            = DomainPermissions.getInstance(DomainPermissions.CREATE_CHILD_DOMAIN);
+      final DomainPermission domCreatePerm_child_withGrant
+            = DomainPermissions.getInstance(DomainPermissions.CREATE_CHILD_DOMAIN, true);
+
+      final String domainName1 = generateDomain();
+      final String domainName2 = generateDomain();
+      final String sysDomainName = accessControlContext.getDomainNameByResource(SYS_RESOURCE);
+
+      // set domain create permissions
+      final String externalId = generateUniqueExternalId();
+      Resource accessorResource = generateUnauthenticatableResourceWithExtId(externalId);
+      Set<DomainPermission> domainPermissions_pre1 = new HashSet<>();
+      domainPermissions_pre1.add(domCreatePerm_child);
+      accessControlContext.setDomainPermissions(accessorResource, domainName1, domainPermissions_pre1);
+
+      // get domain create permissions and verify
+      final Map<String,Set<DomainPermission>> allDomainPermissions
+            = accessControlContext.getEffectiveDomainPermissionsMap(Resources.getInstance(externalId));
+      assertThat(allDomainPermissions.size(), is(1));
+      assertThat(allDomainPermissions.get(domainName1), is(domainPermissions_pre1));
+
+      final Set<DomainPermission> domainPermissions_post
+            = accessControlContext.getEffectiveDomainPermissions(Resources.getInstance(externalId), domainName1);
+      assertThat(domainPermissions_post, is(domainPermissions_pre1));
+   }
+
+   @Test
    public void getEffectiveDomainPermissions_validWithInheritFromParentDomain() {
       authenticateSystemResource();
       final DomainPermission domPerm_createchilddomain
@@ -483,13 +513,28 @@ public class TestAccessControl_getEffectiveDomainPermissions extends TestAccessC
       catch (NullPointerException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("resource required"));
       }
-
       try {
-         accessControlContext.getEffectiveDomainPermissions(null, generateDomain());
+         accessControlContext.getEffectiveDomainPermissionsMap(Resources.getInstance(null));
+         fail("getting effective domain permissions map with null internal/external resource references should have failed");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("resource id and/or external id is required"));
+      }
+
+      final String domainName = generateDomain();
+      try {
+         accessControlContext.getEffectiveDomainPermissions(null, domainName);
          fail("getting effective domain permissions with null accessor resource reference should have failed");
       }
       catch (NullPointerException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("resource required"));
+      }
+      try {
+         accessControlContext.getEffectiveDomainPermissions(Resources.getInstance(null), domainName);
+         fail("getting effective domain permissions map with null internal/external resource references should have failed");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("resource id and/or external id is required"));
       }
 
       try {
@@ -509,6 +554,8 @@ public class TestAccessControl_getEffectiveDomainPermissions extends TestAccessC
 
       final String domainName = generateDomain();
       final Resource invalidResource = Resources.getInstance(-999L);
+      final Resource invalidExternalResource = Resources.getInstance("invalid");
+      final Resource mismatchedResource = Resources.getInstance(-999L, "invalid");
 
       try {
          accessControlContext.getEffectiveDomainPermissions(invalidResource, domainName);
@@ -516,6 +563,20 @@ public class TestAccessControl_getEffectiveDomainPermissions extends TestAccessC
       }
       catch (IllegalArgumentException e) {
          assertThat(e.getMessage().toLowerCase(), containsString(String.valueOf(invalidResource).toLowerCase() + " not found"));
+      }
+      try {
+         accessControlContext.getEffectiveDomainPermissions(invalidExternalResource, domainName);
+         fail("getting effective domain permissions with invalid external resource reference should have failed");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString(String.valueOf(invalidExternalResource).toLowerCase() + " not found"));
+      }
+      try {
+         accessControlContext.getEffectiveDomainPermissions(mismatchedResource, domainName);
+         fail("getting effective domain permissions with mismatched internal/external resource references should have failed");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("not resolve"));
       }
 
       try {
@@ -533,6 +594,20 @@ public class TestAccessControl_getEffectiveDomainPermissions extends TestAccessC
       }
       catch (IllegalArgumentException e) {
          assertThat(e.getMessage().toLowerCase(), containsString(String.valueOf(invalidResource).toLowerCase() + " not found"));
+      }
+      try {
+         accessControlContext.getEffectiveDomainPermissionsMap(invalidExternalResource);
+         fail("getting effective domain permissions with invalid external resource reference should have failed");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString(String.valueOf(invalidExternalResource).toLowerCase() + " not found"));
+      }
+      try {
+         accessControlContext.getEffectiveDomainPermissionsMap(mismatchedResource);
+         fail("getting effective domain permissions with mismatched internal/external resource references should have failed");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("not resolve"));
       }
 
    }

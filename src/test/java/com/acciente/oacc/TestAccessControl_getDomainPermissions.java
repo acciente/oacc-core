@@ -71,12 +71,12 @@ public class TestAccessControl_getDomainPermissions extends TestAccessControlBas
       final String domainName2 = generateDomain();
       final String sysDomainName = accessControlContext.getDomainNameByResource(SYS_RESOURCE);
 
-      // set domain create permissions
+      // set domain permissions
       Resource accessorResource = generateUnauthenticatableResource();
       Set<DomainPermission> domainPermissions_pre1 = setOf(domCreatePerm_superuser, domCreatePerm_child);
       accessControlContext.setDomainPermissions(accessorResource, domainName1, domainPermissions_pre1);
 
-      // get domain create permissions and verify
+      // get domain permissions and verify
       final Map<String,Set<DomainPermission>> allDomainPermissions = accessControlContext.getDomainPermissionsMap(accessorResource);
       assertThat(allDomainPermissions.size(), is(1));
       assertThat(allDomainPermissions.get(domainName1), is(domainPermissions_pre1));
@@ -88,7 +88,7 @@ public class TestAccessControl_getDomainPermissions extends TestAccessControlBas
       Set<DomainPermission> domainPermissions_pre2 = setOf(domCreatePerm_child_withGrant);
       accessControlContext.setDomainPermissions(accessorResource, domainName2, domainPermissions_pre2);
 
-      // get domain create permissions and verify
+      // get domain permissions and verify
       final Map<String,Set<DomainPermission>> allDomainPermissions2 = accessControlContext.getDomainPermissionsMap(accessorResource);
       assertThat(allDomainPermissions2.size(), is(2));
       assertThat(allDomainPermissions2.get(domainName1), is(domainPermissions_pre1));
@@ -101,7 +101,7 @@ public class TestAccessControl_getDomainPermissions extends TestAccessControlBas
       Set<DomainPermission> domainPermissions_pre3 = setOf(domCreatePerm_child_withGrant);
       accessControlContext.setDomainPermissions(accessorResource, sysDomainName, domainPermissions_pre3);
 
-      // get domain create permissions and verify
+      // get domain permissions and verify
       final Map<String,Set<DomainPermission>> allDomainPermissions3 = accessControlContext.getDomainPermissionsMap(accessorResource);
       assertThat(allDomainPermissions3.size(), is(3));
       assertThat(allDomainPermissions3.get(domainName1), is(domainPermissions_pre1));
@@ -110,6 +110,33 @@ public class TestAccessControl_getDomainPermissions extends TestAccessControlBas
 
       final Set<DomainPermission> domainPermissions_post3 = accessControlContext.getDomainPermissions(accessorResource, sysDomainName);
       assertThat(domainPermissions_post3, is(domainPermissions_pre3));
+   }
+
+   @Test
+   public void getDomainPermissions_withExtId() {
+      authenticateSystemResource();
+      final DomainPermission domCreatePerm_superuser
+            = DomainPermissions.getInstance(DomainPermissions.SUPER_USER);
+      final DomainPermission domCreatePerm_child
+            = DomainPermissions.getInstance(DomainPermissions.CREATE_CHILD_DOMAIN);
+
+      final String domainName1 = generateDomain();
+
+      // set domain permissions
+      final String externalId = generateUniqueExternalId();
+      Resource accessorResource = generateUnauthenticatableResourceWithExtId(externalId);
+      Set<DomainPermission> domainPermissions_pre1 = setOf(domCreatePerm_superuser, domCreatePerm_child);
+      accessControlContext.setDomainPermissions(accessorResource, domainName1, domainPermissions_pre1);
+
+      // get domain permissions and verify
+      final Map<String,Set<DomainPermission>> allDomainPermissions 
+            = accessControlContext.getDomainPermissionsMap(Resources.getInstance(externalId));
+      assertThat(allDomainPermissions.size(), is(1));
+      assertThat(allDomainPermissions.get(domainName1), is(domainPermissions_pre1));
+
+      final Set<DomainPermission> domainPermissions_post 
+            = accessControlContext.getDomainPermissions(Resources.getInstance(externalId), domainName1);
+      assertThat(domainPermissions_post, is(domainPermissions_pre1));
    }
 
    @Test
@@ -128,7 +155,7 @@ public class TestAccessControl_getDomainPermissions extends TestAccessControlBas
       final String parentDomain = generateDomain();
       accessControlContext.createDomain(childDomain, parentDomain);
 
-      // set parent domain create permissions
+      // set parent domain permissions
       Resource accessorResource = generateUnauthenticatableResource();
       Set<DomainPermission> parentDomainPermissions_pre = setOf(domPerm_superuser_withGrant, domPerm_createchilddomain);
       accessControlContext.setDomainPermissions(accessorResource, parentDomain, parentDomainPermissions_pre);
@@ -196,7 +223,7 @@ public class TestAccessControl_getDomainPermissions extends TestAccessControlBas
 
       final String domainName1 = generateDomain();
 
-      // set domain create permissions
+      // set domain permissions
       Resource accessorResource = generateAuthenticatableResource(generateUniquePassword());
       Set<DomainPermission> domainPermissions_pre1 = setOf(domCreatePerm_superuser, domCreatePerm_child);
       accessControlContext.setDomainPermissions(accessorResource, domainName1, domainPermissions_pre1);
@@ -204,7 +231,7 @@ public class TestAccessControl_getDomainPermissions extends TestAccessControlBas
       // authenticate without query authorization
       generateResourceAndAuthenticate();
 
-      // get domain create permissions and verify
+      // get domain permissions and verify
       try {
          accessControlContext.getDomainPermissionsMap(accessorResource);
          fail("getting domain permissions without query authorization should have failed");
@@ -232,7 +259,7 @@ public class TestAccessControl_getDomainPermissions extends TestAccessControlBas
 
       final String domainName1 = generateDomain();
 
-      // set domain create permissions
+      // set domain permissions
       Resource accessorResource = generateAuthenticatableResource(generateUniquePassword());
       Set<DomainPermission> domainPermissions_pre1 = setOf(domCreatePerm_superuser, domCreatePerm_child);
       accessControlContext.setDomainPermissions(accessorResource, domainName1, domainPermissions_pre1);
@@ -245,7 +272,7 @@ public class TestAccessControl_getDomainPermissions extends TestAccessControlBas
                                                     ResourcePermissions.getInstance(ResourcePermissions.IMPERSONATE));
       accessControlContext.authenticate(authenticatableResource, PasswordCredentials.newInstance(password));
 
-      // get domain create permissions and verify
+      // get domain permissions and verify
       final Map<String,Set<DomainPermission>> allDomainPermissions = accessControlContext.getDomainPermissionsMap(accessorResource);
       assertThat(allDomainPermissions.size(), is(1));
       assertThat(allDomainPermissions.get(domainName1), is(domainPermissions_pre1));
@@ -265,7 +292,7 @@ public class TestAccessControl_getDomainPermissions extends TestAccessControlBas
 
       final String domainName1 = generateDomain();
 
-      // set domain create permissions
+      // set domain permissions
       Resource accessorResource = generateAuthenticatableResource(generateUniquePassword());
       Set<DomainPermission> domainPermissions_pre1 = setOf(domCreatePerm_superuser, domCreatePerm_child);
       accessControlContext.setDomainPermissions(accessorResource, domainName1, domainPermissions_pre1);
@@ -276,7 +303,7 @@ public class TestAccessControl_getDomainPermissions extends TestAccessControlBas
       grantQueryPermission(authenticatableResource, accessorResource);
       accessControlContext.authenticate(authenticatableResource, PasswordCredentials.newInstance(password));
 
-      // get domain create permissions and verify
+      // get domain permissions and verify
       final Map<String,Set<DomainPermission>> allDomainPermissions = accessControlContext.getDomainPermissionsMap(accessorResource);
       assertThat(allDomainPermissions.size(), is(1));
       assertThat(allDomainPermissions.get(domainName1), is(domainPermissions_pre1));
@@ -297,14 +324,14 @@ public class TestAccessControl_getDomainPermissions extends TestAccessControlBas
       final String domainName = generateDomain();
       final String domainName_whitespaced = " " + domainName + "\t";
 
-      // set domain create permissions
+      // set domain permissions
       Resource accessorResource = generateUnauthenticatableResource();
       Set<DomainPermission> domainPermissions_pre = new HashSet<>();
       domainPermissions_pre.add(domCreatePerm_superuser);
       domainPermissions_pre.add(domCreatePerm_child);
       accessControlContext.setDomainPermissions(accessorResource, domainName, domainPermissions_pre);
 
-      // get domain create permissions and verify
+      // get domain permissions and verify
       final Set<DomainPermission> domainPermissions_post
             = accessControlContext.getDomainPermissions(accessorResource, domainName_whitespaced);
       assertThat(domainPermissions_post, is(domainPermissions_pre));
@@ -316,20 +343,37 @@ public class TestAccessControl_getDomainPermissions extends TestAccessControlBas
 
       try {
          accessControlContext.getDomainPermissionsMap(null);
+         fail("getting domain permissions map with null accessor resource reference should have failed");
       }
       catch (NullPointerException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("resource required"));
+      }
+      try {
+         accessControlContext.getDomainPermissionsMap(Resources.getInstance(null));
+         fail("getting domain permissions map with null external accessor resource reference should have failed");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("resource id and/or external id is required"));
       }
 
       try {
          accessControlContext.getDomainPermissions(null, generateDomain());
+         fail("getting domain permissions with null accessor resource reference should have failed");
       }
       catch (NullPointerException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("resource required"));
       }
+      try {
+         accessControlContext.getDomainPermissions(Resources.getInstance(null), generateDomain());
+         fail("getting domain permissions with null external accessor resource reference should have failed");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("resource id and/or external id is required"));
+      }
 
       try {
          accessControlContext.getDomainPermissions(generateUnauthenticatableResource(), null);
+         fail("getting domain permissions with null domain reference should have failed");
       }
       catch (NullPointerException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("domain required"));
@@ -343,18 +387,34 @@ public class TestAccessControl_getDomainPermissions extends TestAccessControlBas
       final Resource accessorResource = generateUnauthenticatableResource();
       final String domainName = generateDomain();
       final Resource invalidResource = Resources.getInstance(-999L);
+      final Resource invalidExternalResource = Resources.getInstance("invalid");
+      final Resource mismatchedResource = Resources.getInstance(-999L, "invalid");
 
       try {
          accessControlContext.getDomainPermissions(invalidResource, domainName);
-         fail("getting effective domain permissions with invalid resource reference should have failed");
+         fail("getting domain permissions with invalid resource reference should have failed");
       }
       catch (IllegalArgumentException e) {
          assertThat(e.getMessage().toLowerCase(), containsString(String.valueOf(invalidResource).toLowerCase() + " not found"));
       }
+      try {
+         accessControlContext.getDomainPermissions(invalidExternalResource, domainName);
+         fail("getting domain permissions with invalid external resource reference should have failed");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString(String.valueOf(invalidExternalResource).toLowerCase() + " not found"));
+      }
+      try {
+         accessControlContext.getDomainPermissions(mismatchedResource, domainName);
+         fail("getting domain permissions with mismatched internal/external resource references should have failed");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("not resolve"));
+      }
 
       try {
          accessControlContext.getDomainPermissions(accessorResource, "invalid_domain");
-         fail("getting effective domain permissions with invalid domain name should have failed");
+         fail("getting domain permissions with invalid domain name should have failed");
       }
       catch (IllegalArgumentException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("could not find domain"));
@@ -362,10 +422,24 @@ public class TestAccessControl_getDomainPermissions extends TestAccessControlBas
 
       try {
          accessControlContext.getDomainPermissionsMap(invalidResource);
-         fail("getting effective domain permissions with invalid resource reference should have failed");
+         fail("getting domain permissions with invalid resource reference should have failed");
       }
       catch (IllegalArgumentException e) {
          assertThat(e.getMessage().toLowerCase(), containsString(String.valueOf(invalidResource).toLowerCase() + " not found"));
+      }
+      try {
+         accessControlContext.getDomainPermissionsMap(invalidExternalResource);
+         fail("getting domain permissions with invalid external resource reference should have failed");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString(String.valueOf(invalidExternalResource).toLowerCase() + " not found"));
+      }
+      try {
+         accessControlContext.getDomainPermissionsMap(mismatchedResource);
+         fail("getting domain permissions with mismatched internal/external resource references should have failed");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("not resolve"));
       }
    }
 }

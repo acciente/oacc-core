@@ -70,6 +70,36 @@ public class TestAccessControl_getEffectiveResourcePermissions extends TestAcces
    }
 
    @Test
+   public void getEffectiveResourcePermissions_withExtId() {
+      authenticateSystemResource();
+      final String resourceClassName = generateResourceClass(false, false);
+      final String accessorExternalId = generateUniqueExternalId();
+      final Resource accessorResource = generateUnauthenticatableResourceWithExtId(accessorExternalId);
+      final String accessedExternalId = generateUniqueExternalId();
+      final Resource accessedResource = accessControlContext.createResource(resourceClassName,
+                                                                            generateDomain(),
+                                                                            accessedExternalId);
+      assertThat(accessControlContext.getEffectiveResourcePermissions(accessorResource, accessedResource).isEmpty(), is(true));
+
+      // setup permissions
+      Set<ResourcePermission> permissions_pre = new HashSet<>();
+      permissions_pre.add(ResourcePermissions.getInstance(ResourcePermissions.INHERIT));
+      permissions_pre.add(ResourcePermissions.getInstance(generateResourceClassPermission(resourceClassName)));
+      accessControlContext.setResourcePermissions(accessorResource, accessedResource, permissions_pre);
+
+      // verify
+      Set<ResourcePermission> permissions_post
+            = accessControlContext.getEffectiveResourcePermissions(Resources.getInstance(accessorExternalId),
+                                                                   accessedResource);
+      assertThat(permissions_post, is(permissions_pre));
+
+      permissions_post
+            = accessControlContext.getEffectiveResourcePermissions(accessorResource,
+                                                                   Resources.getInstance(accessedExternalId));
+      assertThat(permissions_post, is(permissions_pre));
+   }
+
+   @Test
    public void getEffectiveResourcePermissions_validAsAuthenticatedResource() {
       authenticateSystemResource();
       final String resourceClassName = generateResourceClass(false, false);
@@ -521,6 +551,13 @@ public class TestAccessControl_getEffectiveResourcePermissions extends TestAcces
       catch (NullPointerException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("resource required"));
       }
+      try {
+         accessControlContext.getEffectiveResourcePermissions(Resources.getInstance(null), accessedResource);
+         fail("getting permissions with null internal/external accessor resource ids should have failed");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("resource id and/or external id is required"));
+      }
 
       final Resource accessorResource = generateUnauthenticatableResource();
       try {
@@ -530,6 +567,13 @@ public class TestAccessControl_getEffectiveResourcePermissions extends TestAcces
       catch (NullPointerException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("resource required"));
       }
+      try {
+         accessControlContext.getEffectiveResourcePermissions(accessedResource, Resources.getInstance(null));
+         fail("getting permissions with null internal/external accessed resource ids should have failed");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("resource id and/or external id is required"));
+      }
    }
 
    @Test
@@ -538,6 +582,8 @@ public class TestAccessControl_getEffectiveResourcePermissions extends TestAcces
 
       final Resource validResource = generateUnauthenticatableResource();
       final Resource invalidResource = Resources.getInstance(-999L);
+      final Resource invalidExternalResource = Resources.getInstance("invalid");
+      final Resource mismatchedResource = Resources.getInstance(-999L, "invalid");
 
       try {
          accessControlContext.getEffectiveResourcePermissions(invalidResource, validResource);
@@ -546,13 +592,41 @@ public class TestAccessControl_getEffectiveResourcePermissions extends TestAcces
       catch (IllegalArgumentException e) {
          assertThat(e.getMessage().toLowerCase(), containsString(String.valueOf(invalidResource).toLowerCase() + " not found"));
       }
+      try {
+         accessControlContext.getEffectiveResourcePermissions(invalidExternalResource, validResource);
+         fail("getting effective resource permissions with invalid external accessor resource reference should have failed");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString(String.valueOf(invalidExternalResource).toLowerCase() + " not found"));
+      }
+      try {
+         accessControlContext.getEffectiveResourcePermissions(mismatchedResource, validResource);
+         fail("getting effective resource permissions with mismatched internal/external accessor resource references should have failed");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("not resolve"));
+      }
 
       try {
          accessControlContext.getEffectiveResourcePermissions(validResource, invalidResource);
          fail("getting effective resource permissions with invalid accessed resource reference should have failed");
       }
       catch (IllegalArgumentException e) {
-         assertThat(e.getMessage().toLowerCase(), containsString("could not determine domain"));
+         assertThat(e.getMessage().toLowerCase(), containsString(String.valueOf(invalidResource).toLowerCase() + " not found"));
+      }
+      try {
+         accessControlContext.getEffectiveResourcePermissions(validResource, invalidExternalResource);
+         fail("getting effective resource permissions with invalid external accessed resource reference should have failed");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString(String.valueOf(invalidExternalResource).toLowerCase() + " not found"));
+      }
+      try {
+         accessControlContext.getEffectiveResourcePermissions(validResource, mismatchedResource);
+         fail("getting effective resource permissions with mismatched internal/external accessed resource references should have failed");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("not resolve"));
       }
    }
 }
