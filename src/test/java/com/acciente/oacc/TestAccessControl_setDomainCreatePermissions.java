@@ -58,6 +58,33 @@ public class TestAccessControl_setDomainCreatePermissions extends TestAccessCont
    }
 
    @Test
+   public void setDomainCreatePermissions_withExtId() {
+      authenticateSystemResource();
+      final DomainCreatePermission domCreatePerm_superuser
+            = DomainCreatePermissions.getInstance(DomainPermissions.getInstance(DomainPermissions.SUPER_USER));
+      final DomainCreatePermission domCreatePerm_create_withGrant
+            = DomainCreatePermissions.getInstance(DomainCreatePermissions.CREATE, true);
+      final DomainCreatePermission domCreatePerm_child
+            = DomainCreatePermissions.getInstance(DomainPermissions.getInstance(DomainPermissions.CREATE_CHILD_DOMAIN),
+                                                  false);
+
+      final String externalId = generateUniqueExternalId();
+      Resource accessorResource = generateUnauthenticatableResourceWithExtId(externalId);
+      assertThat(accessControlContext.getEffectiveDomainCreatePermissions(accessorResource).isEmpty(), is(true));
+
+      Set<DomainCreatePermission> domainCreatePermissions_pre = new HashSet<>();
+      domainCreatePermissions_pre.add(domCreatePerm_superuser);
+      domainCreatePermissions_pre.add(domCreatePerm_create_withGrant);
+      domainCreatePermissions_pre.add(domCreatePerm_child);
+
+      // set domain create permissions and verify
+      accessControlContext.setDomainCreatePermissions(Resources.getInstance(externalId), domainCreatePermissions_pre);
+
+      final Set<DomainCreatePermission> domainCreatePermissions_post = accessControlContext.getEffectiveDomainCreatePermissions(accessorResource);
+      assertThat(domainCreatePermissions_post, is(domainCreatePermissions_pre));
+   }
+
+   @Test
    public void setDomainCreatePermissions_validAsAuthorized() {
       authenticateSystemResource();
       final DomainCreatePermission domCreatePerm_superuser_withGrant
@@ -525,6 +552,13 @@ public class TestAccessControl_setDomainCreatePermissions extends TestAccessCont
       catch (NullPointerException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("resource required"));
       }
+      try {
+         accessControlContext.setDomainCreatePermissions(Resources.getInstance(null), domainCreatePermissions);
+         fail("setting domain create permissions with null internal/external resource ids should have failed");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("resource id and/or external id is required"));
+      }
 
       try {
          accessControlContext.setDomainCreatePermissions(accessorResource, null);
@@ -610,13 +644,31 @@ public class TestAccessControl_setDomainCreatePermissions extends TestAccessCont
       Set<DomainCreatePermission> domainCreatePermissions = new HashSet<>();
       domainCreatePermissions.add(domCreatePerm_create_withGrant);
 
+      final Resource invalidResource = Resources.getInstance(-999L);
+      final Resource invalidExternalResource = Resources.getInstance("invalid");
+      final Resource mismatchedResource = Resources.getInstance(-999L, "invalid");
+
       // attempt to set domain create permissions with non-existent references
       try {
-         accessControlContext.setDomainCreatePermissions(Resources.getInstance(-999L), domainCreatePermissions);
+         accessControlContext.setDomainCreatePermissions(invalidResource, domainCreatePermissions);
          fail("setting domain create permissions with non-existent accessor resource reference should have failed");
       }
       catch (IllegalArgumentException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("not found"));
+      }
+      try {
+         accessControlContext.setDomainCreatePermissions(invalidExternalResource, domainCreatePermissions);
+         fail("setting domain create permissions with non-existent external accessor resource reference should have failed");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("not found"));
+      }
+      try {
+         accessControlContext.setDomainCreatePermissions(mismatchedResource, domainCreatePermissions);
+         fail("setting domain create permissions with mismatched internal/external resource references should have failed");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("not resolve"));
       }
    }
 

@@ -65,6 +65,65 @@ public class TestAccessControl_grantResourcePermissions extends TestAccessContro
    }
 
    @Test
+   public void grantResourcePermissions_withExtId() {
+      authenticateSystemResource();
+      final String resourceClassName = generateResourceClass(false, false);
+      final String customPermissionName = generateResourceClassPermission(resourceClassName);
+      final String accessorExternalId = generateUniqueExternalId();
+      final Resource accessorResource = generateUnauthenticatableResourceWithExtId(accessorExternalId);
+      final String accessedExternalId = generateUniqueExternalId();
+      final Resource accessedResource = accessControlContext.createResource(resourceClassName,
+                                                                            generateDomain(),
+                                                                            accessedExternalId);
+      assertThat(accessControlContext.getEffectiveResourcePermissions(accessorResource, accessedResource).isEmpty(), is(true));
+
+      Set<ResourcePermission> permissions_pre = new HashSet<>();
+      permissions_pre.add(ResourcePermissions.getInstance(ResourcePermissions.INHERIT));
+      permissions_pre.add(ResourcePermissions.getInstance(customPermissionName));
+
+      // grant permissions and verify
+      accessControlContext.grantResourcePermissions(Resources.getInstance(accessorExternalId),
+                                                    accessedResource,
+                                                    ResourcePermissions.getInstance(ResourcePermissions.INHERIT),
+                                                    ResourcePermissions.getInstance(customPermissionName));
+
+      Set<ResourcePermission> permissions_post = accessControlContext.getEffectiveResourcePermissions(accessorResource, accessedResource);
+      assertThat(permissions_post, is(permissions_pre));
+
+      final String accessorExternalId2 = generateUniqueExternalId();
+      final Resource accessorResource2 = generateUnauthenticatableResourceWithExtId(accessorExternalId2);
+      accessControlContext.grantResourcePermissions(accessorResource2,
+                                                    Resources.getInstance(accessedExternalId),
+                                                    ResourcePermissions.getInstance(ResourcePermissions.INHERIT),
+                                                    ResourcePermissions.getInstance(customPermissionName));
+
+      permissions_post = accessControlContext.getEffectiveResourcePermissions(accessorResource2, accessedResource);
+      assertThat(permissions_post, is(permissions_pre));
+
+      // test set-based version
+      final String accessedExternalId2 = generateUniqueExternalId();
+      final Resource accessedResource2 = accessControlContext.createResource(resourceClassName,
+                                                                             generateDomain(),
+                                                                             accessedExternalId2);
+
+      accessControlContext.grantResourcePermissions(Resources.getInstance(accessorExternalId),
+                                                    accessedResource2,
+                                                    setOf(ResourcePermissions.getInstance(ResourcePermissions.INHERIT),
+                                                          ResourcePermissions.getInstance(customPermissionName)));
+
+      assertThat(accessControlContext.getEffectiveResourcePermissions(accessorResource, accessedResource2),
+                 is(permissions_pre));
+
+      accessControlContext.grantResourcePermissions(accessorResource2,
+                                                    Resources.getInstance(accessedExternalId2),
+                                                    setOf(ResourcePermissions.getInstance(ResourcePermissions.INHERIT),
+                                                          ResourcePermissions.getInstance(customPermissionName)));
+
+      assertThat(accessControlContext.getEffectiveResourcePermissions(accessorResource2, accessedResource2),
+                 is(permissions_pre));
+   }
+
+   @Test
    public void grantResourcePermissions_resetCredentialsPermissionOnUnauthenticatables_shouldFail() {
       authenticateSystemResource();
       final Resource accessorResource = generateAuthenticatableResource(generateUniquePassword());
@@ -1037,6 +1096,15 @@ public class TestAccessControl_grantResourcePermissions extends TestAccessContro
       catch (NullPointerException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("resource required"));
       }
+      try {
+         accessControlContext.grantResourcePermissions(Resources.getInstance(null),
+                                                       accessedResource,
+                                                       ResourcePermissions.getInstance(ResourcePermissions.INHERIT));
+         fail("granting permissions for null internal/external accessor resource ids should have failed");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("resource id and/or external id is required"));
+      }
 
       try {
          accessControlContext.grantResourcePermissions(accessedResource,
@@ -1046,6 +1114,15 @@ public class TestAccessControl_grantResourcePermissions extends TestAccessContro
       }
       catch (NullPointerException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("resource required"));
+      }
+      try {
+         accessControlContext.grantResourcePermissions(accessorResource,
+                                                       Resources.getInstance(null),
+                                                       ResourcePermissions.getInstance(ResourcePermissions.INHERIT));
+         fail("granting permissions for null internal/external accessed resource ids should have failed");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("resource id and/or external id is required"));
       }
 
       try {
@@ -1079,6 +1156,16 @@ public class TestAccessControl_grantResourcePermissions extends TestAccessContro
       catch (NullPointerException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("resource required"));
       }
+      try {
+         accessControlContext.grantResourcePermissions(Resources.getInstance(null),
+                                                       accessedResource,
+                                                       setOf(ResourcePermissions
+                                                                   .getInstance(ResourcePermissions.INHERIT)));
+         fail("granting permissions for null internal/external accessor resource ids should have failed");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("resource id and/or external id is required"));
+      }
 
       try {
          accessControlContext.grantResourcePermissions(accessedResource,
@@ -1089,6 +1176,16 @@ public class TestAccessControl_grantResourcePermissions extends TestAccessContro
       }
       catch (NullPointerException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("resource required"));
+      }
+      try {
+         accessControlContext.grantResourcePermissions(accessorResource,
+                                                       Resources.getInstance(null),
+                                                       setOf(ResourcePermissions
+                                                                   .getInstance(ResourcePermissions.INHERIT)));
+         fail("granting permissions for null internal/external accessed resource ids should have failed");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("resource id and/or external id is required"));
       }
 
       try {
@@ -1143,6 +1240,10 @@ public class TestAccessControl_grantResourcePermissions extends TestAccessContro
       final Resource accessedResource = accessControlContext.createResource(resourceClassName, generateDomain());
       assertThat(accessControlContext.getEffectiveResourcePermissions(accessorResource, accessedResource).isEmpty(), is(true));
 
+      final Resource invalidResource = Resources.getInstance(-999L);
+      final Resource invalidExternalResource = Resources.getInstance("invalid");
+      final Resource mismatchedResource = Resources.getInstance(-999L, "invalid");
+
       Set<ResourcePermission> grantorPermissions
             = setOf(ResourcePermissions.getInstance(ResourcePermissions.INHERIT, true),
                     ResourcePermissions.getInstance(customPermissionName, true));
@@ -1153,7 +1254,7 @@ public class TestAccessControl_grantResourcePermissions extends TestAccessContro
 
       // attempt to grant permissions with non-existent references
       try {
-         accessControlContext.grantResourcePermissions(Resources.getInstance(-999L),
+         accessControlContext.grantResourcePermissions(invalidResource,
                                                        accessedResource,
                                                        ResourcePermissions.getInstance(ResourcePermissions.INHERIT),
                                                        ResourcePermissions.getInstance(customPermissionName));
@@ -1162,16 +1263,56 @@ public class TestAccessControl_grantResourcePermissions extends TestAccessContro
       catch (IllegalArgumentException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("not found"));
       }
+      try {
+         accessControlContext.grantResourcePermissions(invalidExternalResource,
+                                                       accessedResource,
+                                                       ResourcePermissions.getInstance(ResourcePermissions.INHERIT),
+                                                       ResourcePermissions.getInstance(customPermissionName));
+         fail("granting permissions with non-existent external accessor resource reference should have failed");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("not found"));
+      }
+      try {
+         accessControlContext.grantResourcePermissions(mismatchedResource,
+                                                       accessedResource,
+                                                       ResourcePermissions.getInstance(ResourcePermissions.INHERIT),
+                                                       ResourcePermissions.getInstance(customPermissionName));
+         fail("granting permissions with mismatched internal/external accessor resource references should have failed");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("not resolve"));
+      }
 
       try {
          accessControlContext.grantResourcePermissions(accessorResource,
-                                                       Resources.getInstance(-999L),
+                                                       invalidResource,
                                                        ResourcePermissions.getInstance(ResourcePermissions.INHERIT),
                                                        ResourcePermissions.getInstance(customPermissionName));
          fail("granting permissions with non-existent accessed resource reference should have failed");
       }
       catch (IllegalArgumentException e) {
-         assertThat(e.getMessage().toLowerCase(), containsString("could not determine resource class for resource"));
+         assertThat(e.getMessage().toLowerCase(), containsString("not found"));
+      }
+      try {
+         accessControlContext.grantResourcePermissions(accessorResource,
+                                                       invalidExternalResource,
+                                                       ResourcePermissions.getInstance(ResourcePermissions.INHERIT),
+                                                       ResourcePermissions.getInstance(customPermissionName));
+         fail("granting permissions with non-existent external accessed resource reference should have failed");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("not found"));
+      }
+      try {
+         accessControlContext.grantResourcePermissions(accessorResource,
+                                                       mismatchedResource,
+                                                       ResourcePermissions.getInstance(ResourcePermissions.INHERIT),
+                                                       ResourcePermissions.getInstance(customPermissionName));
+         fail("granting permissions with mismatched internal/external accessed resource references should have failed");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("not resolve"));
       }
 
       try {
@@ -1197,7 +1338,7 @@ public class TestAccessControl_grantResourcePermissions extends TestAccessContro
       }
 
       try {
-         accessControlContext.grantResourcePermissions(Resources.getInstance(-999L),
+         accessControlContext.grantResourcePermissions(invalidResource,
                                                        accessedResource,
                                                        setOf(ResourcePermissions
                                                                    .getInstance(ResourcePermissions.INHERIT),
@@ -1207,17 +1348,61 @@ public class TestAccessControl_grantResourcePermissions extends TestAccessContro
       catch (IllegalArgumentException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("not found"));
       }
+      try {
+         accessControlContext.grantResourcePermissions(invalidExternalResource,
+                                                       accessedResource,
+                                                       setOf(ResourcePermissions
+                                                                   .getInstance(ResourcePermissions.INHERIT),
+                                                             ResourcePermissions.getInstance(customPermissionName)));
+         fail("granting permissions with non-existent external accessor resource reference should have failed");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("not found"));
+      }
+      try {
+         accessControlContext.grantResourcePermissions(mismatchedResource,
+                                                       accessedResource,
+                                                       setOf(ResourcePermissions
+                                                                   .getInstance(ResourcePermissions.INHERIT),
+                                                             ResourcePermissions.getInstance(customPermissionName)));
+         fail("granting permissions with mismatched internal/external accessor resource references should have failed");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("not resolve"));
+      }
 
       try {
          accessControlContext.grantResourcePermissions(accessorResource,
-                                                       Resources.getInstance(-999L),
+                                                       invalidResource,
                                                        setOf(ResourcePermissions
                                                                    .getInstance(ResourcePermissions.INHERIT),
                                                              ResourcePermissions.getInstance(customPermissionName)));
          fail("granting permissions with non-existent accessed resource reference should have failed");
       }
       catch (IllegalArgumentException e) {
-         assertThat(e.getMessage().toLowerCase(), containsString("could not determine resource class for resource"));
+         assertThat(e.getMessage().toLowerCase(), containsString("not found"));
+      }
+      try {
+         accessControlContext.grantResourcePermissions(accessorResource,
+                                                       invalidExternalResource,
+                                                       setOf(ResourcePermissions
+                                                                   .getInstance(ResourcePermissions.INHERIT),
+                                                             ResourcePermissions.getInstance(customPermissionName)));
+         fail("granting permissions with non-existent external accessed resource reference should have failed");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("not found"));
+      }
+      try {
+         accessControlContext.grantResourcePermissions(accessorResource,
+                                                       mismatchedResource,
+                                                       setOf(ResourcePermissions
+                                                                   .getInstance(ResourcePermissions.INHERIT),
+                                                             ResourcePermissions.getInstance(customPermissionName)));
+         fail("granting permissions with mismatched internal/external accessed resource references should have failed");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("not resolve"));
       }
 
       try {

@@ -1094,6 +1094,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
 
       try {
          connection = __getConnection();
+         accessorResource = __resolveResource(connection, accessorResource);
 
          __setDirectDomainPermissions(connection, accessorResource, domainName, permissions, false);
       }
@@ -1216,6 +1217,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
 
       try {
          connection = __getConnection();
+         accessorResource = __resolveResource(connection, accessorResource);
 
          __grantDirectDomainPermissions(connection, accessorResource, domainName, domainPermissions);
       }
@@ -1242,6 +1244,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
 
       try {
          connection = __getConnection();
+         accessorResource = __resolveResource(connection, accessorResource);
 
          __grantDirectDomainPermissions(connection, accessorResource, domainName, requestedDomainPermissions);
       }
@@ -1363,6 +1366,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
 
       try {
          connection = __getConnection();
+         accessorResource = __resolveResource(connection, accessorResource);
 
          __revokeDirectDomainPermissions(connection, accessorResource, domainName, domainPermissions);
       }
@@ -1389,6 +1393,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
 
       try {
          connection = __getConnection();
+         accessorResource = __resolveResource(connection, accessorResource);
 
          __revokeDirectDomainPermissions(connection, accessorResource, domainName, requestedDomainPermissions);
       }
@@ -1640,6 +1645,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
 
       try {
          connection = __getConnection();
+         accessorResource = __resolveResource(connection, accessorResource);
 
          __setDirectDomainCreatePermissions(connection, accessorResource, domainCreatePermissions);
       }
@@ -1775,6 +1781,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
 
       try {
          connection = __getConnection();
+         accessorResource = __resolveResource(connection, accessorResource);
 
          __grantDirectDomainCreatePermissions(connection, accessorResource, domainCreatePermissions);
       }
@@ -1799,6 +1806,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
 
       try {
          connection = __getConnection();
+         accessorResource = __resolveResource(connection, accessorResource);
 
          __grantDirectDomainCreatePermissions(connection, accessorResource, requestedDomainCreatePermissions);
       }
@@ -1970,6 +1978,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
 
       try {
          connection = __getConnection();
+         accessorResource = __resolveResource(connection, accessorResource);
 
          __revokeDirectDomainCreatePermissions(connection, accessorResource, domainCreatePermissions);
       }
@@ -1994,6 +2003,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
 
       try {
          connection = __getConnection();
+         accessorResource = __resolveResource(connection, accessorResource);
 
          __revokeDirectDomainCreatePermissions(connection, accessorResource, requestedDomainCreatePermissions);
       }
@@ -2153,6 +2163,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
 
       try {
          connection = __getConnection();
+         accessorResource = __resolveResource(connection, accessorResource);
 
          __setDirectResourceCreatePermissions(connection,
                                               accessorResource,
@@ -2420,6 +2431,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
 
       try {
          connection = __getConnection();
+         accessorResource = __resolveResource(connection, accessorResource);
 
          __grantDirectResourceCreatePermissions(connection,
                                                 accessorResource,
@@ -2452,6 +2464,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
 
       try {
          connection = __getConnection();
+         accessorResource = __resolveResource(connection, accessorResource);
 
          __grantDirectResourceCreatePermissions(connection,
                                                 accessorResource,
@@ -2650,6 +2663,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
 
       try {
          connection = __getConnection();
+         accessorResource = __resolveResource(connection, accessorResource);
 
          __revokeDirectResourceCreatePermissions(connection,
                                                  accessorResource,
@@ -2682,6 +2696,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
 
       try {
          connection = __getConnection();
+         accessorResource = __resolveResource(connection, accessorResource);
 
          __revokeDirectResourceCreatePermissions(connection,
                                                  accessorResource,
@@ -3185,6 +3200,8 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
 
       try {
          connection = __getConnection();
+         accessorResource = __resolveResource(connection, accessorResource);
+         accessedResource = __resolveResource(connection, accessedResource);
 
          __setDirectResourcePermissions(connection,
                                         accessorResource,
@@ -3375,6 +3392,8 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
 
       try {
          connection = __getConnection();
+         accessorResource = __resolveResource(connection, accessorResource);
+         accessedResource = __resolveResource(connection, accessedResource);
 
          __grantDirectResourcePermissions(connection, accessorResource, accessedResource, resourcePermissions);
       }
@@ -3401,6 +3420,8 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
 
       try {
          connection = __getConnection();
+         accessorResource = __resolveResource(connection, accessorResource);
+         accessedResource = __resolveResource(connection, accessedResource);
 
          __grantDirectResourcePermissions(connection, accessorResource, accessedResource, requestedResourcePermissions);
       }
@@ -3541,6 +3562,8 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
 
       try {
          connection = __getConnection();
+         accessorResource = __resolveResource(connection, accessorResource);
+         accessedResource = __resolveResource(connection, accessedResource);
 
          __revokeDirectResourcePermissions(connection, accessorResource, accessedResource, resourcePermissions);
       }
@@ -3567,6 +3590,8 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
 
       try {
          connection = __getConnection();
+         accessorResource = __resolveResource(connection, accessorResource);
+         accessedResource = __resolveResource(connection, accessedResource);
 
          __revokeDirectResourcePermissions(connection, accessorResource, accessedResource, obsoleteResourcePermissions);
       }
@@ -3797,6 +3822,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
 
       try {
          connection = __getConnection();
+         accessorResource = __resolveResource(connection, accessorResource);
          resourceClassName = resourceClassName.trim();
          domainName = domainName.trim();
 
@@ -3992,6 +4018,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
 
       try {
          connection = __getConnection();
+         accessorResource = __resolveResource(connection, accessorResource);
          resourceClassName = resourceClassName.trim();
          domainName = domainName.trim();
 
@@ -4026,6 +4053,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
 
       try {
          connection = __getConnection();
+         accessorResource = __resolveResource(connection, accessorResource);
          resourceClassName = resourceClassName.trim();
          domainName = domainName.trim();
 
@@ -4163,6 +4191,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
 
       try {
          connection = __getConnection();
+         accessorResource = __resolveResource(connection, accessorResource);
          resourceClassName = resourceClassName.trim();
          domainName = domainName.trim();
 
@@ -4197,6 +4226,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
 
       try {
          connection = __getConnection();
+         accessorResource = __resolveResource(connection, accessorResource);
          resourceClassName = resourceClassName.trim();
          domainName = domainName.trim();
 

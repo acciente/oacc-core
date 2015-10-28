@@ -95,6 +95,72 @@ public class TestAccessControl_revokeGlobalResourcePermissions extends TestAcces
    }
 
    @Test
+   public void revokeGlobalResourcePermissions_withExtId() {
+      authenticateSystemResource();
+      final String authenticatableResourceClassName = generateResourceClass(true, false);
+      final String externalId = generateUniqueExternalId();
+      final Resource accessorResource = generateUnauthenticatableResourceWithExtId(externalId);
+      final String domainName = accessControlContext.getDomainNameByResource(SYS_RESOURCE);
+      assertThat(accessControlContext.getEffectiveGlobalResourcePermissionsMap(accessorResource).isEmpty(), is(true));
+
+      // setup permissions
+      final String permissionName = generateResourceClassPermission(authenticatableResourceClassName);
+      Set<ResourcePermission> permissions_pre
+            = setOf(ResourcePermissions.getInstance(ResourcePermissions.IMPERSONATE),
+                    ResourcePermissions.getInstance(permissionName));
+
+      accessControlContext.setGlobalResourcePermissions(accessorResource,
+                                                        authenticatableResourceClassName,
+                                                        domainName,
+                                                        permissions_pre);
+
+      assertThat(accessControlContext.getEffectiveGlobalResourcePermissions(accessorResource,
+                                                                            authenticatableResourceClassName,
+                                                                            domainName),
+                 is(permissions_pre));
+
+      // revoke permissions and verify
+      accessControlContext.revokeGlobalResourcePermissions(Resources.getInstance(externalId),
+                                                           authenticatableResourceClassName,
+                                                           domainName,
+                                                           ResourcePermissions
+                                                                 .getInstance(ResourcePermissions.IMPERSONATE),
+                                                           ResourcePermissions
+                                                                 .getInstance(permissionName));
+
+      assertThat(accessControlContext.getEffectiveGlobalResourcePermissions(accessorResource,
+                                                                            authenticatableResourceClassName,
+                                                                            domainName).isEmpty(),
+                 is(true));
+
+      // test set-based version
+      final String externalId2 = generateUniqueExternalId();
+      final Resource accessorResource2 = generateUnauthenticatableResourceWithExtId(externalId2);
+      accessControlContext.setGlobalResourcePermissions(accessorResource2,
+                                                        authenticatableResourceClassName,
+                                                        domainName,
+                                                        permissions_pre);
+
+      assertThat(accessControlContext.getEffectiveGlobalResourcePermissions(accessorResource2,
+                                                                            authenticatableResourceClassName,
+                                                                            domainName),
+                 is(permissions_pre));
+
+      accessControlContext.revokeGlobalResourcePermissions(Resources.getInstance(externalId2),
+                                                           authenticatableResourceClassName,
+                                                           domainName,
+                                                           setOf(ResourcePermissions
+                                                                       .getInstance(ResourcePermissions.IMPERSONATE),
+                                                                 ResourcePermissions
+                                                                       .getInstance(permissionName)));
+
+      assertThat(accessControlContext.getEffectiveGlobalResourcePermissions(accessorResource2,
+                                                                            authenticatableResourceClassName,
+                                                                            domainName).isEmpty(),
+                 is(true));
+   }
+
+   @Test
    public void revokeGlobalResourcePermissions_ungrantedPermissions_shouldSucceed() {
       authenticateSystemResource();
       final String authenticatableResourceClassName = generateResourceClass(true, false);
@@ -958,6 +1024,16 @@ public class TestAccessControl_revokeGlobalResourcePermissions extends TestAcces
       catch (NullPointerException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("resource required"));
       }
+      try {
+         accessControlContext.revokeGlobalResourcePermissions(Resources.getInstance(null),
+                                                              resourceClassName,
+                                                              domainName,
+                                                              permission_valid);
+         fail("revoking permissions for null internal/external resource ids should have failed");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("resource id and/or external id is required"));
+      }
 
       try {
          accessControlContext.revokeGlobalResourcePermissions(accessorResource, null, domainName, permission_valid);
@@ -1007,6 +1083,16 @@ public class TestAccessControl_revokeGlobalResourcePermissions extends TestAcces
       }
       catch (NullPointerException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("resource required"));
+      }
+      try {
+         accessControlContext.revokeGlobalResourcePermissions(Resources.getInstance(null),
+                                                              resourceClassName,
+                                                              domainName,
+                                                              setOf(permission_valid));
+         fail("revoking permissions for null internal/external resource ids should have failed");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("resource id and/or external id is required"));
       }
 
       try {
@@ -1079,13 +1165,16 @@ public class TestAccessControl_revokeGlobalResourcePermissions extends TestAcces
       final Resource accessorResource = generateUnauthenticatableResource();
       final String domainName = accessControlContext.getDomainNameByResource(accessorResource);
       assertThat(accessControlContext.getEffectiveGlobalResourcePermissionsMap(accessorResource).isEmpty(), is(true));
+      final Resource invalidResource = Resources.getInstance(-999L);
+      final Resource invalidExternalResource = Resources.getInstance("invalid");
+      final Resource mismatchedResource = Resources.getInstance(-999L, "invalid");
 
       final ResourcePermission permission_valid
             = ResourcePermissions.getInstance(generateResourceClassPermission(resourceClassName));
 
       // attempt to revoke permissions with non-existent references
       try {
-         accessControlContext.revokeGlobalResourcePermissions(Resources.getInstance(-999L),
+         accessControlContext.revokeGlobalResourcePermissions(invalidResource,
                                                               resourceClassName,
                                                               domainName,
                                                               permission_valid);
@@ -1093,6 +1182,26 @@ public class TestAccessControl_revokeGlobalResourcePermissions extends TestAcces
       }
       catch (IllegalArgumentException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("not found"));
+      }
+      try {
+         accessControlContext.revokeGlobalResourcePermissions(invalidExternalResource,
+                                                              resourceClassName,
+                                                              domainName,
+                                                              permission_valid);
+         fail("revoking permissions with non-existent external accessor resource reference should have failed");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("not found"));
+      }
+      try {
+         accessControlContext.revokeGlobalResourcePermissions(mismatchedResource,
+                                                              resourceClassName,
+                                                              domainName,
+                                                              permission_valid);
+         fail("revoking permissions with mismatched internal/external resource references should have failed");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("not resolve"));
       }
       try {
          accessControlContext.revokeGlobalResourcePermissions(accessorResource,
@@ -1116,7 +1225,7 @@ public class TestAccessControl_revokeGlobalResourcePermissions extends TestAcces
       }
 
       try {
-         accessControlContext.revokeGlobalResourcePermissions(Resources.getInstance(-999L),
+         accessControlContext.revokeGlobalResourcePermissions(invalidResource,
                                                               resourceClassName,
                                                               domainName,
                                                               setOf(permission_valid));
@@ -1124,6 +1233,26 @@ public class TestAccessControl_revokeGlobalResourcePermissions extends TestAcces
       }
       catch (IllegalArgumentException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("not found"));
+      }
+      try {
+         accessControlContext.revokeGlobalResourcePermissions(invalidExternalResource,
+                                                              resourceClassName,
+                                                              domainName,
+                                                              setOf(permission_valid));
+         fail("revoking permissions with non-existent external accessor resource reference should have failed");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("not found"));
+      }
+      try {
+         accessControlContext.revokeGlobalResourcePermissions(mismatchedResource,
+                                                              resourceClassName,
+                                                              domainName,
+                                                              setOf(permission_valid));
+         fail("revoking permissions with mismatched internal/external resource references should have failed");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("not resolve"));
       }
       try {
          accessControlContext.revokeGlobalResourcePermissions(accessorResource,

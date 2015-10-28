@@ -69,6 +69,47 @@ public class TestAccessControl_grantDomainPermissions extends TestAccessControlB
    }
 
    @Test
+   public void grantDomainPermissions_withExtId() {
+      authenticateSystemResource();
+      final DomainPermission domainPermission_superUser = DomainPermissions.getInstance(DomainPermissions.SUPER_USER);
+      final DomainPermission domainPermission_child_withGrant = DomainPermissions.getInstance(DomainPermissions.CREATE_CHILD_DOMAIN,
+                                                                                              true);
+
+      final String domainName = generateDomain();
+      final String sysDomainName = accessControlContext.getDomainNameByResource(SYS_RESOURCE);
+      final String externalId = generateUniqueExternalId();
+      final Resource accessorResource = generateUnauthenticatableResourceWithExtId(externalId);
+      assertThat(accessControlContext.getEffectiveDomainPermissions(accessorResource, domainName).isEmpty(), is(true));
+      assertThat(accessControlContext.getEffectiveDomainPermissions(accessorResource, sysDomainName).isEmpty(), is(true));
+
+      // grant domain permissions and verify
+      accessControlContext.grantDomainPermissions(Resources.getInstance(externalId),
+                                                  domainName,
+                                                  domainPermission_superUser,
+                                                  domainPermission_child_withGrant);
+
+      Set<DomainPermission> domainPermissions_expected
+            = setOf(domainPermission_superUser, domainPermission_child_withGrant);
+
+      final Set<DomainPermission> domainPermissions_post
+            = accessControlContext.getDomainPermissions(accessorResource, domainName);
+      assertThat(domainPermissions_post, is(domainPermissions_expected));
+
+      // test set-based version
+      final String externalId2 = generateUniqueExternalId();
+      final Resource accessorResource2 = generateUnauthenticatableResourceWithExtId(externalId2);
+      assertThat(accessControlContext.getEffectiveDomainPermissions(accessorResource2, domainName).isEmpty(), is(true));
+
+      accessControlContext.grantDomainPermissions(Resources.getInstance(externalId2),
+                                                  domainName,
+                                                  setOf(domainPermission_superUser,
+                                                        domainPermission_child_withGrant));
+
+      assertThat(accessControlContext.getDomainPermissions(accessorResource2, domainName),
+                 is(domainPermissions_expected));
+   }
+
+   @Test
    public void grantDomainPermissions_validAsAuthorized() {
       authenticateSystemResource();
       final DomainPermission domPerm_delete_withGrant
@@ -633,6 +674,13 @@ public class TestAccessControl_grantDomainPermissions extends TestAccessControlB
       catch (NullPointerException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("resource required"));
       }
+      try {
+         accessControlContext.grantDomainPermissions(Resources.getInstance(null), domainName, domCreatePerm_child_withGrant);
+         fail("granting domain permissions with null internal/external resource ids should have failed");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("resource id and/or external id is required"));
+      }
 
       try {
          accessControlContext.grantDomainPermissions(accessorResource, (String) null, domCreatePerm_child_withGrant);
@@ -664,6 +712,13 @@ public class TestAccessControl_grantDomainPermissions extends TestAccessControlB
       }
       catch (NullPointerException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("resource required"));
+      }
+      try {
+         accessControlContext.grantDomainPermissions(Resources.getInstance(null), domainName, setOf(domCreatePerm_child_withGrant));
+         fail("granting domain permissions with null internal/external resource ids should have failed");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("resource id and/or external id is required"));
       }
 
       try {
@@ -716,15 +771,36 @@ public class TestAccessControl_grantDomainPermissions extends TestAccessControlB
 
       final String domainName = generateDomain();
       Resource accessorResource = generateUnauthenticatableResource();
+      final Resource invalidResource = Resources.getInstance(-999L);
+      final Resource invalidExternalResource = Resources.getInstance("invalid");
+      final Resource mismatchedResource = Resources.getInstance(-999L, "invalid");
 
       try {
-         accessControlContext.grantDomainPermissions(Resources.getInstance(-999L),
+         accessControlContext.grantDomainPermissions(invalidResource,
                                                      domainName,
                                                      domCreatePerm_child_withGrant);
          fail("granting domain permissions with non-existent accessor resource reference should have failed");
       }
       catch (IllegalArgumentException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("not found"));
+      }
+      try {
+         accessControlContext.grantDomainPermissions(invalidExternalResource,
+                                                     domainName,
+                                                     domCreatePerm_child_withGrant);
+         fail("granting domain permissions with non-existent external accessor resource reference should have failed");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("not found"));
+      }
+      try {
+         accessControlContext.grantDomainPermissions(mismatchedResource,
+                                                     domainName,
+                                                     domCreatePerm_child_withGrant);
+         fail("granting domain permissions with mismatched internal/external resource references should have failed");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("not resolve"));
       }
 
       try {
@@ -738,13 +814,31 @@ public class TestAccessControl_grantDomainPermissions extends TestAccessControlB
       }
 
       try {
-         accessControlContext.grantDomainPermissions(Resources.getInstance(-999L),
+         accessControlContext.grantDomainPermissions(invalidResource,
                                                      domainName,
                                                      setOf(domCreatePerm_child_withGrant));
          fail("granting domain permissions with non-existent accessor resource reference should have failed");
       }
       catch (IllegalArgumentException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("not found"));
+      }
+      try {
+         accessControlContext.grantDomainPermissions(invalidExternalResource,
+                                                     domainName,
+                                                     setOf(domCreatePerm_child_withGrant));
+         fail("granting domain permissions with non-existent external accessor resource reference should have failed");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("not found"));
+      }
+      try {
+         accessControlContext.grantDomainPermissions(mismatchedResource,
+                                                     domainName,
+                                                     setOf(domCreatePerm_child_withGrant));
+         fail("granting domain permissions with mismatched internal/external resource references should have failed");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("not resolve"));
       }
 
       try {

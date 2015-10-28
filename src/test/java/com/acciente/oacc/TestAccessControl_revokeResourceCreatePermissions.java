@@ -94,6 +94,72 @@ public class TestAccessControl_revokeResourceCreatePermissions extends TestAcces
    }
 
    @Test
+   public void revokeResourceCreatePermissions_withExtId() {
+      authenticateSystemResource();
+      final ResourceCreatePermission createPerm_create_withGrant
+            = ResourceCreatePermissions.getInstance(ResourceCreatePermissions.CREATE, true);
+      final ResourceCreatePermission createPerm_impersonate
+            = ResourceCreatePermissions.getInstance(ResourcePermissions.getInstance(ResourcePermissions.IMPERSONATE), false);
+      final ResourceCreatePermission createPerm_inherit_withGrant
+            = ResourceCreatePermissions.getInstance(ResourcePermissions.getInstance(ResourcePermissions.INHERIT, true), true);
+      final ResourceCreatePermission createPerm_resetPwd
+            = ResourceCreatePermissions.getInstance(ResourcePermissions
+                                                          .getInstance(ResourcePermissions.RESET_CREDENTIALS, true));
+
+      final String domainName = generateDomain();
+      final String resourceClassName = generateResourceClass(true, false);
+      final String externalId = generateUniqueExternalId();
+      final Resource accessorResource = generateUnauthenticatableResourceWithExtId(externalId);
+      assertThat(accessControlContext.getEffectiveResourceCreatePermissionsMap(accessorResource).isEmpty(), is(true));
+
+      // set up accessor
+      Set<ResourceCreatePermission> resourceCreatePermissions_pre
+            = setOf(createPerm_create_withGrant,
+                    createPerm_impersonate,
+                    createPerm_inherit_withGrant,
+                    createPerm_resetPwd);
+
+      accessControlContext.setResourceCreatePermissions(accessorResource, resourceClassName, domainName, resourceCreatePermissions_pre);
+      assertThat(accessControlContext.getEffectiveResourceCreatePermissions(accessorResource,
+                                                                            resourceClassName,
+                                                                            domainName),
+                 is(resourceCreatePermissions_pre));
+
+      // revoke create permissions and verify
+      accessControlContext.revokeResourceCreatePermissions(Resources.getInstance(externalId),
+                                                           resourceClassName,
+                                                           domainName,
+                                                           createPerm_create_withGrant,
+                                                           createPerm_impersonate,
+                                                           createPerm_inherit_withGrant,
+                                                           createPerm_resetPwd);
+
+      final Set<ResourceCreatePermission> resourceCreatePermissions_post
+            = accessControlContext.getEffectiveResourceCreatePermissions(accessorResource,
+                                                                         resourceClassName,
+                                                                         domainName);
+      assertThat(resourceCreatePermissions_post.isEmpty(), is(true));
+
+      // test set-based version
+      final String externalId2 = generateUniqueExternalId();
+      final Resource accessorResource2 = generateUnauthenticatableResourceWithExtId(externalId2);
+      accessControlContext.setResourceCreatePermissions(accessorResource2, resourceClassName, domainName, resourceCreatePermissions_pre);
+      assertThat(accessControlContext.getEffectiveResourceCreatePermissions(accessorResource2, resourceClassName, domainName),
+                 is(resourceCreatePermissions_pre));
+
+      accessControlContext.revokeResourceCreatePermissions(Resources.getInstance(externalId2),
+                                                           resourceClassName,
+                                                           domainName,
+                                                           setOf(createPerm_create_withGrant,
+                                                                 createPerm_impersonate,
+                                                                 createPerm_inherit_withGrant,
+                                                                 createPerm_resetPwd));
+
+      assertThat(accessControlContext.getEffectiveResourceCreatePermissions(accessorResource2, resourceClassName, domainName).isEmpty(),
+                 is(true));
+   }
+
+   @Test
    public void revokeResourceCreatePermissions_validAsAuthorized() {
       final ResourcePermission resourcePermission_inherit_withGrant
             = ResourcePermissions.getInstance(ResourcePermissions.INHERIT, true);
@@ -1191,6 +1257,17 @@ public class TestAccessControl_revokeResourceCreatePermissions extends TestAcces
       catch (NullPointerException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("resource required"));
       }
+      try {
+         accessControlContext.revokeResourceCreatePermissions(Resources.getInstance(null),
+                                                              resourceClassName,
+                                                              domainName,
+                                                              createPerm_create_withGrant,
+                                                              createPerm_inherit);
+         fail("revoking create-permissions with null internal/external resource ids should have failed");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("resource id and/or external id is required"));
+      }
 
       try {
          accessControlContext.revokeResourceCreatePermissions(accessorResource,
@@ -1250,6 +1327,17 @@ public class TestAccessControl_revokeResourceCreatePermissions extends TestAcces
       }
       catch (NullPointerException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("resource required"));
+      }
+      try {
+         accessControlContext.revokeResourceCreatePermissions(Resources.getInstance(null),
+                                                              resourceClassName,
+                                                              domainName,
+                                                              setOf(createPerm_create_withGrant,
+                                                                    createPerm_inherit));
+         fail("revoking create-permissions with null accessor resource should have failed");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("resource id and/or external id is required"));
       }
 
       try {
@@ -1331,10 +1419,13 @@ public class TestAccessControl_revokeResourceCreatePermissions extends TestAcces
             = ResourceCreatePermissions.getInstance(ResourceCreatePermissions.CREATE, true);
 
       assertThat(accessControlContext.getEffectiveResourceCreatePermissionsMap(accessorResource).isEmpty(), is(true));
+      final Resource invalidResource = Resources.getInstance(-999L);
+      final Resource invalidExternalResource = Resources.getInstance("invalid");
+      final Resource mismatchedResource = Resources.getInstance(-999L, "invalid");
 
       // attempt to revoke create permissions with invalid references
       try {
-         accessControlContext.revokeResourceCreatePermissions(Resources.getInstance(-999L),
+         accessControlContext.revokeResourceCreatePermissions(invalidResource,
                                                               resourceClassName,
                                                               domainName,
                                                               createPerm_create_withGrant);
@@ -1342,6 +1433,26 @@ public class TestAccessControl_revokeResourceCreatePermissions extends TestAcces
       }
       catch (IllegalArgumentException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("not found"));
+      }
+      try {
+         accessControlContext.revokeResourceCreatePermissions(invalidExternalResource,
+                                                              resourceClassName,
+                                                              domainName,
+                                                              createPerm_create_withGrant);
+         fail("revoking create-permissions with reference to non-existent external accessor resource should have failed");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("not found"));
+      }
+      try {
+         accessControlContext.revokeResourceCreatePermissions(mismatchedResource,
+                                                              resourceClassName,
+                                                              domainName,
+                                                              createPerm_create_withGrant);
+         fail("revoking create-permissions with reference to mismatched internal/external resource ids should have failed");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("not resolve"));
       }
       try {
          accessControlContext.revokeResourceCreatePermissions(accessorResource,
@@ -1366,7 +1477,7 @@ public class TestAccessControl_revokeResourceCreatePermissions extends TestAcces
 
       // test set-based version
       try {
-         accessControlContext.revokeResourceCreatePermissions(Resources.getInstance(-999L),
+         accessControlContext.revokeResourceCreatePermissions(invalidResource,
                                                               resourceClassName,
                                                               domainName,
                                                               setOf(createPerm_create_withGrant));
@@ -1374,6 +1485,26 @@ public class TestAccessControl_revokeResourceCreatePermissions extends TestAcces
       }
       catch (IllegalArgumentException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("not found"));
+      }
+      try {
+         accessControlContext.revokeResourceCreatePermissions(invalidExternalResource,
+                                                              resourceClassName,
+                                                              domainName,
+                                                              setOf(createPerm_create_withGrant));
+         fail("revoking create-permissions with reference to non-existent external accessor resource should have failed");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("not found"));
+      }
+      try {
+         accessControlContext.revokeResourceCreatePermissions(mismatchedResource,
+                                                              resourceClassName,
+                                                              domainName,
+                                                              setOf(createPerm_create_withGrant));
+         fail("revoking create-permissions with reference to mismatched internal/external resource ids should have failed");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("not resolve"));
       }
       try {
          accessControlContext.revokeResourceCreatePermissions(accessorResource,

@@ -83,6 +83,61 @@ public class TestAccessControl_revokeDomainCreatePermissions extends TestAccessC
    }
 
    @Test
+   public void revokeDomainCreatePermissions_withExtId() {
+      authenticateSystemResource();
+      final DomainCreatePermission domCreatePerm_superuser
+            = DomainCreatePermissions.getInstance(DomainPermissions.getInstance(DomainPermissions.SUPER_USER));
+      final DomainCreatePermission domCreatePerm_create_withGrant
+            = DomainCreatePermissions.getInstance(DomainCreatePermissions.CREATE, true);
+      final DomainCreatePermission domCreatePerm_child
+            = DomainCreatePermissions.getInstance(DomainPermissions.getInstance(DomainPermissions.CREATE_CHILD_DOMAIN),
+                                                  false);
+
+      // set accessor permissions
+      final String externalId = generateUniqueExternalId();
+      Resource accessorResource = generateUnauthenticatableResourceWithExtId(externalId);
+      assertThat(accessControlContext.getEffectiveDomainCreatePermissions(accessorResource).isEmpty(), is(true));
+
+      accessControlContext.setDomainCreatePermissions(accessorResource,
+                                                      setOf(domCreatePerm_superuser,
+                                                            domCreatePerm_create_withGrant,
+                                                            domCreatePerm_child));
+
+      Set<DomainCreatePermission> domainCreatePermissions_expected
+            = setOf(domCreatePerm_superuser, domCreatePerm_create_withGrant, domCreatePerm_child);
+      final Set<DomainCreatePermission> domainCreatePermissions_post = accessControlContext.getEffectiveDomainCreatePermissions(
+            accessorResource);
+      assertThat(domainCreatePermissions_post, is(domainCreatePermissions_expected));
+
+      // revoke domain create permissions and verify
+      accessControlContext.revokeDomainCreatePermissions(Resources.getInstance(externalId),
+                                                         domCreatePerm_superuser,
+                                                         domCreatePerm_create_withGrant,
+                                                         domCreatePerm_child);
+
+      assertThat(accessControlContext.getEffectiveDomainCreatePermissions(accessorResource).isEmpty(), is(true));
+
+      // test set-based version
+      final String externalId2 = generateUniqueExternalId();
+      Resource accessorResource2 = generateUnauthenticatableResourceWithExtId(externalId2);
+      assertThat(accessControlContext.getEffectiveDomainCreatePermissions(accessorResource).isEmpty(), is(true));
+
+      accessControlContext.setDomainCreatePermissions(accessorResource2,
+                                                      setOf(domCreatePerm_superuser,
+                                                            domCreatePerm_create_withGrant,
+                                                            domCreatePerm_child));
+      assertThat(accessControlContext.getEffectiveDomainCreatePermissions(accessorResource2),
+                 is(domainCreatePermissions_expected));
+
+      accessControlContext.revokeDomainCreatePermissions(Resources.getInstance(externalId2),
+                                                         setOf(domCreatePerm_superuser,
+                                                               domCreatePerm_create_withGrant,
+                                                               domCreatePerm_child));
+
+      assertThat(accessControlContext.getEffectiveDomainCreatePermissions(accessorResource2).isEmpty(), is(true));
+   }
+
+   @Test
    public void revokeDomainCreatePermissions_validAsAuthorized() {
       authenticateSystemResource();
       final DomainCreatePermission domCreatePerm_superuser_withGrant
@@ -761,6 +816,13 @@ public class TestAccessControl_revokeDomainCreatePermissions extends TestAccessC
       catch (NullPointerException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("resource required"));
       }
+      try {
+         accessControlContext.revokeDomainCreatePermissions(Resources.getInstance(null), domCreatePerm_create_withGrant);
+         fail("revoking domain create permissions with null internal/external resource ids should have failed");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("resource id and/or external id is required"));
+      }
 
       try {
          accessControlContext.revokeDomainCreatePermissions(accessorResource, (DomainCreatePermission) null);
@@ -784,6 +846,14 @@ public class TestAccessControl_revokeDomainCreatePermissions extends TestAccessC
       }
       catch (NullPointerException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("resource required"));
+      }
+      try {
+         accessControlContext.revokeDomainCreatePermissions(Resources.getInstance(null),
+                                                            setOf(domCreatePerm_create_withGrant));
+         fail("revoking domain create permissions with null internal/external resource ids should have failed");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("resource id and/or external id is required"));
       }
 
       try {
@@ -972,22 +1042,56 @@ public class TestAccessControl_revokeDomainCreatePermissions extends TestAccessC
       authenticateSystemResource();
       final DomainCreatePermission domCreatePerm_create_withGrant
             = DomainCreatePermissions.getInstance(DomainCreatePermissions.CREATE, true);
+      final Resource invalidResource = Resources.getInstance(-999L);
+      final Resource invalidExternalResource = Resources.getInstance("invalid");
+      final Resource mismatchedResource = Resources.getInstance(-999L, "invalid");
 
       // attempt to revoke domain create permissions with non-existent references
       try {
-         accessControlContext.revokeDomainCreatePermissions(Resources.getInstance(-999L), domCreatePerm_create_withGrant);
+         accessControlContext.revokeDomainCreatePermissions(invalidResource, domCreatePerm_create_withGrant);
          fail("revoking domain create permissions with non-existent accessor resource reference should have failed");
       }
       catch (IllegalArgumentException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("not found"));
       }
       try {
-         accessControlContext.revokeDomainCreatePermissions(Resources.getInstance(-999L),
+         accessControlContext.revokeDomainCreatePermissions(invalidExternalResource, domCreatePerm_create_withGrant);
+         fail("revoking domain create permissions with non-existent external accessor resource reference should have failed");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("not found"));
+      }
+      try {
+         accessControlContext.revokeDomainCreatePermissions(mismatchedResource, domCreatePerm_create_withGrant);
+         fail("revoking domain create permissions with mismatched internal/external accessor resource reference should have failed");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("not resolve"));
+      }
+
+      try {
+         accessControlContext.revokeDomainCreatePermissions(invalidResource,
                                                             setOf(domCreatePerm_create_withGrant));
          fail("revoking domain create permissions with non-existent accessor resource reference should have failed");
       }
       catch (IllegalArgumentException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("not found"));
+      }
+      try {
+         accessControlContext.revokeDomainCreatePermissions(invalidExternalResource,
+                                                            setOf(domCreatePerm_create_withGrant));
+         fail("revoking domain create permissions with non-existent external accessor resource reference should have failed");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("not found"));
+      }
+      try {
+         accessControlContext.revokeDomainCreatePermissions(mismatchedResource,
+                                                            setOf(domCreatePerm_create_withGrant));
+         fail("revoking domain create permissions with mismatched internal/external accessor resource reference should have failed");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("not resolve"));
       }
    }
 }

@@ -55,6 +55,30 @@ public class TestAccessControl_setDomainPermissions extends TestAccessControlBas
    }
 
    @Test
+   public void setDomainPermissions_withExtId() {
+      authenticateSystemResource();
+      final DomainPermission domainPermission_superUser = DomainPermissions.getInstance(DomainPermissions.SUPER_USER);
+      final DomainPermission domainPermission_child_withGrant = DomainPermissions.getInstance(DomainPermissions.CREATE_CHILD_DOMAIN,
+                                                                                              true);
+
+      final String domainName = generateDomain();
+      final String externalId = generateUniqueExternalId();
+      final Resource accessorResource = generateUnauthenticatableResourceWithExtId(externalId);
+      assertThat(accessControlContext.getEffectiveDomainPermissions(accessorResource, domainName).isEmpty(), is(true));
+
+      Set<DomainPermission> domainPermissions_pre = new HashSet<>();
+      domainPermissions_pre.add(domainPermission_superUser);
+      domainPermissions_pre.add(domainPermission_child_withGrant);
+
+      // set domain permissions and verify
+      accessControlContext.setDomainPermissions(Resources.getInstance(externalId), domainName, domainPermissions_pre);
+
+      final Set<DomainPermission> domainPermissions_post
+            = accessControlContext.getDomainPermissions(accessorResource, domainName);
+      assertThat(domainPermissions_post, is(domainPermissions_pre));
+   }
+
+   @Test
    public void setDomainPermissions_validAsAuthorized() {
       authenticateSystemResource();
       final DomainPermission domPerm_delete_withGrant
@@ -496,6 +520,13 @@ public class TestAccessControl_setDomainPermissions extends TestAccessControlBas
       catch (NullPointerException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("resource required"));
       }
+      try {
+         accessControlContext.setDomainPermissions(Resources.getInstance(null), domainName, domainPermissions);
+         fail("setting domain permissions with null internal/external resource ids should have failed");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("resource id and/or external id is required"));
+      }
 
       try {
          accessControlContext.setDomainPermissions(accessorResource, null, domainPermissions);
@@ -533,13 +564,30 @@ public class TestAccessControl_setDomainPermissions extends TestAccessControlBas
 
       final String domainName = generateDomain();
       Resource accessorResource = generateUnauthenticatableResource();
+      final Resource invalidResource = Resources.getInstance(-999L);
+      final Resource invalidExternalResource = Resources.getInstance("invalid");
+      final Resource mismatchedResource = Resources.getInstance(-999L, "invalid");
 
       try {
-         accessControlContext.setDomainPermissions(Resources.getInstance(-999L), domainName, domainPermissions);
+         accessControlContext.setDomainPermissions(invalidResource, domainName, domainPermissions);
          fail("setting domain permissions with non-existent accessor resource reference should have failed");
       }
       catch (IllegalArgumentException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("not found"));
+      }
+      try {
+         accessControlContext.setDomainPermissions(invalidExternalResource, domainName, domainPermissions);
+         fail("setting domain permissions with non-existent external accessor resource reference should have failed");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("not found"));
+      }
+      try {
+         accessControlContext.setDomainPermissions(mismatchedResource, domainName, domainPermissions);
+         fail("setting domain permissions with mismatched internal/external resource references should have failed");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("not resolve"));
       }
 
       try {

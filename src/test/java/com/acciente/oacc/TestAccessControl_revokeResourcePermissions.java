@@ -73,6 +73,82 @@ public class TestAccessControl_revokeResourcePermissions extends TestAccessContr
    }
 
    @Test
+   public void revokeResourcePermissions_withExtId() {
+      authenticateSystemResource();
+      final String resourceClassName = generateResourceClass(false, false);
+      final String customPermissionName = generateResourceClassPermission(resourceClassName);
+      final String accessorExternalId = generateUniqueExternalId();
+      final Resource accessorResource = generateUnauthenticatableResourceWithExtId(accessorExternalId);
+      final String accessedExternalId = generateUniqueExternalId();
+      final String domainName = generateDomain();
+      final Resource accessedResource = accessControlContext.createResource(resourceClassName,
+                                                                            domainName,
+                                                                            accessedExternalId);
+      assertThat(accessControlContext.getEffectiveResourcePermissions(accessorResource, accessedResource).isEmpty(), is(
+            true));
+
+      Set<ResourcePermission> permissions_pre = new HashSet<>();
+      permissions_pre.add(ResourcePermissions.getInstance(ResourcePermissions.INHERIT));
+      permissions_pre.add(ResourcePermissions.getInstance(customPermissionName));
+
+      accessControlContext.setResourcePermissions(accessorResource, accessedResource, permissions_pre);
+      assertThat(accessControlContext.getEffectiveResourcePermissions(accessorResource, accessedResource),
+                 is(permissions_pre));
+
+      // revoke permissions and verify
+      accessControlContext.revokeResourcePermissions(Resources.getInstance(accessorExternalId),
+                                                     accessedResource,
+                                                     ResourcePermissions.getInstance(ResourcePermissions.INHERIT),
+                                                     ResourcePermissions.getInstance(customPermissionName));
+
+      Set<ResourcePermission> permissions_post = accessControlContext.getEffectiveResourcePermissions(accessorResource, accessedResource);
+      assertThat(permissions_post.isEmpty(), is(true));
+
+      final String accessorExternalId2 = generateUniqueExternalId();
+      final Resource accessorResource2 = generateUnauthenticatableResourceWithExtId(accessorExternalId2);
+      accessControlContext.setResourcePermissions(accessorResource2, accessedResource, permissions_pre);
+      assertThat(accessControlContext.getEffectiveResourcePermissions(accessorResource2, accessedResource),
+                 is(permissions_pre));
+
+      accessControlContext.revokeResourcePermissions(accessorResource2,
+                                                     Resources.getInstance(accessedExternalId),
+                                                     ResourcePermissions.getInstance(ResourcePermissions.INHERIT),
+                                                     ResourcePermissions.getInstance(customPermissionName));
+
+      permissions_post = accessControlContext.getEffectiveResourcePermissions(accessorResource2, accessedResource);
+      assertThat(permissions_post.isEmpty(), is(true));
+
+      // test set-based version
+      final String accessedExternalId2 = generateUniqueExternalId();
+      final Resource accessedResource2 = accessControlContext.createResource(resourceClassName,
+                                                                             domainName,
+                                                                             accessedExternalId2);
+      accessControlContext.setResourcePermissions(accessorResource, accessedResource2, permissions_pre);
+      assertThat(accessControlContext.getEffectiveResourcePermissions(accessorResource, accessedResource2),
+                 is(permissions_pre));
+
+      accessControlContext.revokeResourcePermissions(Resources.getInstance(accessorExternalId),
+                                                     accessedResource2,
+                                                     setOf(ResourcePermissions.getInstance(ResourcePermissions.INHERIT),
+                                                           ResourcePermissions.getInstance(customPermissionName)));
+
+      assertThat(accessControlContext.getEffectiveResourcePermissions(accessorResource, accessedResource2).isEmpty(),
+                 is(true));
+
+      accessControlContext.setResourcePermissions(accessorResource2, accessedResource2, permissions_pre);
+      assertThat(accessControlContext.getEffectiveResourcePermissions(accessorResource2, accessedResource2),
+                 is(permissions_pre));
+
+      accessControlContext.revokeResourcePermissions(accessorResource2,
+                                                     Resources.getInstance(accessedExternalId2),
+                                                     setOf(ResourcePermissions.getInstance(ResourcePermissions.INHERIT),
+                                                           ResourcePermissions.getInstance(customPermissionName)));
+
+      assertThat(accessControlContext.getEffectiveResourcePermissions(accessorResource2, accessedResource2).isEmpty(),
+                 is(true));
+   }
+
+   @Test
    public void revokeResourcePermissions_ungrantedPermissions_shouldSucceed() {
       authenticateSystemResource();
       final String resourceClassName = generateResourceClass(false, false);
@@ -695,6 +771,15 @@ public class TestAccessControl_revokeResourcePermissions extends TestAccessContr
       catch (NullPointerException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("resource required"));
       }
+      try {
+         accessControlContext.revokeResourcePermissions(Resources.getInstance(null),
+                                                        accessedResource,
+                                                        ResourcePermissions.getInstance(ResourcePermissions.INHERIT));
+         fail("revoking permissions for null internal/external accessor resource ids should have failed");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("resource id and/or external id is required"));
+      }
 
       try {
          accessControlContext.revokeResourcePermissions(accessedResource,
@@ -704,6 +789,15 @@ public class TestAccessControl_revokeResourcePermissions extends TestAccessContr
       }
       catch (NullPointerException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("resource required"));
+      }
+      try {
+         accessControlContext.revokeResourcePermissions(accessorResource,
+                                                        Resources.getInstance(null),
+                                                        ResourcePermissions.getInstance(ResourcePermissions.INHERIT));
+         fail("revoking permissions for null internal/external accessed resource ids should have failed");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("resource id and/or external id is required"));
       }
 
       try {
@@ -738,6 +832,16 @@ public class TestAccessControl_revokeResourcePermissions extends TestAccessContr
       catch (NullPointerException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("resource required"));
       }
+      try {
+         accessControlContext.revokeResourcePermissions(Resources.getInstance(null),
+                                                        accessedResource,
+                                                        setOf(ResourcePermissions
+                                                                    .getInstance(ResourcePermissions.INHERIT)));
+         fail("revoking permissions for null internal/external accessor resource ids should have failed");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("resource id and/or external id is required"));
+      }
 
       try {
          accessControlContext.revokeResourcePermissions(accessedResource,
@@ -748,6 +852,16 @@ public class TestAccessControl_revokeResourcePermissions extends TestAccessContr
       }
       catch (NullPointerException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("resource required"));
+      }
+      try {
+         accessControlContext.revokeResourcePermissions(accessorResource,
+                                                        Resources.getInstance(null),
+                                                        setOf(ResourcePermissions
+                                                                    .getInstance(ResourcePermissions.INHERIT)));
+         fail("revoking permissions for null internal/external accessed resource ids should have failed");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("resource id and/or external id is required"));
       }
 
       try {
@@ -801,6 +915,9 @@ public class TestAccessControl_revokeResourcePermissions extends TestAccessContr
       final Resource accessorResource = generateUnauthenticatableResource();
       final Resource accessedResource = accessControlContext.createResource(resourceClassName, generateDomain());
       assertThat(accessControlContext.getEffectiveResourcePermissions(accessorResource, accessedResource).isEmpty(), is(true));
+      final Resource invalidResource = Resources.getInstance(-999L);
+      final Resource invalidExternalResource = Resources.getInstance("invalid");
+      final Resource mismatchedResource = Resources.getInstance(-999L, "invalid");
 
       Set<ResourcePermission> accessorPermissions
             = setOf(ResourcePermissions.getInstance(ResourcePermissions.INHERIT, true),
@@ -812,7 +929,7 @@ public class TestAccessControl_revokeResourcePermissions extends TestAccessContr
 
       // attempt to revoke permissions with non-existent references
       try {
-         accessControlContext.revokeResourcePermissions(Resources.getInstance(-999L),
+         accessControlContext.revokeResourcePermissions(invalidResource,
                                                         accessedResource,
                                                         ResourcePermissions.getInstance(ResourcePermissions.INHERIT),
                                                         ResourcePermissions.getInstance(customPermissionName));
@@ -821,16 +938,56 @@ public class TestAccessControl_revokeResourcePermissions extends TestAccessContr
       catch (IllegalArgumentException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("not found"));
       }
+      try {
+         accessControlContext.revokeResourcePermissions(invalidExternalResource,
+                                                        accessedResource,
+                                                        ResourcePermissions.getInstance(ResourcePermissions.INHERIT),
+                                                        ResourcePermissions.getInstance(customPermissionName));
+         fail("revoking permissions with non-existent external accessor resource reference should have failed");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("not found"));
+      }
+      try {
+         accessControlContext.revokeResourcePermissions(mismatchedResource,
+                                                        accessedResource,
+                                                        ResourcePermissions.getInstance(ResourcePermissions.INHERIT),
+                                                        ResourcePermissions.getInstance(customPermissionName));
+         fail("revoking permissions with mismatched internal/external accessor resource references should have failed");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("not resolve"));
+      }
 
       try {
          accessControlContext.revokeResourcePermissions(accessorResource,
-                                                        Resources.getInstance(-999L),
+                                                        invalidResource,
                                                         ResourcePermissions.getInstance(ResourcePermissions.INHERIT),
                                                         ResourcePermissions.getInstance(customPermissionName));
          fail("revoking permissions with non-existent accessed resource reference should have failed");
       }
       catch (IllegalArgumentException e) {
-         assertThat(e.getMessage().toLowerCase(), containsString("could not determine resource class for resource"));
+         assertThat(e.getMessage().toLowerCase(), containsString("not found"));
+      }
+      try {
+         accessControlContext.revokeResourcePermissions(accessorResource,
+                                                        invalidExternalResource,
+                                                        ResourcePermissions.getInstance(ResourcePermissions.INHERIT),
+                                                        ResourcePermissions.getInstance(customPermissionName));
+         fail("revoking permissions with non-existent external accessed resource reference should have failed");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("not found"));
+      }
+      try {
+         accessControlContext.revokeResourcePermissions(accessorResource,
+                                                        mismatchedResource,
+                                                        ResourcePermissions.getInstance(ResourcePermissions.INHERIT),
+                                                        ResourcePermissions.getInstance(customPermissionName));
+         fail("revoking permissions with mismatched internal/external accessed resource references should have failed");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("not resolve"));
       }
 
       try {
@@ -845,7 +1002,7 @@ public class TestAccessControl_revokeResourcePermissions extends TestAccessContr
 
       // test set-based version
       try {
-         accessControlContext.revokeResourcePermissions(Resources.getInstance(-999L),
+         accessControlContext.revokeResourcePermissions(invalidResource,
                                                         accessedResource,
                                                         setOf(ResourcePermissions
                                                                     .getInstance(ResourcePermissions.INHERIT),
@@ -855,17 +1012,61 @@ public class TestAccessControl_revokeResourcePermissions extends TestAccessContr
       catch (IllegalArgumentException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("not found"));
       }
+      try {
+         accessControlContext.revokeResourcePermissions(invalidExternalResource,
+                                                        accessedResource,
+                                                        setOf(ResourcePermissions
+                                                                    .getInstance(ResourcePermissions.INHERIT),
+                                                              ResourcePermissions.getInstance(customPermissionName)));
+         fail("revoking permissions with non-existent external accessor resource reference should have failed");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("not found"));
+      }
+      try {
+         accessControlContext.revokeResourcePermissions(mismatchedResource,
+                                                        accessedResource,
+                                                        setOf(ResourcePermissions
+                                                                    .getInstance(ResourcePermissions.INHERIT),
+                                                              ResourcePermissions.getInstance(customPermissionName)));
+         fail("revoking permissions with mismatched internal/external accessor resource references should have failed");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("not resolve"));
+      }
 
       try {
          accessControlContext.revokeResourcePermissions(accessorResource,
-                                                        Resources.getInstance(-999L),
+                                                        invalidResource,
                                                         setOf(ResourcePermissions
                                                                     .getInstance(ResourcePermissions.INHERIT),
                                                               ResourcePermissions.getInstance(customPermissionName)));
          fail("revoking permissions with non-existent accessed resource reference should have failed");
       }
       catch (IllegalArgumentException e) {
-         assertThat(e.getMessage().toLowerCase(), containsString("could not determine resource class for resource"));
+         assertThat(e.getMessage().toLowerCase(), containsString("not found"));
+      }
+      try {
+         accessControlContext.revokeResourcePermissions(accessorResource,
+                                                        invalidExternalResource,
+                                                        setOf(ResourcePermissions
+                                                                    .getInstance(ResourcePermissions.INHERIT),
+                                                              ResourcePermissions.getInstance(customPermissionName)));
+         fail("revoking permissions with non-existent external accessed resource reference should have failed");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("not found"));
+      }
+      try {
+         accessControlContext.revokeResourcePermissions(accessorResource,
+                                                        mismatchedResource,
+                                                        setOf(ResourcePermissions
+                                                                    .getInstance(ResourcePermissions.INHERIT),
+                                                              ResourcePermissions.getInstance(customPermissionName)));
+         fail("revoking permissions with mismatched internal/external accessed resource references should have failed");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("not resolve"));
       }
 
       try {
