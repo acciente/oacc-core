@@ -436,8 +436,6 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
    }
 
    private void __assertImpersonatePermission(SQLConnection connection, Resource resource) {
-      __assertResourceExists(connection, resource);
-
       final ResourceClassInternalInfo resourceClassInternalInfo
             = resourceClassPersister.getResourceClassInfoByResourceId(connection, resource);
 
@@ -1120,8 +1118,6 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       }
 
       if (!newDomainMode) {
-         __assertResourceExists(connection, accessorResource);
-
          // check if the grantor (=session resource) has permissions to grant the requested permissions
          final Set<DomainPermission>
                grantorPermissions
@@ -1271,8 +1267,6 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
          throw new IllegalArgumentException("Set of requested domain permissions may not be null");
       }
 
-      __assertResourceExists(connection, accessorResource);
-
       // check if the grantor (=session resource) has permissions to grant the requested permissions
       final Set<DomainPermission>
             grantorPermissions
@@ -1419,8 +1413,6 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       if (requestedDomainPermissions == null) {
          throw new IllegalArgumentException("Set of requested domain permissions to be revoked may not be null");
       }
-
-      __assertResourceExists(connection, accessorResource);
 
       final Set<DomainPermission>
             grantorPermissions
@@ -1659,7 +1651,6 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
                                                    Set<DomainCreatePermission> requestedDomainCreatePermissions) {
       __assertSetContainsDomainCreateSystemPermission(requestedDomainCreatePermissions);
       __assertUniqueSystemOrPostCreateDomainPermissionNames(requestedDomainCreatePermissions);
-      __assertResourceExists(connection, accessorResource);
 
       // check if grantor (=session resource) is authorized to add/remove requested permissions
       final Set<DomainCreatePermission>
@@ -1819,7 +1810,6 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
                                                      Resource accessorResource,
                                                      Set<DomainCreatePermission> requestedDomainCreatePermissions) {
       __assertUniqueSystemOrPostCreateDomainPermissionNames(requestedDomainCreatePermissions);
-      __assertResourceExists(connection, accessorResource);
 
       // check if grantor (=session resource) is authorized to add requested permissions
       final Set<DomainCreatePermission>
@@ -2016,7 +2006,6 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
                                                       Resource accessorResource,
                                                       Set<DomainCreatePermission> requestedDomainCreatePermissions) {
       __assertUniqueSystemOrPostCreateDomainPermissionNames(requestedDomainCreatePermissions);
-      __assertResourceExists(connection, accessorResource);
 
       // check if grantor (=session resource) is authorized to revoke requested permissions
       final Set<DomainCreatePermission>
@@ -2181,8 +2170,6 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
                                                      String resourceClassName,
                                                      String domainName,
                                                      Set<ResourceCreatePermission> requestedResourceCreatePermissions) {
-      __assertResourceExists(connection, accessorResource);
-
       // verify that resource class is defined and get its metadata
       final ResourceClassInternalInfo resourceClassInfo = __getResourceClassInternalInfo(connection,
                                                                                          resourceClassName);
@@ -2482,8 +2469,6 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
                                                        String resourceClassName,
                                                        String domainName,
                                                        Set<ResourceCreatePermission> requestedResourceCreatePermissions) {
-      __assertResourceExists(connection, accessorResource);
-
       // verify that resource class is defined and get its metadata
       final ResourceClassInternalInfo resourceClassInfo = __getResourceClassInternalInfo(connection,
                                                                                          resourceClassName);
@@ -2714,8 +2699,6 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
                                                         String resourceClassName,
                                                         String domainName,
                                                         Set<ResourceCreatePermission> requestedResourceCreatePermissions) {
-      __assertResourceExists(connection, accessorResource);
-
       // verify that resource class is defined and get its metadata
       final ResourceClassInternalInfo resourceClassInfo = __getResourceClassInternalInfo(connection,
                                                                                          resourceClassName);
@@ -3232,8 +3215,6 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       // if this method is being called to set the post create permissions on a newly created resource
       // we do not perform the security checks below, since it would be incorrect
       if (!newResourceMode) {
-         __assertResourceExists(connection, accessorResource);
-
          if (!__isSuperUserOfResource(connection, grantorResource, accessedResource)) {
             // next check if the grantor (i.e. session resource) has permissions to grant the requested permissions
             final Set<ResourcePermission>
@@ -3434,8 +3415,6 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
                                                  Resource accessorResource,
                                                  Resource accessedResource,
                                                  Set<ResourcePermission> requestedResourcePermissions) {
-      __assertResourceExists(connection, accessorResource);
-
       final ResourceClassInternalInfo accessedResourceClassInternalInfo
             = resourceClassPersister.getResourceClassInfoByResourceId(connection, accessedResource);
 
@@ -3604,8 +3583,6 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
                                                   Resource accessorResource,
                                                   Resource accessedResource,
                                                   Set<ResourcePermission> obsoleteResourcePermissions) {
-      __assertResourceExists(connection, accessorResource);
-
       final ResourceClassInternalInfo accessedResourceClassInternalInfo
             = resourceClassPersister.getResourceClassInfoByResourceId(connection, accessedResource);
 
@@ -3842,8 +3819,6 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
                                              String resourceClassName,
                                              String domainName,
                                              Set<ResourcePermission> requestedResourcePermissions) {
-      __assertResourceExists(connection, accessorResource);
-
       // verify that resource class is defined
       final Id<ResourceClassId> resourceClassId = resourceClassPersister.getResourceClassId(connection, resourceClassName);
 
@@ -4073,8 +4048,6 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
                                                String resourceClassName,
                                                String domainName,
                                                Set<ResourcePermission> requestedResourcePermissions) {
-      __assertResourceExists(connection, accessorResource);
-
       // verify that resource class is defined
       final Id<ResourceClassId> resourceClassId = resourceClassPersister.getResourceClassId(connection, resourceClassName);
 
@@ -4246,8 +4219,6 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
                                                 String resourceClassName,
                                                 String domainName,
                                                 Set<ResourcePermission> requestedResourcePermissions) {
-      __assertResourceExists(connection, accessorResource);
-
       // verify that resource class is defined
       final ResourceClassInternalInfo resourceClassInfo = __getResourceClassInternalInfo(connection,
                                                                                          resourceClassName);
@@ -4834,7 +4805,6 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
    private boolean __hasPostCreateDomainPermissions(SQLConnection connection,
                                                     Resource accessorResource,
                                                     Set<DomainPermission> requestedDomainPermissions) {
-      __assertResourceExists(connection, accessorResource);
       __assertQueryAuthorization(connection, accessorResource);
 
       boolean hasPermission = false;
@@ -4960,7 +4930,6 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
                                           Resource accessorResource,
                                           String domainName,
                                           Set<DomainPermission> requestedDomainPermissions) {
-      __assertResourceExists(connection, accessorResource);
       __assertQueryAuthorization(connection, accessorResource);
 
       // first check for effective permissions
@@ -5053,7 +5022,6 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
    private boolean __hasDomainCreatePermissions(SQLConnection connection,
                                                 Resource accessorResource,
                                                 Set<DomainCreatePermission> queriedDomainCreatePermissions) {
-      __assertResourceExists(connection, accessorResource);
       __assertQueryAuthorization(connection, accessorResource);
 
       final Set<DomainCreatePermission> effectiveDomainCreatePermissions
@@ -5185,7 +5153,6 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
                                                       String resourceClassName,
                                                       String domainName,
                                                       Set<ResourcePermission> requestedResourcePermissions) {
-      __assertResourceExists(connection, accessorResource);
       __assertPermissionsValid(connection, resourceClassName, requestedResourcePermissions);
       __assertQueryAuthorization(connection, accessorResource);
 
@@ -5361,7 +5328,6 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
                                                   String resourceClassName,
                                                   String domainName,
                                                   Set<ResourcePermission> requestedResourcePermissions) {
-      __assertResourceExists(connection, accessorResource);
       __assertPermissionsValid(connection, resourceClassName, requestedResourcePermissions);
       __assertQueryAuthorization(connection, accessorResource);
 
@@ -5465,7 +5431,6 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
                                             Resource accessorResource,
                                             Resource accessedResource,
                                             Set<ResourcePermission> requestedResourcePermissions) {
-      __assertResourceExists(connection, accessorResource);
       __assertQueryAuthorization(connection, accessorResource);
 
       final ResourceClassInternalInfo resourceClassInternalInfo
@@ -5602,7 +5567,6 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
                                                   String resourceClassName,
                                                   String domainName,
                                                   Set<ResourceCreatePermission> requestedResourceCreatePermissions) {
-      __assertResourceExists(connection, accessorResource);
       __assertPermissionsValid(connection,
                                resourceClassName,
                                __getPostCreateResourcePermissions(requestedResourceCreatePermissions));
@@ -6160,16 +6124,50 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
             }
          }
          else {
-            // ensure that we have a valid internal resource id, so we might as well also fully resolve it
-            resolvedResource = resourcePersister.resolveResourceByResourceId(connection, resource);
+            // ensure that we have a valid internal resource id, so we might as well also fully resolve it, UNLESS
+            // we already have a resolved instance of this resource cached in authenticatedResource/sessionResource
+
+            if (sessionResource != null) {
+               // this context is authenticated, so let's compare against our resolved cached resources
+               if (sessionResource.equals(resource)) {
+                  resolvedResource = sessionResource;
+               }
+               else if (authenticatedResource.equals(resource)) {
+                  resolvedResource = authenticatedResource;
+               }
+               else {
+                  resolvedResource = resourcePersister.resolveResourceByResourceId(connection, resource);
+               }
+            }
+            else {
+               resolvedResource = resourcePersister.resolveResourceByResourceId(connection, resource);
+            }
+
             if (resolvedResource == null) {
                throw new IllegalArgumentException("Resource " + resource + " not found!");
             }
          }
       }
       else if (resource.getExternalId() != null) {
-         // there is no internal resource Id, so we need to look it up
-         resolvedResource = resourcePersister.resolveResourceByExternalId(connection, resource.getExternalId());
+         // there is no internal resource Id, so we need to look it up, UNLESS
+         // we already have a resolved instance of this resource cached in authenticatedResource/sessionResource
+
+         if (sessionResource != null) {
+            // this context is authenticated, so let's compare against our resolved cached resources
+            if (resource.getExternalId().equals(sessionResource.getExternalId())) {
+               resolvedResource = sessionResource;
+            }
+            else if (resource.getExternalId().equals(authenticatedResource.getExternalId())) {
+               resolvedResource = authenticatedResource;
+            }
+            else {
+               resolvedResource = resourcePersister.resolveResourceByExternalId(connection, resource.getExternalId());
+            }
+         }
+         else {
+            resolvedResource = resourcePersister.resolveResourceByExternalId(connection, resource.getExternalId());
+         }
+
          if (resolvedResource == null) {
             throw new IllegalArgumentException("Resource " + resource + " not found!");
          }
@@ -6443,16 +6441,6 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
                                                         + resourceClassName);
             }
          }
-      }
-   }
-
-   private void __assertResourceExists(SQLConnection connection,
-                                       Resource resource) {
-      // look up resource, but only if it's not the session or authenticated resource (which are already known to exist)
-      if ((authenticatedResource == null) ||
-            !(sessionResource.equals(resource) || authenticatedResource.equals(resource))) {
-         // the persister method will throw an IllegalArgumentException if the lookup fails
-         resourcePersister.verifyResourceExists(connection, resource);
       }
    }
 
