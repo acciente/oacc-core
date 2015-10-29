@@ -516,10 +516,12 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
             throw new IllegalArgumentException("Calling setCredentials for an unauthenticatable resource is not valid");
          }
 
-         domainName = domainPersister.getResourceDomainNameByResourceId(connection, resource);
-
-         // skip permission checks if the authenticated resource is trying to set its own credentials
-         if (!authenticatedResource.equals(resource)) {
+         if (authenticatedResource.equals(resource)) {
+            domainName = authenticatedResourceDomainName;
+            // skip permission checks if the authenticated resource is trying to set its own credentials
+         }
+         else {
+            domainName = domainPersister.getResourceDomainNameByResourceId(connection, resource);
             __assertResetCredentialsResourcePermission(connection,
                                                        resource,
                                                        resourceClassInfo.getResourceClassName(),
