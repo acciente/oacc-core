@@ -6117,6 +6117,14 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
 
    private Resource __resolveResource(SQLConnection connection,
                                       Resource resource) {
+      if (__isEqual(sessionResource, resource)) {
+         return sessionResource;
+      }
+
+      if (__isEqual(authenticatedResource, resource)) {
+         return authenticatedResource;
+      }
+
       final Resource resolvedResource;
 
       if (resource.getId() != null) {
@@ -6128,24 +6136,8 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
             }
          }
          else {
-            // ensure that we have a valid internal resource id, so we might as well also fully resolve it, UNLESS
-            // we already have a resolved instance of this resource cached in authenticatedResource/sessionResource
-
-            if (sessionResource != null) {
-               // this context is authenticated, so let's compare against our resolved cached resources
-               if (sessionResource.equals(resource)) {
-                  resolvedResource = sessionResource;
-               }
-               else if (authenticatedResource.equals(resource)) {
-                  resolvedResource = authenticatedResource;
-               }
-               else {
-                  resolvedResource = resourcePersister.resolveResourceByResourceId(connection, resource);
-               }
-            }
-            else {
-               resolvedResource = resourcePersister.resolveResourceByResourceId(connection, resource);
-            }
+            // ensure that we have a valid internal resource id, so we might as well also fully resolve it
+            resolvedResource = resourcePersister.resolveResourceByResourceId(connection, resource);
 
             if (resolvedResource == null) {
                throw new IllegalArgumentException("Resource " + resource + " not found!");
@@ -6153,24 +6145,8 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
          }
       }
       else if (resource.getExternalId() != null) {
-         // there is no internal resource Id, so we need to look it up, UNLESS
-         // we already have a resolved instance of this resource cached in authenticatedResource/sessionResource
-
-         if (sessionResource != null) {
-            // this context is authenticated, so let's compare against our resolved cached resources
-            if (resource.getExternalId().equals(sessionResource.getExternalId())) {
-               resolvedResource = sessionResource;
-            }
-            else if (resource.getExternalId().equals(authenticatedResource.getExternalId())) {
-               resolvedResource = authenticatedResource;
-            }
-            else {
-               resolvedResource = resourcePersister.resolveResourceByExternalId(connection, resource.getExternalId());
-            }
-         }
-         else {
-            resolvedResource = resourcePersister.resolveResourceByExternalId(connection, resource.getExternalId());
-         }
+         // there is no internal resource Id, so we need to look it up
+         resolvedResource = resourcePersister.resolveResourceByExternalId(connection, resource.getExternalId());
 
          if (resolvedResource == null) {
             throw new IllegalArgumentException("Resource " + resource + " not found!");
@@ -6181,6 +6157,27 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       }
 
       return resolvedResource;
+   }
+
+   private static boolean __isEqual(Resource resource1, Resource resource2) {
+      if (resource1 == resource2) {
+         return true;
+      }
+      if (resource1 == null) {
+         return false;
+      }
+      return resource1.getId() == resource2.getId()
+            && __isEqual(resource1.getExternalId(), resource2.getExternalId());
+   }
+
+   private static boolean __isEqual(String s1, String s2) {
+      if (s1 == s2) {
+         return true;
+      }
+      if (s1 == null) {
+         return false;
+      }
+      return s1.equals(s2);
    }
 
    private List<String> __getApplicableResourcePermissionNames(SQLConnection connection,
