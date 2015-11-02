@@ -518,7 +518,7 @@ public class TestAccessControl_createResource extends TestAccessControlBase {
       else {
          // create resource
          final Resource resource = accessControlContext.createResource(resourceClassName, domainName, externalId_lower);
-         assertThat(resource.getExternalId(), is(externalId));
+         assertThat(resource.getExternalId(), is(externalId_lower));
 
          // create resource with same but case-insensitive external id and verify
          try {

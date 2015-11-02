@@ -645,7 +645,7 @@ public class TestAccessControl_createAuthenticatableResource extends TestAccessC
                                                                        domainName,
                                                                        externalId_lower,
                                                                        password);
-         assertThat(resource.getExternalId(), is(externalId));
+         assertThat(resource.getExternalId(), is(externalId_lower));
 
          // create resource with same but case-insensitive external id and verify
          try {
