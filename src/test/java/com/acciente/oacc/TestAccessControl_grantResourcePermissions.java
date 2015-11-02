@@ -949,6 +949,122 @@ public class TestAccessControl_grantResourcePermissions extends TestAccessContro
    }
 
    @Test
+   public void grantResourcePermissions_inheritanceCycle_fromSelfAsSuperUser_shouldFail() {
+      authenticateSystemResource();
+
+      final String accessorDomain = generateDomain();
+      final String accessorResourceClass = generateResourceClass(true, false);
+      final PasswordCredentials accessorCredentials = PasswordCredentials.newInstance(generateUniquePassword());
+      final Resource accessorResource = accessControlContext.createResource(accessorResourceClass,
+                                                                            accessorDomain,
+                                                                            accessorCredentials);
+
+      // set up accessor resource as a super user on the accessor domain (so we can later grant accessed permission on ourselves)
+      accessControlContext.setDomainPermissions(accessorResource,
+                                                accessorDomain,
+                                                setOf(DomainPermissions.getInstance(DomainPermissions.SUPER_USER)));
+
+      accessControlContext.assertDomainPermissions(accessorResource,
+                                                   accessorDomain,
+                                                   DomainPermissions.getInstance(DomainPermissions.SUPER_USER));
+
+      // authenticate as accessor resource
+      accessControlContext.authenticate(accessorResource, accessorCredentials);
+
+      // attempt to grant inherit permission on self
+      try {
+         accessControlContext.grantResourcePermissions(accessorResource,
+                                                       accessorResource,
+                                                       ResourcePermissions.getInstance(ResourcePermissions.INHERIT));
+         fail("granting direct resource permissions that would create an inherit cycle should have failed");
+      }
+      catch (OaccException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("will cause a cycle"));
+      }
+      try {
+         accessControlContext.grantResourcePermissions(accessorResource,
+                                                       accessorResource,
+                                                       setOf(ResourcePermissions
+                                                                   .getInstance(ResourcePermissions.INHERIT)));
+         fail("granting direct resource permissions that would create an inherit cycle should have failed");
+      }
+      catch (OaccException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("will cause a cycle"));
+      }
+   }
+
+   @Test
+   public void grantResourcePermissions_inheritanceCycle_fromSelfWithCustomResourceImpl_shouldFail() {
+      authenticateSystemResource();
+
+      final String accessorDomain = generateDomain();
+      final String accessorResourceClass = generateResourceClass(true, false);
+      final PasswordCredentials accessorCredentials = PasswordCredentials.newInstance(generateUniquePassword());
+      final Resource accessorResource = accessControlContext.createResource(accessorResourceClass,
+                                                                            accessorDomain,
+                                                                            accessorCredentials);
+
+      // set up accessor resource as a super user on the accessor domain (so we can later grant accessed permission on ourselves)
+      accessControlContext.setDomainPermissions(accessorResource,
+                                                accessorDomain,
+                                                setOf(DomainPermissions.getInstance(DomainPermissions.SUPER_USER)));
+
+      accessControlContext.assertDomainPermissions(accessorResource,
+                                                   accessorDomain,
+                                                   DomainPermissions.getInstance(DomainPermissions.SUPER_USER));
+
+      // authenticate as accessor resource
+      accessControlContext.authenticate(accessorResource, accessorCredentials);
+
+      Resource customAccessorResource = new Resource() {
+         @Override
+         public Long getId() {
+            // return the resolved value of our currently authenticated accessorResource
+            return accessControlContext.getAuthenticatedResource().getId();
+         }
+
+         @Override
+         public String getExternalId() {
+            // return the resolved value of our currently authenticated accessorResource
+            return accessControlContext.getAuthenticatedResource().getExternalId();
+         }
+
+         @Override
+         public boolean equals(Object o) {
+            // return false to pass the cycle check of: "is accessor resource the same as the authenticated resource?"
+            // NOTE! this still won't cause a cycle because we resolve incoming resource parameters to our own implementation
+            return false;
+         }
+      };
+
+      assertThat(customAccessorResource.equals(customAccessorResource), is(false));
+      assertThat(customAccessorResource.equals(accessorResource), is(false));
+      assertThat(customAccessorResource.getId(), is(accessorResource.getId()));
+      assertThat(customAccessorResource.getExternalId(), is(accessorResource.getExternalId()));
+
+      // attempt to grant inherit permission on self
+      try {
+         accessControlContext.grantResourcePermissions(customAccessorResource,
+                                                       customAccessorResource,
+                                                       ResourcePermissions.getInstance(ResourcePermissions.INHERIT));
+         fail("granting direct resource permissions that would create an inherit cycle should have failed");
+      }
+      catch (OaccException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("will cause a cycle"));
+      }
+      try {
+         accessControlContext.grantResourcePermissions(customAccessorResource,
+                                                       customAccessorResource,
+                                                       setOf(ResourcePermissions
+                                                                   .getInstance(ResourcePermissions.INHERIT)));
+         fail("granting direct resource permissions that would create an inherit cycle should have failed");
+      }
+      catch (OaccException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("will cause a cycle"));
+      }
+   }
+
+   @Test
    public void grantResourcePermissions_inheritanceCycle_fromPostCreateInherit_shouldFail() {
       // the test case of granting accessed --INHERIT-> accessor with accessor resource as the grantor
       // can't be produced because we can't grant *ourselves* INHERIT /G (see grantResourcePermissions_inheritanceCycle_onSelf_fromAuthResource_shouldFail);
