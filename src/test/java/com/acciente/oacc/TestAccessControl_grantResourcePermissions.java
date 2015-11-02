@@ -182,6 +182,72 @@ public class TestAccessControl_grantResourcePermissions extends TestAccessContro
    }
 
    @Test
+   public void grantResourcePermissions_impersonatePermissionOnUnauthenticatables_customPermissionImplementation_shouldFail() {
+      authenticateSystemResource();
+      final Resource accessorResource = generateAuthenticatableResource(generateUniquePassword());
+      final Resource accessedResource = generateUnauthenticatableResource();
+      assertThat(accessControlContext.getEffectiveResourcePermissions(accessorResource, accessedResource).isEmpty(), is(true));
+
+      // custom permission has to:
+      // - be a system permission: isSystemPermission():true
+      // - return a valid permission name for the class: e.g. *QUERY
+      // - have the invalid syspermission id for *IMPERSONATE or *RESET-CREDENTIALS if you want to assign to an unauthenticatable resource class
+      // - return false for equalsIgnoreGrant()
+      // - always return false for equals()
+
+      ResourcePermission customImpersonatePermission = new ResourcePermission() {
+         @Override
+         public boolean isSystemPermission() { return true; }
+
+         @Override
+         public String getPermissionName() { return ResourcePermissions.QUERY; }
+
+         @Override
+         public long getSystemPermissionId() { return ResourcePermissions.getInstance(ResourcePermissions.IMPERSONATE).getSystemPermissionId(); }
+
+         @Override
+         public boolean isWithGrantOption() { return true; }
+
+         @Override
+         @Deprecated
+         public boolean isWithGrant() { return isWithGrantOption(); }
+
+         @Override
+         public boolean isGrantableFrom(ResourcePermission other) { return true; }
+
+         @Override
+         public boolean equalsIgnoreGrantOption(Object other) { return false; }
+
+         @Override
+         @Deprecated
+         public boolean equalsIgnoreGrant(Object other) { return equalsIgnoreGrantOption(other); }
+
+         @Override
+         public boolean equals(Object other) { return false; }
+      };
+
+      // attempt to grant *IMPERSONATE system permission
+      try {
+         accessControlContext.grantResourcePermissions(accessorResource,
+                                                       accessedResource,
+                                                       customImpersonatePermission);
+         fail("granting *IMPERSONATE system permission on an unauthenticatable resource should have failed");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("not valid for unauthenticatable resource"));
+      }
+      try {
+         accessControlContext.grantResourcePermissions(accessorResource,
+                                                       accessedResource,
+                                                       setOf(customImpersonatePermission));
+         fail("granting *IMPERSONATE system permission on an unauthenticatable resource should have failed");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("not valid for unauthenticatable resource"));
+      }
+   }
+
+   @Test
    public void grantResourcePermissions_validAsAuthorized() {
       authenticateSystemResource();
       final String resourceClassName = generateResourceClass(false, false);
@@ -577,6 +643,126 @@ public class TestAccessControl_grantResourcePermissions extends TestAccessContro
       catch (NotAuthorizedException e) {
          assertThat(e.getMessage().toLowerCase(), containsString(ungrantedPermissionName.toLowerCase()));
          assertThat(e.getMessage().toLowerCase(), not(containsString(grantedPermissionName)));
+      }
+   }
+
+   @Test
+   public void grantResourcePermissions_addUnauthorizedPermission_withCustomPermissionImplementation_shouldFailAsAuthorized() {
+      authenticateSystemResource();
+      final String resourceClassName = generateResourceClass(false, false);
+      final String grantedPermissionName = generateResourceClassPermission(resourceClassName);
+      final String grantedSysPermissionName = ResourcePermissions.QUERY;
+      final String ungrantedPermissionName = generateResourceClassPermission(resourceClassName);
+      final String ungrantedSysPermissionName = ResourcePermissions.INHERIT;
+      final char[] password = generateUniquePassword();
+      final Resource grantorResource = generateAuthenticatableResource(password);
+      final Resource accessorResource = generateUnauthenticatableResource();
+      final Resource accessedResource = accessControlContext.createResource(resourceClassName, generateDomain());
+      assertThat(accessControlContext.getEffectiveResourcePermissions(accessorResource, accessedResource).isEmpty(), is(true));
+
+      // check accessor permissions
+      assertThat(accessControlContext.getEffectiveResourcePermissions(accessorResource, accessedResource).isEmpty(), is(true));
+
+      // setup grantor permissions
+      // NOTE: for this scenario, we just need at least one permission, to trigger the check against the requested permissions
+      Set<ResourcePermission> grantorResourcePermissions = new HashSet<>();
+      grantorResourcePermissions.add(ResourcePermissions.getInstance(grantedPermissionName));
+      grantorResourcePermissions.add(ResourcePermissions.getInstance(grantedSysPermissionName));
+
+      accessControlContext.setResourcePermissions(grantorResource, accessedResource, grantorResourcePermissions);
+      assertThat(accessControlContext.getEffectiveResourcePermissions(grantorResource, accessedResource), is(grantorResourcePermissions));
+
+      // authenticate grantor resource
+      accessControlContext.authenticate(grantorResource, PasswordCredentials.newInstance(password));
+
+      // attempt to grant permissions as grantor and verify
+      try {
+         accessControlContext.grantResourcePermissions(accessorResource,
+                                                       accessedResource,
+                                                       ResourcePermissions.getInstance(ungrantedPermissionName),
+                                                       ResourcePermissions.getInstance(ungrantedSysPermissionName));
+         fail("granting permission without authorization should have failed");
+      }
+      catch (NotAuthorizedException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString(ungrantedSysPermissionName.toLowerCase()));
+         assertThat(e.getMessage().toLowerCase(), containsString(ungrantedPermissionName));
+      }
+
+      // attempt to grant permissions via custom permission implementation, which has to:
+      // - always return isGrantableFrom(): true
+      // - always return equalsIgnoreGrant(): false
+      ResourcePermission ungrantedCustomPermission = new ResourcePermission() {
+         @Override
+         public boolean isSystemPermission() { return false; }
+
+         @Override
+         public String getPermissionName() { return ungrantedPermissionName; }
+
+         @Override
+         public long getSystemPermissionId() { return 0; }
+
+         @Override
+         public boolean isWithGrantOption() { return true; }
+
+         @Override
+         @Deprecated
+         public boolean isWithGrant() { return isWithGrantOption(); }
+
+         @Override
+         public boolean isGrantableFrom(ResourcePermission other) { return true; }
+
+         @Override
+         public boolean equalsIgnoreGrantOption(Object other) { return false; }
+
+         @Override
+         @Deprecated
+         public boolean equalsIgnoreGrant(Object other) { return equalsIgnoreGrantOption(other); }
+
+         @Override
+         public String toString() { return (isSystemPermission() ? "SYS:" + getPermissionName() : getPermissionName()) + ( isWithGrant() ? " /G" : ""); }
+      };
+
+      ResourcePermission ungrantedCustomSysPermission = new ResourcePermission() {
+         @Override
+         public boolean isSystemPermission() { return true; }
+
+         @Override
+         public String getPermissionName() { return ungrantedSysPermissionName; }
+
+         @Override
+         public long getSystemPermissionId() { return ResourcePermissions.getInstance(ResourcePermissions.INHERIT).getSystemPermissionId(); }
+
+         @Override
+         public boolean isWithGrantOption() { return true; }
+
+         @Override
+         @Deprecated
+         public boolean isWithGrant() { return isWithGrantOption(); }
+
+         @Override
+         public boolean isGrantableFrom(ResourcePermission other) { return true; }
+
+         @Override
+         public boolean equalsIgnoreGrantOption(Object other) { return false; }
+
+         @Override
+         @Deprecated
+         public boolean equalsIgnoreGrant(Object other) { return equalsIgnoreGrantOption(other); }
+
+         @Override
+         public String toString() { return (isSystemPermission() ? "SYS:" + getPermissionName() : getPermissionName()) + ( isWithGrant() ? " /G" : ""); }
+      };
+
+      try {
+         accessControlContext.grantResourcePermissions(accessorResource,
+                                                       accessedResource,
+                                                       ungrantedCustomPermission,
+                                                       ungrantedCustomSysPermission);
+         fail("granting permission without authorization should have failed");
+      }
+      catch (NotAuthorizedException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString(ungrantedSysPermissionName.toLowerCase()));
+         assertThat(e.getMessage().toLowerCase(), containsString(ungrantedPermissionName));
       }
    }
 
@@ -1057,6 +1243,88 @@ public class TestAccessControl_grantResourcePermissions extends TestAccessContro
                                                        customAccessorResource,
                                                        setOf(ResourcePermissions
                                                                    .getInstance(ResourcePermissions.INHERIT)));
+         fail("granting direct resource permissions that would create an inherit cycle should have failed");
+      }
+      catch (OaccException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("will cause a cycle"));
+      }
+   }
+
+   @Test
+   public void grantResourcePermissions_inheritanceCycle_fromSelfWithCustomPermissionImplementation_shouldFail() {
+      authenticateSystemResource();
+
+      final String accessorDomain = generateDomain();
+      final String accessorResourceClass = generateResourceClass(true, false);
+      final PasswordCredentials accessorCredentials = PasswordCredentials.newInstance(generateUniquePassword());
+      final Resource accessorResource = accessControlContext.createResource(accessorResourceClass,
+                                                                            accessorDomain,
+                                                                            accessorCredentials);
+
+      // set up accessor resource as a super user on the accessor domain (so we can later grant accessed permission on ourselves)
+      accessControlContext.setDomainPermissions(accessorResource,
+                                                accessorDomain,
+                                                setOf(DomainPermissions.getInstance(DomainPermissions.SUPER_USER)));
+
+      accessControlContext.assertDomainPermissions(accessorResource,
+                                                   accessorDomain,
+                                                   DomainPermissions.getInstance(DomainPermissions.SUPER_USER));
+
+      // authenticate as accessor resource
+      accessControlContext.authenticate(accessorResource, accessorCredentials);
+
+      // custom permission has to:
+      // - be a system permission: isSystemPermission():true
+      // - return a valid permission name for the class: e.g. *QUERY
+      // - have the invalid syspermission id for *INHERIT if you want to create a cycle
+      // - return false for equalsIgnoreGrant()
+      // - always return false for equals()
+
+      ResourcePermission customInheritPermission = new ResourcePermission() {
+         @Override
+         public boolean isSystemPermission() { return true; }
+
+         @Override
+         public String getPermissionName() { return ResourcePermissions.QUERY; }
+
+         @Override
+         public long getSystemPermissionId() { return ResourcePermissions.getInstance(ResourcePermissions.INHERIT).getSystemPermissionId(); }
+
+         @Override
+         public boolean isWithGrantOption() { return true; }
+
+         @Override
+         @Deprecated
+         public boolean isWithGrant() { return isWithGrantOption(); }
+
+         @Override
+         public boolean isGrantableFrom(ResourcePermission other) { return true; }
+
+         @Override
+         public boolean equalsIgnoreGrantOption(Object other) { return false; }
+
+         @Override
+         @Deprecated
+         public boolean equalsIgnoreGrant(Object other) { return equalsIgnoreGrantOption(other); }
+
+         @Override
+         public boolean equals(Object other) { return false; }
+      };
+
+      // attempt to grant inherit permission on self
+      try {
+         accessControlContext.grantResourcePermissions(accessorResource,
+                                                       accessorResource,
+                                                       customInheritPermission);
+         fail("granting direct resource permissions that would create an inherit cycle should have failed");
+      }
+      catch (OaccException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("will cause a cycle"));
+      }
+      try {
+         accessControlContext.grantResourcePermissions(accessorResource,
+                                                       accessorResource,
+                                                       customInheritPermission);
          fail("granting direct resource permissions that would create an inherit cycle should have failed");
       }
       catch (OaccException e) {
