@@ -75,6 +75,7 @@ public class NonRecursiveGrantGlobalResourcePermissionPersister extends CommonGr
             }
             resultSet.close();
          }
+         closeStatement(statement);
 
          // then get all resources of the specified class for each of the direct domain's descendants
          Set<Resource> resources = new HashSet<>();
@@ -141,6 +142,7 @@ public class NonRecursiveGrantGlobalResourcePermissionPersister extends CommonGr
             }
             resultSet.close();
          }
+         closeStatement(statement);
 
          Set<Id<DomainId>> requestedAncestorDomainIds
                = NonRecursivePersisterHelper.getAncestorDomainIds(sqlStrings, connection, resourceDomainId);
@@ -286,6 +288,8 @@ public class NonRecursiveGrantGlobalResourcePermissionPersister extends CommonGr
             }
             resultSet.close();
          }
+         closeStatement(statement);
+         statement = null;
 
          // then apply each domain's direct permissions to all its descendants
          // !! DON'T UPDATE THE PERMISSION-MAP WHILE ITERATING OVER ITS KEY-SET !! (get a copy of the key-set instead)

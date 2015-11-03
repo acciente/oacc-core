@@ -115,6 +115,7 @@ public abstract class CommonResourcePersister extends Persister implements Resou
             }
             generatedKeys.close();
          }
+         closeStatement(statement);
 
          // save the new resource's external id, if necessary, and return the new resource
          if (externalId != null) {
@@ -148,6 +149,7 @@ public abstract class CommonResourcePersister extends Persister implements Resou
          statement = connection.prepareStatement(sqlStrings.SQL_removeInResourceExternalId_BY_ResourceID);
          statement.setResourceId(1, resource);
          statement.executeUpdate();
+         closeStatement(statement);
 
          // delete resource
          statement = connection.prepareStatement(sqlStrings.SQL_removeInResource_BY_ResourceID);

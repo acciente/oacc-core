@@ -92,6 +92,7 @@ public class RecursiveDomainPersister extends CommonDomainPersister {
             while (resultSet.next()) {
                descendantDomainIds.add(resultSet.getResourceDomainId("DomainId"));
             }
+            closeStatement(statement);
 
             // delete descendant domains one at a time, in reverse order of domainLevel, to preserve FK constraints
             statement = connection.prepareStatement(sqlStrings.SQL_removeInDomain_BY_DomainID);

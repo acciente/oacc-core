@@ -44,49 +44,72 @@ public class SQLAccessControlSystemResetUtil {
 
    public static void deleteAllOACCData(Connection connection,
                                         String dbSchema) throws SQLException {
-      PreparedStatement statement;
+      PreparedStatement statement = null;
 
-      final String schemaNameAndTablePrefix = dbSchema != null ? dbSchema + ".OAC_" : "OAC_";
-
-      statement = connection.prepareStatement("DELETE FROM " + schemaNameAndTablePrefix + "Grant_DomPerm_Sys");
-      statement.executeUpdate();
-      statement = connection.prepareStatement("DELETE FROM " + schemaNameAndTablePrefix + "Grant_DomCrPerm_Sys");
-      statement.executeUpdate();
-      statement = connection.prepareStatement("DELETE FROM " + schemaNameAndTablePrefix + "Grant_DomCrPerm_PostCr_Sys");
-      statement.executeUpdate();
-      statement = connection.prepareStatement("DELETE FROM " + schemaNameAndTablePrefix + "Grant_ResPerm_Sys");
-      statement.executeUpdate();
-      statement = connection.prepareStatement("DELETE FROM " + schemaNameAndTablePrefix + "Grant_ResPerm");
-      statement.executeUpdate();
-      statement = connection.prepareStatement("DELETE FROM " + schemaNameAndTablePrefix + "Grant_Global_ResPerm_Sys");
-      statement.executeUpdate();
-      statement = connection.prepareStatement("DELETE FROM " + schemaNameAndTablePrefix + "Grant_Global_ResPerm");
-      statement.executeUpdate();
-      statement = connection.prepareStatement("DELETE FROM " + schemaNameAndTablePrefix + "Grant_ResCrPerm_Sys");
-      statement.executeUpdate();
-      statement = connection.prepareStatement("DELETE FROM " + schemaNameAndTablePrefix + "Grant_ResCrPerm_PostCr_Sys");
-      statement.executeUpdate();
-      statement = connection.prepareStatement("DELETE FROM " + schemaNameAndTablePrefix + "Grant_ResCrPerm_PostCr");
-      statement.executeUpdate();
-      statement = connection.prepareStatement("DELETE FROM " + schemaNameAndTablePrefix + "ResourcePassword");
-      statement.executeUpdate();
-      statement = connection.prepareStatement("DELETE FROM " + schemaNameAndTablePrefix + "ResourceExternalId");
-      statement.executeUpdate();
-      statement = connection.prepareStatement("DELETE FROM " + schemaNameAndTablePrefix + "Resource");
-      statement.executeUpdate();
-      statement = connection.prepareStatement("DELETE FROM " + schemaNameAndTablePrefix + "ResourceClassPermission");
-      statement.executeUpdate();
-      statement = connection.prepareStatement("DELETE FROM " + schemaNameAndTablePrefix + "ResourceClass");
-      statement.executeUpdate();
-      statement = connection.prepareStatement("DELETE FROM " + schemaNameAndTablePrefix + "Domain");
       try {
-         statement.executeUpdate();
-      }
-      catch (SQLException e) {
-         // some RDBMS don't support deletion of all rows from a table with a self-referential FK constraint,
-         // so let's try to remove each domain's children first
+         final String schemaNameAndTablePrefix = dbSchema != null ? dbSchema + ".OAC_" : "OAC_";
 
-         deleteDomainsIndividually(connection, schemaNameAndTablePrefix);
+         statement = connection.prepareStatement("DELETE FROM " + schemaNameAndTablePrefix + "Grant_DomPerm_Sys");
+         statement.executeUpdate();
+         statement.close();
+         statement = connection.prepareStatement("DELETE FROM " + schemaNameAndTablePrefix + "Grant_DomCrPerm_Sys");
+         statement.executeUpdate();
+         statement.close();
+         statement = connection.prepareStatement("DELETE FROM " + schemaNameAndTablePrefix + "Grant_DomCrPerm_PostCr_Sys");
+         statement.executeUpdate();
+         statement.close();
+         statement = connection.prepareStatement("DELETE FROM " + schemaNameAndTablePrefix + "Grant_ResPerm_Sys");
+         statement.executeUpdate();
+         statement.close();
+         statement = connection.prepareStatement("DELETE FROM " + schemaNameAndTablePrefix + "Grant_ResPerm");
+         statement.executeUpdate();
+         statement.close();
+         statement = connection.prepareStatement("DELETE FROM " + schemaNameAndTablePrefix + "Grant_Global_ResPerm_Sys");
+         statement.executeUpdate();
+         statement.close();
+         statement = connection.prepareStatement("DELETE FROM " + schemaNameAndTablePrefix + "Grant_Global_ResPerm");
+         statement.executeUpdate();
+         statement.close();
+         statement = connection.prepareStatement("DELETE FROM " + schemaNameAndTablePrefix + "Grant_ResCrPerm_Sys");
+         statement.executeUpdate();
+         statement.close();
+         statement = connection.prepareStatement("DELETE FROM " + schemaNameAndTablePrefix + "Grant_ResCrPerm_PostCr_Sys");
+         statement.executeUpdate();
+         statement.close();
+         statement = connection.prepareStatement("DELETE FROM " + schemaNameAndTablePrefix + "Grant_ResCrPerm_PostCr");
+         statement.executeUpdate();
+         statement.close();
+         statement = connection.prepareStatement("DELETE FROM " + schemaNameAndTablePrefix + "ResourcePassword");
+         statement.executeUpdate();
+         statement.close();
+         statement = connection.prepareStatement("DELETE FROM " + schemaNameAndTablePrefix + "ResourceExternalId");
+         statement.executeUpdate();
+         statement.close();
+         statement = connection.prepareStatement("DELETE FROM " + schemaNameAndTablePrefix + "Resource");
+         statement.executeUpdate();
+         statement.close();
+         statement = connection.prepareStatement("DELETE FROM " + schemaNameAndTablePrefix + "ResourceClassPermission");
+         statement.executeUpdate();
+         statement.close();
+         statement = connection.prepareStatement("DELETE FROM " + schemaNameAndTablePrefix + "ResourceClass");
+         statement.executeUpdate();
+         statement.close();
+         statement = connection.prepareStatement("DELETE FROM " + schemaNameAndTablePrefix + "Domain");
+         try {
+            statement.executeUpdate();
+            statement.close();
+         }
+         catch (SQLException e) {
+            // some RDBMS don't support deletion of all rows from a table with a self-referential FK constraint,
+            // so let's try to remove each domain's children first
+
+            deleteDomainsIndividually(connection, schemaNameAndTablePrefix);
+         }
+      }
+      finally {
+         if (statement != null) {
+            statement.close();
+         }
       }
    }
 

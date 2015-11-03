@@ -34,69 +34,83 @@ public class SQLAccessControlSystemInitializer {
       System.out.println("Initializing password encryptor...");
       CleanablePasswordEncryptor passwordEncryptor = new StrongCleanablePasswordEncryptor();
 
-      PreparedStatement statement;
-      ResultSet resultSet;
-
       final String schemaNameAndTablePrefix = dbSchema != null ? dbSchema + ".OAC_" : "OAC_";
-      
+
       System.out.println("Checking database...needs empty tables");
 
-      // create an initial domain to hold the system user
-      statement = connection.prepareStatement("SELECT  DomainId FROM " + schemaNameAndTablePrefix + "Domain WHERE DomainId = 0");
-      resultSet = statement.executeQuery();
-
-      if (resultSet.next()) {
-         System.out.println("Cannot initialize, likely that this OACC is already initialized! (check: found a system domain)");
-         resultSet.close();
-         return;
-      }
-
-      System.out.println("Initializing database...assuming empty tables (will fail safely if tables have data)");
-
-      // create an initial domain to hold the system user
-      statement = connection.prepareStatement("INSERT INTO " + schemaNameAndTablePrefix + "Domain( DomainId, DomainName ) VALUES ( 0, ? )");
-      statement.setString(1, AccessControlContext.SYSTEM_DOMAIN);
-      statement.executeUpdate();
-
-      // create a resource type for the system user
-      statement = connection.prepareStatement("INSERT INTO " + schemaNameAndTablePrefix + "ResourceClass( ResourceClassId, ResourceClassName, IsAuthenticatable, IsUnauthenticatedCreateAllowed ) VALUES ( 0, ?, 1, 0 )");
-      statement.setString(1, AccessControlContext.SYSTEM_RESOURCE_CLASS);
-      statement.executeUpdate();
-
-      // create the system user
-      statement = connection.prepareStatement("INSERT INTO " + schemaNameAndTablePrefix + "Resource( ResourceId, ResourceClassId, DomainId ) VALUES ( 0, 0, 0 )");
-      statement.executeUpdate();
-
-      // set the system user's password
-      statement = connection.prepareStatement("INSERT INTO " + schemaNameAndTablePrefix + "ResourcePassword( ResourceId, Password ) VALUES ( 0, ? )");
-      char[] boundPassword = null;
+      PreparedStatement statement = null;
+      ResultSet resultSet;
       try {
-         boundPassword = PasswordUtils.computeBoundPassword(Resources.getInstance(0), oaccRootPwd);
-         statement.setString(1, passwordEncryptor.encryptPassword(boundPassword));
+         // create an initial domain to hold the system user
+         statement = connection.prepareStatement("SELECT  DomainId FROM " + schemaNameAndTablePrefix + "Domain WHERE DomainId = 0");
+         resultSet = statement.executeQuery();
+
+         if (resultSet.next()) {
+            System.out.println("Cannot initialize, likely that this OACC is already initialized! (check: found a system domain)");
+            resultSet.close();
+            return;
+         }
+         statement.close();
+
+         System.out.println("Initializing database...assuming empty tables (will fail safely if tables have data)");
+
+         // create an initial domain to hold the system user
+         statement = connection.prepareStatement("INSERT INTO " + schemaNameAndTablePrefix + "Domain( DomainId, DomainName ) VALUES ( 0, ? )");
+         statement.setString(1, AccessControlContext.SYSTEM_DOMAIN);
          statement.executeUpdate();
+         statement.close();
+
+         // create a resource type for the system user
+         statement = connection.prepareStatement("INSERT INTO " + schemaNameAndTablePrefix + "ResourceClass( ResourceClassId, ResourceClassName, IsAuthenticatable, IsUnauthenticatedCreateAllowed ) VALUES ( 0, ?, 1, 0 )");
+         statement.setString(1, AccessControlContext.SYSTEM_RESOURCE_CLASS);
+         statement.executeUpdate();
+         statement.close();
+
+         // create the system user
+         statement = connection.prepareStatement("INSERT INTO " + schemaNameAndTablePrefix + "Resource( ResourceId, ResourceClassId, DomainId ) VALUES ( 0, 0, 0 )");
+         statement.executeUpdate();
+         statement.close();
+
+         // set the system user's password
+         statement = connection.prepareStatement("INSERT INTO " + schemaNameAndTablePrefix + "ResourcePassword( ResourceId, Password ) VALUES ( 0, ? )");
+         char[] boundPassword = null;
+         try {
+            boundPassword = PasswordUtils.computeBoundPassword(Resources.getInstance(0), oaccRootPwd);
+            statement.setString(1, passwordEncryptor.encryptPassword(boundPassword));
+            statement.executeUpdate();
+         }
+         finally {
+            PasswordUtils.cleanPassword(boundPassword);
+         }
+         statement.close();
+
+         // grant the system user [super user w/ grant] to the system domain
+         statement = connection.prepareStatement("INSERT INTO " + schemaNameAndTablePrefix + "Grant_DomPerm_Sys( AccessorResourceId, GrantorResourceId, AccessedDomainId, SysPermissionId, IsWithGrant )"
+                                                       + " VALUES ( 0, 0, 0, ?, 1 )");
+         statement.setLong(1, DomainPermissions.getInstance(DomainPermissions.SUPER_USER).getSystemPermissionId());
+         statement.executeUpdate();
+         statement.close();
+
+         // grant the system user [create w/ grant], and [super user w/ grant] to any domains it creates
+         statement = connection.prepareStatement("INSERT INTO " + schemaNameAndTablePrefix + "Grant_DomCrPerm_Sys( AccessorResourceId, GrantorResourceId, SysPermissionId, IsWithGrant )"
+                                                       + " VALUES ( 0, 0, ?, 1 )");
+         statement.setLong(1, DomainCreatePermissions.getInstance(DomainCreatePermissions.CREATE).getSystemPermissionId());
+         statement.executeUpdate();
+         statement.close();
+         statement = connection.prepareStatement("INSERT INTO " + schemaNameAndTablePrefix + "Grant_DomCrPerm_PostCr_Sys( AccessorResourceId, GrantorResourceId, PostCreateSysPermissionId, PostCreateIsWithGrant, IsWithGrant )"
+                                                       + " VALUES ( 0, 0, ?, 1, 1 )");
+         statement.setLong(1, DomainPermissions.getInstance(DomainPermissions.SUPER_USER).getSystemPermissionId());
+         statement.executeUpdate();
+         statement.setLong(1, DomainPermissions.getInstance(DomainPermissions.CREATE_CHILD_DOMAIN).getSystemPermissionId());
+         statement.executeUpdate();
+         statement.setLong(1, DomainPermissions.getInstance(DomainPermissions.DELETE).getSystemPermissionId());
+         statement.executeUpdate();
+         statement.close();
       }
       finally {
-         PasswordUtils.cleanPassword(boundPassword);
+         if (statement != null) {
+            statement.close();
+         }
       }
-
-      // grant the system user [super user w/ grant] to the system domain
-      statement = connection.prepareStatement("INSERT INTO " + schemaNameAndTablePrefix + "Grant_DomPerm_Sys( AccessorResourceId, GrantorResourceId, AccessedDomainId, SysPermissionId, IsWithGrant )"
-                                                    + " VALUES ( 0, 0, 0, ?, 1 )");
-      statement.setLong(1, DomainPermissions.getInstance(DomainPermissions.SUPER_USER).getSystemPermissionId());
-      statement.executeUpdate();
-
-      // grant the system user [create w/ grant], and [super user w/ grant] to any domains it creates
-      statement = connection.prepareStatement("INSERT INTO " + schemaNameAndTablePrefix + "Grant_DomCrPerm_Sys( AccessorResourceId, GrantorResourceId, SysPermissionId, IsWithGrant )"
-                                                    + " VALUES ( 0, 0, ?, 1 )");
-      statement.setLong(1, DomainCreatePermissions.getInstance(DomainCreatePermissions.CREATE).getSystemPermissionId());
-      statement.executeUpdate();
-      statement = connection.prepareStatement("INSERT INTO " + schemaNameAndTablePrefix + "Grant_DomCrPerm_PostCr_Sys( AccessorResourceId, GrantorResourceId, PostCreateSysPermissionId, PostCreateIsWithGrant, IsWithGrant )"
-                                                    + " VALUES ( 0, 0, ?, 1, 1 )");
-      statement.setLong(1, DomainPermissions.getInstance(DomainPermissions.SUPER_USER).getSystemPermissionId());
-      statement.executeUpdate();
-      statement.setLong(1, DomainPermissions.getInstance(DomainPermissions.CREATE_CHILD_DOMAIN).getSystemPermissionId());
-      statement.executeUpdate();
-      statement.setLong(1, DomainPermissions.getInstance(DomainPermissions.DELETE).getSystemPermissionId());
-      statement.executeUpdate();
    }
 }

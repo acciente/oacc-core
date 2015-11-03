@@ -131,6 +131,8 @@ public class NonRecursiveGrantResourceCreatePermissionSysPersister extends Commo
             }
             resultSet.close();
          }
+         closeStatement(statement);
+         statement = null;
 
          // then apply each domain's direct permissions to all its descendants
          // !! DON'T UPDATE THE PERMISSION-MAP WHILE ITERATING OVER ITS KEY-SET !! (get a copy of the key-set instead)

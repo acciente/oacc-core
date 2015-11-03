@@ -160,6 +160,7 @@ public class RecursiveGrantResourceCreatePermissionPostCreateSysPersister extend
             while (resultSet.next()) {
                descendantDomainIds.add(resultSet.getResourceDomainId("DomainId"));
             }
+            closeStatement(statement);
 
             // delete domains' accessors (in reverse order of domainLevel, to preserve FK constraints)
             statement = connection.prepareStatement(sqlStrings.SQL_removeInGrantResourceCreatePermissionPostCreateSys_BY_AccessedDomainID);

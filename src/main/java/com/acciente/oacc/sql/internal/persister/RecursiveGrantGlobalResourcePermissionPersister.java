@@ -228,6 +228,7 @@ public class RecursiveGrantGlobalResourcePermissionPersister extends CommonGrant
             while (resultSet.next()) {
                descendantDomainIds.add(resultSet.getResourceDomainId("DomainId"));
             }
+            closeStatement(statement);
 
             // delete domains' accessors (in reverse order of domainLevel, to preserve FK constraints)
             statement = connection.prepareStatement(sqlStrings.SQL_removeInGrantGlobalResourcePermission_BY_AccessedDomainId);
