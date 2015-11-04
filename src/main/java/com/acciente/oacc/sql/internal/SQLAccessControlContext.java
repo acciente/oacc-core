@@ -6166,8 +6166,18 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       if (resource1 == null) {
          return false;
       }
-      return resource1.getId() == resource2.getId()
+      return __isEqual(resource1.getId(), resource2.getId())
             && __isEqual(resource1.getExternalId(), resource2.getExternalId());
+   }
+
+   private static boolean __isEqual(Long long1, Long long2) {
+      if (long1 == long2) {
+         return true;
+      }
+      if (long1 == null) {
+         return false;
+      }
+      return long1.equals(long2);
    }
 
    private static boolean __isEqual(String s1, String s2) {
