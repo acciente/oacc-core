@@ -30,7 +30,7 @@ import java.util.Set;
 public class NonRecursivePersisterHelper {
    protected static Set<Id<ResourceId>> getInheritedAccessorResourceIds(SQLStrings sqlStrings,
                                                                         SQLConnection connection,
-                                                                        Resource accessorResource) throws SQLException {
+                                                                        Resource accessorResource) {
       SQLStatement statement = null;
       Set<Id<ResourceId>> allAccessorResourceIds = new HashSet<>();
       allAccessorResourceIds.add(Id.<ResourceId>from(accessorResource.getId()));
@@ -67,7 +67,7 @@ public class NonRecursivePersisterHelper {
 
    protected static Set<Id<DomainId>> getDescendantDomainIdsOrderedByAscendingLevel(SQLStrings sqlStrings,
                                                                                     SQLConnection connection,
-                                                                                    Id<DomainId> parentDomainId) throws SQLException {
+                                                                                    Id<DomainId> parentDomainId) {
       SQLStatement statement = null;
       Set<Id<DomainId>> allDomainIds = new LinkedHashSet<>();
       allDomainIds.add(parentDomainId);
@@ -104,7 +104,7 @@ public class NonRecursivePersisterHelper {
 
    protected static Set<String> getDescendantDomainNames(SQLStrings sqlStrings,
                                                          SQLConnection connection,
-                                                         String parentDomainName) throws SQLException {
+                                                         String parentDomainName) {
       SQLStatement statement = null;
       Set<String> allDomainNames = new HashSet<>();
       allDomainNames.add(parentDomainName);
@@ -141,7 +141,7 @@ public class NonRecursivePersisterHelper {
 
    protected static Set<Id<DomainId>> getAncestorDomainIds(SQLStrings sqlStrings,
                                                            SQLConnection connection,
-                                                           Id<DomainId> domainId) throws SQLException {
+                                                           Id<DomainId> domainId) {
       SQLStatement statement = null;
       Set<Id<DomainId>> ancestorDomainIds = new HashSet<>();
       ancestorDomainIds.add(domainId);
