@@ -157,11 +157,11 @@ public class ResourceCreatePermissions {
             return this.systemPermissionId == other.getSystemPermissionId();
          }
 
-         if (this.postCreateResourcePermission.isWithGrant() && !other.getPostCreateResourcePermission().isWithGrant()) {
+         if (this.postCreateResourcePermission.isWithGrantOption() && !other.getPostCreateResourcePermission().isWithGrantOption()) {
             return false;
          }
 
-         return this.postCreateResourcePermission.equalsIgnoreGrant(other.getPostCreateResourcePermission());
+         return this.postCreateResourcePermission.equalsIgnoreGrantOption(other.getPostCreateResourcePermission());
       }
 
       @Override

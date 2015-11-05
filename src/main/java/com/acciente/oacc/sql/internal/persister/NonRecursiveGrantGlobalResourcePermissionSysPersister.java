@@ -65,7 +65,7 @@ public class NonRecursiveGrantGlobalResourcePermissionSysPersister extends Commo
             statement.setResourceId(1, accessorResourceId);
             statement.setResourceClassId(2, resourceClassId);
             statement.setResourceSystemPermissionId(3, resourcePermission.getSystemPermissionId());
-            statement.setBoolean(4, resourcePermission.isWithGrant());
+            statement.setBoolean(4, resourcePermission.isWithGrantOption());
             resultSet = statement.executeQuery();
 
             while (resultSet.next()) {
@@ -131,7 +131,7 @@ public class NonRecursiveGrantGlobalResourcePermissionSysPersister extends Commo
             statement.setResourceId(1, accessorResourceId);
             statement.setResourceClassId(2, resourceClassId);
             statement.setResourceSystemPermissionId(3, resourcePermission.getSystemPermissionId());
-            statement.setBoolean(4, resourcePermission.isWithGrant());
+            statement.setBoolean(4, resourcePermission.isWithGrantOption());
             resultSet = statement.executeQuery();
 
             while (resultSet.next()) {

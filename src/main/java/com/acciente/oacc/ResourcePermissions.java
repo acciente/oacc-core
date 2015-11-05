@@ -71,14 +71,14 @@ public class ResourcePermissions {
       // permission data
       private final long    systemPermissionId;
       private final String  permissionName;
-      private final boolean withGrant;
+      private final boolean withGrantOption;
 
       private ResourcePermissionImpl(String permissionName) {
          this(permissionName, false);
       }
 
       private ResourcePermissionImpl(String permissionName,
-                                     boolean withGrant) {
+                                     boolean withGrantOption) {
          assertPermissionNameSpecified(permissionName);
 
          permissionName = permissionName.trim();
@@ -94,7 +94,7 @@ public class ResourcePermissions {
             this.permissionName = permissionName.intern();
          }
 
-         this.withGrant = withGrant;
+         this.withGrantOption = withGrantOption;
       }
 
       @Override
@@ -117,8 +117,14 @@ public class ResourcePermissions {
       }
 
       @Override
+      public boolean isWithGrantOption() {
+         return withGrantOption;
+      }
+
+      @Override
+      @Deprecated
       public boolean isWithGrant() {
-         return withGrant;
+         return isWithGrantOption();
       }
 
       @Override
@@ -127,11 +133,11 @@ public class ResourcePermissions {
             return false;
          }
 
-         if (!other.isWithGrant()) {
+         if (!other.isWithGrantOption()) {
             return false;
          }
 
-         return this.equalsIgnoreGrant(other);
+         return this.equalsIgnoreGrantOption(other);
       }
 
       @Override
@@ -148,7 +154,7 @@ public class ResourcePermissions {
          if (!permissionName.equals(otherResourcePermission.permissionName)) {
             return false;
          }
-         if (withGrant != otherResourcePermission.withGrant) {
+         if (withGrantOption != otherResourcePermission.withGrantOption) {
             return false;
          }
 
@@ -156,7 +162,7 @@ public class ResourcePermissions {
       }
 
       @Override
-      public boolean equalsIgnoreGrant(Object other) {
+      public boolean equalsIgnoreGrantOption(Object other) {
          if (this == other) {
             return true;
          }
@@ -174,16 +180,22 @@ public class ResourcePermissions {
       }
 
       @Override
+      @Deprecated
+      public boolean equalsIgnoreGrant(Object other) {
+         return equalsIgnoreGrantOption(other);
+      }
+
+      @Override
       public int hashCode() {
          int result = permissionName.hashCode();
-         result = 31 * result + (withGrant ? 1 : 0);
+         result = 31 * result + (withGrantOption ? 1 : 0);
          return result;
       }
 
       @Override
       public String toString() {
          return (isSystemPermission() ? "SYS:" + permissionName : permissionName)
-               + (withGrant ? " /G" : "");
+               + (withGrantOption ? " /G" : "");
       }
 
       // private helper methods

@@ -71,7 +71,7 @@ public abstract class CommonGrantResourcePermissionSysPersister extends Persiste
          statement.setResourceId(1, accessedResource);
          statement.setResourceClassId(2, resourceClassId);
          statement.setResourceSystemPermissionId(3, resourcePermission.getSystemPermissionId());
-         statement.setBoolean(4, resourcePermission.isWithGrant());
+         statement.setBoolean(4, resourcePermission.isWithGrantOption());
          resultSet = statement.executeQuery();
 
          while (resultSet.next()) {
@@ -142,7 +142,7 @@ public abstract class CommonGrantResourcePermissionSysPersister extends Persiste
                statement.setResourceId(1, accessorResource);
                statement.setResourceId(2, grantorResource);
                statement.setResourceId(3, accessedResource);
-               statement.setBoolean(4, resourcePermission.isWithGrant());
+               statement.setBoolean(4, resourcePermission.isWithGrantOption());
                statement.setResourceClassId(5, accessedResourceClassId);
                statement.setResourceSystemPermissionId(6, resourcePermission.getSystemPermissionId());
 
@@ -172,7 +172,7 @@ public abstract class CommonGrantResourcePermissionSysPersister extends Persiste
          for (ResourcePermission resourcePermission : requestedResourcePermissions) {
             if (resourcePermission.isSystemPermission()) {
                statement.setResourceId(1, grantorResource);
-               statement.setBoolean(2, resourcePermission.isWithGrant());
+               statement.setBoolean(2, resourcePermission.isWithGrantOption());
                statement.setResourceId(3, accessorResource);
                statement.setResourceId(4, accessedResource);
                statement.setResourceClassId(5, accessedResourceClassId);

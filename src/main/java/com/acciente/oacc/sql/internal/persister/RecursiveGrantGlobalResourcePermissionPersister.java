@@ -60,7 +60,7 @@ public class RecursiveGrantGlobalResourcePermissionPersister extends CommonGrant
          statement.setResourceId(1, accessorResource);
          statement.setResourceClassId(2, resourceClassId);
          statement.setResourcePermissionId(3, resourcePermissionId);
-         statement.setBoolean(4, resourcePermission.isWithGrant());
+         statement.setBoolean(4, resourcePermission.isWithGrantOption());
          statement.setResourceClassId(5, resourceClassId);
          resultSet = statement.executeQuery();
 
@@ -101,7 +101,7 @@ public class RecursiveGrantGlobalResourcePermissionPersister extends CommonGrant
          statement.setResourceDomainId(2, resourceDomainId);
          statement.setResourceClassId(3, resourceClassId);
          statement.setResourcePermissionId(4, resourcePermissionId);
-         statement.setBoolean(5, resourcePermission.isWithGrant());
+         statement.setBoolean(5, resourcePermission.isWithGrantOption());
          statement.setResourceClassId(6, resourceClassId);
          resultSet = statement.executeQuery();
 

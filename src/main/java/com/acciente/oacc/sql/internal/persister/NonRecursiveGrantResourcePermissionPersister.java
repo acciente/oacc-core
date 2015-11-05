@@ -62,7 +62,7 @@ public class NonRecursiveGrantResourcePermissionPersister extends CommonGrantRes
             statement.setResourceId(1, accessorResourceId);
             statement.setResourceClassId(2, resourceClassId);
             statement.setResourcePermissionId(3, resourcePermissionId);
-            statement.setBoolean(4, resourcePermission.isWithGrant());
+            statement.setBoolean(4, resourcePermission.isWithGrantOption());
             resultSet = statement.executeQuery();
 
             while (resultSet.next()) {
@@ -115,7 +115,7 @@ public class NonRecursiveGrantResourcePermissionPersister extends CommonGrantRes
                statement.setResourceDomainId(2, descendantDomainId);
                statement.setResourceClassId(3, resourceClassId);
                statement.setResourcePermissionId(4, resourcePermissionId);
-               statement.setBoolean(5, resourcePermission.isWithGrant());
+               statement.setBoolean(5, resourcePermission.isWithGrantOption());
                resultSet = statement.executeQuery();
 
                while (resultSet.next()) {

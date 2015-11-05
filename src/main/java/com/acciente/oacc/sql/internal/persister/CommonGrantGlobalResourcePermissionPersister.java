@@ -163,7 +163,7 @@ public abstract class CommonGrantGlobalResourcePermissionPersister extends Persi
                statement.setResourceId(1, accessorResource);
                statement.setResourceId(2, grantorResource);
                statement.setResourceDomainId(3, accessedResourceDomainId);
-               statement.setBoolean(4, resourcePermission.isWithGrant());
+               statement.setBoolean(4, resourcePermission.isWithGrantOption());
                statement.setResourceClassId(5, accessedResourceClassId);
                statement.setString(6, resourcePermission.getPermissionName());
 
@@ -193,7 +193,7 @@ public abstract class CommonGrantGlobalResourcePermissionPersister extends Persi
          for (ResourcePermission resourcePermission : requestedResourcePermissions) {
             if (!resourcePermission.isSystemPermission()) {
                statement.setResourceId(1, grantorResource);
-               statement.setBoolean(2, resourcePermission.isWithGrant());
+               statement.setBoolean(2, resourcePermission.isWithGrantOption());
                statement.setResourceId(3, accessorResource);
                statement.setResourceDomainId(4, accessedResourceDomainId);
                statement.setResourceClassId(5, accessedResourceClassId);
