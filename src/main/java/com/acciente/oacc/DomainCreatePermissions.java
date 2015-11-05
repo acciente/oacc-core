@@ -143,11 +143,11 @@ public class DomainCreatePermissions {
             return this.systemPermissionId == other.getSystemPermissionId();
          }
 
-         if (this.postCreateDomainPermission.isWithGrant() && !other.getPostCreateDomainPermission().isWithGrant()) {
+         if (this.postCreateDomainPermission.isWithGrantOption() && !other.getPostCreateDomainPermission().isWithGrantOption()) {
             return false;
          }
 
-         return this.postCreateDomainPermission.equalsIgnoreGrant(other.getPostCreateDomainPermission());
+         return this.postCreateDomainPermission.equalsIgnoreGrantOption(other.getPostCreateDomainPermission());
       }
 
       @Override

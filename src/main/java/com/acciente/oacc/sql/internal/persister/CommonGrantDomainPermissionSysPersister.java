@@ -151,7 +151,7 @@ public abstract class CommonGrantDomainPermissionSysPersister extends Persister 
             statement.setResourceId(1, accessorResource);
             statement.setResourceId(2, grantorResource);
             statement.setResourceDomainId(3, resourceDomainId);
-            statement.setBoolean(4, domainPermission.isWithGrant());
+            statement.setBoolean(4, domainPermission.isWithGrantOption());
             statement.setDomainSystemPermissionId(5, domainPermission.getSystemPermissionId());
 
             assertOneRowInserted(statement.executeUpdate());
@@ -178,7 +178,7 @@ public abstract class CommonGrantDomainPermissionSysPersister extends Persister 
 
          for (DomainPermission domainPermission : requestedDomainPermissions) {
             statement.setResourceId(1, grantorResource);
-            statement.setBoolean(2, domainPermission.isWithGrant());
+            statement.setBoolean(2, domainPermission.isWithGrantOption());
             statement.setResourceId(3, accessorResource);
             statement.setResourceDomainId(4, resourceDomainId);
             statement.setDomainSystemPermissionId(5, domainPermission.getSystemPermissionId());

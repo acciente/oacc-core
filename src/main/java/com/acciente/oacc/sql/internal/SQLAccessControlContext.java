@@ -1299,7 +1299,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
          boolean existingPermission = false;
 
          for (DomainPermission existingDirectPermission : directAccessorPermissions) {
-            if (requestedPermission.equalsIgnoreGrant(existingDirectPermission)) {
+            if (requestedPermission.equalsIgnoreGrantOption(existingDirectPermission)) {
                // we found a match by permission name - now let's see if we need to update existing or leave it unchanged
                if (!requestedPermission.equals(existingDirectPermission) &&
                      !requestedPermission.isGrantableFrom(existingDirectPermission)) {
@@ -1443,7 +1443,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
 
       for (DomainPermission requestedPermission : requestedDomainPermissions) {
          for (DomainPermission existingDirectPermission : directAccessorPermissions) {
-            if (requestedPermission.equalsIgnoreGrant(existingDirectPermission)) {
+            if (requestedPermission.equalsIgnoreGrantOption(existingDirectPermission)) {
                // requested permission has same name and regardless of granting rights we need to remove it
                removePermissions.add(requestedPermission);
                break;
@@ -1867,10 +1867,10 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
                   final DomainPermission existingPostCreateDomainPermission
                         = existingDirectPermission.getPostCreateDomainPermission();
 
-                  if (requestedPostCreateDomainPermission.equalsIgnoreGrant(existingPostCreateDomainPermission)) {
+                  if (requestedPostCreateDomainPermission.equalsIgnoreGrantOption(existingPostCreateDomainPermission)) {
                      // found a match in name - let's check compatibility first
-                     if (requestedPermission.isWithGrantOption() != requestedPostCreateDomainPermission.isWithGrant()
-                           && existingDirectPermission.isWithGrantOption() != existingPostCreateDomainPermission.isWithGrant()
+                     if (requestedPermission.isWithGrantOption() != requestedPostCreateDomainPermission.isWithGrantOption()
+                           && existingDirectPermission.isWithGrantOption() != existingPostCreateDomainPermission.isWithGrantOption()
                            && requestedPermission.isWithGrantOption() != existingDirectPermission.isWithGrantOption()) {
                         // the requested permission is incompatible to the existing permission because we can't
                         // perform grant operations (a)/G -> (a/G) or (a/G) -> (a)/G without removing either the
@@ -1883,8 +1883,8 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
 
                      // now let's see if we need to update existing permission or leave it unchanged
                      if (!requestedPermission.equals(existingDirectPermission)
-                           && ((requestedPermission.isWithGrantOption() && requestedPostCreateDomainPermission.isWithGrant())
-                           || (!existingDirectPermission.isWithGrantOption() && !existingPostCreateDomainPermission.isWithGrant()))) {
+                           && ((requestedPermission.isWithGrantOption() && requestedPostCreateDomainPermission.isWithGrantOption())
+                           || (!existingDirectPermission.isWithGrantOption() && !existingPostCreateDomainPermission.isWithGrantOption()))) {
                         // the two permissions match in name, but the requested has higher granting rights,
                         // so we need to update
                         updatePermissions.add(requestedPermission);
@@ -2053,7 +2053,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
             for (DomainCreatePermission existingDirectPermission : directAccessorPermissions) {
                if (!existingDirectPermission.isSystemPermission()) {
                   // now let's look at the post-create permissions
-                  if (requestedPostCreateDomainPermission.equalsIgnoreGrant(existingDirectPermission.getPostCreateDomainPermission())) {
+                  if (requestedPostCreateDomainPermission.equalsIgnoreGrantOption(existingDirectPermission.getPostCreateDomainPermission())) {
                      // requested post-create permission has same name as an already existing direct permission, so remove it
                      removePermissions.add(requestedPermission);
                      break;

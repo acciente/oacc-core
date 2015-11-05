@@ -133,7 +133,7 @@ public abstract class CommonGrantDomainCreatePermissionPostCreateSysPersister ex
                statement.setResourceId(1, accessorResource);
                statement.setResourceId(2, grantorResource);
                statement.setBoolean(3, domainCreatePermission.isWithGrantOption());
-               statement.setBoolean(4, domainCreatePermission.getPostCreateDomainPermission().isWithGrant());
+               statement.setBoolean(4, domainCreatePermission.getPostCreateDomainPermission().isWithGrantOption());
                statement.setDomainSystemPermissionId(5, domainCreatePermission.getPostCreateDomainPermission().getSystemPermissionId());
 
                assertOneRowInserted(statement.executeUpdate());
@@ -162,7 +162,7 @@ public abstract class CommonGrantDomainCreatePermissionPostCreateSysPersister ex
                   && domainCreatePermission.getPostCreateDomainPermission().isSystemPermission()) {
                statement.setResourceId(1, grantorResource);
                statement.setBoolean(2, domainCreatePermission.isWithGrantOption());
-               statement.setBoolean(3, domainCreatePermission.getPostCreateDomainPermission().isWithGrant());
+               statement.setBoolean(3, domainCreatePermission.getPostCreateDomainPermission().isWithGrantOption());
                statement.setResourceId(4, accessorResource);
                statement.setDomainSystemPermissionId(5, domainCreatePermission.getPostCreateDomainPermission().getSystemPermissionId());
 

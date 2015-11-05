@@ -64,7 +64,7 @@ public class DomainPermissions {
       // permission data
       private final long    systemPermissionId;
       private final String  permissionName;
-      private final boolean withGrant;
+      private final boolean withGrantOption;
 
       // simpler and preferred factories to create a domain permission
 
@@ -75,12 +75,12 @@ public class DomainPermissions {
       // constructor used when creating domain permissions from a syspermission id (typically read from a db)
 
       private DomainPermissionImpl(String sysPermissionName,
-                                   boolean withGrant) {
+                                   boolean withGrantOption) {
          SysPermission sysPermission = getSysPermission(sysPermissionName);
 
          this.systemPermissionId = sysPermission.getSystemPermissionId();
          this.permissionName = sysPermission.getPermissionName();
-         this.withGrant = withGrant;
+         this.withGrantOption = withGrantOption;
       }
 
       @Override
@@ -103,8 +103,14 @@ public class DomainPermissions {
       }
 
       @Override
+      public boolean isWithGrantOption() {
+         return withGrantOption;
+      }
+
+      @Override
+      @Deprecated
       public boolean isWithGrant() {
-         return withGrant;
+         return isWithGrantOption();
       }
 
       @Override
@@ -113,7 +119,7 @@ public class DomainPermissions {
             return false;
          }
 
-         if (!other.isWithGrant()) {
+         if (!other.isWithGrantOption()) {
             return false;
          }
 
@@ -133,7 +139,7 @@ public class DomainPermissions {
 
          DomainPermissionImpl otherDomainPermission = (DomainPermissionImpl) other;
 
-         if (withGrant != otherDomainPermission.withGrant) {
+         if (withGrantOption != otherDomainPermission.withGrantOption) {
             return false;
          }
          if (!permissionName.equals(otherDomainPermission.permissionName)) {
@@ -144,7 +150,7 @@ public class DomainPermissions {
       }
 
       @Override
-      public boolean equalsIgnoreGrant(Object other) {
+      public boolean equalsIgnoreGrantOption(Object other) {
          if (this == other) {
             return true;
          }
@@ -162,9 +168,15 @@ public class DomainPermissions {
       }
 
       @Override
+      @Deprecated
+      public boolean equalsIgnoreGrant(Object other) {
+         return equalsIgnoreGrantOption(other);
+      }
+
+      @Override
       public int hashCode() {
          int result = permissionName.hashCode();
-         result = 31 * result + (withGrant ? 1 : 0);
+         result = 31 * result + (withGrantOption ? 1 : 0);
          return result;
       }
 
@@ -172,12 +184,12 @@ public class DomainPermissions {
       public String toString() {
          if (isSystemPermission()) {
             return "DOMAIN:SYS:" + permissionName
-                  + (withGrant ? " /G" : "");
+                  + (withGrantOption ? " /G" : "");
          }
          else {
             // USR: for user-defined
             return "DOMAIN:" + permissionName
-                  + (withGrant ? " /G" : "");
+                  + (withGrantOption ? " /G" : "");
          }
       }
 
