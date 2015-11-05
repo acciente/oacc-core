@@ -76,10 +76,20 @@ public interface DomainCreatePermission {
    DomainPermission getPostCreateDomainPermission();
 
    /**
-    * Retrieves the "with grant" option.
+    * Retrieves the value of the "grant option".
     *
     * @return true if this permission includes the privilege to be granted to others, false otherwise.
     */
+   boolean isWithGrantOption();
+
+   /**
+    * Retrieves the "with grant" option.
+    *
+    * @return true if this permission includes the privilege to be granted to others, false otherwise.
+    *
+    * @deprecated as of v2.0.0-rc.5; use {@link #isWithGrantOption()} instead.
+    */
+   @Deprecated
    boolean isWithGrant();
 
    /**
@@ -96,7 +106,19 @@ public interface DomainCreatePermission {
     *
     * @param other another permission to compare with
     * @return true if the specified other permission is equal to this permission ignoring the
-    *         value of the {@link #isWithGrant()} property.
+    *         value of the {@link #isWithGrantOption()} property.
     */
+   boolean equalsIgnoreGrantOption(Object other);
+
+   /**
+    * Compare this permission with the specified other permission for equality, but ignoring the grant option.
+    *
+    * @param other another permission to compare with
+    * @return true if the specified other permission is equal to this permission ignoring the
+    *         value of the {@link #isWithGrantOption()} property.
+    *
+    * @deprecated as of v2.0.0-rc.5; use {@link #equalsIgnoreGrant(Object)} instead.
+    */
+   @Deprecated
    boolean equalsIgnoreGrant(Object other);
 }

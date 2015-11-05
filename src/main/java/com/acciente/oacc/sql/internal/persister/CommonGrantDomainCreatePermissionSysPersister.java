@@ -83,7 +83,7 @@ public abstract class CommonGrantDomainCreatePermissionSysPersister extends Pers
             if (domainCreatePermission.isSystemPermission()) {
                statement.setResourceId(1, accessorResource);
                statement.setResourceId(2, grantorResource);
-               statement.setBoolean(3, domainCreatePermission.isWithGrant());
+               statement.setBoolean(3, domainCreatePermission.isWithGrantOption());
                statement.setDomainCreateSystemPermissionId(4, domainCreatePermission.getSystemPermissionId());
 
                assertOneRowInserted(statement.executeUpdate());
@@ -110,7 +110,7 @@ public abstract class CommonGrantDomainCreatePermissionSysPersister extends Pers
          for (DomainCreatePermission domainCreatePermission : domainCreatePermissions) {
             if (domainCreatePermission.isSystemPermission()) {
                statement.setResourceId(1, grantorResource);
-               statement.setBoolean(2, domainCreatePermission.isWithGrant());
+               statement.setBoolean(2, domainCreatePermission.isWithGrantOption());
                statement.setResourceId(3, accessorResource);
                statement.setDomainCreateSystemPermissionId(4, domainCreatePermission.getSystemPermissionId());
 

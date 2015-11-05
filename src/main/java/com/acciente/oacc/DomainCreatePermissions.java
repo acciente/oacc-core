@@ -61,24 +61,24 @@ public class DomainCreatePermissions {
       private final long             systemPermissionId;
       private final String           sysPermissionName;
       private final DomainPermission postCreateDomainPermission;
-      private final boolean          withGrant;
+      private final boolean          withGrantOption;
 
       private DomainCreatePermissionImpl(String sysPermissionName,
-                                         boolean withGrant) {
+                                         boolean withGrantOption) {
          SysPermission sysPermission = getSysPermission(sysPermissionName);
 
          this.systemPermissionId = sysPermission.getSystemPermissionId();
          this.sysPermissionName = sysPermission.getPermissionName();
          this.postCreateDomainPermission = null;
-         this.withGrant = withGrant;
+         this.withGrantOption = withGrantOption;
       }
 
       private DomainCreatePermissionImpl(DomainPermission postCreateDomainPermission,
-                                         boolean withGrant) {
+                                         boolean withGrantOption) {
          this.systemPermissionId = 0;
          this.sysPermissionName = null;
          this.postCreateDomainPermission = postCreateDomainPermission;
-         this.withGrant = withGrant;
+         this.withGrantOption = withGrantOption;
       }
 
       @Override
@@ -115,8 +115,14 @@ public class DomainCreatePermissions {
       }
 
       @Override
+      public boolean isWithGrantOption() {
+         return withGrantOption;
+      }
+
+      @Override
+      @Deprecated
       public boolean isWithGrant() {
-         return withGrant;
+         return isWithGrantOption();
       }
 
       @Override
@@ -125,7 +131,7 @@ public class DomainCreatePermissions {
             return false;
          }
 
-         if (!other.isWithGrant()) {
+         if (!other.isWithGrantOption()) {
             return false;
          }
 
@@ -158,7 +164,7 @@ public class DomainCreatePermissions {
          if (systemPermissionId != otherDomainCreatePermission.systemPermissionId) {
             return false;
          }
-         if (withGrant != otherDomainCreatePermission.withGrant) {
+         if (withGrantOption != otherDomainCreatePermission.withGrantOption) {
             return false;
          }
          if (postCreateDomainPermission != null
@@ -176,7 +182,7 @@ public class DomainCreatePermissions {
       }
 
       @Override
-      public boolean equalsIgnoreGrant(Object other) {
+      public boolean equalsIgnoreGrantOption(Object other) {
          if (this == other) {
             return true;
          }
@@ -206,11 +212,17 @@ public class DomainCreatePermissions {
       }
 
       @Override
+      @Deprecated
+      public boolean equalsIgnoreGrant(Object other) {
+         return equalsIgnoreGrantOption(other);
+      }
+
+      @Override
       public int hashCode() {
          int result = (int) (systemPermissionId ^ (systemPermissionId >>> 32));
          result = 31 * result + (sysPermissionName != null ? sysPermissionName.hashCode() : 0);
          result = 31 * result + (postCreateDomainPermission != null ? postCreateDomainPermission.hashCode() : 0);
-         result = 31 * result + (withGrant ? 1 : 0);
+         result = 31 * result + (withGrantOption ? 1 : 0);
          return result;
       }
 
@@ -218,11 +230,11 @@ public class DomainCreatePermissions {
       public String toString() {
          if (postCreateDomainPermission == null) {
             return "*CREATE[]"
-                  + (withGrant ? " /G" : "");
+                  + (withGrantOption ? " /G" : "");
          }
          else {
             return "*CREATE[" + postCreateDomainPermission.toString() + "]"
-                  + (withGrant ? " /G" : "");
+                  + (withGrantOption ? " /G" : "");
          }
       }
 
