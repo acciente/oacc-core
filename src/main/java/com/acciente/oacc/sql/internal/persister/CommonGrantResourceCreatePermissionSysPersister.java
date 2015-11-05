@@ -150,7 +150,7 @@ public abstract class CommonGrantResourceCreatePermissionSysPersister extends Pe
                statement.setResourceId(1, accessorResource);
                statement.setResourceId(2, grantorResource);
                statement.setResourceDomainId(3, accessedResourceDomainId);
-               statement.setBoolean(4, resourceCreatePermission.isWithGrant());
+               statement.setBoolean(4, resourceCreatePermission.isWithGrantOption());
                statement.setResourceClassId(5, accessedResourceClassId);
                statement.setResourceCreateSystemPermissionId(6, resourceCreatePermission.getSystemPermissionId());
 
@@ -180,7 +180,7 @@ public abstract class CommonGrantResourceCreatePermissionSysPersister extends Pe
          for (ResourceCreatePermission resourceCreatePermission : requestedResourceCreatePermissions) {
             if (resourceCreatePermission.isSystemPermission()) {
                statement.setResourceId(1, grantorResource);
-               statement.setBoolean(2, resourceCreatePermission.isWithGrant());
+               statement.setBoolean(2, resourceCreatePermission.isWithGrantOption());
                statement.setResourceId(3, accessorResource);
                statement.setResourceDomainId(4, accessedResourceDomainId);
                statement.setResourceClassId(5, accessedResourceClassId);

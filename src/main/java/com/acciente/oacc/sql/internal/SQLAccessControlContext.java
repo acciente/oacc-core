@@ -2551,9 +2551,9 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
 
                   if (requestedPostCreateResourcePermission.equalsIgnoreGrant(existingPostCreateResourcePermission)) {
                      // found a match in name - let's check compatibility first
-                     if (requestedPermission.isWithGrant() != requestedPostCreateResourcePermission.isWithGrant()
-                           && existingDirectPermission.isWithGrant() != existingPostCreateResourcePermission.isWithGrant()
-                           && requestedPermission.isWithGrant() != existingDirectPermission.isWithGrant()) {
+                     if (requestedPermission.isWithGrantOption() != requestedPostCreateResourcePermission.isWithGrant()
+                           && existingDirectPermission.isWithGrantOption() != existingPostCreateResourcePermission.isWithGrant()
+                           && requestedPermission.isWithGrantOption() != existingDirectPermission.isWithGrantOption()) {
                         // the requested permission is incompatible to the existing permission because we can't
                         // perform grant operations (a)/G -> (a/G) or (a/G) -> (a)/G without removing either the
                         // create or post-create granting option
@@ -2565,8 +2565,8 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
 
                      // now let's see if we need to update existing permission or leave it unchanged
                      if (!requestedPermission.equals(existingDirectPermission)
-                           && ((requestedPermission.isWithGrant() && requestedPostCreateResourcePermission.isWithGrant())
-                           || (!existingDirectPermission.isWithGrant() && !existingPostCreateResourcePermission.isWithGrant()))) {
+                           && ((requestedPermission.isWithGrantOption() && requestedPostCreateResourcePermission.isWithGrant())
+                           || (!existingDirectPermission.isWithGrantOption() && !existingPostCreateResourcePermission.isWithGrant()))) {
                         // the two permissions match in name, but the requested has higher granting rights,
                         // so we need to update
                         updatePermissions.add(requestedPermission);

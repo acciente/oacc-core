@@ -53,7 +53,7 @@ public class ResourceCreatePermissions {
 
    /**
     * Creates a new resource create permission with no post-create permissions (i.e. only resource creation)
-    * and defaults the withGrant to false
+    * and defaults the withGrantOption to false
     *
     * @param sysPermissionName
     * @return a resource create permission
@@ -76,24 +76,24 @@ public class ResourceCreatePermissions {
       private final long               systemPermissionId;
       private final String             sysPermissionName;
       private final ResourcePermission postCreateResourcePermission;
-      private final boolean            withGrant;
+      private final boolean            withGrantOption;
 
       private ResourceCreatePermissionImpl(String sysPermissionName,
-                                           boolean withGrant) {
+                                           boolean withGrantOption) {
          SysPermission sysPermission = getSysPermission(sysPermissionName);
 
          this.systemPermissionId = sysPermission.getSystemPermissionId();
          this.sysPermissionName = sysPermission.getPermissionName();
          this.postCreateResourcePermission = null;
-         this.withGrant = withGrant;
+         this.withGrantOption = withGrantOption;
       }
 
       private ResourceCreatePermissionImpl(ResourcePermission postCreateResourcePermission,
-                                           boolean withGrant) {
+                                           boolean withGrantOption) {
          this.systemPermissionId = 0;
          this.sysPermissionName = null;
          this.postCreateResourcePermission = postCreateResourcePermission;
-         this.withGrant = withGrant;
+         this.withGrantOption = withGrantOption;
       }
 
       @Override
@@ -129,8 +129,14 @@ public class ResourceCreatePermissions {
       }
 
       @Override
+      public boolean isWithGrantOption() {
+         return withGrantOption;
+      }
+
+      @Override
+      @Deprecated
       public boolean isWithGrant() {
-         return withGrant;
+         return isWithGrantOption();
       }
 
       @Override
@@ -139,7 +145,7 @@ public class ResourceCreatePermissions {
             return false;
          }
 
-         if (!other.isWithGrant()) {
+         if (!other.isWithGrantOption()) {
             return false;
          }
 
@@ -182,7 +188,7 @@ public class ResourceCreatePermissions {
              : otherResourceCreatePermission.postCreateResourcePermission != null) {
             return false;
          }
-         if (withGrant != otherResourceCreatePermission.withGrant) {
+         if (withGrantOption != otherResourceCreatePermission.withGrantOption) {
             return false;
          }
 
@@ -190,7 +196,7 @@ public class ResourceCreatePermissions {
       }
 
       @Override
-      public boolean equalsIgnoreGrant(Object other) {
+      public boolean equalsIgnoreGrantOption(Object other) {
          if (this == other) {
             return true;
          }
@@ -218,11 +224,17 @@ public class ResourceCreatePermissions {
       }
 
       @Override
+      @Deprecated
+      public boolean equalsIgnoreGrant(Object other) {
+         return equalsIgnoreGrantOption(other);
+      }
+
+      @Override
       public int hashCode() {
          int result = (int) (systemPermissionId ^ (systemPermissionId >>> 32));
          result = 31 * result + (sysPermissionName != null ? sysPermissionName.hashCode() : 0);
          result = 31 * result + (postCreateResourcePermission != null ? postCreateResourcePermission.hashCode() : 0);
-         result = 31 * result + (withGrant ? 1 : 0);
+         result = 31 * result + (withGrantOption ? 1 : 0);
          return result;
       }
 
@@ -230,11 +242,11 @@ public class ResourceCreatePermissions {
       public String toString() {
          if (postCreateResourcePermission == null) {
             return "*CREATE[]"
-                  + (withGrant ? " /G" : "");
+                  + (withGrantOption ? " /G" : "");
          }
          else {
             return "*CREATE[" + postCreateResourcePermission.toString() + "]"
-                  + (withGrant ? " /G" : "");
+                  + (withGrantOption ? " /G" : "");
          }
       }
 

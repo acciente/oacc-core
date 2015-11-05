@@ -163,7 +163,7 @@ public abstract class CommonGrantResourceCreatePermissionPostCreateSysPersister 
                statement.setResourceId(1, accessorResource);
                statement.setResourceId(2, grantorResource);
                statement.setResourceDomainId(3, accessedResourceDomainId);
-               statement.setBoolean(4, resourceCreatePermission.isWithGrant());
+               statement.setBoolean(4, resourceCreatePermission.isWithGrantOption());
                statement.setBoolean(5, resourceCreatePermission.getPostCreateResourcePermission().isWithGrant());
                statement.setResourceClassId(6, accessedResourceClassId);
                statement.setResourceSystemPermissionId(7, resourceCreatePermission.getPostCreateResourcePermission().getSystemPermissionId());
@@ -195,7 +195,7 @@ public abstract class CommonGrantResourceCreatePermissionPostCreateSysPersister 
             if (!resourceCreatePermission.isSystemPermission()
                   && resourceCreatePermission.getPostCreateResourcePermission().isSystemPermission()) {
                statement.setResourceId(1, grantorResource);
-               statement.setBoolean(2, resourceCreatePermission.isWithGrant());
+               statement.setBoolean(2, resourceCreatePermission.isWithGrantOption());
                statement.setBoolean(3, resourceCreatePermission.getPostCreateResourcePermission().isWithGrant());
                statement.setResourceId(4, accessorResource);
                statement.setResourceDomainId(5, accessedResourceDomainId);
