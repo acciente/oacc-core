@@ -78,14 +78,7 @@ public abstract class CommonGrantGlobalResourcePermissionSysPersister extends Pe
          resultSet = statement.executeQuery();
 
          while (resultSet.next()) {
-            if (resultSet.getBoolean("IsWithGrant")) {
-               resourcePermissions
-                     .add(ResourcePermissions.getInstanceWithGrantOption(resultSet.getResourceSysPermissionName("SysPermissionId")));
-            }
-            else {
-               resourcePermissions
-                     .add(ResourcePermissions.getInstance(resultSet.getResourceSysPermissionName("SysPermissionId")));
-            }
+            resourcePermissions.add(getResourceSysPermission(resultSet));
          }
          resultSet.close();
 
@@ -96,6 +89,15 @@ public abstract class CommonGrantGlobalResourcePermissionSysPersister extends Pe
       }
       finally {
          closeStatement(statement);
+      }
+   }
+
+   protected static ResourcePermission getResourceSysPermission(SQLResult resultSet) throws SQLException {
+      if (resultSet.getBoolean("IsWithGrant")) {
+         return ResourcePermissions.getInstanceWithGrantOption(resultSet.getResourceSysPermissionName("SysPermissionId"));
+      }
+      else {
+         return ResourcePermissions.getInstance(resultSet.getResourceSysPermissionName("SysPermissionId"));
       }
    }
 
@@ -135,14 +137,7 @@ public abstract class CommonGrantGlobalResourcePermissionSysPersister extends Pe
                                                 resourcePermissionsForResourceClass = new HashSet<>());
             }
 
-            if (resultSet.getBoolean("IsWithGrant")) {
-               resourcePermissionsForResourceClass
-                     .add(ResourcePermissions.getInstanceWithGrantOption(resultSet.getResourceSysPermissionName("SysPermissionId")));
-            }
-            else {
-               resourcePermissionsForResourceClass
-                     .add(ResourcePermissions.getInstance(resultSet.getResourceSysPermissionName("SysPermissionId")));
-            }
+            resourcePermissionsForResourceClass.add(getResourceSysPermission(resultSet));
          }
          resultSet.close();
 

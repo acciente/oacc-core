@@ -19,7 +19,6 @@ package com.acciente.oacc.sql.internal.persister;
 
 import com.acciente.oacc.Resource;
 import com.acciente.oacc.ResourcePermission;
-import com.acciente.oacc.ResourcePermissions;
 import com.acciente.oacc.sql.SQLProfile;
 import com.acciente.oacc.sql.internal.persister.id.DomainId;
 import com.acciente.oacc.sql.internal.persister.id.Id;
@@ -154,14 +153,7 @@ public class NonRecursiveGrantResourcePermissionSysPersister extends CommonGrant
             resultSet = statement.executeQuery();
 
             while (resultSet.next()) {
-               if (resultSet.getBoolean("IsWithGrant")) {
-                  resourcePermissions
-                        .add(ResourcePermissions.getInstanceWithGrantOption(resultSet.getResourceSysPermissionName("SysPermissionId")));
-               }
-               else {
-                  resourcePermissions
-                        .add(ResourcePermissions.getInstance(resultSet.getResourceSysPermissionName("SysPermissionId")));
-               }
+               resourcePermissions.add(getResourceSysPermission(resultSet));
             }
             resultSet.close();
          }

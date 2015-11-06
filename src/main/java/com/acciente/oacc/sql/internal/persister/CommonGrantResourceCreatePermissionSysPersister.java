@@ -84,12 +84,7 @@ public abstract class CommonGrantResourceCreatePermissionSysPersister extends Pe
                                                 permissionsForResourceClass = new HashSet<>());
             }
 
-            if (resultSet.getBoolean("IsWithGrant")) {
-               permissionsForResourceClass.add(ResourceCreatePermissions.getInstanceWithGrantOption(resultSet.getResourceCreateSysPermissionName("SysPermissionId")));
-            }
-            else {
-               permissionsForResourceClass.add(ResourceCreatePermissions.getInstance(resultSet.getResourceCreateSysPermissionName("SysPermissionId")));
-            }
+            permissionsForResourceClass.add(getResourceCreateSysPermission(resultSet));
          }
          resultSet.close();
 
@@ -100,6 +95,15 @@ public abstract class CommonGrantResourceCreatePermissionSysPersister extends Pe
       }
       finally {
          closeStatement(statement);
+      }
+   }
+
+   protected static ResourceCreatePermission getResourceCreateSysPermission(SQLResult resultSet) throws SQLException {
+      if (resultSet.getBoolean("IsWithGrant")) {
+         return ResourceCreatePermissions.getInstanceWithGrantOption(resultSet.getResourceCreateSysPermissionName("SysPermissionId"));
+      }
+      else {
+         return ResourceCreatePermissions.getInstance(resultSet.getResourceCreateSysPermissionName("SysPermissionId"));
       }
    }
 
@@ -121,12 +125,7 @@ public abstract class CommonGrantResourceCreatePermissionSysPersister extends Pe
          resultSet = statement.executeQuery();
 
          while (resultSet.next()) {
-            if (resultSet.getBoolean("IsWithGrant")) {
-               resourceCreatePermissions.add(ResourceCreatePermissions.getInstanceWithGrantOption(resultSet.getResourceCreateSysPermissionName("SysPermissionId")));
-            }
-            else {
-               resourceCreatePermissions.add(ResourceCreatePermissions.getInstance(resultSet.getResourceCreateSysPermissionName("SysPermissionId")));
-            }
+            resourceCreatePermissions.add(getResourceCreateSysPermission(resultSet));
          }
          resultSet.close();
 

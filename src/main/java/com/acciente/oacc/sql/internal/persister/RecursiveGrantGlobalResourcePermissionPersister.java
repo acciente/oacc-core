@@ -19,7 +19,6 @@ package com.acciente.oacc.sql.internal.persister;
 
 import com.acciente.oacc.Resource;
 import com.acciente.oacc.ResourcePermission;
-import com.acciente.oacc.ResourcePermissions;
 import com.acciente.oacc.sql.SQLProfile;
 import com.acciente.oacc.sql.internal.persister.id.DomainId;
 import com.acciente.oacc.sql.internal.persister.id.Id;
@@ -138,12 +137,7 @@ public class RecursiveGrantGlobalResourcePermissionPersister extends CommonGrant
          resultSet = statement.executeQuery();
 
          while (resultSet.next()) {
-            if (resultSet.getBoolean("IsWithGrant")) {
-               resourcePermissions.add(ResourcePermissions.getInstanceWithGrantOption(resultSet.getString("PermissionName")));
-            }
-            else {
-               resourcePermissions.add(ResourcePermissions.getInstance(resultSet.getString("PermissionName")));
-            }
+            resourcePermissions.add(getResourcePermission(resultSet));
          }
          resultSet.close();
 
@@ -189,14 +183,7 @@ public class RecursiveGrantGlobalResourcePermissionPersister extends CommonGrant
                                                 resourcePermissionsForResourceClass = new HashSet<>());
             }
 
-            if (resultSet.getBoolean("IsWithGrant")) {
-               resourcePermissionsForResourceClass
-                     .add(ResourcePermissions.getInstanceWithGrantOption(resultSet.getString("PermissionName")));
-            }
-            else {
-               resourcePermissionsForResourceClass
-                     .add(ResourcePermissions.getInstance(resultSet.getString("PermissionName")));
-            }
+            resourcePermissionsForResourceClass.add(getResourcePermission(resultSet));
          }
          resultSet.close();
 

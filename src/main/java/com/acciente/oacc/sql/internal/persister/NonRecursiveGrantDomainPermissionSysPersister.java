@@ -18,7 +18,6 @@
 package com.acciente.oacc.sql.internal.persister;
 
 import com.acciente.oacc.DomainPermission;
-import com.acciente.oacc.DomainPermissions;
 import com.acciente.oacc.Resource;
 import com.acciente.oacc.sql.SQLProfile;
 import com.acciente.oacc.sql.internal.persister.id.DomainId;
@@ -202,12 +201,7 @@ public class NonRecursiveGrantDomainPermissionSysPersister extends CommonGrantDo
 
                while (resultSet.next()) {
                   // on the domains only pre-defined system permissions are expected
-                  if (resultSet.getBoolean("IsWithGrant")) {
-                     domainPermissions.add(DomainPermissions.getInstanceWithGrantOption(resultSet.getDomainSysPermissionName("SysPermissionId")));
-                  }
-                  else {
-                     domainPermissions.add(DomainPermissions.getInstance(resultSet.getDomainSysPermissionName("SysPermissionId")));
-                  }
+                  domainPermissions.add(getDomainSysPermission(resultSet));
                }
                resultSet.close();
             }
@@ -254,12 +248,7 @@ public class NonRecursiveGrantDomainPermissionSysPersister extends CommonGrantDo
                }
 
                // on the domains only pre-defined system permissions are expected
-               if (resultSet.getBoolean("IsWithGrant")) {
-                  domainPermissions.add(DomainPermissions.getInstanceWithGrantOption(resultSet.getDomainSysPermissionName("SysPermissionId")));
-               }
-               else {
-                  domainPermissions.add(DomainPermissions.getInstance(resultSet.getDomainSysPermissionName("SysPermissionId")));
-               }
+               domainPermissions.add(getDomainSysPermission(resultSet));
             }
             resultSet.close();
          }

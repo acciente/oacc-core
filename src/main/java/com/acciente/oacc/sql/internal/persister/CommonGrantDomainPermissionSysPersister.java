@@ -76,12 +76,7 @@ public abstract class CommonGrantDomainPermissionSysPersister extends Persister 
          Set<DomainPermission> domainPermissions = new HashSet<>();
          while (resultSet.next()) {
             // on the domains only pre-defined system permissions are expected
-            if (resultSet.getBoolean("IsWithGrant")) {
-               domainPermissions.add(DomainPermissions.getInstanceWithGrantOption(resultSet.getDomainSysPermissionName("SysPermissionId")));
-            }
-            else {
-               domainPermissions.add(DomainPermissions.getInstance(resultSet.getDomainSysPermissionName("SysPermissionId")));
-            }
+            domainPermissions.add(getDomainSysPermission(resultSet));
          }
          resultSet.close();
 
@@ -123,12 +118,7 @@ public abstract class CommonGrantDomainPermissionSysPersister extends Persister 
             }
 
             // on the domains only pre-defined system permissions are expected
-            if (resultSet.getBoolean("IsWithGrant")) {
-               domainPermissions.add(DomainPermissions.getInstanceWithGrantOption(resultSet.getDomainSysPermissionName("SysPermissionId")));
-            }
-            else {
-               domainPermissions.add(DomainPermissions.getInstance(resultSet.getDomainSysPermissionName("SysPermissionId")));
-            }
+            domainPermissions.add(getDomainSysPermission(resultSet));
          }
          resultSet.close();
 
@@ -139,6 +129,15 @@ public abstract class CommonGrantDomainPermissionSysPersister extends Persister 
       }
       finally {
          closeStatement(statement);
+      }
+   }
+
+   protected static DomainPermission getDomainSysPermission(SQLResult resultSet) throws SQLException {
+      if (resultSet.getBoolean("IsWithGrant")) {
+         return DomainPermissions.getInstanceWithGrantOption(resultSet.getDomainSysPermissionName("SysPermissionId"));
+      }
+      else {
+         return DomainPermissions.getInstance(resultSet.getDomainSysPermissionName("SysPermissionId"));
       }
    }
 

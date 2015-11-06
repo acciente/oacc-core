@@ -18,8 +18,6 @@
 package com.acciente.oacc.sql.internal.persister;
 
 import com.acciente.oacc.DomainCreatePermission;
-import com.acciente.oacc.DomainCreatePermissions;
-import com.acciente.oacc.DomainPermissions;
 import com.acciente.oacc.Resource;
 import com.acciente.oacc.sql.SQLProfile;
 import com.acciente.oacc.sql.internal.persister.id.Id;
@@ -54,22 +52,7 @@ public class NonRecursiveGrantDomainCreatePermissionPostCreateSysPersister exten
             SQLResult resultSet = statement.executeQuery();
 
             while (resultSet.next()) {
-               if (resultSet.getBoolean("IsWithGrant")) {
-                  if (resultSet.getBoolean("PostCreateIsWithGrant")) {
-                     domainCreatePermissions.add(DomainCreatePermissions.getInstanceWithGrantOption(DomainPermissions.getInstanceWithGrantOption(resultSet.getDomainSysPermissionName("PostCreateSysPermissionId"))));
-                  }
-                  else {
-                     domainCreatePermissions.add(DomainCreatePermissions.getInstanceWithGrantOption(DomainPermissions.getInstance(resultSet.getDomainSysPermissionName("PostCreateSysPermissionId"))));
-                  }
-               }
-               else {
-                  if (resultSet.getBoolean("PostCreateIsWithGrant")) {
-                     domainCreatePermissions.add(DomainCreatePermissions.getInstance(DomainPermissions.getInstanceWithGrantOption(resultSet.getDomainSysPermissionName("PostCreateSysPermissionId"))));
-                  }
-                  else {
-                     domainCreatePermissions.add(DomainCreatePermissions.getInstance(DomainPermissions.getInstance(resultSet.getDomainSysPermissionName("PostCreateSysPermissionId"))));
-                  }
-               }
+               domainCreatePermissions.add(getDomainCreatePostCreateSysPermission(resultSet));
             }
             resultSet.close();
          }

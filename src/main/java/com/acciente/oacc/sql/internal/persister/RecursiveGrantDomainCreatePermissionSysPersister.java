@@ -18,7 +18,6 @@
 package com.acciente.oacc.sql.internal.persister;
 
 import com.acciente.oacc.DomainCreatePermission;
-import com.acciente.oacc.DomainCreatePermissions;
 import com.acciente.oacc.Resource;
 import com.acciente.oacc.sql.SQLProfile;
 
@@ -45,14 +44,7 @@ public class RecursiveGrantDomainCreatePermissionSysPersister extends CommonGran
          // collect the create permissions that this resource has to domains
          Set<DomainCreatePermission> domainCreatePermissions = new HashSet<>();
          while (resultSet.next()) {
-            if (resultSet.getBoolean("IsWithGrant")) {
-               domainCreatePermissions
-                     .add(DomainCreatePermissions.getInstanceWithGrantOption(resultSet.getDomainCreateSysPermissionName("SysPermissionId")));
-            }
-            else {
-               domainCreatePermissions
-                     .add(DomainCreatePermissions.getInstance(resultSet.getDomainCreateSysPermissionName("SysPermissionId")));
-            }
+            domainCreatePermissions.add(getDomainCreateSysPermission(resultSet));
          }
          resultSet.close();
 

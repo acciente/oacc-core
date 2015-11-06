@@ -19,7 +19,6 @@ package com.acciente.oacc.sql.internal.persister;
 
 import com.acciente.oacc.Resource;
 import com.acciente.oacc.ResourceCreatePermission;
-import com.acciente.oacc.ResourceCreatePermissions;
 import com.acciente.oacc.sql.SQLProfile;
 import com.acciente.oacc.sql.internal.persister.id.DomainId;
 import com.acciente.oacc.sql.internal.persister.id.Id;
@@ -58,14 +57,7 @@ public class RecursiveGrantResourceCreatePermissionSysPersister extends CommonGr
          resultSet = statement.executeQuery();
 
          while (resultSet.next()) {
-            if (resultSet.getBoolean("IsWithGrant")) {
-               resourceCreatePermissions
-                     .add(ResourceCreatePermissions.getInstanceWithGrantOption(resultSet.getResourceCreateSysPermissionName("SysPermissionId")));
-            }
-            else {
-               resourceCreatePermissions
-                     .add(ResourceCreatePermissions.getInstance(resultSet.getResourceCreateSysPermissionName("SysPermissionId")));
-            }
+            resourceCreatePermissions.add(getResourceCreateSysPermission(resultSet));
          }
          resultSet.close();
 
@@ -113,14 +105,7 @@ public class RecursiveGrantResourceCreatePermissionSysPersister extends CommonGr
                                                 permissionsForResourceClass = new HashSet<>());
             }
 
-            if (resultSet.getBoolean("IsWithGrant")) {
-               permissionsForResourceClass
-                     .add(ResourceCreatePermissions.getInstanceWithGrantOption(resultSet.getResourceCreateSysPermissionName("SysPermissionId")));
-            }
-            else {
-               permissionsForResourceClass
-                     .add(ResourceCreatePermissions.getInstance(resultSet.getResourceCreateSysPermissionName("SysPermissionId")));
-            }
+            permissionsForResourceClass.add(getResourceCreateSysPermission(resultSet));
          }
          resultSet.close();
 

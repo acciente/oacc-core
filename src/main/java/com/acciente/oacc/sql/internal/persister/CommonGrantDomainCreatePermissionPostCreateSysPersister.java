@@ -55,22 +55,7 @@ public abstract class CommonGrantDomainCreatePermissionPostCreateSysPersister ex
          // collect the create permissions that this resource has to domains directly
          Set<DomainCreatePermission> domainCreatePermissions = new HashSet<>();
          while (resultSet.next()) {
-            if (resultSet.getBoolean("IsWithGrant")) {
-               if (resultSet.getBoolean("PostCreateIsWithGrant")) {
-                  domainCreatePermissions.add(DomainCreatePermissions.getInstanceWithGrantOption(DomainPermissions.getInstanceWithGrantOption(resultSet.getDomainSysPermissionName("PostCreateSysPermissionId"))));
-               }
-               else {
-                  domainCreatePermissions.add(DomainCreatePermissions.getInstanceWithGrantOption(DomainPermissions.getInstance(resultSet.getDomainSysPermissionName("PostCreateSysPermissionId"))));
-               }
-            }
-            else {
-               if (resultSet.getBoolean("PostCreateIsWithGrant")) {
-                  domainCreatePermissions.add(DomainCreatePermissions.getInstance(DomainPermissions.getInstanceWithGrantOption(resultSet.getDomainSysPermissionName("PostCreateSysPermissionId"))));
-               }
-               else {
-                  domainCreatePermissions.add(DomainCreatePermissions.getInstance(DomainPermissions.getInstance(resultSet.getDomainSysPermissionName("PostCreateSysPermissionId"))));
-               }
-            }
+            domainCreatePermissions.add(getDomainCreatePostCreateSysPermission(resultSet));
          }
          resultSet.close();
 
@@ -81,6 +66,25 @@ public abstract class CommonGrantDomainCreatePermissionPostCreateSysPersister ex
       }
       finally {
          closeStatement(statement);
+      }
+   }
+
+   protected static DomainCreatePermission getDomainCreatePostCreateSysPermission(SQLResult resultSet) throws SQLException {
+      if (resultSet.getBoolean("IsWithGrant")) {
+         if (resultSet.getBoolean("PostCreateIsWithGrant")) {
+            return DomainCreatePermissions.getInstanceWithGrantOption(DomainPermissions.getInstanceWithGrantOption(resultSet.getDomainSysPermissionName("PostCreateSysPermissionId")));
+         }
+         else {
+            return DomainCreatePermissions.getInstanceWithGrantOption(DomainPermissions.getInstance(resultSet.getDomainSysPermissionName("PostCreateSysPermissionId")));
+         }
+      }
+      else {
+         if (resultSet.getBoolean("PostCreateIsWithGrant")) {
+            return DomainCreatePermissions.getInstance(DomainPermissions.getInstanceWithGrantOption(resultSet.getDomainSysPermissionName("PostCreateSysPermissionId")));
+         }
+         else {
+            return DomainCreatePermissions.getInstance(DomainPermissions.getInstance(resultSet.getDomainSysPermissionName("PostCreateSysPermissionId")));
+         }
       }
    }
 

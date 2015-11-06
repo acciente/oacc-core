@@ -113,12 +113,7 @@ public abstract class CommonGrantResourcePermissionPersister extends Persister i
          resultSet = statement.executeQuery();
 
          while (resultSet.next()) {
-            if (resultSet.getBoolean("IsWithGrant")) {
-               resourcePermissions.add(ResourcePermissions.getInstanceWithGrantOption(resultSet.getString("PermissionName")));
-            }
-            else {
-               resourcePermissions.add(ResourcePermissions.getInstance(resultSet.getString("PermissionName")));
-            }
+            resourcePermissions.add(getResourcePermission(resultSet));
          }
          resultSet.close();
 
@@ -129,6 +124,15 @@ public abstract class CommonGrantResourcePermissionPersister extends Persister i
       }
       finally {
          closeStatement(statement);
+      }
+   }
+
+   protected static ResourcePermission getResourcePermission(SQLResult resultSet) throws SQLException {
+      if (resultSet.getBoolean("IsWithGrant")) {
+         return ResourcePermissions.getInstanceWithGrantOption(resultSet.getString("PermissionName"));
+      }
+      else {
+         return ResourcePermissions.getInstance(resultSet.getString("PermissionName"));
       }
    }
 
