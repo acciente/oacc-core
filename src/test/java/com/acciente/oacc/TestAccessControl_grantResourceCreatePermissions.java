@@ -35,16 +35,13 @@ public class TestAccessControl_grantResourceCreatePermissions extends TestAccess
    public void grantResourceCreatePermissions_validAsSystemResource() {
       authenticateSystemResource();
       final ResourceCreatePermission createPerm_create_withGrant
-            = ResourceCreatePermissions.getInstance(ResourceCreatePermissions.CREATE, true);
+            = ResourceCreatePermissions.getInstanceWithGrantOption(ResourceCreatePermissions.CREATE);
       final ResourceCreatePermission createPerm_impersonate
-            = ResourceCreatePermissions.getInstance(ResourcePermissions.getInstance(ResourcePermissions.IMPERSONATE),
-                                                    false);
+            = ResourceCreatePermissions.getInstance(ResourcePermissions.getInstance(ResourcePermissions.IMPERSONATE));
       final ResourceCreatePermission createPerm_inherit_withGrant
-            = ResourceCreatePermissions.getInstance(ResourcePermissions.getInstance(ResourcePermissions.INHERIT, true),
-                                                    true);
+            = ResourceCreatePermissions.getInstanceWithGrantOption(ResourcePermissions.getInstanceWithGrantOption(ResourcePermissions.INHERIT));
       final ResourceCreatePermission createPerm_resetPwd
-            = ResourceCreatePermissions.getInstance(ResourcePermissions
-                                                          .getInstance(ResourcePermissions.RESET_CREDENTIALS, true));
+            = ResourceCreatePermissions.getInstance(ResourcePermissions.getInstanceWithGrantOption(ResourcePermissions.RESET_CREDENTIALS));
 
       final String domainName = generateDomain();
       final String resourceClassName = generateResourceClass(true, false);
@@ -92,16 +89,13 @@ public class TestAccessControl_grantResourceCreatePermissions extends TestAccess
    public void grantResourceCreatePermissions_withExtId() {
       authenticateSystemResource();
       final ResourceCreatePermission createPerm_create_withGrant
-            = ResourceCreatePermissions.getInstance(ResourceCreatePermissions.CREATE, true);
+            = ResourceCreatePermissions.getInstanceWithGrantOption(ResourceCreatePermissions.CREATE);
       final ResourceCreatePermission createPerm_impersonate
-            = ResourceCreatePermissions.getInstance(ResourcePermissions.getInstance(ResourcePermissions.IMPERSONATE),
-                                                    false);
+            = ResourceCreatePermissions.getInstance(ResourcePermissions.getInstance(ResourcePermissions.IMPERSONATE));
       final ResourceCreatePermission createPerm_inherit_withGrant
-            = ResourceCreatePermissions.getInstance(ResourcePermissions.getInstance(ResourcePermissions.INHERIT, true),
-                                                    true);
+            = ResourceCreatePermissions.getInstanceWithGrantOption(ResourcePermissions.getInstanceWithGrantOption(ResourcePermissions.INHERIT));
       final ResourceCreatePermission createPerm_resetPwd
-            = ResourceCreatePermissions.getInstance(ResourcePermissions
-                                                          .getInstance(ResourcePermissions.RESET_CREDENTIALS, true));
+            = ResourceCreatePermissions.getInstance(ResourcePermissions.getInstanceWithGrantOption(ResourcePermissions.RESET_CREDENTIALS));
 
       final String domainName = generateDomain();
       final String resourceClassName = generateResourceClass(true, false);
@@ -150,11 +144,11 @@ public class TestAccessControl_grantResourceCreatePermissions extends TestAccess
    @Test
    public void grantResourceCreatePermissions_validAsAuthorized() {
       final ResourcePermission resourcePermission_inherit_withGrant
-            = ResourcePermissions.getInstance(ResourcePermissions.INHERIT, true);
+            = ResourcePermissions.getInstanceWithGrantOption(ResourcePermissions.INHERIT);
       final ResourceCreatePermission createPerm_create_withGrant
-            = ResourceCreatePermissions.getInstance(ResourceCreatePermissions.CREATE, true);
+            = ResourceCreatePermissions.getInstanceWithGrantOption(ResourceCreatePermissions.CREATE);
       final ResourceCreatePermission createPerm_inherit_withGrant
-            = ResourceCreatePermissions.getInstance(resourcePermission_inherit_withGrant, true);
+            = ResourceCreatePermissions.getInstanceWithGrantOption(resourcePermission_inherit_withGrant);
 
       // set up the grantorResource
       authenticateSystemResource();
@@ -188,11 +182,11 @@ public class TestAccessControl_grantResourceCreatePermissions extends TestAccess
                                                           resourceClassName,
                                                           domainName,
                                                           ResourceCreatePermissions
-                                                                .getInstance(ResourceCreatePermissions.CREATE, false),
+                                                                .getInstance(ResourceCreatePermissions.CREATE),
                                                           createPerm_inherit_withGrant);
 
       Set<ResourceCreatePermission> resourceCreatePermissions_expected
-            = setOf(ResourceCreatePermissions.getInstance(ResourceCreatePermissions.CREATE, false),
+            = setOf(ResourceCreatePermissions.getInstance(ResourceCreatePermissions.CREATE),
                     createPerm_inherit_withGrant);
       final Set<ResourceCreatePermission> resourceCreatePermissions_post
             = accessControlContext.getEffectiveResourceCreatePermissions(accessorResource, resourceClassName, domainName);
@@ -207,8 +201,7 @@ public class TestAccessControl_grantResourceCreatePermissions extends TestAccess
                                                           resourceClassName,
                                                           domainName,
                                                           setOf(ResourceCreatePermissions
-                                                                      .getInstance(ResourceCreatePermissions.CREATE,
-                                                                                   false),
+                                                                      .getInstance(ResourceCreatePermissions.CREATE),
                                                                 createPerm_inherit_withGrant));
 
       assertThat(accessControlContext.getEffectiveResourceCreatePermissions(accessorResource2, resourceClassName, domainName),
@@ -245,9 +238,8 @@ public class TestAccessControl_grantResourceCreatePermissions extends TestAccess
 
       // setup grantor permissions
       Set<ResourceCreatePermission> grantorPermissions
-            = setOf(ResourceCreatePermissions.getInstance(ResourceCreatePermissions.CREATE, true),
-                    ResourceCreatePermissions.getInstance(ResourcePermissions.getInstance(grantablePermissionName),
-                                                          true));
+            = setOf(ResourceCreatePermissions.getInstanceWithGrantOption(ResourceCreatePermissions.CREATE),
+                    ResourceCreatePermissions.getInstanceWithGrantOption(ResourcePermissions.getInstance(grantablePermissionName)));
       accessControlContext.setResourceCreatePermissions(grantorResource, resourceClassName, domainName, grantorPermissions);
       assertThat(accessControlContext.getEffectiveResourceCreatePermissions(grantorResource,
                                                                             resourceClassName,
@@ -307,8 +299,8 @@ public class TestAccessControl_grantResourceCreatePermissions extends TestAccess
 
       // setup grantor permissions
       Set<ResourceCreatePermission> grantorPermissions
-            = setOf(ResourceCreatePermissions.getInstance(ResourceCreatePermissions.CREATE, true),
-                    ResourceCreatePermissions.getInstance(ResourcePermissions.getInstance(grantablePermissionName), true));
+            = setOf(ResourceCreatePermissions.getInstanceWithGrantOption(ResourceCreatePermissions.CREATE),
+                    ResourceCreatePermissions.getInstanceWithGrantOption(ResourcePermissions.getInstance(grantablePermissionName)));
       accessControlContext.setResourceCreatePermissions(grantorResource, resourceClassName, domainName, grantorPermissions);
       assertThat(accessControlContext.getEffectiveResourceCreatePermissions(grantorResource, resourceClassName, domainName),
                  is(grantorPermissions));
@@ -373,8 +365,8 @@ public class TestAccessControl_grantResourceCreatePermissions extends TestAccess
 
       // setup grantor permissions
       Set<ResourceCreatePermission> grantorPermissions
-            = setOf(ResourceCreatePermissions.getInstance(ResourceCreatePermissions.CREATE, true),
-                    ResourceCreatePermissions.getInstance(ResourcePermissions.getInstance(grantablePermissionName), true));
+            = setOf(ResourceCreatePermissions.getInstanceWithGrantOption(ResourceCreatePermissions.CREATE),
+                    ResourceCreatePermissions.getInstanceWithGrantOption(ResourcePermissions.getInstance(grantablePermissionName)));
       accessControlContext.setResourceCreatePermissions(grantorResource, resourceClassName, domainName, grantorPermissions);
       assertThat(accessControlContext.getEffectiveResourceCreatePermissions(grantorResource, resourceClassName, domainName),
                  is(grantorPermissions));
@@ -420,11 +412,11 @@ public class TestAccessControl_grantResourceCreatePermissions extends TestAccess
    @Test
    public void grantResourceCreatePermissions_regrantPermissions() {
       final ResourcePermission resourcePermission_inherit_withGrant
-            = ResourcePermissions.getInstance(ResourcePermissions.INHERIT, true);
+            = ResourcePermissions.getInstanceWithGrantOption(ResourcePermissions.INHERIT);
       final ResourceCreatePermission createPerm_create_withGrant
-            = ResourceCreatePermissions.getInstance(ResourceCreatePermissions.CREATE, true);
+            = ResourceCreatePermissions.getInstanceWithGrantOption(ResourceCreatePermissions.CREATE);
       final ResourceCreatePermission createPerm_inherit_withGrant
-            = ResourceCreatePermissions.getInstance(resourcePermission_inherit_withGrant, true);
+            = ResourceCreatePermissions.getInstanceWithGrantOption(resourcePermission_inherit_withGrant);
 
       // set up the grantorResource
       authenticateSystemResource();
@@ -455,11 +447,11 @@ public class TestAccessControl_grantResourceCreatePermissions extends TestAccess
                                                           resourceClassName,
                                                           domainName,
                                                           ResourceCreatePermissions
-                                                                .getInstance(ResourceCreatePermissions.CREATE, false),
+                                                                .getInstance(ResourceCreatePermissions.CREATE),
                                                           createPerm_inherit_withGrant);
 
       Set<ResourceCreatePermission> resourceCreatePermissions_expected
-            = setOf(ResourceCreatePermissions.getInstance(ResourceCreatePermissions.CREATE, false),
+            = setOf(ResourceCreatePermissions.getInstance(ResourceCreatePermissions.CREATE),
                     createPerm_inherit_withGrant);
       assertThat(accessControlContext.getEffectiveResourceCreatePermissions(accessorResource,
                                                                             resourceClassName,
@@ -502,9 +494,9 @@ public class TestAccessControl_grantResourceCreatePermissions extends TestAccess
       Set<ResourceCreatePermission> accessorPermissions_pre
             = setOf(ResourceCreatePermissions.getInstance(ResourceCreatePermissions.CREATE),
                     ResourceCreatePermissions
-                          .getInstance(ResourcePermissions.getInstance(ResourcePermissions.INHERIT, true), true),
+                          .getInstanceWithGrantOption(ResourcePermissions.getInstanceWithGrantOption(ResourcePermissions.INHERIT)),
                     ResourceCreatePermissions
-                          .getInstance(ResourcePermissions.getInstance(customPermissionName), true));
+                          .getInstanceWithGrantOption(ResourcePermissions.getInstance(customPermissionName)));
 
       final Resource accessorResource = generateUnauthenticatableResource();
       accessControlContext.setResourceCreatePermissions(accessorResource, resourceClassName, domainName, accessorPermissions_pre);
@@ -521,11 +513,11 @@ public class TestAccessControl_grantResourceCreatePermissions extends TestAccess
 
       // setup grantor permissions
       Set<ResourceCreatePermission> grantorPermissions
-            = setOf(ResourceCreatePermissions.getInstance(ResourceCreatePermissions.CREATE, true),
+            = setOf(ResourceCreatePermissions.getInstanceWithGrantOption(ResourceCreatePermissions.CREATE),
                     ResourceCreatePermissions
-                          .getInstance(ResourcePermissions.getInstance(ResourcePermissions.INHERIT, true), true),
+                          .getInstanceWithGrantOption(ResourcePermissions.getInstanceWithGrantOption(ResourcePermissions.INHERIT)),
                     ResourceCreatePermissions
-                          .getInstance(ResourcePermissions.getInstance(customPermissionName, true), true));
+                          .getInstanceWithGrantOption(ResourcePermissions.getInstanceWithGrantOption(customPermissionName)));
 
 
       accessControlContext.setResourceCreatePermissions(grantorResource,
@@ -549,8 +541,7 @@ public class TestAccessControl_grantResourceCreatePermissions extends TestAccess
                                             domainName,
                                             ResourceCreatePermissions
                                                   .getInstance(ResourcePermissions
-                                                                     .getInstance(ResourcePermissions.INHERIT,
-                                                                                  true)),
+                                                                     .getInstanceWithGrantOption(ResourcePermissions.INHERIT)),
                                             ResourceCreatePermissions
                                                   .getInstance(ResourcePermissions.getInstance(customPermissionName)));
 
@@ -572,8 +563,7 @@ public class TestAccessControl_grantResourceCreatePermissions extends TestAccess
                                             domainName,
                                             setOf(ResourceCreatePermissions
                                                         .getInstance(ResourcePermissions
-                                                                           .getInstance(ResourcePermissions.INHERIT,
-                                                                                        true)),
+                                                                           .getInstanceWithGrantOption(ResourcePermissions.INHERIT)),
                                                   ResourceCreatePermissions
                                                         .getInstance(ResourcePermissions.getInstance(
                                                               customPermissionName))));
@@ -596,9 +586,9 @@ public class TestAccessControl_grantResourceCreatePermissions extends TestAccess
       Set<ResourceCreatePermission> accessorPermissions_pre
             = setOf(ResourceCreatePermissions.getInstance(ResourceCreatePermissions.CREATE),
                     ResourceCreatePermissions
-                          .getInstance(ResourcePermissions.getInstance(ResourcePermissions.INHERIT, true), true),
+                          .getInstanceWithGrantOption(ResourcePermissions.getInstanceWithGrantOption(ResourcePermissions.INHERIT)),
                     ResourceCreatePermissions
-                          .getInstance(ResourcePermissions.getInstance(customPermissionName, true), false));
+                          .getInstance(ResourcePermissions.getInstanceWithGrantOption(customPermissionName)));
 
       accessControlContext.setResourceCreatePermissions(accessorResource,
                                                         resourceClassName,
@@ -617,11 +607,11 @@ public class TestAccessControl_grantResourceCreatePermissions extends TestAccess
 
       // setup grantor permissions
       Set<ResourceCreatePermission> grantorPermissions
-            = setOf(ResourceCreatePermissions.getInstance(ResourceCreatePermissions.CREATE, true),
+            = setOf(ResourceCreatePermissions.getInstanceWithGrantOption(ResourceCreatePermissions.CREATE),
                     ResourceCreatePermissions
-                          .getInstance(ResourcePermissions.getInstance(ResourcePermissions.INHERIT, true), true),
+                          .getInstanceWithGrantOption(ResourcePermissions.getInstanceWithGrantOption(ResourcePermissions.INHERIT)),
                     ResourceCreatePermissions
-                          .getInstance(ResourcePermissions.getInstance(customPermissionName, true), true));
+                          .getInstanceWithGrantOption(ResourcePermissions.getInstanceWithGrantOption(customPermissionName)));
 
 
       accessControlContext.setResourceCreatePermissions(grantorResource,
@@ -643,8 +633,7 @@ public class TestAccessControl_grantResourceCreatePermissions extends TestAccess
                                             resourceClassName,
                                             domainName,
                                             ResourceCreatePermissions
-                                                  .getInstance(ResourcePermissions.getInstance(ResourcePermissions.INHERIT),
-                                                               true),
+                                                  .getInstanceWithGrantOption(ResourcePermissions.getInstance(ResourcePermissions.INHERIT)),
                                             ResourceCreatePermissions
                                                   .getInstance(ResourcePermissions.getInstance(customPermissionName)));
 
@@ -665,9 +654,8 @@ public class TestAccessControl_grantResourceCreatePermissions extends TestAccess
                                             resourceClassName,
                                             domainName,
                                             setOf(ResourceCreatePermissions
-                                                        .getInstance(ResourcePermissions
-                                                                           .getInstance(ResourcePermissions.INHERIT),
-                                                                     true),
+                                                        .getInstanceWithGrantOption(ResourcePermissions
+                                                                           .getInstance(ResourcePermissions.INHERIT)),
                                                   ResourceCreatePermissions
                                                         .getInstance(ResourcePermissions.getInstance(
                                                               customPermissionName))));
@@ -689,7 +677,7 @@ public class TestAccessControl_grantResourceCreatePermissions extends TestAccess
       Set<ResourceCreatePermission> accessorPermissions_pre
             = setOf(ResourceCreatePermissions.getInstance(ResourceCreatePermissions.CREATE),
                     ResourceCreatePermissions
-                          .getInstance(ResourcePermissions.getInstance(ResourcePermissions.INHERIT, true), true));
+                          .getInstanceWithGrantOption(ResourcePermissions.getInstanceWithGrantOption(ResourcePermissions.INHERIT)));
 
       accessControlContext.setResourceCreatePermissions(accessorResource,
                                                         resourceClassName,
@@ -708,9 +696,9 @@ public class TestAccessControl_grantResourceCreatePermissions extends TestAccess
 
       // setup grantor permissions
       Set<ResourceCreatePermission> grantorPermissions
-            = setOf(ResourceCreatePermissions.getInstance(ResourceCreatePermissions.CREATE, true),
+            = setOf(ResourceCreatePermissions.getInstanceWithGrantOption(ResourceCreatePermissions.CREATE),
                     ResourceCreatePermissions
-                          .getInstance(ResourcePermissions.getInstance(ResourcePermissions.INHERIT, true), true));
+                          .getInstanceWithGrantOption(ResourcePermissions.getInstanceWithGrantOption(ResourcePermissions.INHERIT)));
 
 
       accessControlContext.setResourceCreatePermissions(grantorResource, resourceClassName, domainName, grantorPermissions);
@@ -770,8 +758,7 @@ public class TestAccessControl_grantResourceCreatePermissions extends TestAccess
       // setup accessor permissions
       Set<ResourceCreatePermission> accessorPermissions_pre
             = setOf(ResourceCreatePermissions.getInstance(ResourceCreatePermissions.CREATE),
-                    ResourceCreatePermissions.getInstance(ResourcePermissions.getInstance(ungrantablePermissionName),
-                                                          true));
+                    ResourceCreatePermissions.getInstanceWithGrantOption(ResourcePermissions.getInstance(ungrantablePermissionName)));
 
       accessControlContext.setResourceCreatePermissions(accessorResource,
                                                         resourceClassName,
@@ -784,10 +771,9 @@ public class TestAccessControl_grantResourceCreatePermissions extends TestAccess
 
       // setup grantor permissions
       Set<ResourceCreatePermission> grantorPermissions = new HashSet<>();
-      grantorPermissions.add(ResourceCreatePermissions.getInstance(ResourceCreatePermissions.CREATE, true));
-      grantorPermissions.add(ResourceCreatePermissions.getInstance(ResourcePermissions.getInstance(
-            grantablePermissionName),
-                                                                   true));
+      grantorPermissions.add(ResourceCreatePermissions.getInstanceWithGrantOption(ResourceCreatePermissions.CREATE));
+      grantorPermissions.add(ResourceCreatePermissions.getInstanceWithGrantOption(ResourcePermissions.getInstance(
+            grantablePermissionName)));
 
       accessControlContext.setResourceCreatePermissions(grantorResource,
                                                         resourceClassName,
@@ -860,7 +846,7 @@ public class TestAccessControl_grantResourceCreatePermissions extends TestAccess
       // setup accessor permissions
       Set<ResourceCreatePermission> accessorPermissions_pre
             = setOf(ResourceCreatePermissions.getInstance(ResourceCreatePermissions.CREATE),
-                    ResourceCreatePermissions.getInstance(ResourcePermissions.getInstance(ResourcePermissions.INHERIT, true)),
+                    ResourceCreatePermissions.getInstance(ResourcePermissions.getInstanceWithGrantOption(ResourcePermissions.INHERIT)),
                     ResourceCreatePermissions.getInstance(ResourcePermissions.getInstance(grantedPermissionName)));
 
       accessControlContext.setResourceCreatePermissions(accessorResource, resourceClassName, domainName, accessorPermissions_pre);
@@ -877,12 +863,9 @@ public class TestAccessControl_grantResourceCreatePermissions extends TestAccess
 
       // setup grantor permissions
       Set<ResourceCreatePermission> grantorPermissions
-            = setOf(ResourceCreatePermissions.getInstance(ResourceCreatePermissions.CREATE, true),
-                    ResourceCreatePermissions.getInstance(ResourcePermissions.getInstance(ResourcePermissions.INHERIT,
-                                                                                          true),
-                                                          true),
-                    ResourceCreatePermissions.getInstance(ResourcePermissions.getInstance(grantedPermissionName, true),
-                                                          true));
+            = setOf(ResourceCreatePermissions.getInstanceWithGrantOption(ResourceCreatePermissions.CREATE),
+                    ResourceCreatePermissions.getInstanceWithGrantOption(ResourcePermissions.getInstanceWithGrantOption(ResourcePermissions.INHERIT)),
+                    ResourceCreatePermissions.getInstanceWithGrantOption(ResourcePermissions.getInstanceWithGrantOption(grantedPermissionName)));
 
       accessControlContext.setResourceCreatePermissions(grantorResource,
                                                         resourceClassName,
@@ -904,17 +887,15 @@ public class TestAccessControl_grantResourceCreatePermissions extends TestAccess
                                             resourceClassName,
                                             domainName,
                                             ResourceCreatePermissions
-                                                  .getInstance(ResourcePermissions
-                                                                     .getInstance(ResourcePermissions.INHERIT, true),
-                                                               true),
+                                                  .getInstanceWithGrantOption(ResourcePermissions
+                                                                     .getInstanceWithGrantOption(ResourcePermissions.INHERIT)),
                                             ResourceCreatePermissions
-                                                  .getInstance(ResourcePermissions.getInstance(grantedPermissionName),
-                                                               true));
+                                                  .getInstanceWithGrantOption(ResourcePermissions.getInstance(grantedPermissionName)));
 
       Set<ResourceCreatePermission> permissions_expected
             = setOf(ResourceCreatePermissions.getInstance(ResourceCreatePermissions.CREATE),
-                    ResourceCreatePermissions.getInstance(ResourcePermissions.getInstance(ResourcePermissions.INHERIT, true), true),
-                    ResourceCreatePermissions.getInstance(ResourcePermissions.getInstance(grantedPermissionName), true));
+                    ResourceCreatePermissions.getInstanceWithGrantOption(ResourcePermissions.getInstanceWithGrantOption(ResourcePermissions.INHERIT)),
+                    ResourceCreatePermissions.getInstanceWithGrantOption(ResourcePermissions.getInstance(grantedPermissionName)));
 
       final Set<ResourceCreatePermission> permissions_post
             = accessControlContext.getEffectiveResourceCreatePermissions(accessorResource,
@@ -933,14 +914,12 @@ public class TestAccessControl_grantResourceCreatePermissions extends TestAccess
                                             resourceClassName,
                                             domainName,
                                             setOf(ResourceCreatePermissions
-                                                        .getInstance(ResourcePermissions
-                                                                           .getInstance(ResourcePermissions.INHERIT,
-                                                                                        true),
-                                                                     true),
+                                                        .getInstanceWithGrantOption(ResourcePermissions
+                                                                           .getInstanceWithGrantOption(ResourcePermissions.INHERIT)
+                                                        ),
                                                   ResourceCreatePermissions
-                                                        .getInstance(ResourcePermissions.getInstance(
-                                                                           grantedPermissionName),
-                                                                     true)));
+                                                        .getInstanceWithGrantOption(ResourcePermissions.getInstance(
+                                                                           grantedPermissionName))));
 
       assertThat(accessControlContext.getEffectiveResourceCreatePermissions(accessorResource2, resourceClassName, domainName),
                  is(permissions_expected));
@@ -959,7 +938,7 @@ public class TestAccessControl_grantResourceCreatePermissions extends TestAccess
       // setup accessor permissions
       Set<ResourceCreatePermission> accessorPermissions_pre
             = setOf(ResourceCreatePermissions.getInstance(ResourceCreatePermissions.CREATE),
-                    ResourceCreatePermissions.getInstance(ResourcePermissions.getInstance(ResourcePermissions.INHERIT), true),
+                    ResourceCreatePermissions.getInstanceWithGrantOption(ResourcePermissions.getInstance(ResourcePermissions.INHERIT)),
                     ResourceCreatePermissions.getInstance(ResourcePermissions.getInstance(grantedPermissionName)));
 
       accessControlContext.setResourceCreatePermissions(accessorResource, resourceClassName, domainName, accessorPermissions_pre);
@@ -976,11 +955,9 @@ public class TestAccessControl_grantResourceCreatePermissions extends TestAccess
 
       // setup grantor permissions
       Set<ResourceCreatePermission> grantorPermissions
-            = setOf(ResourceCreatePermissions.getInstance(ResourceCreatePermissions.CREATE, true),
-                    ResourceCreatePermissions.getInstance(ResourcePermissions.getInstance(ResourcePermissions.INHERIT, true),
-                                                          true),
-                    ResourceCreatePermissions.getInstance(ResourcePermissions.getInstance(grantedPermissionName, true),
-                                                          true));
+            = setOf(ResourceCreatePermissions.getInstanceWithGrantOption(ResourceCreatePermissions.CREATE),
+                    ResourceCreatePermissions.getInstanceWithGrantOption(ResourcePermissions.getInstanceWithGrantOption(ResourcePermissions.INHERIT)),
+                    ResourceCreatePermissions.getInstanceWithGrantOption(ResourcePermissions.getInstanceWithGrantOption(grantedPermissionName)));
 
       accessControlContext.setResourceCreatePermissions(grantorResource, resourceClassName, domainName, grantorPermissions);
       assertThat(accessControlContext.getEffectiveResourceCreatePermissions(grantorResource, resourceClassName, domainName),
@@ -997,16 +974,15 @@ public class TestAccessControl_grantResourceCreatePermissions extends TestAccess
                                             resourceClassName,
                                             domainName,
                                             ResourceCreatePermissions
-                                                  .getInstance(ResourcePermissions
-                                                                     .getInstance(ResourcePermissions.INHERIT, true),
-                                                               true),
+                                                  .getInstanceWithGrantOption(ResourcePermissions
+                                                                     .getInstanceWithGrantOption(ResourcePermissions.INHERIT)),
                                             ResourceCreatePermissions
-                                                  .getInstance(ResourcePermissions.getInstance(grantedPermissionName, true)));
+                                                  .getInstance(ResourcePermissions.getInstanceWithGrantOption(grantedPermissionName)));
 
       Set<ResourceCreatePermission> permissions_expected
             = setOf(ResourceCreatePermissions.getInstance(ResourceCreatePermissions.CREATE),
-                    ResourceCreatePermissions.getInstance(ResourcePermissions.getInstance(ResourcePermissions.INHERIT, true), true),
-                    ResourceCreatePermissions.getInstance(ResourcePermissions.getInstance(grantedPermissionName, true)));
+                    ResourceCreatePermissions.getInstanceWithGrantOption(ResourcePermissions.getInstanceWithGrantOption(ResourcePermissions.INHERIT)),
+                    ResourceCreatePermissions.getInstance(ResourcePermissions.getInstanceWithGrantOption(grantedPermissionName)));
 
       final Set<ResourceCreatePermission> permissions_post
             = accessControlContext.getEffectiveResourceCreatePermissions(accessorResource,
@@ -1023,11 +999,10 @@ public class TestAccessControl_grantResourceCreatePermissions extends TestAccess
                                             resourceClassName,
                                             domainName,
                                             setOf(ResourceCreatePermissions
-                                                        .getInstance(ResourcePermissions
-                                                                           .getInstance(ResourcePermissions.INHERIT, true),
-                                                                     true),
+                                                        .getInstanceWithGrantOption(ResourcePermissions
+                                                                           .getInstanceWithGrantOption(ResourcePermissions.INHERIT)),
                                                   ResourceCreatePermissions
-                                                        .getInstance(ResourcePermissions.getInstance(grantedPermissionName, true))));
+                                                        .getInstance(ResourcePermissions.getInstanceWithGrantOption(grantedPermissionName))));
 
       assertThat(accessControlContext.getEffectiveResourceCreatePermissions(accessorResource2, resourceClassName, domainName),
                  is(permissions_expected));
@@ -1065,9 +1040,8 @@ public class TestAccessControl_grantResourceCreatePermissions extends TestAccess
 
       // setup grantor permissions
       Set<ResourceCreatePermission> grantorPermissions
-            = setOf(ResourceCreatePermissions.getInstance(ResourceCreatePermissions.CREATE, true),
-                    ResourceCreatePermissions.getInstance(ResourcePermissions.getInstance(grantedPermissionName, true),
-                                                          true));
+            = setOf(ResourceCreatePermissions.getInstanceWithGrantOption(ResourceCreatePermissions.CREATE),
+                    ResourceCreatePermissions.getInstanceWithGrantOption(ResourcePermissions.getInstanceWithGrantOption(grantedPermissionName)));
 
       accessControlContext.setResourceCreatePermissions(grantorResource,
                                                         resourceClassName,
@@ -1088,12 +1062,11 @@ public class TestAccessControl_grantResourceCreatePermissions extends TestAccess
                                             resourceClassName,
                                             domainName,
                                             ResourceCreatePermissions
-                                                  .getInstance(ResourcePermissions.getInstance(grantedPermissionName, true),
-                                                               true));
+                                                  .getInstanceWithGrantOption(ResourcePermissions.getInstanceWithGrantOption(grantedPermissionName)));
 
       Set<ResourceCreatePermission> permissions_expected
             = setOf(ResourceCreatePermissions.getInstance(ResourceCreatePermissions.CREATE),
-                    ResourceCreatePermissions.getInstance(ResourcePermissions.getInstance(grantedPermissionName, true), true));
+                    ResourceCreatePermissions.getInstanceWithGrantOption(ResourcePermissions.getInstanceWithGrantOption(grantedPermissionName)));
 
       final Set<ResourceCreatePermission> permissions_post
             = accessControlContext.getEffectiveResourceCreatePermissions(accessorResource,
@@ -1110,9 +1083,7 @@ public class TestAccessControl_grantResourceCreatePermissions extends TestAccess
                                             resourceClassName,
                                             domainName,
                                             setOf(ResourceCreatePermissions
-                                                        .getInstance(ResourcePermissions.getInstance(grantedPermissionName,
-                                                                                                     true),
-                                                                     true)));
+                                                        .getInstanceWithGrantOption(ResourcePermissions.getInstanceWithGrantOption(grantedPermissionName))));
 
       assertThat(accessControlContext.getEffectiveResourceCreatePermissions(accessorResource2, resourceClassName, domainName),
                  is(permissions_expected));
@@ -1144,9 +1115,8 @@ public class TestAccessControl_grantResourceCreatePermissions extends TestAccess
       // setup grantor permissions
       Set<ResourceCreatePermission> grantorPermissions = new HashSet<>();
       grantorPermissions.add(ResourceCreatePermissions.getInstance(ResourceCreatePermissions.CREATE));
-      grantorPermissions.add(ResourceCreatePermissions.getInstance(ResourcePermissions
-                                                                         .getInstance(grantedPermissionName),
-                                                                   true));
+      grantorPermissions.add(ResourceCreatePermissions.getInstanceWithGrantOption(ResourcePermissions
+                                                                         .getInstance(grantedPermissionName)));
 
       accessControlContext.setResourceCreatePermissions(grantorResource,
                                                         resourceClassName,
@@ -1168,7 +1138,7 @@ public class TestAccessControl_grantResourceCreatePermissions extends TestAccess
                                                              ResourceCreatePermissions
                                                                    .getInstance(ResourcePermissions.getInstance(grantedPermissionName)),
                                                              ResourceCreatePermissions
-                                                                   .getInstance(ResourcePermissions.getInstance(ungrantedPermissionName, true)));
+                                                                   .getInstance(ResourcePermissions.getInstanceWithGrantOption(ungrantedPermissionName)));
          fail("Upgrading (=addition of granting rights) of create-permission granted elsewhere, to which I have no granting rights, should have failed");
       }
       catch (NotAuthorizedException e) {
@@ -1184,7 +1154,7 @@ public class TestAccessControl_grantResourceCreatePermissions extends TestAccess
                                                                    ResourceCreatePermissions
                                                                          .getInstance(ResourcePermissions.getInstance(grantedPermissionName)),
                                                                    ResourceCreatePermissions
-                                                                         .getInstance(ResourcePermissions.getInstance(ungrantedPermissionName, true))));
+                                                                         .getInstance(ResourcePermissions.getInstanceWithGrantOption(ungrantedPermissionName))));
          fail("Upgrading (=addition of granting rights) of create-permission granted elsewhere, to which I have no granting rights, should have failed");
       }
       catch (NotAuthorizedException e) {
@@ -1207,8 +1177,8 @@ public class TestAccessControl_grantResourceCreatePermissions extends TestAccess
       // setup accessor permissions
       Set<ResourceCreatePermission> accessorPermissions_pre
             = setOf(ResourceCreatePermissions.getInstance(ResourceCreatePermissions.CREATE),
-                    ResourceCreatePermissions.getInstance(ResourcePermissions.getInstance(permissionName1, true)),
-                    ResourceCreatePermissions.getInstance(ResourcePermissions.getInstance(permissionName2), true));
+                    ResourceCreatePermissions.getInstance(ResourcePermissions.getInstanceWithGrantOption(permissionName1)),
+                    ResourceCreatePermissions.getInstanceWithGrantOption(ResourcePermissions.getInstance(permissionName2)));
 
       accessControlContext.setResourceCreatePermissions(accessorResource,
                                                         resourceClassName,
@@ -1222,8 +1192,8 @@ public class TestAccessControl_grantResourceCreatePermissions extends TestAccess
       // setup grantor permissions
       Set<ResourceCreatePermission> grantorPermissions
             = setOf(ResourceCreatePermissions.getInstance(ResourceCreatePermissions.CREATE),
-                    ResourceCreatePermissions.getInstance(ResourcePermissions.getInstance(permissionName1, true), true),
-                    ResourceCreatePermissions.getInstance(ResourcePermissions.getInstance(permissionName2, true), true));
+                    ResourceCreatePermissions.getInstanceWithGrantOption(ResourcePermissions.getInstanceWithGrantOption(permissionName1)),
+                    ResourceCreatePermissions.getInstanceWithGrantOption(ResourcePermissions.getInstanceWithGrantOption(permissionName2)));
 
       accessControlContext.setResourceCreatePermissions(grantorResource,
                                                         resourceClassName,
@@ -1244,7 +1214,7 @@ public class TestAccessControl_grantResourceCreatePermissions extends TestAccess
                                                resourceClassName,
                                                domainName,
                                                ResourceCreatePermissions
-                                                     .getInstance(ResourcePermissions.getInstance(permissionName1), true));
+                                                     .getInstanceWithGrantOption(ResourcePermissions.getInstance(permissionName1)));
          fail("granting resource create-permission that is incompatible with existing permission should have failed");
       }
       catch (IllegalArgumentException e) {
@@ -1256,7 +1226,7 @@ public class TestAccessControl_grantResourceCreatePermissions extends TestAccess
                                                resourceClassName,
                                                domainName,
                                                ResourceCreatePermissions
-                                                     .getInstance(ResourcePermissions.getInstance(permissionName2, true)));
+                                                     .getInstance(ResourcePermissions.getInstanceWithGrantOption(permissionName2)));
          fail("granting resource create-permission that is incompatible with existing permission should have failed");
       }
       catch (IllegalArgumentException e) {
@@ -1269,8 +1239,8 @@ public class TestAccessControl_grantResourceCreatePermissions extends TestAccess
                                                resourceClassName,
                                                domainName,
                                                setOf(ResourceCreatePermissions
-                                                           .getInstance(ResourcePermissions
-                                                                              .getInstance(permissionName1), true)));
+                                                           .getInstanceWithGrantOption(ResourcePermissions
+                                                                              .getInstance(permissionName1))));
          fail("granting resource create-permission that is incompatible with existing permission should have failed");
       }
       catch (IllegalArgumentException e) {
@@ -1282,8 +1252,8 @@ public class TestAccessControl_grantResourceCreatePermissions extends TestAccess
                                                resourceClassName,
                                                domainName,
                                                setOf(ResourceCreatePermissions
-                                                           .getInstance(ResourcePermissions.getInstance(permissionName2,
-                                                                                                        true))));
+                                                           .getInstance(ResourcePermissions.getInstanceWithGrantOption(permissionName2
+                                                           ))));
          fail("granting resource create-permission that is incompatible with existing permission should have failed");
       }
       catch (IllegalArgumentException e) {
@@ -1295,7 +1265,7 @@ public class TestAccessControl_grantResourceCreatePermissions extends TestAccess
    public void grantResourceCreatePermissions_withoutCreate_shouldFail() {
       authenticateSystemResource();
       final ResourceCreatePermission createPerm_inherit
-            = ResourceCreatePermissions.getInstance(ResourcePermissions.getInstance(ResourcePermissions.INHERIT, true));
+            = ResourceCreatePermissions.getInstance(ResourcePermissions.getInstanceWithGrantOption(ResourcePermissions.INHERIT));
 
       final Resource accessorResource = generateUnauthenticatableResource();
       final String domainName = generateDomain();
@@ -1356,8 +1326,7 @@ public class TestAccessControl_grantResourceCreatePermissions extends TestAccess
       // set up the grantorResource
       Set<ResourceCreatePermission> grantorPermissions
             = setOf(ResourceCreatePermissions.getInstance(ResourceCreatePermissions.CREATE),
-                    ResourceCreatePermissions.getInstance(ResourcePermissions.getInstance(ResourcePermissions.INHERIT, true),
-                                                          true));
+                    ResourceCreatePermissions.getInstanceWithGrantOption(ResourcePermissions.getInstanceWithGrantOption(ResourcePermissions.INHERIT)));
 
       accessControlContext.setResourceCreatePermissions(grantorResource,
                                                         resourceClassName,
@@ -1530,11 +1499,11 @@ public class TestAccessControl_grantResourceCreatePermissions extends TestAccess
       final String resourceClassName_whitespaced = " " + resourceClassName + "\t";
       final String permissionName = generateResourceClassPermission(resourceClassName);
       final ResourceCreatePermission createPerm_create
-            = ResourceCreatePermissions.getInstance(ResourceCreatePermissions.CREATE, false);
+            = ResourceCreatePermissions.getInstance(ResourceCreatePermissions.CREATE);
       final ResourceCreatePermission createPerm_customPerm
-            = ResourceCreatePermissions.getInstance(ResourcePermissions.getInstance(permissionName), false);
+            = ResourceCreatePermissions.getInstance(ResourcePermissions.getInstance(permissionName));
       final ResourceCreatePermission createPerm_customPerm_ws
-            = ResourceCreatePermissions.getInstance(ResourcePermissions.getInstance(permissionName + " \t"), false);
+            = ResourceCreatePermissions.getInstance(ResourcePermissions.getInstance(permissionName + " \t"));
 
       assertThat(accessControlContext.getEffectiveResourceCreatePermissionsMap(accessorResource).isEmpty(), is(true));
 
@@ -1580,11 +1549,11 @@ public class TestAccessControl_grantResourceCreatePermissions extends TestAccess
       final String permissionName_UPPER = permissionName + "_PPP";
       accessControlContext.createResourcePermission(resourceClassName, permissionName_lower);
       final ResourceCreatePermission createPerm_create
-            = ResourceCreatePermissions.getInstance(ResourceCreatePermissions.CREATE, false);
+            = ResourceCreatePermissions.getInstance(ResourceCreatePermissions.CREATE);
       final ResourceCreatePermission createPerm_lower
-            = ResourceCreatePermissions.getInstance(ResourcePermissions.getInstance(permissionName_lower), false);
+            = ResourceCreatePermissions.getInstance(ResourcePermissions.getInstance(permissionName_lower));
       final ResourceCreatePermission createPerm_UPPER
-            = ResourceCreatePermissions.getInstance(ResourcePermissions.getInstance(permissionName_UPPER), false);
+            = ResourceCreatePermissions.getInstance(ResourcePermissions.getInstance(permissionName_UPPER));
 
       if (isDatabaseCaseSensitive()) {
          accessControlContext.createResourcePermission(resourceClassName, permissionName_UPPER);
@@ -1656,13 +1625,13 @@ public class TestAccessControl_grantResourceCreatePermissions extends TestAccess
       final ResourcePermission resourcePermission_inherit
             = ResourcePermissions.getInstance(ResourcePermissions.INHERIT);
       final ResourcePermission resourcePermission_inherit_withGrant
-            = ResourcePermissions.getInstance(ResourcePermissions.INHERIT, true);
+            = ResourcePermissions.getInstanceWithGrantOption(ResourcePermissions.INHERIT);
       final ResourceCreatePermission createPerm_create_withGrant
-            = ResourceCreatePermissions.getInstance(ResourceCreatePermissions.CREATE, true);
+            = ResourceCreatePermissions.getInstanceWithGrantOption(ResourceCreatePermissions.CREATE);
       final ResourceCreatePermission createPerm_inherit
-            = ResourceCreatePermissions.getInstance(resourcePermission_inherit, true);
+            = ResourceCreatePermissions.getInstanceWithGrantOption(resourcePermission_inherit);
       final ResourceCreatePermission createPerm_inherit_withGrant
-            = ResourceCreatePermissions.getInstance(resourcePermission_inherit_withGrant, true);
+            = ResourceCreatePermissions.getInstanceWithGrantOption(resourcePermission_inherit_withGrant);
 
       // set up the grantorResource
       authenticateSystemResource();
@@ -1693,8 +1662,7 @@ public class TestAccessControl_grantResourceCreatePermissions extends TestAccess
                                                              resourceClassName,
                                                              domainName,
                                                              ResourceCreatePermissions
-                                                                   .getInstance(ResourceCreatePermissions.CREATE,
-                                                                                false),
+                                                                   .getInstance(ResourceCreatePermissions.CREATE),
                                                              createPerm_inherit,
                                                              createPerm_inherit);
          fail("granting resource create permissions with duplicate (identical) permissions should have failed");
@@ -1708,12 +1676,11 @@ public class TestAccessControl_grantResourceCreatePermissions extends TestAccess
    public void grantResourceCreatePermissions_duplicatePermissionNames_shouldFail() {
       authenticateSystemResource();
       final ResourceCreatePermission createPerm_create_withGrant
-            = ResourceCreatePermissions.getInstance(ResourceCreatePermissions.CREATE, true);
+            = ResourceCreatePermissions.getInstanceWithGrantOption(ResourceCreatePermissions.CREATE);
       final ResourceCreatePermission createPerm_inherit
-            = ResourceCreatePermissions.getInstance(ResourcePermissions.getInstance(ResourcePermissions.INHERIT, true));
+            = ResourceCreatePermissions.getInstance(ResourcePermissions.getInstanceWithGrantOption(ResourcePermissions.INHERIT));
       final ResourceCreatePermission createPerm_inherit_withGrant
-            = ResourceCreatePermissions.getInstance(ResourcePermissions.getInstance(ResourcePermissions.INHERIT, true),
-                                                    true);
+            = ResourceCreatePermissions.getInstanceWithGrantOption(ResourcePermissions.getInstanceWithGrantOption(ResourcePermissions.INHERIT));
 
       final Resource accessorResource = generateUnauthenticatableResource();
       final String domainName = generateDomain();
@@ -1752,9 +1719,9 @@ public class TestAccessControl_grantResourceCreatePermissions extends TestAccess
    public void grantResourceCreatePermissions_nulls_shouldFail() {
       authenticateSystemResource();
       final ResourceCreatePermission createPerm_create_withGrant
-            = ResourceCreatePermissions.getInstance(ResourceCreatePermissions.CREATE, true);
+            = ResourceCreatePermissions.getInstanceWithGrantOption(ResourceCreatePermissions.CREATE);
       final ResourceCreatePermission createPerm_inherit
-            = ResourceCreatePermissions.getInstance(ResourcePermissions.getInstance(ResourcePermissions.INHERIT, true));
+            = ResourceCreatePermissions.getInstance(ResourcePermissions.getInstanceWithGrantOption(ResourcePermissions.INHERIT));
 
       final Resource accessorResource = generateUnauthenticatableResource();
       final String domainName = generateDomain();
@@ -1932,9 +1899,9 @@ public class TestAccessControl_grantResourceCreatePermissions extends TestAccess
       final String domainName = generateDomain();
       final String resourceClassName = generateResourceClass(false, false);
       final ResourceCreatePermission createPerm_create_withGrant
-            = ResourceCreatePermissions.getInstance(ResourceCreatePermissions.CREATE, true);
+            = ResourceCreatePermissions.getInstanceWithGrantOption(ResourceCreatePermissions.CREATE);
       final ResourceCreatePermission createPerm_invalid
-            = ResourceCreatePermissions.getInstance(ResourcePermissions.getInstance("invalid_permission", false));
+            = ResourceCreatePermissions.getInstance(ResourcePermissions.getInstance("invalid_permission"));
       final Resource invalidResource = Resources.getInstance(-999L);
       final Resource invalidExternalResource = Resources.getInstance("invalid");
       final Resource mismatchedResource = Resources.getInstance(-999L, "invalid");

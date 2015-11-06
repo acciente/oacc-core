@@ -54,9 +54,12 @@ public abstract class CommonGrantDomainCreatePermissionSysPersister extends Pers
          // first collect the create permissions that this resource has to domains directly
          Set<DomainCreatePermission> domainCreatePermissions = new HashSet<>();
          while (resultSet.next()) {
-            domainCreatePermissions
-                  .add(DomainCreatePermissions.getInstance(resultSet.getDomainCreateSysPermissionName("SysPermissionId"),
-                                                           resultSet.getBoolean("IsWithGrant")));
+            if (resultSet.getBoolean("IsWithGrant")) {
+               domainCreatePermissions.add(DomainCreatePermissions.getInstanceWithGrantOption(resultSet.getDomainCreateSysPermissionName("SysPermissionId")));
+            }
+            else {
+               domainCreatePermissions.add(DomainCreatePermissions.getInstance(resultSet.getDomainCreateSysPermissionName("SysPermissionId")));
+            }
          }
          resultSet.close();
 

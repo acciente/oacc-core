@@ -59,12 +59,20 @@ public class RecursiveGrantResourceCreatePermissionPostCreateSysPersister extend
          resultSet = statement.executeQuery();
 
          while (resultSet.next()) {
-            ResourcePermission resourcePermission
-                  = ResourcePermissions.getInstance(resultSet.getResourceSysPermissionName("PostCreateSysPermissionId"),
-                                                    resultSet.getBoolean("PostCreateIsWithGrant"));
+            ResourcePermission resourcePermission;
+            if (resultSet.getBoolean("PostCreateIsWithGrant")) {
+               resourcePermission = ResourcePermissions.getInstanceWithGrantOption(resultSet.getResourceSysPermissionName("PostCreateSysPermissionId"));
+            }
+            else {
+               resourcePermission = ResourcePermissions.getInstance(resultSet.getResourceSysPermissionName("PostCreateSysPermissionId"));
+            }
 
-            resourceCreatePermissions.add(ResourceCreatePermissions.getInstance(resourcePermission,
-                                                                                resultSet.getBoolean("IsWithGrant")));
+            if (resultSet.getBoolean("IsWithGrant")) {
+               resourceCreatePermissions.add(ResourceCreatePermissions.getInstanceWithGrantOption(resourcePermission));
+            }
+            else {
+               resourceCreatePermissions.add(ResourceCreatePermissions.getInstance(resourcePermission));
+            }
          }
          resultSet.close();
 
@@ -114,12 +122,21 @@ public class RecursiveGrantResourceCreatePermissionPostCreateSysPersister extend
 
             ResourcePermission resourcePermission;
 
-            resourcePermission = ResourcePermissions.getInstance(resultSet.getResourceSysPermissionName(
-                                                                       "PostCreateSysPermissionId"),
-                                                                 resultSet.getBoolean("PostCreateIsWithGrant"));
+            if (resultSet.getBoolean("PostCreateIsWithGrant")) {
+               resourcePermission = ResourcePermissions
+                     .getInstanceWithGrantOption(resultSet.getResourceSysPermissionName("PostCreateSysPermissionId"));
+            }
+            else {
+               resourcePermission = ResourcePermissions
+                     .getInstance(resultSet.getResourceSysPermissionName("PostCreateSysPermissionId"));
+            }
 
-            permissionsForResourceClass.add(ResourceCreatePermissions.getInstance(resourcePermission,
-                                                                                  resultSet.getBoolean("IsWithGrant")));
+            if (resultSet.getBoolean("IsWithGrant")) {
+               permissionsForResourceClass.add(ResourceCreatePermissions.getInstanceWithGrantOption(resourcePermission));
+            }
+            else {
+               permissionsForResourceClass.add(ResourceCreatePermissions.getInstance(resourcePermission));
+            }
          }
          resultSet.close();
 

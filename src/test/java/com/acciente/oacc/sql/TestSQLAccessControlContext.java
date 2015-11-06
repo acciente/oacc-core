@@ -46,20 +46,16 @@ import java.util.Set;
 
 public class TestSQLAccessControlContext extends TestSQLAccessControlContextBase {
    // domain permissions constants
-   private static final DomainPermission DomainPermission_CREATE_CHILD_DOMAIN       = DomainPermissions.getInstance(
-         DomainPermissions.CREATE_CHILD_DOMAIN,
-         false);
-   private static final DomainPermission DomainPermission_CREATE_CHILD_DOMAIN_GRANT = DomainPermissions.getInstance(
-         DomainPermissions.CREATE_CHILD_DOMAIN,
-         true);
-   private static final DomainPermission DomainPermission_SUPER_USER                = DomainPermissions.getInstance(
-         DomainPermissions.SUPER_USER,
-         false);
-   private static final DomainPermission DomainPermission_SUPER_USER_GRANT          = DomainPermissions.getInstance(
-         DomainPermissions.SUPER_USER,
-         true);
-   public static final  char[]           PASSWORD                                   = "foobar".toCharArray();
-   public static final  char[]           PASSWORD2                                  = "goobar".toCharArray();
+   private static final DomainPermission DomainPermission_CREATE_CHILD_DOMAIN
+                                                   = DomainPermissions.getInstance(DomainPermissions.CREATE_CHILD_DOMAIN);
+   private static final DomainPermission DomainPermission_CREATE_CHILD_DOMAIN_GRANT
+                                                   = DomainPermissions.getInstanceWithGrantOption(DomainPermissions.CREATE_CHILD_DOMAIN);
+   private static final DomainPermission DomainPermission_SUPER_USER
+                                                   = DomainPermissions.getInstance(DomainPermissions.SUPER_USER);
+   private static final DomainPermission DomainPermission_SUPER_USER_GRANT
+                                                   = DomainPermissions.getInstanceWithGrantOption(DomainPermissions.SUPER_USER);
+   public static final  char[]           PASSWORD  = "foobar".toCharArray();
+   public static final  char[]           PASSWORD2 = "goobar".toCharArray();
 
    public static void main(String args[]) throws SQLException, IOException {
       if (!checkDBConnectArgs(args)) {
@@ -292,11 +288,12 @@ public class TestSQLAccessControlContext extends TestSQLAccessControlContextBase
 
       // we grant the new user permission to create BLOGs
       Set<ResourceCreatePermission> resourceCreatePermissions = new HashSet<>();
-      resourceCreatePermissions.add(ResourceCreatePermissions.getInstance(ResourceCreatePermissions.CREATE, true));
-      resourceCreatePermissions.add(ResourceCreatePermissions.getInstance(ResourcePermissions.getInstance(
-            ResourcePermissions.INHERIT), true));
-      resourceCreatePermissions.add(ResourceCreatePermissions.getInstance(ResourcePermissions.getInstance("CREATE-POST"),
-                                                                          true));
+      resourceCreatePermissions
+            .add(ResourceCreatePermissions.getInstanceWithGrantOption(ResourceCreatePermissions.CREATE));
+      resourceCreatePermissions
+            .add(ResourceCreatePermissions.getInstanceWithGrantOption(ResourcePermissions.getInstance(ResourcePermissions.INHERIT)));
+      resourceCreatePermissions
+            .add(ResourceCreatePermissions.getInstanceWithGrantOption(ResourcePermissions.getInstance("CREATE-POST")));
 
       setupName("setResourceCreatePermissions( acmeRootUser, BLOG, " + resourceCreatePermissions + " )");
       try {
@@ -393,11 +390,11 @@ public class TestSQLAccessControlContext extends TestSQLAccessControlContextBase
 
       // we grant the new user permission to create BLOGs
       Set<ResourceCreatePermission> resourceCreatePermissions = new HashSet<>();
-      resourceCreatePermissions.add(ResourceCreatePermissions.getInstance(ResourceCreatePermissions.CREATE, true));
-      resourceCreatePermissions.add(ResourceCreatePermissions.getInstance(ResourcePermissions.getInstance(
-            ResourcePermissions.INHERIT), true));
-      resourceCreatePermissions.add(ResourceCreatePermissions.getInstance(ResourcePermissions.getInstance("CREATE-POST"),
-                                                                          true));
+      resourceCreatePermissions.add(ResourceCreatePermissions.getInstanceWithGrantOption(ResourceCreatePermissions.CREATE));
+      resourceCreatePermissions.add(ResourceCreatePermissions.getInstanceWithGrantOption(ResourcePermissions.getInstance(
+            ResourcePermissions.INHERIT)));
+      resourceCreatePermissions.add(ResourceCreatePermissions.getInstanceWithGrantOption(ResourcePermissions.getInstance("CREATE-POST")
+      ));
 
       setupName("setResourceCreatePermissions( acmeRootUser, BLOG, " + resourceCreatePermissions + " )");
       try {
@@ -557,8 +554,8 @@ public class TestSQLAccessControlContext extends TestSQLAccessControlContextBase
 
       // we permit the new user to new create new domains
       Set<DomainCreatePermission> domainCreatePermissions = new HashSet<>();
-      domainCreatePermissions.add(DomainCreatePermissions.getInstance(DomainCreatePermissions.CREATE, false));
-      domainCreatePermissions.add(DomainCreatePermissions.getInstance(DomainPermission_SUPER_USER, false));
+      domainCreatePermissions.add(DomainCreatePermissions.getInstance(DomainCreatePermissions.CREATE));
+      domainCreatePermissions.add(DomainCreatePermissions.getInstance(DomainPermission_SUPER_USER));
       setupName("setDomainCreatePermissions( acmeRootUser, \"" + domainCreatePermissions + "\" )");
       try {
          accessControlContext.setDomainCreatePermissions(acmeRootUser, domainCreatePermissions);
@@ -635,8 +632,8 @@ public class TestSQLAccessControlContext extends TestSQLAccessControlContextBase
 
       // next we give user 1 some domain create permissions
       Set<DomainCreatePermission> domainCreatePermissions = new HashSet<>();
-      domainCreatePermissions.add(DomainCreatePermissions.getInstance(DomainCreatePermissions.CREATE, false));
-      domainCreatePermissions.add(DomainCreatePermissions.getInstance(DomainPermission_SUPER_USER, false));
+      domainCreatePermissions.add(DomainCreatePermissions.getInstance(DomainCreatePermissions.CREATE));
+      domainCreatePermissions.add(DomainCreatePermissions.getInstance(DomainPermission_SUPER_USER));
       setupName("setDomainCreatePermissions( newUser_1, \"" + domainCreatePermissions + "\" )");
       try {
          accessControlContext.setDomainCreatePermissions(newUser_1, domainCreatePermissions);
@@ -830,11 +827,12 @@ public class TestSQLAccessControlContext extends TestSQLAccessControlContextBase
 
       // next we give user 1 some create permissions
       Set<ResourceCreatePermission> resourceCreatePermissions = new HashSet<>();
-      resourceCreatePermissions.add(ResourceCreatePermissions.getInstance(ResourceCreatePermissions.CREATE, true));
-      resourceCreatePermissions.add(ResourceCreatePermissions.getInstance(ResourcePermissions.getInstance("CREATE-POST",
-                                                                                                          true), false));
-      resourceCreatePermissions.add(ResourceCreatePermissions.getInstance(ResourcePermissions.getInstance("EDIT-POST",
-                                                                                                          false), false));
+      resourceCreatePermissions
+            .add(ResourceCreatePermissions.getInstanceWithGrantOption(ResourceCreatePermissions.CREATE));
+      resourceCreatePermissions
+            .add(ResourceCreatePermissions.getInstance(ResourcePermissions.getInstanceWithGrantOption("CREATE-POST")));
+      resourceCreatePermissions
+            .add(ResourceCreatePermissions.getInstance(ResourcePermissions.getInstance("EDIT-POST")));
       setupName("setCreatePermission( newUser_1, \"" + resourceCreatePermissions + "\" )");
       try {
          accessControlContext.setResourceCreatePermissions(newUser_1,
@@ -873,7 +871,7 @@ public class TestSQLAccessControlContext extends TestSQLAccessControlContextBase
          setupFail(e);
       }
 
-      final ResourcePermission filterPermission = ResourcePermissions.getInstance("CREATE-POST", false);
+      final ResourcePermission filterPermission = ResourcePermissions.getInstance("CREATE-POST");
       setupName("getResourcesByPermissions( BLOG, " + filterPermission + " )");
       Set<Resource> newUser_1_ResourceList;
       try {

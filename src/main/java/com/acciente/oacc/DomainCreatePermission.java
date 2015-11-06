@@ -117,7 +117,7 @@ public interface DomainCreatePermission {
     * @return true if the specified other permission is equal to this permission ignoring the
     *         value of the {@link #isWithGrantOption()} property.
     *
-    * @deprecated as of v2.0.0-rc.5; use {@link #equalsIgnoreGrant(Object)} instead.
+    * @deprecated as of v2.0.0-rc.5; use {@link #equalsIgnoreGrantOption(Object)} instead.
     */
    @Deprecated
    boolean equalsIgnoreGrant(Object other);

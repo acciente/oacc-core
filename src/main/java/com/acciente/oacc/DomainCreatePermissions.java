@@ -40,6 +40,14 @@ public class DomainCreatePermissions {
       }
    }
 
+   public static DomainCreatePermission getInstanceWithGrantOption(String sysPermissionName) {
+      return new DomainCreatePermissionImpl(sysPermissionName, true);
+   }
+
+   /**
+    * @deprecated as of v2.0.0-rc.5; use {@link #getInstanceWithGrantOption(String)} or {@link #getInstance(String)} instead.
+    */
+   @Deprecated
    public static DomainCreatePermission getInstance(String sysPermissionName, boolean withGrant) {
       return new DomainCreatePermissionImpl(sysPermissionName, withGrant);
    }
@@ -48,10 +56,18 @@ public class DomainCreatePermissions {
       return new DomainCreatePermissionImpl(sysPermissionName, false);
    }
 
-   public static DomainCreatePermission getInstance(DomainPermission domainPostCreatePermission) {
-      return new DomainCreatePermissionImpl(domainPostCreatePermission, false);
+   public static DomainCreatePermission getInstance(DomainPermission postCreateDomainPermission) {
+      return new DomainCreatePermissionImpl(postCreateDomainPermission, false);
    }
 
+   public static DomainCreatePermission getInstanceWithGrantOption(DomainPermission postCreateDomainPermission) {
+      return new DomainCreatePermissionImpl(postCreateDomainPermission, true);
+   }
+
+   /**
+    * @deprecated as of v2.0.0-rc.5; use {@link #getInstanceWithGrantOption(DomainPermission)} or {@link #getInstance(DomainPermission)} instead.
+    */
+   @Deprecated
    public static DomainCreatePermission getInstance(DomainPermission domainPostCreatePermission, boolean withGrant) {
       return new DomainCreatePermissionImpl(domainPostCreatePermission, withGrant);
    }

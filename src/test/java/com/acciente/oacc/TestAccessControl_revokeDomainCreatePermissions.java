@@ -35,10 +35,9 @@ public class TestAccessControl_revokeDomainCreatePermissions extends TestAccessC
       final DomainCreatePermission domCreatePerm_superuser
             = DomainCreatePermissions.getInstance(DomainPermissions.getInstance(DomainPermissions.SUPER_USER));
       final DomainCreatePermission domCreatePerm_create_withGrant
-            = DomainCreatePermissions.getInstance(DomainCreatePermissions.CREATE, true);
+            = DomainCreatePermissions.getInstanceWithGrantOption(DomainCreatePermissions.CREATE);
       final DomainCreatePermission domCreatePerm_child
-            = DomainCreatePermissions.getInstance(DomainPermissions.getInstance(DomainPermissions.CREATE_CHILD_DOMAIN),
-                                                  false);
+            = DomainCreatePermissions.getInstance(DomainPermissions.getInstance(DomainPermissions.CREATE_CHILD_DOMAIN));
 
       // set accessor permissions
       Resource accessorResource = generateUnauthenticatableResource();
@@ -88,10 +87,9 @@ public class TestAccessControl_revokeDomainCreatePermissions extends TestAccessC
       final DomainCreatePermission domCreatePerm_superuser
             = DomainCreatePermissions.getInstance(DomainPermissions.getInstance(DomainPermissions.SUPER_USER));
       final DomainCreatePermission domCreatePerm_create_withGrant
-            = DomainCreatePermissions.getInstance(DomainCreatePermissions.CREATE, true);
+            = DomainCreatePermissions.getInstanceWithGrantOption(DomainCreatePermissions.CREATE);
       final DomainCreatePermission domCreatePerm_child
-            = DomainCreatePermissions.getInstance(DomainPermissions.getInstance(DomainPermissions.CREATE_CHILD_DOMAIN),
-                                                  false);
+            = DomainCreatePermissions.getInstance(DomainPermissions.getInstance(DomainPermissions.CREATE_CHILD_DOMAIN));
 
       // set accessor permissions
       final String externalId = generateUniqueExternalId();
@@ -141,17 +139,15 @@ public class TestAccessControl_revokeDomainCreatePermissions extends TestAccessC
    public void revokeDomainCreatePermissions_validAsAuthorized() {
       authenticateSystemResource();
       final DomainCreatePermission domCreatePerm_superuser_withGrant
-            = DomainCreatePermissions.getInstance(DomainPermissions.getInstance(DomainPermissions.SUPER_USER), true);
+            = DomainCreatePermissions.getInstanceWithGrantOption(DomainPermissions.getInstance(DomainPermissions.SUPER_USER));
       final DomainCreatePermission domCreatePerm_superuser
             = DomainCreatePermissions.getInstance(DomainPermissions.getInstance(DomainPermissions.SUPER_USER));
       final DomainCreatePermission domCreatePerm_create_withGrant
-            = DomainCreatePermissions.getInstance(DomainCreatePermissions.CREATE, true);
+            = DomainCreatePermissions.getInstanceWithGrantOption(DomainCreatePermissions.CREATE);
       final DomainCreatePermission domCreatePerm_child_withGrant
-            = DomainCreatePermissions.getInstance(DomainPermissions.getInstance(DomainPermissions.CREATE_CHILD_DOMAIN),
-                                                  true);
+            = DomainCreatePermissions.getInstanceWithGrantOption(DomainPermissions.getInstance(DomainPermissions.CREATE_CHILD_DOMAIN));
       final DomainCreatePermission domCreatePerm_child
-            = DomainCreatePermissions.getInstance(DomainPermissions.getInstance(DomainPermissions.CREATE_CHILD_DOMAIN),
-                                                  false);
+            = DomainCreatePermissions.getInstance(DomainPermissions.getInstance(DomainPermissions.CREATE_CHILD_DOMAIN));
 
       // set up an authenticatable resource with resource class create permission
       final char[] password = generateUniquePassword();
@@ -211,17 +207,15 @@ public class TestAccessControl_revokeDomainCreatePermissions extends TestAccessC
    public void revokeDomainCreatePermissions_ungrantedPermissions_shouldSucceed() {
       authenticateSystemResource();
       final DomainCreatePermission domCreatePerm_superuser_withGrant
-            = DomainCreatePermissions.getInstance(DomainPermissions.getInstance(DomainPermissions.SUPER_USER), true);
+            = DomainCreatePermissions.getInstanceWithGrantOption(DomainPermissions.getInstance(DomainPermissions.SUPER_USER));
       final DomainCreatePermission domCreatePerm_superuser
             = DomainCreatePermissions.getInstance(DomainPermissions.getInstance(DomainPermissions.SUPER_USER));
       final DomainCreatePermission domCreatePerm_create_withGrant
-            = DomainCreatePermissions.getInstance(DomainCreatePermissions.CREATE, true);
+            = DomainCreatePermissions.getInstanceWithGrantOption(DomainCreatePermissions.CREATE);
       final DomainCreatePermission domCreatePerm_child_withGrant
-            = DomainCreatePermissions.getInstance(DomainPermissions.getInstance(DomainPermissions.CREATE_CHILD_DOMAIN),
-                                                  true);
+            = DomainCreatePermissions.getInstanceWithGrantOption(DomainPermissions.getInstance(DomainPermissions.CREATE_CHILD_DOMAIN));
       final DomainCreatePermission domCreatePerm_child
-            = DomainCreatePermissions.getInstance(DomainPermissions.getInstance(DomainPermissions.CREATE_CHILD_DOMAIN),
-                                                  false);
+            = DomainCreatePermissions.getInstance(DomainPermissions.getInstance(DomainPermissions.CREATE_CHILD_DOMAIN));
 
       // set up an authenticatable resource with resource class create permission
       final char[] password = generateUniquePassword();
@@ -267,13 +261,11 @@ public class TestAccessControl_revokeDomainCreatePermissions extends TestAccessC
       final DomainCreatePermission domCreatePerm_superuser
             = DomainCreatePermissions.getInstance(DomainPermissions.getInstance(DomainPermissions.SUPER_USER));
       final DomainCreatePermission domCreatePerm_create_withGrant
-            = DomainCreatePermissions.getInstance(DomainCreatePermissions.CREATE, true);
+            = DomainCreatePermissions.getInstanceWithGrantOption(DomainCreatePermissions.CREATE);
       final DomainCreatePermission domCreatePerm_child_withGrant
-            = DomainCreatePermissions.getInstance(DomainPermissions.getInstance(DomainPermissions.CREATE_CHILD_DOMAIN),
-                                                  true);
+            = DomainCreatePermissions.getInstanceWithGrantOption(DomainPermissions.getInstance(DomainPermissions.CREATE_CHILD_DOMAIN));
       final DomainCreatePermission domCreatePerm_child
-            = DomainCreatePermissions.getInstance(DomainPermissions.getInstance(DomainPermissions.CREATE_CHILD_DOMAIN),
-                                                  false);
+            = DomainCreatePermissions.getInstance(DomainPermissions.getInstance(DomainPermissions.CREATE_CHILD_DOMAIN));
 
       // set up an authenticatable resource with resource class create permission
       final char[] password = generateUniquePassword();
@@ -328,8 +320,7 @@ public class TestAccessControl_revokeDomainCreatePermissions extends TestAccessC
       final DomainCreatePermission domCreatePerm_create
             = DomainCreatePermissions.getInstance(DomainCreatePermissions.CREATE) ;
       final DomainCreatePermission domCreatePerm_child_withGrant
-            = DomainCreatePermissions.getInstance(DomainPermissions.getInstance(DomainPermissions.CREATE_CHILD_DOMAIN),
-                                                  true);
+            = DomainCreatePermissions.getInstanceWithGrantOption(DomainPermissions.getInstance(DomainPermissions.CREATE_CHILD_DOMAIN));
 
       Resource accessorResource = generateUnauthenticatableResource();
 
@@ -371,17 +362,15 @@ public class TestAccessControl_revokeDomainCreatePermissions extends TestAccessC
    public void revokeDomainCreatePermissions_revokeSubsetOfPermissions() {
       authenticateSystemResource();
       final DomainCreatePermission domCreatePerm_superuser_withGrant
-            = DomainCreatePermissions.getInstance(DomainPermissions.getInstance(DomainPermissions.SUPER_USER), true);
+            = DomainCreatePermissions.getInstanceWithGrantOption(DomainPermissions.getInstance(DomainPermissions.SUPER_USER));
       final DomainCreatePermission domCreatePerm_superuser
             = DomainCreatePermissions.getInstance(DomainPermissions.getInstance(DomainPermissions.SUPER_USER));
       final DomainCreatePermission domCreatePerm_create_withGrant
-            = DomainCreatePermissions.getInstance(DomainCreatePermissions.CREATE, true);
+            = DomainCreatePermissions.getInstanceWithGrantOption(DomainCreatePermissions.CREATE);
       final DomainCreatePermission domCreatePerm_child_withGrant
-            = DomainCreatePermissions.getInstance(DomainPermissions.getInstance(DomainPermissions.CREATE_CHILD_DOMAIN),
-                                                  true);
+            = DomainCreatePermissions.getInstanceWithGrantOption(DomainPermissions.getInstance(DomainPermissions.CREATE_CHILD_DOMAIN));
       final DomainCreatePermission domCreatePerm_child
-            = DomainCreatePermissions.getInstance(DomainPermissions.getInstance(DomainPermissions.CREATE_CHILD_DOMAIN),
-                                                  false);
+            = DomainCreatePermissions.getInstance(DomainPermissions.getInstance(DomainPermissions.CREATE_CHILD_DOMAIN));
 
       // set up an authenticatable resource with resource class create permission
       final char[] password = generateUniquePassword();
@@ -436,17 +425,15 @@ public class TestAccessControl_revokeDomainCreatePermissions extends TestAccessC
    public void revokeDomainCreatePermissions_revokeSubsetWithCreate_shouldFail() {
       authenticateSystemResource();
       final DomainCreatePermission domCreatePerm_superuser_withGrant
-            = DomainCreatePermissions.getInstance(DomainPermissions.getInstance(DomainPermissions.SUPER_USER), true);
+            = DomainCreatePermissions.getInstanceWithGrantOption(DomainPermissions.getInstance(DomainPermissions.SUPER_USER));
       final DomainCreatePermission domCreatePerm_superuser
             = DomainCreatePermissions.getInstance(DomainPermissions.getInstance(DomainPermissions.SUPER_USER));
       final DomainCreatePermission domCreatePerm_create_withGrant
-            = DomainCreatePermissions.getInstance(DomainCreatePermissions.CREATE, true);
+            = DomainCreatePermissions.getInstanceWithGrantOption(DomainCreatePermissions.CREATE);
       final DomainCreatePermission domCreatePerm_child_withGrant
-            = DomainCreatePermissions.getInstance(DomainPermissions.getInstance(DomainPermissions.CREATE_CHILD_DOMAIN),
-                                                  true);
+            = DomainCreatePermissions.getInstanceWithGrantOption(DomainPermissions.getInstance(DomainPermissions.CREATE_CHILD_DOMAIN));
       final DomainCreatePermission domCreatePerm_child
-            = DomainCreatePermissions.getInstance(DomainPermissions.getInstance(DomainPermissions.CREATE_CHILD_DOMAIN),
-                                                  false);
+            = DomainCreatePermissions.getInstance(DomainPermissions.getInstance(DomainPermissions.CREATE_CHILD_DOMAIN));
 
       // set up an authenticatable resource with resource class create permission
       final char[] password = generateUniquePassword();
@@ -512,8 +499,8 @@ public class TestAccessControl_revokeDomainCreatePermissions extends TestAccessC
 
       // setup grantor permissions
       Set<DomainCreatePermission> grantorPermissions
-            = setOf(DomainCreatePermissions.getInstance(DomainCreatePermissions.CREATE, true),
-                    DomainCreatePermissions.getInstance(DomainPermissions.getInstance(grantablePermissionName), true));
+            = setOf(DomainCreatePermissions.getInstanceWithGrantOption(DomainCreatePermissions.CREATE),
+                    DomainCreatePermissions.getInstanceWithGrantOption(DomainPermissions.getInstance(grantablePermissionName)));
 
       accessControlContext.setDomainCreatePermissions(grantorResource, grantorPermissions);
       assertThat(accessControlContext.getEffectiveDomainCreatePermissions(grantorResource), is(grantorPermissions));
@@ -557,16 +544,15 @@ public class TestAccessControl_revokeDomainCreatePermissions extends TestAccessC
    public void revokeDomainCreatePermissions_identicalPermissions_shouldSucceedAsAuthorized() {
       authenticateSystemResource();
       final DomainCreatePermission domCreatePerm_superuser_withGrant
-            = DomainCreatePermissions.getInstance(DomainPermissions.getInstance(DomainPermissions.SUPER_USER), true);
+            = DomainCreatePermissions.getInstanceWithGrantOption(DomainPermissions.getInstance(DomainPermissions.SUPER_USER));
       final DomainCreatePermission domCreatePerm_superuser
             = DomainCreatePermissions.getInstance(DomainPermissions.getInstance(DomainPermissions.SUPER_USER));
       final DomainCreatePermission domCreatePerm_create_withGrant
-            = DomainCreatePermissions.getInstance(DomainCreatePermissions.CREATE, true);
+            = DomainCreatePermissions.getInstanceWithGrantOption(DomainCreatePermissions.CREATE);
       final DomainCreatePermission domCreatePerm_create
             = DomainCreatePermissions.getInstance(DomainCreatePermissions.CREATE);
       final DomainCreatePermission domCreatePerm_child_withGrant
-            = DomainCreatePermissions.getInstance(DomainPermissions.getInstance(DomainPermissions.CREATE_CHILD_DOMAIN),
-                                                  true);
+            = DomainCreatePermissions.getInstanceWithGrantOption(DomainPermissions.getInstance(DomainPermissions.CREATE_CHILD_DOMAIN));
 
       // set up an authenticatable resource with resource class create permission
       final char[] password = generateUniquePassword();
@@ -623,19 +609,17 @@ public class TestAccessControl_revokeDomainCreatePermissions extends TestAccessC
    public void revokeDomainCreatePermissions_lesserPermissions_shouldSucceedAsAuthorized() {
       authenticateSystemResource();
       final DomainCreatePermission domCreatePerm_superuser_withGrant
-            = DomainCreatePermissions.getInstance(DomainPermissions.getInstance(DomainPermissions.SUPER_USER), true);
+            = DomainCreatePermissions.getInstanceWithGrantOption(DomainPermissions.getInstance(DomainPermissions.SUPER_USER));
       final DomainCreatePermission domCreatePerm_superuser
             = DomainCreatePermissions.getInstance(DomainPermissions.getInstance(DomainPermissions.SUPER_USER));
       final DomainCreatePermission domCreatePerm_create_withGrant
-            = DomainCreatePermissions.getInstance(DomainCreatePermissions.CREATE, true);
+            = DomainCreatePermissions.getInstanceWithGrantOption(DomainCreatePermissions.CREATE);
       final DomainCreatePermission domCreatePerm_create
             = DomainCreatePermissions.getInstance(DomainCreatePermissions.CREATE);
       final DomainCreatePermission domCreatePerm_child_withGrant
-            = DomainCreatePermissions.getInstance(DomainPermissions.getInstance(DomainPermissions.CREATE_CHILD_DOMAIN),
-                                                  true);
+            = DomainCreatePermissions.getInstanceWithGrantOption(DomainPermissions.getInstance(DomainPermissions.CREATE_CHILD_DOMAIN));
       final DomainCreatePermission domCreatePerm_child
-            = DomainCreatePermissions.getInstance(DomainPermissions.getInstance(DomainPermissions.CREATE_CHILD_DOMAIN),
-                                                  false);
+            = DomainCreatePermissions.getInstance(DomainPermissions.getInstance(DomainPermissions.CREATE_CHILD_DOMAIN));
 
       // set up an authenticatable resource with resource class create permission
       final char[] password = generateUniquePassword();
@@ -693,19 +677,17 @@ public class TestAccessControl_revokeDomainCreatePermissions extends TestAccessC
    public void revokeDomainCreatePermissions_greaterPermissions_shouldSucceedAsAuthorized() {
       authenticateSystemResource();
       final DomainCreatePermission domCreatePerm_superuser_withGrant
-            = DomainCreatePermissions.getInstance(DomainPermissions.getInstance(DomainPermissions.SUPER_USER), true);
+            = DomainCreatePermissions.getInstanceWithGrantOption(DomainPermissions.getInstance(DomainPermissions.SUPER_USER));
       final DomainCreatePermission domCreatePerm_superuser
             = DomainCreatePermissions.getInstance(DomainPermissions.getInstance(DomainPermissions.SUPER_USER));
       final DomainCreatePermission domCreatePerm_create_withGrant
-            = DomainCreatePermissions.getInstance(DomainCreatePermissions.CREATE, true);
+            = DomainCreatePermissions.getInstanceWithGrantOption(DomainCreatePermissions.CREATE);
       final DomainCreatePermission domCreatePerm_create
             = DomainCreatePermissions.getInstance(DomainCreatePermissions.CREATE);
       final DomainCreatePermission domCreatePerm_child_withGrant
-            = DomainCreatePermissions.getInstance(DomainPermissions.getInstance(DomainPermissions.CREATE_CHILD_DOMAIN),
-                                                  true);
+            = DomainCreatePermissions.getInstanceWithGrantOption(DomainPermissions.getInstance(DomainPermissions.CREATE_CHILD_DOMAIN));
       final DomainCreatePermission domCreatePerm_child
-            = DomainCreatePermissions.getInstance(DomainPermissions.getInstance(DomainPermissions.CREATE_CHILD_DOMAIN),
-                                                  false);
+            = DomainCreatePermissions.getInstance(DomainPermissions.getInstance(DomainPermissions.CREATE_CHILD_DOMAIN));
 
       // set up an authenticatable resource with resource class create permission
       final char[] password = generateUniquePassword();
@@ -766,13 +748,13 @@ public class TestAccessControl_revokeDomainCreatePermissions extends TestAccessC
       final DomainCreatePermission domCreatePerm_superuser_trailingspaces
             = DomainCreatePermissions.getInstance(DomainPermissions.getInstance(DomainPermissions.SUPER_USER + " \t"));
       final DomainCreatePermission domCreatePerm_create_withGrant
-            = DomainCreatePermissions.getInstance(" \t" + DomainCreatePermissions.CREATE, true);
+            = DomainCreatePermissions.getInstanceWithGrantOption(" \t" + DomainCreatePermissions.CREATE);
 
       // todo: arguably, system permissions should match in name exactly, but the API uses Strings, not Enums, and is otherwise whitespace-consistent
       //       this could pose some complications depending on if the system permission name is persisted from the passed string or derived from an authoritative source
       // set accessor permissions
       Set<DomainCreatePermission> domainCreatePermissions_pre
-            = setOf(DomainCreatePermissions.getInstance(DomainCreatePermissions.CREATE, true),
+            = setOf(DomainCreatePermissions.getInstanceWithGrantOption(DomainCreatePermissions.CREATE),
                     DomainCreatePermissions.getInstance(DomainPermissions.getInstance(DomainPermissions.SUPER_USER)));
       Resource accessorResource = generateUnauthenticatableResource();
       accessControlContext.setDomainCreatePermissions(accessorResource,
@@ -804,7 +786,7 @@ public class TestAccessControl_revokeDomainCreatePermissions extends TestAccessC
    public void revokeDomainCreatePermissions_nulls_shouldFail() {
       authenticateSystemResource();
       final DomainCreatePermission domCreatePerm_create_withGrant
-            = DomainCreatePermissions.getInstance(DomainCreatePermissions.CREATE, true);
+            = DomainCreatePermissions.getInstanceWithGrantOption(DomainCreatePermissions.CREATE);
 
       Resource accessorResource = generateUnauthenticatableResource();
 
@@ -877,7 +859,7 @@ public class TestAccessControl_revokeDomainCreatePermissions extends TestAccessC
    public void revokeDomainCreatePermissions_emptyPermissionSet_shouldFail() {
       authenticateSystemResource();
       final DomainCreatePermission domCreatePerm_create_withGrant
-            = DomainCreatePermissions.getInstance(DomainCreatePermissions.CREATE, true);
+            = DomainCreatePermissions.getInstanceWithGrantOption(DomainCreatePermissions.CREATE);
 
       Resource accessorResource = generateUnauthenticatableResource();
 
@@ -908,8 +890,8 @@ public class TestAccessControl_revokeDomainCreatePermissions extends TestAccessC
 
       // setup grantor permissions WITHOUT grantable *CREATE
       Set<DomainCreatePermission> grantorPermissions
-            = setOf(DomainCreatePermissions.getInstance(DomainCreatePermissions.CREATE, true),
-                    DomainCreatePermissions.getInstance(DomainPermissions.getInstance(grantedPermissionName), true));
+            = setOf(DomainCreatePermissions.getInstanceWithGrantOption(DomainCreatePermissions.CREATE),
+                    DomainCreatePermissions.getInstanceWithGrantOption(DomainPermissions.getInstance(grantedPermissionName)));
 
       accessControlContext.setDomainCreatePermissions(grantorResource, grantorPermissions);
       assertThat(accessControlContext.getEffectiveDomainCreatePermissions(grantorResource), is(grantorPermissions));
@@ -943,8 +925,8 @@ public class TestAccessControl_revokeDomainCreatePermissions extends TestAccessC
 
       // setup grantor permissions
       Set<DomainCreatePermission> grantorPermissions
-            = setOf(DomainCreatePermissions.getInstance(DomainCreatePermissions.CREATE, true),
-                    DomainCreatePermissions.getInstance(DomainPermissions.getInstance(grantedPermissionName), true));
+            = setOf(DomainCreatePermissions.getInstanceWithGrantOption(DomainCreatePermissions.CREATE),
+                    DomainCreatePermissions.getInstanceWithGrantOption(DomainPermissions.getInstance(grantedPermissionName)));
 
       accessControlContext.setDomainCreatePermissions(grantorResource, grantorPermissions);
       assertThat(accessControlContext.getEffectiveDomainCreatePermissions(grantorResource), is(grantorPermissions));
@@ -960,8 +942,7 @@ public class TestAccessControl_revokeDomainCreatePermissions extends TestAccessC
                                               DomainCreatePermissions
                                                     .getInstance(DomainPermissions.getInstance(grantedPermissionName)),
                                               DomainCreatePermissions
-                                                    .getInstance(DomainPermissions.getInstance(grantedPermissionName),
-                                                                 true));
+                                                    .getInstanceWithGrantOption(DomainPermissions.getInstance(grantedPermissionName)));
          fail("revoking create permissions that include the same permission - by name - but with different grant-options, should have failed");
       }
       catch (IllegalArgumentException e) {
@@ -974,8 +955,7 @@ public class TestAccessControl_revokeDomainCreatePermissions extends TestAccessC
                                               DomainCreatePermissions
                                                     .getInstance(DomainPermissions.getInstance(grantedPermissionName)),
                                               DomainCreatePermissions
-                                                    .getInstance(DomainPermissions.getInstance(grantedPermissionName,
-                                                                                               true)));
+                                                    .getInstance(DomainPermissions.getInstanceWithGrantOption(grantedPermissionName)));
          fail("revoking create permissions that include the same permission - by name - but with different grant-options, should have failed");
       }
       catch (IllegalArgumentException e) {
@@ -985,7 +965,7 @@ public class TestAccessControl_revokeDomainCreatePermissions extends TestAccessC
          accessControlContext
                .revokeDomainCreatePermissions(accessorResource,
                                               DomainCreatePermissions.getInstance(DomainCreatePermissions.CREATE),
-                                              DomainCreatePermissions.getInstance(DomainCreatePermissions.CREATE, true));
+                                              DomainCreatePermissions.getInstanceWithGrantOption(DomainCreatePermissions.CREATE));
          fail("revoking create permissions that include the same permission - by name - but with different grant-options, should have failed");
       }
       catch (IllegalArgumentException e) {
@@ -1000,9 +980,8 @@ public class TestAccessControl_revokeDomainCreatePermissions extends TestAccessC
                                                           .getInstance(DomainPermissions.getInstance(
                                                                 grantedPermissionName)),
                                                     DomainCreatePermissions
-                                                          .getInstance(DomainPermissions.getInstance(
-                                                                grantedPermissionName),
-                                                                       true)));
+                                                          .getInstanceWithGrantOption(DomainPermissions.getInstance(
+                                                                grantedPermissionName))));
          fail("revoking create permissions that include the same permission - by name - but with different grant-options, should have failed");
       }
       catch (IllegalArgumentException e) {
@@ -1016,9 +995,8 @@ public class TestAccessControl_revokeDomainCreatePermissions extends TestAccessC
                                                           .getInstance(DomainPermissions.getInstance(
                                                                 grantedPermissionName)),
                                                     DomainCreatePermissions
-                                                          .getInstance(DomainPermissions.getInstance(
-                                                                grantedPermissionName,
-                                                                true))));
+                                                          .getInstance(DomainPermissions.getInstanceWithGrantOption(
+                                                                grantedPermissionName))));
          fail("revoking create permissions that include the same permission - by name - but with different grant-options, should have failed");
       }
       catch (IllegalArgumentException e) {
@@ -1028,8 +1006,7 @@ public class TestAccessControl_revokeDomainCreatePermissions extends TestAccessC
          accessControlContext
                .revokeDomainCreatePermissions(accessorResource,
                                               setOf(DomainCreatePermissions.getInstance(DomainCreatePermissions.CREATE),
-                                                    DomainCreatePermissions.getInstance(DomainCreatePermissions.CREATE,
-                                                                                        true)));
+                                                    DomainCreatePermissions.getInstanceWithGrantOption(DomainCreatePermissions.CREATE)));
          fail("revoking create permissions that include the same permission - by name - but with different grant-options, should have failed");
       }
       catch (IllegalArgumentException e) {
@@ -1041,7 +1018,7 @@ public class TestAccessControl_revokeDomainCreatePermissions extends TestAccessC
    public void revokeDomainCreatePermissions_nonExistentReferences_shouldFail() {
       authenticateSystemResource();
       final DomainCreatePermission domCreatePerm_create_withGrant
-            = DomainCreatePermissions.getInstance(DomainCreatePermissions.CREATE, true);
+            = DomainCreatePermissions.getInstanceWithGrantOption(DomainCreatePermissions.CREATE);
       final Resource invalidResource = Resources.getInstance(-999L);
       final Resource invalidExternalResource = Resources.getInstance("invalid");
       final Resource mismatchedResource = Resources.getInstance(-999L, "invalid");

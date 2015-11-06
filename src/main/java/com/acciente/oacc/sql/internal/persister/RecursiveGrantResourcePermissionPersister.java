@@ -130,8 +130,12 @@ public class RecursiveGrantResourcePermissionPersister extends CommonGrantResour
          resultSet = statement.executeQuery();
 
          while (resultSet.next()) {
-            resourcePermissions.add(ResourcePermissions.getInstance(resultSet.getString("PermissionName"),
-                                                                    resultSet.getBoolean("IsWithGrant")));
+            if (resultSet.getBoolean("IsWithGrant")) {
+               resourcePermissions.add(ResourcePermissions.getInstanceWithGrantOption(resultSet.getString("PermissionName")));
+            }
+            else {
+               resourcePermissions.add(ResourcePermissions.getInstance(resultSet.getString("PermissionName")));
+            }
          }
          resultSet.close();
 

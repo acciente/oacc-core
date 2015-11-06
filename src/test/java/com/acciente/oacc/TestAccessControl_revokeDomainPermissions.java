@@ -33,8 +33,7 @@ public class TestAccessControl_revokeDomainPermissions extends TestAccessControl
    public void revokeDomainPermissions_validAsSystemResource() {
       authenticateSystemResource();
       final DomainPermission domainPermission_superUser = DomainPermissions.getInstance(DomainPermissions.SUPER_USER);
-      final DomainPermission domainPermission_child_withGrant = DomainPermissions.getInstance(DomainPermissions.CREATE_CHILD_DOMAIN,
-                                                                                              true);
+      final DomainPermission domainPermission_child_withGrant = DomainPermissions.getInstanceWithGrantOption(DomainPermissions.CREATE_CHILD_DOMAIN);
 
       final String domainName = generateDomain();
       final String sysDomainName = accessControlContext.getDomainNameByResource(SYS_RESOURCE);
@@ -88,8 +87,7 @@ public class TestAccessControl_revokeDomainPermissions extends TestAccessControl
    public void revokeDomainPermissions_withExtId() {
       authenticateSystemResource();
       final DomainPermission domainPermission_superUser = DomainPermissions.getInstance(DomainPermissions.SUPER_USER);
-      final DomainPermission domainPermission_child_withGrant = DomainPermissions.getInstance(DomainPermissions.CREATE_CHILD_DOMAIN,
-                                                                                              true);
+      final DomainPermission domainPermission_child_withGrant = DomainPermissions.getInstanceWithGrantOption(DomainPermissions.CREATE_CHILD_DOMAIN);
 
       final String domainName = generateDomain();
       final String sysDomainName = accessControlContext.getDomainNameByResource(SYS_RESOURCE);
@@ -145,11 +143,11 @@ public class TestAccessControl_revokeDomainPermissions extends TestAccessControl
    public void revokeDomainPermissions_validAsAuthorized() {
       authenticateSystemResource();
       final DomainPermission domPerm_delete_withGrant
-            = DomainPermissions.getInstance(DomainPermissions.DELETE, true);
+            = DomainPermissions.getInstanceWithGrantOption(DomainPermissions.DELETE);
       final DomainPermission domPerm_delete
             = DomainPermissions.getInstance(DomainPermissions.DELETE);
       final DomainPermission domPerm_child_withGrant
-            = DomainPermissions.getInstance(DomainPermissions.CREATE_CHILD_DOMAIN, true);
+            = DomainPermissions.getInstanceWithGrantOption(DomainPermissions.CREATE_CHILD_DOMAIN);
 
       final char[] password = generateUniquePassword();
       final Resource authenticatableResource = generateAuthenticatableResource(password);
@@ -203,8 +201,7 @@ public class TestAccessControl_revokeDomainPermissions extends TestAccessControl
    public void revokeDomainPermissions_ungrantedPermissions_shouldSucceed() {
       authenticateSystemResource();
       final DomainPermission domainPermission_superUser = DomainPermissions.getInstance(DomainPermissions.SUPER_USER);
-      final DomainPermission domainPermission_child_withGrant = DomainPermissions.getInstance(DomainPermissions.CREATE_CHILD_DOMAIN,
-                                                                                              true);
+      final DomainPermission domainPermission_child_withGrant = DomainPermissions.getInstanceWithGrantOption(DomainPermissions.CREATE_CHILD_DOMAIN);
 
       final String domainName = generateDomain();
       final String sysDomainName = accessControlContext.getDomainNameByResource(SYS_RESOURCE);
@@ -235,7 +232,7 @@ public class TestAccessControl_revokeDomainPermissions extends TestAccessControl
       final DomainPermission domPerm_superuser
             = DomainPermissions.getInstance(DomainPermissions.SUPER_USER);
       final DomainPermission domPerm_child_withGrant
-            = DomainPermissions.getInstance(DomainPermissions.CREATE_CHILD_DOMAIN, true);
+            = DomainPermissions.getInstanceWithGrantOption(DomainPermissions.CREATE_CHILD_DOMAIN);
 
       final char[] password = generateUniquePassword();
       final Resource authenticatableResource = generateAuthenticatableResource(password);
@@ -281,8 +278,7 @@ public class TestAccessControl_revokeDomainPermissions extends TestAccessControl
    public void revokeDomainPermissions_reRevokePermissions() {
       authenticateSystemResource();
       final DomainPermission domainPermission_superUser = DomainPermissions.getInstance(DomainPermissions.SUPER_USER);
-      final DomainPermission domainPermission_child_withGrant = DomainPermissions.getInstance(DomainPermissions.CREATE_CHILD_DOMAIN,
-                                                                                              true);
+      final DomainPermission domainPermission_child_withGrant = DomainPermissions.getInstanceWithGrantOption(DomainPermissions.CREATE_CHILD_DOMAIN);
 
       final String domainName = generateDomain();
       final Resource accessorResource = generateUnauthenticatableResource();
@@ -328,11 +324,11 @@ public class TestAccessControl_revokeDomainPermissions extends TestAccessControl
    public void revokeDomainPermissions_revokeSubsetOfPermissions() {
       authenticateSystemResource();
       final DomainPermission domPerm_delete_withGrant
-            = DomainPermissions.getInstance(DomainPermissions.DELETE, true);
+            = DomainPermissions.getInstanceWithGrantOption(DomainPermissions.DELETE);
       final DomainPermission domPerm_delete
             = DomainPermissions.getInstance(DomainPermissions.DELETE);
       final DomainPermission domPerm_child_withGrant
-            = DomainPermissions.getInstance(DomainPermissions.CREATE_CHILD_DOMAIN, true);
+            = DomainPermissions.getInstanceWithGrantOption(DomainPermissions.CREATE_CHILD_DOMAIN);
 
       final char[] password = generateUniquePassword();
       final Resource authenticatableResource = generateAuthenticatableResource(password);
@@ -403,7 +399,7 @@ public class TestAccessControl_revokeDomainPermissions extends TestAccessControl
       assertThat(accessControlContext.getDomainPermissions(accessorResource, domainName), is(accessorPermissions_pre));
 
       // setup grantor permissions
-      Set<DomainPermission> grantorPermissions = setOf(DomainPermissions.getInstance(grantedPermissionName, true));
+      Set<DomainPermission> grantorPermissions = setOf(DomainPermissions.getInstanceWithGrantOption(grantedPermissionName));
 
       accessControlContext.setDomainPermissions(grantorResource, domainName, grantorPermissions);
       assertThat(accessControlContext.getDomainPermissions(grantorResource, domainName), is(grantorPermissions));
@@ -441,11 +437,11 @@ public class TestAccessControl_revokeDomainPermissions extends TestAccessControl
    public void revokeDomainPermissions_identicalPermissions_shouldSucceedAsAuthorized() {
       authenticateSystemResource();
       final DomainPermission domPerm_delete_withGrant
-            = DomainPermissions.getInstance(DomainPermissions.DELETE, true);
+            = DomainPermissions.getInstanceWithGrantOption(DomainPermissions.DELETE);
       final DomainPermission domPerm_delete
             = DomainPermissions.getInstance(DomainPermissions.DELETE);
       final DomainPermission domPerm_child_withGrant
-            = DomainPermissions.getInstance(DomainPermissions.CREATE_CHILD_DOMAIN, true);
+            = DomainPermissions.getInstanceWithGrantOption(DomainPermissions.CREATE_CHILD_DOMAIN);
 
       final char[] password = generateUniquePassword();
       final Resource authenticatableResource = generateAuthenticatableResource(password);
@@ -503,11 +499,11 @@ public class TestAccessControl_revokeDomainPermissions extends TestAccessControl
    public void revokeDomainPermissions_lesserGrantingRightPermissions_shouldSucceedAsAuthorized() {
       authenticateSystemResource();
       final DomainPermission domPerm_delete_withGrant
-            = DomainPermissions.getInstance(DomainPermissions.DELETE, true);
+            = DomainPermissions.getInstanceWithGrantOption(DomainPermissions.DELETE);
       final DomainPermission domPerm_delete
             = DomainPermissions.getInstance(DomainPermissions.DELETE);
       final DomainPermission domPerm_child_withGrant
-            = DomainPermissions.getInstance(DomainPermissions.CREATE_CHILD_DOMAIN, true);
+            = DomainPermissions.getInstanceWithGrantOption(DomainPermissions.CREATE_CHILD_DOMAIN);
       final DomainPermission domPerm_child
             = DomainPermissions.getInstance(DomainPermissions.CREATE_CHILD_DOMAIN);
 
@@ -565,11 +561,11 @@ public class TestAccessControl_revokeDomainPermissions extends TestAccessControl
    public void revokeDomainPermissions_greaterGrantingRightPermissions_shouldSucceedAsAuthorized() {
       authenticateSystemResource();
       final DomainPermission domPerm_delete_withGrant
-            = DomainPermissions.getInstance(DomainPermissions.DELETE, true);
+            = DomainPermissions.getInstanceWithGrantOption(DomainPermissions.DELETE);
       final DomainPermission domPerm_delete
             = DomainPermissions.getInstance(DomainPermissions.DELETE);
       final DomainPermission domPerm_child_withGrant
-            = DomainPermissions.getInstance(DomainPermissions.CREATE_CHILD_DOMAIN, true);
+            = DomainPermissions.getInstanceWithGrantOption(DomainPermissions.CREATE_CHILD_DOMAIN);
       final DomainPermission domPerm_child
             = DomainPermissions.getInstance(DomainPermissions.CREATE_CHILD_DOMAIN);
 
@@ -633,7 +629,7 @@ public class TestAccessControl_revokeDomainPermissions extends TestAccessControl
       final DomainPermission domPerm_superuser
             = DomainPermissions.getInstance(DomainPermissions.SUPER_USER);
       final DomainPermission domPerm_superuser_withGrant
-            = DomainPermissions.getInstance(DomainPermissions.SUPER_USER, true);
+            = DomainPermissions.getInstanceWithGrantOption(DomainPermissions.SUPER_USER);
       final DomainPermission domPerm_child
             = DomainPermissions.getInstance(DomainPermissions.CREATE_CHILD_DOMAIN);
 
@@ -691,8 +687,7 @@ public class TestAccessControl_revokeDomainPermissions extends TestAccessControl
    public void revokeDomainPermissions_duplicatePermissionNames_shouldFail() {
       authenticateSystemResource();
       final DomainPermission domainPermission_superUser = DomainPermissions.getInstance(DomainPermissions.SUPER_USER);
-      final DomainPermission domainPermission_superUser_withGrant = DomainPermissions.getInstance(DomainPermissions.SUPER_USER,
-                                                                                              true);
+      final DomainPermission domainPermission_superUser_withGrant = DomainPermissions.getInstanceWithGrantOption(DomainPermissions.SUPER_USER);
 
       final String sysDomainName = accessControlContext.getDomainNameByResource(SYS_RESOURCE);
       final String domainName = generateDomain();
@@ -779,9 +774,9 @@ public class TestAccessControl_revokeDomainPermissions extends TestAccessControl
       final DomainPermission domPerm_superuser_trailingspaces
             = DomainPermissions.getInstance(DomainPermissions.SUPER_USER + " \t");
       final DomainPermission domPerm_child_withGrant
-            = DomainPermissions.getInstance(DomainPermissions.CREATE_CHILD_DOMAIN, true);
+            = DomainPermissions.getInstanceWithGrantOption(DomainPermissions.CREATE_CHILD_DOMAIN);
       final DomainPermission domPerm_child_withGrant_whitespaced
-            = DomainPermissions.getInstance(" \t" + DomainPermissions.CREATE_CHILD_DOMAIN, true);
+            = DomainPermissions.getInstanceWithGrantOption(" \t" + DomainPermissions.CREATE_CHILD_DOMAIN);
 
       final String domainName = generateDomain();
       final String domainName_whitespaced = " " + domainName + "\t";
@@ -824,7 +819,7 @@ public class TestAccessControl_revokeDomainPermissions extends TestAccessControl
    public void revokeDomainPermissions_nulls_shouldFail() {
       authenticateSystemResource();
       final DomainPermission domCreatePerm_child_withGrant
-            = DomainPermissions.getInstance(DomainPermissions.CREATE_CHILD_DOMAIN, true);
+            = DomainPermissions.getInstanceWithGrantOption(DomainPermissions.CREATE_CHILD_DOMAIN);
 
       final String domainName = generateDomain();
       Resource accessorResource = generateUnauthenticatableResource();
@@ -930,7 +925,7 @@ public class TestAccessControl_revokeDomainPermissions extends TestAccessControl
    public void revokeDomainPermissions_nonExistentReferences_shouldFail() {
       authenticateSystemResource();
       final DomainPermission domCreatePerm_child_withGrant
-            = DomainPermissions.getInstance(DomainPermissions.CREATE_CHILD_DOMAIN, true);
+            = DomainPermissions.getInstanceWithGrantOption(DomainPermissions.CREATE_CHILD_DOMAIN);
 
       final String domainName = generateDomain();
       Resource accessorResource = generateUnauthenticatableResource();

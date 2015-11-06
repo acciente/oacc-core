@@ -135,8 +135,14 @@ public class RecursiveGrantGlobalResourcePermissionSysPersister extends CommonGr
          resultSet = statement.executeQuery();
 
          while (resultSet.next()) {
-            resourcePermissions.add(ResourcePermissions.getInstance(resultSet.getResourceSysPermissionName("SysPermissionId"),
-                                                                    resultSet.getBoolean("IsWithGrant")));
+            if (resultSet.getBoolean("IsWithGrant")) {
+               resourcePermissions
+                     .add(ResourcePermissions.getInstanceWithGrantOption(resultSet.getResourceSysPermissionName("SysPermissionId")));
+            }
+            else {
+               resourcePermissions
+                     .add(ResourcePermissions.getInstance(resultSet.getResourceSysPermissionName("SysPermissionId")));
+            }
          }
          resultSet.close();
 
@@ -182,9 +188,14 @@ public class RecursiveGrantGlobalResourcePermissionSysPersister extends CommonGr
                                                 resourcePermissionsForResourceClass = new HashSet<>());
             }
 
-            resourcePermissionsForResourceClass
-                  .add(ResourcePermissions.getInstance(resultSet.getResourceSysPermissionName("SysPermissionId"),
-                                                       resultSet.getBoolean("IsWithGrant")));
+            if (resultSet.getBoolean("IsWithGrant")) {
+               resourcePermissionsForResourceClass
+                     .add(ResourcePermissions.getInstanceWithGrantOption(resultSet.getResourceSysPermissionName("SysPermissionId")));
+            }
+            else {
+               resourcePermissionsForResourceClass
+                     .add(ResourcePermissions.getInstance(resultSet.getResourceSysPermissionName("SysPermissionId")));
+            }
          }
          resultSet.close();
 

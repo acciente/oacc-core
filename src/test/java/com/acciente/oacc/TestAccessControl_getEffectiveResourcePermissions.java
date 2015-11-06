@@ -162,7 +162,7 @@ public class TestAccessControl_getEffectiveResourcePermissions extends TestAcces
 
       // setup donor permissions
       Set<ResourcePermission> donorResourcePermissions = new HashSet<>();
-      donorResourcePermissions.add(ResourcePermissions.getInstance(inheritedPermissionName, true));
+      donorResourcePermissions.add(ResourcePermissions.getInstanceWithGrantOption(inheritedPermissionName));
 
       accessControlContext.setResourcePermissions(donorResource, accessedResource, donorResourcePermissions);
       assertThat(accessControlContext.getEffectiveResourcePermissions(donorResource, accessedResource), is(donorResourcePermissions));
@@ -204,7 +204,7 @@ public class TestAccessControl_getEffectiveResourcePermissions extends TestAcces
 
       // setup donor2 permissions
       Set<ResourcePermission> donor2ResourcePermissions = new HashSet<>();
-      donor2ResourcePermissions.add(ResourcePermissions.getInstance(inheritedPermissionName, true));
+      donor2ResourcePermissions.add(ResourcePermissions.getInstanceWithGrantOption(inheritedPermissionName));
 
       accessControlContext.setResourcePermissions(donorResource2, accessedResource, donor2ResourcePermissions);
       assertThat(accessControlContext.getEffectiveResourcePermissions(donorResource2, accessedResource), is(
@@ -223,7 +223,7 @@ public class TestAccessControl_getEffectiveResourcePermissions extends TestAcces
 
       // verify
       Set<ResourcePermission> expectedPermissions = new HashSet<>();
-      expectedPermissions.add(ResourcePermissions.getInstance(inheritedPermissionName, true));
+      expectedPermissions.add(ResourcePermissions.getInstanceWithGrantOption(inheritedPermissionName));
 
       assertThat(accessControlContext.getEffectiveResourcePermissions(accessorResource, accessedResource), is(expectedPermissions));
    }
@@ -313,7 +313,7 @@ public class TestAccessControl_getEffectiveResourcePermissions extends TestAcces
 
       // setup donor permissions
       Set<ResourcePermission> donorResourcePermissions = new HashSet<>();
-      donorResourcePermissions.add(ResourcePermissions.getInstance(inheritedPermissionName, true));
+      donorResourcePermissions.add(ResourcePermissions.getInstanceWithGrantOption(inheritedPermissionName));
 
       accessControlContext.setResourcePermissions(donorResource, accessedResource, donorResourcePermissions);
       assertThat(accessControlContext.getEffectiveResourcePermissions(donorResource, accessedResource), is(donorResourcePermissions));
@@ -378,7 +378,7 @@ public class TestAccessControl_getEffectiveResourcePermissions extends TestAcces
 
       // setup donor permissions
       Set<ResourcePermission> donorResourcePermissions = new HashSet<>();
-      donorResourcePermissions.add(ResourcePermissions.getInstance(permissionName1, true));
+      donorResourcePermissions.add(ResourcePermissions.getInstanceWithGrantOption(permissionName1));
 
       accessControlContext.setResourcePermissions(donorResource, accessedResource, donorResourcePermissions);
       assertThat(accessControlContext.getEffectiveResourcePermissions(donorResource, accessedResource), is(
@@ -403,7 +403,7 @@ public class TestAccessControl_getEffectiveResourcePermissions extends TestAcces
 
       // setup domain-inherited global permissions
       Set<ResourcePermission> domainInheritedGlobalResourcePermissions = new HashSet<>();
-      domainInheritedGlobalResourcePermissions.add(ResourcePermissions.getInstance(permissionName2, true));
+      domainInheritedGlobalResourcePermissions.add(ResourcePermissions.getInstanceWithGrantOption(permissionName2));
 
       accessControlContext.setGlobalResourcePermissions(accessorResource, resourceClassName, parentDomain, domainInheritedGlobalResourcePermissions);
       assertThat(accessControlContext.getEffectiveGlobalResourcePermissions(accessorResource,
@@ -413,8 +413,8 @@ public class TestAccessControl_getEffectiveResourcePermissions extends TestAcces
 
       // verify
       Set<ResourcePermission> permissions_expected = new HashSet<>();
-      permissions_expected.add(ResourcePermissions.getInstance(permissionName1, true));
-      permissions_expected.add(ResourcePermissions.getInstance(permissionName2, true));
+      permissions_expected.add(ResourcePermissions.getInstanceWithGrantOption(permissionName1));
+      permissions_expected.add(ResourcePermissions.getInstanceWithGrantOption(permissionName2));
 
       final Set<ResourcePermission> permissions_post = accessControlContext.getEffectiveResourcePermissions(accessorResource, accessedResource);
       assertThat(permissions_post, is(permissions_expected));
@@ -449,12 +449,12 @@ public class TestAccessControl_getEffectiveResourcePermissions extends TestAcces
 
       // verify
       Set<ResourcePermission> permissions_expected
-            = setOf(ResourcePermissions.getInstance(ResourcePermissions.QUERY, true),
-                    ResourcePermissions.getInstance(ResourcePermissions.DELETE, true),
-                    ResourcePermissions.getInstance(ResourcePermissions.INHERIT, true),
-                    ResourcePermissions.getInstance(ResourcePermissions.IMPERSONATE, true),
-                    ResourcePermissions.getInstance(ResourcePermissions.RESET_CREDENTIALS, true),
-                    ResourcePermissions.getInstance(customPermission.getPermissionName(), true));
+            = setOf(ResourcePermissions.getInstanceWithGrantOption(ResourcePermissions.QUERY),
+                    ResourcePermissions.getInstanceWithGrantOption(ResourcePermissions.DELETE),
+                    ResourcePermissions.getInstanceWithGrantOption(ResourcePermissions.INHERIT),
+                    ResourcePermissions.getInstanceWithGrantOption(ResourcePermissions.IMPERSONATE),
+                    ResourcePermissions.getInstanceWithGrantOption(ResourcePermissions.RESET_CREDENTIALS),
+                    ResourcePermissions.getInstanceWithGrantOption(customPermission.getPermissionName()));
 
       final Set<ResourcePermission> permissions_post
             = accessControlContext.getEffectiveResourcePermissions(accessorResource, accessedResource);

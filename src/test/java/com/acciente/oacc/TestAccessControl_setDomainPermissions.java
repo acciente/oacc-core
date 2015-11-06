@@ -35,8 +35,7 @@ public class TestAccessControl_setDomainPermissions extends TestAccessControlBas
    public void setDomainPermissions_validAsSystemResource() {
       authenticateSystemResource();
       final DomainPermission domainPermission_superUser = DomainPermissions.getInstance(DomainPermissions.SUPER_USER);
-      final DomainPermission domainPermission_child_withGrant = DomainPermissions.getInstance(DomainPermissions.CREATE_CHILD_DOMAIN,
-                                                                                              true);
+      final DomainPermission domainPermission_child_withGrant = DomainPermissions.getInstanceWithGrantOption(DomainPermissions.CREATE_CHILD_DOMAIN);
 
       final String domainName = generateDomain();
       final Resource accessorResource = generateUnauthenticatableResource();
@@ -58,8 +57,7 @@ public class TestAccessControl_setDomainPermissions extends TestAccessControlBas
    public void setDomainPermissions_withExtId() {
       authenticateSystemResource();
       final DomainPermission domainPermission_superUser = DomainPermissions.getInstance(DomainPermissions.SUPER_USER);
-      final DomainPermission domainPermission_child_withGrant = DomainPermissions.getInstance(DomainPermissions.CREATE_CHILD_DOMAIN,
-                                                                                              true);
+      final DomainPermission domainPermission_child_withGrant = DomainPermissions.getInstanceWithGrantOption(DomainPermissions.CREATE_CHILD_DOMAIN);
 
       final String domainName = generateDomain();
       final String externalId = generateUniqueExternalId();
@@ -82,11 +80,11 @@ public class TestAccessControl_setDomainPermissions extends TestAccessControlBas
    public void setDomainPermissions_validAsAuthorized() {
       authenticateSystemResource();
       final DomainPermission domPerm_delete_withGrant
-            = DomainPermissions.getInstance(DomainPermissions.DELETE, true);
+            = DomainPermissions.getInstanceWithGrantOption(DomainPermissions.DELETE);
       final DomainPermission domPerm_delete
             = DomainPermissions.getInstance(DomainPermissions.DELETE);
       final DomainPermission domPerm_child_withGrant
-            = DomainPermissions.getInstance(DomainPermissions.CREATE_CHILD_DOMAIN, true);
+            = DomainPermissions.getInstanceWithGrantOption(DomainPermissions.CREATE_CHILD_DOMAIN);
 
       final String domainName = generateDomain();
 
@@ -130,7 +128,7 @@ public class TestAccessControl_setDomainPermissions extends TestAccessControlBas
       final DomainPermission domCreatePerm_superuser
             = DomainPermissions.getInstance(DomainPermissions.SUPER_USER);
       final DomainPermission domCreatePerm_superuser_withGrant
-            = DomainPermissions.getInstance(DomainPermissions.SUPER_USER, true);
+            = DomainPermissions.getInstanceWithGrantOption(DomainPermissions.SUPER_USER);
       final DomainPermission domCreatePerm_child
             = DomainPermissions.getInstance(DomainPermissions.CREATE_CHILD_DOMAIN);
 
@@ -174,8 +172,7 @@ public class TestAccessControl_setDomainPermissions extends TestAccessControlBas
       authenticateSystemResource();
       final DomainPermission domainPermission_superUser = DomainPermissions.getInstance(DomainPermissions.SUPER_USER);
       final DomainPermission domainPermission_child = DomainPermissions.getInstance(DomainPermissions.CREATE_CHILD_DOMAIN);
-      final DomainPermission domainPermission_child_withGrant = DomainPermissions.getInstance(DomainPermissions.CREATE_CHILD_DOMAIN,
-                                                                                              true);
+      final DomainPermission domainPermission_child_withGrant = DomainPermissions.getInstanceWithGrantOption(DomainPermissions.CREATE_CHILD_DOMAIN);
 
       final String domainName = accessControlContext.getDomainNameByResource(SYS_RESOURCE);
       final Resource accessorResource = generateUnauthenticatableResource();
@@ -229,7 +226,7 @@ public class TestAccessControl_setDomainPermissions extends TestAccessControlBas
 
       // setup grantor permissions
       Set<DomainPermission> grantorPermissions = new HashSet<>();
-      grantorPermissions.add(DomainPermissions.getInstance(grantedPermissionName, true));
+      grantorPermissions.add(DomainPermissions.getInstanceWithGrantOption(grantedPermissionName));
 
       accessControlContext.setDomainPermissions(grantorResource, domainName, grantorPermissions);
       assertThat(accessControlContext.getEffectiveDomainPermissions(grantorResource, domainName),
@@ -247,8 +244,8 @@ public class TestAccessControl_setDomainPermissions extends TestAccessControlBas
       accessControlContext.setDomainPermissions(accessorResource, domainName, requestedPermissions);
 
       Set<DomainPermission> permissions_expected = new HashSet<>();
-      permissions_expected.add(DomainPermissions.getInstance(grantedPermissionName, false));
-      permissions_expected.add(DomainPermissions.getInstance(ungrantedPermissionName, false));
+      permissions_expected.add(DomainPermissions.getInstance(grantedPermissionName));
+      permissions_expected.add(DomainPermissions.getInstance(ungrantedPermissionName));
 
       final Set<DomainPermission> permissions_post
             = accessControlContext.getDomainPermissions(accessorResource, domainName);
@@ -275,7 +272,7 @@ public class TestAccessControl_setDomainPermissions extends TestAccessControlBas
 
       // setup grantor permissions
       Set<DomainPermission> grantorPermissions = new HashSet<>();
-      grantorPermissions.add(DomainPermissions.getInstance(grantedPermissionName, true));
+      grantorPermissions.add(DomainPermissions.getInstanceWithGrantOption(grantedPermissionName));
 
       accessControlContext.setDomainPermissions(grantorResource, domainName, grantorPermissions);
       assertThat(accessControlContext.getEffectiveDomainPermissions(grantorResource, domainName), is(grantorPermissions));
@@ -291,7 +288,7 @@ public class TestAccessControl_setDomainPermissions extends TestAccessControlBas
       accessControlContext.setDomainPermissions(accessorResource, domainName, requestedPermissions);
 
       Set<DomainPermission> permissions_expected = new HashSet<>();
-      permissions_expected.add(DomainPermissions.getInstance(ungrantedPermissionName, false));
+      permissions_expected.add(DomainPermissions.getInstance(ungrantedPermissionName));
 
       final Set<DomainPermission> permissions_post
             = accessControlContext.getDomainPermissions(accessorResource, domainName);
@@ -309,14 +306,14 @@ public class TestAccessControl_setDomainPermissions extends TestAccessControlBas
 
       // setup accessor permissions
       Set<DomainPermission> accessorPermissions_pre = new HashSet<>();
-      accessorPermissions_pre.add(DomainPermissions.getInstance(grantedPermissionName, true));
+      accessorPermissions_pre.add(DomainPermissions.getInstanceWithGrantOption(grantedPermissionName));
 
       accessControlContext.setDomainPermissions(accessorResource, domainName, accessorPermissions_pre);
       assertThat(accessControlContext.getEffectiveDomainPermissions(accessorResource, domainName), is(accessorPermissions_pre));
 
       // setup grantor permissions
       Set<DomainPermission> grantorPermissions = new HashSet<>();
-      grantorPermissions.add(DomainPermissions.getInstance(grantedPermissionName, true));
+      grantorPermissions.add(DomainPermissions.getInstanceWithGrantOption(grantedPermissionName));
 
       accessControlContext.setDomainPermissions(grantorResource, domainName, grantorPermissions);
       assertThat(accessControlContext.getEffectiveDomainPermissions(grantorResource, domainName), is(grantorPermissions));
@@ -332,7 +329,7 @@ public class TestAccessControl_setDomainPermissions extends TestAccessControlBas
       accessControlContext.setDomainPermissions(accessorResource, domainName, requestedPermissions);
 
       Set<DomainPermission> permissions_expected = new HashSet<>();
-      permissions_expected.add(DomainPermissions.getInstance(grantedPermissionName, false));
+      permissions_expected.add(DomainPermissions.getInstance(grantedPermissionName));
 
       final Set<DomainPermission> permissions_post
             = accessControlContext.getEffectiveDomainPermissions(accessorResource, domainName);
@@ -351,14 +348,14 @@ public class TestAccessControl_setDomainPermissions extends TestAccessControlBas
 
       // setup accessor permissions
       Set<DomainPermission> accessorPermissions_pre = new HashSet<>();
-      accessorPermissions_pre.add(DomainPermissions.getInstance(ungrantedPermissionName, true));
+      accessorPermissions_pre.add(DomainPermissions.getInstanceWithGrantOption(ungrantedPermissionName));
 
       accessControlContext.setDomainPermissions(accessorResource, domainName, accessorPermissions_pre);
       assertThat(accessControlContext.getDomainPermissions(accessorResource, domainName), is(accessorPermissions_pre));
 
       // setup grantor permissions
       Set<DomainPermission> grantorPermissions = new HashSet<>();
-      grantorPermissions.add(DomainPermissions.getInstance(grantedPermissionName, true));
+      grantorPermissions.add(DomainPermissions.getInstanceWithGrantOption(grantedPermissionName));
 
       accessControlContext.setDomainPermissions(grantorResource, domainName, grantorPermissions);
       assertThat(accessControlContext.getEffectiveDomainPermissions(grantorResource, domainName), is(grantorPermissions));
@@ -398,7 +395,7 @@ public class TestAccessControl_setDomainPermissions extends TestAccessControlBas
 
       // setup grantor permissions
       Set<DomainPermission> grantorPermissions = new HashSet<>();
-      grantorPermissions.add(DomainPermissions.getInstance(grantedPermissionName, true));
+      grantorPermissions.add(DomainPermissions.getInstanceWithGrantOption(grantedPermissionName));
 
       accessControlContext.setDomainPermissions(grantorResource, domainName, grantorPermissions);
       assertThat(accessControlContext.getEffectiveDomainPermissions(grantorResource, domainName), is(grantorPermissions));
@@ -409,12 +406,12 @@ public class TestAccessControl_setDomainPermissions extends TestAccessControlBas
 
       // set permissions as grantor and verify
       Set<DomainPermission> requestedPermissions = new HashSet<>();
-      requestedPermissions.add(DomainPermissions.getInstance(grantedPermissionName, true));
+      requestedPermissions.add(DomainPermissions.getInstanceWithGrantOption(grantedPermissionName));
 
       accessControlContext.setDomainPermissions(accessorResource, domainName, requestedPermissions);
 
       Set<DomainPermission> permissions_expected = new HashSet<>();
-      permissions_expected.add(DomainPermissions.getInstance(grantedPermissionName, true));
+      permissions_expected.add(DomainPermissions.getInstanceWithGrantOption(grantedPermissionName));
 
       final Set<DomainPermission> permissions_post
             = accessControlContext.getEffectiveDomainPermissions(accessorResource, domainName);
@@ -440,7 +437,7 @@ public class TestAccessControl_setDomainPermissions extends TestAccessControlBas
 
       // setup grantor permissions
       Set<DomainPermission> grantorPermissions = new HashSet<>();
-      grantorPermissions.add(DomainPermissions.getInstance(grantedPermissionName, true));
+      grantorPermissions.add(DomainPermissions.getInstanceWithGrantOption(grantedPermissionName));
 
       accessControlContext.setDomainPermissions(grantorResource, domainName, grantorPermissions);
       assertThat(accessControlContext.getEffectiveDomainPermissions(grantorResource, domainName), is(grantorPermissions));
@@ -450,7 +447,7 @@ public class TestAccessControl_setDomainPermissions extends TestAccessControlBas
 
       // set permissions as grantor and verify
       Set<DomainPermission> requestedPermissions = new HashSet<>();
-      requestedPermissions.add(DomainPermissions.getInstance(ungrantedPermissionName, true));
+      requestedPermissions.add(DomainPermissions.getInstanceWithGrantOption(ungrantedPermissionName));
 
       try {
          accessControlContext.setDomainPermissions(accessorResource, domainName, requestedPermissions);
@@ -469,7 +466,7 @@ public class TestAccessControl_setDomainPermissions extends TestAccessControlBas
       final DomainPermission domCreatePerm_superuser_trailingspaces
             = DomainPermissions.getInstance(DomainPermissions.SUPER_USER + " \t");
       final DomainPermission domCreatePerm_child_withGrant
-            = DomainPermissions.getInstance(" \t" + DomainPermissions.CREATE_CHILD_DOMAIN, true);
+            = DomainPermissions.getInstanceWithGrantOption(" \t" + DomainPermissions.CREATE_CHILD_DOMAIN);
 
       // todo: arguably, system permissions should match in name exactly, but the API uses Strings, not Enums, and is otherwise whitespace-consistent
       //       this could pose some complications depending on if the system permission name is persisted from the passed string or derived from an authoritative source
@@ -488,8 +485,7 @@ public class TestAccessControl_setDomainPermissions extends TestAccessControlBas
       final Set<DomainPermission> domainPermissions_post = accessControlContext.getDomainPermissions(accessorResource, domainName);
       assertThat(domainPermissions_post.size(), is(2));
       assertThat(domainPermissions_post, hasItem(DomainPermissions.getInstance(DomainPermissions.SUPER_USER)));
-      assertThat(domainPermissions_post, hasItem(DomainPermissions.getInstance(DomainPermissions.CREATE_CHILD_DOMAIN,
-                                                                               true)));
+      assertThat(domainPermissions_post, hasItem(DomainPermissions.getInstanceWithGrantOption(DomainPermissions.CREATE_CHILD_DOMAIN)));
    }
 
    // the DomainPermission object prevents creation with invalid system permission names, hence we don't test
@@ -501,7 +497,7 @@ public class TestAccessControl_setDomainPermissions extends TestAccessControlBas
    public void setDomainPermissions_nulls_shouldFail() {
       authenticateSystemResource();
       final DomainPermission domCreatePerm_child_withGrant
-            = DomainPermissions.getInstance(DomainPermissions.CREATE_CHILD_DOMAIN, true);
+            = DomainPermissions.getInstanceWithGrantOption(DomainPermissions.CREATE_CHILD_DOMAIN);
 
       Set<DomainPermission> domainPermissions = new HashSet<>();
       domainPermissions.add(domCreatePerm_child_withGrant);
@@ -557,7 +553,7 @@ public class TestAccessControl_setDomainPermissions extends TestAccessControlBas
    public void setDomainPermissions_nonExistentReferences_shouldFail() {
       authenticateSystemResource();
       final DomainPermission domCreatePerm_child_withGrant
-            = DomainPermissions.getInstance(DomainPermissions.CREATE_CHILD_DOMAIN, true);
+            = DomainPermissions.getInstanceWithGrantOption(DomainPermissions.CREATE_CHILD_DOMAIN);
 
       Set<DomainPermission> domainPermissions = new HashSet<>();
       domainPermissions.add(domCreatePerm_child_withGrant);

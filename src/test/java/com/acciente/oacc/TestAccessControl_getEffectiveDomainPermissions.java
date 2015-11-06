@@ -63,7 +63,7 @@ public class TestAccessControl_getEffectiveDomainPermissions extends TestAccessC
       final DomainPermission domCreatePerm_child
             = DomainPermissions.getInstance(DomainPermissions.CREATE_CHILD_DOMAIN);
       final DomainPermission domCreatePerm_child_withGrant
-            = DomainPermissions.getInstance(DomainPermissions.CREATE_CHILD_DOMAIN, true);
+            = DomainPermissions.getInstanceWithGrantOption(DomainPermissions.CREATE_CHILD_DOMAIN);
 
       final String domainName1 = generateDomain();
       final String domainName2 = generateDomain();
@@ -119,7 +119,7 @@ public class TestAccessControl_getEffectiveDomainPermissions extends TestAccessC
       final DomainPermission domCreatePerm_child
             = DomainPermissions.getInstance(DomainPermissions.CREATE_CHILD_DOMAIN);
       final DomainPermission domCreatePerm_child_withGrant
-            = DomainPermissions.getInstance(DomainPermissions.CREATE_CHILD_DOMAIN, true);
+            = DomainPermissions.getInstanceWithGrantOption(DomainPermissions.CREATE_CHILD_DOMAIN);
 
       final String domainName1 = generateDomain();
       final String domainName2 = generateDomain();
@@ -149,7 +149,7 @@ public class TestAccessControl_getEffectiveDomainPermissions extends TestAccessC
       final DomainPermission domPerm_createchilddomain
             = DomainPermissions.getInstance(DomainPermissions.CREATE_CHILD_DOMAIN);
       final DomainPermission domPerm_createchilddomain_withGrant
-            = DomainPermissions.getInstance(DomainPermissions.CREATE_CHILD_DOMAIN, true);
+            = DomainPermissions.getInstanceWithGrantOption(DomainPermissions.CREATE_CHILD_DOMAIN);
 
       final String childDomain = generateUniqueDomainName();
       final String parentDomain = generateDomain();
@@ -185,7 +185,7 @@ public class TestAccessControl_getEffectiveDomainPermissions extends TestAccessC
       final DomainPermission domPerm_createchilddomain
             = DomainPermissions.getInstance(DomainPermissions.CREATE_CHILD_DOMAIN);
       final DomainPermission domPerm_createchilddomain_withGrant
-            = DomainPermissions.getInstance(DomainPermissions.CREATE_CHILD_DOMAIN, true);
+            = DomainPermissions.getInstanceWithGrantOption(DomainPermissions.CREATE_CHILD_DOMAIN);
 
       final String parentDomain = generateDomain();
       final String childDomain = generateUniqueDomainName();
@@ -245,7 +245,7 @@ public class TestAccessControl_getEffectiveDomainPermissions extends TestAccessC
       final DomainPermission domPerm_createchilddomain
             = DomainPermissions.getInstance(DomainPermissions.CREATE_CHILD_DOMAIN);
       final DomainPermission domPerm_createchilddomain_withGrant
-            = DomainPermissions.getInstance(DomainPermissions.CREATE_CHILD_DOMAIN, true);
+            = DomainPermissions.getInstanceWithGrantOption(DomainPermissions.CREATE_CHILD_DOMAIN);
 
       final String domainName = generateDomain();
       Resource accessorResource = generateUnauthenticatableResource();
@@ -286,7 +286,7 @@ public class TestAccessControl_getEffectiveDomainPermissions extends TestAccessC
       final DomainPermission domPerm_createchilddomain
             = DomainPermissions.getInstance(DomainPermissions.CREATE_CHILD_DOMAIN);
       final DomainPermission domPerm_createchilddomain_withGrant
-            = DomainPermissions.getInstance(DomainPermissions.CREATE_CHILD_DOMAIN, true);
+            = DomainPermissions.getInstanceWithGrantOption(DomainPermissions.CREATE_CHILD_DOMAIN);
 
       final String childDomain = generateUniqueDomainName();
       final String parentDomain = generateDomain();
@@ -336,15 +336,15 @@ public class TestAccessControl_getEffectiveDomainPermissions extends TestAccessC
       final DomainPermission domCreatePerm_superuser
             = DomainPermissions.getInstance(DomainPermissions.SUPER_USER);
       final DomainPermission domCreatePerm_superuser_withGrant
-            = DomainPermissions.getInstance(DomainPermissions.SUPER_USER, true);
+            = DomainPermissions.getInstanceWithGrantOption(DomainPermissions.SUPER_USER);
       final DomainPermission domCreatePerm_child
             = DomainPermissions.getInstance(DomainPermissions.CREATE_CHILD_DOMAIN);
       final DomainPermission domCreatePerm_child_withGrant
-            = DomainPermissions.getInstance(DomainPermissions.CREATE_CHILD_DOMAIN, true);
+            = DomainPermissions.getInstanceWithGrantOption(DomainPermissions.CREATE_CHILD_DOMAIN);
       final DomainPermission domCreatePerm_delete
             = DomainPermissions.getInstance(DomainPermissions.DELETE);
       final DomainPermission domCreatePerm_delete_withGrant
-            = DomainPermissions.getInstance(DomainPermissions.DELETE, true);
+            = DomainPermissions.getInstanceWithGrantOption(DomainPermissions.DELETE);
 
       final String domainName1 = generateDomain();
       final String domainName2 = generateDomain();

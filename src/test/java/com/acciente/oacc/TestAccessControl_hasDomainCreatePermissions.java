@@ -46,7 +46,7 @@ public class TestAccessControl_hasDomainCreatePermissions extends TestAccessCont
       }
       if (!accessControlContext
             .hasDomainCreatePermissions(SYS_RESOURCE,
-                                        DomainCreatePermissions.getInstance(DomainCreatePermissions.CREATE, true))) {
+                                        DomainCreatePermissions.getInstanceWithGrantOption(DomainCreatePermissions.CREATE))) {
          fail("checking implicit domain create permission with grant should have succeeded for system resource");
       }
       if (!accessControlContext
@@ -56,8 +56,7 @@ public class TestAccessControl_hasDomainCreatePermissions extends TestAccessCont
       }
       if (!accessControlContext
             .hasDomainCreatePermissions(SYS_RESOURCE,
-                                        DomainCreatePermissions.getInstance(DomainPermissions.getInstance(DomainPermissions.CREATE_CHILD_DOMAIN),
-                                                                            true))) {
+                                        DomainCreatePermissions.getInstanceWithGrantOption(DomainPermissions.getInstance(DomainPermissions.CREATE_CHILD_DOMAIN)))) {
          fail("checking implicit domain create permission with grant should have succeeded for system resource");
       }
       if (!accessControlContext
@@ -67,8 +66,7 @@ public class TestAccessControl_hasDomainCreatePermissions extends TestAccessCont
       }
       if (!accessControlContext
             .hasDomainCreatePermissions(SYS_RESOURCE,
-                                        DomainCreatePermissions.getInstance(DomainPermissions.getInstance(DomainPermissions.DELETE),
-                                                                            true))) {
+                                        DomainCreatePermissions.getInstanceWithGrantOption(DomainPermissions.getInstance(DomainPermissions.DELETE)))) {
          fail("checking implicit domain create permission with grant should have succeeded for system resource");
       }
       if (!accessControlContext
@@ -78,23 +76,21 @@ public class TestAccessControl_hasDomainCreatePermissions extends TestAccessCont
       }
       if (!accessControlContext
             .hasDomainCreatePermissions(SYS_RESOURCE,
-                                        DomainCreatePermissions.getInstance(DomainPermissions.getInstance(DomainPermissions.SUPER_USER),
-                                                                            true))) {
+                                        DomainCreatePermissions.getInstanceWithGrantOption(DomainPermissions.getInstance(DomainPermissions.SUPER_USER)))) {
          fail("checking implicit domain create permission with grant should have succeeded for system resource");
       }
 
       if (!accessControlContext
             .hasDomainCreatePermissions(SYS_RESOURCE,
                                         DomainCreatePermissions.getInstance(DomainCreatePermissions.CREATE),
-                                        DomainCreatePermissions.getInstance(DomainCreatePermissions.CREATE, true))) {
+                                        DomainCreatePermissions.getInstanceWithGrantOption(DomainCreatePermissions.CREATE))) {
          fail("checking implicit domain create permission with and without grant should have succeeded for system resource");
       }
 
       if (!accessControlContext
             .hasDomainCreatePermissions(SYS_RESOURCE,
-                                        DomainCreatePermissions.getInstance(DomainPermissions.getInstance(
-                                                                                  DomainPermissions.CREATE_CHILD_DOMAIN),
-                                                                            true),
+                                        DomainCreatePermissions.getInstanceWithGrantOption(DomainPermissions.getInstance(
+                                                                                  DomainPermissions.CREATE_CHILD_DOMAIN)),
                                         DomainCreatePermissions.getInstance(DomainPermissions.getInstance(
                                               DomainPermissions.SUPER_USER)))) {
          fail("checking implicit domain create permission with multiple permissions should have succeeded for system resource");
@@ -110,15 +106,14 @@ public class TestAccessControl_hasDomainCreatePermissions extends TestAccessCont
       if (!accessControlContext
             .hasDomainCreatePermissions(SYS_RESOURCE,
                                         setOf(DomainCreatePermissions.getInstance(DomainCreatePermissions.CREATE),
-                                              DomainCreatePermissions.getInstance(DomainCreatePermissions.CREATE, true)))) {
+                                              DomainCreatePermissions.getInstanceWithGrantOption(DomainCreatePermissions.CREATE)))) {
          fail("checking implicit domain create permission with and without grant should have succeeded for system resource");
       }
 
       if (!accessControlContext
             .hasDomainCreatePermissions(SYS_RESOURCE,
-                                        setOf(DomainCreatePermissions.getInstance(DomainPermissions.getInstance(
-                                                                                        DomainPermissions.CREATE_CHILD_DOMAIN),
-                                                                                  true),
+                                        setOf(DomainCreatePermissions.getInstanceWithGrantOption(DomainPermissions.getInstance(
+                                                                                        DomainPermissions.CREATE_CHILD_DOMAIN)),
                                               DomainCreatePermissions.getInstance(DomainPermissions.getInstance(
                                                     DomainPermissions.SUPER_USER))))) {
          fail("checking implicit domain create permission with multiple permissions should have succeeded for system resource");
@@ -279,13 +274,10 @@ public class TestAccessControl_hasDomainCreatePermissions extends TestAccessCont
 
       // setup create permissions
       Set<DomainCreatePermission> domainCreatePermissions
-            = setOf(DomainCreatePermissions.getInstance(DomainCreatePermissions.CREATE,
-                                                        false),
+            = setOf(DomainCreatePermissions.getInstance(DomainCreatePermissions.CREATE),
                     DomainCreatePermissions.getInstance(DomainPermissions
-                                                              .getInstance(DomainPermissions.CREATE_CHILD_DOMAIN,
-                                                                           false)),
-                    DomainCreatePermissions.getInstance(DomainPermissions.getInstance(DomainPermissions.SUPER_USER,
-                                                                                      false)));
+                                                              .getInstance(DomainPermissions.CREATE_CHILD_DOMAIN)),
+                    DomainCreatePermissions.getInstance(DomainPermissions.getInstance(DomainPermissions.SUPER_USER)));
 
       accessControlContext.setDomainCreatePermissions(accessorResource, domainCreatePermissions);
 
@@ -329,10 +321,8 @@ public class TestAccessControl_hasDomainCreatePermissions extends TestAccessCont
 
       // setup create permissions
       Set<DomainCreatePermission> domainCreatePermissions
-            = setOf(DomainCreatePermissions.getInstance(DomainCreatePermissions.CREATE,
-                                                        false),
-                    DomainCreatePermissions.getInstance(DomainPermissions.getInstance(DomainPermissions.CREATE_CHILD_DOMAIN,
-                                                                                      false)));
+            = setOf(DomainCreatePermissions.getInstance(DomainCreatePermissions.CREATE),
+                    DomainCreatePermissions.getInstance(DomainPermissions.getInstance(DomainPermissions.CREATE_CHILD_DOMAIN)));
 
       accessControlContext.setDomainCreatePermissions(accessorResource, domainCreatePermissions);
 
@@ -353,9 +343,8 @@ public class TestAccessControl_hasDomainCreatePermissions extends TestAccessCont
       }
       if (accessControlContext
             .hasDomainCreatePermissions(accessorResource,
-                                        DomainCreatePermissions.getInstance(DomainPermissions.getInstance(
-                                              DomainPermissions.CREATE_CHILD_DOMAIN,
-                                              true)))) {
+                                        DomainCreatePermissions.getInstance(DomainPermissions.getInstanceWithGrantOption(
+                                              DomainPermissions.CREATE_CHILD_DOMAIN)))) {
          fail("checking direct domain create permission with exceeded granting rights should have failed for authenticated resource");
       }
 
@@ -371,8 +360,7 @@ public class TestAccessControl_hasDomainCreatePermissions extends TestAccessCont
             .hasDomainCreatePermissions(accessorResource,
                                         setOf(DomainCreatePermissions
                                                     .getInstance(DomainPermissions
-                                                                       .getInstance(DomainPermissions.CREATE_CHILD_DOMAIN,
-                                                                                    true))))) {
+                                                                       .getInstanceWithGrantOption(DomainPermissions.CREATE_CHILD_DOMAIN))))) {
          fail("checking direct domain create permission with exceeded granting rights should have failed for authenticated resource");
       }
    }
@@ -421,8 +409,8 @@ public class TestAccessControl_hasDomainCreatePermissions extends TestAccessCont
 
       // setup super-user domain create permission
       Set<DomainCreatePermission> domainCreatePermissions
-            = setOf(DomainCreatePermissions.getInstance(DomainCreatePermissions.CREATE, false),
-                    DomainCreatePermissions.getInstance(DomainPermissions.getInstance(DomainPermissions.SUPER_USER, false)));
+            = setOf(DomainCreatePermissions.getInstance(DomainCreatePermissions.CREATE),
+                    DomainCreatePermissions.getInstance(DomainPermissions.getInstance(DomainPermissions.SUPER_USER)));
 
       accessControlContext.setDomainCreatePermissions(accessorResource, domainCreatePermissions);
 
@@ -440,8 +428,7 @@ public class TestAccessControl_hasDomainCreatePermissions extends TestAccessCont
       if (accessControlContext
             .hasDomainCreatePermissions(accessorResource,
                                         DomainCreatePermissions
-                                              .getInstance(DomainPermissions.getInstance(DomainPermissions.SUPER_USER,
-                                                                                         true)))) {
+                                              .getInstance(DomainPermissions.getInstanceWithGrantOption(DomainPermissions.SUPER_USER)))) {
          fail("checking direct super-user /G domain create permission should have failed for authenticated resource");
       }
       if (accessControlContext
@@ -455,8 +442,7 @@ public class TestAccessControl_hasDomainCreatePermissions extends TestAccessCont
             .hasDomainCreatePermissions(accessorResource,
                                         DomainCreatePermissions
                                               .getInstance(DomainPermissions
-                                                                 .getInstance(DomainPermissions.CREATE_CHILD_DOMAIN,
-                                                                              true)))) {
+                                                                 .getInstanceWithGrantOption(DomainPermissions.CREATE_CHILD_DOMAIN)))) {
          fail("checking create-child-domain /G domain create permission when only super-user domain create permission is given should have failed for authenticated resource");
       }
 
@@ -464,15 +450,14 @@ public class TestAccessControl_hasDomainCreatePermissions extends TestAccessCont
       if (accessControlContext
             .hasDomainCreatePermissions(accessorResource,
                                         setOf(DomainCreatePermissions
-                                                    .getInstance(DomainPermissions.getInstance(DomainPermissions.SUPER_USER, true))))) {
+                                                    .getInstance(DomainPermissions.getInstanceWithGrantOption(DomainPermissions.SUPER_USER))))) {
          fail("checking direct super-user /G domain create permission should have failed for authenticated resource");
       }
       if (accessControlContext
             .hasDomainCreatePermissions(accessorResource,
                                         setOf(DomainCreatePermissions
                                                     .getInstance(DomainPermissions
-                                                                       .getInstance(DomainPermissions.CREATE_CHILD_DOMAIN,
-                                                                                    true))))) {
+                                                                       .getInstanceWithGrantOption(DomainPermissions.CREATE_CHILD_DOMAIN))))) {
          fail("checking create-child-domain /G domain create permission when only super-user domain create permission is given should have failed for authenticated resource");
       }
    }
@@ -489,18 +474,16 @@ public class TestAccessControl_hasDomainCreatePermissions extends TestAccessCont
       // setup donor domain create permissions
       Set<DomainCreatePermission> donorPermissions
             = setOf(DomainCreatePermissions.getInstance(DomainCreatePermissions.CREATE),
-                    DomainCreatePermissions.getInstance(DomainPermissions.getInstance(donorPermissionName_createChild, true),
-                                                        true));
+                    DomainCreatePermissions.getInstanceWithGrantOption(DomainPermissions.getInstanceWithGrantOption(donorPermissionName_createChild)));
 
       accessControlContext.setDomainCreatePermissions(donorResource, donorPermissions);
       assertThat(accessControlContext.getEffectiveDomainCreatePermissions(donorResource), is(donorPermissions));
 
       // setup accessor domain create permissions
       Set<DomainCreatePermission> accessorPermissions
-            = setOf(DomainCreatePermissions.getInstance(DomainCreatePermissions.CREATE, true),
+            = setOf(DomainCreatePermissions.getInstanceWithGrantOption(DomainCreatePermissions.CREATE),
                     DomainCreatePermissions.getInstance(DomainPermissions
-                                                              .getInstance(accessorPermissionName_createChild, false),
-                                                        false));
+                                                              .getInstance(accessorPermissionName_createChild)));
 
       accessControlContext.setDomainCreatePermissions(accessorResource, accessorPermissions);
       assertThat(accessControlContext.getEffectiveDomainCreatePermissions(accessorResource), is(accessorPermissions));
@@ -516,20 +499,16 @@ public class TestAccessControl_hasDomainCreatePermissions extends TestAccessCont
       if (!accessControlContext
             .hasDomainCreatePermissions(accessorResource,
                                         DomainCreatePermissions
-                                              .getInstance(DomainPermissions.getInstance(
-                                                    accessorPermissionName_createChild,
-                                                    true),
-                                                           true))) {
+                                              .getInstanceWithGrantOption(DomainPermissions.getInstanceWithGrantOption(
+                                                    accessorPermissionName_createChild)))) {
          fail("checking inherited domain create permission with different granting rights should have succeeded for authenticated resource");
       }
 
       if (!accessControlContext
             .hasDomainCreatePermissions(accessorResource,
                                         setOf(DomainCreatePermissions
-                                                    .getInstance(DomainPermissions.getInstance(
-                                                          accessorPermissionName_createChild,
-                                                          true),
-                                                                 true)))) {
+                                                    .getInstanceWithGrantOption(DomainPermissions.getInstanceWithGrantOption(
+                                                          accessorPermissionName_createChild))))) {
          fail("checking inherited domain create permission with different granting rights should have succeeded for authenticated resource");
       }
    }
@@ -546,8 +525,7 @@ public class TestAccessControl_hasDomainCreatePermissions extends TestAccessCont
       // setup donor 1 domain create permissions
       Set<DomainCreatePermission> donor1Permissions
             = setOf(DomainCreatePermissions.getInstance(DomainCreatePermissions.CREATE),
-                    DomainCreatePermissions.getInstance(DomainPermissions.getInstance(donorPermissionName_createChild, true),
-                                                        false));
+                    DomainCreatePermissions.getInstance(DomainPermissions.getInstanceWithGrantOption(donorPermissionName_createChild)));
 
       accessControlContext.setDomainCreatePermissions(donor1Resource, donor1Permissions);
       assertThat(accessControlContext.getEffectiveDomainCreatePermissions(donor1Resource), is(donor1Permissions));
@@ -555,8 +533,7 @@ public class TestAccessControl_hasDomainCreatePermissions extends TestAccessCont
       // setup donor 2 domain create permissions
       Set<DomainCreatePermission> donor2Permissions
             = setOf(DomainCreatePermissions.getInstance(DomainCreatePermissions.CREATE),
-                    DomainCreatePermissions.getInstance(DomainPermissions.getInstance(donorPermissionName_createChild, false),
-                                                        true));
+                    DomainCreatePermissions.getInstanceWithGrantOption(DomainPermissions.getInstance(donorPermissionName_createChild)));
 
       accessControlContext.setDomainCreatePermissions(donor2Resource, donor2Permissions);
       assertThat(accessControlContext.getEffectiveDomainCreatePermissions(donor2Resource), is(donor2Permissions));
@@ -583,22 +560,18 @@ public class TestAccessControl_hasDomainCreatePermissions extends TestAccessCont
       if (!accessControlContext
             .hasDomainCreatePermissions(accessorResource,
                                         DomainCreatePermissions
-                                              .getInstance(DomainPermissions.getInstance(donorPermissionName_createChild, false),
-                                                           true),
+                                              .getInstanceWithGrantOption(DomainPermissions.getInstance(donorPermissionName_createChild)),
                                         DomainCreatePermissions
-                                              .getInstance(DomainPermissions.getInstance(donorPermissionName_createChild, true),
-                                                           false),
+                                              .getInstance(DomainPermissions.getInstanceWithGrantOption(donorPermissionName_createChild)),
                                         DomainCreatePermissions
-                                              .getInstance(DomainPermissions.getInstance(donorPermissionName_createChild, false),
-                                                           false))) {
+                                              .getInstance(DomainPermissions.getInstance(donorPermissionName_createChild)))) {
          fail("checking domain create permission inherited from two sources with different granting rights should have succeeded for authenticated resource");
       }
 
       if (accessControlContext
             .hasDomainCreatePermissions(accessorResource,
                                         DomainCreatePermissions
-                                              .getInstance(DomainPermissions.getInstance(donorPermissionName_createChild, true),
-                                                           true))) {
+                                              .getInstanceWithGrantOption(DomainPermissions.getInstanceWithGrantOption(donorPermissionName_createChild)))) {
          fail("checking domain create permission inherited from two sources with different granting rights should have failed for authenticated resource");
       }
 
@@ -606,30 +579,22 @@ public class TestAccessControl_hasDomainCreatePermissions extends TestAccessCont
       if (!accessControlContext
             .hasDomainCreatePermissions(accessorResource,
                                         setOf(DomainCreatePermissions
-                                                    .getInstance(DomainPermissions.getInstance(
-                                                          donorPermissionName_createChild,
-                                                          false),
-                                                                 true),
+                                                    .getInstanceWithGrantOption(DomainPermissions.getInstance(
+                                                          donorPermissionName_createChild)),
+                                              DomainCreatePermissions
+                                                    .getInstance(DomainPermissions.getInstanceWithGrantOption(
+                                                          donorPermissionName_createChild)),
                                               DomainCreatePermissions
                                                     .getInstance(DomainPermissions.getInstance(
-                                                          donorPermissionName_createChild,
-                                                          true),
-                                                                 false),
-                                              DomainCreatePermissions
-                                                    .getInstance(DomainPermissions.getInstance(
-                                                          donorPermissionName_createChild,
-                                                          false),
-                                                                 false)))) {
+                                                          donorPermissionName_createChild))))) {
          fail("checking domain create permission inherited from two sources with different granting rights should have succeeded for authenticated resource");
       }
 
       if (accessControlContext
             .hasDomainCreatePermissions(accessorResource,
                                         setOf(DomainCreatePermissions
-                                                    .getInstance(DomainPermissions.getInstance(
-                                                          donorPermissionName_createChild,
-                                                          true),
-                                                                 true)))) {
+                                                    .getInstanceWithGrantOption(DomainPermissions.getInstanceWithGrantOption(
+                                                          donorPermissionName_createChild))))) {
          fail("checking domain create permission inherited from two sources with different granting rights should have failed for authenticated resource");
       }
    }
@@ -647,8 +612,7 @@ public class TestAccessControl_hasDomainCreatePermissions extends TestAccessCont
       // setup donor domain create permissions
       Set<DomainCreatePermission> donorPermissions
             = setOf(DomainCreatePermissions.getInstance(DomainCreatePermissions.CREATE),
-                    DomainCreatePermissions.getInstance(DomainPermissions.getInstance(donorPermissionName_createChild,
-                                                                                      true)));
+                    DomainCreatePermissions.getInstance(DomainPermissions.getInstanceWithGrantOption(donorPermissionName_createChild)));
 
       accessControlContext.setDomainCreatePermissions(donorResource, donorPermissions);
       assertThat(accessControlContext.getEffectiveDomainCreatePermissions(donorResource), is(donorPermissions));
@@ -656,8 +620,7 @@ public class TestAccessControl_hasDomainCreatePermissions extends TestAccessCont
       // setup inheritor domain create permissions
       Set<DomainCreatePermission> inheritorPermissions
             = setOf(DomainCreatePermissions.getInstance(DomainCreatePermissions.CREATE),
-                    DomainCreatePermissions.getInstance(DomainPermissions.getInstance(inheritorPermissionName_createChild, false),
-                                                        true));
+                    DomainCreatePermissions.getInstanceWithGrantOption(DomainPermissions.getInstance(inheritorPermissionName_createChild)));
 
       accessControlContext.setDomainCreatePermissions(inheritorResource, inheritorPermissions);
       assertThat(accessControlContext.getEffectiveDomainCreatePermissions(inheritorResource), is(inheritorPermissions));
@@ -677,43 +640,34 @@ public class TestAccessControl_hasDomainCreatePermissions extends TestAccessCont
       if (!accessControlContext
             .hasDomainCreatePermissions(accessorResource,
                                         DomainCreatePermissions
-                                              .getInstance(DomainPermissions.getInstance(donorPermissionName_createChild, true),
-                                                           false), DomainCreatePermissions
-                                              .getInstance(DomainPermissions
-                                                                 .getInstance(donorPermissionName_createChild, false),
-                                                           true))) {
+                                              .getInstance(DomainPermissions.getInstanceWithGrantOption(donorPermissionName_createChild)), DomainCreatePermissions
+                                              .getInstanceWithGrantOption(DomainPermissions.getInstance(donorPermissionName_createChild)))) {
          fail("checking double-inherited domain create permission with different granting rights should have succeeded for authenticated resource");
       }
 
       if (accessControlContext
             .hasDomainCreatePermissions(accessorResource,
                                         DomainCreatePermissions
-                                              .getInstance(DomainPermissions.getInstance(donorPermissionName_createChild, true),
-                                                           true))) {
+                                              .getInstanceWithGrantOption(DomainPermissions.getInstanceWithGrantOption(donorPermissionName_createChild)))) {
          fail("checking double-inherited domain create permission with different granting rights should have failed for authenticated resource");
       }
 
       if (!accessControlContext
             .hasDomainCreatePermissions(accessorResource,
                                         setOf(DomainCreatePermissions
-                                                    .getInstance(DomainPermissions.getInstance(
-                                                          donorPermissionName_createChild,
-                                                          true),
-                                                                 false), DomainCreatePermissions
-                                                    .getInstance(DomainPermissions.getInstance(
-                                                          donorPermissionName_createChild,
-                                                          false),
-                                                                 true)))) {
+                                                    .getInstance(DomainPermissions.getInstanceWithGrantOption(
+                                                          donorPermissionName_createChild)),
+                                              DomainCreatePermissions
+                                                    .getInstanceWithGrantOption(DomainPermissions.getInstance(
+                                                          donorPermissionName_createChild))))) {
          fail("checking double-inherited domain create permission with different granting rights should have succeeded for authenticated resource");
       }
 
       if (accessControlContext
             .hasDomainCreatePermissions(accessorResource,
                                         setOf(DomainCreatePermissions
-                                                    .getInstance(DomainPermissions.getInstance(
-                                                          donorPermissionName_createChild,
-                                                          true),
-                                                                 true)))) {
+                                                    .getInstanceWithGrantOption(DomainPermissions.getInstanceWithGrantOption(
+                                                          donorPermissionName_createChild))))) {
          fail("checking double-inherited domain create permission with different granting rights should have failed for authenticated resource");
       }
    }
@@ -1037,7 +991,7 @@ public class TestAccessControl_hasDomainCreatePermissions extends TestAccessCont
       final DomainCreatePermission domainCreatePermission
             = DomainCreatePermissions.getInstance(DomainCreatePermissions.CREATE);
       final DomainCreatePermission domainCreatePermission_grantable
-            = DomainCreatePermissions.getInstance(DomainCreatePermissions.CREATE, true);
+            = DomainCreatePermissions.getInstanceWithGrantOption(DomainCreatePermissions.CREATE);
 
       //setup
       systemAccessControlContext.setDomainCreatePermissions(accessorResource,

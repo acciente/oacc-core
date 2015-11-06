@@ -44,7 +44,7 @@ public class TestDomainPermission {
    @Test
    public void construct_withGrant_valid() {
       for(String systemPermissionName : DomainPermissions.getSysPermissionNames()) {
-         DomainPermissions.getInstance(systemPermissionName, true);
+         DomainPermissions.getInstanceWithGrantOption(systemPermissionName);
       }
    }
 
@@ -52,8 +52,7 @@ public class TestDomainPermission {
    public void construct_whitespaceConsistent() {
       for(String systemPermissionName : DomainPermissions.getSysPermissionNames()) {
          DomainPermissions.getInstance(" " + systemPermissionName + "\t");
-         DomainPermissions.getInstance(" " + systemPermissionName + "\t", false);
-         DomainPermissions.getInstance(" " + systemPermissionName + "\t", true);
+         DomainPermissions.getInstanceWithGrantOption(" " + systemPermissionName + "\t");
       }
    }
 
@@ -72,7 +71,7 @@ public class TestDomainPermission {
          }
          // now attempt with grant
          try {
-            DomainPermissions.getInstance(mixedCasePermissionName, true);
+            DomainPermissions.getInstanceWithGrantOption(mixedCasePermissionName);
             fail("domain permission names are case sensitive - creation of domain permission with case insensitive name should have failed");
          }
          catch (Exception e) {
@@ -92,7 +91,7 @@ public class TestDomainPermission {
       }
       // now attempt with grant
       try {
-         DomainPermissions.getInstance(null, true);
+         DomainPermissions.getInstanceWithGrantOption(null);
          fail("creation of domain permission with null name should have failed");
       }
       catch (Exception e) {
@@ -111,7 +110,7 @@ public class TestDomainPermission {
       }
       // now attempt with grant
       try {
-         DomainPermissions.getInstance("*invalid", true);
+         DomainPermissions.getInstanceWithGrantOption("*invalid");
          fail("creation of domain permission with asterisk-prefixed name should have failed");
       }
       catch (Exception e) {
@@ -137,14 +136,14 @@ public class TestDomainPermission {
       }
       // now attempt with grant
       try {
-         DomainPermissions.getInstance("", true);
+         DomainPermissions.getInstanceWithGrantOption("");
          fail("creation of domain permission with empty name should have failed");
       }
       catch (Exception e) {
          assertThat(e.getMessage().toLowerCase(), containsString("system permission name is required"));
       }
       try {
-         DomainPermissions.getInstance(" \t", true);
+         DomainPermissions.getInstanceWithGrantOption(" \t");
          fail("creation of domain permission with empty name should have failed");
       }
       catch (Exception e) {
@@ -163,7 +162,7 @@ public class TestDomainPermission {
       }
       // now attempt with grant
       try {
-         DomainPermissions.getInstance("invalid", true);
+         DomainPermissions.getInstanceWithGrantOption("invalid");
          fail("creation of domain permission non-system domain permission name should have failed");
       }
       catch (Exception e) {

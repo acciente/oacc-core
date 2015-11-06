@@ -242,8 +242,7 @@ public class TestAccessControlBase {
    protected static void grantDomainCreatePermission(Resource accessorResource, DomainPermission... domainPermissions) {
       authenticateSystemAccessControlContext();
       Set<DomainCreatePermission> domainCreatePermissions = new HashSet<>();
-      domainCreatePermissions.add(DomainCreatePermissions.getInstance(DomainCreatePermissions.CREATE,
-                                                                      false));
+      domainCreatePermissions.add(DomainCreatePermissions.getInstance(DomainCreatePermissions.CREATE));
 
       for (DomainPermission domainPermission : domainPermissions) {
          domainCreatePermissions.add(DomainCreatePermissions.getInstance(domainPermission));
@@ -255,10 +254,8 @@ public class TestAccessControlBase {
    protected static void grantDomainAndChildCreatePermission(Resource accessorResource) {
       authenticateSystemAccessControlContext();
       Set<DomainCreatePermission> domainCreatePermissions = new HashSet<>();
-      domainCreatePermissions.add(DomainCreatePermissions.getInstance(DomainCreatePermissions.CREATE,
-                                                                      false));
-      domainCreatePermissions.add(DomainCreatePermissions.getInstance(DomainPermissions.getInstance(DomainPermissions.CREATE_CHILD_DOMAIN),
-                                                                      false));
+      domainCreatePermissions.add(DomainCreatePermissions.getInstance(DomainCreatePermissions.CREATE));
+      domainCreatePermissions.add(DomainCreatePermissions.getInstance(DomainPermissions.getInstance(DomainPermissions.CREATE_CHILD_DOMAIN)));
 
       systemAccessControlContext.setDomainCreatePermissions(accessorResource, domainCreatePermissions);
    }
@@ -269,7 +266,7 @@ public class TestAccessControlBase {
                                                        String... permissionNames) {
       authenticateSystemAccessControlContext();
       Set<ResourceCreatePermission> resourceCreatePermissions = new HashSet<>();
-      resourceCreatePermissions.add(ResourceCreatePermissions.getInstance(ResourceCreatePermissions.CREATE, false));
+      resourceCreatePermissions.add(ResourceCreatePermissions.getInstance(ResourceCreatePermissions.CREATE));
       // create & add each unique permission
       Set<String> uniquePermissionNames = new HashSet<>();
       Collections.addAll(uniquePermissionNames, permissionNames);

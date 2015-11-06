@@ -60,9 +60,17 @@ public class ResourcePermissions {
    }
 
    public static ResourcePermission getInstance(String permissionName) {
-      return new ResourcePermissionImpl(permissionName);
+      return new ResourcePermissionImpl(permissionName, false);
    }
 
+   public static ResourcePermission getInstanceWithGrantOption(String permissionName) {
+      return new ResourcePermissionImpl(permissionName, true);
+   }
+
+   /**
+    * @deprecated as of v2.0.0-rc.5; use {@link #getInstanceWithGrantOption(String)} or {@link #getInstance(String)} instead.
+    */
+   @Deprecated
    public static ResourcePermission getInstance(String permissionName, boolean withGrant) {
       return new ResourcePermissionImpl(permissionName, withGrant);
    }
@@ -72,10 +80,6 @@ public class ResourcePermissions {
       private final long    systemPermissionId;
       private final String  permissionName;
       private final boolean withGrantOption;
-
-      private ResourcePermissionImpl(String permissionName) {
-         this(permissionName, false);
-      }
 
       private ResourcePermissionImpl(String permissionName,
                                      boolean withGrantOption) {

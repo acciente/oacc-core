@@ -431,7 +431,7 @@ public class TestAccessControl_deleteResource extends TestAccessControlBase {
       accessControlContext.setGlobalResourcePermissions(obsoleteResource,
                                                         dependentResourceClass,
                                                         dependentDomain,
-                                                        setOf(ResourcePermissions.getInstance(ResourcePermissions.DELETE, true),
+                                                        setOf(ResourcePermissions.getInstanceWithGrantOption(ResourcePermissions.DELETE),
                                                               ResourcePermissions.getInstance(dependentPermissionName)));
       // I.5. resourcePermissions
       final Resource dependentAccessedResource
@@ -441,8 +441,8 @@ public class TestAccessControl_deleteResource extends TestAccessControlBase {
       accessControlContext.setResourcePermissions(obsoleteResource,
                                                   dependentAccessedResource,
                                                   setOf(ResourcePermissions.getInstance(ResourcePermissions.DELETE),
-                                                        ResourcePermissions.getInstance(ResourcePermissions.INHERIT, true),
-                                                        ResourcePermissions.getInstance(dependentPermissionName, true)));
+                                                        ResourcePermissions.getInstanceWithGrantOption(ResourcePermissions.INHERIT),
+                                                        ResourcePermissions.getInstanceWithGrantOption(dependentPermissionName)));
 
       // II. dependencies as accessed
       // II.1. direct resourcePermissions
@@ -450,8 +450,8 @@ public class TestAccessControl_deleteResource extends TestAccessControlBase {
       final String obsoletePermissionName = generateResourceClassPermission(resourceClassName);
       accessControlContext.setResourcePermissions(dependentAccessorResource,
                                                   obsoleteResource,
-                                                  setOf(ResourcePermissions.getInstance(ResourcePermissions.DELETE, true),
-                                                        ResourcePermissions.getInstance(obsoletePermissionName, true)));
+                                                  setOf(ResourcePermissions.getInstanceWithGrantOption(ResourcePermissions.DELETE),
+                                                        ResourcePermissions.getInstanceWithGrantOption(obsoletePermissionName)));
 
       // delete resource and verify
       accessControlContext.deleteResource(obsoleteResource);

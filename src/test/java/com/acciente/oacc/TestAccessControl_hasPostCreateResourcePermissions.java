@@ -145,9 +145,9 @@ public class TestAccessControl_hasPostCreateResourcePermissions extends TestAcce
       final ResourcePermission customPermission_forAccessorDomain
             = ResourcePermissions.getInstance(customPermissionName_accessorDomain);
       final ResourceCreatePermission customCreatePermission_accessorDomain_withGrant
-            = ResourceCreatePermissions.getInstance(customPermission_forAccessorDomain, true);
+            = ResourceCreatePermissions.getInstanceWithGrantOption(customPermission_forAccessorDomain);
       final ResourceCreatePermission createPermission_withGrant
-            = ResourceCreatePermissions.getInstance(ResourceCreatePermissions.CREATE, true);
+            = ResourceCreatePermissions.getInstanceWithGrantOption(ResourceCreatePermissions.CREATE);
 
       grantResourceCreatePermission(accessorResource,
                                     resourceClassName,
@@ -203,9 +203,9 @@ public class TestAccessControl_hasPostCreateResourcePermissions extends TestAcce
       final ResourcePermission customPermission_forAccessorDomain
             = ResourcePermissions.getInstance(customPermissionName_accessorDomain);
       final ResourceCreatePermission customCreatePermission_accessorDomain_withGrant
-            = ResourceCreatePermissions.getInstance(customPermission_forAccessorDomain, true);
+            = ResourceCreatePermissions.getInstanceWithGrantOption(customPermission_forAccessorDomain);
       final ResourceCreatePermission createPermission_withGrant
-            = ResourceCreatePermissions.getInstance(ResourceCreatePermissions.CREATE, true);
+            = ResourceCreatePermissions.getInstanceWithGrantOption(ResourceCreatePermissions.CREATE);
 
       grantResourceCreatePermission(accessorResource,
                                     resourceClassName,
@@ -257,9 +257,9 @@ public class TestAccessControl_hasPostCreateResourcePermissions extends TestAcce
       final ResourcePermission customPermission_forAccessorDomain
             = ResourcePermissions.getInstance(customPermissionName_accessorDomain);
       final ResourceCreatePermission customCreatePermission_accessorDomain_withGrant
-            = ResourceCreatePermissions.getInstance(customPermission_forAccessorDomain, true);
+            = ResourceCreatePermissions.getInstanceWithGrantOption(customPermission_forAccessorDomain);
       final ResourceCreatePermission createPermission_withGrant
-            = ResourceCreatePermissions.getInstance(ResourceCreatePermissions.CREATE, true);
+            = ResourceCreatePermissions.getInstanceWithGrantOption(ResourceCreatePermissions.CREATE);
 
       grantResourceCreatePermission(accessorResource,
                                     resourceClassName,
@@ -307,18 +307,18 @@ public class TestAccessControl_hasPostCreateResourcePermissions extends TestAcce
       final ResourcePermission customPermission_forAccessorDomain
             = ResourcePermissions.getInstance(customPermissionName_accessorDomain);
       final ResourceCreatePermission customCreatePermission_accessorDomain_withGrant
-            = ResourceCreatePermissions.getInstance(customPermission_forAccessorDomain, true);
+            = ResourceCreatePermissions.getInstanceWithGrantOption(customPermission_forAccessorDomain);
 
       final String customPermissionName_accessedDomain = generateResourceClassPermission(resourceClassName);
       final ResourcePermission customPermission_forAccessedDomain
             = ResourcePermissions.getInstance(customPermissionName_accessedDomain);
       final ResourceCreatePermission customCreatePermission_accessedDomain_withoutGrant
-            = ResourceCreatePermissions.getInstance(customPermission_forAccessedDomain, false);
+            = ResourceCreatePermissions.getInstance(customPermission_forAccessedDomain);
 
       final ResourceCreatePermission createPermission_withoutGrant
-            = ResourceCreatePermissions.getInstance(ResourceCreatePermissions.CREATE, false);
+            = ResourceCreatePermissions.getInstance(ResourceCreatePermissions.CREATE);
       final ResourceCreatePermission createPermission_withGrant
-            = ResourceCreatePermissions.getInstance(ResourceCreatePermissions.CREATE, true);
+            = ResourceCreatePermissions.getInstanceWithGrantOption(ResourceCreatePermissions.CREATE);
 
       grantResourceCreatePermission(accessorResource,
                                     resourceClassName,
@@ -391,9 +391,9 @@ public class TestAccessControl_hasPostCreateResourcePermissions extends TestAcce
       final ResourcePermission customPermission_forAccessorDomain
             = ResourcePermissions.getInstance(customPermissionName_accessorDomain);
       final ResourceCreatePermission customCreatePermission_accessorDomain_withGrant
-            = ResourceCreatePermissions.getInstance(customPermission_forAccessorDomain, true);
+            = ResourceCreatePermissions.getInstanceWithGrantOption(customPermission_forAccessorDomain);
       final ResourceCreatePermission createPermission_withGrant
-            = ResourceCreatePermissions.getInstance(ResourceCreatePermissions.CREATE, true);
+            = ResourceCreatePermissions.getInstanceWithGrantOption(ResourceCreatePermissions.CREATE);
 
       grantResourceCreatePermission(accessorResource,
                                     resourceClassName,
@@ -438,18 +438,18 @@ public class TestAccessControl_hasPostCreateResourcePermissions extends TestAcce
       final ResourcePermission customPermission_forAccessorDomain
             = ResourcePermissions.getInstance(customPermissionName_accessorDomain);
       final ResourceCreatePermission customCreatePermission_accessorDomain_withGrant
-            = ResourceCreatePermissions.getInstance(customPermission_forAccessorDomain, true);
+            = ResourceCreatePermissions.getInstanceWithGrantOption(customPermission_forAccessorDomain);
 
       final String customPermissionName_accessedDomain = generateResourceClassPermission(resourceClassName);
       final ResourcePermission customPermission_forAccessedDomain
             = ResourcePermissions.getInstance(customPermissionName_accessedDomain);
       final ResourceCreatePermission customCreatePermission_accessedDomain_withoutGrant
-            = ResourceCreatePermissions.getInstance(customPermission_forAccessedDomain, false);
+            = ResourceCreatePermissions.getInstance(customPermission_forAccessedDomain);
 
       final ResourceCreatePermission createPermission_withoutGrant
-            = ResourceCreatePermissions.getInstance(ResourceCreatePermissions.CREATE, false);
+            = ResourceCreatePermissions.getInstance(ResourceCreatePermissions.CREATE);
       final ResourceCreatePermission createPermission_withGrant
-            = ResourceCreatePermissions.getInstance(ResourceCreatePermissions.CREATE, true);
+            = ResourceCreatePermissions.getInstanceWithGrantOption(ResourceCreatePermissions.CREATE);
 
       grantResourceCreatePermission(accessorResource,
                                     resourceClassName,
@@ -528,18 +528,18 @@ public class TestAccessControl_hasPostCreateResourcePermissions extends TestAcce
       final ResourcePermission customPermission_forAccessorDomain
             = ResourcePermissions.getInstance(customPermissionName_accessorDomain);
       final ResourceCreatePermission customCreatePermission_accessorDomain_withGrant
-            = ResourceCreatePermissions.getInstance(customPermission_forAccessorDomain, true);
+            = ResourceCreatePermissions.getInstanceWithGrantOption(customPermission_forAccessorDomain);
 
       final String customPermissionName_accessedDomain = generateResourceClassPermission(resourceClassName);
       final ResourcePermission customPermission_forAccessedDomain
             = ResourcePermissions.getInstance(customPermissionName_accessedDomain);
       final ResourceCreatePermission customCreatePermission_accessedDomain_withoutGrant
-            = ResourceCreatePermissions.getInstance(customPermission_forAccessedDomain, false);
+            = ResourceCreatePermissions.getInstance(customPermission_forAccessedDomain);
 
       final ResourceCreatePermission createPermission_withoutGrant
-            = ResourceCreatePermissions.getInstance(ResourceCreatePermissions.CREATE, false);
+            = ResourceCreatePermissions.getInstance(ResourceCreatePermissions.CREATE);
       final ResourceCreatePermission createPermission_withGrant
-            = ResourceCreatePermissions.getInstance(ResourceCreatePermissions.CREATE, true);
+            = ResourceCreatePermissions.getInstanceWithGrantOption(ResourceCreatePermissions.CREATE);
 
       grantResourceCreatePermission(accessorResource,
                                     resourceClassName,
@@ -656,24 +656,24 @@ public class TestAccessControl_hasPostCreateResourcePermissions extends TestAcce
       // setup create permissions
       final String customPermissionName_accessorDomain = generateResourceClassPermission(resourceClassName);
       final ResourcePermission grantableCustomPermission_forAccessorDomain
-            = ResourcePermissions.getInstance(customPermissionName_accessorDomain, true);
+            = ResourcePermissions.getInstanceWithGrantOption(customPermissionName_accessorDomain);
       final ResourcePermission ungrantableCustomPermission_forAccessorDomain
-            = ResourcePermissions.getInstance(customPermissionName_accessorDomain, false);
+            = ResourcePermissions.getInstance(customPermissionName_accessorDomain);
       final ResourceCreatePermission grantableCustomCreatePermission_accessorDomain_withGrant
-            = ResourceCreatePermissions.getInstance(grantableCustomPermission_forAccessorDomain, true);
+            = ResourceCreatePermissions.getInstanceWithGrantOption(grantableCustomPermission_forAccessorDomain);
 
       final String customPermissionName_accessedDomain = generateResourceClassPermission(resourceClassName);
       final ResourcePermission grantableCustomPermission_forAccessedDomain
-            = ResourcePermissions.getInstance(customPermissionName_accessedDomain, true);
+            = ResourcePermissions.getInstanceWithGrantOption(customPermissionName_accessedDomain);
       final ResourcePermission ungrantableCustomPermission_forAccessedDomain
-            = ResourcePermissions.getInstance(customPermissionName_accessedDomain, false);
+            = ResourcePermissions.getInstance(customPermissionName_accessedDomain);
       final ResourceCreatePermission ungrantableCustomCreatePermission_accessedDomain_withoutGrant
-            = ResourceCreatePermissions.getInstance(ungrantableCustomPermission_forAccessedDomain, false);
+            = ResourceCreatePermissions.getInstance(ungrantableCustomPermission_forAccessedDomain);
 
       final ResourceCreatePermission createPermission_withoutGrant
-            = ResourceCreatePermissions.getInstance(ResourceCreatePermissions.CREATE, false);
+            = ResourceCreatePermissions.getInstance(ResourceCreatePermissions.CREATE);
       final ResourceCreatePermission createPermission_withGrant
-            = ResourceCreatePermissions.getInstance(ResourceCreatePermissions.CREATE, true);
+            = ResourceCreatePermissions.getInstanceWithGrantOption(ResourceCreatePermissions.CREATE);
 
       grantResourceCreatePermission(accessorResource,
                                     resourceClassName,
@@ -728,8 +728,7 @@ public class TestAccessControl_hasPostCreateResourcePermissions extends TestAcce
       if (accessControlContext.hasPostCreateResourcePermissions(accessorResource,
                                                                 resourceClassName,
                                                                 accessorDomainName,
-                                                                ResourcePermissions.getInstance(ResourcePermissions.INHERIT,
-                                                                                                true),
+                                                                ResourcePermissions.getInstanceWithGrantOption(ResourcePermissions.INHERIT),
                                                                 ungrantableCustomPermission_forAccessorDomain)) {
          fail("checking multiple direct post-create resource permission with lesser and exceeded granting rights (for a domain) should have failed");
       }
@@ -771,8 +770,7 @@ public class TestAccessControl_hasPostCreateResourcePermissions extends TestAcce
                                                                 resourceClassName,
                                                                 accessorDomainName,
                                                                 setOf(ResourcePermissions
-                                                                            .getInstance(ResourcePermissions.INHERIT,
-                                                                                         true),
+                                                                            .getInstanceWithGrantOption(ResourcePermissions.INHERIT),
                                                                       ungrantableCustomPermission_forAccessorDomain))) {
          fail("checking multiple direct post-create resource permission with lesser and exceeded granting rights (for a domain) should have failed");
       }
@@ -827,18 +825,18 @@ public class TestAccessControl_hasPostCreateResourcePermissions extends TestAcce
       // verify permissions
       Set<ResourceCreatePermission> resourceCreatePermissions_forAccessorDomain = new HashSet<>();
       resourceCreatePermissions_forAccessorDomain.add(ResourceCreatePermissions
-                                                            .getInstance(ResourceCreatePermissions.CREATE, false));
+                                                            .getInstance(ResourceCreatePermissions.CREATE));
       resourceCreatePermissions_forAccessorDomain.add(ResourceCreatePermissions
-                                                            .getInstance(customPermission_forAccessorDomain, false));
+                                                            .getInstance(customPermission_forAccessorDomain));
       final Set<ResourceCreatePermission> allResourceCreatePermissionsForResourceClassAndAccessorDomain
             = accessControlContext.getEffectiveResourceCreatePermissions(intermediaryResource, resourceClassName, accessorDomainName);
       assertThat(allResourceCreatePermissionsForResourceClassAndAccessorDomain, is(resourceCreatePermissions_forAccessorDomain));
 
       Set<ResourceCreatePermission> resourceCreatePermissions_forAccessedDomain = new HashSet<>();
       resourceCreatePermissions_forAccessedDomain.add(ResourceCreatePermissions
-                                                            .getInstance(ResourceCreatePermissions.CREATE, false));
+                                                            .getInstance(ResourceCreatePermissions.CREATE));
       resourceCreatePermissions_forAccessedDomain.add(ResourceCreatePermissions
-                                                            .getInstance(customPermission_forAccessedDomain, false));
+                                                            .getInstance(customPermission_forAccessedDomain));
       final Set<ResourceCreatePermission> allResourceCreatePermissionsForResourceClassAndAccessedDomain
             = accessControlContext.getEffectiveResourceCreatePermissions(intermediaryResource, resourceClassName, accessedDomainName);
       assertThat(allResourceCreatePermissionsForResourceClassAndAccessedDomain, is(resourceCreatePermissions_forAccessedDomain));
@@ -912,9 +910,9 @@ public class TestAccessControl_hasPostCreateResourcePermissions extends TestAcce
       // verify permissions
       Set<ResourceCreatePermission> resourceCreatePermissions_forAccessorDomain = new HashSet<>();
       resourceCreatePermissions_forAccessorDomain.add(ResourceCreatePermissions
-                                                            .getInstance(ResourceCreatePermissions.CREATE, false));
+                                                            .getInstance(ResourceCreatePermissions.CREATE));
       resourceCreatePermissions_forAccessorDomain.add(ResourceCreatePermissions
-                                                            .getInstance(customPermission_forAccessorDomain, false));
+                                                            .getInstance(customPermission_forAccessorDomain));
       final Set<ResourceCreatePermission> allResourceCreatePermissionsForResourceClassAndAccessorDomain
             = accessControlContext.getEffectiveResourceCreatePermissions(accessorResource, resourceClassName, accessorDomainName);
       assertThat(allResourceCreatePermissionsForResourceClassAndAccessorDomain, is(
@@ -922,10 +920,9 @@ public class TestAccessControl_hasPostCreateResourcePermissions extends TestAcce
 
       Set<ResourceCreatePermission> resourceCreatePermissions_forIntermediaryDomain = new HashSet<>();
       resourceCreatePermissions_forIntermediaryDomain.add(ResourceCreatePermissions
-                                                                .getInstance(ResourceCreatePermissions.CREATE, false));
+                                                                .getInstance(ResourceCreatePermissions.CREATE));
       resourceCreatePermissions_forIntermediaryDomain.add(ResourceCreatePermissions
-                                                                .getInstance(customPermission_forIntermediaryDomain,
-                                                                             false));
+                                                                .getInstance(customPermission_forIntermediaryDomain));
       resourceCreatePermissions_forIntermediaryDomain.addAll(resourceCreatePermissions_forAccessorDomain);
       final Set<ResourceCreatePermission> allResourceCreatePermissionsForResourceClassAndIntermediaryDomain
             = accessControlContext.getEffectiveResourceCreatePermissions(accessorResource, resourceClassName, intermediaryDomainName);
@@ -1005,9 +1002,9 @@ public class TestAccessControl_hasPostCreateResourcePermissions extends TestAcce
       // verify permissions
       Set<ResourceCreatePermission> resourceCreatePermissions_forDonorDomain = new HashSet<>();
       resourceCreatePermissions_forDonorDomain.add(ResourceCreatePermissions
-                                                         .getInstance(ResourceCreatePermissions.CREATE, false));
+                                                         .getInstance(ResourceCreatePermissions.CREATE));
       resourceCreatePermissions_forDonorDomain.add(ResourceCreatePermissions
-                                                         .getInstance(customPermission_forAccessorDomain, false));
+                                                         .getInstance(customPermission_forAccessorDomain));
       final Set<ResourceCreatePermission> allResourceCreatePermissionsForResourceClassAndDonorDomain
             = accessControlContext.getEffectiveResourceCreatePermissions(donorResource, resourceClassName, accessorDomainName);
       assertThat(allResourceCreatePermissionsForResourceClassAndDonorDomain,
@@ -1015,10 +1012,9 @@ public class TestAccessControl_hasPostCreateResourcePermissions extends TestAcce
 
       Set<ResourceCreatePermission> resourceCreatePermissions_forIntermediaryDomain = new HashSet<>();
       resourceCreatePermissions_forIntermediaryDomain.add(ResourceCreatePermissions
-                                                                .getInstance(ResourceCreatePermissions.CREATE, false));
+                                                                .getInstance(ResourceCreatePermissions.CREATE));
       resourceCreatePermissions_forIntermediaryDomain.add(ResourceCreatePermissions
-                                                                .getInstance(customPermission_forIntermediaryDomain,
-                                                                             false));
+                                                                .getInstance(customPermission_forIntermediaryDomain));
       resourceCreatePermissions_forIntermediaryDomain.addAll(resourceCreatePermissions_forDonorDomain);
       final Set<ResourceCreatePermission> allResourceCreatePermissionsForResourceClassAndIntermediaryDomain
             = accessControlContext.getEffectiveResourceCreatePermissions(donorResource, resourceClassName, intermediaryDomainName);
@@ -1150,11 +1146,11 @@ public class TestAccessControl_hasPostCreateResourcePermissions extends TestAcce
 
       // setup direct resource create permissions
       final ResourceCreatePermission createPermission_create
-            = ResourceCreatePermissions.getInstance(ResourceCreatePermissions.CREATE, false);
+            = ResourceCreatePermissions.getInstance(ResourceCreatePermissions.CREATE);
       final ResourceCreatePermission createPermission_custom
-            = ResourceCreatePermissions.getInstance(customResourcePermission, false);
+            = ResourceCreatePermissions.getInstance(customResourcePermission);
       final ResourceCreatePermission createPermission_system
-            = ResourceCreatePermissions.getInstance(systemResourcePermission, false);
+            = ResourceCreatePermissions.getInstance(systemResourcePermission);
       Set<ResourceCreatePermission> resourceCreatePermissions
             = setOf(createPermission_create, createPermission_custom, createPermission_system);
       accessControlContext.setResourceCreatePermissions(accessorResource,
@@ -1220,9 +1216,9 @@ public class TestAccessControl_hasPostCreateResourcePermissions extends TestAcce
 
       // setup create permissions
       final ResourceCreatePermission createPermission_withoutGrant
-            = ResourceCreatePermissions.getInstance(ResourceCreatePermissions.CREATE, false);
+            = ResourceCreatePermissions.getInstance(ResourceCreatePermissions.CREATE);
       final ResourceCreatePermission createPermission_withGrant
-            = ResourceCreatePermissions.getInstance(ResourceCreatePermissions.CREATE, true);
+            = ResourceCreatePermissions.getInstanceWithGrantOption(ResourceCreatePermissions.CREATE);
 
       accessControlContext.setResourceCreatePermissions(accessorResource,
                                                         resourceClassName,
@@ -1235,10 +1231,10 @@ public class TestAccessControl_hasPostCreateResourcePermissions extends TestAcce
 
       // setup global permission
       final String globalPermissionName1 = generateResourceClassPermission(resourceClassName);
-      final ResourcePermission grantableGlobalPermission1 = ResourcePermissions.getInstance(globalPermissionName1, true);
+      final ResourcePermission grantableGlobalPermission1 = ResourcePermissions.getInstanceWithGrantOption(globalPermissionName1);
       final ResourcePermission ungrantableGlobalPermission1 = ResourcePermissions.getInstance(globalPermissionName1);
       final String globalPermissionName2 = generateResourceClassPermission(resourceClassName);
-      final ResourcePermission grantableGlobalPermission2 = ResourcePermissions.getInstance(globalPermissionName2, true);
+      final ResourcePermission grantableGlobalPermission2 = ResourcePermissions.getInstanceWithGrantOption(globalPermissionName2);
       final ResourcePermission ungrantableGlobalPermission2 = ResourcePermissions.getInstance(globalPermissionName2);
       accessControlContext.setGlobalResourcePermissions(accessorResource,
                                                         resourceClassName,
@@ -1795,7 +1791,7 @@ public class TestAccessControl_hasPostCreateResourcePermissions extends TestAcce
                                                                  domainName,
                                                                  ResourcePermissions.getInstance(customPermissionName),
                                                                  ResourcePermissions
-                                                                       .getInstance(customPermissionName, true))) {
+                                                                       .getInstanceWithGrantOption(customPermissionName))) {
          fail("checking post create resource permission with duplicate permissions (with different grant options) should have succeeded");
       }
       if (!accessControlContext.hasPostCreateResourcePermissions(SYS_RESOURCE,
@@ -1804,7 +1800,7 @@ public class TestAccessControl_hasPostCreateResourcePermissions extends TestAcce
                                                                  setOf(ResourcePermissions
                                                                              .getInstance(customPermissionName),
                                                                        ResourcePermissions
-                                                                             .getInstance(customPermissionName, true)))) {
+                                                                             .getInstanceWithGrantOption(customPermissionName)))) {
          fail("checking post create resource permission with duplicate permissions (with different grant options) should have succeeded");
       }
    }

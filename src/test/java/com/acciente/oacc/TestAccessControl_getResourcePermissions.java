@@ -159,7 +159,7 @@ public class TestAccessControl_getResourcePermissions extends TestAccessControlB
 
       // setup donor permissions
       Set<ResourcePermission> donorResourcePermissions
-            = setOf(ResourcePermissions.getInstance(inheritedPermissionName, true));
+            = setOf(ResourcePermissions.getInstanceWithGrantOption(inheritedPermissionName));
 
       accessControlContext.setResourcePermissions(donorResource, accessedResource, donorResourcePermissions);
       assertThat(accessControlContext.getResourcePermissions(donorResource, accessedResource), is(
@@ -266,7 +266,7 @@ public class TestAccessControl_getResourcePermissions extends TestAccessControlB
 
       // setup donor permissions
       Set<ResourcePermission> donorResourcePermissions = new HashSet<>();
-      donorResourcePermissions.add(ResourcePermissions.getInstance(inheritedPermissionName, true));
+      donorResourcePermissions.add(ResourcePermissions.getInstanceWithGrantOption(inheritedPermissionName));
 
       accessControlContext.setResourcePermissions(donorResource, accessedResource, donorResourcePermissions);
       assertThat(accessControlContext.getResourcePermissions(donorResource, accessedResource), is(donorResourcePermissions));

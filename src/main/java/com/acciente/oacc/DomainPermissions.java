@@ -53,9 +53,17 @@ public class DomainPermissions {
    }
 
    public static DomainPermission getInstance(String sysPermissionName) {
-      return new DomainPermissionImpl(sysPermissionName);
+      return new DomainPermissionImpl(sysPermissionName, false);
    }
 
+   public static DomainPermission getInstanceWithGrantOption(String sysPermissionName) {
+      return new DomainPermissionImpl(sysPermissionName, true);
+   }
+
+   /**
+    * @deprecated as of v2.0.0-rc.5; use {@link #getInstanceWithGrantOption(String)} or {@link #getInstance(String)} instead.
+    */
+   @Deprecated
    public static DomainPermission getInstance(String sysPermissionName, boolean withGrant) {
       return new DomainPermissionImpl(sysPermissionName, withGrant);
    }
@@ -66,16 +74,7 @@ public class DomainPermissions {
       private final String  permissionName;
       private final boolean withGrantOption;
 
-      // simpler and preferred factories to create a domain permission
-
-      private DomainPermissionImpl(String sysPermissionName) {
-         this(sysPermissionName, false);
-      }
-
-      // constructor used when creating domain permissions from a syspermission id (typically read from a db)
-
-      private DomainPermissionImpl(String sysPermissionName,
-                                   boolean withGrantOption) {
+      private DomainPermissionImpl(String sysPermissionName, boolean withGrantOption) {
          SysPermission sysPermission = getSysPermission(sysPermissionName);
 
          this.systemPermissionId = sysPermission.getSystemPermissionId();

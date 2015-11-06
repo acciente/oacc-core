@@ -193,7 +193,7 @@ public class TestAccessControl_revokeResourcePermissions extends TestAccessContr
 
       // setup grantor permissions
       Set<ResourcePermission> grantorResourcePermissions = new HashSet<>();
-      grantorResourcePermissions.add(ResourcePermissions.getInstance(grantablePermissionName, true));
+      grantorResourcePermissions.add(ResourcePermissions.getInstanceWithGrantOption(grantablePermissionName));
 
       accessControlContext.setResourcePermissions(grantorResource, accessedResource, grantorResourcePermissions);
       assertThat(accessControlContext.getEffectiveResourcePermissions(grantorResource, accessedResource), is(
@@ -315,8 +315,8 @@ public class TestAccessControl_revokeResourcePermissions extends TestAccessContr
 
       // setup grantor permissions
       Set<ResourcePermission> grantorResourcePermissions = new HashSet<>();
-      grantorResourcePermissions.add(ResourcePermissions.getInstance(ResourcePermissions.INHERIT, true));
-      grantorResourcePermissions.add(ResourcePermissions.getInstance(customPermissionName, true));
+      grantorResourcePermissions.add(ResourcePermissions.getInstanceWithGrantOption(ResourcePermissions.INHERIT));
+      grantorResourcePermissions.add(ResourcePermissions.getInstanceWithGrantOption(customPermissionName));
 
       accessControlContext.setResourcePermissions(grantorResource, accessedResource, grantorResourcePermissions);
       assertThat(accessControlContext.getEffectiveResourcePermissions(grantorResource, accessedResource), is(
@@ -368,8 +368,8 @@ public class TestAccessControl_revokeResourcePermissions extends TestAccessContr
 
       // setup grantor permissions
       Set<ResourcePermission> grantorResourcePermissions = new HashSet<>();
-      grantorResourcePermissions.add(ResourcePermissions.getInstance(ResourcePermissions.INHERIT, true));
-      grantorResourcePermissions.add(ResourcePermissions.getInstance(customPermissionName, true));
+      grantorResourcePermissions.add(ResourcePermissions.getInstanceWithGrantOption(ResourcePermissions.INHERIT));
+      grantorResourcePermissions.add(ResourcePermissions.getInstanceWithGrantOption(customPermissionName));
 
       accessControlContext.setResourcePermissions(grantorResource, accessedResource, grantorResourcePermissions);
       assertThat(accessControlContext.getEffectiveResourcePermissions(grantorResource, accessedResource), is(
@@ -434,8 +434,8 @@ public class TestAccessControl_revokeResourcePermissions extends TestAccessContr
 
       // setup grantor permissions
       Set<ResourcePermission> grantorResourcePermissions = new HashSet<>();
-      grantorResourcePermissions.add(ResourcePermissions.getInstance(ResourcePermissions.INHERIT, true));
-      grantorResourcePermissions.add(ResourcePermissions.getInstance(customPermissionName, true));
+      grantorResourcePermissions.add(ResourcePermissions.getInstanceWithGrantOption(ResourcePermissions.INHERIT));
+      grantorResourcePermissions.add(ResourcePermissions.getInstanceWithGrantOption(customPermissionName));
 
       accessControlContext.setResourcePermissions(grantorResource, accessedResource, grantorResourcePermissions);
       assertThat(accessControlContext.getEffectiveResourcePermissions(grantorResource, accessedResource), is(
@@ -488,7 +488,7 @@ public class TestAccessControl_revokeResourcePermissions extends TestAccessContr
 
       // setup grantor permissions
       Set<ResourcePermission> grantorResourcePermissions = new HashSet<>();
-      grantorResourcePermissions.add(ResourcePermissions.getInstance(grantablePermissionName, true));
+      grantorResourcePermissions.add(ResourcePermissions.getInstanceWithGrantOption(grantablePermissionName));
 
       accessControlContext.setResourcePermissions(grantorResource, accessedResource, grantorResourcePermissions);
       assertThat(accessControlContext.getEffectiveResourcePermissions(grantorResource, accessedResource), is(grantorResourcePermissions));
@@ -537,7 +537,7 @@ public class TestAccessControl_revokeResourcePermissions extends TestAccessContr
       // setup accessor permissions
       Set<ResourcePermission> accessorPermissions_pre = new HashSet<>();
       accessorPermissions_pre.add(ResourcePermissions.getInstance(grantedPermissionName1));
-      accessorPermissions_pre.add(ResourcePermissions.getInstance(grantedPermissionName2, true));
+      accessorPermissions_pre.add(ResourcePermissions.getInstanceWithGrantOption(grantedPermissionName2));
 
       accessControlContext.setResourcePermissions(accessorResource, accessedResource, accessorPermissions_pre);
       assertThat(accessControlContext.getEffectiveResourcePermissions(accessorResource, accessedResource), is(
@@ -549,8 +549,8 @@ public class TestAccessControl_revokeResourcePermissions extends TestAccessContr
 
       // setup grantor permissions
       Set<ResourcePermission> grantorResourcePermissions = new HashSet<>();
-      grantorResourcePermissions.add(ResourcePermissions.getInstance(grantedPermissionName1, true));
-      grantorResourcePermissions.add(ResourcePermissions.getInstance(grantedPermissionName2, true));
+      grantorResourcePermissions.add(ResourcePermissions.getInstanceWithGrantOption(grantedPermissionName1));
+      grantorResourcePermissions.add(ResourcePermissions.getInstanceWithGrantOption(grantedPermissionName2));
 
       accessControlContext.setResourcePermissions(grantorResource, accessedResource, grantorResourcePermissions);
       assertThat(accessControlContext.getEffectiveResourcePermissions(grantorResource, accessedResource),
@@ -565,7 +565,7 @@ public class TestAccessControl_revokeResourcePermissions extends TestAccessContr
       accessControlContext.revokeResourcePermissions(accessorResource,
                                                      accessedResource,
                                                      ResourcePermissions.getInstance(grantedPermissionName1),
-                                                     ResourcePermissions.getInstance(grantedPermissionName2, true));
+                                                     ResourcePermissions.getInstanceWithGrantOption(grantedPermissionName2));
 
       final Set<ResourcePermission> permissions_post = accessControlContext.getEffectiveResourcePermissions(accessorResource, accessedResource);
       assertThat(permissions_post.isEmpty(), is(true));
@@ -574,8 +574,7 @@ public class TestAccessControl_revokeResourcePermissions extends TestAccessContr
       accessControlContext.revokeResourcePermissions(accessorResource2,
                                                      accessedResource,
                                                      setOf(ResourcePermissions.getInstance(grantedPermissionName1),
-                                                           ResourcePermissions.getInstance(grantedPermissionName2,
-                                                                                           true)));
+                                                           ResourcePermissions.getInstanceWithGrantOption(grantedPermissionName2)));
 
       assertThat(accessControlContext.getEffectiveResourcePermissions(accessorResource2, accessedResource).isEmpty(),
                  is(true));
@@ -607,7 +606,7 @@ public class TestAccessControl_revokeResourcePermissions extends TestAccessContr
 
       // setup grantor permissions
       Set<ResourcePermission> grantorResourcePermissions = new HashSet<>();
-      grantorResourcePermissions.add(ResourcePermissions.getInstance(grantedPermissionName1, true));
+      grantorResourcePermissions.add(ResourcePermissions.getInstanceWithGrantOption(grantedPermissionName1));
 
       accessControlContext.setResourcePermissions(grantorResource, accessedResource, grantorResourcePermissions);
       assertThat(accessControlContext.getEffectiveResourcePermissions(grantorResource, accessedResource),
@@ -621,7 +620,7 @@ public class TestAccessControl_revokeResourcePermissions extends TestAccessContr
       // revoke permissions as grantor and verify
       accessControlContext.revokeResourcePermissions(accessorResource,
                                                      accessedResource,
-                                                     ResourcePermissions.getInstance(grantedPermissionName1, true));
+                                                     ResourcePermissions.getInstanceWithGrantOption(grantedPermissionName1));
 
       final Set<ResourcePermission> permissions_post = accessControlContext.getEffectiveResourcePermissions(accessorResource, accessedResource);
       assertThat(permissions_post.isEmpty(), is(true));
@@ -629,7 +628,7 @@ public class TestAccessControl_revokeResourcePermissions extends TestAccessContr
       // test set-based version
       accessControlContext.revokeResourcePermissions(accessorResource2,
                                                      accessedResource,
-                                                     setOf(ResourcePermissions.getInstance(grantedPermissionName1, true)));
+                                                     setOf(ResourcePermissions.getInstanceWithGrantOption(grantedPermissionName1)));
 
       assertThat(accessControlContext.getEffectiveResourcePermissions(accessorResource2, accessedResource).isEmpty(),
                  is(true));
@@ -649,7 +648,7 @@ public class TestAccessControl_revokeResourcePermissions extends TestAccessContr
 
       // setup accessor permissions
       Set<ResourcePermission> accessorPermissions_pre = new HashSet<>();
-      accessorPermissions_pre.add(ResourcePermissions.getInstance(grantedPermissionName1, true));
+      accessorPermissions_pre.add(ResourcePermissions.getInstanceWithGrantOption(grantedPermissionName1));
 
       accessControlContext.setResourcePermissions(accessorResource, accessedResource, accessorPermissions_pre);
       assertThat(accessControlContext.getEffectiveResourcePermissions(accessorResource, accessedResource),
@@ -662,7 +661,7 @@ public class TestAccessControl_revokeResourcePermissions extends TestAccessContr
 
       // setup grantor permissions
       Set<ResourcePermission> grantorResourcePermissions = new HashSet<>();
-      grantorResourcePermissions.add(ResourcePermissions.getInstance(grantedPermissionName1, true));
+      grantorResourcePermissions.add(ResourcePermissions.getInstanceWithGrantOption(grantedPermissionName1));
 
       accessControlContext.setResourcePermissions(grantorResource, accessedResource, grantorResourcePermissions);
       assertThat(accessControlContext.getEffectiveResourcePermissions(grantorResource, accessedResource),
@@ -705,8 +704,8 @@ public class TestAccessControl_revokeResourcePermissions extends TestAccessContr
          accessControlContext.revokeResourcePermissions(accessorResource,
                                                         accessedResource,
                                                         ResourcePermissions.getInstance(ResourcePermissions.INHERIT),
-                                                        ResourcePermissions.getInstance(permissionName, true),
-                                                        ResourcePermissions.getInstance(permissionName, false));
+                                                        ResourcePermissions.getInstanceWithGrantOption(permissionName),
+                                                        ResourcePermissions.getInstance(permissionName));
          fail("revoking permissions that include the same permission - by name - but with different grant-options, should have failed");
       }
       catch (IllegalArgumentException e) {
@@ -716,8 +715,8 @@ public class TestAccessControl_revokeResourcePermissions extends TestAccessContr
          accessControlContext.revokeResourcePermissions(accessorResource,
                                                         accessedResource,
                                                         setOf(ResourcePermissions.getInstance(ResourcePermissions.INHERIT),
-                                                              ResourcePermissions.getInstance(permissionName, true),
-                                                              ResourcePermissions.getInstance(permissionName, false)));
+                                                              ResourcePermissions.getInstanceWithGrantOption(permissionName),
+                                                              ResourcePermissions.getInstance(permissionName)));
          fail("revoking permissions that include the same permission - by name - but with different grant-options, should have failed");
       }
       catch (IllegalArgumentException e) {
@@ -920,8 +919,8 @@ public class TestAccessControl_revokeResourcePermissions extends TestAccessContr
       final Resource mismatchedResource = Resources.getInstance(-999L, "invalid");
 
       Set<ResourcePermission> accessorPermissions
-            = setOf(ResourcePermissions.getInstance(ResourcePermissions.INHERIT, true),
-                    ResourcePermissions.getInstance(customPermissionName, true));
+            = setOf(ResourcePermissions.getInstanceWithGrantOption(ResourcePermissions.INHERIT),
+                    ResourcePermissions.getInstanceWithGrantOption(customPermissionName));
 
       // setup grantor permissions
       accessControlContext.setResourcePermissions(accessorResource, accessedResource, accessorPermissions);
@@ -1085,7 +1084,7 @@ public class TestAccessControl_revokeResourcePermissions extends TestAccessContr
       authenticateSystemResource();
       final String resourceClassName = generateResourceClass(false, false);
       final ResourcePermission permission_valid
-            = ResourcePermissions.getInstance(generateResourceClassPermission(resourceClassName), true);
+            = ResourcePermissions.getInstanceWithGrantOption(generateResourceClassPermission(resourceClassName));
       final ResourcePermission permission_invalid
             = ResourcePermissions.getInstance(generateResourceClassPermission(generateResourceClass(false, false)));
       final Resource accessorResource = generateUnauthenticatableResource();
@@ -1093,7 +1092,7 @@ public class TestAccessControl_revokeResourcePermissions extends TestAccessContr
       assertThat(accessControlContext.getEffectiveResourcePermissions(accessorResource, accessedResource).isEmpty(), is(true));
 
       Set<ResourcePermission> accessorPermissions
-            = setOf(ResourcePermissions.getInstance(ResourcePermissions.INHERIT, true), permission_valid);
+            = setOf(ResourcePermissions.getInstanceWithGrantOption(ResourcePermissions.INHERIT), permission_valid);
 
       // setup grantor permissions
       accessControlContext.setResourcePermissions(accessorResource, accessedResource, accessorPermissions);

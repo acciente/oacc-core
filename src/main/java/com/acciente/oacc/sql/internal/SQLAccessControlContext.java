@@ -115,39 +115,39 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
 
    // domain permissions constants
    private static final DomainPermission DomainPermission_CREATE_CHILD_DOMAIN
-         = DomainPermissions.getInstance(DomainPermissions.CREATE_CHILD_DOMAIN, false);
+         = DomainPermissions.getInstance(DomainPermissions.CREATE_CHILD_DOMAIN);
    private static final DomainPermission DomainPermission_CREATE_CHILD_DOMAIN_GRANT
-         = DomainPermissions.getInstance(DomainPermissions.CREATE_CHILD_DOMAIN, true);
+         = DomainPermissions.getInstanceWithGrantOption(DomainPermissions.CREATE_CHILD_DOMAIN);
    private static final DomainPermission DomainPermission_DELETE
-         = DomainPermissions.getInstance(DomainPermissions.DELETE, false);
+         = DomainPermissions.getInstance(DomainPermissions.DELETE);
    private static final DomainPermission DomainPermission_DELETE_GRANT
-         = DomainPermissions.getInstance(DomainPermissions.DELETE, true);
+         = DomainPermissions.getInstanceWithGrantOption(DomainPermissions.DELETE);
    private static final DomainPermission DomainPermission_SUPER_USER
-         = DomainPermissions.getInstance(DomainPermissions.SUPER_USER, false);
+         = DomainPermissions.getInstance(DomainPermissions.SUPER_USER);
    private static final DomainPermission DomainPermission_SUPER_USER_GRANT
-         = DomainPermissions.getInstance(DomainPermissions.SUPER_USER, true);
+         = DomainPermissions.getInstanceWithGrantOption(DomainPermissions.SUPER_USER);
 
    // resource permissions constants
    private static final ResourcePermission ResourcePermission_INHERIT
-         = ResourcePermissions.getInstance(ResourcePermissions.INHERIT, false);
+         = ResourcePermissions.getInstance(ResourcePermissions.INHERIT);
    private static final ResourcePermission ResourcePermission_INHERIT_GRANT
-         = ResourcePermissions.getInstance(ResourcePermissions.INHERIT, true);
+         = ResourcePermissions.getInstanceWithGrantOption(ResourcePermissions.INHERIT);
    private static final ResourcePermission ResourcePermission_IMPERSONATE
-         = ResourcePermissions.getInstance(ResourcePermissions.IMPERSONATE, false);
+         = ResourcePermissions.getInstance(ResourcePermissions.IMPERSONATE);
    private static final ResourcePermission ResourcePermission_IMPERSONATE_GRANT
-         = ResourcePermissions.getInstance(ResourcePermissions.IMPERSONATE, true);
+         = ResourcePermissions.getInstanceWithGrantOption(ResourcePermissions.IMPERSONATE);
    private static final ResourcePermission ResourcePermission_RESET_CREDENTIALS
-         = ResourcePermissions.getInstance(ResourcePermissions.RESET_CREDENTIALS, false);
+         = ResourcePermissions.getInstance(ResourcePermissions.RESET_CREDENTIALS);
    private static final ResourcePermission ResourcePermission_RESET_CREDENTIALS_GRANT
-         = ResourcePermissions.getInstance(ResourcePermissions.RESET_CREDENTIALS, true);
+         = ResourcePermissions.getInstanceWithGrantOption(ResourcePermissions.RESET_CREDENTIALS);
    private static final ResourcePermission ResourcePermission_DELETE
-         = ResourcePermissions.getInstance(ResourcePermissions.DELETE, false);
+         = ResourcePermissions.getInstance(ResourcePermissions.DELETE);
    private static final ResourcePermission ResourcePermission_DELETE_GRANT
-         = ResourcePermissions.getInstance(ResourcePermissions.DELETE, true);
+         = ResourcePermissions.getInstanceWithGrantOption(ResourcePermissions.DELETE);
    private static final ResourcePermission ResourcePermission_QUERY
-         = ResourcePermissions.getInstance(ResourcePermissions.QUERY, false);
+         = ResourcePermissions.getInstance(ResourcePermissions.QUERY);
    private static final ResourcePermission ResourcePermission_QUERY_GRANT
-         = ResourcePermissions.getInstance(ResourcePermissions.QUERY, true);
+         = ResourcePermissions.getInstanceWithGrantOption(ResourcePermissions.QUERY);
 
    // persisters
    private final ResourceClassPersister                              resourceClassPersister;
@@ -926,15 +926,15 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
          newResourcePermissions = new HashSet<>();
 
          for (String permissionName : resourceClassPermissionPersister.getPermissionNames(connection, resourceClassName)) {
-            newResourcePermissions.add(ResourcePermissions.getInstance(permissionName, true));
+            newResourcePermissions.add(ResourcePermissions.getInstanceWithGrantOption(permissionName));
          }
 
-         newResourcePermissions.add(ResourcePermissions.getInstance(ResourcePermissions.DELETE, true));
-         newResourcePermissions.add(ResourcePermissions.getInstance(ResourcePermissions.QUERY, true));
+         newResourcePermissions.add(ResourcePermission_DELETE_GRANT);
+         newResourcePermissions.add(ResourcePermission_QUERY_GRANT);
 
          if (resourceClassInternalInfo.isAuthenticatable()) {
-            newResourcePermissions.add(ResourcePermissions.getInstance(ResourcePermissions.RESET_CREDENTIALS, true));
-            newResourcePermissions.add(ResourcePermissions.getInstance(ResourcePermissions.IMPERSONATE, true));
+            newResourcePermissions.add(ResourcePermission_RESET_CREDENTIALS_GRANT);
+            newResourcePermissions.add(ResourcePermission_IMPERSONATE_GRANT);
          }
       }
       else {
@@ -4450,7 +4450,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       Set<ResourcePermission> superResourcePermissions = new HashSet<>(resourcePermissionNames.size());
 
       for (String permissionName : resourcePermissionNames) {
-         superResourcePermissions.add(ResourcePermissions.getInstance(permissionName, true));
+         superResourcePermissions.add(ResourcePermissions.getInstanceWithGrantOption(permissionName));
       }
 
       return superResourcePermissions;
@@ -4464,13 +4464,12 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
 
       Set<ResourceCreatePermission> superResourceCreatePermissions = new HashSet<>(resourcePermissionNames.size()+1);
 
-      superResourceCreatePermissions.add(ResourceCreatePermissions.getInstance(ResourceCreatePermissions.CREATE, true));
+      superResourceCreatePermissions.add(ResourceCreatePermissions.getInstanceWithGrantOption(ResourceCreatePermissions.CREATE));
 
       for (String permissionName : resourcePermissionNames) {
-         superResourceCreatePermissions.add(ResourceCreatePermissions
-                                                  .getInstance(ResourcePermissions
-                                                                     .getInstance(permissionName, true),
-                                                               true));
+         superResourceCreatePermissions
+               .add(ResourceCreatePermissions
+                          .getInstanceWithGrantOption(ResourcePermissions.getInstanceWithGrantOption(permissionName)));
       }
 
       return superResourceCreatePermissions;

@@ -81,8 +81,12 @@ public abstract class CommonGrantGlobalResourcePermissionPersister extends Persi
          resultSet = statement.executeQuery();
 
          while (resultSet.next()) {
-            resourcePermissions.add(ResourcePermissions.getInstance(resultSet.getString("PermissionName"),
-                                                                    resultSet.getBoolean("IsWithGrant")));
+            if (resultSet.getBoolean("IsWithGrant")) {
+               resourcePermissions.add(ResourcePermissions.getInstanceWithGrantOption(resultSet.getString("PermissionName")));
+            }
+            else {
+               resourcePermissions.add(ResourcePermissions.getInstance(resultSet.getString("PermissionName")));
+            }
          }
          resultSet.close();
 
@@ -132,8 +136,12 @@ public abstract class CommonGrantGlobalResourcePermissionPersister extends Persi
                                                 resourcePermissionsForResourceClass = new HashSet<>());
             }
 
-            resourcePermissionsForResourceClass.add(ResourcePermissions.getInstance(resultSet.getString("PermissionName"),
-                                                                                    resultSet.getBoolean("IsWithGrant")));
+            if (resultSet.getBoolean("IsWithGrant")) {
+               resourcePermissionsForResourceClass.add(ResourcePermissions.getInstanceWithGrantOption(resultSet.getString("PermissionName")));
+            }
+            else {
+               resourcePermissionsForResourceClass.add(ResourcePermissions.getInstance(resultSet.getString("PermissionName")));
+            }
          }
          resultSet.close();
 

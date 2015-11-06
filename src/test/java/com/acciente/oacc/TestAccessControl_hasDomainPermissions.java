@@ -55,13 +55,12 @@ public class TestAccessControl_hasDomainPermissions extends TestAccessControlBas
       }
       if (!accessControlContext.hasDomainPermissions(SYS_RESOURCE,
                                                      domainName,
-                                                     DomainPermissions.getInstance(DomainPermissions.SUPER_USER, true))) {
+                                                     DomainPermissions.getInstanceWithGrantOption(DomainPermissions.SUPER_USER))) {
          fail("checking SUPER_USER /G domain permission should have succeeded for system resource");
       }
       if (!accessControlContext.hasDomainPermissions(SYS_RESOURCE,
                                                      domainName,
-                                                     setOf(DomainPermissions.getInstance(DomainPermissions.SUPER_USER,
-                                                                                         true)))) {
+                                                     setOf(DomainPermissions.getInstanceWithGrantOption(DomainPermissions.SUPER_USER)))) {
          fail("checking SUPER_USER /G domain permission should have succeeded for system resource");
       }
       if (!accessControlContext.hasDomainPermissions(SYS_RESOURCE,
@@ -77,14 +76,13 @@ public class TestAccessControl_hasDomainPermissions extends TestAccessControlBas
       }
       if (!accessControlContext.hasDomainPermissions(SYS_RESOURCE,
                                                      domainName,
-                                                     DomainPermissions.getInstance(DomainPermissions.CREATE_CHILD_DOMAIN, true))) {
+                                                     DomainPermissions.getInstanceWithGrantOption(DomainPermissions.CREATE_CHILD_DOMAIN))) {
          fail("checking CREATE_CHILD_DOMAIN /G domain permission should have succeeded for system resource");
       }
       if (!accessControlContext.hasDomainPermissions(SYS_RESOURCE,
                                                      domainName,
                                                      setOf(DomainPermissions
-                                                                 .getInstance(DomainPermissions.CREATE_CHILD_DOMAIN,
-                                                                              true)))) {
+                                                                 .getInstanceWithGrantOption(DomainPermissions.CREATE_CHILD_DOMAIN)))) {
          fail("checking CREATE_CHILD_DOMAIN /G domain permission should have succeeded for system resource");
       }
       if (!accessControlContext.hasDomainPermissions(SYS_RESOURCE,
@@ -100,29 +98,28 @@ public class TestAccessControl_hasDomainPermissions extends TestAccessControlBas
       }
       if (!accessControlContext.hasDomainPermissions(SYS_RESOURCE,
                                                      domainName,
-                                                     DomainPermissions.getInstance(DomainPermissions.DELETE, true))) {
+                                                     DomainPermissions.getInstanceWithGrantOption(DomainPermissions.DELETE))) {
          fail("checking DELETE /G domain permission should have succeeded for system resource");
       }
       if (!accessControlContext.hasDomainPermissions(SYS_RESOURCE,
                                                      domainName,
                                                      setOf(DomainPermissions
-                                                                 .getInstance(DomainPermissions.DELETE,
-                                                                              true)))) {
+                                                                 .getInstanceWithGrantOption(DomainPermissions.DELETE)))) {
          fail("checking DELETE /G domain permission should have succeeded for system resource");
       }
       if (!accessControlContext.hasDomainPermissions(SYS_RESOURCE,
                                                      domainName,
                                                      DomainPermissions.getInstance(DomainPermissions.CREATE_CHILD_DOMAIN),
-                                                     DomainPermissions.getInstance(DomainPermissions.CREATE_CHILD_DOMAIN, true))) {
+                                                     DomainPermissions.getInstanceWithGrantOption(DomainPermissions.CREATE_CHILD_DOMAIN))) {
          fail("checking multiple implicit domain permission should have succeeded for system resource");
       }
 
       if (!accessControlContext.hasDomainPermissions(SYS_RESOURCE,
                                                      domainName,
                                                      DomainPermissions.getInstance(DomainPermissions.CREATE_CHILD_DOMAIN),
-                                                     DomainPermissions.getInstance(DomainPermissions.CREATE_CHILD_DOMAIN, true),
+                                                     DomainPermissions.getInstanceWithGrantOption(DomainPermissions.CREATE_CHILD_DOMAIN),
                                                      DomainPermissions.getInstance(DomainPermissions.SUPER_USER),
-                                                     DomainPermissions.getInstance(DomainPermissions.SUPER_USER, true))) {
+                                                     DomainPermissions.getInstanceWithGrantOption(DomainPermissions.SUPER_USER))) {
          fail("checking all implicit domain permission should have succeeded for system resource");
       }
 
@@ -131,11 +128,9 @@ public class TestAccessControl_hasDomainPermissions extends TestAccessControlBas
                                                      setOf(DomainPermissions
                                                                  .getInstance(DomainPermissions.CREATE_CHILD_DOMAIN),
                                                            DomainPermissions
-                                                                 .getInstance(DomainPermissions.CREATE_CHILD_DOMAIN,
-                                                                              true),
+                                                                 .getInstanceWithGrantOption(DomainPermissions.CREATE_CHILD_DOMAIN),
                                                            DomainPermissions.getInstance(DomainPermissions.SUPER_USER),
-                                                           DomainPermissions.getInstance(DomainPermissions.SUPER_USER,
-                                                                                         true)))) {
+                                                           DomainPermissions.getInstanceWithGrantOption(DomainPermissions.SUPER_USER)))) {
          fail("checking all implicit domain permission should have succeeded for system resource");
       }
 
@@ -239,7 +234,7 @@ public class TestAccessControl_hasDomainPermissions extends TestAccessControlBas
       final DomainPermission domPerm_child
             = DomainPermissions.getInstance(DomainPermissions.CREATE_CHILD_DOMAIN);
       final DomainPermission domPerm_child_withGrant
-            = DomainPermissions.getInstance(DomainPermissions.CREATE_CHILD_DOMAIN, true);
+            = DomainPermissions.getInstanceWithGrantOption(DomainPermissions.CREATE_CHILD_DOMAIN);
 
       final String domainName1 = generateDomain();
       final String domainName2 = generateDomain();
@@ -294,7 +289,7 @@ public class TestAccessControl_hasDomainPermissions extends TestAccessControlBas
       final DomainPermission domPerm_child
             = DomainPermissions.getInstance(DomainPermissions.CREATE_CHILD_DOMAIN);
       final DomainPermission domPerm_child_withGrant
-            = DomainPermissions.getInstance(DomainPermissions.CREATE_CHILD_DOMAIN, true);
+            = DomainPermissions.getInstanceWithGrantOption(DomainPermissions.CREATE_CHILD_DOMAIN);
 
       final String domainName1 = generateDomain();
       final String domainName2 = generateDomain();
@@ -328,7 +323,7 @@ public class TestAccessControl_hasDomainPermissions extends TestAccessControlBas
       final DomainPermission domPerm_child
             = DomainPermissions.getInstance(DomainPermissions.CREATE_CHILD_DOMAIN);
       final DomainPermission domPerm_child_withGrant
-            = DomainPermissions.getInstance(DomainPermissions.CREATE_CHILD_DOMAIN, true);
+            = DomainPermissions.getInstanceWithGrantOption(DomainPermissions.CREATE_CHILD_DOMAIN);
 
       final String domainName1 = generateDomain();
       final String domainName2 = generateDomain();
@@ -392,15 +387,15 @@ public class TestAccessControl_hasDomainPermissions extends TestAccessControlBas
       final DomainPermission domPerm_superuser
             = DomainPermissions.getInstance(DomainPermissions.SUPER_USER);
       final DomainPermission domPerm_superuser_withGrant
-            = DomainPermissions.getInstance(DomainPermissions.SUPER_USER, true);
+            = DomainPermissions.getInstanceWithGrantOption(DomainPermissions.SUPER_USER);
       final DomainPermission domPerm_child
             = DomainPermissions.getInstance(DomainPermissions.CREATE_CHILD_DOMAIN);
       final DomainPermission domPerm_child_withGrant
-            = DomainPermissions.getInstance(DomainPermissions.CREATE_CHILD_DOMAIN, true);
+            = DomainPermissions.getInstanceWithGrantOption(DomainPermissions.CREATE_CHILD_DOMAIN);
       final DomainPermission domPerm_delete
             = DomainPermissions.getInstance(DomainPermissions.DELETE);
       final DomainPermission domPerm_delete_withGrant
-            = DomainPermissions.getInstance(DomainPermissions.DELETE, true);
+            = DomainPermissions.getInstanceWithGrantOption(DomainPermissions.DELETE);
 
       // set super-user domain permission
       final char[] password = generateUniquePassword();
@@ -454,7 +449,7 @@ public class TestAccessControl_hasDomainPermissions extends TestAccessControlBas
       final DomainPermission domPerm_child
             = DomainPermissions.getInstance(DomainPermissions.CREATE_CHILD_DOMAIN);
       final DomainPermission domPerm_child_withGrant
-            = DomainPermissions.getInstance(DomainPermissions.CREATE_CHILD_DOMAIN, true);
+            = DomainPermissions.getInstanceWithGrantOption(DomainPermissions.CREATE_CHILD_DOMAIN);
 
 
       // set super-user domain permission
@@ -519,11 +514,11 @@ public class TestAccessControl_hasDomainPermissions extends TestAccessControlBas
       final DomainPermission domPerm_superuser
             = DomainPermissions.getInstance(DomainPermissions.SUPER_USER);
       final DomainPermission domPerm_superuser_withGrant
-            = DomainPermissions.getInstance(DomainPermissions.SUPER_USER, true);
+            = DomainPermissions.getInstanceWithGrantOption(DomainPermissions.SUPER_USER);
       final DomainPermission domPerm_createchilddomain
             = DomainPermissions.getInstance(DomainPermissions.CREATE_CHILD_DOMAIN);
       final DomainPermission domPerm_createchilddomain_withGrant
-            = DomainPermissions.getInstance(DomainPermissions.CREATE_CHILD_DOMAIN, true);
+            = DomainPermissions.getInstanceWithGrantOption(DomainPermissions.CREATE_CHILD_DOMAIN);
 
       final String childDomain = generateUniqueDomainName();
       final String parentDomain = generateDomain();
@@ -559,11 +554,11 @@ public class TestAccessControl_hasDomainPermissions extends TestAccessControlBas
       final DomainPermission domPerm_superuser
             = DomainPermissions.getInstance(DomainPermissions.SUPER_USER);
       final DomainPermission domPerm_superuser_withGrant
-            = DomainPermissions.getInstance(DomainPermissions.SUPER_USER, true);
+            = DomainPermissions.getInstanceWithGrantOption(DomainPermissions.SUPER_USER);
       final DomainPermission domPerm_createchilddomain
             = DomainPermissions.getInstance(DomainPermissions.CREATE_CHILD_DOMAIN);
       final DomainPermission domPerm_createchilddomain_withGrant
-            = DomainPermissions.getInstance(DomainPermissions.CREATE_CHILD_DOMAIN, true);
+            = DomainPermissions.getInstanceWithGrantOption(DomainPermissions.CREATE_CHILD_DOMAIN);
 
       final String parentDomain = generateDomain();
       final String childDomain = generateUniqueDomainName();
@@ -614,11 +609,11 @@ public class TestAccessControl_hasDomainPermissions extends TestAccessControlBas
       final DomainPermission domPerm_superuser
             = DomainPermissions.getInstance(DomainPermissions.SUPER_USER);
       final DomainPermission domPerm_superuser_withGrant
-            = DomainPermissions.getInstance(DomainPermissions.SUPER_USER, true);
+            = DomainPermissions.getInstanceWithGrantOption(DomainPermissions.SUPER_USER);
       final DomainPermission domPerm_createchilddomain
             = DomainPermissions.getInstance(DomainPermissions.CREATE_CHILD_DOMAIN);
       final DomainPermission domPerm_createchilddomain_withGrant
-            = DomainPermissions.getInstance(DomainPermissions.CREATE_CHILD_DOMAIN, true);
+            = DomainPermissions.getInstanceWithGrantOption(DomainPermissions.CREATE_CHILD_DOMAIN);
 
       final String domainName = generateDomain();
       Resource accessorResource = generateUnauthenticatableResource();
@@ -659,11 +654,11 @@ public class TestAccessControl_hasDomainPermissions extends TestAccessControlBas
    public void hasDomainPermissions_validWithInheritFromAncestorDomainAndResource() {
       authenticateSystemResource();
       final DomainPermission domPerm_superuser_withGrant
-            = DomainPermissions.getInstance(DomainPermissions.SUPER_USER, true);
+            = DomainPermissions.getInstanceWithGrantOption(DomainPermissions.SUPER_USER);
       final DomainPermission domPerm_createchilddomain
             = DomainPermissions.getInstance(DomainPermissions.CREATE_CHILD_DOMAIN);
       final DomainPermission domPerm_createchilddomain_withGrant
-            = DomainPermissions.getInstance(DomainPermissions.CREATE_CHILD_DOMAIN, true);
+            = DomainPermissions.getInstanceWithGrantOption(DomainPermissions.CREATE_CHILD_DOMAIN);
 
       final String childDomain = generateUniqueDomainName();
       final String parentDomain = generateDomain();
@@ -1011,7 +1006,7 @@ public class TestAccessControl_hasDomainPermissions extends TestAccessControlBas
       final DomainPermission domPerm_superUser
             = DomainPermissions.getInstance(DomainPermissions.SUPER_USER);
       final DomainPermission domPerm_superUser_grantable
-            = DomainPermissions.getInstance(DomainPermissions.SUPER_USER, true);
+            = DomainPermissions.getInstanceWithGrantOption(DomainPermissions.SUPER_USER);
       final String domainName = accessControlContext.getDomainNameByResource(SYS_RESOURCE);
 
       // setup permission

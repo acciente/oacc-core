@@ -492,13 +492,13 @@ public class TestAccessControl_hasGlobalResourcePermissions extends TestAccessCo
       // setup global permissions
       final String customPermissionName_accessorDomain = generateResourceClassPermission(resourceClassName);
       final ResourcePermission customPermission_forAccessorDomain_withGrant
-            = ResourcePermissions.getInstance(customPermissionName_accessorDomain, true);
+            = ResourcePermissions.getInstanceWithGrantOption(customPermissionName_accessorDomain);
       final ResourcePermission customPermission_forAccessorDomain_withoutGrant
             = ResourcePermissions.getInstance(customPermissionName_accessorDomain);
 
       final String customPermissionName_otherDomain = generateResourceClassPermission(resourceClassName);
       final ResourcePermission customPermission_forOtherDomain_withGrant
-            = ResourcePermissions.getInstance(customPermissionName_otherDomain, true);
+            = ResourcePermissions.getInstanceWithGrantOption(customPermissionName_otherDomain);
       final ResourcePermission customPermission_forOtherDomain_withoutGrant
             = ResourcePermissions.getInstance(customPermissionName_otherDomain);
 
@@ -1422,7 +1422,7 @@ public class TestAccessControl_hasGlobalResourcePermissions extends TestAccessCo
                                                              ResourcePermissions
                                                                    .getInstance(ResourcePermissions.IMPERSONATE),
                                                              ResourcePermissions
-                                                                   .getInstance(ResourcePermissions.IMPERSONATE, true))) {
+                                                                   .getInstanceWithGrantOption(ResourcePermissions.IMPERSONATE))) {
          fail("checking global resource permission with duplicate permissions (with different grant options) should have succeeded");
       }
 
@@ -1432,7 +1432,7 @@ public class TestAccessControl_hasGlobalResourcePermissions extends TestAccessCo
                                                              setOf(ResourcePermissions
                                                                          .getInstance(ResourcePermissions.IMPERSONATE),
                                                                    ResourcePermissions
-                                                                         .getInstance(ResourcePermissions.IMPERSONATE, true)))) {
+                                                                         .getInstanceWithGrantOption(ResourcePermissions.IMPERSONATE)))) {
          fail("checking global resource permission with duplicate permissions (with different grant options) should have succeeded");
       }
    }

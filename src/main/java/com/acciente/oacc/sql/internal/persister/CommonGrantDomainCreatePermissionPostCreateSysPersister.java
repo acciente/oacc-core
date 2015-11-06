@@ -55,12 +55,22 @@ public abstract class CommonGrantDomainCreatePermissionPostCreateSysPersister ex
          // collect the create permissions that this resource has to domains directly
          Set<DomainCreatePermission> domainCreatePermissions = new HashSet<>();
          while (resultSet.next()) {
-            domainCreatePermissions
-                  .add(DomainCreatePermissions
-                             .getInstance(DomainPermissions
-                                                .getInstance(resultSet.getDomainSysPermissionName("PostCreateSysPermissionId"),
-                                                             resultSet.getBoolean("PostCreateIsWithGrant")),
-                                          resultSet.getBoolean("IsWithGrant")));
+            if (resultSet.getBoolean("IsWithGrant")) {
+               if (resultSet.getBoolean("PostCreateIsWithGrant")) {
+                  domainCreatePermissions.add(DomainCreatePermissions.getInstanceWithGrantOption(DomainPermissions.getInstanceWithGrantOption(resultSet.getDomainSysPermissionName("PostCreateSysPermissionId"))));
+               }
+               else {
+                  domainCreatePermissions.add(DomainCreatePermissions.getInstanceWithGrantOption(DomainPermissions.getInstance(resultSet.getDomainSysPermissionName("PostCreateSysPermissionId"))));
+               }
+            }
+            else {
+               if (resultSet.getBoolean("PostCreateIsWithGrant")) {
+                  domainCreatePermissions.add(DomainCreatePermissions.getInstance(DomainPermissions.getInstanceWithGrantOption(resultSet.getDomainSysPermissionName("PostCreateSysPermissionId"))));
+               }
+               else {
+                  domainCreatePermissions.add(DomainCreatePermissions.getInstance(DomainPermissions.getInstance(resultSet.getDomainSysPermissionName("PostCreateSysPermissionId"))));
+               }
+            }
          }
          resultSet.close();
 

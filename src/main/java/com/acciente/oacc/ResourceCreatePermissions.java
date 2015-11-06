@@ -41,19 +41,33 @@ public class ResourceCreatePermissions {
    }
 
    /**
+    * Creates a new resource create permission with no post-create permissions (i.e. only resource creation),
+    * but with the option to grant the create-permission to another resource
+    *
+    * @param sysPermissionName
+    * @return a resource create permission
+    */
+   public static ResourceCreatePermission getInstanceWithGrantOption(String sysPermissionName) {
+      return new ResourceCreatePermissionImpl(sysPermissionName, true);
+   }
+
+   /**
     * Creates a new resource create permission with no post-create permissions (i.e. only resource creation)
     *
     * @param sysPermissionName
     * @param withGrant         true if the permission should have the grant privilege, false otherwise
     * @return a resource create permission
+    * @deprecated as of v2.0.0-rc.5; use {@link #getInstanceWithGrantOption(String)} or {@link #getInstance(String)} instead.
     */
+   @Deprecated
    public static ResourceCreatePermission getInstance(String sysPermissionName, boolean withGrant) {
       return new ResourceCreatePermissionImpl(sysPermissionName, withGrant);
    }
 
+
    /**
     * Creates a new resource create permission with no post-create permissions (i.e. only resource creation)
-    * and defaults the withGrantOption to false
+    * without the option to grant the create-permission to another resource
     *
     * @param sysPermissionName
     * @return a resource create permission
@@ -66,6 +80,15 @@ public class ResourceCreatePermissions {
       return new ResourceCreatePermissionImpl(postCreateResourcePermission, false);
    }
 
+   public static ResourceCreatePermission getInstanceWithGrantOption(ResourcePermission postCreateResourcePermission) {
+      return new ResourceCreatePermissionImpl(postCreateResourcePermission, true);
+   }
+
+   /**
+    * @deprecated as of v2.0.0-rc.5; use {@link #getInstanceWithGrantOption(ResourcePermission)} or
+    * {@link #getInstance(ResourcePermission)} instead.
+    */
+   @Deprecated
    public static ResourceCreatePermission getInstance(ResourcePermission postCreateResourcePermission,
                                                       boolean withGrant) {
       return new ResourceCreatePermissionImpl(postCreateResourcePermission, withGrant);

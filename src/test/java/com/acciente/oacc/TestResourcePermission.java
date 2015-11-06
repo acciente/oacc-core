@@ -47,7 +47,7 @@ public class TestResourcePermission {
    public void constructSystemPermission_withGrant_valid() {
       for(String systemPermissionName : ResourcePermissions.getSysPermissionNames()) {
          // with exception of *CREATE system permission, all should be creatable with grant option, as well
-         ResourcePermissions.getInstance(systemPermissionName, true);
+         ResourcePermissions.getInstanceWithGrantOption(systemPermissionName);
       }
    }
 
@@ -61,7 +61,7 @@ public class TestResourcePermission {
    @Test
    public void constructCustomPermission_withGrant_valid() {
       final String permissionName = "this_is_also_a_valid_permission_name";
-      final ResourcePermission resourcePermission = ResourcePermissions.getInstance(permissionName, true);
+      final ResourcePermission resourcePermission = ResourcePermissions.getInstanceWithGrantOption(permissionName);
       assertThat(resourcePermission.getPermissionName(), is(permissionName));
    }
 
@@ -73,8 +73,7 @@ public class TestResourcePermission {
       }
       // now with grant
       for(String systemPermissionName : ResourcePermissions.getSysPermissionNames()) {
-         final ResourcePermission resourcePermission = ResourcePermissions.getInstance(" " + systemPermissionName + "\t",
-                                                                                       true);
+         final ResourcePermission resourcePermission = ResourcePermissions.getInstanceWithGrantOption(" " + systemPermissionName + "\t");
          assertThat(resourcePermission.getPermissionName(), is(systemPermissionName));
       }
    }
@@ -87,8 +86,7 @@ public class TestResourcePermission {
       assertThat(resourcePermission.getPermissionName(), is(permissionName));
 
       // now with grant
-      final ResourcePermission grantableResourcePermission = ResourcePermissions.getInstance(" " + permissionName + "\t",
-                                                                                             true);
+      final ResourcePermission grantableResourcePermission = ResourcePermissions.getInstanceWithGrantOption(" " + permissionName + "\t");
       assertThat(grantableResourcePermission.getPermissionName(), is(permissionName));
    }
 
@@ -107,7 +105,7 @@ public class TestResourcePermission {
          }
          // now with grant
          try {
-            ResourcePermissions.getInstance(mixedCasePermissionName, true);
+            ResourcePermissions.getInstanceWithGrantOption(mixedCasePermissionName);
             fail("permission names are case sensitive - creation of resource permission with case insensitive name should have failed");
          }
          catch (Exception e) {
@@ -127,7 +125,7 @@ public class TestResourcePermission {
       }
       // now with grant
       try {
-         ResourcePermissions.getInstance(null, true);
+         ResourcePermissions.getInstanceWithGrantOption(null);
          fail("creation of resource permission with null name should have failed");
       }
       catch (Exception e) {
@@ -153,14 +151,14 @@ public class TestResourcePermission {
       }
       // now with grant
       try {
-         ResourcePermissions.getInstance("", true);
+         ResourcePermissions.getInstanceWithGrantOption("");
          fail("creation of resource permission with empty name should have failed");
       }
       catch (Exception e) {
          assertThat(e.getMessage().toLowerCase(), containsString("permission name is required"));
       }
       try {
-         ResourcePermissions.getInstance(" \t", true);
+         ResourcePermissions.getInstanceWithGrantOption(" \t");
          fail("creation of resource permission with empty name should have failed");
       }
       catch (Exception e) {
@@ -179,7 +177,7 @@ public class TestResourcePermission {
       }
       // now with grant
       try {
-         ResourcePermissions.getInstance("*this_is_an_invalid_system_permission_name_that_starts_with_asterisk", true);
+         ResourcePermissions.getInstanceWithGrantOption("*this_is_an_invalid_system_permission_name_that_starts_with_asterisk");
          fail("creating system resource permission with invalid system permission name should fail");
       }
       catch (Exception e) {

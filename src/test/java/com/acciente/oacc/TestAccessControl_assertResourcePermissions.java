@@ -370,13 +370,13 @@ public class TestAccessControl_assertResourcePermissions extends TestAccessContr
       final ResourcePermission customPermission1_withoutGrant
             = ResourcePermissions.getInstance(customPermissionName1);
       final ResourcePermission customPermission1_withGrant
-            = ResourcePermissions.getInstance(customPermissionName1, true);
+            = ResourcePermissions.getInstanceWithGrantOption(customPermissionName1);
 
       final String customPermissionName2 = generateResourceClassPermission(accessedResourceClassName);
       final ResourcePermission customPermission2_withoutGrant
             = ResourcePermissions.getInstance(customPermissionName2);
       final ResourcePermission customPermission2_withGrant
-            = ResourcePermissions.getInstance(customPermissionName2, true);
+            = ResourcePermissions.getInstanceWithGrantOption(customPermissionName2);
 
       accessControlContext.setResourcePermissions(accessorResource,
                                                   accessedResource,
@@ -901,7 +901,7 @@ public class TestAccessControl_assertResourcePermissions extends TestAccessContr
       // setup direct permissions
       accessControlContext.setResourcePermissions(accessorResource,
                                                   accessedResource,
-                                                  setOf(ResourcePermissions.getInstance(ResourcePermissions.INHERIT, true)));
+                                                  setOf(ResourcePermissions.getInstanceWithGrantOption(ResourcePermissions.INHERIT)));
 
       // authenticate accessor resource
       accessControlContext.authenticate(accessorResource, PasswordCredentials.newInstance(password));
@@ -910,14 +910,14 @@ public class TestAccessControl_assertResourcePermissions extends TestAccessContr
       accessControlContext.assertResourcePermissions(accessorResource,
                                                      accessedResource,
                                                      ResourcePermissions.getInstance(ResourcePermissions.INHERIT),
-                                                     ResourcePermissions.getInstance(ResourcePermissions.INHERIT, true));
+                                                     ResourcePermissions.getInstanceWithGrantOption(ResourcePermissions.INHERIT));
 
       accessControlContext.assertResourcePermissions(accessorResource,
                                                      accessedResource,
                                                      setOf(ResourcePermissions
                                                                  .getInstance(ResourcePermissions.INHERIT),
                                                            ResourcePermissions
-                                                                 .getInstance(ResourcePermissions.INHERIT, true)));
+                                                                 .getInstanceWithGrantOption(ResourcePermissions.INHERIT)));
    }
 
    @Test

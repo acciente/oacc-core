@@ -492,13 +492,13 @@ public class TestAccessControl_assertGlobalResourcePermissions extends TestAcces
       // setup global permissions
       final String customPermissionName_accessorDomain = generateResourceClassPermission(resourceClassName);
       final ResourcePermission customPermission_forAccessorDomain_withGrant
-            = ResourcePermissions.getInstance(customPermissionName_accessorDomain, true);
+            = ResourcePermissions.getInstanceWithGrantOption(customPermissionName_accessorDomain);
       final ResourcePermission customPermission_forAccessorDomain_withoutGrant
             = ResourcePermissions.getInstance(customPermissionName_accessorDomain);
 
       final String customPermissionName_otherDomain = generateResourceClassPermission(resourceClassName);
       final ResourcePermission customPermission_forOtherDomain_withGrant
-            = ResourcePermissions.getInstance(customPermissionName_otherDomain, true);
+            = ResourcePermissions.getInstanceWithGrantOption(customPermissionName_otherDomain);
       final ResourcePermission customPermission_forOtherDomain_withoutGrant
             = ResourcePermissions.getInstance(customPermissionName_otherDomain);
 
@@ -1330,7 +1330,7 @@ public class TestAccessControl_assertGlobalResourcePermissions extends TestAcces
                                                            ResourcePermissions
                                                                  .getInstance(ResourcePermissions.IMPERSONATE),
                                                            ResourcePermissions
-                                                                 .getInstance(ResourcePermissions.IMPERSONATE, true));
+                                                                 .getInstanceWithGrantOption(ResourcePermissions.IMPERSONATE));
 
       accessControlContext.assertGlobalResourcePermissions(SYS_RESOURCE,
                                                            resourceClassName,
@@ -1338,7 +1338,7 @@ public class TestAccessControl_assertGlobalResourcePermissions extends TestAcces
                                                            setOf(ResourcePermissions
                                                                        .getInstance(ResourcePermissions.IMPERSONATE),
                                                                  ResourcePermissions
-                                                                       .getInstance(ResourcePermissions.IMPERSONATE, true)));
+                                                                       .getInstanceWithGrantOption(ResourcePermissions.IMPERSONATE)));
    }
 
    @Test

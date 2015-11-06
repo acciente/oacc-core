@@ -69,9 +69,14 @@ public class NonRecursiveGrantResourceCreatePermissionSysPersister extends Commo
                SQLResult resultSet = statement.executeQuery();
 
                while (resultSet.next()) {
-                  resourceCreatePermissions
-                        .add(ResourceCreatePermissions.getInstance(resultSet.getResourceCreateSysPermissionName("SysPermissionId"),
-                                                                   resultSet.getBoolean("IsWithGrant")));
+                  if (resultSet.getBoolean("IsWithGrant")) {
+                     resourceCreatePermissions
+                           .add(ResourceCreatePermissions.getInstanceWithGrantOption(resultSet.getResourceCreateSysPermissionName("SysPermissionId")));
+                  }
+                  else {
+                     resourceCreatePermissions
+                           .add(ResourceCreatePermissions.getInstance(resultSet.getResourceCreateSysPermissionName("SysPermissionId")));
+                  }
                }
                resultSet.close();
             }
@@ -125,9 +130,14 @@ public class NonRecursiveGrantResourceCreatePermissionSysPersister extends Commo
                   permissionsForResourceDomain.put(resourceClassName, permissionsForResourceClass);
                }
 
-               permissionsForResourceClass.add(
-                     ResourceCreatePermissions.getInstance(resultSet.getResourceCreateSysPermissionName("SysPermissionId"),
-                                                           resultSet.getBoolean("IsWithGrant")));
+               if (resultSet.getBoolean("IsWithGrant")) {
+                  permissionsForResourceClass
+                        .add(ResourceCreatePermissions.getInstanceWithGrantOption(resultSet.getResourceCreateSysPermissionName("SysPermissionId")));
+               }
+               else {
+                  permissionsForResourceClass
+                        .add(ResourceCreatePermissions.getInstance(resultSet.getResourceCreateSysPermissionName("SysPermissionId")));
+               }
             }
             resultSet.close();
          }

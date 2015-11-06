@@ -42,58 +42,48 @@ public class TestAccessControl_assertPostCreateDomainPermissions extends TestAcc
       accessControlContext.assertPostCreateDomainPermissions(SYS_RESOURCE,
                                                              DomainPermissions.getInstance(DomainPermissions.CREATE_CHILD_DOMAIN));
       accessControlContext.assertPostCreateDomainPermissions(SYS_RESOURCE,
-                                                             DomainPermissions.getInstance(DomainPermissions.CREATE_CHILD_DOMAIN,
-                                                                                           true));
+                                                             DomainPermissions.getInstanceWithGrantOption(DomainPermissions.CREATE_CHILD_DOMAIN));
       accessControlContext.assertPostCreateDomainPermissions(SYS_RESOURCE,
                                                              DomainPermissions.getInstance(DomainPermissions.DELETE));
       accessControlContext.assertPostCreateDomainPermissions(SYS_RESOURCE,
-                                                             DomainPermissions.getInstance(DomainPermissions.DELETE,
-                                                                                           true));
+                                                             DomainPermissions.getInstanceWithGrantOption(DomainPermissions.DELETE));
       accessControlContext.assertPostCreateDomainPermissions(SYS_RESOURCE,
                                                              DomainPermissions.getInstance(DomainPermissions.SUPER_USER));
       accessControlContext.assertPostCreateDomainPermissions(SYS_RESOURCE,
-                                                             DomainPermissions.getInstance(DomainPermissions.SUPER_USER,
-                                                                                           true));
+                                                             DomainPermissions.getInstanceWithGrantOption(DomainPermissions.SUPER_USER));
       accessControlContext.assertPostCreateDomainPermissions(SYS_RESOURCE,
                                                              DomainPermissions.getInstance(DomainPermissions.CREATE_CHILD_DOMAIN),
-                                                             DomainPermissions.getInstance(DomainPermissions.CREATE_CHILD_DOMAIN,
-                                                                                           true),
+                                                             DomainPermissions.getInstanceWithGrantOption(DomainPermissions.CREATE_CHILD_DOMAIN),
                                                              DomainPermissions.getInstance(DomainPermissions.SUPER_USER),
-                                                             DomainPermissions.getInstance(DomainPermissions.SUPER_USER,
-                                                                                           true));
+                                                             DomainPermissions.getInstanceWithGrantOption(DomainPermissions.SUPER_USER));
       // test set-based versions
       accessControlContext.assertPostCreateDomainPermissions(SYS_RESOURCE,
                                                              setOf(DomainPermissions
                                                                          .getInstance(DomainPermissions.CREATE_CHILD_DOMAIN)));
       accessControlContext.assertPostCreateDomainPermissions(SYS_RESOURCE,
                                                              setOf(DomainPermissions
-                                                                         .getInstance(DomainPermissions.CREATE_CHILD_DOMAIN,
-                                                                                      true)));
+                                                                         .getInstanceWithGrantOption(DomainPermissions.CREATE_CHILD_DOMAIN)));
       accessControlContext.assertPostCreateDomainPermissions(SYS_RESOURCE,
                                                              setOf(DomainPermissions
                                                                          .getInstance(DomainPermissions.DELETE)));
       accessControlContext.assertPostCreateDomainPermissions(SYS_RESOURCE,
                                                              setOf(DomainPermissions
-                                                                         .getInstance(DomainPermissions.DELETE,
-                                                                                      true)));
+                                                                         .getInstanceWithGrantOption(DomainPermissions.DELETE)));
       accessControlContext.assertPostCreateDomainPermissions(SYS_RESOURCE,
                                                              setOf(DomainPermissions
                                                                          .getInstance(DomainPermissions.SUPER_USER)));
       accessControlContext.assertPostCreateDomainPermissions(SYS_RESOURCE,
                                                              setOf(DomainPermissions
-                                                                         .getInstance(DomainPermissions.SUPER_USER,
-                                                                                      true)));
+                                                                         .getInstanceWithGrantOption(DomainPermissions.SUPER_USER)));
       accessControlContext.assertPostCreateDomainPermissions(SYS_RESOURCE,
                                                              setOf(DomainPermissions
                                                                          .getInstance(DomainPermissions.CREATE_CHILD_DOMAIN),
                                                                    DomainPermissions
-                                                                         .getInstance(DomainPermissions.CREATE_CHILD_DOMAIN,
-                                                                                      true),
+                                                                         .getInstanceWithGrantOption(DomainPermissions.CREATE_CHILD_DOMAIN),
                                                                    DomainPermissions
                                                                          .getInstance(DomainPermissions.SUPER_USER),
                                                                    DomainPermissions
-                                                                         .getInstance(DomainPermissions.SUPER_USER,
-                                                                                      true)));
+                                                                         .getInstanceWithGrantOption(DomainPermissions.SUPER_USER)));
    }
 
    @Test
@@ -124,8 +114,7 @@ public class TestAccessControl_assertPostCreateDomainPermissions extends TestAcc
       try {
          accessControlContext.assertPostCreateDomainPermissions(accessorResource,
                                                                 DomainPermissions.getInstance(DomainPermissions.CREATE_CHILD_DOMAIN),
-                                                                DomainPermissions.getInstance(DomainPermissions.CREATE_CHILD_DOMAIN,
-                                                                                              true));
+                                                                DomainPermissions.getInstanceWithGrantOption(DomainPermissions.CREATE_CHILD_DOMAIN));
          fail("asserting multiple post-create domain permission when none has been granted should not have succeeded for authenticated resource");
       }
       catch (NotAuthorizedException e) {
@@ -146,8 +135,7 @@ public class TestAccessControl_assertPostCreateDomainPermissions extends TestAcc
                                                                 setOf(DomainPermissions
                                                                             .getInstance(DomainPermissions.CREATE_CHILD_DOMAIN),
                                                                       DomainPermissions
-                                                                            .getInstance(DomainPermissions.CREATE_CHILD_DOMAIN,
-                                                                                         true)));
+                                                                            .getInstanceWithGrantOption(DomainPermissions.CREATE_CHILD_DOMAIN)));
          fail("asserting multiple post-create domain permission when none has been granted should not have succeeded for authenticated resource");
       }
       catch (NotAuthorizedException e) {
@@ -297,8 +285,7 @@ public class TestAccessControl_assertPostCreateDomainPermissions extends TestAcc
       try {
          accessControlContext.assertPostCreateDomainPermissions(accessorResource,
                                                                 DomainPermissions.getInstance(DomainPermissions.CREATE_CHILD_DOMAIN),
-                                                                DomainPermissions.getInstance(DomainPermissions.CREATE_CHILD_DOMAIN,
-                                                                                              true));
+                                                                DomainPermissions.getInstanceWithGrantOption(DomainPermissions.CREATE_CHILD_DOMAIN));
          fail("asserting direct and unauthorized post-create domain permission should have failed for authenticated resource");
       }
       catch (NotAuthorizedException e) {
@@ -308,8 +295,7 @@ public class TestAccessControl_assertPostCreateDomainPermissions extends TestAcc
       try {
          accessControlContext.assertPostCreateDomainPermissions(accessorResource,
                                                                 setOf(DomainPermissions.getInstance(DomainPermissions.CREATE_CHILD_DOMAIN),
-                                                                      DomainPermissions.getInstance(DomainPermissions.CREATE_CHILD_DOMAIN,
-                                                                                                    true)));
+                                                                      DomainPermissions.getInstanceWithGrantOption(DomainPermissions.CREATE_CHILD_DOMAIN)));
          fail("asserting direct and unauthorized post-create domain permission should have failed for authenticated resource");
       }
       catch (NotAuthorizedException e) {
@@ -326,12 +312,10 @@ public class TestAccessControl_assertPostCreateDomainPermissions extends TestAcc
 
       // setup create permissions
       Set<DomainCreatePermission> domainCreatePermissions
-            = setOf(DomainCreatePermissions.getInstance(DomainCreatePermissions.CREATE, false),
+            = setOf(DomainCreatePermissions.getInstance(DomainCreatePermissions.CREATE),
                     DomainCreatePermissions.getInstance(DomainPermissions
-                                                              .getInstance(DomainPermissions.CREATE_CHILD_DOMAIN,
-                                                                           false)),
-                    DomainCreatePermissions.getInstance(DomainPermissions.getInstance(DomainPermissions.SUPER_USER,
-                                                                                      false)));
+                                                              .getInstance(DomainPermissions.CREATE_CHILD_DOMAIN)),
+                    DomainCreatePermissions.getInstance(DomainPermissions.getInstance(DomainPermissions.SUPER_USER)));
 
       accessControlContext.setDomainCreatePermissions(accessorResource, domainCreatePermissions);
 
@@ -361,11 +345,9 @@ public class TestAccessControl_assertPostCreateDomainPermissions extends TestAcc
 
       // setup create permissions
       Set<DomainCreatePermission> domainCreatePermissions
-            = setOf(DomainCreatePermissions.getInstance(DomainCreatePermissions.CREATE,
-                                                        false),
+            = setOf(DomainCreatePermissions.getInstance(DomainCreatePermissions.CREATE),
                     DomainCreatePermissions.getInstance(DomainPermissions
-                                                              .getInstance(DomainPermissions.CREATE_CHILD_DOMAIN,
-                                                                           false)));
+                                                              .getInstance(DomainPermissions.CREATE_CHILD_DOMAIN)));
 
       accessControlContext.setDomainCreatePermissions(accessorResource, domainCreatePermissions);
 
@@ -386,8 +368,7 @@ public class TestAccessControl_assertPostCreateDomainPermissions extends TestAcc
 
       try {
          accessControlContext.assertPostCreateDomainPermissions(accessorResource,
-                                                                DomainPermissions.getInstance(DomainPermissions.CREATE_CHILD_DOMAIN,
-                                                                                              true));
+                                                                DomainPermissions.getInstanceWithGrantOption(DomainPermissions.CREATE_CHILD_DOMAIN));
          fail("asserting post-create domain permission for a direct create permission with exceeded granting rights should have failed");
       }
       catch (NotAuthorizedException e) {
@@ -396,8 +377,7 @@ public class TestAccessControl_assertPostCreateDomainPermissions extends TestAcc
       try {
          accessControlContext.assertPostCreateDomainPermissions(accessorResource,
                                                                 setOf(DomainPermissions
-                                                                            .getInstance(DomainPermissions.CREATE_CHILD_DOMAIN,
-                                                                                         true)));
+                                                                            .getInstanceWithGrantOption(DomainPermissions.CREATE_CHILD_DOMAIN)));
          fail("asserting post-create domain permission for a direct create permission with exceeded granting rights should have failed");
       }
       catch (NotAuthorizedException e) {
@@ -440,8 +420,8 @@ public class TestAccessControl_assertPostCreateDomainPermissions extends TestAcc
 
       // setup super-user domain create permission
       Set<DomainCreatePermission> domainCreatePermissions
-            = setOf(DomainCreatePermissions.getInstance(DomainCreatePermissions.CREATE, false),
-                    DomainCreatePermissions.getInstance(DomainPermissions.getInstance(DomainPermissions.SUPER_USER, false)));
+            = setOf(DomainCreatePermissions.getInstance(DomainCreatePermissions.CREATE),
+                    DomainCreatePermissions.getInstance(DomainPermissions.getInstance(DomainPermissions.SUPER_USER)));
 
       accessControlContext.setDomainCreatePermissions(accessorResource, domainCreatePermissions);
 
@@ -452,44 +432,38 @@ public class TestAccessControl_assertPostCreateDomainPermissions extends TestAcc
       accessControlContext.assertPostCreateDomainPermissions(accessorResource,
                                                              DomainPermissions.getInstance(DomainPermissions.SUPER_USER));
       accessControlContext.assertPostCreateDomainPermissions(accessorResource,
-                                                             DomainPermissions.getInstance(DomainPermissions.SUPER_USER,
-                                                                                           true));
+                                                             DomainPermissions.getInstanceWithGrantOption(DomainPermissions.SUPER_USER));
       accessControlContext.assertPostCreateDomainPermissions(accessorResource,
                                                              DomainPermissions
                                                                    .getInstance(DomainPermissions.CREATE_CHILD_DOMAIN));
       accessControlContext.assertPostCreateDomainPermissions(accessorResource,
                                                              DomainPermissions
-                                                                   .getInstance(DomainPermissions.CREATE_CHILD_DOMAIN,
-                                                                                true));
+                                                                   .getInstanceWithGrantOption(DomainPermissions.CREATE_CHILD_DOMAIN));
       accessControlContext.assertPostCreateDomainPermissions(accessorResource,
                                                              DomainPermissions
                                                                    .getInstance(DomainPermissions.DELETE));
       accessControlContext.assertPostCreateDomainPermissions(accessorResource,
                                                              DomainPermissions
-                                                                   .getInstance(DomainPermissions.DELETE,
-                                                                                true));
+                                                                   .getInstanceWithGrantOption(DomainPermissions.DELETE));
 
       accessControlContext.assertPostCreateDomainPermissions(accessorResource,
                                                              setOf(DomainPermissions
                                                                          .getInstance(DomainPermissions.SUPER_USER)));
       accessControlContext.assertPostCreateDomainPermissions(accessorResource,
                                                              setOf(DomainPermissions
-                                                                         .getInstance(DomainPermissions.SUPER_USER,
-                                                                                      true)));
+                                                                         .getInstanceWithGrantOption(DomainPermissions.SUPER_USER)));
       accessControlContext.assertPostCreateDomainPermissions(accessorResource,
                                                              setOf(DomainPermissions
                                                                          .getInstance(DomainPermissions.CREATE_CHILD_DOMAIN)));
       accessControlContext.assertPostCreateDomainPermissions(accessorResource,
                                                              setOf(DomainPermissions
-                                                                         .getInstance(DomainPermissions.CREATE_CHILD_DOMAIN,
-                                                                                      true)));
+                                                                         .getInstanceWithGrantOption(DomainPermissions.CREATE_CHILD_DOMAIN)));
       accessControlContext.assertPostCreateDomainPermissions(accessorResource,
                                                              setOf(DomainPermissions
                                                                          .getInstance(DomainPermissions.DELETE)));
       accessControlContext.assertPostCreateDomainPermissions(accessorResource,
                                                              setOf(DomainPermissions
-                                                                         .getInstance(DomainPermissions.DELETE,
-                                                                                      true)));
+                                                                         .getInstanceWithGrantOption(DomainPermissions.DELETE)));
    }
 
    @Test
@@ -504,17 +478,15 @@ public class TestAccessControl_assertPostCreateDomainPermissions extends TestAcc
       // setup donor domain create permissions
       Set<DomainCreatePermission> donorPermissions
             = setOf(DomainCreatePermissions.getInstance(DomainCreatePermissions.CREATE),
-                    DomainCreatePermissions.getInstance(DomainPermissions.getInstance(donorPermissionName_createChild, true),
-                                                        true));
+                    DomainCreatePermissions.getInstanceWithGrantOption(DomainPermissions.getInstanceWithGrantOption(donorPermissionName_createChild)));
 
       accessControlContext.setDomainCreatePermissions(donorResource, donorPermissions);
       assertThat(accessControlContext.getEffectiveDomainCreatePermissions(donorResource), is(donorPermissions));
 
       // setup accessor domain create permissions
       Set<DomainCreatePermission> accessorPermissions
-            = setOf(DomainCreatePermissions.getInstance(DomainCreatePermissions.CREATE, true),
-                    DomainCreatePermissions.getInstance(DomainPermissions.getInstance(accessorPermissionName_createChild, false),
-                                                        false));
+            = setOf(DomainCreatePermissions.getInstanceWithGrantOption(DomainCreatePermissions.CREATE),
+                    DomainCreatePermissions.getInstance(DomainPermissions.getInstance(accessorPermissionName_createChild)));
 
       accessControlContext.setDomainCreatePermissions(accessorResource, accessorPermissions);
       assertThat(accessControlContext.getEffectiveDomainCreatePermissions(accessorResource), is(accessorPermissions));
@@ -528,26 +500,22 @@ public class TestAccessControl_assertPostCreateDomainPermissions extends TestAcc
 
       // verify
       accessControlContext.assertPostCreateDomainPermissions(accessorResource,
-                                                             DomainPermissions.getInstance(
-                                                                   accessorPermissionName_createChild,
-                                                                   true));
+                                                             DomainPermissions.getInstanceWithGrantOption(
+                                                                   accessorPermissionName_createChild));
       accessControlContext.assertPostCreateDomainPermissions(accessorResource,
                                                              DomainPermissions.getInstance(
                                                                    accessorPermissionName_createChild),
-                                                             DomainPermissions.getInstance(
-                                                                   accessorPermissionName_createChild,
-                                                                   true));
+                                                             DomainPermissions.getInstanceWithGrantOption(
+                                                                   accessorPermissionName_createChild));
 
       accessControlContext.assertPostCreateDomainPermissions(accessorResource,
-                                                             setOf(DomainPermissions.getInstance(
-                                                                   accessorPermissionName_createChild,
-                                                                   true)));
+                                                             setOf(DomainPermissions.getInstanceWithGrantOption(
+                                                                   accessorPermissionName_createChild)));
       accessControlContext.assertPostCreateDomainPermissions(accessorResource,
                                                              setOf(DomainPermissions.getInstance(
                                                                          accessorPermissionName_createChild),
-                                                                   DomainPermissions.getInstance(
-                                                                         accessorPermissionName_createChild,
-                                                                         true)));
+                                                                   DomainPermissions.getInstanceWithGrantOption(
+                                                                         accessorPermissionName_createChild)));
    }
 
    @Test
@@ -562,8 +530,7 @@ public class TestAccessControl_assertPostCreateDomainPermissions extends TestAcc
       // setup donor 1 domain create permissions
       Set<DomainCreatePermission> donor1Permissions
             = setOf(DomainCreatePermissions.getInstance(DomainCreatePermissions.CREATE),
-                    DomainCreatePermissions.getInstance(DomainPermissions.getInstance(donorPermissionName_createChild, true),
-                                                        false));
+                    DomainCreatePermissions.getInstance(DomainPermissions.getInstanceWithGrantOption(donorPermissionName_createChild)));
 
       accessControlContext.setDomainCreatePermissions(donor1Resource, donor1Permissions);
       assertThat(accessControlContext.getEffectiveDomainCreatePermissions(donor1Resource), is(donor1Permissions));
@@ -571,8 +538,7 @@ public class TestAccessControl_assertPostCreateDomainPermissions extends TestAcc
       // setup donor 2 domain create permissions
       Set<DomainCreatePermission> donor2Permissions
             = setOf(DomainCreatePermissions.getInstance(DomainCreatePermissions.CREATE),
-                    DomainCreatePermissions.getInstance(DomainPermissions.getInstance(donorPermissionName_createChild, false),
-                                                        true));
+                    DomainCreatePermissions.getInstanceWithGrantOption(DomainPermissions.getInstance(donorPermissionName_createChild)));
 
       accessControlContext.setDomainCreatePermissions(donor2Resource, donor2Permissions);
       assertThat(accessControlContext.getEffectiveDomainCreatePermissions(donor2Resource), is(donor2Permissions));
@@ -597,25 +563,21 @@ public class TestAccessControl_assertPostCreateDomainPermissions extends TestAcc
 
       // verify
       accessControlContext.assertPostCreateDomainPermissions(accessorResource,
-                                                             DomainPermissions.getInstance(donorPermissionName_createChild,
-                                                                                           true));
+                                                             DomainPermissions.getInstanceWithGrantOption(donorPermissionName_createChild));
       accessControlContext.assertPostCreateDomainPermissions(accessorResource,
                                                              DomainPermissions.getInstance(
                                                                    donorPermissionName_createChild),
-                                                             DomainPermissions.getInstance(
-                                                                   donorPermissionName_createChild,
-                                                                   true));
+                                                             DomainPermissions.getInstanceWithGrantOption(
+                                                                   donorPermissionName_createChild));
 
       accessControlContext.assertPostCreateDomainPermissions(accessorResource,
-                                                             setOf(DomainPermissions.getInstance(
-                                                                   donorPermissionName_createChild,
-                                                                   true)));
+                                                             setOf(DomainPermissions.getInstanceWithGrantOption(
+                                                                   donorPermissionName_createChild)));
       accessControlContext.assertPostCreateDomainPermissions(accessorResource,
                                                              setOf(DomainPermissions.getInstance(
                                                                          donorPermissionName_createChild),
-                                                                   DomainPermissions.getInstance(
-                                                                         donorPermissionName_createChild,
-                                                                         true)));
+                                                                   DomainPermissions.getInstanceWithGrantOption(
+                                                                         donorPermissionName_createChild)));
    }
 
    @Test
@@ -631,8 +593,7 @@ public class TestAccessControl_assertPostCreateDomainPermissions extends TestAcc
       // setup donor domain create permissions
       Set<DomainCreatePermission> donorPermissions
             = setOf(DomainCreatePermissions.getInstance(DomainCreatePermissions.CREATE),
-                    DomainCreatePermissions.getInstance(DomainPermissions.getInstance(donorPermissionName_createChild,
-                                                                                      true)));
+                    DomainCreatePermissions.getInstance(DomainPermissions.getInstanceWithGrantOption(donorPermissionName_createChild)));
 
       accessControlContext.setDomainCreatePermissions(donorResource, donorPermissions);
       assertThat(accessControlContext.getEffectiveDomainCreatePermissions(donorResource), is(donorPermissions));
@@ -640,8 +601,7 @@ public class TestAccessControl_assertPostCreateDomainPermissions extends TestAcc
       // setup inheritor domain create permissions
       Set<DomainCreatePermission> inheritorPermissions
             = setOf(DomainCreatePermissions.getInstance(DomainCreatePermissions.CREATE),
-                    DomainCreatePermissions.getInstance(DomainPermissions.getInstance(inheritorPermissionName_createChild, false),
-                                                        true));
+                    DomainCreatePermissions.getInstanceWithGrantOption(DomainPermissions.getInstance(inheritorPermissionName_createChild)));
 
       accessControlContext.setDomainCreatePermissions(inheritorResource, inheritorPermissions);
       assertThat(accessControlContext.getEffectiveDomainCreatePermissions(inheritorResource), is(inheritorPermissions));
@@ -659,20 +619,17 @@ public class TestAccessControl_assertPostCreateDomainPermissions extends TestAcc
 
       // verify
       accessControlContext.assertPostCreateDomainPermissions(accessorResource,
-                                                             DomainPermissions.getInstance(donorPermissionName_createChild, true));
+                                                             DomainPermissions.getInstanceWithGrantOption(donorPermissionName_createChild));
       accessControlContext.assertPostCreateDomainPermissions(accessorResource,
                                                              DomainPermissions.getInstance(donorPermissionName_createChild),
-                                                             DomainPermissions.getInstance(
-                                                                   donorPermissionName_createChild,
-                                                                   true));
+                                                             DomainPermissions.getInstanceWithGrantOption(
+                                                                   donorPermissionName_createChild));
 
       accessControlContext.assertPostCreateDomainPermissions(accessorResource,
-                                                             setOf(DomainPermissions.getInstance(donorPermissionName_createChild,
-                                                                                                 true)));
+                                                             setOf(DomainPermissions.getInstanceWithGrantOption(donorPermissionName_createChild)));
       accessControlContext.assertPostCreateDomainPermissions(accessorResource,
                                                              setOf(DomainPermissions.getInstance(donorPermissionName_createChild),
-                                                                   DomainPermissions.getInstance(donorPermissionName_createChild,
-                                                                                                 true)));
+                                                                   DomainPermissions.getInstanceWithGrantOption(donorPermissionName_createChild)));
    }
 
    @Test
@@ -858,7 +815,7 @@ public class TestAccessControl_assertPostCreateDomainPermissions extends TestAcc
       final DomainPermission domainPermission
             = DomainPermissions.getInstance(DomainPermissions.CREATE_CHILD_DOMAIN);
       final DomainPermission domainPermission_grantable
-            = DomainPermissions.getInstance(DomainPermissions.CREATE_CHILD_DOMAIN, true);
+            = DomainPermissions.getInstanceWithGrantOption(DomainPermissions.CREATE_CHILD_DOMAIN);
 
       accessControlContext.assertPostCreateDomainPermissions(SYS_RESOURCE, domainPermission, domainPermission_grantable);
       accessControlContext.assertPostCreateDomainPermissions(SYS_RESOURCE, setOf(domainPermission, domainPermission_grantable));

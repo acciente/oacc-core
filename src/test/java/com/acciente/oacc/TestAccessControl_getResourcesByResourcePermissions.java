@@ -514,9 +514,9 @@ public class TestAccessControl_getResourcesByResourcePermissions extends TestAcc
       final String permissionName1 = generateResourceClassPermission(queriedResourceClass);
       final String permissionName2 = generateResourceClassPermission(queriedResourceClass);
       final ResourcePermission permission1_withoutGrant = ResourcePermissions.getInstance(permissionName1);
-      final ResourcePermission permission1_withGrant = ResourcePermissions.getInstance(permissionName1, true);
+      final ResourcePermission permission1_withGrant = ResourcePermissions.getInstanceWithGrantOption(permissionName1);
       final ResourcePermission permission2_withoutGrant = ResourcePermissions.getInstance(permissionName2);
-      final ResourcePermission permission2_withGrant = ResourcePermissions.getInstance(permissionName2, true);
+      final ResourcePermission permission2_withGrant = ResourcePermissions.getInstanceWithGrantOption(permissionName2);
       final Resource resource1_queriedDomain = accessControlContext.createResource(queriedResourceClass, queriedDomain);
       final Resource resource_unqueriedDomain = accessControlContext.createResource(queriedResourceClass,
                                                                                     generateDomain());
@@ -1483,7 +1483,7 @@ public class TestAccessControl_getResourcesByResourcePermissions extends TestAcc
       // set permission between accessor and accessed resources
       accessControlContext.setResourcePermissions(accessorResource,
                                                   resource,
-                                                  setOf(ResourcePermissions.getInstance(permission, true)));
+                                                  setOf(ResourcePermissions.getInstanceWithGrantOption(permission)));
 
       // verify as system resource
       final Set<Resource> expectedResources = setOf(resource);
@@ -1492,7 +1492,7 @@ public class TestAccessControl_getResourcesByResourcePermissions extends TestAcc
             = accessControlContext.getResourcesByResourcePermissions(accessorResource,
                                                                      resourceClass,
                                                                      ResourcePermissions.getInstance(permission),
-                                                                     ResourcePermissions.getInstance(permission, true));
+                                                                     ResourcePermissions.getInstanceWithGrantOption(permission));
       assertThat(resourcesByAccessorAndPermission, is(expectedResources));
 
       resourcesByAccessorAndPermission
@@ -1501,7 +1501,7 @@ public class TestAccessControl_getResourcesByResourcePermissions extends TestAcc
                                                                      setOf(ResourcePermissions
                                                                                  .getInstance(permission),
                                                                            ResourcePermissions
-                                                                                 .getInstance(permission, true)));
+                                                                                 .getInstanceWithGrantOption(permission)));
       assertThat(resourcesByAccessorAndPermission, is(expectedResources));
    }
 

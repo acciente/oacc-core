@@ -224,9 +224,7 @@ public class SQLStrings implements Serializable {
    private final SQLProfile sqlProfile;
 
    // resource permissions constants
-   private static final ResourcePermission ResourcePermission_INHERIT = ResourcePermissions.getInstance(
-         ResourcePermissions.INHERIT,
-         false);
+   private static final ResourcePermission ResourcePermission_INHERIT = ResourcePermissions.getInstance(ResourcePermissions.INHERIT);
 
    public static SQLStrings getSQLStrings(String schemaName,
                                           SQLProfile sqlProfile) {
