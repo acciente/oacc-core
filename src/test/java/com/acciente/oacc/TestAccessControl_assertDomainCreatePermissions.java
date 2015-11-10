@@ -149,6 +149,175 @@ public class TestAccessControl_assertDomainCreatePermissions extends TestAccessC
    }
 
    @Test
+   public void assertDomainCreatePermissions_partialDirect_withCustomPermissionImplementation_shouldFailAsAuthenticated() {
+      authenticateSystemResource();
+
+      // setup permission without granting it to anything
+      final char[] password = generateUniquePassword();
+      final Resource accessorResource = generateAuthenticatableResource(password);
+
+      // setup create permissions
+      grantDomainCreatePermission(accessorResource);
+
+      DomainCreatePermission customPermission = new DomainCreatePermission() {
+         @Override
+         public boolean isSystemPermission() { return true; }
+
+         @Override
+         public String getPermissionName() { return DomainCreatePermissions.CREATE; }
+
+         @Override
+         public long getSystemPermissionId() { return DomainCreatePermissions.getInstance(DomainCreatePermissions.CREATE).getSystemPermissionId(); }
+
+         @Override
+         public DomainPermission getPostCreateDomainPermission() { return null; }
+
+         @Override
+         public boolean isWithGrantOption() { return true; }
+
+         @Override
+         @Deprecated
+         public boolean isWithGrant() { return isWithGrantOption(); }
+
+         @Override
+         public boolean isGrantableFrom(DomainCreatePermission other) { return true; }
+
+         @Override
+         public boolean equalsIgnoreGrantOption(Object other) { return true; }
+
+         @Override
+         @Deprecated
+         public boolean equalsIgnoreGrant(Object other) { return equalsIgnoreGrantOption(other); }
+
+         // this implementation will always indicate two permissions are equal
+         @Override
+         public boolean equals(Object other) { return true; }
+      };
+
+      // authenticate accessor/creator resource
+      accessControlContext.authenticate(accessorResource, PasswordCredentials.newInstance(password));
+
+      // verify
+      try {
+         accessControlContext.assertDomainCreatePermissions(accessorResource,
+                                                            customPermission);
+         fail("asserting domain create permission when none has been granted should not have succeeded for authenticated resource");
+      }
+      catch (NotAuthorizedException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString(String.valueOf(accessorResource).toLowerCase()
+                                                                       + " does not have domain create permission"));
+      }
+      try {
+         accessControlContext.assertDomainCreatePermissions(accessorResource,
+                                                            customPermission,
+                                                            DomainCreatePermissions
+                                                            .getInstance(DomainPermissions
+                                                                               .getInstance(DomainPermissions.CREATE_CHILD_DOMAIN)));
+         fail("asserting domain create permissions when none has been granted should not have succeeded for authenticated resource");
+      }
+      catch (NotAuthorizedException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString(String.valueOf(accessorResource).toLowerCase()
+                                                                       + " does not have domain create permission"));
+      }
+      try {
+         accessControlContext.assertDomainCreatePermissions(accessorResource,
+                                                            setOf(customPermission,
+                                                                  DomainCreatePermissions
+                                                                        .getInstance(DomainPermissions
+                                                                                           .getInstance(
+                                                                                                 DomainPermissions.CREATE_CHILD_DOMAIN))));
+         fail("asserting domain create permissions when none has been granted should not have succeeded for authenticated resource");
+      }
+      catch (NotAuthorizedException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString(String.valueOf(accessorResource).toLowerCase()
+                                                                       + " does not have domain create permission"));
+      }
+   }
+
+   @Test
+   public void assertDomainCreatePermissions_invalidCustomPermissionImplementation_shouldFailAsAuthenticated() {
+      authenticateSystemResource();
+
+      // setup permission without granting it to anything
+      final char[] password = generateUniquePassword();
+      final Resource accessorResource = generateAuthenticatableResource(password);
+
+      // setup create permissions
+      grantDomainCreatePermission(accessorResource);
+
+      DomainCreatePermission customPermission = new DomainCreatePermission() {
+         @Override
+         public boolean isSystemPermission() { return true; }
+
+         @Override
+         public String getPermissionName() { return DomainCreatePermissions.CREATE; }
+
+         // this implementation's sys permission id does NOT match the sys permission name
+         @Override
+         public long getSystemPermissionId() { return -99; }
+
+         @Override
+         public DomainPermission getPostCreateDomainPermission() { return null; }
+
+         @Override
+         public boolean isWithGrantOption() { return true; }
+
+         @Override
+         @Deprecated
+         public boolean isWithGrant() { return isWithGrantOption(); }
+
+         @Override
+         public boolean isGrantableFrom(DomainCreatePermission other) { return true; }
+
+         @Override
+         public boolean equalsIgnoreGrantOption(Object other) { return true; }
+
+         @Override
+         @Deprecated
+         public boolean equalsIgnoreGrant(Object other) { return equalsIgnoreGrantOption(other); }
+
+         @Override
+         public boolean equals(Object other) { return true; }
+      };
+
+      // authenticate accessor/creator resource
+      accessControlContext.authenticate(accessorResource, PasswordCredentials.newInstance(password));
+
+      // verify
+      try {
+         accessControlContext.assertDomainCreatePermissions(accessorResource,
+                                                            customPermission);
+         fail("asserting domain create permission when none has been granted should not have succeeded for authenticated resource");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("invalid system permission id"));
+      }
+      try {
+         accessControlContext.assertDomainCreatePermissions(accessorResource,
+                                                            customPermission,
+                                                            DomainCreatePermissions
+                                                            .getInstance(DomainPermissions
+                                                                               .getInstance(DomainPermissions.CREATE_CHILD_DOMAIN)));
+         fail("asserting domain create permissions when none has been granted should not have succeeded for authenticated resource");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("invalid system permission id"));
+      }
+      try {
+         accessControlContext.assertDomainCreatePermissions(accessorResource,
+                                                            setOf(customPermission,
+                                                                  DomainCreatePermissions
+                                                                        .getInstance(DomainPermissions
+                                                                                           .getInstance(
+                                                                                                 DomainPermissions.CREATE_CHILD_DOMAIN))));
+         fail("asserting domain create permissions when none has been granted should not have succeeded for authenticated resource");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("invalid system permission id"));
+      }
+   }
+
+   @Test
    public void assertDomainCreatePermissions_withoutQueryAuthorization_shouldFailAsAuthenticated() {
       authenticateSystemResource();
 

@@ -1092,11 +1092,13 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       __assertDomainSpecified(domainName);
       __assertPermissionsSpecified(permissions);
 
+      final Set<DomainPermission> normalizedDomainPermissions = __normalizeDomainPermissions(permissions);
+
       try {
          connection = __getConnection();
          accessorResource = __resolveResource(connection, accessorResource);
 
-         __setDirectDomainPermissions(connection, accessorResource, domainName, permissions, false);
+         __setDirectDomainPermissions(connection, accessorResource, domainName, normalizedDomainPermissions, false);
       }
       finally {
          __closeConnection(connection);
@@ -1213,11 +1215,13 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       __assertPermissionsSpecified(domainPermissions);
       __assertPermissionsSetNotEmpty(domainPermissions);
 
+      final Set<DomainPermission> normalizedDomainPermissions = __normalizeDomainPermissions(domainPermissions);
+
       try {
          connection = __getConnection();
          accessorResource = __resolveResource(connection, accessorResource);
 
-         __grantDirectDomainPermissions(connection, accessorResource, domainName, domainPermissions);
+         __grantDirectDomainPermissions(connection, accessorResource, domainName, normalizedDomainPermissions);
       }
       finally {
          __closeConnection(connection);
@@ -1237,14 +1241,14 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       __assertPermissionSpecified(domainPermission);
       __assertVarargPermissionsSpecified(domainPermissions);
 
-      final Set<DomainPermission> requestedDomainPermissions = __getSetWithoutNullsOrDuplicates(domainPermission,
-                                                                                                domainPermissions);
+      final Set<DomainPermission> normalizedDomainPermissions
+            = __normalizeDomainPermissions(__getSetWithoutNullsOrDuplicates(domainPermission, domainPermissions));
 
       try {
          connection = __getConnection();
          accessorResource = __resolveResource(connection, accessorResource);
 
-         __grantDirectDomainPermissions(connection, accessorResource, domainName, requestedDomainPermissions);
+         __grantDirectDomainPermissions(connection, accessorResource, domainName, normalizedDomainPermissions);
       }
       finally {
          __closeConnection(connection);
@@ -1360,11 +1364,13 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       __assertPermissionsSpecified(domainPermissions);
       __assertPermissionsSetNotEmpty(domainPermissions);
 
+      final Set<DomainPermission> normalizedDomainPermissions = __normalizeDomainPermissions(domainPermissions);
+
       try {
          connection = __getConnection();
          accessorResource = __resolveResource(connection, accessorResource);
 
-         __revokeDirectDomainPermissions(connection, accessorResource, domainName, domainPermissions);
+         __revokeDirectDomainPermissions(connection, accessorResource, domainName, normalizedDomainPermissions);
       }
       finally {
          __closeConnection(connection);
@@ -1384,14 +1390,14 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       __assertPermissionSpecified(domainPermission);
       __assertVarargPermissionsSpecified(domainPermissions);
 
-      final Set<DomainPermission> requestedDomainPermissions = __getSetWithoutNullsOrDuplicates(domainPermission,
-                                                                                                domainPermissions);
+      final Set<DomainPermission> normalizedDomainPermissions
+            = __normalizeDomainPermissions(__getSetWithoutNullsOrDuplicates(domainPermission, domainPermissions));
 
       try {
          connection = __getConnection();
          accessorResource = __resolveResource(connection, accessorResource);
 
-         __revokeDirectDomainPermissions(connection, accessorResource, domainName, requestedDomainPermissions);
+         __revokeDirectDomainPermissions(connection, accessorResource, domainName, normalizedDomainPermissions);
       }
       finally {
          __closeConnection(connection);
@@ -1637,11 +1643,14 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       __assertResourceSpecified(accessorResource);
       __assertPermissionsSpecified(domainCreatePermissions);
 
+      final Set<DomainCreatePermission> normalizedDomainCreatePermissions
+            = __normalizeDomainCreatePermissions(domainCreatePermissions);
+
       try {
          connection = __getConnection();
          accessorResource = __resolveResource(connection, accessorResource);
 
-         __setDirectDomainCreatePermissions(connection, accessorResource, domainCreatePermissions);
+         __setDirectDomainCreatePermissions(connection, accessorResource, normalizedDomainCreatePermissions);
       }
       finally {
          __closeConnection(connection);
@@ -1772,11 +1781,14 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       __assertPermissionsSpecified(domainCreatePermissions);
       __assertPermissionsSetNotEmpty(domainCreatePermissions);
 
+      final Set<DomainCreatePermission> normalizedDomainCreatePermissions
+            = __normalizeDomainCreatePermissions(domainCreatePermissions);
+
       try {
          connection = __getConnection();
          accessorResource = __resolveResource(connection, accessorResource);
 
-         __grantDirectDomainCreatePermissions(connection, accessorResource, domainCreatePermissions);
+         __grantDirectDomainCreatePermissions(connection, accessorResource, normalizedDomainCreatePermissions);
       }
       finally {
          __closeConnection(connection);
@@ -1794,14 +1806,14 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       __assertPermissionSpecified(domainCreatePermission);
       __assertVarargPermissionsSpecified(domainCreatePermissions);
 
-      final Set<DomainCreatePermission> requestedDomainCreatePermissions
-            = __getSetWithoutNullsOrDuplicates(domainCreatePermission, domainCreatePermissions);
+      final Set<DomainCreatePermission> normalizedDomainCreatePermissions
+            = __normalizeDomainCreatePermissions(__getSetWithoutNullsOrDuplicates(domainCreatePermission, domainCreatePermissions));
 
       try {
          connection = __getConnection();
          accessorResource = __resolveResource(connection, accessorResource);
 
-         __grantDirectDomainCreatePermissions(connection, accessorResource, requestedDomainCreatePermissions);
+         __grantDirectDomainCreatePermissions(connection, accessorResource, normalizedDomainCreatePermissions);
       }
       finally {
          __closeConnection(connection);
@@ -1968,11 +1980,14 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       __assertPermissionsSpecified(domainCreatePermissions);
       __assertPermissionsSetNotEmpty(domainCreatePermissions);
 
+      final Set<DomainCreatePermission> normalizedDomainCreatePermissions
+            = __normalizeDomainCreatePermissions(domainCreatePermissions);
+
       try {
          connection = __getConnection();
          accessorResource = __resolveResource(connection, accessorResource);
 
-         __revokeDirectDomainCreatePermissions(connection, accessorResource, domainCreatePermissions);
+         __revokeDirectDomainCreatePermissions(connection, accessorResource, normalizedDomainCreatePermissions);
       }
       finally {
          __closeConnection(connection);
@@ -1990,14 +2005,14 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       __assertPermissionSpecified(domainCreatePermission);
       __assertVarargPermissionsSpecified(domainCreatePermissions);
 
-      final Set<DomainCreatePermission> requestedDomainCreatePermissions
-            = __getSetWithoutNullsOrDuplicates(domainCreatePermission, domainCreatePermissions);
+      final Set<DomainCreatePermission> normalizedDomainCreatePermissions
+            = __normalizeDomainCreatePermissions(__getSetWithoutNullsOrDuplicates(domainCreatePermission, domainCreatePermissions));
 
       try {
          connection = __getConnection();
          accessorResource = __resolveResource(connection, accessorResource);
 
-         __revokeDirectDomainCreatePermissions(connection, accessorResource, requestedDomainCreatePermissions);
+         __revokeDirectDomainCreatePermissions(connection, accessorResource, normalizedDomainCreatePermissions);
       }
       finally {
          __closeConnection(connection);
@@ -2152,6 +2167,9 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       __assertDomainSpecified(domainName);
       __assertPermissionsSpecified(resourceCreatePermissions);
 
+      final Set<ResourceCreatePermission> normalizedResourceCreatePermissions
+            = __normalizeResourceCreatePermission(resourceCreatePermissions);
+
       try {
          connection = __getConnection();
          accessorResource = __resolveResource(connection, accessorResource);
@@ -2160,7 +2178,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
                                               accessorResource,
                                               resourceClassName,
                                               domainName,
-                                              resourceCreatePermissions);
+                                              normalizedResourceCreatePermissions);
       }
       finally {
          __closeConnection(connection);
@@ -2418,6 +2436,9 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       __assertPermissionsSpecified(resourceCreatePermissions);
       __assertPermissionsSetNotEmpty(resourceCreatePermissions);
 
+      final Set<ResourceCreatePermission> normalizedResourceCreatePermissions
+            = __normalizeResourceCreatePermission(resourceCreatePermissions);
+
       try {
          connection = __getConnection();
          accessorResource = __resolveResource(connection, accessorResource);
@@ -2426,7 +2447,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
                                                 accessorResource,
                                                 resourceClassName,
                                                 domainName,
-                                                resourceCreatePermissions);
+                                                normalizedResourceCreatePermissions);
       }
       finally {
          __closeConnection(connection);
@@ -2448,9 +2469,9 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       __assertPermissionSpecified(resourceCreatePermission);
       __assertVarargPermissionsSpecified(resourceCreatePermissions);
 
-      final Set<ResourceCreatePermission> requestedResourceCreatePermissions
-            = __getSetWithoutNullsOrDuplicates(resourceCreatePermission, resourceCreatePermissions);
-
+      final Set<ResourceCreatePermission> normalizedResourceCreatePermissions
+            = __normalizeResourceCreatePermission(__getSetWithoutNullsOrDuplicates(resourceCreatePermission,
+                                                                                   resourceCreatePermissions));
       try {
          connection = __getConnection();
          accessorResource = __resolveResource(connection, accessorResource);
@@ -2459,7 +2480,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
                                                 accessorResource,
                                                 resourceClassName,
                                                 domainName,
-                                                requestedResourceCreatePermissions);
+                                                normalizedResourceCreatePermissions);
       }
       finally {
          __closeConnection(connection);
@@ -2648,6 +2669,9 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       __assertPermissionsSpecified(resourceCreatePermissions);
       __assertPermissionsSetNotEmpty(resourceCreatePermissions);
 
+      final Set<ResourceCreatePermission> normalizedResourceCreatePermissions
+            = __normalizeResourceCreatePermission(resourceCreatePermissions);
+
       try {
          connection = __getConnection();
          accessorResource = __resolveResource(connection, accessorResource);
@@ -2656,7 +2680,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
                                                  accessorResource,
                                                  resourceClassName,
                                                  domainName,
-                                                 resourceCreatePermissions);
+                                                 normalizedResourceCreatePermissions);
       }
       finally {
          __closeConnection(connection);
@@ -2678,8 +2702,9 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       __assertPermissionSpecified(resourceCreatePermission);
       __assertVarargPermissionsSpecified(resourceCreatePermissions);
 
-      final Set<ResourceCreatePermission> requestedResourceCreatePermissions
-            = __getSetWithoutNullsOrDuplicates(resourceCreatePermission, resourceCreatePermissions);
+      final Set<ResourceCreatePermission> normalizedResourceCreatePermissions
+            = __normalizeResourceCreatePermission(__getSetWithoutNullsOrDuplicates(resourceCreatePermission,
+                                                                                   resourceCreatePermissions));
 
       try {
          connection = __getConnection();
@@ -2689,7 +2714,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
                                                  accessorResource,
                                                  resourceClassName,
                                                  domainName,
-                                                 requestedResourceCreatePermissions);
+                                                 normalizedResourceCreatePermissions);
       }
       finally {
          __closeConnection(connection);
@@ -3183,6 +3208,8 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       __assertResourceSpecified(accessedResource);
       __assertPermissionsSpecified(resourcePermissions);
 
+      final Set<ResourcePermission> normalizedResourcePermissions = __normalizeResourcePermission(resourcePermissions);
+
       try {
          connection = __getConnection();
          accessorResource = __resolveResource(connection, accessorResource);
@@ -3191,7 +3218,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
          __setDirectResourcePermissions(connection,
                                         accessorResource,
                                         accessedResource,
-                                        resourcePermissions,
+                                        normalizedResourcePermissions,
                                         sessionResource,
                                         false);
       }
@@ -3373,12 +3400,14 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       __assertPermissionsSpecified(resourcePermissions);
       __assertPermissionsSetNotEmpty(resourcePermissions);
 
+      final Set<ResourcePermission> normalizedResourcePermissions = __normalizeResourcePermission(resourcePermissions);
+
       try {
          connection = __getConnection();
          accessorResource = __resolveResource(connection, accessorResource);
          accessedResource = __resolveResource(connection, accessedResource);
 
-         __grantDirectResourcePermissions(connection, accessorResource, accessedResource, resourcePermissions);
+         __grantDirectResourcePermissions(connection, accessorResource, accessedResource, normalizedResourcePermissions);
       }
       finally {
          __closeConnection(connection);
@@ -3398,15 +3427,15 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       __assertPermissionSpecified(resourcePermission);
       __assertVarargPermissionsSpecified(resourcePermissions);
 
-      final Set<ResourcePermission> requestedResourcePermissions
-            = __getSetWithoutNullsOrDuplicates(resourcePermission, resourcePermissions);
+      final Set<ResourcePermission> normalizedResourcePermissions
+            = __normalizeResourcePermission(__getSetWithoutNullsOrDuplicates(resourcePermission, resourcePermissions));
 
       try {
          connection = __getConnection();
          accessorResource = __resolveResource(connection, accessorResource);
          accessedResource = __resolveResource(connection, accessedResource);
 
-         __grantDirectResourcePermissions(connection, accessorResource, accessedResource, requestedResourcePermissions);
+         __grantDirectResourcePermissions(connection, accessorResource, accessedResource, normalizedResourcePermissions);
       }
       finally {
          __closeConnection(connection);
@@ -3541,12 +3570,14 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       __assertPermissionsSpecified(resourcePermissions);
       __assertPermissionsSetNotEmpty(resourcePermissions);
 
+      final Set<ResourcePermission> normalizedResourcePermissions = __normalizeResourcePermission(resourcePermissions);
+
       try {
          connection = __getConnection();
          accessorResource = __resolveResource(connection, accessorResource);
          accessedResource = __resolveResource(connection, accessedResource);
 
-         __revokeDirectResourcePermissions(connection, accessorResource, accessedResource, resourcePermissions);
+         __revokeDirectResourcePermissions(connection, accessorResource, accessedResource, normalizedResourcePermissions);
       }
       finally {
          __closeConnection(connection);
@@ -3566,15 +3597,15 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       __assertPermissionSpecified(resourcePermission);
       __assertVarargPermissionsSpecified(resourcePermissions);
 
-      final Set<ResourcePermission> obsoleteResourcePermissions
-            = __getSetWithoutNullsOrDuplicates(resourcePermission, resourcePermissions);
+      final Set<ResourcePermission> normalizedResourcePermissions
+            = __normalizeResourcePermission(__getSetWithoutNullsOrDuplicates(resourcePermission, resourcePermissions));
 
       try {
          connection = __getConnection();
          accessorResource = __resolveResource(connection, accessorResource);
          accessedResource = __resolveResource(connection, accessedResource);
 
-         __revokeDirectResourcePermissions(connection, accessorResource, accessedResource, obsoleteResourcePermissions);
+         __revokeDirectResourcePermissions(connection, accessorResource, accessedResource, normalizedResourcePermissions);
       }
       finally {
          __closeConnection(connection);
@@ -3799,6 +3830,8 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       __assertDomainSpecified(domainName);
       __assertPermissionsSpecified(resourcePermissions);
 
+      final Set<ResourcePermission> normalizedResourcePermissions = __normalizeResourcePermission(resourcePermissions);
+
       try {
          connection = __getConnection();
          accessorResource = __resolveResource(connection, accessorResource);
@@ -3809,7 +3842,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
                                       accessorResource,
                                       resourceClassName,
                                       domainName,
-                                      resourcePermissions);
+                                      normalizedResourcePermissions);
       }
       finally {
          __closeConnection(connection);
@@ -3993,6 +4026,8 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       __assertPermissionsSpecified(resourcePermissions);
       __assertPermissionsSetNotEmpty(resourcePermissions);
 
+      final Set<ResourcePermission> normalizedResourcePermissions = __normalizeResourcePermission(resourcePermissions);
+
       try {
          connection = __getConnection();
          accessorResource = __resolveResource(connection, accessorResource);
@@ -4003,7 +4038,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
                                         accessorResource,
                                         resourceClassName,
                                         domainName,
-                                        resourcePermissions);
+                                        normalizedResourcePermissions);
       }
       finally {
          __closeConnection(connection);
@@ -4025,8 +4060,8 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       __assertPermissionSpecified(resourcePermission);
       __assertVarargPermissionsSpecified(resourcePermissions);
 
-      final Set<ResourcePermission> requestedResourcePermissions
-            = __getSetWithoutNullsOrDuplicates(resourcePermission, resourcePermissions);
+      final Set<ResourcePermission> normalizedResourcePermissions
+            = __normalizeResourcePermission(__getSetWithoutNullsOrDuplicates(resourcePermission, resourcePermissions));
 
       try {
          connection = __getConnection();
@@ -4038,7 +4073,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
                                         accessorResource,
                                         resourceClassName,
                                         domainName,
-                                        requestedResourcePermissions);
+                                        normalizedResourcePermissions);
       }
       finally {
          __closeConnection(connection);
@@ -4164,6 +4199,8 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       __assertPermissionsSpecified(resourcePermissions);
       __assertPermissionsSetNotEmpty(resourcePermissions);
 
+      final Set<ResourcePermission> normalizedResourcePermissions = __normalizeResourcePermission(resourcePermissions);
+
       try {
          connection = __getConnection();
          accessorResource = __resolveResource(connection, accessorResource);
@@ -4174,7 +4211,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
                                          accessorResource,
                                          resourceClassName,
                                          domainName,
-                                         resourcePermissions);
+                                         normalizedResourcePermissions);
       }
       finally {
          __closeConnection(connection);
@@ -4196,8 +4233,8 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       __assertPermissionSpecified(resourcePermission);
       __assertVarargPermissionsSpecified(resourcePermissions);
 
-      final Set<ResourcePermission> requestedResourcePermissions
-            = __getSetWithoutNullsOrDuplicates(resourcePermission, resourcePermissions);
+      final Set<ResourcePermission> normalizedResourcePermissions
+            = __normalizeResourcePermission(__getSetWithoutNullsOrDuplicates(resourcePermission, resourcePermissions));
 
       try {
          connection = __getConnection();
@@ -4209,7 +4246,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
                                          accessorResource,
                                          resourceClassName,
                                          domainName,
-                                         requestedResourcePermissions);
+                                         normalizedResourcePermissions);
       }
       finally {
          __closeConnection(connection);
@@ -4767,11 +4804,13 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       __assertPermissionsSpecified(domainPermissions);
       __assertPermissionsSetNotEmpty(domainPermissions);
 
+      final Set<DomainPermission> normalizedDomainPermissions = __normalizeDomainPermissions(domainPermissions);
+
       try {
          connection = __getConnection();
          accessorResource = __resolveResource(connection, accessorResource);
 
-         return __hasPostCreateDomainPermissions(connection, accessorResource, domainPermissions);
+         return __hasPostCreateDomainPermissions(connection, accessorResource, normalizedDomainPermissions);
       }
       finally {
          __closeConnection(connection);
@@ -4789,8 +4828,8 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       __assertPermissionSpecified(domainPermission);
       __assertVarargPermissionsSpecified(domainPermissions);
 
-      final Set<DomainPermission> requestedDomainPermissions = __getSetWithoutNullsOrDuplicates(domainPermission,
-                                                                                                domainPermissions);
+      final Set<DomainPermission> normalizedDomainPermissions
+            = __normalizeDomainPermissions(__getSetWithoutNullsOrDuplicates(domainPermission, domainPermissions));
 
       try {
          connection = __getConnection();
@@ -4798,7 +4837,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
 
          return __hasPostCreateDomainPermissions(connection,
                                                  accessorResource,
-                                                 requestedDomainPermissions);
+                                                 normalizedDomainPermissions);
       }
       finally {
          __closeConnection(connection);
@@ -4891,11 +4930,13 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       __assertPermissionsSpecified(domainPermissions);
       __assertPermissionsSetNotEmpty(domainPermissions);
 
+      final Set<DomainPermission> normalizedDomainPermissions = __normalizeDomainPermissions(domainPermissions);
+
       try {
          connection = __getConnection();
          accessorResource = __resolveResource(connection, accessorResource);
 
-         return __hasDomainPermissions(connection, accessorResource, domainName, domainPermissions);
+         return __hasDomainPermissions(connection, accessorResource, domainName, normalizedDomainPermissions);
       }
       finally {
          __closeConnection(connection);
@@ -4915,14 +4956,14 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       __assertPermissionSpecified(domainPermission);
       __assertVarargPermissionsSpecified(domainPermissions);
 
-      final Set<DomainPermission> requestedDomainPermissions = __getSetWithoutNullsOrDuplicates(domainPermission,
-                                                                                                domainPermissions);
+      final Set<DomainPermission> normalizedDomainPermissions
+            = __normalizeDomainPermissions(__getSetWithoutNullsOrDuplicates(domainPermission, domainPermissions));
 
       try {
          connection = __getConnection();
          accessorResource = __resolveResource(connection, accessorResource);
 
-         return __hasDomainPermissions(connection, accessorResource, domainName, requestedDomainPermissions);
+         return __hasDomainPermissions(connection, accessorResource, domainName, normalizedDomainPermissions);
       }
       finally {
          __closeConnection(connection);
@@ -4986,11 +5027,14 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       __assertPermissionsSpecified(domainCreatePermissions);
       __assertPermissionsSetNotEmpty(domainCreatePermissions);
 
+      final Set<DomainCreatePermission> normalizedDomainCreatePermissions
+            = __normalizeDomainCreatePermissions(domainCreatePermissions);
+
       try {
          connection = __getConnection();
          accessorResource = __resolveResource(connection, accessorResource);
 
-         return __hasDomainCreatePermissions(connection, accessorResource, domainCreatePermissions);
+         return __hasDomainCreatePermissions(connection, accessorResource, normalizedDomainCreatePermissions);
       }
       finally {
          __closeConnection(connection);
@@ -5008,14 +5052,15 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       __assertPermissionSpecified(domainCreatePermission);
       __assertVarargPermissionsSpecified(domainCreatePermissions);
 
-      final Set<DomainCreatePermission> requestedDomainCreatePermissions
-            = __getSetWithoutNullsOrDuplicates(domainCreatePermission, domainCreatePermissions);
+      final Set<DomainCreatePermission> normalizedDomainCreatePermissions
+            = __normalizeDomainCreatePermissions(__getSetWithoutNullsOrDuplicates(domainCreatePermission,
+                                                                                  domainCreatePermissions));
 
       try {
          connection = __getConnection();
          accessorResource = __resolveResource(connection, accessorResource);
 
-         return __hasDomainCreatePermissions(connection, accessorResource, requestedDomainCreatePermissions);
+         return __hasDomainCreatePermissions(connection, accessorResource, normalizedDomainCreatePermissions);
       }
       finally {
          __closeConnection(connection);
@@ -5099,6 +5144,8 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       __assertPermissionsSpecified(resourcePermissions);
       __assertPermissionsSetNotEmpty(resourcePermissions);
 
+      final Set<ResourcePermission> normalizedResourcePermissions = __normalizeResourcePermission(resourcePermissions);
+
       try {
          connection = __getConnection();
          accessorResource = __resolveResource(connection, accessorResource);
@@ -5109,7 +5156,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
                                                    accessorResource,
                                                    resourceClassName,
                                                    domainName,
-                                                   resourcePermissions);
+                                                   normalizedResourcePermissions);
       }
       finally {
          __closeConnection(connection);
@@ -5131,8 +5178,8 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       __assertPermissionSpecified(resourcePermission);
       __assertVarargPermissionsSpecified(resourcePermissions);
 
-      final Set<ResourcePermission> requestedResourcePermissions
-            = __getSetWithoutNullsOrDuplicates(resourcePermission, resourcePermissions);
+      final Set<ResourcePermission> normalizedResourcePermissions
+            = __normalizeResourcePermission(__getSetWithoutNullsOrDuplicates(resourcePermission, resourcePermissions));
 
       try {
          connection = __getConnection();
@@ -5144,7 +5191,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
                                                    accessorResource,
                                                    resourceClassName,
                                                    domainName,
-                                                   requestedResourcePermissions);
+                                                   normalizedResourcePermissions);
       }
       finally {
          __closeConnection(connection);
@@ -5274,6 +5321,8 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       __assertPermissionsSpecified(resourcePermissions);
       __assertPermissionsSetNotEmpty(resourcePermissions);
 
+      final Set<ResourcePermission> normalizedResourcePermissions = __normalizeResourcePermission(resourcePermissions);
+
       try {
          connection = __getConnection();
          accessorResource = __resolveResource(connection, accessorResource);
@@ -5284,7 +5333,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
                                                accessorResource,
                                                resourceClassName,
                                                domainName,
-                                               resourcePermissions);
+                                               normalizedResourcePermissions);
       }
       finally {
          __closeConnection(connection);
@@ -5306,8 +5355,8 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       __assertPermissionSpecified(resourcePermission);
       __assertVarargPermissionsSpecified(resourcePermissions);
 
-      final Set<ResourcePermission> requestedResourcePermissions
-            = __getSetWithoutNullsOrDuplicates(resourcePermission, resourcePermissions);
+      final Set<ResourcePermission> normalizedResourcePermissions
+            = __normalizeResourcePermission(__getSetWithoutNullsOrDuplicates(resourcePermission, resourcePermissions));
 
       try {
          connection = __getConnection();
@@ -5319,7 +5368,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
                                                accessorResource,
                                                resourceClassName,
                                                domainName,
-                                               requestedResourcePermissions);
+                                               normalizedResourcePermissions);
       }
       finally {
          __closeConnection(connection);
@@ -5390,12 +5439,14 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       __assertPermissionsSpecified(resourcePermissions);
       __assertPermissionsSetNotEmpty(resourcePermissions);
 
+      final Set<ResourcePermission> normalizedResourcePermissions = __normalizeResourcePermission(resourcePermissions);
+
       try {
          connection = __getConnection();
          accessorResource = __resolveResource(connection, accessorResource);
          accessedResource = __resolveResource(connection, accessedResource);
 
-         return __hasResourcePermissions(connection, accessorResource, accessedResource, resourcePermissions);
+         return __hasResourcePermissions(connection, accessorResource, accessedResource, normalizedResourcePermissions);
       }
       finally {
          __closeConnection(connection);
@@ -5415,15 +5466,15 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       __assertPermissionSpecified(resourcePermission);
       __assertVarargPermissionsSpecified(resourcePermissions);
 
-      final Set<ResourcePermission> requestedResourcePermissions
-            = __getSetWithoutNullsOrDuplicates(resourcePermission, resourcePermissions);
+      final Set<ResourcePermission> normalizedResourcePermissions
+            = __normalizeResourcePermission(__getSetWithoutNullsOrDuplicates(resourcePermission, resourcePermissions));
 
       try {
          connection = __getConnection();
          accessorResource = __resolveResource(connection, accessorResource);
          accessedResource = __resolveResource(connection, accessedResource);
 
-         return __hasResourcePermissions(connection, accessorResource, accessedResource, requestedResourcePermissions);
+         return __hasResourcePermissions(connection, accessorResource, accessedResource, normalizedResourcePermissions);
       }
       finally {
          __closeConnection(connection);
@@ -5513,6 +5564,9 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       __assertPermissionsSpecified(resourceCreatePermissions);
       __assertPermissionsSetNotEmpty(resourceCreatePermissions);
 
+      final Set<ResourceCreatePermission> normalizedResourceCreatePermissions
+            = __normalizeResourceCreatePermission(resourceCreatePermissions);
+
       try {
          connection = __getConnection();
          accessorResource = __resolveResource(connection, accessorResource);
@@ -5523,7 +5577,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
                                                accessorResource,
                                                resourceClassName,
                                                domainName,
-                                               resourceCreatePermissions);
+                                               normalizedResourceCreatePermissions);
       }
       finally {
          __closeConnection(connection);
@@ -5545,8 +5599,9 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       __assertPermissionSpecified(resourceCreatePermission);
       __assertVarargPermissionsSpecified(resourceCreatePermissions);
 
-      final Set<ResourceCreatePermission> requestedResourceCreatePermissions
-            = __getSetWithoutNullsOrDuplicates(resourceCreatePermission, resourceCreatePermissions);
+      final Set<ResourceCreatePermission> normalizedResourceCreatePermissions
+            = __normalizeResourceCreatePermission(__getSetWithoutNullsOrDuplicates(resourceCreatePermission,
+                                                                                   resourceCreatePermissions));
 
       try {
          connection = __getConnection();
@@ -5558,7 +5613,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
                                                accessorResource,
                                                resourceClassName,
                                                domainName,
-                                               requestedResourceCreatePermissions);
+                                               normalizedResourceCreatePermissions);
       }
       finally {
          __closeConnection(connection);
@@ -5621,6 +5676,8 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       __assertPermissionsSpecified(resourcePermissions);
       __assertPermissionsSetNotEmpty(resourcePermissions);
 
+      final Set<ResourcePermission> normalizedResourcePermissions = __normalizeResourcePermission(resourcePermissions);
+
       try {
          connection = __getConnection();
 
@@ -5632,7 +5689,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
          return __getResourcesByPermissions(connection,
                                             accessorResource,
                                             resourceClassName,
-                                            resourcePermissions);
+                                            normalizedResourcePermissions);
       }
       finally {
          __closeConnection(connection);
@@ -5652,8 +5709,8 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       __assertPermissionSpecified(resourcePermission);
       __assertVarargPermissionsSpecified(resourcePermissions);
 
-      final Set<ResourcePermission> requestedResourcePermissions
-            = __getSetWithoutNullsOrDuplicates(resourcePermission, resourcePermissions);
+      final Set<ResourcePermission> normalizedResourcePermissions
+            = __normalizeResourcePermission(__getSetWithoutNullsOrDuplicates(resourcePermission, resourcePermissions));
 
       try {
          connection = __getConnection();
@@ -5666,7 +5723,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
          return __getResourcesByPermissions(connection,
                                             accessorResource,
                                             resourceClassName,
-                                            requestedResourcePermissions);
+                                            normalizedResourcePermissions);
       }
       finally {
          __closeConnection(connection);
@@ -5780,6 +5837,8 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       __assertPermissionsSpecified(resourcePermissions);
       __assertPermissionsSetNotEmpty(resourcePermissions);
 
+      final Set<ResourcePermission> normalizedResourcePermissions = __normalizeResourcePermission(resourcePermissions);
+
       try {
          connection = __getConnection();
 
@@ -5792,7 +5851,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
                                                      accessorResource,
                                                      resourceClassName,
                                                      domainName,
-                                                     resourcePermissions);
+                                                     normalizedResourcePermissions);
       }
       finally {
          __closeConnection(connection);
@@ -5814,8 +5873,8 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       __assertPermissionSpecified(resourcePermission);
       __assertVarargPermissionsSpecified(resourcePermissions);
 
-      final Set<ResourcePermission> requestedResourcePermissions
-            = __getSetWithoutNullsOrDuplicates(resourcePermission, resourcePermissions);
+      final Set<ResourcePermission> normalizedResourcePermissions
+            = __normalizeResourcePermission(__getSetWithoutNullsOrDuplicates(resourcePermission, resourcePermissions));
 
       try {
          connection = __getConnection();
@@ -5829,7 +5888,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
                                                      accessorResource,
                                                      resourceClassName,
                                                      domainName,
-                                                     requestedResourcePermissions);
+                                                     normalizedResourcePermissions);
       }
       finally {
          __closeConnection(connection);
@@ -5953,6 +6012,8 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       __assertPermissionsSpecified(resourcePermissions);
       __assertPermissionsSetNotEmpty(resourcePermissions);
 
+      final Set<ResourcePermission> normalizedResourcePermissions = __normalizeResourcePermission(resourcePermissions);
+
       try {
          connection = __getConnection();
 
@@ -5964,7 +6025,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
          return __getAccessorResourcesByResourcePermissions(connection,
                                                             accessedResource,
                                                             resourceClassName,
-                                                            resourcePermissions);
+                                                            normalizedResourcePermissions);
       }
       finally {
          __closeConnection(connection);
@@ -5984,8 +6045,8 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       __assertPermissionSpecified(resourcePermission);
       __assertVarargPermissionsSpecified(resourcePermissions);
 
-      final Set<ResourcePermission> requestedResourcePermissions
-            = __getSetWithoutNullsOrDuplicates(resourcePermission, resourcePermissions);
+      final Set<ResourcePermission> normalizedResourcePermissions
+            = __normalizeResourcePermission(__getSetWithoutNullsOrDuplicates(resourcePermission, resourcePermissions));
 
       try {
          connection = __getConnection();
@@ -5998,7 +6059,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
          return __getAccessorResourcesByResourcePermissions(connection,
                                                             accessedResource,
                                                             resourceClassName,
-                                                            requestedResourcePermissions);
+                                                            normalizedResourcePermissions);
       }
       finally {
          __closeConnection(connection);
@@ -6113,6 +6174,38 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
    }
 
    // private shared helper methods
+
+   private static Set<DomainPermission> __normalizeDomainPermissions(Set<DomainPermission> domainPermissions) {
+      Set<DomainPermission> translatedPermissions = new HashSet<>(domainPermissions.size());
+      for (DomainPermission domainPermission : domainPermissions) {
+         translatedPermissions.add(DomainPermissions.getInstance(domainPermission));
+      }
+      return translatedPermissions;
+   }
+
+   private static Set<DomainCreatePermission> __normalizeDomainCreatePermissions(Set<DomainCreatePermission> domainCreatePermissions) {
+      Set<DomainCreatePermission> translatedPermissions = new HashSet<>(domainCreatePermissions.size());
+      for (DomainCreatePermission permission : domainCreatePermissions) {
+         translatedPermissions.add(DomainCreatePermissions.getInstance(permission));
+      }
+      return translatedPermissions;
+   }
+
+   private static Set<ResourcePermission> __normalizeResourcePermission(Set<ResourcePermission> resourcePermissions) {
+      Set<ResourcePermission> translatedResourcePermissions = new HashSet<>(resourcePermissions.size());
+      for (ResourcePermission resourcePermission : resourcePermissions) {
+         translatedResourcePermissions.add(ResourcePermissions.getInstance(resourcePermission));
+      }
+      return translatedResourcePermissions;
+   }
+
+   private static Set<ResourceCreatePermission> __normalizeResourceCreatePermission(Set<ResourceCreatePermission> resourceCreatePermissions) {
+      Set<ResourceCreatePermission> translatedResourceCreatePermissions = new HashSet<>(resourceCreatePermissions.size());
+      for (ResourceCreatePermission resourceCreatePermission : resourceCreatePermissions) {
+         translatedResourceCreatePermissions.add(ResourceCreatePermissions.getInstance(resourceCreatePermission));
+      }
+      return translatedResourceCreatePermissions;
+   }
 
    private Resource __resolveResource(SQLConnection connection,
                                       Resource resource) {

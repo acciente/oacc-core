@@ -18,38 +18,50 @@
 package com.acciente.oacc;
 
 import java.io.Serializable;
-import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class DomainPermissions {
    // constants for the important system permission names with pre-defined semantics
    private static final SysPermission SYSPERMISSION_SUPER_USER          = new SysPermission(-301, "*SUPER-USER");
-   // constants for the important system permission names with pre-defined semantics
    public static final  String        SUPER_USER                        = SYSPERMISSION_SUPER_USER.getPermissionName();
-   private static final SysPermission SYSPERMISSION_CREATE_CHILD_DOMAIN = new SysPermission(-302,
-                                                                                            "*CREATE-CHILD-DOMAIN");
+   private static final SysPermission SYSPERMISSION_CREATE_CHILD_DOMAIN = new SysPermission(-302, "*CREATE-CHILD-DOMAIN");
    public static final  String        CREATE_CHILD_DOMAIN               = SYSPERMISSION_CREATE_CHILD_DOMAIN.getPermissionName();
-   private static final SysPermission SYSPERMISSION_DELETE              = new SysPermission(-303,
-                                                                                            "*DELETE");
+   private static final SysPermission SYSPERMISSION_DELETE              = new SysPermission(-303, "*DELETE");
    public static final  String        DELETE                            = SYSPERMISSION_DELETE.getPermissionName();
 
+   private static final Map<String, SysPermission> sysPermissionsByName;
+   private static final Map<Long, String>          sysPermissionNamesById;
+   private static final List<String>               sysPermissionNames;
+   static {
+      sysPermissionsByName = new HashMap<>();
+      sysPermissionsByName.put(SUPER_USER, SYSPERMISSION_SUPER_USER);
+      sysPermissionsByName.put(CREATE_CHILD_DOMAIN, SYSPERMISSION_CREATE_CHILD_DOMAIN);
+      sysPermissionsByName.put(DELETE, SYSPERMISSION_DELETE);
+
+      sysPermissionNamesById = new HashMap<>(sysPermissionsByName.size());
+      for (SysPermission sysPermission : sysPermissionsByName.values()) {
+         sysPermissionNamesById.put(sysPermission.getSystemPermissionId(), sysPermission.getPermissionName());
+      }
+
+      sysPermissionNames = Collections.unmodifiableList(new ArrayList<>(sysPermissionNamesById.values()));
+   }
+
    public static List<String> getSysPermissionNames() {
-      return Arrays.asList(SUPER_USER, CREATE_CHILD_DOMAIN, DELETE);
+      return sysPermissionNames;
    }
 
    public static String getSysPermissionName(long systemPermissionId) {
-      if (systemPermissionId == SYSPERMISSION_SUPER_USER.getSystemPermissionId()) {
-         return SYSPERMISSION_SUPER_USER.getPermissionName();
-      }
-      else if (systemPermissionId == SYSPERMISSION_CREATE_CHILD_DOMAIN.getSystemPermissionId()) {
-         return SYSPERMISSION_CREATE_CHILD_DOMAIN.getPermissionName();
-      }
-      else if (systemPermissionId == SYSPERMISSION_DELETE.getSystemPermissionId()) {
-         return SYSPERMISSION_DELETE.getPermissionName();
-      }
-      else {
+      final String sysPermissionName = sysPermissionNamesById.get(systemPermissionId);
+
+      if (sysPermissionName == null) {
          throw new IllegalArgumentException("Invalid system permission ID: " + systemPermissionId);
       }
+
+      return sysPermissionName;
    }
 
    public static DomainPermission getInstance(String sysPermissionName) {
@@ -66,6 +78,25 @@ public class DomainPermissions {
    @Deprecated
    public static DomainPermission getInstance(String sysPermissionName, boolean withGrant) {
       return new DomainPermissionImpl(sysPermissionName, withGrant);
+   }
+
+   public static DomainPermission getInstance(DomainPermission domainPermission) {
+      if (domainPermission instanceof DomainPermissions.DomainPermissionImpl) {
+         return domainPermission;
+      }
+
+      // validate system permission name is valid and id matches
+      if (!getSysPermissionName(domainPermission.getSystemPermissionId()).equals(domainPermission.getPermissionName())) {
+         throw new IllegalArgumentException("Invalid system permission id for domain permission: "
+                                                  + domainPermission.getSystemPermissionId());
+      }
+
+      if(domainPermission.isWithGrantOption()) {
+         return getInstanceWithGrantOption(domainPermission.getPermissionName());
+      }
+      else {
+         return getInstance(domainPermission.getPermissionName());
+      }
    }
 
    private static class DomainPermissionImpl implements DomainPermission, Serializable {
@@ -195,24 +226,23 @@ public class DomainPermissions {
       // private static helper method
 
       private static SysPermission getSysPermission(String permissionName) {
-         if (permissionName == null || permissionName.trim().isEmpty()) {
+         if (permissionName == null) {
             throw new IllegalArgumentException("A system permission name is required");
          }
 
-         permissionName = permissionName.trim();
+         final String trimmedPermissionName = permissionName.trim();
 
-         if (SYSPERMISSION_SUPER_USER.getPermissionName().equals(permissionName)) {
-            return SYSPERMISSION_SUPER_USER;
+         if (trimmedPermissionName.isEmpty()) {
+            throw new IllegalArgumentException("A system permission name is required");
          }
-         else if (SYSPERMISSION_CREATE_CHILD_DOMAIN.getPermissionName().equals(permissionName)) {
-            return SYSPERMISSION_CREATE_CHILD_DOMAIN;
+
+         final SysPermission sysPermission = sysPermissionsByName.get(trimmedPermissionName);
+
+         if (sysPermission == null) {
+            throw new IllegalArgumentException("Invalid system permission name: " + trimmedPermissionName);
          }
-         else if (SYSPERMISSION_DELETE.getPermissionName().equals(permissionName)) {
-            return SYSPERMISSION_DELETE;
-         }
-         else {
-            throw new IllegalArgumentException("Invalid system permission name: " + permissionName);
-         }
+
+         return sysPermission;
       }
    }
 }

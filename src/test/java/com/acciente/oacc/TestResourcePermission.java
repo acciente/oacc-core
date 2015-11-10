@@ -117,7 +117,7 @@ public class TestResourcePermission {
    @Test
    public void constructPermission_nulls_shouldFail() {
       try {
-         ResourcePermissions.getInstance(null);
+         ResourcePermissions.getInstance((String) null);
          fail("creation of resource permission with null name should have failed");
       }
       catch (Exception e) {

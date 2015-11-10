@@ -18,8 +18,11 @@
 package com.acciente.oacc;
 
 import java.io.Serializable;
-import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class ResourcePermissions {
    // constants for the important system permissions with pre-defined semantics
@@ -34,29 +37,37 @@ public class ResourcePermissions {
    private static final SysPermission SYSPERMISSION_QUERY             = new SysPermission(-105, "*QUERY");
    public static final  String        QUERY                           = SYSPERMISSION_QUERY.getPermissionName();
 
+   private static final Map<String, SysPermission> sysPermissionsByName;
+   private static final Map<Long, String>          sysPermissionNamesById;
+   private static final List<String>               sysPermissionNames;
+   static {
+      sysPermissionsByName = new HashMap<>();
+      sysPermissionsByName.put(INHERIT, SYSPERMISSION_INHERIT);
+      sysPermissionsByName.put(IMPERSONATE, SYSPERMISSION_IMPERSONATE);
+      sysPermissionsByName.put(RESET_CREDENTIALS, SYSPERMISSION_RESET_CREDENTIALS);
+      sysPermissionsByName.put(DELETE, SYSPERMISSION_DELETE);
+      sysPermissionsByName.put(QUERY, SYSPERMISSION_QUERY);
+
+      sysPermissionNamesById = new HashMap<>(sysPermissionsByName.size());
+      for (SysPermission sysPermission : sysPermissionsByName.values()) {
+         sysPermissionNamesById.put(sysPermission.getSystemPermissionId(), sysPermission.getPermissionName());
+      }
+
+      sysPermissionNames = Collections.unmodifiableList(new ArrayList<>(sysPermissionNamesById.values()));
+   }
+
    public static List<String> getSysPermissionNames() {
-      return Arrays.asList(INHERIT, IMPERSONATE, RESET_CREDENTIALS, DELETE, QUERY);
+      return sysPermissionNames;
    }
 
    public static String getSysPermissionName(long systemPermissionId) {
-      if (systemPermissionId == SYSPERMISSION_INHERIT.getSystemPermissionId()) {
-         return SYSPERMISSION_INHERIT.getPermissionName();
-      }
-      else if (systemPermissionId == SYSPERMISSION_IMPERSONATE.getSystemPermissionId()) {
-         return SYSPERMISSION_IMPERSONATE.getPermissionName();
-      }
-      else if (systemPermissionId == SYSPERMISSION_RESET_CREDENTIALS.getSystemPermissionId()) {
-         return SYSPERMISSION_RESET_CREDENTIALS.getPermissionName();
-      }
-      else if (systemPermissionId == SYSPERMISSION_DELETE.getSystemPermissionId()) {
-         return SYSPERMISSION_DELETE.getPermissionName();
-      }
-      else if (systemPermissionId == SYSPERMISSION_QUERY.getSystemPermissionId()) {
-         return SYSPERMISSION_QUERY.getPermissionName();
-      }
-      else {
+      final String sysPermissionName = sysPermissionNamesById.get(systemPermissionId);
+
+      if (sysPermissionName == null) {
          throw new IllegalArgumentException("Invalid system permission ID: " + systemPermissionId);
       }
+
+      return sysPermissionName;
    }
 
    public static ResourcePermission getInstance(String permissionName) {
@@ -73,6 +84,27 @@ public class ResourcePermissions {
    @Deprecated
    public static ResourcePermission getInstance(String permissionName, boolean withGrant) {
       return new ResourcePermissionImpl(permissionName, withGrant);
+   }
+
+   public static ResourcePermission getInstance(ResourcePermission resourcePermission) {
+      if (resourcePermission instanceof ResourcePermissions.ResourcePermissionImpl) {
+         return resourcePermission;
+      }
+
+      // validate system permission name is valid and id matches
+      if (resourcePermission.isSystemPermission() &&
+            !getSysPermissionName(resourcePermission.getSystemPermissionId()).equals(resourcePermission
+                                                                                           .getPermissionName())) {
+         throw new IllegalArgumentException("Invalid system permission id for resource permission: "
+                                                  + resourcePermission.getSystemPermissionId());
+      }
+
+      if (resourcePermission.isWithGrantOption()) {
+         return getInstanceWithGrantOption(resourcePermission.getPermissionName());
+      }
+      else {
+         return getInstance(resourcePermission.getPermissionName());
+      }
    }
 
    private static class ResourcePermissionImpl implements ResourcePermission, Serializable {
@@ -212,31 +244,24 @@ public class ResourcePermissions {
 
       // private static helper method to convert a sys permission name to a sys permission object
 
-      private static SysPermission getSysPermission(String systemPermissionName) {
-         if (systemPermissionName == null || systemPermissionName.trim().isEmpty()) {
+      private static SysPermission getSysPermission(String permissionName) {
+         if (permissionName == null) {
             throw new IllegalArgumentException("A system permission name is required");
          }
 
-         systemPermissionName = systemPermissionName.trim();
+         final String trimmedPermissionName = permissionName.trim();
 
-         if (SYSPERMISSION_INHERIT.getPermissionName().equals(systemPermissionName)) {
-            return SYSPERMISSION_INHERIT;
+         if (trimmedPermissionName.isEmpty()) {
+            throw new IllegalArgumentException("A system permission name is required");
          }
-         else if (SYSPERMISSION_IMPERSONATE.getPermissionName().equals(systemPermissionName)) {
-            return SYSPERMISSION_IMPERSONATE;
+
+         final SysPermission sysPermission = sysPermissionsByName.get(trimmedPermissionName);
+
+         if (sysPermission == null) {
+            throw new IllegalArgumentException("Invalid system permission name: " + trimmedPermissionName);
          }
-         else if (SYSPERMISSION_RESET_CREDENTIALS.getPermissionName().equals(systemPermissionName)) {
-            return SYSPERMISSION_RESET_CREDENTIALS;
-         }
-         else if (SYSPERMISSION_DELETE.getPermissionName().equals(systemPermissionName)) {
-            return SYSPERMISSION_DELETE;
-         }
-         else if (SYSPERMISSION_QUERY.getPermissionName().equals(systemPermissionName)) {
-            return SYSPERMISSION_QUERY;
-         }
-         else {
-            throw new IllegalArgumentException("Invalid system permission name: " + systemPermissionName);
-         }
+
+         return sysPermission;
       }
    }
 }

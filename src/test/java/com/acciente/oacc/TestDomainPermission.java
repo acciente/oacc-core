@@ -83,7 +83,7 @@ public class TestDomainPermission {
    @Test
    public void construct_nulls_shouldFail() {
       try {
-         DomainPermissions.getInstance(null);
+         DomainPermissions.getInstance((String) null);
          fail("creation of domain permission with null name should have failed");
       }
       catch (Exception e) {

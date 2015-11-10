@@ -234,7 +234,7 @@ public class TestAccessControl_grantResourcePermissions extends TestAccessContro
          fail("granting *IMPERSONATE system permission on an unauthenticatable resource should have failed");
       }
       catch (IllegalArgumentException e) {
-         assertThat(e.getMessage().toLowerCase(), containsString("not valid for unauthenticatable resource"));
+         assertThat(e.getMessage().toLowerCase(), containsString("invalid system permission id"));
       }
       try {
          accessControlContext.grantResourcePermissions(accessorResource,
@@ -243,7 +243,7 @@ public class TestAccessControl_grantResourcePermissions extends TestAccessContro
          fail("granting *IMPERSONATE system permission on an unauthenticatable resource should have failed");
       }
       catch (IllegalArgumentException e) {
-         assertThat(e.getMessage().toLowerCase(), containsString("not valid for unauthenticatable resource"));
+         assertThat(e.getMessage().toLowerCase(), containsString("invalid system permission id"));
       }
    }
 
@@ -1318,8 +1318,8 @@ public class TestAccessControl_grantResourcePermissions extends TestAccessContro
                                                        customInheritPermission);
          fail("granting direct resource permissions that would create an inherit cycle should have failed");
       }
-      catch (OaccException e) {
-         assertThat(e.getMessage().toLowerCase(), containsString("will cause a cycle"));
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("invalid system permission id"));
       }
       try {
          accessControlContext.grantResourcePermissions(accessorResource,
@@ -1327,8 +1327,8 @@ public class TestAccessControl_grantResourcePermissions extends TestAccessContro
                                                        customInheritPermission);
          fail("granting direct resource permissions that would create an inherit cycle should have failed");
       }
-      catch (OaccException e) {
-         assertThat(e.getMessage().toLowerCase(), containsString("will cause a cycle"));
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("invalid system permission id"));
       }
    }
 

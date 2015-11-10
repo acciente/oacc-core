@@ -18,26 +18,44 @@
 package com.acciente.oacc;
 
 import java.io.Serializable;
-import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class DomainCreatePermissions {
    // constants for the important system permission names with pre-defined semantics
    private static final SysPermission SYSPERMISSION_CREATE = new SysPermission(-300, "*CREATE");
-   // constants for the important system permission names with pre-defined semantics
    public static final  String        CREATE               = SYSPERMISSION_CREATE.getPermissionName();
 
+   private static final Map<String, SysPermission> sysPermissionsByName;
+   private static final Map<Long, String>          sysPermissionNamesById;
+   private static final List<String>               sysPermissionNames;
+   static {
+      sysPermissionsByName = new HashMap<>();
+      sysPermissionsByName.put(CREATE, SYSPERMISSION_CREATE);
+
+      sysPermissionNamesById = new HashMap<>(sysPermissionsByName.size());
+      for (SysPermission sysPermission : sysPermissionsByName.values()) {
+         sysPermissionNamesById.put(sysPermission.getSystemPermissionId(), sysPermission.getPermissionName());
+      }
+
+      sysPermissionNames = Collections.unmodifiableList(new ArrayList<>(sysPermissionNamesById.values()));
+   }
+
    public static List<String> getSysPermissionNames() {
-      return Arrays.asList(CREATE);
+      return sysPermissionNames;
    }
 
    public static String getSysPermissionName(long systemPermissionId) {
-      if (systemPermissionId == SYSPERMISSION_CREATE.getSystemPermissionId()) {
-         return SYSPERMISSION_CREATE.getPermissionName();
-      }
-      else {
+      final String sysPermissionName = sysPermissionNamesById.get(systemPermissionId);
+
+      if (sysPermissionName == null) {
          throw new IllegalArgumentException("Invalid system permission ID: " + systemPermissionId);
       }
+
+      return sysPermissionName;
    }
 
    public static DomainCreatePermission getInstanceWithGrantOption(String sysPermissionName) {
@@ -70,6 +88,36 @@ public class DomainCreatePermissions {
    @Deprecated
    public static DomainCreatePermission getInstance(DomainPermission domainPostCreatePermission, boolean withGrant) {
       return new DomainCreatePermissionImpl(domainPostCreatePermission, withGrant);
+   }
+
+   public static DomainCreatePermission getInstance(DomainCreatePermission domainCreatePermission) {
+      if (domainCreatePermission instanceof DomainCreatePermissions.DomainCreatePermissionImpl) {
+         return domainCreatePermission;
+      }
+
+      if (domainCreatePermission.isSystemPermission()) {
+         // validate system permission name is valid and id matches
+         if (!getSysPermissionName(domainCreatePermission.getSystemPermissionId()).equals(domainCreatePermission
+                                                                                                .getPermissionName())) {
+            throw new IllegalArgumentException("Invalid system permission id for domain create permission: "
+                                                     + domainCreatePermission.getSystemPermissionId());
+         }
+
+         if (domainCreatePermission.isWithGrantOption()) {
+            return getInstanceWithGrantOption(domainCreatePermission.getPermissionName());
+         }
+         else {
+            return getInstance(domainCreatePermission.getPermissionName());
+         }
+      }
+      else {
+         if (domainCreatePermission.isWithGrantOption()) {
+            return getInstanceWithGrantOption(DomainPermissions.getInstance(domainCreatePermission.getPostCreateDomainPermission()));
+         }
+         else {
+            return getInstance(DomainPermissions.getInstance(domainCreatePermission.getPostCreateDomainPermission()));
+         }
+      }
    }
 
    private static class DomainCreatePermissionImpl implements DomainCreatePermission, Serializable{
@@ -256,19 +304,24 @@ public class DomainCreatePermissions {
 
       // private static helper method to convert a sys permission name to a sys permission object
 
-      private static SysPermission getSysPermission(String systemPermissionName) {
-         if (systemPermissionName == null || systemPermissionName.trim().isEmpty()) {
+      private static SysPermission getSysPermission(String permissionName) {
+         if (permissionName == null) {
             throw new IllegalArgumentException("A system permission name is required");
          }
 
-         systemPermissionName = systemPermissionName.trim();
+         final String trimmedPermissionName = permissionName.trim();
 
-         if (SYSPERMISSION_CREATE.getPermissionName().equals(systemPermissionName)) {
-            return SYSPERMISSION_CREATE;
+         if (trimmedPermissionName.isEmpty()) {
+            throw new IllegalArgumentException("A system permission name is required");
          }
-         else {
-            throw new IllegalArgumentException("Invalid system permission name: " + systemPermissionName);
+
+         final SysPermission sysPermission = sysPermissionsByName.get(trimmedPermissionName);
+
+         if (sysPermission == null) {
+            throw new IllegalArgumentException("Invalid system permission name: " + trimmedPermissionName);
          }
+
+         return sysPermission;
       }
    }
 }
