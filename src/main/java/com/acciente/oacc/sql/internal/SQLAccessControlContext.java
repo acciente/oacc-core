@@ -1603,12 +1603,14 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
             = grantDomainPermissionSysPersister.getDomainSysPermissionsIncludeInherited(connection,
                                                                                         accessorResource);
 
-      for (String domainName : domainSysPermissionsIncludingInherited.keySet()) {
-         final Set<DomainPermission> domainPermissions = domainSysPermissionsIncludingInherited.get(domainName);
+      for (Map.Entry<String, Set<DomainPermission>>
+            domainPermissionsByDomainEntry : domainSysPermissionsIncludingInherited.entrySet()) {
+         final Set<DomainPermission> domainPermissions = domainPermissionsByDomainEntry.getValue();
 
          if (domainPermissions.contains(DomainPermission_SUPER_USER)
                || domainPermissions.contains(DomainPermission_SUPER_USER_GRANT)) {
-            domainSysPermissionsIncludingInherited.put(domainName, __getApplicableDomainPermissions());
+            domainSysPermissionsIncludingInherited.put(domainPermissionsByDomainEntry.getKey(),
+                                                       __getApplicableDomainPermissions());
          }
       }
 
@@ -1627,8 +1629,9 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
    private Map<String, Set<DomainPermission>> __collapseDomainPermissions(Map<String, Set<DomainPermission>> domainPermissionsMap) {
       Map<String, Set<DomainPermission>> collapsedDomainPermissionsMap = new HashMap<>(domainPermissionsMap.size());
 
-      for (String domainName : domainPermissionsMap.keySet()) {
-         collapsedDomainPermissionsMap.put(domainName, __collapseDomainPermissions(domainPermissionsMap.get(domainName)));
+      for (Map.Entry<String, Set<DomainPermission>> domainPermissionsByDomainEntry : domainPermissionsMap.entrySet()) {
+         collapsedDomainPermissionsMap.put(domainPermissionsByDomainEntry.getKey(),
+                                           __collapseDomainPermissions(domainPermissionsByDomainEntry.getValue()));
       }
 
       return collapsedDomainPermissionsMap;
@@ -3127,8 +3130,9 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       final Map<String, Set<DomainPermission>> effectiveDomainPermissionsMap
             = __getEffectiveDomainPermissionsMap(connection, accessorResource);
 
-      for (String domainName : effectiveDomainPermissionsMap.keySet()) {
-         final Set<DomainPermission> effectiveDomainPermissions = effectiveDomainPermissionsMap.get(domainName);
+      for (Map.Entry<String, Set<DomainPermission>>
+            effectiveDomainPermissionsByDomainEntry : effectiveDomainPermissionsMap.entrySet()) {
+         final Set<DomainPermission> effectiveDomainPermissions = effectiveDomainPermissionsByDomainEntry.getValue();
          if (effectiveDomainPermissions.contains(DomainPermission_SUPER_USER)
                || effectiveDomainPermissions.contains(DomainPermission_SUPER_USER_GRANT)) {
 
@@ -3145,7 +3149,8 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
                   superResourceCreatePermissionsMap.put(resourceClassName, applicableResourceCreatePermissions);
                }
             }
-            allSuperResourceCreatePermissionsMap.put(domainName, superResourceCreatePermissionsMap);
+            allSuperResourceCreatePermissionsMap.put(effectiveDomainPermissionsByDomainEntry.getKey(),
+                                                     superResourceCreatePermissionsMap);
          }
       }
 
@@ -3157,40 +3162,47 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
 
    private void __mergeSourceCreatePermissionsMapIntoTargetCreatePermissionsMap(Map<String, Map<String, Set<ResourceCreatePermission>>> sourceCreatePermissionsMap,
                                                                                 Map<String, Map<String, Set<ResourceCreatePermission>>> targetCreatePermissionsMap) {
-      for (String domainName : sourceCreatePermissionsMap.keySet()) {
-         Map<String, Set<ResourceCreatePermission>> targetCreatePermsForDomainMap;
+      for (Map.Entry<String, Map<String, Set<ResourceCreatePermission>>>
+            sourcePermissionsMapByDomainEntry : sourceCreatePermissionsMap.entrySet()) {
+         final String domainName = sourcePermissionsMapByDomainEntry.getKey();
+
+         Map<String, Set<ResourceCreatePermission>> targetCreatePermsForDomainMap
+               = targetCreatePermissionsMap.get(domainName);
          // does the target map have domain?
-         if ((targetCreatePermsForDomainMap = targetCreatePermissionsMap.get(domainName)) == null) {
+         if (targetCreatePermsForDomainMap == null) {
             // no, add the domain
-            targetCreatePermissionsMap.put(domainName, targetCreatePermsForDomainMap = new HashMap<>());
+            targetCreatePermsForDomainMap = new HashMap<>();
+            targetCreatePermissionsMap.put(domainName, targetCreatePermsForDomainMap);
          }
-         for (String resourceClassName : sourceCreatePermissionsMap.get(domainName).keySet()) {
-            Set<ResourceCreatePermission> targetCreatePermsForClassSet;
+         for (Map.Entry<String, Set<ResourceCreatePermission>>
+               sourcePermissionsByResourceClassEntry : sourcePermissionsMapByDomainEntry.getValue().entrySet()) {
+            final String resourceClassName = sourcePermissionsByResourceClassEntry.getKey();
+
+            Set<ResourceCreatePermission> targetCreatePermsForClassSet = targetCreatePermsForDomainMap.get(resourceClassName);
             // does the target map have the resource class?
-            if ((targetCreatePermsForClassSet = targetCreatePermsForDomainMap.get(resourceClassName)) == null) {
+            if (targetCreatePermsForClassSet == null) {
                // no, add the resource class
-               targetCreatePermsForDomainMap.put(resourceClassName,
-                                                 targetCreatePermsForClassSet = new HashSet<>());
+               targetCreatePermsForClassSet = new HashSet<>();
+               targetCreatePermsForDomainMap.put(resourceClassName, targetCreatePermsForClassSet);
             }
-            // get the source permissions for the domain + resource class
-            final Set<ResourceCreatePermission> sourceCreatePermsForClassSet
-                  = sourceCreatePermissionsMap.get(domainName).get(resourceClassName);
+
             // add the source permissions above to the target for the respective domain + resource class
-            targetCreatePermsForClassSet.addAll(sourceCreatePermsForClassSet);
+            targetCreatePermsForClassSet.addAll(sourcePermissionsByResourceClassEntry.getValue());
          }
       }
    }
 
    private Map<String, Map<String, Set<ResourceCreatePermission>>> __collapseResourceCreatePermissions(Map<String, Map<String, Set<ResourceCreatePermission>>> resourceCreatePermissionsMap) {
-      for (String domainName : resourceCreatePermissionsMap.keySet()) {
-         final Map<String, Set<ResourceCreatePermission>> createPermissionsByDomainMap
-               = resourceCreatePermissionsMap.get(domainName);
+      for (Map.Entry<String, Map<String, Set<ResourceCreatePermission>>>
+            createPermissionsByDomainEntry : resourceCreatePermissionsMap.entrySet()) {
+         final Map<String, Set<ResourceCreatePermission>>
+               createPermissionsByResourceClassMap = createPermissionsByDomainEntry.getValue();
 
-         for (String resourceClassName : createPermissionsByDomainMap.keySet()) {
-            final Set<ResourceCreatePermission> createPermissionsByResourceClassMap
-                  = createPermissionsByDomainMap.get(resourceClassName);
-            createPermissionsByDomainMap.put(resourceClassName,
-                                             __collapseResourceCreatePermissions(createPermissionsByResourceClassMap));
+         for (Map.Entry<String, Set<ResourceCreatePermission>>
+               createPermissionsByResourceClassEntry : createPermissionsByResourceClassMap.entrySet()) {
+            createPermissionsByResourceClassMap.put(createPermissionsByResourceClassEntry.getKey(),
+                                                    __collapseResourceCreatePermissions(createPermissionsByResourceClassEntry
+                                                                                              .getValue()));
          }
       }
 
@@ -4605,8 +4617,9 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       final Map<String, Set<DomainPermission>> effectiveDomainPermissionsMap
             = __getEffectiveDomainPermissionsMap(connection, accessorResource);
 
-      for (String domainName : effectiveDomainPermissionsMap.keySet()) {
-         final Set<DomainPermission> effectiveDomainPermissions = effectiveDomainPermissionsMap.get(domainName);
+      for (Map.Entry<String, Set<DomainPermission>>
+            effectiveDomainPermissionsByDomainEntry : effectiveDomainPermissionsMap.entrySet()) {
+         final Set<DomainPermission> effectiveDomainPermissions = effectiveDomainPermissionsByDomainEntry.getValue();
          if (effectiveDomainPermissions.contains(DomainPermission_SUPER_USER)
                || effectiveDomainPermissions.contains(DomainPermission_SUPER_USER_GRANT)) {
 
@@ -4623,7 +4636,8 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
                   superResourcePermissionsMap.put(resourceClassName, applicableResourcePermissions);
                }
             }
-            superGlobalResourcePermissionsMap.put(domainName, superResourcePermissionsMap);
+            superGlobalResourcePermissionsMap.put(effectiveDomainPermissionsByDomainEntry.getKey(),
+                                                  superResourcePermissionsMap);
          }
       }
 
@@ -4634,39 +4648,47 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
 
    private void __mergeSourcePermissionsMapIntoTargetPermissionsMap(Map<String, Map<String, Set<ResourcePermission>>> sourcePermissionsMap,
                                                                     Map<String, Map<String, Set<ResourcePermission>>> targetPermissionsMap) {
-      for (String domainName : sourcePermissionsMap.keySet()) {
-         Map<String, Set<ResourcePermission>> targetPermsForDomainMap;
+      for (Map.Entry<String, Map<String, Set<ResourcePermission>>>
+            sourcePermissionsMapByDomainEntry : sourcePermissionsMap.entrySet()) {
+         final String domainName = sourcePermissionsMapByDomainEntry.getKey();
+
+         Map<String, Set<ResourcePermission>> targetPermsForDomainMap = targetPermissionsMap.get(domainName);
          // does the target map have domain?
-         if ((targetPermsForDomainMap = targetPermissionsMap.get(domainName)) == null) {
+         if (targetPermsForDomainMap == null) {
             // no, add the domain
-            targetPermissionsMap.put(domainName, targetPermsForDomainMap = new HashMap<>());
+            targetPermsForDomainMap = new HashMap<>();
+            targetPermissionsMap.put(domainName, targetPermsForDomainMap);
          }
-         for (String resourceClassName : sourcePermissionsMap.get(domainName).keySet()) {
-            Set<ResourcePermission> targetPermsForClassSet;
+
+         for (Map.Entry<String, Set<ResourcePermission>>
+               sourcePermissionsByResourceClassEntry : sourcePermissionsMapByDomainEntry.getValue().entrySet()) {
+            final String resourceClassName = sourcePermissionsByResourceClassEntry.getKey();
+
+            Set<ResourcePermission> targetPermsForClassSet = targetPermsForDomainMap.get(resourceClassName);
             // does the target map have the resource class?
-            if ((targetPermsForClassSet = targetPermsForDomainMap.get(resourceClassName)) == null) {
+            if (targetPermsForClassSet == null) {
                // no, add the resource class
-               targetPermsForDomainMap.put(resourceClassName,
-                                           targetPermsForClassSet = new HashSet<>());
+               targetPermsForClassSet = new HashSet<>();
+               targetPermsForDomainMap.put(resourceClassName, targetPermsForClassSet);
             }
-            // get the source permissions for the domain + resource class
-            final Set<ResourcePermission> sourcePermissionsForClassSet
-                  = sourcePermissionsMap.get(domainName).get(resourceClassName);
+
             // add the source permissions above to the target for the respective domain + resource class
-            targetPermsForClassSet.addAll(sourcePermissionsForClassSet);
+            targetPermsForClassSet.addAll(sourcePermissionsByResourceClassEntry.getValue());
          }
       }
    }
 
    private Map<String, Map<String, Set<ResourcePermission>>> __collapseResourcePermissions(Map<String, Map<String, Set<ResourcePermission>>> resourcePermissionsMap) {
-      for (String domainName : resourcePermissionsMap.keySet()) {
-         final Map<String, Set<ResourcePermission>> createPermissionsByDomainMap = resourcePermissionsMap.get(domainName);
+      for (Map.Entry<String, Map<String, Set<ResourcePermission>>>
+            resourcePermissionsMapByDomainEntry : resourcePermissionsMap.entrySet()) {
+         final Map<String, Set<ResourcePermission>> resourcePermissionsByResourceClassMap
+               = resourcePermissionsMapByDomainEntry.getValue();
 
-         for (String resourceClassName : createPermissionsByDomainMap.keySet()) {
-            final Set<ResourcePermission> createPermissionsByResourceClassMap
-                  = createPermissionsByDomainMap.get(resourceClassName);
-            createPermissionsByDomainMap.put(resourceClassName,
-                                             __collapseResourcePermissions(createPermissionsByResourceClassMap));
+         for (Map.Entry<String, Set<ResourcePermission>>
+               resourcePermissionsByResourceClassEntry : resourcePermissionsByResourceClassMap.entrySet()) {
+            resourcePermissionsByResourceClassMap.put(resourcePermissionsByResourceClassEntry.getKey(),
+                                                      __collapseResourcePermissions(resourcePermissionsByResourceClassEntry
+                                                                                          .getValue()));
          }
       }
 
