@@ -21,16 +21,17 @@ import java.io.Serializable;
 import java.util.Arrays;
 import java.util.List;
 
+/**
+ * TODO: DomainPermissions - missing javadoc
+ */
 public class DomainPermissions {
    // constants for the important system permission names with pre-defined semantics
    private static final SysPermission SYSPERMISSION_SUPER_USER          = new SysPermission(-301, "*SUPER-USER");
-   // constants for the important system permission names with pre-defined semantics
+   private static final SysPermission SYSPERMISSION_CREATE_CHILD_DOMAIN = new SysPermission(-302, "*CREATE-CHILD-DOMAIN");
+   private static final SysPermission SYSPERMISSION_DELETE              = new SysPermission(-303, "*DELETE");
+
    public static final  String        SUPER_USER                        = SYSPERMISSION_SUPER_USER.getPermissionName();
-   private static final SysPermission SYSPERMISSION_CREATE_CHILD_DOMAIN = new SysPermission(-302,
-                                                                                            "*CREATE-CHILD-DOMAIN");
    public static final  String        CREATE_CHILD_DOMAIN               = SYSPERMISSION_CREATE_CHILD_DOMAIN.getPermissionName();
-   private static final SysPermission SYSPERMISSION_DELETE              = new SysPermission(-303,
-                                                                                            "*DELETE");
    public static final  String        DELETE                            = SYSPERMISSION_DELETE.getPermissionName();
 
    public static List<String> getSysPermissionNames() {
@@ -69,7 +70,10 @@ public class DomainPermissions {
    }
 
    private static class DomainPermissionImpl implements DomainPermission, Serializable {
-      // permission data
+
+	      private static final long serialVersionUID = 1L;
+
+	// permission data
       private final long    systemPermissionId;
       private final String  permissionName;
       private final boolean withGrantOption;

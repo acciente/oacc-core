@@ -21,8 +21,8 @@ package com.acciente.oacc;
  * The interface for the type of permission that governs domain management.
  * <p/>
  * A DomainPermission is the type of permission used to grant an accessor permission to manage
- * a domain. A DomainPermission is never application-defined, bu is always a system permission;
- * the supported system permissions values are *SUPER-USER and *CREATE-CHILD-DOMAIN.
+ * a domain. A DomainPermission is never application-defined, but is always a system permission;
+ * the supported system permissions values are *SUPER-USER, *CREATE-CHILD-DOMAIN and *DELETE.
  * <p/>
  * To create an instance of this class use {@link DomainPermissions#getInstance(String)} or one
  * of its variants.
