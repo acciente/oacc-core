@@ -586,6 +586,7 @@ public class TestAccessControl_createAuthenticatableResource extends TestAccessC
                                              domainName2,
                                              externalId,
                                              password);
+         fail("creating resource with duplicate (i.e. non-unique) external id should have failed");
       }
       catch (IllegalArgumentException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("external id is not unique"));
@@ -650,6 +651,7 @@ public class TestAccessControl_createAuthenticatableResource extends TestAccessC
          // create resource with same but case-insensitive external id and verify
          try {
             accessControlContext.createResource(resourceClassName, domainName, externalId_UPPER, password);
+            fail("creating resource with external id that differs in case should have failed for case-insensitive database");
          }
          catch (IllegalArgumentException e) {
             assertThat(e.getMessage().toLowerCase(), containsString("external id is not unique"));
