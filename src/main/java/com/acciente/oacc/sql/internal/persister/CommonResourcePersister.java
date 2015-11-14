@@ -119,17 +119,35 @@ public abstract class CommonResourcePersister extends Persister implements Resou
 
          // save the new resource's external id, if necessary, and return the new resource
          if (externalId != null) {
-            statement = connection.prepareStatement(sqlStrings.SQL_createInResourceExternalId_WITH_ResourceID_ExternalID);
-            statement.setResourceId(1, nextResourceId);
-            statement.setString(2, externalId);
-
-            assertOneRowInserted(statement.executeUpdate());
-
-            return Resources.getInstance(nextResourceId.getValue(), externalId);
+            return setExternalId(connection, nextResourceId, externalId);
          }
          else {
             return Resources.getInstance(nextResourceId.getValue());
          }
+      }
+      catch (SQLException e) {
+         throw new RuntimeException(e);
+      }
+      finally {
+         closeStatement(statement);
+      }
+   }
+
+   @Override
+   public Resource setExternalId(SQLConnection connection,
+                                 Id<ResourceId> resourceId,
+                                 String externalId) {
+      SQLStatement statement = null;
+
+      try {
+         // save the new resource's external id and return the new resource reference
+         statement = connection.prepareStatement(sqlStrings.SQL_createInResourceExternalId_WITH_ResourceID_ExternalID);
+         statement.setResourceId(1, resourceId);
+         statement.setString(2, externalId);
+
+         assertOneRowInserted(statement.executeUpdate());
+
+         return Resources.getInstance(resourceId.getValue(), externalId);
       }
       catch (SQLException e) {
          throw new RuntimeException(e);

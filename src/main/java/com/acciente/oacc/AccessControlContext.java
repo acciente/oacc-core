@@ -1193,6 +1193,21 @@ public interface AccessControlContext {
    Resource createResource(String resourceClassName, String domainName, String externalId, Credentials credentials);
 
    /**
+    * Sets the external id of the specified resource as an alternative resource identifier, if none was previously set.
+    * <p/>
+    * The externalId has to be globally unique, i.e. it has to be unique across all resource classes and domains.
+    *
+    * @param resource   the resource for which to set the alternative identifier
+    * @param externalId a globally unique string identifier for the resource
+    * @return the fully resolved resource reference of the updated resource, i.e. with both resourceId and externalId
+    * @throws com.acciente.oacc.NotAuthorizedException if the session resource is not authorized to set the specified
+    *                                                  resource's externalId by having the *CREATE system permission
+    * @throws java.lang.IllegalArgumentException if another resource with externalId already exists, or
+    *                                            if the specified resource has previously been associated with another externalId
+    */
+   Resource setExternalId(Resource resource, String externalId);
+
+   /**
     * Deletes the specified resource.
     * <p/>
     * Note this method performs a cascading delete of any permissions the obsolete resource has as

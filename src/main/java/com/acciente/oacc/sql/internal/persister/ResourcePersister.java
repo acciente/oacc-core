@@ -32,6 +32,10 @@ public interface ResourcePersister {
                            Id<DomainId> resourceDomainId,
                            String externalId);
 
+   Resource setExternalId(SQLConnection connection,
+                          Id<ResourceId> resourceId,
+                          String externalId);
+
    void deleteResource(SQLConnection connection,
                        Resource resource);
 

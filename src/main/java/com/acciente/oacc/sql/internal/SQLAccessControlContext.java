@@ -77,6 +77,7 @@ import com.acciente.oacc.sql.internal.persister.SQLStrings;
 import com.acciente.oacc.sql.internal.persister.id.DomainId;
 import com.acciente.oacc.sql.internal.persister.id.Id;
 import com.acciente.oacc.sql.internal.persister.id.ResourceClassId;
+import com.acciente.oacc.sql.internal.persister.id.ResourceId;
 import com.acciente.oacc.sql.internal.persister.id.ResourcePermissionId;
 
 import javax.sql.DataSource;
@@ -996,6 +997,74 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       }
 
       return newResource;
+   }
+
+   @Override
+   public Resource setExternalId(Resource resource, String externalId) {
+      SQLConnection connection = null;
+
+      __assertAuthenticated();
+      __assertResourceSpecified(resource);
+      __assertExternalIdSpecified(externalId);
+
+      try {
+         connection = __getConnection();
+         resource = __resolveResource(connection, resource);
+
+         return __setExternalId(connection, resource, externalId);
+      }
+      finally {
+         __closeConnection(connection);
+      }
+   }
+
+   private Resource __setExternalId(SQLConnection connection, Resource resource, String externalId) {
+      final Resource resourceByExternalId = resourcePersister.resolveResourceByExternalId(connection, externalId);
+
+      if (resourceByExternalId == null) {
+         // ok, that externalId is unused, we can go ahead and set it, unless the existing resource already has a different one set
+         if (resource.getExternalId() != null){
+            // setting external id is a one-time operation - resetting to a different value is not allowed
+            throw new IllegalArgumentException("Could not reset the resource's external id to a different value");
+         }
+      }
+      else {
+         // the externalId is already used - let's check if it's on the same resource we're trying to set
+         if (resource.getId().equals(resourceByExternalId.getId())) {
+            // for idempotency - if externalId is already set to the specified value, do nothing
+            return resource;
+         }
+         else {
+            // the externalId has already been assigned to a different resource
+            throw new IllegalArgumentException("External id is not unique: " + externalId);
+         }
+      }
+
+      // check create-permission on the resource's domain and resource class in order to set external id
+      final Id<ResourceClassId> resourceClassId
+            = Id.from(resourceClassPersister.getResourceClassInfoByResourceId(connection, resource).getResourceClassId());
+      final Id<DomainId> domainId = resourcePersister.getDomainIdByResource(connection, resource);
+      final Set<ResourceCreatePermission> resourceCreateSysPermissions
+            = grantResourceCreatePermissionSysPersister.getResourceCreateSysPermissionsIncludeInherited(connection,
+                                                                                                        sessionResource,
+                                                                                                        resourceClassId,
+                                                                                                        domainId);
+
+      boolean createPermissionOK = false;
+      if (resourceCreateSysPermissions.size() > 0) {
+         createPermissionOK = true;
+      }
+
+      // check if the session resource has super user permissions to the resource's domain, if necessary
+      if (!createPermissionOK) {
+         createPermissionOK = __isSuperUserOfDomain(connection, sessionResource, domainId);
+      }
+
+      if (!createPermissionOK) {
+         throw NotAuthorizedException.newInstanceForAction(sessionResource, "set external id of resource " + resource);
+      }
+
+      return resourcePersister.setExternalId(connection, Id.<ResourceId>from(resource.getId()), externalId);
    }
 
    @Override
