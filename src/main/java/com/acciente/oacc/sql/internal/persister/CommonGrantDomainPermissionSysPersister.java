@@ -133,11 +133,13 @@ public abstract class CommonGrantDomainPermissionSysPersister extends Persister 
    }
 
    protected static DomainPermission getDomainSysPermission(SQLResult resultSet) throws SQLException {
+      final String sysPermissionName = resultSet.getDomainSysPermissionName("SysPermissionId");
+
       if (resultSet.getBoolean("IsWithGrant")) {
-         return DomainPermissions.getInstanceWithGrantOption(resultSet.getDomainSysPermissionName("SysPermissionId"));
+         return DomainPermissions.getInstanceWithGrantOption(sysPermissionName);
       }
       else {
-         return DomainPermissions.getInstance(resultSet.getDomainSysPermissionName("SysPermissionId"));
+         return DomainPermissions.getInstance(sysPermissionName);
       }
    }
 

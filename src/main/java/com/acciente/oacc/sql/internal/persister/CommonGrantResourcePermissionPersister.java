@@ -128,11 +128,13 @@ public abstract class CommonGrantResourcePermissionPersister extends Persister i
    }
 
    protected static ResourcePermission getResourcePermission(SQLResult resultSet) throws SQLException {
+      final String permissionName = resultSet.getString("PermissionName");
+
       if (resultSet.getBoolean("IsWithGrant")) {
-         return ResourcePermissions.getInstanceWithGrantOption(resultSet.getString("PermissionName"));
+         return ResourcePermissions.getInstanceWithGrantOption(permissionName);
       }
       else {
-         return ResourcePermissions.getInstance(resultSet.getString("PermissionName"));
+         return ResourcePermissions.getInstance(permissionName);
       }
    }
 

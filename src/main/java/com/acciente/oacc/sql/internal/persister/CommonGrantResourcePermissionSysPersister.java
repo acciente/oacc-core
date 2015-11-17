@@ -125,11 +125,13 @@ public abstract class CommonGrantResourcePermissionSysPersister extends Persiste
    }
 
    protected static ResourcePermission getResourceSysPermission(SQLResult resultSet) throws SQLException {
+      final String sysPermissionName = resultSet.getResourceSysPermissionName("SysPermissionId");
+
       if (resultSet.getBoolean("IsWithGrant")) {
-         return ResourcePermissions.getInstanceWithGrantOption(resultSet.getResourceSysPermissionName("SysPermissionId"));
+         return ResourcePermissions.getInstanceWithGrantOption(sysPermissionName);
       }
       else {
-         return ResourcePermissions.getInstance(resultSet.getResourceSysPermissionName("SysPermissionId"));
+         return ResourcePermissions.getInstance(sysPermissionName);
       }
    }
 

@@ -102,19 +102,21 @@ public abstract class CommonGrantResourceCreatePermissionPostCreatePersister ext
    }
 
    protected static ResourceCreatePermission getResourceCreatePostCreatePermission(SQLResult resultSet) throws SQLException {
-      ResourcePermission resourcePermission;
+      final ResourcePermission postCreatePermission;
+      final String postCreatePermissionName = resultSet.getString("PostCreatePermissionName");
+
       if (resultSet.getBoolean("PostCreateIsWithGrant")) {
-         resourcePermission = ResourcePermissions.getInstanceWithGrantOption(resultSet.getString("PostCreatePermissionName"));
+         postCreatePermission = ResourcePermissions.getInstanceWithGrantOption(postCreatePermissionName);
       }
       else {
-         resourcePermission = ResourcePermissions.getInstance(resultSet.getString("PostCreatePermissionName"));
+         postCreatePermission = ResourcePermissions.getInstance(postCreatePermissionName);
       }
 
       if (resultSet.getBoolean("IsWithGrant")) {
-         return ResourceCreatePermissions.getInstanceWithGrantOption(resourcePermission);
+         return ResourceCreatePermissions.getInstanceWithGrantOption(postCreatePermission);
       }
       else {
-         return ResourceCreatePermissions.getInstance(resourcePermission);
+         return ResourceCreatePermissions.getInstance(postCreatePermission);
       }
    }
 

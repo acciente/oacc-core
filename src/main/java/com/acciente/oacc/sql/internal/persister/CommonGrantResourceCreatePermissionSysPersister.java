@@ -99,11 +99,13 @@ public abstract class CommonGrantResourceCreatePermissionSysPersister extends Pe
    }
 
    protected static ResourceCreatePermission getResourceCreateSysPermission(SQLResult resultSet) throws SQLException {
+      final String sysPermissionName = resultSet.getResourceCreateSysPermissionName("SysPermissionId");
+
       if (resultSet.getBoolean("IsWithGrant")) {
-         return ResourceCreatePermissions.getInstanceWithGrantOption(resultSet.getResourceCreateSysPermissionName("SysPermissionId"));
+         return ResourceCreatePermissions.getInstanceWithGrantOption(sysPermissionName);
       }
       else {
-         return ResourceCreatePermissions.getInstance(resultSet.getResourceCreateSysPermissionName("SysPermissionId"));
+         return ResourceCreatePermissions.getInstance(sysPermissionName);
       }
    }
 

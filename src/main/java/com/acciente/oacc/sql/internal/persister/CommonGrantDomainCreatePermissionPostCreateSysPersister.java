@@ -19,6 +19,7 @@ package com.acciente.oacc.sql.internal.persister;
 
 import com.acciente.oacc.DomainCreatePermission;
 import com.acciente.oacc.DomainCreatePermissions;
+import com.acciente.oacc.DomainPermission;
 import com.acciente.oacc.DomainPermissions;
 import com.acciente.oacc.Resource;
 import com.acciente.oacc.sql.SQLProfile;
@@ -70,21 +71,21 @@ public abstract class CommonGrantDomainCreatePermissionPostCreateSysPersister ex
    }
 
    protected static DomainCreatePermission getDomainCreatePostCreateSysPermission(SQLResult resultSet) throws SQLException {
-      if (resultSet.getBoolean("IsWithGrant")) {
-         if (resultSet.getBoolean("PostCreateIsWithGrant")) {
-            return DomainCreatePermissions.getInstanceWithGrantOption(DomainPermissions.getInstanceWithGrantOption(resultSet.getDomainSysPermissionName("PostCreateSysPermissionId")));
-         }
-         else {
-            return DomainCreatePermissions.getInstanceWithGrantOption(DomainPermissions.getInstance(resultSet.getDomainSysPermissionName("PostCreateSysPermissionId")));
-         }
+      final DomainPermission postCreatePermission;
+      final String postCreateSysPermissionName = resultSet.getDomainSysPermissionName("PostCreateSysPermissionId");
+
+      if (resultSet.getBoolean("PostCreateIsWithGrant")) {
+         postCreatePermission = DomainPermissions.getInstanceWithGrantOption(postCreateSysPermissionName);
       }
       else {
-         if (resultSet.getBoolean("PostCreateIsWithGrant")) {
-            return DomainCreatePermissions.getInstance(DomainPermissions.getInstanceWithGrantOption(resultSet.getDomainSysPermissionName("PostCreateSysPermissionId")));
-         }
-         else {
-            return DomainCreatePermissions.getInstance(DomainPermissions.getInstance(resultSet.getDomainSysPermissionName("PostCreateSysPermissionId")));
-         }
+         postCreatePermission = DomainPermissions.getInstance(postCreateSysPermissionName);
+      }
+
+      if (resultSet.getBoolean("IsWithGrant")) {
+         return DomainCreatePermissions.getInstanceWithGrantOption(postCreatePermission);
+      }
+      else {
+         return  DomainCreatePermissions.getInstance(postCreatePermission);
       }
    }
 

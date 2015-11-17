@@ -69,11 +69,13 @@ public abstract class CommonGrantDomainCreatePermissionSysPersister extends Pers
    }
 
    protected static DomainCreatePermission getDomainCreateSysPermission(SQLResult resultSet) throws SQLException {
+      final String sysPermissionName = resultSet.getDomainCreateSysPermissionName("SysPermissionId");
+
       if (resultSet.getBoolean("IsWithGrant")) {
-         return DomainCreatePermissions.getInstanceWithGrantOption(resultSet.getDomainCreateSysPermissionName("SysPermissionId"));
+         return DomainCreatePermissions.getInstanceWithGrantOption(sysPermissionName);
       }
       else {
-         return DomainCreatePermissions.getInstance(resultSet.getDomainCreateSysPermissionName("SysPermissionId"));
+         return DomainCreatePermissions.getInstance(sysPermissionName);
       }
    }
 
