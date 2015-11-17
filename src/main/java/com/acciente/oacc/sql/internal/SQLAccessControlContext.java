@@ -6267,35 +6267,35 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
    // private shared helper methods
 
    private static Set<DomainPermission> __normalizeDomainPermissions(Set<DomainPermission> domainPermissions) {
-      Set<DomainPermission> translatedPermissions = new HashSet<>(domainPermissions.size());
+      Set<DomainPermission> normalizedPermissions = new HashSet<>(domainPermissions.size());
       for (DomainPermission domainPermission : domainPermissions) {
-         translatedPermissions.add(DomainPermissions.getInstance(domainPermission));
+         normalizedPermissions.add(DomainPermissions.getInstance(domainPermission));
       }
-      return translatedPermissions;
+      return normalizedPermissions;
    }
 
    private static Set<DomainCreatePermission> __normalizeDomainCreatePermissions(Set<DomainCreatePermission> domainCreatePermissions) {
-      Set<DomainCreatePermission> translatedPermissions = new HashSet<>(domainCreatePermissions.size());
+      Set<DomainCreatePermission> normalizedPermissions = new HashSet<>(domainCreatePermissions.size());
       for (DomainCreatePermission permission : domainCreatePermissions) {
-         translatedPermissions.add(DomainCreatePermissions.getInstance(permission));
+         normalizedPermissions.add(DomainCreatePermissions.getInstance(permission));
       }
-      return translatedPermissions;
+      return normalizedPermissions;
    }
 
    private static Set<ResourcePermission> __normalizeResourcePermission(Set<ResourcePermission> resourcePermissions) {
-      Set<ResourcePermission> translatedResourcePermissions = new HashSet<>(resourcePermissions.size());
+      Set<ResourcePermission> normalizedPermissions = new HashSet<>(resourcePermissions.size());
       for (ResourcePermission resourcePermission : resourcePermissions) {
-         translatedResourcePermissions.add(ResourcePermissions.getInstance(resourcePermission));
+         normalizedPermissions.add(ResourcePermissions.getInstance(resourcePermission));
       }
-      return translatedResourcePermissions;
+      return normalizedPermissions;
    }
 
    private static Set<ResourceCreatePermission> __normalizeResourceCreatePermission(Set<ResourceCreatePermission> resourceCreatePermissions) {
-      Set<ResourceCreatePermission> translatedResourceCreatePermissions = new HashSet<>(resourceCreatePermissions.size());
+      Set<ResourceCreatePermission> normalizedPermissions = new HashSet<>(resourceCreatePermissions.size());
       for (ResourceCreatePermission resourceCreatePermission : resourceCreatePermissions) {
-         translatedResourceCreatePermissions.add(ResourceCreatePermissions.getInstance(resourceCreatePermission));
+         normalizedPermissions.add(ResourceCreatePermissions.getInstance(resourceCreatePermission));
       }
-      return translatedResourceCreatePermissions;
+      return normalizedPermissions;
    }
 
    private Resource __resolveResource(SQLConnection connection,

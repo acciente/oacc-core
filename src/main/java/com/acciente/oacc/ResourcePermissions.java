@@ -91,20 +91,22 @@ public class ResourcePermissions {
          return resourcePermission;
       }
 
-      // validate system permission name is valid and id matches
-      if (resourcePermission.isSystemPermission() &&
-            !getSysPermissionName(resourcePermission.getSystemPermissionId()).equals(resourcePermission
-                                                                                           .getPermissionName())) {
-         throw new IllegalArgumentException("Invalid system permission id for resource permission: "
-                                                  + resourcePermission.getSystemPermissionId());
-      }
+      final ResourcePermission verifiedPermission;
 
       if (resourcePermission.isWithGrantOption()) {
-         return getInstanceWithGrantOption(resourcePermission.getPermissionName());
+         verifiedPermission = getInstanceWithGrantOption(resourcePermission.getPermissionName());
       }
       else {
-         return getInstance(resourcePermission.getPermissionName());
+         verifiedPermission = getInstance(resourcePermission.getPermissionName());
       }
+
+      // validate system permission name and id matched
+      if (resourcePermission.isSystemPermission() &&
+            verifiedPermission.getSystemPermissionId() != resourcePermission.getSystemPermissionId()){
+         throw new IllegalArgumentException("Invalid system permission id for resource permission: " + resourcePermission);
+      }
+
+      return verifiedPermission;
    }
 
    private static class ResourcePermissionImpl implements ResourcePermission, Serializable {

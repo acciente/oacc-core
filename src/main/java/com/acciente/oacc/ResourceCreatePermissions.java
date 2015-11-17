@@ -117,30 +117,34 @@ public class ResourceCreatePermissions {
          return resourceCreatePermission;
       }
 
-      if (resourceCreatePermission.isSystemPermission()) {
-         // validate system permission name is valid and id matches
-         if (!getSysPermissionName(resourceCreatePermission.getSystemPermissionId()).equals(resourceCreatePermission
-                                                                                                  .getPermissionName())) {
-            throw new IllegalArgumentException("Invalid system permission id for resource create permission: "
-                                                     + resourceCreatePermission.getSystemPermissionId());
-         }
+      final ResourceCreatePermission verifiedPermission;
 
+      if (resourceCreatePermission.isSystemPermission()) {
          if (resourceCreatePermission.isWithGrantOption()) {
-            return getInstanceWithGrantOption(resourceCreatePermission.getPermissionName());
+            verifiedPermission = getInstanceWithGrantOption(resourceCreatePermission.getPermissionName());
          }
          else {
-            return getInstance(resourceCreatePermission.getPermissionName());
+            verifiedPermission = getInstance(resourceCreatePermission.getPermissionName());
+         }
+
+         // validate system permission name and id matched
+         if (verifiedPermission.getSystemPermissionId() != resourceCreatePermission.getSystemPermissionId()) {
+            throw new IllegalArgumentException("Invalid system permission id for resource create permission: "
+                                                     + resourceCreatePermission);
          }
       }
       else {
          if (resourceCreatePermission.isWithGrantOption()) {
-            return getInstanceWithGrantOption(ResourcePermissions.getInstance(resourceCreatePermission
+            verifiedPermission = getInstanceWithGrantOption(ResourcePermissions.getInstance(resourceCreatePermission
                                                                                     .getPostCreateResourcePermission()));
          }
          else {
-            return getInstance(ResourcePermissions.getInstance(resourceCreatePermission.getPostCreateResourcePermission()));
+            verifiedPermission = getInstance(ResourcePermissions.getInstance(resourceCreatePermission
+                                                                                   .getPostCreateResourcePermission()));
          }
       }
+
+      return verifiedPermission;
    }
 
    private static class ResourceCreatePermissionImpl implements ResourceCreatePermission, Serializable {

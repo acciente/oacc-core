@@ -95,29 +95,32 @@ public class DomainCreatePermissions {
          return domainCreatePermission;
       }
 
-      if (domainCreatePermission.isSystemPermission()) {
-         // validate system permission name is valid and id matches
-         if (!getSysPermissionName(domainCreatePermission.getSystemPermissionId()).equals(domainCreatePermission
-                                                                                                .getPermissionName())) {
-            throw new IllegalArgumentException("Invalid system permission id for domain create permission: "
-                                                     + domainCreatePermission.getSystemPermissionId());
-         }
+      final DomainCreatePermission verifiedPermission;
 
+      if (domainCreatePermission.isSystemPermission()) {
          if (domainCreatePermission.isWithGrantOption()) {
-            return getInstanceWithGrantOption(domainCreatePermission.getPermissionName());
+            verifiedPermission = getInstanceWithGrantOption(domainCreatePermission.getPermissionName());
          }
          else {
-            return getInstance(domainCreatePermission.getPermissionName());
+            verifiedPermission = getInstance(domainCreatePermission.getPermissionName());
+         }
+
+         // validate system permission name and id matched
+         if (verifiedPermission.getSystemPermissionId() != domainCreatePermission.getSystemPermissionId()){
+            throw new IllegalArgumentException("Invalid system permission id for domain create permission: "
+                                                     + domainCreatePermission);
          }
       }
       else {
          if (domainCreatePermission.isWithGrantOption()) {
-            return getInstanceWithGrantOption(DomainPermissions.getInstance(domainCreatePermission.getPostCreateDomainPermission()));
+            verifiedPermission = getInstanceWithGrantOption(DomainPermissions.getInstance(domainCreatePermission.getPostCreateDomainPermission()));
          }
          else {
-            return getInstance(DomainPermissions.getInstance(domainCreatePermission.getPostCreateDomainPermission()));
+            verifiedPermission = getInstance(DomainPermissions.getInstance(domainCreatePermission.getPostCreateDomainPermission()));
          }
       }
+
+      return verifiedPermission;
    }
 
    private static class DomainCreatePermissionImpl implements DomainCreatePermission, Serializable{

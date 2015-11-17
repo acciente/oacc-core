@@ -85,18 +85,21 @@ public class DomainPermissions {
          return domainPermission;
       }
 
-      // validate system permission name is valid and id matches
-      if (!getSysPermissionName(domainPermission.getSystemPermissionId()).equals(domainPermission.getPermissionName())) {
-         throw new IllegalArgumentException("Invalid system permission id for domain permission: "
-                                                  + domainPermission.getSystemPermissionId());
-      }
+      final DomainPermission verifiedPermission;
 
       if(domainPermission.isWithGrantOption()) {
-         return getInstanceWithGrantOption(domainPermission.getPermissionName());
+         verifiedPermission = getInstanceWithGrantOption(domainPermission.getPermissionName());
       }
       else {
-         return getInstance(domainPermission.getPermissionName());
+         verifiedPermission = getInstance(domainPermission.getPermissionName());
       }
+
+      // validate system permission name and id matched
+      if (verifiedPermission.getSystemPermissionId() != domainPermission.getSystemPermissionId()) {
+         throw new IllegalArgumentException("Invalid system permission id for domain permission: " + domainPermission);
+      }
+
+      return verifiedPermission;
    }
 
    private static class DomainPermissionImpl implements DomainPermission, Serializable {
