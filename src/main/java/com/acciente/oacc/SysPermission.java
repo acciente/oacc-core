@@ -3,7 +3,10 @@ package com.acciente.oacc;
 import java.io.Serializable;
 
 class SysPermission implements Serializable {
-   private final long   systemPermissionId;
+
+	private static final long serialVersionUID = 1L;
+
+	private final long   systemPermissionId;
    private final String permissionName;
 
    SysPermission(int systemPermissionId, String permissionName) {
