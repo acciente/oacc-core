@@ -23,6 +23,8 @@ import java.util.List;
 import java.util.Set;
 
 public class NotAuthorizedException extends AuthorizationException {
+   private static final long serialVersionUID = 1L;
+
    public NotAuthorizedException(String message) {
       super(message);
    }

@@ -18,6 +18,8 @@
 package com.acciente.oacc;
 
 public class AuthenticationException extends OaccException {
+   private static final long serialVersionUID = 1L;
+
    public AuthenticationException(String message) {
       super(message);
    }

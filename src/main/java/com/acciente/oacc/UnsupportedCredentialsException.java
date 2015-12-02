@@ -18,6 +18,8 @@
 package com.acciente.oacc;
 
 public class UnsupportedCredentialsException extends InvalidCredentialsException {
+   private static final long serialVersionUID = 1L;
+
    public UnsupportedCredentialsException(String message) {
       super(message);
    }

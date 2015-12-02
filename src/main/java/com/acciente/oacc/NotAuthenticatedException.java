@@ -18,6 +18,8 @@
 package com.acciente.oacc;
 
 public class NotAuthenticatedException extends AuthorizationException {
+   private static final long serialVersionUID = 1L;
+
    public NotAuthenticatedException(String message) {
       super(message);
    }
