@@ -102,6 +102,16 @@ public class TestAccessControl_serialize extends TestAccessControlBase {
          deserializedAccessControlContext.authenticate(systemAuthResource,
                                                        PasswordCredentials.newInstance(TestConfigLoader
                                                                                              .getOaccRootPassword()));
+         final String domainName = generateUniqueDomainName();
+         deserializedAccessControlContext.createDomain(domainName);
+
+         final String resourceClassName = generateUniqueResourceClassName();
+         deserializedAccessControlContext.createResourceClass(resourceClassName, false, true);
+
+         final Resource resource = deserializedAccessControlContext.createResource(resourceClassName, domainName);
+
+         final ResourceClassInfo resourceClassInfo = deserializedAccessControlContext.getResourceClassInfoByResource(resource);
+         Assert.assertThat(resourceClassInfo.getResourceClassName(), is(resourceClassName));
       }
    }
 }
