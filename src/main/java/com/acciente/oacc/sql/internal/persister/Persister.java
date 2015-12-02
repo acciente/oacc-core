@@ -24,6 +24,8 @@ import java.sql.SQLException;
  * Base class for persisters
  */
 public abstract class Persister implements Serializable {
+   private static final long serialVersionUID = 1L;
+
    protected static void closeStatement(SQLStatement statement) {
       try {
          if (statement != null) {

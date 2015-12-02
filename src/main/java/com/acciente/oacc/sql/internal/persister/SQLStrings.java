@@ -25,6 +25,8 @@ import com.acciente.oacc.sql.SQLProfile;
 import java.io.Serializable;
 
 public class SQLStrings implements Serializable {
+   private static final long serialVersionUID = 1L;
+
    // SQL string constants
 
    // ResourceClass - common

@@ -33,6 +33,8 @@ public class Resources {
    }
 
    private static class ResourceImpl implements Resource, Serializable {
+      private static final long serialVersionUID = 1L;
+
       private final Long resourceId;
       private final String externalId;
 

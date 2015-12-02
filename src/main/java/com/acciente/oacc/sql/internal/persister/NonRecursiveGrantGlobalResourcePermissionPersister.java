@@ -26,6 +26,7 @@ import com.acciente.oacc.sql.internal.persister.id.ResourceClassId;
 import com.acciente.oacc.sql.internal.persister.id.ResourceId;
 import com.acciente.oacc.sql.internal.persister.id.ResourcePermissionId;
 
+import java.io.Serializable;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -35,7 +36,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-public class NonRecursiveGrantGlobalResourcePermissionPersister extends CommonGrantGlobalResourcePermissionPersister {
+public class NonRecursiveGrantGlobalResourcePermissionPersister extends CommonGrantGlobalResourcePermissionPersister implements Serializable {
+   private static final long serialVersionUID = 1L;
+
    public NonRecursiveGrantGlobalResourcePermissionPersister(SQLProfile sqlProfile,
                                                              SQLStrings sqlStrings) {
       super(sqlProfile, sqlStrings);

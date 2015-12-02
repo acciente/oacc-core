@@ -25,9 +25,12 @@ import com.acciente.oacc.sql.internal.persister.id.Id;
 import com.acciente.oacc.sql.internal.persister.id.ResourceClassId;
 import com.acciente.oacc.sql.internal.persister.id.ResourceId;
 
+import java.io.Serializable;
 import java.sql.SQLException;
 
-public abstract class CommonResourcePersister extends Persister implements ResourcePersister {
+public abstract class CommonResourcePersister extends Persister implements ResourcePersister, Serializable {
+   private static final long serialVersionUID = 1L;
+
    protected static final String[] GENERATED_KEY_COLUMNS = new String[]{"ResourceId"};
 
    protected final SQLProfile sqlProfile;

@@ -18,6 +18,8 @@ import java.sql.Connection;
 import java.sql.SQLException;
 
 public class SQLPasswordAuthenticationProvider implements AuthenticationProvider, Serializable {
+   private static final long serialVersionUID = 1L;
+
    // services
    private DataSource                 dataSource;
    private Connection                 connection;

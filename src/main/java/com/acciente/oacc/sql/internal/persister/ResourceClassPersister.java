@@ -23,11 +23,14 @@ import com.acciente.oacc.sql.internal.ResourceClassInternalInfo;
 import com.acciente.oacc.sql.internal.persister.id.Id;
 import com.acciente.oacc.sql.internal.persister.id.ResourceClassId;
 
+import java.io.Serializable;
 import java.sql.SQLException;
 import java.util.LinkedList;
 import java.util.List;
 
-public class ResourceClassPersister extends Persister {
+public class ResourceClassPersister extends Persister implements Serializable {
+   private static final long serialVersionUID = 1L;
+
    protected final SQLProfile sqlProfile;
    private final   SQLStrings sqlStrings;
 

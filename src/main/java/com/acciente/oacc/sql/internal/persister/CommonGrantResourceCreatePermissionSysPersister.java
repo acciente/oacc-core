@@ -25,13 +25,16 @@ import com.acciente.oacc.sql.internal.persister.id.DomainId;
 import com.acciente.oacc.sql.internal.persister.id.Id;
 import com.acciente.oacc.sql.internal.persister.id.ResourceClassId;
 
+import java.io.Serializable;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-public abstract class CommonGrantResourceCreatePermissionSysPersister extends Persister implements GrantResourceCreatePermissionSysPersister {
+public abstract class CommonGrantResourceCreatePermissionSysPersister extends Persister implements GrantResourceCreatePermissionSysPersister, Serializable {
+   private static final long serialVersionUID = 1L;
+
    protected final SQLProfile sqlProfile;
    protected final SQLStrings sqlStrings;
 

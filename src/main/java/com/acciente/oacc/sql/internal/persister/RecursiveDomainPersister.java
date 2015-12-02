@@ -21,13 +21,16 @@ import com.acciente.oacc.sql.SQLProfile;
 import com.acciente.oacc.sql.internal.persister.id.DomainId;
 import com.acciente.oacc.sql.internal.persister.id.Id;
 
+import java.io.Serializable;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-public class RecursiveDomainPersister extends CommonDomainPersister {
+public class RecursiveDomainPersister extends CommonDomainPersister implements Serializable {
+   private static final long serialVersionUID = 1L;
+
    public RecursiveDomainPersister(SQLProfile sqlProfile,
                                    SQLStrings sqlStrings) {
       super(sqlProfile, sqlStrings);

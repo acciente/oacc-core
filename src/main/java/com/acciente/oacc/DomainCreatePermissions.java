@@ -124,6 +124,8 @@ public class DomainCreatePermissions {
    }
 
    private static class DomainCreatePermissionImpl implements DomainCreatePermission, Serializable{
+      private static final long serialVersionUID = 1L;
+
       // permission data
       private final long             systemPermissionId;
       private final String           sysPermissionName;

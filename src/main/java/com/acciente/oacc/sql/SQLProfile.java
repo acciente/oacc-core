@@ -22,6 +22,8 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 public class SQLProfile implements Serializable {
+   private static final long serialVersionUID = 1L;
+
    public static final SQLProfile DB2_10_5_RECURSIVE;
    public static final SQLProfile DB2_10_5_NON_RECURSIVE;
    public static final SQLProfile Oracle_11_2_RECURSIVE;

@@ -24,11 +24,14 @@ import com.acciente.oacc.sql.internal.persister.id.DomainId;
 import com.acciente.oacc.sql.internal.persister.id.Id;
 import com.acciente.oacc.sql.internal.persister.id.ResourceClassId;
 
+import java.io.Serializable;
 import java.sql.SQLException;
 import java.util.HashSet;
 import java.util.Set;
 
-public class RecursiveGrantResourcePermissionSysPersister extends CommonGrantResourcePermissionSysPersister {
+public class RecursiveGrantResourcePermissionSysPersister extends CommonGrantResourcePermissionSysPersister implements Serializable {
+   private static final long serialVersionUID = 1L;
+
    public RecursiveGrantResourcePermissionSysPersister(SQLProfile sqlProfile,
                                                        SQLStrings sqlStrings) {
       super(sqlProfile, sqlStrings);

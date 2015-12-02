@@ -24,6 +24,7 @@ import com.acciente.oacc.sql.internal.persister.id.DomainId;
 import com.acciente.oacc.sql.internal.persister.id.Id;
 import com.acciente.oacc.sql.internal.persister.id.ResourceClassId;
 
+import java.io.Serializable;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -32,7 +33,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-public class RecursiveGrantResourceCreatePermissionPostCreatePersister extends CommonGrantResourceCreatePermissionPostCreatePersister {
+public class RecursiveGrantResourceCreatePermissionPostCreatePersister extends CommonGrantResourceCreatePermissionPostCreatePersister implements Serializable {
+   private static final long serialVersionUID = 1L;
+
    public RecursiveGrantResourceCreatePermissionPostCreatePersister(SQLProfile sqlProfile,
                                                                     SQLStrings sqlStrings) {
       super(sqlProfile, sqlStrings);

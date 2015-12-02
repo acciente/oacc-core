@@ -21,9 +21,12 @@ import com.acciente.oacc.sql.SQLProfile;
 import com.acciente.oacc.sql.internal.persister.id.DomainId;
 import com.acciente.oacc.sql.internal.persister.id.Id;
 
+import java.io.Serializable;
 import java.sql.SQLException;
 
-public class RecursiveResourcePersister extends CommonResourcePersister {
+public class RecursiveResourcePersister extends CommonResourcePersister implements Serializable {
+   private static final long serialVersionUID = 1L;
+
    public RecursiveResourcePersister(SQLProfile sqlProfile,
                                      SQLStrings sqlStrings) {
       super(sqlProfile, sqlStrings);

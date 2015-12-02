@@ -94,6 +94,8 @@ import java.util.Set;
 
 @SuppressWarnings({"UnusedAssignment", "ThrowFromFinallyBlock"})
 public class SQLAccessControlContext implements AccessControlContext, Serializable {
+   private static final long serialVersionUID = 1L;
+
    // services
    private DataSource dataSource;
    private Connection connection;

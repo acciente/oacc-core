@@ -21,9 +21,12 @@ import com.acciente.oacc.Resource;
 import com.acciente.oacc.sql.internal.persister.id.Id;
 import com.acciente.oacc.sql.internal.persister.id.ResourceId;
 
+import java.io.Serializable;
 import java.sql.SQLException;
 
-public class ResourcePasswordPersister extends Persister {
+public class ResourcePasswordPersister extends Persister implements Serializable {
+   private static final long serialVersionUID = 1L;
+
    private final SQLPasswordStrings sqlPasswordStrings;
 
    public ResourcePasswordPersister(SQLPasswordStrings sqlPasswordStrings) {

@@ -20,6 +20,8 @@ package com.acciente.oacc;
 import java.io.Serializable;
 
 public class ResourceClassInfo implements Serializable {
+   private static final long serialVersionUID = 1L;
+
    private final String  resourceClassName;
    private final boolean authenticatable;
    private final boolean unauthenticatedCreateAllowed;

@@ -103,6 +103,8 @@ public class DomainPermissions {
    }
 
    private static class DomainPermissionImpl implements DomainPermission, Serializable {
+      private static final long serialVersionUID = 1L;
+
       // permission data
       private final long    systemPermissionId;
       private final String  permissionName;

@@ -22,10 +22,13 @@ import com.acciente.oacc.sql.SQLProfile;
 import com.acciente.oacc.sql.internal.persister.id.DomainId;
 import com.acciente.oacc.sql.internal.persister.id.Id;
 
+import java.io.Serializable;
 import java.sql.SQLException;
 import java.util.Set;
 
-public abstract class CommonDomainPersister extends Persister implements DomainPersister {
+public abstract class CommonDomainPersister extends Persister implements DomainPersister, Serializable {
+   private static final long serialVersionUID = 1L;
+
    protected final SQLProfile sqlProfile;
    protected final SQLStrings sqlStrings;
 

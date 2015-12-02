@@ -21,11 +21,14 @@ import com.acciente.oacc.DomainCreatePermission;
 import com.acciente.oacc.Resource;
 import com.acciente.oacc.sql.SQLProfile;
 
+import java.io.Serializable;
 import java.sql.SQLException;
 import java.util.HashSet;
 import java.util.Set;
 
-public class RecursiveGrantDomainCreatePermissionSysPersister extends CommonGrantDomainCreatePermissionSysPersister {
+public class RecursiveGrantDomainCreatePermissionSysPersister extends CommonGrantDomainCreatePermissionSysPersister implements Serializable {
+   private static final long serialVersionUID = 1L;
+
    public RecursiveGrantDomainCreatePermissionSysPersister(SQLProfile sqlProfile,
                                                            SQLStrings sqlStrings) {
       super(sqlProfile, sqlStrings);

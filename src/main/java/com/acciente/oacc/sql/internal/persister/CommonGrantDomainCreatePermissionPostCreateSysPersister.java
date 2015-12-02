@@ -24,11 +24,14 @@ import com.acciente.oacc.DomainPermissions;
 import com.acciente.oacc.Resource;
 import com.acciente.oacc.sql.SQLProfile;
 
+import java.io.Serializable;
 import java.sql.SQLException;
 import java.util.HashSet;
 import java.util.Set;
 
-public abstract class CommonGrantDomainCreatePermissionPostCreateSysPersister extends Persister implements GrantDomainCreatePermissionPostCreateSysPersister {
+public abstract class CommonGrantDomainCreatePermissionPostCreateSysPersister extends Persister implements GrantDomainCreatePermissionPostCreateSysPersister, Serializable {
+   private static final long serialVersionUID = 1L;
+
    protected final SQLProfile sqlProfile;
    protected final SQLStrings sqlStrings;
 

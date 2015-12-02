@@ -20,6 +20,8 @@ package com.acciente.oacc.sql.internal.persister;
 import java.io.Serializable;
 
 public class SQLPasswordStrings implements Serializable {
+   private static final long serialVersionUID = 1L;
+
    // SQL string constants
 
    // ResourcePassword

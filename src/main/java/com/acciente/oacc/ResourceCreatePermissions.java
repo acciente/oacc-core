@@ -148,6 +148,8 @@ public class ResourceCreatePermissions {
    }
 
    private static class ResourceCreatePermissionImpl implements ResourceCreatePermission, Serializable {
+      private static final long serialVersionUID = 1L;
+
       // permission data
       private final long               systemPermissionId;
       private final String             sysPermissionName;
