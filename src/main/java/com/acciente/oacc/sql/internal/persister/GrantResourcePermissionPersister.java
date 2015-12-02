@@ -24,10 +24,9 @@ import com.acciente.oacc.sql.internal.persister.id.Id;
 import com.acciente.oacc.sql.internal.persister.id.ResourceClassId;
 import com.acciente.oacc.sql.internal.persister.id.ResourcePermissionId;
 
-import java.io.Serializable;
 import java.util.Set;
 
-public interface GrantResourcePermissionPersister extends Serializable {
+public interface GrantResourcePermissionPersister {
    Set<Resource> getResourcesByResourcePermission(SQLConnection connection,
                                                   Resource accessorResource,
                                                   Id<ResourceClassId> resourceClassId,
