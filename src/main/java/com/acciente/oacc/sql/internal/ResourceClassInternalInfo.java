@@ -22,7 +22,7 @@ import com.acciente.oacc.sql.internal.persister.id.ResourceClassId;
 
 import java.io.Serializable;
 
-public class ResourceClassInternalInfo implements Serializable {
+public class ResourceClassInternalInfo {
    private final long    resourceClassId;
    private final String  resourceClassName;
    private final boolean authenticatable;
