@@ -97,8 +97,8 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
    private static final long serialVersionUID = 1L;
 
    // services
-   private DataSource dataSource;
-   private Connection connection;
+   private transient DataSource dataSource;
+   private transient Connection connection;
 
    // state
    private AuthenticationProvider authenticationProvider;
@@ -194,24 +194,17 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       return new SQLAccessControlContext(dataSource, schemaName, sqlProfile, authenticationProvider);
    }
 
-   public static void preSerialize(AccessControlContext accessControlContext) {
+   public static void initialize(AccessControlContext accessControlContext, Connection connection) {
       if (accessControlContext instanceof SQLAccessControlContext) {
          SQLAccessControlContext sqlAccessControlContext = (SQLAccessControlContext) accessControlContext;
-         sqlAccessControlContext.__preSerialize();
+         sqlAccessControlContext.__initialize(connection);
       }
    }
 
-   public static void postDeserialize(AccessControlContext accessControlContext, Connection connection) {
+   public static void initialize(AccessControlContext accessControlContext, DataSource dataSource) {
       if (accessControlContext instanceof SQLAccessControlContext) {
          SQLAccessControlContext sqlAccessControlContext = (SQLAccessControlContext) accessControlContext;
-         sqlAccessControlContext.__postDeserialize(connection);
-      }
-   }
-
-   public static void postDeserialize(AccessControlContext accessControlContext, DataSource dataSource) {
-      if (accessControlContext instanceof SQLAccessControlContext) {
-         SQLAccessControlContext sqlAccessControlContext = (SQLAccessControlContext) accessControlContext;
-         sqlAccessControlContext.__postDeserialize(dataSource);
+         sqlAccessControlContext.__initialize(dataSource);
       }
    }
 
@@ -322,27 +315,25 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       }
    }
 
-   private void __preSerialize() {
-      this.dataSource = null;
-      this.connection = null;
-      if (hasDefaultAuthenticationProvider) {
-         ((SQLPasswordAuthenticationProvider) authenticationProvider).preSerialize();
+   private void __initialize(DataSource dataSource) {
+      if (this.dataSource != null || this.connection != null) {
+         throw new IllegalStateException("Cannot re-initialize an already initialized SQLAccessControlContext");
       }
-   }
-
-   private void __postDeserialize(DataSource dataSource) {
       this.dataSource = dataSource;
       this.connection = null;
       if (hasDefaultAuthenticationProvider) {
-         ((SQLPasswordAuthenticationProvider) authenticationProvider).postDeserialize(dataSource);
+         ((SQLPasswordAuthenticationProvider) authenticationProvider).initialize(dataSource);
       }
    }
 
-   private void __postDeserialize(Connection connection) {
+   private void __initialize(Connection connection) {
+      if (this.dataSource != null || this.connection != null) {
+         throw new IllegalStateException("Cannot re-initialize an already initialized SQLAccessControlContext");
+      }
       this.dataSource = null;
       this.connection = connection;
       if (hasDefaultAuthenticationProvider) {
-         ((SQLPasswordAuthenticationProvider) authenticationProvider).postDeserialize(connection);
+         ((SQLPasswordAuthenticationProvider) authenticationProvider).initialize(connection);
       }
    }
 

@@ -1,3 +1,20 @@
+/*
+ * Copyright 2009-2015, Acciente LLC
+ *
+ * Acciente LLC licenses this file to you under the
+ * Apache License, Version 2.0 (the "License"); you
+ * may not use this file except in compliance with the
+ * License. You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in
+ * writing, software distributed under the License is
+ * distributed on an "AS IS" BASIS, WITHOUT WARRANTIES
+ * OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing
+ * permissions and limitations under the License.
+ */
 package com.acciente.oacc.sql.internal;
 
 import com.acciente.oacc.AuthenticationProvider;
@@ -13,6 +30,8 @@ import com.acciente.oacc.sql.internal.persister.SQLConnection;
 import com.acciente.oacc.sql.internal.persister.SQLPasswordStrings;
 
 import javax.sql.DataSource;
+import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.io.Serializable;
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -21,9 +40,9 @@ public class SQLPasswordAuthenticationProvider implements AuthenticationProvider
    private static final long serialVersionUID = 1L;
 
    // services
-   private DataSource                 dataSource;
-   private Connection                 connection;
-   private CleanablePasswordEncryptor passwordEncryptor;
+   private transient DataSource                 dataSource;
+   private transient Connection                 connection;
+   private transient CleanablePasswordEncryptor passwordEncryptor;
 
    // persisters
    private final ResourcePasswordPersister resourcePasswordPersister;
@@ -53,22 +72,55 @@ public class SQLPasswordAuthenticationProvider implements AuthenticationProvider
       resourcePasswordPersister = new ResourcePasswordPersister(sqlPasswordStrings);
    }
 
-   protected void preSerialize() {
-      this.dataSource = null;
-      this.connection = null;
-      this.passwordEncryptor = null;
-   }
-
-   protected void postDeserialize(DataSource dataSource) {
+   /**
+    * Initializes the transient data source after deserialization.
+    * <p/>
+    * This method is only intended to be called after successful deserialization, in order to reset
+    * a transient data source to a database that was not serialized. If the method is called when a
+    * data source or connection has already been initialized, the method will throw an IllegalStateException.
+    *
+    * @param dataSource   the database dataSource to be reset
+    * @throws IllegalStateException if a dataSource or connection is already set
+    */
+   protected void initialize(DataSource dataSource) {
+      if (this.dataSource != null || this.connection != null) {
+         throw new IllegalStateException("Cannot re-initialize an already initialized SQLPasswordAuthenticationProvider");
+      }
       this.dataSource = dataSource;
       this.connection = null;
-      this.passwordEncryptor = new StrongCleanablePasswordEncryptor();
    }
 
-   protected void postDeserialize(Connection connection) {
+   /**
+    * Initializes the transient connection after deserialization.
+    * <p/>
+    * This method is only intended to be called after successful deserialization, in order to reset
+    * a transient connection to a database that was not serialized. If the method is called when a
+    * data source or connection has already been initialized, the method will throw an IllegalStateException.
+    *
+    * @param connection   the database connection to be reset
+    * @throws IllegalStateException if a dataSource or connection is already set
+    */
+   protected void initialize(Connection connection) {
+      if (this.dataSource != null || this.connection != null) {
+         throw new IllegalStateException("Cannot re-initialize an already initialized SQLPasswordAuthenticationProvider");
+      }
       this.dataSource = null;
       this.connection = connection;
-      this.passwordEncryptor = new StrongCleanablePasswordEncryptor();
+   }
+
+   /*
+    * Deserializes the object from the stream using the default method and re-initializes the transient passwordEncryptor
+    * field. The remaining transient fields (dataSource and connection) need to be set after deserialization by calling
+    * one of the initialize() methods.
+    */
+   private void readObject(ObjectInputStream objectInputStream) throws ClassNotFoundException, IOException {
+      // perform the default de-serialization first
+      objectInputStream.defaultReadObject();
+
+      // restore transient field
+      passwordEncryptor = new StrongCleanablePasswordEncryptor();
+
+      // the other transient fields have to be set with a subsequent call to initialize()
    }
 
    @Override
@@ -224,7 +276,7 @@ public class SQLPasswordAuthenticationProvider implements AuthenticationProvider
          return new SQLConnection(connection);
       }
       else {
-         throw new IllegalStateException("Not initialized! No data source or connection, perhaps missing call to postDeserialize()?");
+         throw new IllegalStateException("Not initialized! No data source or connection - don't forget to re-initialize after deserialization!");
       }
    }
 

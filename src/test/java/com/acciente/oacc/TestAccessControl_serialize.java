@@ -25,25 +25,20 @@ import org.junit.Test;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.NotSerializableException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 
+import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.fail;
 
 public class TestAccessControl_serialize extends TestAccessControlBase {
    @Test
-   public void serialize_withoutPreSerialization_shouldFail() throws IOException {
+   public void serialize_serialization_shouldSucceed() throws IOException {
       ObjectOutputStream objectOutputStream = null;
       try {
          objectOutputStream = new ObjectOutputStream(new ByteArrayOutputStream());
          objectOutputStream.writeObject(accessControlContext);
-         fail("serializing accessControlContext instance without calling preSerialize() should have failed");
-      }
-      catch (NotSerializableException e)
-      {
-         // ignore - this is the expected exception
       }
       finally {
          if (objectOutputStream != null) {
@@ -53,7 +48,7 @@ public class TestAccessControl_serialize extends TestAccessControlBase {
    }
 
    @Test
-   public void serialize_withPreSerialization_shouldSucceed() throws IOException, ClassNotFoundException {
+   public void serialize_deserializationWithoutInitialization_shouldFail() throws IOException, ClassNotFoundException {
       Resource systemAuthResource = getSystemResource();
       accessControlContext.authenticate(systemAuthResource,
                                         PasswordCredentials.newInstance(TestConfigLoader.getOaccRootPassword()));
@@ -64,9 +59,6 @@ public class TestAccessControl_serialize extends TestAccessControlBase {
          ObjectOutputStream objectOutputStream = null;
          ObjectInputStream objectInputStream = null;
          AccessControlContext deserializedAccessControlContext;
-
-         // call preSerialize()
-         SQLAccessControlContext.preSerialize(accessControlContext);
 
          try {
             // serialize into byte array
@@ -92,16 +84,93 @@ public class TestAccessControl_serialize extends TestAccessControlBase {
             }
          }
 
-         // call postDeserialize()
-         SQLAccessControlContext.postDeserialize(deserializedAccessControlContext, TestConfigLoader.getDataSource());
+         // currently we don't check that accessControlContext is initialized within *every* method, so
+         // the following will succeed because it only deals with a field that was serializable by default
+         deserializedAccessControlContext.getAuthenticatedResource();
+
+         // attempt to use deserialized AccessControlContext without calling initialize()
+         try {
+            deserializedAccessControlContext.authenticate(systemAuthResource,
+                                                          PasswordCredentials.newInstance(TestConfigLoader
+                                                                                                .getOaccRootPassword()));
+            fail("using deserialized AccessControlContext without re-initialization should have failed");
+         }
+         catch (IllegalStateException e) {
+             Assert.assertThat(e.getMessage().toLowerCase(), containsString("not initialized"));
+         }
+
+         final String domainName = generateUniqueDomainName();
+         try {
+            deserializedAccessControlContext.createDomain(domainName);
+            fail("using deserialized AccessControlContext without re-initialization should have failed");
+         }
+         catch (IllegalStateException e) {
+             Assert.assertThat(e.getMessage().toLowerCase(), containsString("not initialized"));
+         }
+
+         final String resourceClassName = generateUniqueResourceClassName();
+         try {
+            deserializedAccessControlContext.createResourceClass(resourceClassName, false, true);
+            fail("using deserialized AccessControlContext without re-initialization should have failed");
+         }
+         catch (IllegalStateException e) {
+             Assert.assertThat(e.getMessage().toLowerCase(), containsString("not initialized"));
+         }
+
+         try {
+            deserializedAccessControlContext.createResource(resourceClassName, domainName);
+            fail("using deserialized AccessControlContext without re-initialization should have failed");
+         }
+         catch (IllegalStateException e) {
+             Assert.assertThat(e.getMessage().toLowerCase(), containsString("not initialized"));
+         }
+      }
+   }
+
+   @Test
+   public void serialize_deserializationWithInitialization_shouldSucceed() throws IOException, ClassNotFoundException {
+      Resource systemAuthResource = getSystemResource();
+      accessControlContext.authenticate(systemAuthResource,
+                                        PasswordCredentials.newInstance(TestConfigLoader.getOaccRootPassword()));
+      Assert.assertThat(accessControlContext.getAuthenticatedResource(), is(systemAuthResource));
+
+      if (accessControlContext instanceof SQLAccessControlContext) {
+         ByteArrayOutputStream byteArrayOutputStream = null;
+         ObjectOutputStream objectOutputStream = null;
+         ObjectInputStream objectInputStream = null;
+         AccessControlContext deserializedAccessControlContext;
+
+         try {
+            // serialize into byte array
+            byteArrayOutputStream = new ByteArrayOutputStream();
+            objectOutputStream = new ObjectOutputStream(byteArrayOutputStream);
+            objectOutputStream.writeObject(accessControlContext);
+            objectOutputStream.close();
+            final byte[] serializedAccessControlContext = byteArrayOutputStream.toByteArray();
+
+            // deserialize from byte array
+            objectInputStream = new ObjectInputStream(new ByteArrayInputStream(serializedAccessControlContext));
+            deserializedAccessControlContext = (AccessControlContext) objectInputStream.readObject();
+         }
+         finally {
+            if (byteArrayOutputStream != null) {
+               byteArrayOutputStream.close();
+            }
+            if (objectOutputStream != null) {
+               objectOutputStream.close();
+            }
+            if (objectInputStream != null) {
+               objectOutputStream.close();
+            }
+         }
+
+         // call initialize()
+         SQLAccessControlContext.initialize(deserializedAccessControlContext, TestConfigLoader.getDataSource());
 
          // verify state hasn't changed
          Assert.assertThat(deserializedAccessControlContext.getAuthenticatedResource(), is(systemAuthResource));
 
          // verify it's still usable
-         deserializedAccessControlContext.authenticate(systemAuthResource,
-                                                       PasswordCredentials.newInstance(TestConfigLoader
-                                                                                             .getOaccRootPassword()));
          final String domainName = generateUniqueDomainName();
          deserializedAccessControlContext.createDomain(domainName);
 
@@ -112,6 +181,10 @@ public class TestAccessControl_serialize extends TestAccessControlBase {
 
          final ResourceClassInfo resourceClassInfo = deserializedAccessControlContext.getResourceClassInfoByResource(resource);
          Assert.assertThat(resourceClassInfo.getResourceClassName(), is(resourceClassName));
+
+         deserializedAccessControlContext.authenticate(systemAuthResource,
+                                                       PasswordCredentials.newInstance(TestConfigLoader
+                                                                                             .getOaccRootPassword()));
       }
    }
 }

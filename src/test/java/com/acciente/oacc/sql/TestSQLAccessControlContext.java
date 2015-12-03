@@ -1181,8 +1181,6 @@ public class TestSQLAccessControlContext extends TestSQLAccessControlContextBase
 
       testName("test_serializability()");
       try {
-         SQLAccessControlContextFactory.preSerialize(accessControlContext);
-
          objectOutputStream.writeObject(accessControlContext);
 
          testOK();
