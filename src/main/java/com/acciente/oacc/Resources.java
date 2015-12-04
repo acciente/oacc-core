@@ -70,16 +70,17 @@ public class Resources {
 
          ResourceImpl otherResource = (ResourceImpl) other;
 
-         if (!resourceId.equals(otherResource.resourceId)) {
+         if (resourceId != null ? !resourceId.equals(otherResource.resourceId) : otherResource.resourceId != null) {
             return false;
          }
-
-         return true;
+         return !(externalId != null ? !externalId.equals(otherResource.externalId) : otherResource.externalId != null);
       }
 
       @Override
       public int hashCode() {
-         return resourceId.hashCode();
+         int result = resourceId != null ? resourceId.hashCode() : 0;
+         result = 31 * result + (externalId != null ? externalId.hashCode() : 0);
+         return result;
       }
 
       @Override
