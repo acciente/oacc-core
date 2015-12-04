@@ -33,6 +33,7 @@ import com.acciente.oacc.ResourceCreatePermission;
 import com.acciente.oacc.ResourceCreatePermissions;
 import com.acciente.oacc.ResourcePermission;
 import com.acciente.oacc.ResourcePermissions;
+import com.acciente.oacc.Resources;
 import com.acciente.oacc.sql.SQLProfile;
 import com.acciente.oacc.sql.internal.persister.DomainPersister;
 import com.acciente.oacc.sql.internal.persister.GrantDomainCreatePermissionPostCreateSysPersister;
@@ -106,11 +107,13 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
 
    // The resource that authenticated in this session with a call to one of the authenticate() methods
    private Resource authenticatedResource;
+   private Resource defensiveCopyOfAuthenticatedResource;
    private String   authenticatedResourceDomainName;
 
    // The resource as which the session's credentials are checked. This would be the same as the resource
    // that initially authenticated - UNLESS a another resource is being IMPERSONATED
    private Resource sessionResource;
+   private Resource defensiveCopyOfSessionResource;
    private String   sessionResourceDomainName;
 
    // resource ID constants
@@ -395,15 +398,18 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       }
 
       authenticatedResource = resource;
+      defensiveCopyOfAuthenticatedResource = null;
       authenticatedResourceDomainName = resourceDomainForResource;
 
       sessionResource = authenticatedResource;
+      defensiveCopyOfSessionResource = null;
       sessionResourceDomainName = authenticatedResourceDomainName;
    }
 
    @Override
    public void unauthenticate() {
       sessionResource = authenticatedResource = null;
+      defensiveCopyOfSessionResource = defensiveCopyOfAuthenticatedResource = null;
       sessionResourceDomainName = authenticatedResourceDomainName = null;
    }
 
@@ -422,6 +428,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
 
          // switch the session credentials to the new resource
          sessionResource = resource;
+         defensiveCopyOfSessionResource = null;
          sessionResourceDomainName = domainPersister.getResourceDomainNameByResourceId(connection, resource);
       }
       finally {
@@ -482,6 +489,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
    @Override
    public void unimpersonate() {
       sessionResource = authenticatedResource;
+      defensiveCopyOfSessionResource = defensiveCopyOfAuthenticatedResource;
       sessionResourceDomainName = authenticatedResourceDomainName;
    }
 
@@ -4848,14 +4856,26 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
    public Resource getAuthenticatedResource() {
       __assertAuthenticated();
 
-      return authenticatedResource;
+      if (defensiveCopyOfAuthenticatedResource == null ||
+            !__isEqual(defensiveCopyOfAuthenticatedResource, authenticatedResource)) {
+         defensiveCopyOfAuthenticatedResource = Resources.getInstance(authenticatedResource.getId(), 
+                                                                      authenticatedResource.getExternalId());
+      }
+      
+      return defensiveCopyOfAuthenticatedResource;
    }
 
    @Override
    public Resource getSessionResource() {
       __assertAuthenticated();
 
-      return sessionResource;
+      if (defensiveCopyOfSessionResource == null ||
+            !__isEqual(defensiveCopyOfSessionResource, sessionResource)) {
+         defensiveCopyOfSessionResource = Resources.getInstance(sessionResource.getId(),
+                                                                sessionResource.getExternalId());
+      }
+
+      return defensiveCopyOfSessionResource;
    }
 
    @Override
