@@ -73,7 +73,14 @@ public class SQLPasswordAuthenticationProvider implements AuthenticationProvider
    }
 
    /**
-    * Initializes the transient data source after deserialization.
+    * @deprecated  As of v2.0.0-rc.6; no replacement method necessary because unserializable fields are now marked as transient
+    */
+   @Deprecated
+   protected void preSerialize() {
+   }
+
+   /**
+    * Re-initializes the transient data source after deserialization.
     * <p/>
     * This method is only intended to be called after successful deserialization, in order to reset
     * a transient data source to a database that was not serialized. If the method is called when a
@@ -82,7 +89,7 @@ public class SQLPasswordAuthenticationProvider implements AuthenticationProvider
     * @param dataSource   the database dataSource to be reset
     * @throws IllegalStateException if a dataSource or connection is already set
     */
-   protected void initialize(DataSource dataSource) {
+   protected void postDeserialize(DataSource dataSource) {
       if (this.dataSource != null || this.connection != null) {
          throw new IllegalStateException("Cannot re-initialize an already initialized SQLPasswordAuthenticationProvider");
       }
@@ -91,7 +98,7 @@ public class SQLPasswordAuthenticationProvider implements AuthenticationProvider
    }
 
    /**
-    * Initializes the transient connection after deserialization.
+    * Re-initializes the transient connection after deserialization.
     * <p/>
     * This method is only intended to be called after successful deserialization, in order to reset
     * a transient connection to a database that was not serialized. If the method is called when a
@@ -100,7 +107,7 @@ public class SQLPasswordAuthenticationProvider implements AuthenticationProvider
     * @param connection   the database connection to be reset
     * @throws IllegalStateException if a dataSource or connection is already set
     */
-   protected void initialize(Connection connection) {
+   protected void postDeserialize(Connection connection) {
       if (this.dataSource != null || this.connection != null) {
          throw new IllegalStateException("Cannot re-initialize an already initialized SQLPasswordAuthenticationProvider");
       }
@@ -111,7 +118,7 @@ public class SQLPasswordAuthenticationProvider implements AuthenticationProvider
    /*
     * Deserializes the object from the stream using the default method and re-initializes the transient passwordEncryptor
     * field. The remaining transient fields (dataSource and connection) need to be set after deserialization by calling
-    * one of the initialize() methods.
+    * one of the postDeserialize() methods.
     */
    private void readObject(ObjectInputStream objectInputStream) throws ClassNotFoundException, IOException {
       // perform the default de-serialization first

@@ -65,7 +65,14 @@ public class SQLAccessControlContextFactory {
    }
 
    /**
-    * Initializes the specified deserialized accessControlContext with the specified connection.
+    * @deprecated  As of v2.0.0-rc.6; no replacement method necessary because unserializable fields are now marked as transient
+    */
+   @Deprecated
+   public static void preSerialize(AccessControlContext accessControlContext) {
+   }
+
+   /**
+    * Re-initializes the specified deserialized accessControlContext with the specified connection.
     * <p/>
     * This method is only intended to be called after the specified accessControlContext was successfully
     * deserialized, in order to reset a transient connection to a database that was not serialized. If the
@@ -75,12 +82,12 @@ public class SQLAccessControlContextFactory {
     * @param accessControlContext the accessControlContext on which to reset the database connection
     * @param connection the database connection to be reset on the accessControlContext
     */
-   public static void initialize(AccessControlContext accessControlContext, Connection connection) {
-      SQLAccessControlContext.initialize(accessControlContext, connection);
+   public static void postDeserialize(AccessControlContext accessControlContext, Connection connection) {
+      SQLAccessControlContext.postDeserialize(accessControlContext, connection);
    }
 
    /**
-    * Initializes the specified deserialized accessControlContext with the specified data source.
+    * Re-initializes the specified deserialized accessControlContext with the specified data source.
     * <p/>
     * This method is only intended to be called after the specified accessControlContext was successfully
     * deserialized, in order to reset a transient dataSource to a database that was not serialized. If the
@@ -90,7 +97,7 @@ public class SQLAccessControlContextFactory {
     * @param accessControlContext the accessControlContext on which to reset the database connection
     * @param dataSource the database dataSource to be reset on the accessControlContext
     */
-   public static void initialize(AccessControlContext accessControlContext, DataSource dataSource) {
-      SQLAccessControlContext.initialize(accessControlContext, dataSource);
+   public static void postDeserialize(AccessControlContext accessControlContext, DataSource dataSource) {
+      SQLAccessControlContext.postDeserialize(accessControlContext, dataSource);
    }
 }

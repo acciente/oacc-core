@@ -48,7 +48,7 @@ public class TestAccessControl_serialize extends TestAccessControlBase {
    }
 
    @Test
-   public void serialize_deserializationWithoutInitialization_shouldFail() throws IOException, ClassNotFoundException {
+   public void serialize_deserializationWithoutPostDeserialize_shouldFail() throws IOException, ClassNotFoundException {
       Resource systemAuthResource = getSystemResource();
       accessControlContext.authenticate(systemAuthResource,
                                         PasswordCredentials.newInstance(TestConfigLoader.getOaccRootPassword()));
@@ -128,7 +128,7 @@ public class TestAccessControl_serialize extends TestAccessControlBase {
    }
 
    @Test
-   public void serialize_deserializationWithInitialization_shouldSucceed() throws IOException, ClassNotFoundException {
+   public void serialize_deserializationWithPostDeserialize_shouldSucceed() throws IOException, ClassNotFoundException {
       Resource systemAuthResource = getSystemResource();
       accessControlContext.authenticate(systemAuthResource,
                                         PasswordCredentials.newInstance(TestConfigLoader.getOaccRootPassword()));
@@ -165,7 +165,7 @@ public class TestAccessControl_serialize extends TestAccessControlBase {
          }
 
          // call initialize()
-         SQLAccessControlContext.initialize(deserializedAccessControlContext, TestConfigLoader.getDataSource());
+         SQLAccessControlContext.postDeserialize(deserializedAccessControlContext, TestConfigLoader.getDataSource());
 
          // verify state hasn't changed
          Assert.assertThat(deserializedAccessControlContext.getAuthenticatedResource(), is(systemAuthResource));

@@ -17,11 +17,13 @@
  */
 package com.acciente.oacc;
 
+import com.acciente.oacc.helper.TestConfigLoader;
 import com.acciente.oacc.sql.SQLAccessControlContextFactory;
 import org.junit.Test;
 
 import javax.sql.DataSource;
 import java.sql.Connection;
+import java.sql.SQLException;
 
 import static com.ibm.icu.impl.Assert.fail;
 import static org.hamcrest.CoreMatchers.containsString;
@@ -29,11 +31,14 @@ import static org.junit.Assert.assertThat;
 
 public class TestSQLAccessControlContextFactory {
    @Test
-   public void getAccessControlContext_invalidSchemaName_shouldFail() {
+   public void getAccessControlContext_invalidSchemaName_shouldFail() throws SQLException {
       final String invalidSchemaName = "oacc.temp;drop database oaccdb;--";
 
+      final DataSource dataSource = TestConfigLoader.getDataSource();
+      final Connection connection = dataSource.getConnection();
+
       try {
-         SQLAccessControlContextFactory.getAccessControlContext((DataSource) null,
+         SQLAccessControlContextFactory.getAccessControlContext(dataSource,
                                                                 invalidSchemaName,
                                                                 null);
          fail("getting access control context with invalid schema name should have failed");
@@ -42,7 +47,7 @@ public class TestSQLAccessControlContextFactory {
          assertThat(e.getMessage().toLowerCase(), containsString("invalid database schema name"));
       }
       try {
-         SQLAccessControlContextFactory.getAccessControlContext((DataSource) null,
+         SQLAccessControlContextFactory.getAccessControlContext(dataSource,
                                                                 invalidSchemaName,
                                                                 null,
                                                                 null);
@@ -53,7 +58,7 @@ public class TestSQLAccessControlContextFactory {
       }
 
       try {
-         SQLAccessControlContextFactory.getAccessControlContext((Connection) null,
+         SQLAccessControlContextFactory.getAccessControlContext(connection,
                                                                 invalidSchemaName,
                                                                 null);
          fail("getting access control context with invalid schema name should have failed");
@@ -62,7 +67,7 @@ public class TestSQLAccessControlContextFactory {
          assertThat(e.getMessage().toLowerCase(), containsString("invalid database schema name"));
       }
       try {
-         SQLAccessControlContextFactory.getAccessControlContext((Connection) null,
+         SQLAccessControlContextFactory.getAccessControlContext(connection,
                                                                 invalidSchemaName,
                                                                 null,
                                                                 null);

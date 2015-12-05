@@ -174,12 +174,14 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
    public static AccessControlContext getAccessControlContext(Connection connection,
                                                               String schemaName,
                                                               SQLProfile sqlProfile) {
+      __assertConnectionSpecified(connection);
       return new SQLAccessControlContext(connection, schemaName, sqlProfile);
    }
 
    public static AccessControlContext getAccessControlContext(DataSource dataSource,
                                                               String schemaName,
                                                               SQLProfile sqlProfile) {
+      __assertDataSourceSpecified(dataSource);
       return new SQLAccessControlContext(dataSource, schemaName, sqlProfile);
    }
 
@@ -187,6 +189,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
                                                               String schemaName,
                                                               SQLProfile sqlProfile,
                                                               AuthenticationProvider authenticationProvider) {
+      __assertConnectionSpecified(connection);
       return new SQLAccessControlContext(connection, schemaName, sqlProfile, authenticationProvider);
    }
 
@@ -194,20 +197,28 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
                                                               String schemaName,
                                                               SQLProfile sqlProfile,
                                                               AuthenticationProvider authenticationProvider) {
+      __assertDataSourceSpecified(dataSource);
       return new SQLAccessControlContext(dataSource, schemaName, sqlProfile, authenticationProvider);
    }
 
-   public static void initialize(AccessControlContext accessControlContext, Connection connection) {
+   /**
+    * @deprecated  As of v2.0.0-rc.6; no replacement method necessary because unserializable fields are now marked as transient
+    */
+   @Deprecated
+   public static void preSerialize(AccessControlContext accessControlContext) {
+   }
+
+   public static void postDeserialize(AccessControlContext accessControlContext, Connection connection) {
       if (accessControlContext instanceof SQLAccessControlContext) {
          SQLAccessControlContext sqlAccessControlContext = (SQLAccessControlContext) accessControlContext;
-         sqlAccessControlContext.__initialize(connection);
+         sqlAccessControlContext.__postDeserialize(connection);
       }
    }
 
-   public static void initialize(AccessControlContext accessControlContext, DataSource dataSource) {
+   public static void postDeserialize(AccessControlContext accessControlContext, DataSource dataSource) {
       if (accessControlContext instanceof SQLAccessControlContext) {
          SQLAccessControlContext sqlAccessControlContext = (SQLAccessControlContext) accessControlContext;
-         sqlAccessControlContext.__initialize(dataSource);
+         sqlAccessControlContext.__postDeserialize(dataSource);
       }
    }
 
@@ -320,25 +331,25 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       }
    }
 
-   private void __initialize(DataSource dataSource) {
+   private void __postDeserialize(DataSource dataSource) {
       if (this.dataSource != null || this.connection != null) {
          throw new IllegalStateException("Cannot re-initialize an already initialized SQLAccessControlContext");
       }
       this.dataSource = dataSource;
       this.connection = null;
       if (hasDefaultAuthenticationProvider) {
-         ((SQLPasswordAuthenticationProvider) authenticationProvider).initialize(dataSource);
+         ((SQLPasswordAuthenticationProvider) authenticationProvider).postDeserialize(dataSource);
       }
    }
 
-   private void __initialize(Connection connection) {
+   private void __postDeserialize(Connection connection) {
       if (this.dataSource != null || this.connection != null) {
          throw new IllegalStateException("Cannot re-initialize an already initialized SQLAccessControlContext");
       }
       this.dataSource = null;
       this.connection = connection;
       if (hasDefaultAuthenticationProvider) {
-         ((SQLPasswordAuthenticationProvider) authenticationProvider).initialize(connection);
+         ((SQLPasswordAuthenticationProvider) authenticationProvider).postDeserialize(connection);
       }
    }
 
@@ -6475,6 +6486,18 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
    }
 
    // helper methods
+
+   private static void __assertConnectionSpecified(Connection connection) {
+      if (connection == null) {
+         throw new IllegalArgumentException("Connection required, none specified");
+      }
+   }
+
+   private static void __assertDataSourceSpecified(DataSource dataSource) {
+      if (dataSource == null) {
+         throw new IllegalArgumentException("DataSource required, none specified");
+      }
+   }
 
    private void __assertResourceSpecified(Resource resource) {
       if (resource == null) {
