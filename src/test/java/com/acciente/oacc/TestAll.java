@@ -19,6 +19,7 @@ package com.acciente.oacc;
 
 import com.acciente.oacc.helper.Test_OACC_Resource;
 import com.acciente.oacc.sql.TestSQLAccessControlSystemInitializerSuite;
+import com.acciente.oacc.sql.TestSchemaNameValidator;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 
@@ -27,8 +28,10 @@ import static org.junit.runners.Suite.SuiteClasses;
 @RunWith(Suite.class)
 @SuiteClasses({Test_OACC_Resource.class,
       TestSQLAccessControlSystemInitializerSuite.class,
+      TestSQLAccessControlContextFactory.class,
       TestResourcePermission.class,
       TestDomainPermission.class,
+      TestSchemaNameValidator.class,
       TestAccessControlSuite.class})
 public class TestAll {
 }

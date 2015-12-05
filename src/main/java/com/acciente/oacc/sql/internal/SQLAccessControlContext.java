@@ -255,6 +255,8 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
 
    private SQLAccessControlContext(String schemaName,
                                    SQLProfile sqlProfile) {
+      SchemaNameValidator.assertValid(schemaName);
+
       // generate all the SQLs the persisters need based on the database dialect
       SQLStrings sqlStrings = SQLStrings.getSQLStrings(schemaName, sqlProfile);
 

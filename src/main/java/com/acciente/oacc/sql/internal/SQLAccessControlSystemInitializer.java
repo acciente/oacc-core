@@ -31,6 +31,8 @@ public class SQLAccessControlSystemInitializer {
    public static void initializeOACC(Connection connection,
                                      String dbSchema,
                                      char[] oaccRootPwd) throws SQLException {
+      SchemaNameValidator.assertValid(dbSchema);
+
       System.out.println("Initializing password encryptor...");
       CleanablePasswordEncryptor passwordEncryptor = new StrongCleanablePasswordEncryptor();
 

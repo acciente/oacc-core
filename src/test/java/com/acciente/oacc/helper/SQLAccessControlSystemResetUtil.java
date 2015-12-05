@@ -18,6 +18,7 @@
 package com.acciente.oacc.helper;
 
 import com.acciente.oacc.sql.internal.SQLAccessControlSystemInitializer;
+import com.acciente.oacc.sql.internal.SchemaNameValidator;
 
 import javax.sql.DataSource;
 import java.sql.Connection;
@@ -45,6 +46,8 @@ public class SQLAccessControlSystemResetUtil {
    public static void deleteAllOACCData(Connection connection,
                                         String dbSchema) throws SQLException {
       PreparedStatement statement = null;
+
+      SchemaNameValidator.assertValid(dbSchema);
 
       try {
          final String schemaNameAndTablePrefix = dbSchema != null ? dbSchema + ".OAC_" : "OAC_";

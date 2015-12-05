@@ -46,6 +46,8 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.List;
 
+import static com.ibm.icu.impl.Assert.fail;
+import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.hasItems;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -91,6 +93,19 @@ public class TestSQLAccessControlSystemInitializer {
    public void initializeOACC() throws SQLException, InterruptedException {
       SQLAccessControlSystemInitializer.initializeOACC(con, TestConfigLoader.getDatabaseSchema(), TestConfigLoader.getOaccRootPassword());
       assertThatOACCIsInInitializedState();
+   }
+
+   @Test
+   public void initializeOACC_invalidSchemaName_shouldFail() throws SQLException, InterruptedException {
+      try {
+         SQLAccessControlSystemInitializer.initializeOACC(con,
+                                                          "oacc.temp;drop database oaccdb;--",
+                                                          TestConfigLoader.getOaccRootPassword());
+         fail("initializing OACC with invalid schema name should have failed");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("invalid database schema name"));
+      }
    }
 
    @Test
