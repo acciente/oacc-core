@@ -144,7 +144,7 @@
                     <finalName>${project.artifactId}-${project.version}</finalName>
                     <outputDirectory>target/apidocs-${project.version}</outputDirectory>
                     <doctitle>${project.name} ${project.version} API</doctitle>
-                    <bottom><![CDATA[<br><a href="http://www.oaccframework.org">OACC<a> is a Java Application Security Framework developed by <a href="http://www.acciente.com">Acciente, LLC.<a>.<br>Copyright 2015, <a href="http://www.acciente.com">Acciente, LLC.<a>All rights reserved.]]></bottom>
+                    <bottom><![CDATA[<br><a href="http://www.oaccframework.org">OACC<a> is a Java Application Security Framework developed by <a href="http://www.acciente.com">Acciente, LLC.<a>.<br>Copyright 2009-2016, <a href="http://www.acciente.com">Acciente, LLC.<a>All rights reserved.]]></bottom>
                 </configuration>
             </plugin>
             <plugin>
