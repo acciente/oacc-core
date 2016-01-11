@@ -127,7 +127,7 @@ public class SQLPasswordAuthenticationProvider implements AuthenticationProvider
       // restore transient field
       passwordEncryptor = new StrongCleanablePasswordEncryptor();
 
-      // the other transient fields have to be set with a subsequent call to initialize()
+      // the other transient fields have to be set with a subsequent call to postDeserialize()
    }
 
    @Override
