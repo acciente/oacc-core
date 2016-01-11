@@ -20,8 +20,6 @@ package com.acciente.oacc.sql.internal;
 import com.acciente.oacc.sql.internal.persister.id.Id;
 import com.acciente.oacc.sql.internal.persister.id.ResourceClassId;
 
-import java.io.Serializable;
-
 public class ResourceClassInternalInfo {
    private final long    resourceClassId;
    private final String  resourceClassName;
