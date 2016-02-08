@@ -25,9 +25,9 @@ import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.SQLException;
 
-import static com.ibm.icu.impl.Assert.fail;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.fail;
 
 public class TestSQLAccessControlContextFactory {
    @Test
