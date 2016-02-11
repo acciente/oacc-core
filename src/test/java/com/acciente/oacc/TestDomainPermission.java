@@ -22,6 +22,7 @@ import org.junit.Test;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.hasItem;
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 
@@ -42,6 +43,14 @@ public class TestDomainPermission {
    }
 
    @Test
+   public void cache_valid() {
+      for(String systemPermissionName : DomainPermissions.getSysPermissionNames()) {
+         final DomainPermission domainPermission = DomainPermissions.getInstance(systemPermissionName);
+         assertThat(DomainPermissions.getInstance(systemPermissionName), sameInstance(domainPermission));
+      }
+   }
+
+   @Test
    public void construct_withGrant_valid() {
       for(String systemPermissionName : DomainPermissions.getSysPermissionNames()) {
          DomainPermissions.getInstanceWithGrantOption(systemPermissionName);
@@ -49,10 +58,34 @@ public class TestDomainPermission {
    }
 
    @Test
+   public void cache_withGrant_valid() {
+      for(String systemPermissionName : DomainPermissions.getSysPermissionNames()) {
+         final DomainPermission domainPermission = DomainPermissions.getInstanceWithGrantOption(systemPermissionName);
+         assertThat(DomainPermissions.getInstanceWithGrantOption(systemPermissionName), sameInstance(domainPermission));
+      }
+   }
+
+   @Test
    public void construct_whitespaceConsistent() {
       for(String systemPermissionName : DomainPermissions.getSysPermissionNames()) {
-         DomainPermissions.getInstance(" " + systemPermissionName + "\t");
-         DomainPermissions.getInstanceWithGrantOption(" " + systemPermissionName + "\t");
+         assertThat(DomainPermissions.getInstance(" " + systemPermissionName + "\t").getPermissionName(),
+                    is(systemPermissionName));
+         assertThat(DomainPermissions.getInstanceWithGrantOption(" " + systemPermissionName + "\t").getPermissionName(),
+                    is(systemPermissionName));
+      }
+   }
+
+   @Test
+   public void cache_whitespaceConsistent() {
+      for(String systemPermissionName : DomainPermissions.getSysPermissionNames()) {
+         final DomainPermission domainPermission
+               = DomainPermissions.getInstance(" " + systemPermissionName + "\t");
+         assertThat(DomainPermissions.getInstance(systemPermissionName),
+                    sameInstance(domainPermission));
+         final DomainPermission grantableDomainPermission
+               = DomainPermissions.getInstanceWithGrantOption(" " + systemPermissionName + "\t");
+         assertThat(DomainPermissions.getInstanceWithGrantOption(systemPermissionName),
+                    sameInstance(grantableDomainPermission));
       }
    }
 

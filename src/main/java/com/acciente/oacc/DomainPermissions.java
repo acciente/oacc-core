@@ -33,9 +33,11 @@ public class DomainPermissions {
    private static final SysPermission SYSPERMISSION_DELETE              = new SysPermission(-303, "*DELETE");
    public static final  String        DELETE                            = SYSPERMISSION_DELETE.getPermissionName();
 
-   private static final Map<String, SysPermission> sysPermissionsByName;
-   private static final Map<Long, String>          sysPermissionNamesById;
-   private static final List<String>               sysPermissionNames;
+   private static final Map<String, SysPermission>    sysPermissionsByName;
+   private static final Map<Long, String>             sysPermissionNamesById;
+   private static final List<String>                  sysPermissionNames;
+   private static final Map<String, DomainPermission> grantablePermissionsByName;
+   private static final Map<String, DomainPermission> ungrantablePermissionsByName;
    static {
       sysPermissionsByName = new HashMap<>();
       sysPermissionsByName.put(SUPER_USER, SYSPERMISSION_SUPER_USER);
@@ -48,6 +50,9 @@ public class DomainPermissions {
       }
 
       sysPermissionNames = Collections.unmodifiableList(new ArrayList<>(sysPermissionNamesById.values()));
+
+      grantablePermissionsByName = new HashMap<>(sysPermissionsByName.size());
+      ungrantablePermissionsByName = new HashMap<>(sysPermissionsByName.size());
    }
 
    public static List<String> getSysPermissionNames() {
@@ -65,11 +70,29 @@ public class DomainPermissions {
    }
 
    public static DomainPermission getInstance(String sysPermissionName) {
-      return new DomainPermissionImpl(sysPermissionName, false);
+      sysPermissionName = getCanonicalSysPermissionName(sysPermissionName);
+
+      DomainPermission domainPermission = ungrantablePermissionsByName.get(sysPermissionName);
+
+      if (domainPermission == null) {
+         domainPermission = new DomainPermissionImpl(sysPermissionName, false);
+         ungrantablePermissionsByName.put(sysPermissionName, domainPermission);
+      }
+
+      return domainPermission;
    }
 
    public static DomainPermission getInstanceWithGrantOption(String sysPermissionName) {
-      return new DomainPermissionImpl(sysPermissionName, true);
+      sysPermissionName = getCanonicalSysPermissionName(sysPermissionName);
+
+      DomainPermission domainPermission = grantablePermissionsByName.get(sysPermissionName);
+
+      if (domainPermission == null) {
+         domainPermission = new DomainPermissionImpl(sysPermissionName, true);
+         grantablePermissionsByName.put(sysPermissionName, domainPermission);
+      }
+
+      return domainPermission;
    }
 
    /**
@@ -100,6 +123,20 @@ public class DomainPermissions {
       }
 
       return verifiedPermission;
+   }
+
+   private static String getCanonicalSysPermissionName(String permissionName) {
+      if (permissionName == null) {
+         throw new IllegalArgumentException("A system permission name is required");
+      }
+
+      permissionName = permissionName.trim();
+
+      if (permissionName.isEmpty())
+      {
+         throw new IllegalArgumentException("A system permission name is required");
+      }
+      return permissionName;
    }
 
    private static class DomainPermissionImpl implements DomainPermission, Serializable {
