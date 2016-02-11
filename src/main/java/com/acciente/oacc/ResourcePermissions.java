@@ -37,9 +37,12 @@ public class ResourcePermissions {
    private static final SysPermission SYSPERMISSION_QUERY             = new SysPermission(-105, "*QUERY");
    public static final  String        QUERY                           = SYSPERMISSION_QUERY.getPermissionName();
 
-   private static final Map<String, SysPermission> sysPermissionsByName;
-   private static final Map<Long, String>          sysPermissionNamesById;
-   private static final List<String>               sysPermissionNames;
+   private static final Map<String, SysPermission>      sysPermissionsByName;
+   private static final Map<Long, String>               sysPermissionNamesById;
+   private static final List<String>                    sysPermissionNames;
+   private static final Map<String, ResourcePermission> ungrantablePermissionByName;
+   private static final Map<String, ResourcePermission> grantablePermissionByName;
+
    static {
       sysPermissionsByName = new HashMap<>();
       sysPermissionsByName.put(INHERIT, SYSPERMISSION_INHERIT);
@@ -54,6 +57,9 @@ public class ResourcePermissions {
       }
 
       sysPermissionNames = Collections.unmodifiableList(new ArrayList<>(sysPermissionNamesById.values()));
+
+      ungrantablePermissionByName = new HashMap<>();
+      grantablePermissionByName = new HashMap<>();
    }
 
    public static List<String> getSysPermissionNames() {
@@ -71,11 +77,29 @@ public class ResourcePermissions {
    }
 
    public static ResourcePermission getInstance(String permissionName) {
-      return new ResourcePermissionImpl(permissionName, false);
+      permissionName = getCanonicalPermissionName(permissionName);
+
+      ResourcePermission resourcePermission = ungrantablePermissionByName.get(permissionName);
+
+      if (resourcePermission == null) {
+         resourcePermission = new ResourcePermissionImpl(permissionName, false);
+         ungrantablePermissionByName.put(permissionName, resourcePermission);
+      }
+
+      return resourcePermission;
    }
 
    public static ResourcePermission getInstanceWithGrantOption(String permissionName) {
-      return new ResourcePermissionImpl(permissionName, true);
+      permissionName = getCanonicalPermissionName(permissionName);
+
+      ResourcePermission resourcePermission = grantablePermissionByName.get(permissionName);
+
+      if (resourcePermission == null) {
+         resourcePermission = new ResourcePermissionImpl(permissionName, true);
+         grantablePermissionByName.put(permissionName, resourcePermission);
+      }
+
+      return resourcePermission;
    }
 
    /**
@@ -107,6 +131,20 @@ public class ResourcePermissions {
       }
 
       return verifiedPermission;
+   }
+
+   private static String getCanonicalPermissionName(String permissionName) {
+      if (permissionName == null) {
+         throw new IllegalArgumentException("A permission name is required");
+      }
+
+      permissionName = permissionName.trim();
+
+      if (permissionName.isEmpty())
+      {
+         throw new IllegalArgumentException("A permission name is required");
+      }
+      return permissionName;
    }
 
    private static class ResourcePermissionImpl implements ResourcePermission, Serializable {

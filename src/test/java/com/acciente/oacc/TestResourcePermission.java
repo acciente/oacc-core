@@ -22,6 +22,7 @@ import org.junit.Test;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.hasItem;
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 
@@ -39,7 +40,18 @@ public class TestResourcePermission {
    @Test
    public void constructSystemPermission_valid() {
       for(String systemPermissionName : ResourcePermissions.getSysPermissionNames()) {
-         ResourcePermissions.getInstance(systemPermissionName);
+         final ResourcePermission resourcePermission = ResourcePermissions.getInstance(systemPermissionName);
+         assertThat(resourcePermission.getPermissionName(), is(systemPermissionName));
+         assertThat(resourcePermission.isSystemPermission(), is(true));
+         assertThat(resourcePermission.isWithGrantOption(), is(false));
+      }
+   }
+
+   @Test
+   public void cacheSystemPermission_valid() {
+      for(String systemPermissionName : ResourcePermissions.getSysPermissionNames()) {
+         final ResourcePermission resourcePermission = ResourcePermissions.getInstance(systemPermissionName);
+         assertThat(ResourcePermissions.getInstance(systemPermissionName), sameInstance(resourcePermission));
       }
    }
 
@@ -47,7 +59,18 @@ public class TestResourcePermission {
    public void constructSystemPermission_withGrant_valid() {
       for(String systemPermissionName : ResourcePermissions.getSysPermissionNames()) {
          // with exception of *CREATE system permission, all should be creatable with grant option, as well
-         ResourcePermissions.getInstanceWithGrantOption(systemPermissionName);
+         final ResourcePermission resourcePermission = ResourcePermissions.getInstanceWithGrantOption(systemPermissionName);
+         assertThat(resourcePermission.getPermissionName(), is(systemPermissionName));
+         assertThat(resourcePermission.isSystemPermission(), is(true));
+         assertThat(resourcePermission.isWithGrantOption(), is(true));
+      }
+   }
+
+   @Test
+   public void cacheSystemPermission_withGrant_valid() {
+      for(String systemPermissionName : ResourcePermissions.getSysPermissionNames()) {
+         final ResourcePermission resourcePermission = ResourcePermissions.getInstanceWithGrantOption(systemPermissionName);
+         assertThat(ResourcePermissions.getInstanceWithGrantOption(systemPermissionName), sameInstance(resourcePermission));
       }
    }
 
@@ -56,6 +79,15 @@ public class TestResourcePermission {
       final String permissionName = "this_is_a_valid_permission_name";
       final ResourcePermission resourcePermission = ResourcePermissions.getInstance(permissionName);
       assertThat(resourcePermission.getPermissionName(), is(permissionName));
+      assertThat(resourcePermission.isSystemPermission(), is(false));
+      assertThat(resourcePermission.isWithGrantOption(), is(false));
+   }
+
+   @Test
+   public void cacheCustomPermission_valid() {
+      final String permissionName = "this_is_a_valid_permission_name";
+      final ResourcePermission resourcePermission = ResourcePermissions.getInstance(permissionName);
+      assertThat(ResourcePermissions.getInstance(permissionName), sameInstance(resourcePermission));
    }
 
    @Test
@@ -63,6 +95,15 @@ public class TestResourcePermission {
       final String permissionName = "this_is_also_a_valid_permission_name";
       final ResourcePermission resourcePermission = ResourcePermissions.getInstanceWithGrantOption(permissionName);
       assertThat(resourcePermission.getPermissionName(), is(permissionName));
+      assertThat(resourcePermission.isSystemPermission(), is(false));
+      assertThat(resourcePermission.isWithGrantOption(), is(true));
+   }
+
+   @Test
+   public void cacheCustomPermission_withGrant_valid() {
+      final String permissionName = "this_is_also_a_valid_permission_name";
+      final ResourcePermission resourcePermission = ResourcePermissions.getInstanceWithGrantOption(permissionName);
+      assertThat(ResourcePermissions.getInstanceWithGrantOption(permissionName), sameInstance(resourcePermission));
    }
 
    @Test
@@ -79,6 +120,19 @@ public class TestResourcePermission {
    }
 
    @Test
+   public void cacheSystemPermission_whitespaceConsistent() {
+      for(String systemPermissionName : ResourcePermissions.getSysPermissionNames()) {
+         final ResourcePermission resourcePermission = ResourcePermissions.getInstance(" " + systemPermissionName + "\t");
+         assertThat(ResourcePermissions.getInstance(systemPermissionName), sameInstance(resourcePermission));
+      }
+      // now with grant
+      for(String systemPermissionName : ResourcePermissions.getSysPermissionNames()) {
+         final ResourcePermission resourcePermission = ResourcePermissions.getInstanceWithGrantOption(" " + systemPermissionName + "\t");
+         assertThat(ResourcePermissions.getInstanceWithGrantOption(systemPermissionName), sameInstance(resourcePermission));
+      }
+   }
+
+   @Test
    public void constructCustomPermission_whitespaceConsistent() {
       final String permissionName = "this_is_a_valid_permission_name";
 
@@ -88,6 +142,18 @@ public class TestResourcePermission {
       // now with grant
       final ResourcePermission grantableResourcePermission = ResourcePermissions.getInstanceWithGrantOption(" " + permissionName + "\t");
       assertThat(grantableResourcePermission.getPermissionName(), is(permissionName));
+   }
+
+   @Test
+   public void cacheCustomPermission_whitespaceConsistent() {
+      final String permissionName = "this_is_a_valid_permission_name";
+
+      final ResourcePermission resourcePermission = ResourcePermissions.getInstance(" " + permissionName + "\t");
+      assertThat(ResourcePermissions.getInstance(permissionName), sameInstance(resourcePermission));
+
+      // now with grant
+      final ResourcePermission grantableResourcePermission = ResourcePermissions.getInstanceWithGrantOption(" " + permissionName + "\t");
+      assertThat(ResourcePermissions.getInstanceWithGrantOption(permissionName), sameInstance(grantableResourcePermission));
    }
 
    @Test
