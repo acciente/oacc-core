@@ -58,7 +58,6 @@ public class TestResourcePermission {
    @Test
    public void constructSystemPermission_withGrant_valid() {
       for(String systemPermissionName : ResourcePermissions.getSysPermissionNames()) {
-         // with exception of *CREATE system permission, all should be creatable with grant option, as well
          final ResourcePermission resourcePermission = ResourcePermissions.getInstanceWithGrantOption(systemPermissionName);
          assertThat(resourcePermission.getPermissionName(), is(systemPermissionName));
          assertThat(resourcePermission.isSystemPermission(), is(true));

@@ -29,9 +29,14 @@ public class ResourceCreatePermissions {
    private static final SysPermission SYSPERMISSION_CREATE = new SysPermission(-100, "*CREATE");
    public static final  String        CREATE               = SYSPERMISSION_CREATE.getPermissionName();
 
-   private static final Map<String, SysPermission> sysPermissionsByName;
-   private static final Map<Long, String>          sysPermissionNamesById;
-   private static final List<String>               sysPermissionNames;
+   private static final Map<String, SysPermission>                        sysPermissionsByName;
+   private static final Map<Long, String>                                 sysPermissionNamesById;
+   private static final List<String>                                      sysPermissionNames;
+   private static final Map<String, ResourceCreatePermission>             grantableCreatePermissionsByName;
+   private static final Map<String, ResourceCreatePermission>             ungrantableCreatePermissionsByName;
+   private static final Map<ResourcePermission, ResourceCreatePermission> grantableCreatePermissionsByPostCreatePermission;
+   private static final Map<ResourcePermission, ResourceCreatePermission> ungrantableCreatePermissionsByPostCreatePermission;
+
    static {
       sysPermissionsByName = new HashMap<>();
       sysPermissionsByName.put(CREATE, SYSPERMISSION_CREATE);
@@ -42,6 +47,11 @@ public class ResourceCreatePermissions {
       }
 
       sysPermissionNames = Collections.unmodifiableList(new ArrayList<>(sysPermissionNamesById.values()));
+
+      grantableCreatePermissionsByName = new HashMap<>();
+      ungrantableCreatePermissionsByName = new HashMap<>();
+      grantableCreatePermissionsByPostCreatePermission = new HashMap<>();
+      ungrantableCreatePermissionsByPostCreatePermission = new HashMap<>();
    }
 
    public static List<String> getSysPermissionNames() {
@@ -66,7 +76,16 @@ public class ResourceCreatePermissions {
     * @return a resource create permission
     */
    public static ResourceCreatePermission getInstanceWithGrantOption(String sysPermissionName) {
-      return new ResourceCreatePermissionImpl(sysPermissionName, true);
+      sysPermissionName = getCanonicalSysPermissionName(sysPermissionName);
+
+      ResourceCreatePermission resourceCreatePermission = grantableCreatePermissionsByName.get(sysPermissionName);
+
+      if (resourceCreatePermission == null) {
+         resourceCreatePermission = new ResourceCreatePermissionImpl(sysPermissionName, true);
+         grantableCreatePermissionsByName.put(sysPermissionName, resourceCreatePermission);
+      }
+
+      return resourceCreatePermission;
    }
 
    /**
@@ -91,15 +110,40 @@ public class ResourceCreatePermissions {
     * @return a resource create permission
     */
    public static ResourceCreatePermission getInstance(String sysPermissionName) {
-      return new ResourceCreatePermissionImpl(sysPermissionName, false);
+      sysPermissionName = getCanonicalSysPermissionName(sysPermissionName);
+
+      ResourceCreatePermission resourceCreatePermission = ungrantableCreatePermissionsByName.get(sysPermissionName);
+
+      if (resourceCreatePermission == null) {
+         resourceCreatePermission = new ResourceCreatePermissionImpl(sysPermissionName, false);
+         ungrantableCreatePermissionsByName.put(sysPermissionName, resourceCreatePermission);
+      }
+
+      return resourceCreatePermission;
    }
 
    public static ResourceCreatePermission getInstance(ResourcePermission postCreateResourcePermission) {
-      return new ResourceCreatePermissionImpl(postCreateResourcePermission, false);
+      ResourceCreatePermission resourceCreatePermission
+            = ungrantableCreatePermissionsByPostCreatePermission.get(postCreateResourcePermission);
+
+      if (resourceCreatePermission == null) {
+         resourceCreatePermission = new ResourceCreatePermissionImpl(postCreateResourcePermission, false);
+         ungrantableCreatePermissionsByPostCreatePermission.put(postCreateResourcePermission, resourceCreatePermission);
+      }
+
+      return resourceCreatePermission;
    }
 
    public static ResourceCreatePermission getInstanceWithGrantOption(ResourcePermission postCreateResourcePermission) {
-      return new ResourceCreatePermissionImpl(postCreateResourcePermission, true);
+      ResourceCreatePermission resourceCreatePermission
+            = grantableCreatePermissionsByPostCreatePermission.get(postCreateResourcePermission);
+
+      if (resourceCreatePermission == null) {
+         resourceCreatePermission = new ResourceCreatePermissionImpl(postCreateResourcePermission, true);
+         grantableCreatePermissionsByPostCreatePermission.put(postCreateResourcePermission, resourceCreatePermission);
+      }
+
+      return resourceCreatePermission;
    }
 
    /**
@@ -147,6 +191,20 @@ public class ResourceCreatePermissions {
       return verifiedPermission;
    }
 
+   private static String getCanonicalSysPermissionName(String permissionName) {
+      if (permissionName == null) {
+         throw new IllegalArgumentException("A system permission name is required");
+      }
+
+      permissionName = permissionName.trim();
+
+      if (permissionName.isEmpty())
+      {
+         throw new IllegalArgumentException("A system permission name is required");
+      }
+      return permissionName;
+   }
+
    private static class ResourceCreatePermissionImpl implements ResourceCreatePermission, Serializable {
       private static final long serialVersionUID = 1L;
 
@@ -168,6 +226,9 @@ public class ResourceCreatePermissions {
 
       private ResourceCreatePermissionImpl(ResourcePermission postCreateResourcePermission,
                                            boolean withGrantOption) {
+         if (postCreateResourcePermission == null) {
+            throw new IllegalArgumentException("A post create resource permission is required");
+         }
          this.systemPermissionId = 0;
          this.sysPermissionName = null;
          this.postCreateResourcePermission = postCreateResourcePermission;

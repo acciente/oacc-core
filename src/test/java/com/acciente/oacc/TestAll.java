@@ -30,6 +30,7 @@ import static org.junit.runners.Suite.SuiteClasses;
       TestSQLAccessControlSystemInitializerSuite.class,
       TestSQLAccessControlContextFactory.class,
       TestResourcePermission.class,
+      TestResourceCreatePermission.class,
       TestDomainPermission.class,
       TestSchemaNameValidator.class,
       TestAccessControlSuite.class})
