@@ -24,7 +24,7 @@ package com.acciente.oacc;
  * another resource. The kind of "access" that a resource permission represents is determined
  * by the application and is typically described in the permission name. In addition to such
  * application-defined resource permissions, OACC provides a set of pre-defined common "system"
- * resource permissions: *INHERIT, *IMPERSONATE and *RESET-CREDENTIALS.
+ * resource permissions: *INHERIT, *IMPERSONATE, *RESET-CREDENTIALS, *DELETE and *QUERY.
  * <p/>
  * To create an instance of this class use {@link ResourcePermissions#getInstance(String)} or one
  * of its variants.

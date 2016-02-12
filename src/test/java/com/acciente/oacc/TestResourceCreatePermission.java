@@ -19,6 +19,10 @@ package com.acciente.oacc;
 
 import org.junit.Test;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.ObjectOutputStream;
+
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.hasItem;
 import static org.hamcrest.CoreMatchers.is;
@@ -277,4 +281,65 @@ public class TestResourceCreatePermission {
          assertThat(e.getMessage().toLowerCase(), containsString("invalid system permission name"));
       }
    }
+
+   @Test
+   public void serialize_internalPermissionImpl_shouldSucceed() throws IOException {
+      final ResourcePermission serializablePermission = ResourcePermissions.getInstance("serializable_permission");
+      final ResourceCreatePermission resourceCreatePermission = ResourceCreatePermissions.getInstance(serializablePermission);
+
+      ObjectOutputStream objectOutputStream = null;
+      try {
+         objectOutputStream = new ObjectOutputStream(new ByteArrayOutputStream());
+         objectOutputStream.writeObject(resourceCreatePermission);
+      }
+      finally {
+         if (objectOutputStream != null) {
+            objectOutputStream.close();
+         }
+      }
+   }
+
+   @Test
+   public void serialize_customPermissionImpl_shouldSucceed() throws IOException {
+      final ResourcePermission nonSerializablePermission = new ResourcePermission() {
+         @Override
+         public boolean isSystemPermission() { return false; }
+
+         @Override
+         public String getPermissionName() { return "nonSerializable_permission"; }
+
+         @Override
+         public long getSystemPermissionId() { return 0; }
+
+         @Override
+         public boolean isWithGrantOption() { return false; }
+
+         @Override
+         public boolean isWithGrant() { return false; }
+
+         @Override
+         public boolean isGrantableFrom(ResourcePermission other) { return false; }
+
+         @Override
+         public boolean equalsIgnoreGrantOption(Object other) { return false; }
+
+         @Override
+         public boolean equalsIgnoreGrant(Object other) { return false; }
+      };
+
+      final ResourceCreatePermission resourceCreatePermission
+            = ResourceCreatePermissions.getInstance(nonSerializablePermission);
+
+      ObjectOutputStream objectOutputStream = null;
+      try {
+         objectOutputStream = new ObjectOutputStream(new ByteArrayOutputStream());
+         objectOutputStream.writeObject(resourceCreatePermission);
+      }
+      finally {
+         if (objectOutputStream != null) {
+            objectOutputStream.close();
+         }
+      }
+   }
+
 }

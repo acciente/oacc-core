@@ -19,6 +19,10 @@ package com.acciente.oacc;
 
 import org.junit.Test;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.ObjectOutputStream;
+
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.hasItem;
 import static org.hamcrest.CoreMatchers.is;
@@ -144,7 +148,6 @@ public class TestDomainCreatePermission {
             = DomainCreatePermissions.getInstance(domainPermission);
       assertThat(DomainCreatePermissions.getInstance(DomainPermissions.getInstance(permissionName)),
                  is(domainCreatePermission));
-
       // now with grant
       final DomainCreatePermission grantableDomainCreatePermission
             = DomainCreatePermissions.getInstanceWithGrantOption(domainPermission);
@@ -275,6 +278,66 @@ public class TestDomainCreatePermission {
       }
       catch (Exception e) {
          assertThat(e.getMessage().toLowerCase(), containsString("invalid system permission name"));
+      }
+   }
+
+   @Test
+   public void serialize_internalPermissionImpl_shouldSucceed() throws IOException {
+      final DomainPermission serializablePermission = DomainPermissions.getInstance(DomainPermissions.DELETE);
+      final DomainCreatePermission DomainCreatePermission = DomainCreatePermissions.getInstance(serializablePermission);
+
+      ObjectOutputStream objectOutputStream = null;
+      try {
+         objectOutputStream = new ObjectOutputStream(new ByteArrayOutputStream());
+         objectOutputStream.writeObject(DomainCreatePermission);
+      }
+      finally {
+         if (objectOutputStream != null) {
+            objectOutputStream.close();
+         }
+      }
+   }
+
+   @Test
+   public void serialize_customPermissionImpl_shouldSucceed() throws IOException {
+      final DomainPermission nonSerializablePermission = new DomainPermission() {
+         @Override
+         public boolean isSystemPermission() { return true; }
+
+         @Override
+         public String getPermissionName() { return DomainPermissions.CREATE_CHILD_DOMAIN; }
+
+         @Override
+         public long getSystemPermissionId() { return -302; }
+
+         @Override
+         public boolean isWithGrantOption() { return false; }
+
+         @Override
+         public boolean isWithGrant() { return false; }
+
+         @Override
+         public boolean isGrantableFrom(DomainPermission other) { return false; }
+
+         @Override
+         public boolean equalsIgnoreGrantOption(Object other) { return false; }
+
+         @Override
+         public boolean equalsIgnoreGrant(Object other) { return false; }
+      };
+
+      final DomainCreatePermission DomainCreatePermission
+            = DomainCreatePermissions.getInstance(nonSerializablePermission);
+
+      ObjectOutputStream objectOutputStream = null;
+      try {
+         objectOutputStream = new ObjectOutputStream(new ByteArrayOutputStream());
+         objectOutputStream.writeObject(DomainCreatePermission);
+      }
+      finally {
+         if (objectOutputStream != null) {
+            objectOutputStream.close();
+         }
       }
    }
 }

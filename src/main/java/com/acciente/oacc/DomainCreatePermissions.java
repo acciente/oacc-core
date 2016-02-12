@@ -17,6 +17,8 @@
  */
 package com.acciente.oacc;
 
+import com.acciente.oacc.DomainPermissions.DomainPermissionImpl;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -141,7 +143,7 @@ public class DomainCreatePermissions {
             = ungrantableCreatePermissionsByPostCreatePermission.get(postCreateDomainPermission);
 
       if (domainCreatePermission == null) {
-         domainCreatePermission = new DomainCreatePermissionImpl(postCreateDomainPermission, false);
+         domainCreatePermission = new DomainCreatePermissionImpl((DomainPermissionImpl) postCreateDomainPermission, false);
          final DomainCreatePermission cachedInstance
                = ungrantableCreatePermissionsByPostCreatePermission.putIfAbsent(postCreateDomainPermission, domainCreatePermission);
          if (cachedInstance != null) {
@@ -168,7 +170,7 @@ public class DomainCreatePermissions {
             = grantableCreatePermissionsByPostCreatePermission.get(postCreateDomainPermission);
 
       if (domainCreatePermission == null) {
-         domainCreatePermission = new DomainCreatePermissionImpl(postCreateDomainPermission, true);
+         domainCreatePermission = new DomainCreatePermissionImpl((DomainPermissionImpl) postCreateDomainPermission, true);
          final DomainCreatePermission cachedInstance
                = grantableCreatePermissionsByPostCreatePermission.putIfAbsent(postCreateDomainPermission, domainCreatePermission);
          if (cachedInstance != null) {
@@ -184,7 +186,8 @@ public class DomainCreatePermissions {
     */
    @Deprecated
    public static DomainCreatePermission getInstance(DomainPermission domainPostCreatePermission, boolean withGrant) {
-      return new DomainCreatePermissionImpl(domainPostCreatePermission, withGrant);
+      domainPostCreatePermission = DomainPermissions.getInstance(domainPostCreatePermission);
+      return new DomainCreatePermissionImpl((DomainPermissionImpl) domainPostCreatePermission, withGrant);
    }
 
    public static DomainCreatePermission getInstance(DomainCreatePermission domainCreatePermission) {
@@ -227,8 +230,7 @@ public class DomainCreatePermissions {
 
       permissionName = permissionName.trim();
 
-      if (permissionName.isEmpty())
-      {
+      if (permissionName.isEmpty()) {
          throw new IllegalArgumentException("A system permission name is required");
       }
       return permissionName;
@@ -240,14 +242,14 @@ public class DomainCreatePermissions {
       }
    }
 
-   private static class DomainCreatePermissionImpl implements DomainCreatePermission, Serializable{
-      private static final long serialVersionUID = 1L;
+   static class DomainCreatePermissionImpl implements DomainCreatePermission, Serializable{
+      private static final long serialVersionUID = 2L;
 
       // permission data
-      private final long             systemPermissionId;
-      private final String           sysPermissionName;
-      private final DomainPermission postCreateDomainPermission;
-      private final boolean          withGrantOption;
+      private final long                 systemPermissionId;
+      private final String               sysPermissionName;
+      private final DomainPermissionImpl postCreateDomainPermission;
+      private final boolean              withGrantOption;
 
       private DomainCreatePermissionImpl(String sysPermissionName,
                                          boolean withGrantOption) {
@@ -259,11 +261,8 @@ public class DomainCreatePermissions {
          this.withGrantOption = withGrantOption;
       }
 
-      private DomainCreatePermissionImpl(DomainPermission postCreateDomainPermission,
+      private DomainCreatePermissionImpl(DomainPermissionImpl postCreateDomainPermission,
                                          boolean withGrantOption) {
-         if (postCreateDomainPermission == null) {
-            throw new IllegalArgumentException("A post create domain permission is required");
-         }
          this.systemPermissionId = 0;
          this.sysPermissionName = null;
          this.postCreateDomainPermission = postCreateDomainPermission;

@@ -154,14 +154,13 @@ public class DomainPermissions {
 
       permissionName = permissionName.trim();
 
-      if (permissionName.isEmpty())
-      {
+      if (permissionName.isEmpty()) {
          throw new IllegalArgumentException("A system permission name is required");
       }
       return permissionName;
    }
 
-   private static class DomainPermissionImpl implements DomainPermission, Serializable {
+   static class DomainPermissionImpl implements DomainPermission, Serializable {
       private static final long serialVersionUID = 1L;
 
       // permission data

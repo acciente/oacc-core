@@ -17,6 +17,8 @@
  */
 package com.acciente.oacc;
 
+import com.acciente.oacc.ResourcePermissions.ResourcePermissionImpl;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -148,7 +150,7 @@ public class ResourceCreatePermissions {
             = ungrantableCreatePermissionsByPostCreatePermission.get(postCreateResourcePermission);
 
       if (resourceCreatePermission == null) {
-         resourceCreatePermission = new ResourceCreatePermissionImpl(postCreateResourcePermission, false);
+         resourceCreatePermission = new ResourceCreatePermissionImpl((ResourcePermissionImpl) postCreateResourcePermission, false);
          final ResourceCreatePermission cachedInstance
                = ungrantableCreatePermissionsByPostCreatePermission.putIfAbsent(postCreateResourcePermission, resourceCreatePermission);
          if (cachedInstance != null) {
@@ -175,7 +177,7 @@ public class ResourceCreatePermissions {
             = grantableCreatePermissionsByPostCreatePermission.get(postCreateResourcePermission);
 
       if (resourceCreatePermission == null) {
-         resourceCreatePermission = new ResourceCreatePermissionImpl(postCreateResourcePermission, true);
+         resourceCreatePermission = new ResourceCreatePermissionImpl((ResourcePermissionImpl) postCreateResourcePermission, true);
          final ResourceCreatePermission cachedInstance
                = grantableCreatePermissionsByPostCreatePermission.putIfAbsent(postCreateResourcePermission, resourceCreatePermission);
          if (cachedInstance != null) {
@@ -193,7 +195,8 @@ public class ResourceCreatePermissions {
    @Deprecated
    public static ResourceCreatePermission getInstance(ResourcePermission postCreateResourcePermission,
                                                       boolean withGrant) {
-      return new ResourceCreatePermissionImpl(postCreateResourcePermission, withGrant);
+      postCreateResourcePermission = ResourcePermissions.getInstance(postCreateResourcePermission);
+      return new ResourceCreatePermissionImpl((ResourcePermissionImpl) postCreateResourcePermission, withGrant);
    }
 
    public static ResourceCreatePermission getInstance(ResourceCreatePermission resourceCreatePermission) {
@@ -238,8 +241,7 @@ public class ResourceCreatePermissions {
 
       permissionName = permissionName.trim();
 
-      if (permissionName.isEmpty())
-      {
+      if (permissionName.isEmpty()) {
          throw new IllegalArgumentException("A system permission name is required");
       }
       return permissionName;
@@ -251,14 +253,14 @@ public class ResourceCreatePermissions {
       }
    }
 
-   private static class ResourceCreatePermissionImpl implements ResourceCreatePermission, Serializable {
-      private static final long serialVersionUID = 1L;
+   static class ResourceCreatePermissionImpl implements ResourceCreatePermission, Serializable {
+      private static final long serialVersionUID = 2L;
 
       // permission data
-      private final long               systemPermissionId;
-      private final String             sysPermissionName;
-      private final ResourcePermission postCreateResourcePermission;
-      private final boolean            withGrantOption;
+      private final long                   systemPermissionId;
+      private final String                 sysPermissionName;
+      private final ResourcePermissionImpl postCreateResourcePermission;
+      private final boolean                withGrantOption;
 
       private ResourceCreatePermissionImpl(String sysPermissionName,
                                            boolean withGrantOption) {
@@ -270,7 +272,7 @@ public class ResourceCreatePermissions {
          this.withGrantOption = withGrantOption;
       }
 
-      private ResourceCreatePermissionImpl(ResourcePermission postCreateResourcePermission,
+      private ResourceCreatePermissionImpl(ResourcePermissionImpl postCreateResourcePermission,
                                            boolean withGrantOption) {
          this.systemPermissionId = 0;
          this.sysPermissionName = null;

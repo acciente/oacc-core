@@ -162,14 +162,13 @@ public class ResourcePermissions {
 
       permissionName = permissionName.trim();
 
-      if (permissionName.isEmpty())
-      {
+      if (permissionName.isEmpty()) {
          throw new IllegalArgumentException("A permission name is required");
       }
       return permissionName;
    }
 
-   private static class ResourcePermissionImpl implements ResourcePermission, Serializable {
+   static class ResourcePermissionImpl implements ResourcePermission, Serializable {
       private static final long serialVersionUID = 1L;
 
       // permission data
