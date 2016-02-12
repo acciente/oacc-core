@@ -102,6 +102,10 @@ public class DomainCreatePermissions {
    }
 
    public static DomainCreatePermission getInstance(DomainPermission postCreateDomainPermission) {
+      assertPostCreatePermissionSpecified(postCreateDomainPermission);
+      // normalize post create permission before cache lookup, to prevent hash collisions from rogue implementations
+      postCreateDomainPermission = DomainPermissions.getInstance(postCreateDomainPermission);
+
       DomainCreatePermission domainCreatePermission
             = ungrantableCreatePermissionsByPostCreatePermission.get(postCreateDomainPermission);
 
@@ -114,6 +118,10 @@ public class DomainCreatePermissions {
    }
 
    public static DomainCreatePermission getInstanceWithGrantOption(DomainPermission postCreateDomainPermission) {
+      assertPostCreatePermissionSpecified(postCreateDomainPermission);
+      // normalize post create permission before cache lookup, to prevent hash collisions from rogue implementations
+      postCreateDomainPermission = DomainPermissions.getInstance(postCreateDomainPermission);
+
       DomainCreatePermission domainCreatePermission
             = grantableCreatePermissionsByPostCreatePermission.get(postCreateDomainPermission);
 
@@ -178,6 +186,12 @@ public class DomainCreatePermissions {
          throw new IllegalArgumentException("A system permission name is required");
       }
       return permissionName;
+   }
+
+   private static void assertPostCreatePermissionSpecified(DomainPermission postCreateDomainPermission) {
+      if (postCreateDomainPermission == null) {
+         throw new IllegalArgumentException("A post create domain permission is required");
+      }
    }
 
    private static class DomainCreatePermissionImpl implements DomainCreatePermission, Serializable{

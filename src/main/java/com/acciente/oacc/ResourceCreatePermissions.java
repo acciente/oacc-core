@@ -123,6 +123,10 @@ public class ResourceCreatePermissions {
    }
 
    public static ResourceCreatePermission getInstance(ResourcePermission postCreateResourcePermission) {
+      assertPostCreatePermissionSpecified(postCreateResourcePermission);
+      // normalize post create permission before cache lookup, to prevent hash collisions from rogue implementations
+      postCreateResourcePermission = ResourcePermissions.getInstance(postCreateResourcePermission);
+
       ResourceCreatePermission resourceCreatePermission
             = ungrantableCreatePermissionsByPostCreatePermission.get(postCreateResourcePermission);
 
@@ -135,6 +139,10 @@ public class ResourceCreatePermissions {
    }
 
    public static ResourceCreatePermission getInstanceWithGrantOption(ResourcePermission postCreateResourcePermission) {
+      assertPostCreatePermissionSpecified(postCreateResourcePermission);
+      // normalize post create permission before cache lookup, to prevent hash collisions from rogue implementations
+      postCreateResourcePermission = ResourcePermissions.getInstance(postCreateResourcePermission);
+
       ResourceCreatePermission resourceCreatePermission
             = grantableCreatePermissionsByPostCreatePermission.get(postCreateResourcePermission);
 
@@ -205,6 +213,12 @@ public class ResourceCreatePermissions {
       return permissionName;
    }
 
+   private static void assertPostCreatePermissionSpecified(ResourcePermission postCreateResourcePermission) {
+      if (postCreateResourcePermission == null) {
+         throw new IllegalArgumentException("A post create resource permission is required");
+      }
+   }
+
    private static class ResourceCreatePermissionImpl implements ResourceCreatePermission, Serializable {
       private static final long serialVersionUID = 1L;
 
@@ -226,9 +240,6 @@ public class ResourceCreatePermissions {
 
       private ResourceCreatePermissionImpl(ResourcePermission postCreateResourcePermission,
                                            boolean withGrantOption) {
-         if (postCreateResourcePermission == null) {
-            throw new IllegalArgumentException("A post create resource permission is required");
-         }
          this.systemPermissionId = 0;
          this.sysPermissionName = null;
          this.postCreateResourcePermission = postCreateResourcePermission;
