@@ -48,8 +48,8 @@ public class ResourceCreatePermissions {
 
       sysPermissionNames = Collections.unmodifiableList(new ArrayList<>(sysPermissionNamesById.values()));
 
-      grantableCreatePermissionsByName = new HashMap<>();
-      ungrantableCreatePermissionsByName = new HashMap<>();
+      grantableCreatePermissionsByName = new HashMap<>(sysPermissionsByName.size());
+      ungrantableCreatePermissionsByName = new HashMap<>(sysPermissionsByName.size());
       grantableCreatePermissionsByPostCreatePermission = new HashMap<>();
       ungrantableCreatePermissionsByPostCreatePermission = new HashMap<>();
    }

@@ -29,9 +29,13 @@ public class DomainCreatePermissions {
    private static final SysPermission SYSPERMISSION_CREATE = new SysPermission(-300, "*CREATE");
    public static final  String        CREATE               = SYSPERMISSION_CREATE.getPermissionName();
 
-   private static final Map<String, SysPermission> sysPermissionsByName;
-   private static final Map<Long, String>          sysPermissionNamesById;
-   private static final List<String>               sysPermissionNames;
+   private static final Map<String, SysPermission>                    sysPermissionsByName;
+   private static final Map<Long, String>                             sysPermissionNamesById;
+   private static final List<String>                                  sysPermissionNames;
+   private static final Map<String, DomainCreatePermission>           grantableCreatePermissionsByName;
+   private static final Map<String, DomainCreatePermission>           ungrantableCreatePermissionsByName;
+   private static final Map<DomainPermission, DomainCreatePermission> grantableCreatePermissionsByPostCreatePermission;
+   private static final Map<DomainPermission, DomainCreatePermission> ungrantableCreatePermissionsByPostCreatePermission;
    static {
       sysPermissionsByName = new HashMap<>();
       sysPermissionsByName.put(CREATE, SYSPERMISSION_CREATE);
@@ -42,6 +46,11 @@ public class DomainCreatePermissions {
       }
 
       sysPermissionNames = Collections.unmodifiableList(new ArrayList<>(sysPermissionNamesById.values()));
+
+      grantableCreatePermissionsByName = new HashMap<>(sysPermissionsByName.size());
+      ungrantableCreatePermissionsByName = new HashMap<>(sysPermissionsByName.size());
+      grantableCreatePermissionsByPostCreatePermission = new HashMap<>();
+      ungrantableCreatePermissionsByPostCreatePermission = new HashMap<>();
    }
 
    public static List<String> getSysPermissionNames() {
@@ -59,7 +68,16 @@ public class DomainCreatePermissions {
    }
 
    public static DomainCreatePermission getInstanceWithGrantOption(String sysPermissionName) {
-      return new DomainCreatePermissionImpl(sysPermissionName, true);
+      sysPermissionName = getCanonicalSysPermissionName(sysPermissionName);
+
+      DomainCreatePermission domainCreatePermission = grantableCreatePermissionsByName.get(sysPermissionName);
+
+      if (domainCreatePermission == null) {
+         domainCreatePermission = new DomainCreatePermissionImpl(sysPermissionName, true);
+         grantableCreatePermissionsByName.put(sysPermissionName, domainCreatePermission);
+      }
+
+      return domainCreatePermission;
    }
 
    /**
@@ -71,15 +89,40 @@ public class DomainCreatePermissions {
    }
 
    public static DomainCreatePermission getInstance(String sysPermissionName) {
-      return new DomainCreatePermissionImpl(sysPermissionName, false);
+      sysPermissionName = getCanonicalSysPermissionName(sysPermissionName);
+
+      DomainCreatePermission domainCreatePermission = ungrantableCreatePermissionsByName.get(sysPermissionName);
+
+      if (domainCreatePermission == null) {
+         domainCreatePermission = new DomainCreatePermissionImpl(sysPermissionName, false);
+         ungrantableCreatePermissionsByName.put(sysPermissionName, domainCreatePermission);
+      }
+
+      return domainCreatePermission;
    }
 
    public static DomainCreatePermission getInstance(DomainPermission postCreateDomainPermission) {
-      return new DomainCreatePermissionImpl(postCreateDomainPermission, false);
+      DomainCreatePermission domainCreatePermission
+            = ungrantableCreatePermissionsByPostCreatePermission.get(postCreateDomainPermission);
+
+      if (domainCreatePermission == null) {
+         domainCreatePermission = new DomainCreatePermissionImpl(postCreateDomainPermission, false);
+         ungrantableCreatePermissionsByPostCreatePermission.put(postCreateDomainPermission, domainCreatePermission);
+      }
+
+      return domainCreatePermission;
    }
 
    public static DomainCreatePermission getInstanceWithGrantOption(DomainPermission postCreateDomainPermission) {
-      return new DomainCreatePermissionImpl(postCreateDomainPermission, true);
+      DomainCreatePermission domainCreatePermission
+            = grantableCreatePermissionsByPostCreatePermission.get(postCreateDomainPermission);
+
+      if (domainCreatePermission == null) {
+         domainCreatePermission = new DomainCreatePermissionImpl(postCreateDomainPermission, true);
+         grantableCreatePermissionsByPostCreatePermission.put(postCreateDomainPermission, domainCreatePermission);
+      }
+
+      return domainCreatePermission;
    }
 
    /**
@@ -123,6 +166,20 @@ public class DomainCreatePermissions {
       return verifiedPermission;
    }
 
+   private static String getCanonicalSysPermissionName(String permissionName) {
+      if (permissionName == null) {
+         throw new IllegalArgumentException("A system permission name is required");
+      }
+
+      permissionName = permissionName.trim();
+
+      if (permissionName.isEmpty())
+      {
+         throw new IllegalArgumentException("A system permission name is required");
+      }
+      return permissionName;
+   }
+
    private static class DomainCreatePermissionImpl implements DomainCreatePermission, Serializable{
       private static final long serialVersionUID = 1L;
 
@@ -144,6 +201,9 @@ public class DomainCreatePermissions {
 
       private DomainCreatePermissionImpl(DomainPermission postCreateDomainPermission,
                                          boolean withGrantOption) {
+         if (postCreateDomainPermission == null) {
+            throw new IllegalArgumentException("A post create domain permission is required");
+         }
          this.systemPermissionId = 0;
          this.sysPermissionName = null;
          this.postCreateDomainPermission = postCreateDomainPermission;

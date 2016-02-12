@@ -32,6 +32,7 @@ import static org.junit.runners.Suite.SuiteClasses;
       TestResourcePermission.class,
       TestResourceCreatePermission.class,
       TestDomainPermission.class,
+      TestDomainCreatePermission.class,
       TestSchemaNameValidator.class,
       TestAccessControlSuite.class})
 public class TestAll {
