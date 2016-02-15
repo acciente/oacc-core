@@ -23,6 +23,8 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 public class ResourcePermissions {
    // constants for the important system permissions with pre-defined semantics
@@ -37,11 +39,11 @@ public class ResourcePermissions {
    private static final SysPermission SYSPERMISSION_QUERY             = new SysPermission(-105, "*QUERY");
    public static final  String        QUERY                           = SYSPERMISSION_QUERY.getPermissionName();
 
-   private static final Map<String, SysPermission>      sysPermissionsByName;
-   private static final Map<Long, String>               sysPermissionNamesById;
-   private static final List<String>                    sysPermissionNames;
-   private static final Map<String, ResourcePermission> ungrantablePermissionByName;
-   private static final Map<String, ResourcePermission> grantablePermissionByName;
+   private static final Map<String, SysPermission>                sysPermissionsByName;
+   private static final Map<Long, String>                         sysPermissionNamesById;
+   private static final List<String>                              sysPermissionNames;
+   private static final ConcurrentMap<String, ResourcePermission> ungrantablePermissionByName;
+   private static final ConcurrentMap<String, ResourcePermission> grantablePermissionByName;
 
    static {
       sysPermissionsByName = new HashMap<>();
@@ -58,8 +60,8 @@ public class ResourcePermissions {
 
       sysPermissionNames = Collections.unmodifiableList(new ArrayList<>(sysPermissionNamesById.values()));
 
-      ungrantablePermissionByName = new HashMap<>();
-      grantablePermissionByName = new HashMap<>();
+      ungrantablePermissionByName = new ConcurrentHashMap<>();
+      grantablePermissionByName = new ConcurrentHashMap<>();
    }
 
    public static List<String> getSysPermissionNames() {
@@ -76,6 +78,13 @@ public class ResourcePermissions {
       return sysPermissionName;
    }
 
+   /**
+    * Creates a new resource permission of the specified name without
+    * the option to grant the permission to another resource
+    *
+    * @param permissionName  the name of the permission
+    * @return a resource permission
+    */
    public static ResourcePermission getInstance(String permissionName) {
       permissionName = getCanonicalPermissionName(permissionName);
 
@@ -83,12 +92,22 @@ public class ResourcePermissions {
 
       if (resourcePermission == null) {
          resourcePermission = new ResourcePermissionImpl(permissionName, false);
-         ungrantablePermissionByName.put(permissionName, resourcePermission);
+         final ResourcePermission cachedInstance = ungrantablePermissionByName.putIfAbsent(permissionName, resourcePermission);
+         if (cachedInstance != null) {
+            resourcePermission = cachedInstance;
+         }
       }
 
       return resourcePermission;
    }
 
+   /**
+    * Creates a new resource permission of the specified name, but
+    * with the option to grant the permission to another resource
+    *
+    * @param permissionName  the name of the permission
+    * @return a resource permission
+    */
    public static ResourcePermission getInstanceWithGrantOption(String permissionName) {
       permissionName = getCanonicalPermissionName(permissionName);
 
@@ -96,7 +115,10 @@ public class ResourcePermissions {
 
       if (resourcePermission == null) {
          resourcePermission = new ResourcePermissionImpl(permissionName, true);
-         grantablePermissionByName.put(permissionName, resourcePermission);
+         final ResourcePermission cachedInstance = grantablePermissionByName.putIfAbsent(permissionName, resourcePermission);
+         if (cachedInstance != null) {
+            resourcePermission = cachedInstance;
+         }
       }
 
       return resourcePermission;

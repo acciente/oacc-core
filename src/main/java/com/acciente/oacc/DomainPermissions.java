@@ -23,6 +23,8 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 public class DomainPermissions {
    // constants for the important system permission names with pre-defined semantics
@@ -33,11 +35,11 @@ public class DomainPermissions {
    private static final SysPermission SYSPERMISSION_DELETE              = new SysPermission(-303, "*DELETE");
    public static final  String        DELETE                            = SYSPERMISSION_DELETE.getPermissionName();
 
-   private static final Map<String, SysPermission>    sysPermissionsByName;
-   private static final Map<Long, String>             sysPermissionNamesById;
-   private static final List<String>                  sysPermissionNames;
-   private static final Map<String, DomainPermission> grantablePermissionsByName;
-   private static final Map<String, DomainPermission> ungrantablePermissionsByName;
+   private static final Map<String, SysPermission>              sysPermissionsByName;
+   private static final Map<Long, String>                       sysPermissionNamesById;
+   private static final List<String>                            sysPermissionNames;
+   private static final ConcurrentMap<String, DomainPermission> grantablePermissionsByName;
+   private static final ConcurrentMap<String, DomainPermission> ungrantablePermissionsByName;
    static {
       sysPermissionsByName = new HashMap<>();
       sysPermissionsByName.put(SUPER_USER, SYSPERMISSION_SUPER_USER);
@@ -51,8 +53,8 @@ public class DomainPermissions {
 
       sysPermissionNames = Collections.unmodifiableList(new ArrayList<>(sysPermissionNamesById.values()));
 
-      grantablePermissionsByName = new HashMap<>(sysPermissionsByName.size());
-      ungrantablePermissionsByName = new HashMap<>(sysPermissionsByName.size());
+      grantablePermissionsByName = new ConcurrentHashMap<>(sysPermissionsByName.size());
+      ungrantablePermissionsByName = new ConcurrentHashMap<>(sysPermissionsByName.size());
    }
 
    public static List<String> getSysPermissionNames() {
@@ -69,6 +71,13 @@ public class DomainPermissions {
       return sysPermissionName;
    }
 
+   /**
+    * Creates a new domain permission of the specified name, without
+    * the option to grant the domain-permission to another resource
+    *
+    * @param sysPermissionName  the name of the system domain permission
+    * @return a domain permission
+    */
    public static DomainPermission getInstance(String sysPermissionName) {
       sysPermissionName = getCanonicalSysPermissionName(sysPermissionName);
 
@@ -76,12 +85,22 @@ public class DomainPermissions {
 
       if (domainPermission == null) {
          domainPermission = new DomainPermissionImpl(sysPermissionName, false);
-         ungrantablePermissionsByName.put(sysPermissionName, domainPermission);
+         final DomainPermission cachedInstance = ungrantablePermissionsByName.putIfAbsent(sysPermissionName, domainPermission);
+         if (cachedInstance != null) {
+            domainPermission = cachedInstance;
+         }
       }
 
       return domainPermission;
    }
 
+   /**
+    * Creates a new domain permission of the specified name, but with
+    * the option to grant the domain-permission to another resource
+    *
+    * @param sysPermissionName  the name of the system domain permission
+    * @return a domain permission
+    */
    public static DomainPermission getInstanceWithGrantOption(String sysPermissionName) {
       sysPermissionName = getCanonicalSysPermissionName(sysPermissionName);
 
@@ -89,7 +108,10 @@ public class DomainPermissions {
 
       if (domainPermission == null) {
          domainPermission = new DomainPermissionImpl(sysPermissionName, true);
-         grantablePermissionsByName.put(sysPermissionName, domainPermission);
+         final DomainPermission cachedInstance = grantablePermissionsByName.putIfAbsent(sysPermissionName, domainPermission);
+         if (cachedInstance != null) {
+            domainPermission = cachedInstance;
+         }
       }
 
       return domainPermission;

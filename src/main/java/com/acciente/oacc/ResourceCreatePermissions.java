@@ -23,19 +23,21 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 public class ResourceCreatePermissions {
    // constants for the important system permissions with pre-defined semantics
    private static final SysPermission SYSPERMISSION_CREATE = new SysPermission(-100, "*CREATE");
    public static final  String        CREATE               = SYSPERMISSION_CREATE.getPermissionName();
 
-   private static final Map<String, SysPermission>                        sysPermissionsByName;
-   private static final Map<Long, String>                                 sysPermissionNamesById;
-   private static final List<String>                                      sysPermissionNames;
-   private static final Map<String, ResourceCreatePermission>             grantableCreatePermissionsByName;
-   private static final Map<String, ResourceCreatePermission>             ungrantableCreatePermissionsByName;
-   private static final Map<ResourcePermission, ResourceCreatePermission> grantableCreatePermissionsByPostCreatePermission;
-   private static final Map<ResourcePermission, ResourceCreatePermission> ungrantableCreatePermissionsByPostCreatePermission;
+   private static final Map<String, SysPermission>                                  sysPermissionsByName;
+   private static final Map<Long, String>                                           sysPermissionNamesById;
+   private static final List<String>                                                sysPermissionNames;
+   private static final ConcurrentMap<String, ResourceCreatePermission>             grantableCreatePermissionsByName;
+   private static final ConcurrentMap<String, ResourceCreatePermission>             ungrantableCreatePermissionsByName;
+   private static final ConcurrentMap<ResourcePermission, ResourceCreatePermission> grantableCreatePermissionsByPostCreatePermission;
+   private static final ConcurrentMap<ResourcePermission, ResourceCreatePermission> ungrantableCreatePermissionsByPostCreatePermission;
 
    static {
       sysPermissionsByName = new HashMap<>();
@@ -48,10 +50,10 @@ public class ResourceCreatePermissions {
 
       sysPermissionNames = Collections.unmodifiableList(new ArrayList<>(sysPermissionNamesById.values()));
 
-      grantableCreatePermissionsByName = new HashMap<>(sysPermissionsByName.size());
-      ungrantableCreatePermissionsByName = new HashMap<>(sysPermissionsByName.size());
-      grantableCreatePermissionsByPostCreatePermission = new HashMap<>();
-      ungrantableCreatePermissionsByPostCreatePermission = new HashMap<>();
+      grantableCreatePermissionsByName = new ConcurrentHashMap<>(sysPermissionsByName.size());
+      ungrantableCreatePermissionsByName = new ConcurrentHashMap<>(sysPermissionsByName.size());
+      grantableCreatePermissionsByPostCreatePermission = new ConcurrentHashMap<>();
+      ungrantableCreatePermissionsByPostCreatePermission = new ConcurrentHashMap<>();
    }
 
    public static List<String> getSysPermissionNames() {
@@ -72,7 +74,7 @@ public class ResourceCreatePermissions {
     * Creates a new resource create permission with no post-create permissions (i.e. only resource creation),
     * but with the option to grant the create-permission to another resource
     *
-    * @param sysPermissionName
+    * @param sysPermissionName  the name of the system permission
     * @return a resource create permission
     */
    public static ResourceCreatePermission getInstanceWithGrantOption(String sysPermissionName) {
@@ -82,7 +84,11 @@ public class ResourceCreatePermissions {
 
       if (resourceCreatePermission == null) {
          resourceCreatePermission = new ResourceCreatePermissionImpl(sysPermissionName, true);
-         grantableCreatePermissionsByName.put(sysPermissionName, resourceCreatePermission);
+         final ResourceCreatePermission cachedInstance
+               = grantableCreatePermissionsByName.putIfAbsent(sysPermissionName, resourceCreatePermission);
+         if (cachedInstance != null) {
+            resourceCreatePermission = cachedInstance;
+         }
       }
 
       return resourceCreatePermission;
@@ -106,7 +112,7 @@ public class ResourceCreatePermissions {
     * Creates a new resource create permission with no post-create permissions (i.e. only resource creation)
     * without the option to grant the create-permission to another resource
     *
-    * @param sysPermissionName
+    * @param sysPermissionName  the name of the system permission
     * @return a resource create permission
     */
    public static ResourceCreatePermission getInstance(String sysPermissionName) {
@@ -116,12 +122,23 @@ public class ResourceCreatePermissions {
 
       if (resourceCreatePermission == null) {
          resourceCreatePermission = new ResourceCreatePermissionImpl(sysPermissionName, false);
-         ungrantableCreatePermissionsByName.put(sysPermissionName, resourceCreatePermission);
+         final ResourceCreatePermission cachedInstance
+               = ungrantableCreatePermissionsByName.putIfAbsent(sysPermissionName, resourceCreatePermission);
+         if (cachedInstance != null) {
+            resourceCreatePermission = cachedInstance;
+         }
       }
 
       return resourceCreatePermission;
    }
 
+   /**
+    * Creates a new resource create permission with the specified post-create permission
+    * without the option to grant the create-permission to another resource
+    *
+    * @param postCreateResourcePermission  the post-create resource permission
+    * @return a resource create permission
+    */
    public static ResourceCreatePermission getInstance(ResourcePermission postCreateResourcePermission) {
       assertPostCreatePermissionSpecified(postCreateResourcePermission);
       // normalize post create permission before cache lookup, to prevent hash collisions from rogue implementations
@@ -132,12 +149,23 @@ public class ResourceCreatePermissions {
 
       if (resourceCreatePermission == null) {
          resourceCreatePermission = new ResourceCreatePermissionImpl(postCreateResourcePermission, false);
-         ungrantableCreatePermissionsByPostCreatePermission.put(postCreateResourcePermission, resourceCreatePermission);
+         final ResourceCreatePermission cachedInstance
+               = ungrantableCreatePermissionsByPostCreatePermission.putIfAbsent(postCreateResourcePermission, resourceCreatePermission);
+         if (cachedInstance != null) {
+            resourceCreatePermission = cachedInstance;
+         }
       }
 
       return resourceCreatePermission;
    }
 
+   /**
+    * Creates a new resource create permission with the specified post-create permission,
+    * but with the option to grant the create-permission to another resource
+    *
+    * @param postCreateResourcePermission  the post-create resource permission
+    * @return a resource create permission
+    */
    public static ResourceCreatePermission getInstanceWithGrantOption(ResourcePermission postCreateResourcePermission) {
       assertPostCreatePermissionSpecified(postCreateResourcePermission);
       // normalize post create permission before cache lookup, to prevent hash collisions from rogue implementations
@@ -148,7 +176,11 @@ public class ResourceCreatePermissions {
 
       if (resourceCreatePermission == null) {
          resourceCreatePermission = new ResourceCreatePermissionImpl(postCreateResourcePermission, true);
-         grantableCreatePermissionsByPostCreatePermission.put(postCreateResourcePermission, resourceCreatePermission);
+         final ResourceCreatePermission cachedInstance
+               = grantableCreatePermissionsByPostCreatePermission.putIfAbsent(postCreateResourcePermission, resourceCreatePermission);
+         if (cachedInstance != null) {
+            resourceCreatePermission = cachedInstance;
+         }
       }
 
       return resourceCreatePermission;

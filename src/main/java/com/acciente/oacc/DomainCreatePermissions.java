@@ -23,19 +23,21 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 public class DomainCreatePermissions {
    // constants for the important system permission names with pre-defined semantics
    private static final SysPermission SYSPERMISSION_CREATE = new SysPermission(-300, "*CREATE");
    public static final  String        CREATE               = SYSPERMISSION_CREATE.getPermissionName();
 
-   private static final Map<String, SysPermission>                    sysPermissionsByName;
-   private static final Map<Long, String>                             sysPermissionNamesById;
-   private static final List<String>                                  sysPermissionNames;
-   private static final Map<String, DomainCreatePermission>           grantableCreatePermissionsByName;
-   private static final Map<String, DomainCreatePermission>           ungrantableCreatePermissionsByName;
-   private static final Map<DomainPermission, DomainCreatePermission> grantableCreatePermissionsByPostCreatePermission;
-   private static final Map<DomainPermission, DomainCreatePermission> ungrantableCreatePermissionsByPostCreatePermission;
+   private static final Map<String, SysPermission>                              sysPermissionsByName;
+   private static final Map<Long, String>                                       sysPermissionNamesById;
+   private static final List<String>                                            sysPermissionNames;
+   private static final ConcurrentMap<String, DomainCreatePermission>           grantableCreatePermissionsByName;
+   private static final ConcurrentMap<String, DomainCreatePermission>           ungrantableCreatePermissionsByName;
+   private static final ConcurrentMap<DomainPermission, DomainCreatePermission> grantableCreatePermissionsByPostCreatePermission;
+   private static final ConcurrentMap<DomainPermission, DomainCreatePermission> ungrantableCreatePermissionsByPostCreatePermission;
    static {
       sysPermissionsByName = new HashMap<>();
       sysPermissionsByName.put(CREATE, SYSPERMISSION_CREATE);
@@ -47,10 +49,10 @@ public class DomainCreatePermissions {
 
       sysPermissionNames = Collections.unmodifiableList(new ArrayList<>(sysPermissionNamesById.values()));
 
-      grantableCreatePermissionsByName = new HashMap<>(sysPermissionsByName.size());
-      ungrantableCreatePermissionsByName = new HashMap<>(sysPermissionsByName.size());
-      grantableCreatePermissionsByPostCreatePermission = new HashMap<>();
-      ungrantableCreatePermissionsByPostCreatePermission = new HashMap<>();
+      grantableCreatePermissionsByName = new ConcurrentHashMap<>(sysPermissionsByName.size());
+      ungrantableCreatePermissionsByName = new ConcurrentHashMap<>(sysPermissionsByName.size());
+      grantableCreatePermissionsByPostCreatePermission = new ConcurrentHashMap<>();
+      ungrantableCreatePermissionsByPostCreatePermission = new ConcurrentHashMap<>();
    }
 
    public static List<String> getSysPermissionNames() {
@@ -67,6 +69,13 @@ public class DomainCreatePermissions {
       return sysPermissionName;
    }
 
+   /**
+    * Creates a new domain create permission with no post-create permissions (i.e. only domain creation),
+    * but with the option to grant the create-permission to another resource
+    *
+    * @param sysPermissionName  the name of the system permission
+    * @return a domain create permission
+    */
    public static DomainCreatePermission getInstanceWithGrantOption(String sysPermissionName) {
       sysPermissionName = getCanonicalSysPermissionName(sysPermissionName);
 
@@ -74,7 +83,11 @@ public class DomainCreatePermissions {
 
       if (domainCreatePermission == null) {
          domainCreatePermission = new DomainCreatePermissionImpl(sysPermissionName, true);
-         grantableCreatePermissionsByName.put(sysPermissionName, domainCreatePermission);
+         final DomainCreatePermission cachedInstance
+               = grantableCreatePermissionsByName.putIfAbsent(sysPermissionName, domainCreatePermission);
+         if (cachedInstance != null) {
+            domainCreatePermission = cachedInstance;
+         }
       }
 
       return domainCreatePermission;
@@ -88,6 +101,13 @@ public class DomainCreatePermissions {
       return new DomainCreatePermissionImpl(sysPermissionName, withGrant);
    }
 
+   /**
+    * Creates a new domain create permission with no post-create permissions (i.e. only domain creation)
+    * without the option to grant the create-permission to another resource
+    *
+    * @param sysPermissionName  the name of the system permission
+    * @return a domain create permission
+    */
    public static DomainCreatePermission getInstance(String sysPermissionName) {
       sysPermissionName = getCanonicalSysPermissionName(sysPermissionName);
 
@@ -95,12 +115,23 @@ public class DomainCreatePermissions {
 
       if (domainCreatePermission == null) {
          domainCreatePermission = new DomainCreatePermissionImpl(sysPermissionName, false);
-         ungrantableCreatePermissionsByName.put(sysPermissionName, domainCreatePermission);
+         final DomainCreatePermission cachedInstance
+               = ungrantableCreatePermissionsByName.putIfAbsent(sysPermissionName, domainCreatePermission);
+         if (cachedInstance != null) {
+            domainCreatePermission = cachedInstance;
+         }
       }
 
       return domainCreatePermission;
    }
 
+   /**
+    * Creates a new domain create permission with the specified post-create domain permission
+    * without the option to grant the create-permission to another resource
+    *
+    * @param postCreateDomainPermission  the post-create domain permission
+    * @return a domain create permission
+    */
    public static DomainCreatePermission getInstance(DomainPermission postCreateDomainPermission) {
       assertPostCreatePermissionSpecified(postCreateDomainPermission);
       // normalize post create permission before cache lookup, to prevent hash collisions from rogue implementations
@@ -111,12 +142,23 @@ public class DomainCreatePermissions {
 
       if (domainCreatePermission == null) {
          domainCreatePermission = new DomainCreatePermissionImpl(postCreateDomainPermission, false);
-         ungrantableCreatePermissionsByPostCreatePermission.put(postCreateDomainPermission, domainCreatePermission);
+         final DomainCreatePermission cachedInstance
+               = ungrantableCreatePermissionsByPostCreatePermission.putIfAbsent(postCreateDomainPermission, domainCreatePermission);
+         if (cachedInstance != null) {
+            domainCreatePermission = cachedInstance;
+         }
       }
 
       return domainCreatePermission;
    }
 
+   /**
+    * Creates a new domain create permission with the specified post-create domain permission,
+    * but with the option to grant the create-permission to another resource
+    *
+    * @param postCreateDomainPermission  the post-create domain permission
+    * @return a domain create permission
+    */
    public static DomainCreatePermission getInstanceWithGrantOption(DomainPermission postCreateDomainPermission) {
       assertPostCreatePermissionSpecified(postCreateDomainPermission);
       // normalize post create permission before cache lookup, to prevent hash collisions from rogue implementations
@@ -127,7 +169,11 @@ public class DomainCreatePermissions {
 
       if (domainCreatePermission == null) {
          domainCreatePermission = new DomainCreatePermissionImpl(postCreateDomainPermission, true);
-         grantableCreatePermissionsByPostCreatePermission.put(postCreateDomainPermission, domainCreatePermission);
+         final DomainCreatePermission cachedInstance
+               = grantableCreatePermissionsByPostCreatePermission.putIfAbsent(postCreateDomainPermission, domainCreatePermission);
+         if (cachedInstance != null) {
+            domainCreatePermission = cachedInstance;
+         }
       }
 
       return domainCreatePermission;
