@@ -1024,7 +1024,7 @@ public interface AccessControlContext {
     *
     * @param resource a resource about whose resource class to retrieve information
     * @return returns a ResourceClassInfo object containing information about the resource class of the specified resource
-    * @throws java.lang.IllegalArgumentException if no resource class of resourceClassName exists
+    * @throws java.lang.IllegalArgumentException if the specified resource reference does not exist
     */
    ResourceClassInfo getResourceClassInfoByResource(Resource resource);
 
