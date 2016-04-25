@@ -46,4 +46,3 @@ You can find more information about OACC, including the latest Javadocs, release
 
 ## About Acciente
 [Acciente, LLC](http://www.acciente.com) is a software company located in Scottsdale, Arizona specializing in systems architecture and software design for medium to large scale software projects.
-You can learn more about [Acciente](http://www.acciente.com) on our [about us](http://www.acciente.com/index.php?cid=about) page.
