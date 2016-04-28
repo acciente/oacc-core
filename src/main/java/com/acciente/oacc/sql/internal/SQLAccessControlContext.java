@@ -927,7 +927,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
 
       // check to ensure that the specified external id does not already exist
       if (externalId != null && resourcePersister.resolveResourceByExternalId(connection, externalId) != null) {
-         throw new IllegalArgumentException("External id is not unique: " + externalId);
+         throw new IllegalArgumentException("External id is unique: " + externalId);
       }
 
       // we first check the create permissions
