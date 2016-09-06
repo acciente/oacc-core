@@ -19,7 +19,7 @@ Thanks again - you rock!
 - In general, please make sure to:
     + add a test for any new feature/enhancement
     + run the test suite for any changes
-    + apply the boy-scout rule
+    + apply the boy-scout rule: _"Leave the code cleaner than you found it"_
     + make an effort to adhere to the existing coding style (ask on the [OACC mailing list](https://groups.google.com/forum/#!forum/oacc-users) if you can't determine it)
     + update the existing documentation (javadocs &amp; comments) if you change the API (did you discuss this on the mailing list first?)
     + include the Acciente copyright notice at the top of new files
