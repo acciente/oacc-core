@@ -17,6 +17,8 @@
  */
 package com.acciente.oacc;
 
+import java.util.Arrays;
+
 /**
  * This is a {@link Credentials} implementation that may be used by an {@link AuthenticationProvider}
  * that provides password-based authentication. The built-in {@link AuthenticationProvider} requires that the
@@ -48,6 +50,25 @@ public abstract class PasswordCredentials implements Credentials {
       @Override
       public char[] getPassword() {
          return password;
+      }
+
+      @Override
+      public boolean equals(Object other) {
+         if (this == other) {
+            return true;
+         }
+         if (other == null || getClass() != other.getClass()) {
+            return false;
+         }
+
+         Impl impl = (Impl) other;
+
+         return Arrays.equals(password, impl.password);
+      }
+
+      @Override
+      public int hashCode() {
+         return Arrays.hashCode(password);
       }
    }
 }
