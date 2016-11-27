@@ -25,6 +25,8 @@ import com.acciente.oacc.PasswordCredentials;
 import com.acciente.oacc.Resource;
 import com.acciente.oacc.UnsupportedCredentialsException;
 import com.acciente.oacc.sql.SQLDialect;
+import com.acciente.oacc.sql.internal.encryptor.PasswordEncryptor;
+import com.acciente.oacc.sql.internal.encryptor.JasyptPasswordEncryptor;
 import com.acciente.oacc.sql.internal.persister.ResourcePasswordPersister;
 import com.acciente.oacc.sql.internal.persister.SQLConnection;
 import com.acciente.oacc.sql.internal.persister.SQLPasswordStrings;
@@ -40,9 +42,9 @@ public class SQLPasswordAuthenticationProvider implements AuthenticationProvider
    private static final long serialVersionUID = 1L;
 
    // services
-   private transient DataSource                 dataSource;
-   private transient Connection                 connection;
-   private transient CleanablePasswordEncryptor passwordEncryptor;
+   private transient DataSource           dataSource;
+   private transient Connection           connection;
+   private transient PasswordEncryptor    passwordEncryptor;
 
    // persisters
    private final ResourcePasswordPersister resourcePasswordPersister;
@@ -63,7 +65,7 @@ public class SQLPasswordAuthenticationProvider implements AuthenticationProvider
    }
 
    private SQLPasswordAuthenticationProvider(String schemaName, SQLDialect sqlDialect) {
-      this.passwordEncryptor = new StrongCleanablePasswordEncryptor();
+      this.passwordEncryptor = new JasyptPasswordEncryptor();
 
       // generate all the SQLs the persisters need based on the database dialect
       SQLPasswordStrings sqlPasswordStrings = SQLPasswordStrings.getSQLPasswordStrings(schemaName);
@@ -125,7 +127,7 @@ public class SQLPasswordAuthenticationProvider implements AuthenticationProvider
       objectInputStream.defaultReadObject();
 
       // restore transient field
-      passwordEncryptor = new StrongCleanablePasswordEncryptor();
+      passwordEncryptor = new JasyptPasswordEncryptor();
 
       // the other transient fields have to be set with a subsequent call to postDeserialize()
    }

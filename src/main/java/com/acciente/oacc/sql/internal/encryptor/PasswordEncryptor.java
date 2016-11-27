@@ -15,9 +15,9 @@
  * See the License for the specific language governing
  * permissions and limitations under the License.
  */
-package com.acciente.oacc.sql.internal;
+package com.acciente.oacc.sql.internal.encryptor;
 
-public interface CleanablePasswordEncryptor {
+public interface PasswordEncryptor {
 
    /**
     * Encrypts a password.
