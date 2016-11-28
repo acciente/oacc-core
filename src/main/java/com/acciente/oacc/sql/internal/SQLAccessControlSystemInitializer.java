@@ -22,7 +22,6 @@ import com.acciente.oacc.DomainCreatePermissions;
 import com.acciente.oacc.DomainPermissions;
 import com.acciente.oacc.Resources;
 import com.acciente.oacc.sql.internal.encryptor.PasswordEncryptor;
-import com.acciente.oacc.sql.internal.encryptor.JasyptPasswordEncryptor;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -32,11 +31,11 @@ import java.sql.SQLException;
 public class SQLAccessControlSystemInitializer {
    public static void initializeOACC(Connection connection,
                                      String dbSchema,
-                                     char[] oaccRootPwd) throws SQLException {
+                                     char[] oaccRootPwd,
+                                     PasswordEncryptor passwordEncryptor) throws SQLException {
       SchemaNameValidator.assertValid(dbSchema);
 
       System.out.println("Initializing password encryptor...");
-      PasswordEncryptor passwordEncryptor = new JasyptPasswordEncryptor();
 
       final String schemaNameAndTablePrefix = dbSchema != null ? dbSchema + ".OAC_" : "OAC_";
 

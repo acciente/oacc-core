@@ -19,6 +19,7 @@ package com.acciente.oacc.helper;
 
 import com.acciente.oacc.sql.internal.SQLAccessControlSystemInitializer;
 import com.acciente.oacc.sql.internal.SchemaNameValidator;
+import com.acciente.oacc.sql.internal.encryptor.PasswordEncryptor;
 
 import javax.sql.DataSource;
 import java.sql.Connection;
@@ -29,17 +30,21 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class SQLAccessControlSystemResetUtil {
-   public static void resetOACC(Connection connection, String dbSchema, char[] oaccRootPwd)
+   public static void resetOACC(Connection connection,
+                                String dbSchema,
+                                char[] oaccRootPwd,
+                                PasswordEncryptor passwordEncryptor)
          throws SQLException {
       deleteAllOACCData(connection, dbSchema);
-      SQLAccessControlSystemInitializer.initializeOACC(connection, dbSchema, oaccRootPwd);
+      SQLAccessControlSystemInitializer.initializeOACC(connection, dbSchema, oaccRootPwd, passwordEncryptor);
    }
 
-   public static void resetOACC(DataSource dataSource, String dbSchema, char[] oaccRootPwd)
+   public static void resetOACC(DataSource dataSource, String dbSchema, char[] oaccRootPwd,
+                                PasswordEncryptor passwordEncryptor)
          throws SQLException {
       try (Connection connection = dataSource.getConnection()) {
          deleteAllOACCData(connection, dbSchema);
-         SQLAccessControlSystemInitializer.initializeOACC(connection, dbSchema, oaccRootPwd);
+         SQLAccessControlSystemInitializer.initializeOACC(connection, dbSchema, oaccRootPwd, passwordEncryptor);
       }
    }
 

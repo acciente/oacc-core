@@ -45,7 +45,8 @@ public class TestAccessControlBase {
       systemAccessControlContext
             = SQLAccessControlContextFactory.getAccessControlContext(dataSource,
                                                                      TestConfigLoader.getDatabaseSchema(),
-                                                                     sqlProfile);
+                                                                     sqlProfile,
+                                                                     TestConfigLoader.getPasswordEncryptor());
    }
 
    protected AccessControlContext accessControlContext;
@@ -54,11 +55,13 @@ public class TestAccessControlBase {
    public void setUpTest() throws Exception {
       SQLAccessControlSystemResetUtil.resetOACC(dataSource,
                                                 TestConfigLoader.getDatabaseSchema(),
-                                                TestConfigLoader.getOaccRootPassword());
+                                                TestConfigLoader.getOaccRootPassword(),
+                                                TestConfigLoader.getPasswordEncryptor());
       accessControlContext
             = SQLAccessControlContextFactory.getAccessControlContext(dataSource,
                                                                      TestConfigLoader.getDatabaseSchema(),
-                                                                     sqlProfile);
+                                                                     sqlProfile,
+                                                                     TestConfigLoader.getPasswordEncryptor());
    }
 
    @After

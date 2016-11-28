@@ -91,7 +91,9 @@ public class TestSQLAccessControlSystemInitializer {
 
    @Test
    public void initializeOACC() throws SQLException, InterruptedException {
-      SQLAccessControlSystemInitializer.initializeOACC(con, TestConfigLoader.getDatabaseSchema(), TestConfigLoader.getOaccRootPassword());
+      SQLAccessControlSystemInitializer.initializeOACC(con, TestConfigLoader.getDatabaseSchema(),
+                                                       TestConfigLoader.getOaccRootPassword(),
+                                                       TestConfigLoader.getPasswordEncryptor());
       assertThatOACCIsInInitializedState();
    }
 
@@ -100,7 +102,8 @@ public class TestSQLAccessControlSystemInitializer {
       try {
          SQLAccessControlSystemInitializer.initializeOACC(con,
                                                           "oacc.temp;drop database oaccdb;--",
-                                                          TestConfigLoader.getOaccRootPassword());
+                                                          TestConfigLoader.getOaccRootPassword(),
+                                                          TestConfigLoader.getPasswordEncryptor());
          fail("initializing OACC with invalid schema name should have failed");
       }
       catch (IllegalArgumentException e) {
@@ -110,10 +113,14 @@ public class TestSQLAccessControlSystemInitializer {
 
    @Test
    public void reInitializeOACC() throws SQLException, InterruptedException {
-      SQLAccessControlSystemInitializer.initializeOACC(con, TestConfigLoader.getDatabaseSchema(), TestConfigLoader.getOaccRootPassword());
+      SQLAccessControlSystemInitializer.initializeOACC(con, TestConfigLoader.getDatabaseSchema(),
+                                                       TestConfigLoader.getOaccRootPassword(),
+                                                       TestConfigLoader.getPasswordEncryptor());
       assertThatOACCIsInInitializedState();
 
-      SQLAccessControlSystemInitializer.initializeOACC(con, TestConfigLoader.getDatabaseSchema(), TestConfigLoader.getOaccRootPassword());
+      SQLAccessControlSystemInitializer.initializeOACC(con, TestConfigLoader.getDatabaseSchema(),
+                                                       TestConfigLoader.getOaccRootPassword(),
+                                                       TestConfigLoader.getPasswordEncryptor());
       assertThatOACCIsInInitializedState();
    }
 

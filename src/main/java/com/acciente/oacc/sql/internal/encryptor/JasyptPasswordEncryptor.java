@@ -21,38 +21,43 @@ import org.jasypt.contrib.org.apache.commons.codec_1_3.binary.Base64;
 import org.jasypt.digest.StandardByteDigester;
 import org.jasypt.normalization.Normalizer;
 
+import java.io.Serializable;
 import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 
-public final class JasyptPasswordEncryptor implements PasswordEncryptor {
-   private final StandardByteDigester digester;
-   private final Base64               base64;
+public final class JasyptPasswordEncryptor implements PasswordEncryptor, Serializable {
+   static final String NAME = "jasypt";
+
+   private static final StandardByteDigester digester = newStandardByteDigester();
+   private static final Base64               base64   = new Base64();
 
    public JasyptPasswordEncryptor() {
-      this.digester = new StandardByteDigester();
-      this.digester.setAlgorithm("SHA-256");
-      this.digester.setIterations(100000);
-      this.digester.setSaltSizeBytes(16);
-      this.digester.initialize();
-      this.base64 = new Base64();
    }
 
    @Override
    public String encryptPassword(final char[] password) {
+      return __encryptPassword(password);
+   }
+
+   private static String __encryptPassword(char[] password) {
       if (password == null) {
          return null;
       }
 
-      final byte[] digest = this.digester.digest(getCleanedBytes(password));
+      final byte[] digest = digester.digest(getCleanedBytes(password));
 
-      return new String(this.base64.encode(digest), StandardCharsets.US_ASCII);
+      return new String(base64.encode(digest), StandardCharsets.US_ASCII);
    }
 
    @Override
    public boolean checkPassword(final char[] plainPassword,
                                 final String encryptedPassword) {
+      return __checkPassword(plainPassword, encryptedPassword);
+   }
+
+   private static boolean __checkPassword(char[] plainPassword, String encryptedPassword) {
       if (plainPassword == null) {
          return (encryptedPassword == null);
       }
@@ -60,13 +65,22 @@ public final class JasyptPasswordEncryptor implements PasswordEncryptor {
          return false;
       }
 
-      return this.digester.matches(getCleanedBytes(plainPassword),
-                                   this.base64.decode(encryptedPassword.getBytes(StandardCharsets.US_ASCII)));
+      return digester.matches(getCleanedBytes(plainPassword),
+                              base64.decode(encryptedPassword.getBytes(StandardCharsets.US_ASCII)));
    }
 
-   private byte[] getCleanedBytes(char[] password) {
+   private static StandardByteDigester newStandardByteDigester() {
+      final StandardByteDigester standardByteDigester = new StandardByteDigester();
+      standardByteDigester.setAlgorithm("SHA-256");
+      standardByteDigester.setIterations(100000);
+      standardByteDigester.setSaltSizeBytes(16);
+      standardByteDigester.initialize();
+      return standardByteDigester;
+   }
+
+   private static byte[] getCleanedBytes(char[] password) {
       final ByteBuffer byteBuffer = StandardCharsets.UTF_8.encode(CharBuffer.wrap(Normalizer.normalizeToNfc(password)));
-      final byte[] byteArray = new byte[byteBuffer.remaining()];
+      final byte[]     byteArray  = new byte[byteBuffer.remaining()];
       byteBuffer.get(byteArray);
       Arrays.fill(byteBuffer.array(), (byte) 0);
       return byteArray;

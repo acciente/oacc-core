@@ -31,6 +31,7 @@ import com.acciente.oacc.ResourcePermission;
 import com.acciente.oacc.ResourcePermissions;
 import com.acciente.oacc.Resources;
 import com.acciente.oacc.helper.SQLAccessControlSystemResetUtil;
+import com.acciente.oacc.sql.internal.encryptor.JasyptPasswordEncryptor;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -84,8 +85,10 @@ public class TestSQLAccessControlContext extends TestSQLAccessControlContextBase
    private static AccessControlContext newSQLAccessControlContext()
          throws SQLException {
       Connection connection = DriverManager.getConnection(dbUrl, dbUser, dbPwd);
-      SQLAccessControlSystemResetUtil.resetOACC(connection, dbSchema, oaccRootPwd);
-      return SQLAccessControlContextFactory.getAccessControlContext(connection, dbSchema, SQLProfile.DB2_10_5_RECURSIVE);
+      final JasyptPasswordEncryptor passwordEncryptor = new JasyptPasswordEncryptor();
+      SQLAccessControlSystemResetUtil.resetOACC(connection, dbSchema, oaccRootPwd, passwordEncryptor);
+      return SQLAccessControlContextFactory.getAccessControlContext(connection, dbSchema, SQLProfile.DB2_10_5_RECURSIVE,
+                                                                    passwordEncryptor);
    }
 
    private static void authSysResource(final AccessControlContext accessControlContext) {

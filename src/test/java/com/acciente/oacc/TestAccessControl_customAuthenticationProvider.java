@@ -22,6 +22,7 @@ import com.acciente.oacc.sql.SQLAccessControlContextFactory;
 import com.acciente.oacc.sql.SQLDialect;
 import com.acciente.oacc.sql.SQLProfile;
 import com.acciente.oacc.sql.internal.SQLPasswordAuthenticationProvider;
+import com.acciente.oacc.sql.internal.encryptor.JasyptPasswordEncryptor;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -179,13 +180,13 @@ public class TestAccessControl_customAuthenticationProvider extends TestAccessCo
       protected CustomAuthenticationProvider(Connection connection,
                                              String schemaName,
                                              SQLDialect sqlDialect) {
-         super(connection, schemaName, sqlDialect);
+         super(connection, schemaName, sqlDialect, new JasyptPasswordEncryptor());
       }
 
       protected CustomAuthenticationProvider(DataSource dataSource,
                                              String schemaName,
                                              SQLDialect sqlDialect) {
-         super(dataSource, schemaName, sqlDialect);
+         super(dataSource, schemaName, sqlDialect, new JasyptPasswordEncryptor());
       }
 
       @Override

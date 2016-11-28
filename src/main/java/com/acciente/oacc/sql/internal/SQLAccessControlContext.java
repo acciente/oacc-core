@@ -35,6 +35,7 @@ import com.acciente.oacc.ResourcePermission;
 import com.acciente.oacc.ResourcePermissions;
 import com.acciente.oacc.Resources;
 import com.acciente.oacc.sql.SQLProfile;
+import com.acciente.oacc.sql.internal.encryptor.PasswordEncryptor;
 import com.acciente.oacc.sql.internal.persister.DomainPersister;
 import com.acciente.oacc.sql.internal.persister.GrantDomainCreatePermissionPostCreateSysPersister;
 import com.acciente.oacc.sql.internal.persister.GrantDomainCreatePermissionSysPersister;
@@ -173,16 +174,18 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
 
    public static AccessControlContext getAccessControlContext(Connection connection,
                                                               String schemaName,
-                                                              SQLProfile sqlProfile) {
+                                                              SQLProfile sqlProfile,
+                                                              PasswordEncryptor passwordEncryptor) {
       __assertConnectionSpecified(connection);
-      return new SQLAccessControlContext(connection, schemaName, sqlProfile);
+      return new SQLAccessControlContext(connection, schemaName, sqlProfile, passwordEncryptor);
    }
 
    public static AccessControlContext getAccessControlContext(DataSource dataSource,
                                                               String schemaName,
-                                                              SQLProfile sqlProfile) {
+                                                              SQLProfile sqlProfile,
+                                                              PasswordEncryptor passwordEncryptor) {
       __assertDataSourceSpecified(dataSource);
-      return new SQLAccessControlContext(dataSource, schemaName, sqlProfile);
+      return new SQLAccessControlContext(dataSource, schemaName, sqlProfile, passwordEncryptor);
    }
 
    public static AccessControlContext getAccessControlContext(Connection connection,
@@ -224,12 +227,14 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
 
    private SQLAccessControlContext(Connection connection,
                                    String schemaName,
-                                   SQLProfile sqlProfile) {
+                                   SQLProfile sqlProfile,
+                                   PasswordEncryptor passwordEncryptor) {
       this(schemaName, sqlProfile);
       this.connection = connection;
       // use the built-in authentication provider when no custom implementation is provided
       this.authenticationProvider
-            = new SQLPasswordAuthenticationProvider(connection, schemaName, sqlProfile.getSqlDialect());
+            = new SQLPasswordAuthenticationProvider(connection, schemaName, sqlProfile.getSqlDialect(),
+                                                    passwordEncryptor);
       this.hasDefaultAuthenticationProvider = true;
    }
 
@@ -245,12 +250,14 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
 
    private SQLAccessControlContext(DataSource dataSource,
                                    String schemaName,
-                                   SQLProfile sqlProfile) {
+                                   SQLProfile sqlProfile,
+                                   PasswordEncryptor passwordEncryptor) {
       this(schemaName, sqlProfile);
       this.dataSource = dataSource;
       // use the built-in authentication provider when no custom implementation is provided
       this.authenticationProvider
-            = new SQLPasswordAuthenticationProvider(dataSource, schemaName, sqlProfile.getSqlDialect());
+            = new SQLPasswordAuthenticationProvider(dataSource, schemaName, sqlProfile.getSqlDialect(),
+                                                    passwordEncryptor);
       this.hasDefaultAuthenticationProvider = true;
    }
 

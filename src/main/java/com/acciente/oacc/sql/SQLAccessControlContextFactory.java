@@ -20,6 +20,7 @@ package com.acciente.oacc.sql;
 import com.acciente.oacc.AccessControlContext;
 import com.acciente.oacc.AuthenticationProvider;
 import com.acciente.oacc.sql.internal.SQLAccessControlContext;
+import com.acciente.oacc.sql.internal.encryptor.PasswordEncryptor;
 
 import javax.sql.DataSource;
 import java.sql.Connection;
@@ -30,18 +31,22 @@ import java.sql.Connection;
 public class SQLAccessControlContextFactory {
    public static AccessControlContext getAccessControlContext(Connection connection,
                                                               String schemaName,
-                                                              SQLProfile sqlProfile) {
+                                                              SQLProfile sqlProfile,
+                                                              PasswordEncryptor passwordEncryptor) {
       return SQLAccessControlContext.getAccessControlContext(connection,
                                                              schemaName,
-                                                             sqlProfile);
+                                                             sqlProfile,
+                                                             passwordEncryptor);
    }
 
    public static AccessControlContext getAccessControlContext(DataSource dataSource,
                                                               String schemaName,
-                                                              SQLProfile sqlProfile) {
+                                                              SQLProfile sqlProfile,
+                                                              PasswordEncryptor passwordEncryptor) {
       return SQLAccessControlContext.getAccessControlContext(dataSource,
                                                              schemaName,
-                                                             sqlProfile);
+                                                             sqlProfile,
+                                                             passwordEncryptor);
    }
 
    public static AccessControlContext getAccessControlContext(Connection connection,
