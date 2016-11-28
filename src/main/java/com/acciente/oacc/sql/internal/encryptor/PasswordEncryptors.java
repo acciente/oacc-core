@@ -15,7 +15,7 @@ public class PasswordEncryptors {
       }
 
       if (encryptorName.equalsIgnoreCase(JasyptPasswordEncryptor.NAME)) {
-         return new JasyptPasswordEncryptor();
+         return JasyptPasswordEncryptor.getPasswordEncryptor();
       }
 
       throw new IllegalArgumentException("Encryptor name " + encryptorName + " not recognized");

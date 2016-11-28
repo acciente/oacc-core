@@ -33,7 +33,13 @@ public final class JasyptPasswordEncryptor implements PasswordEncryptor, Seriali
    private static final StandardByteDigester digester = newStandardByteDigester();
    private static final Base64               base64   = new Base64();
 
-   public JasyptPasswordEncryptor() {
+   private static final JasyptPasswordEncryptor singletonInstance = new JasyptPasswordEncryptor();
+
+   private JasyptPasswordEncryptor() {
+   }
+
+   public static JasyptPasswordEncryptor getPasswordEncryptor() {
+      return singletonInstance;
    }
 
    @Override

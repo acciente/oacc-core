@@ -85,7 +85,7 @@ public class TestSQLAccessControlContext extends TestSQLAccessControlContextBase
    private static AccessControlContext newSQLAccessControlContext()
          throws SQLException {
       Connection connection = DriverManager.getConnection(dbUrl, dbUser, dbPwd);
-      final JasyptPasswordEncryptor passwordEncryptor = new JasyptPasswordEncryptor();
+      final JasyptPasswordEncryptor passwordEncryptor = JasyptPasswordEncryptor.getPasswordEncryptor();
       SQLAccessControlSystemResetUtil.resetOACC(connection, dbSchema, oaccRootPwd, passwordEncryptor);
       return SQLAccessControlContextFactory.getAccessControlContext(connection, dbSchema, SQLProfile.DB2_10_5_RECURSIVE,
                                                                     passwordEncryptor);

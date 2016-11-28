@@ -180,13 +180,13 @@ public class TestAccessControl_customAuthenticationProvider extends TestAccessCo
       protected CustomAuthenticationProvider(Connection connection,
                                              String schemaName,
                                              SQLDialect sqlDialect) {
-         super(connection, schemaName, sqlDialect, new JasyptPasswordEncryptor());
+         super(connection, schemaName, sqlDialect, JasyptPasswordEncryptor.getPasswordEncryptor());
       }
 
       protected CustomAuthenticationProvider(DataSource dataSource,
                                              String schemaName,
                                              SQLDialect sqlDialect) {
-         super(dataSource, schemaName, sqlDialect, new JasyptPasswordEncryptor());
+         super(dataSource, schemaName, sqlDialect, JasyptPasswordEncryptor.getPasswordEncryptor());
       }
 
       @Override

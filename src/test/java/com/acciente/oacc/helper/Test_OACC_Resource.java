@@ -31,7 +31,7 @@ public class Test_OACC_Resource {
 
    @Test
    public void meta_checkPasswords() {
-      PasswordEncryptor passwordEncryptor = new JasyptPasswordEncryptor();
+      PasswordEncryptor passwordEncryptor = JasyptPasswordEncryptor.getPasswordEncryptor();
       final char[] plaintext = "abc".toCharArray();
       final String digest_01 = passwordEncryptor.encryptPassword(plaintext);
       final String digest_02 = passwordEncryptor.encryptPassword(plaintext);
@@ -46,7 +46,7 @@ public class Test_OACC_Resource {
 
    @Test
    public void meta_equalityOfResourcesWithEncryptedPasswords() {
-      PasswordEncryptor passwordEncryptor = new JasyptPasswordEncryptor();
+      PasswordEncryptor passwordEncryptor = JasyptPasswordEncryptor.getPasswordEncryptor();
       final char[] plaintext = "abc".toCharArray();
       final String digest_01 = passwordEncryptor.encryptPassword(PasswordUtils.computeBoundPassword(
             Resources.getInstance(0), plaintext));

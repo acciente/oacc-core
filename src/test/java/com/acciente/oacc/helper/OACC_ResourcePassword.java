@@ -33,7 +33,7 @@ public class OACC_ResourcePassword extends DbBase {
 
    private final char[] password_plaintext;
 
-   private static final PasswordEncryptor __passwordEncryptor = new JasyptPasswordEncryptor();
+   private static final PasswordEncryptor __passwordEncryptor = JasyptPasswordEncryptor.getPasswordEncryptor();
 
    OACC_ResourcePassword(Builder builder) {
       resourceID = builder.resourceID;
