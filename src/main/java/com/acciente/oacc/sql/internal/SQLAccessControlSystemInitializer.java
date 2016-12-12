@@ -35,8 +35,6 @@ public class SQLAccessControlSystemInitializer {
                                      PasswordEncryptor passwordEncryptor) throws SQLException {
       SchemaNameValidator.assertValid(dbSchema);
 
-      System.out.println("Initializing password encryptor...");
-
       final String schemaNameAndTablePrefix = dbSchema != null ? dbSchema + ".OAC_" : "OAC_";
 
       System.out.println("Checking database...needs empty tables");

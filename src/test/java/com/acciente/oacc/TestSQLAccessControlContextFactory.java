@@ -20,7 +20,6 @@ package com.acciente.oacc;
 import com.acciente.oacc.helper.TestConfigLoader;
 import com.acciente.oacc.sql.SQLAccessControlContextFactory;
 import com.acciente.oacc.sql.internal.SQLPasswordAuthenticationProvider;
-import com.acciente.oacc.sql.internal.encryptor.JasyptPasswordEncryptor;
 import com.acciente.oacc.sql.internal.encryptor.PasswordEncryptor;
 import org.junit.Test;
 

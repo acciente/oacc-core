@@ -127,11 +127,11 @@ public class SQLAccessControlSystemInitializer {
                                                                                       passwordEncryptor);
    }
 
-   //TODO removed this method and replace its usages with String.join() once we update the project POM to use Java 8
+   //TODO remove this method and replace its usages with String.join() when OACC updates use Java 8
    /**
-    * Provides identical functionailty of the Strings.join() method in Java 8
+    * Provides identical functionality of the Strings.join() method in Java 8
     *
-    * @param delimiter the delimter to insert between elements
+    * @param delimiter the delimiter to insert between elements
     * @param elements the elements to concatenate
     * @return
     */
