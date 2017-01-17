@@ -1,5 +1,7 @@
 package com.acciente.oacc.sql.internal.encryptor;
 
+import com.acciente.oacc.sql.PasswordEncryptor;
+
 import java.util.Arrays;
 import java.util.List;
 

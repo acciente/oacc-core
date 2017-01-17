@@ -17,9 +17,9 @@
  */
 package com.acciente.oacc.helper;
 
+import com.acciente.oacc.sql.PasswordEncryptor;
 import com.acciente.oacc.sql.internal.SQLAccessControlSystemInitializer;
 import com.acciente.oacc.sql.internal.SchemaNameValidator;
-import com.acciente.oacc.sql.internal.encryptor.PasswordEncryptor;
 
 import javax.sql.DataSource;
 import java.sql.Connection;

@@ -17,7 +17,6 @@
  */
 package com.acciente.oacc.sql;
 
-import com.acciente.oacc.sql.internal.encryptor.PasswordEncryptor;
 import com.acciente.oacc.sql.internal.encryptor.PasswordEncryptors;
 
 import java.io.IOException;

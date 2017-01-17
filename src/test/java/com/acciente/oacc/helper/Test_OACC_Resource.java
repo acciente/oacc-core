@@ -18,8 +18,8 @@
 package com.acciente.oacc.helper;
 
 import com.acciente.oacc.Resources;
+import com.acciente.oacc.sql.PasswordEncryptor;
 import com.acciente.oacc.sql.internal.PasswordUtils;
-import com.acciente.oacc.sql.internal.encryptor.PasswordEncryptor;
 import com.acciente.oacc.sql.internal.encryptor.JasyptPasswordEncryptor;
 import org.junit.Test;
 

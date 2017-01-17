@@ -17,6 +17,7 @@
  */
 package com.acciente.oacc.sql.internal.encryptor;
 
+import com.acciente.oacc.sql.PasswordEncryptor;
 import org.jasypt.contrib.org.apache.commons.codec_1_3.binary.Base64;
 import org.jasypt.digest.StandardByteDigester;
 import org.jasypt.normalization.Normalizer;

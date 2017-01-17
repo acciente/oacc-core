@@ -20,7 +20,6 @@ package com.acciente.oacc.sql;
 import com.acciente.oacc.AccessControlContext;
 import com.acciente.oacc.AuthenticationProvider;
 import com.acciente.oacc.sql.internal.SQLAccessControlContext;
-import com.acciente.oacc.sql.internal.encryptor.PasswordEncryptor;
 
 import javax.sql.DataSource;
 import java.sql.Connection;
