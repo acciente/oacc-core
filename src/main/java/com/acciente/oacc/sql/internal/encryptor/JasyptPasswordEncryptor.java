@@ -30,6 +30,7 @@ import java.util.Arrays;
 public final class JasyptPasswordEncryptor implements PasswordEncryptor, Serializable {
    static final String NAME = "jasypt";
 
+   private static final String               marker   = NAME + ":";
    private static final StandardByteDigester digester = newStandardByteDigester();
    private static final Base64               base64   = new Base64();
 
@@ -54,7 +55,7 @@ public final class JasyptPasswordEncryptor implements PasswordEncryptor, Seriali
 
       final byte[] digest = digester.digest(getCleanedBytes(password));
 
-      return new String(base64.encode(digest), StandardCharsets.US_ASCII);
+      return addMarker(new String(base64.encode(digest), StandardCharsets.US_ASCII));
    }
 
    @Override
@@ -72,7 +73,19 @@ public final class JasyptPasswordEncryptor implements PasswordEncryptor, Seriali
       }
 
       return digester.matches(getCleanedBytes(plainPassword),
-                              base64.decode(encryptedPassword.getBytes(StandardCharsets.US_ASCII)));
+                              base64.decode(subtractMarker(encryptedPassword).getBytes(StandardCharsets.US_ASCII)));
+   }
+
+   private static String addMarker(String encryptedPassword) {
+      return marker + encryptedPassword;
+   }
+
+   private static String subtractMarker(String encryptedPasswordPlusMarker) {
+      if (encryptedPasswordPlusMarker.startsWith(marker)) {
+         return encryptedPasswordPlusMarker.substring(marker.length());
+      }
+      // if no marker is present we assume this is a legacy Jasypt hash (no marker is present in these hashes)
+      return encryptedPasswordPlusMarker;
    }
 
    private static StandardByteDigester newStandardByteDigester() {
