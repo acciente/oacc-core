@@ -24,25 +24,26 @@ import com.acciente.oacc.InvalidCredentialsException;
 import com.acciente.oacc.PasswordCredentials;
 import com.acciente.oacc.Resource;
 import com.acciente.oacc.UnsupportedCredentialsException;
+import com.acciente.oacc.sql.PasswordEncryptor;
 import com.acciente.oacc.sql.SQLDialect;
 import com.acciente.oacc.sql.internal.persister.ResourcePasswordPersister;
 import com.acciente.oacc.sql.internal.persister.SQLConnection;
 import com.acciente.oacc.sql.internal.persister.SQLPasswordStrings;
 
 import javax.sql.DataSource;
-import java.io.IOException;
-import java.io.ObjectInputStream;
 import java.io.Serializable;
 import java.sql.Connection;
 import java.sql.SQLException;
 
 public class SQLPasswordAuthenticationProvider implements AuthenticationProvider, Serializable {
-   private static final long serialVersionUID = 1L;
+   private static final long serialVersionUID = 2L;
 
-   // services
-   private transient DataSource                 dataSource;
-   private transient Connection                 connection;
-   private transient CleanablePasswordEncryptor passwordEncryptor;
+   // database
+   private transient DataSource dataSource;
+   private transient Connection connection;
+
+   // password encryptor
+   private final PasswordEncryptor passwordEncryptor;
 
    // persisters
    private final ResourcePasswordPersister resourcePasswordPersister;
@@ -50,20 +51,24 @@ public class SQLPasswordAuthenticationProvider implements AuthenticationProvider
    // protected constructors/methods
    protected SQLPasswordAuthenticationProvider(Connection connection,
                                                String schemaName,
-                                               SQLDialect sqlDialect) {
-      this(schemaName, sqlDialect);
+                                               SQLDialect sqlDialect,
+                                               PasswordEncryptor passwordEncryptor) {
+      this(schemaName, sqlDialect, passwordEncryptor);
       this.connection = connection;
    }
 
    protected SQLPasswordAuthenticationProvider(DataSource dataSource,
                                                String schemaName,
-                                               SQLDialect sqlDialect) {
-      this(schemaName, sqlDialect);
+                                               SQLDialect sqlDialect,
+                                               PasswordEncryptor passwordEncryptor) {
+      this(schemaName, sqlDialect, passwordEncryptor);
       this.dataSource = dataSource;
    }
 
-   private SQLPasswordAuthenticationProvider(String schemaName, SQLDialect sqlDialect) {
-      this.passwordEncryptor = new StrongCleanablePasswordEncryptor();
+   private SQLPasswordAuthenticationProvider(String schemaName,
+                                             SQLDialect sqlDialect,
+                                             PasswordEncryptor passwordEncryptor) {
+      this.passwordEncryptor = passwordEncryptor;
 
       // generate all the SQLs the persisters need based on the database dialect
       SQLPasswordStrings sqlPasswordStrings = SQLPasswordStrings.getSQLPasswordStrings(schemaName);
@@ -113,21 +118,6 @@ public class SQLPasswordAuthenticationProvider implements AuthenticationProvider
       }
       this.dataSource = null;
       this.connection = connection;
-   }
-
-   /*
-    * Deserializes the object from the stream using the default method and re-initializes the transient passwordEncryptor
-    * field. The remaining transient fields (dataSource and connection) need to be set after deserialization by calling
-    * one of the postDeserialize() methods.
-    */
-   private void readObject(ObjectInputStream objectInputStream) throws ClassNotFoundException, IOException {
-      // perform the default de-serialization first
-      objectInputStream.defaultReadObject();
-
-      // restore transient field
-      passwordEncryptor = new StrongCleanablePasswordEncryptor();
-
-      // the other transient fields have to be set with a subsequent call to postDeserialize()
    }
 
    @Override

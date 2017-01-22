@@ -30,18 +30,22 @@ import java.sql.Connection;
 public class SQLAccessControlContextFactory {
    public static AccessControlContext getAccessControlContext(Connection connection,
                                                               String schemaName,
-                                                              SQLProfile sqlProfile) {
+                                                              SQLProfile sqlProfile,
+                                                              PasswordEncryptor passwordEncryptor) {
       return SQLAccessControlContext.getAccessControlContext(connection,
                                                              schemaName,
-                                                             sqlProfile);
+                                                             sqlProfile,
+                                                             passwordEncryptor);
    }
 
    public static AccessControlContext getAccessControlContext(DataSource dataSource,
                                                               String schemaName,
-                                                              SQLProfile sqlProfile) {
+                                                              SQLProfile sqlProfile,
+                                                              PasswordEncryptor passwordEncryptor) {
       return SQLAccessControlContext.getAccessControlContext(dataSource,
                                                              schemaName,
-                                                             sqlProfile);
+                                                             sqlProfile,
+                                                             passwordEncryptor);
    }
 
    public static AccessControlContext getAccessControlContext(Connection connection,

@@ -15,8 +15,9 @@
  * See the License for the specific language governing
  * permissions and limitations under the License.
  */
-package com.acciente.oacc.sql.internal;
+package com.acciente.oacc;
 
+import com.acciente.oacc.sql.PasswordEncryptor;
 import org.jasypt.contrib.org.apache.commons.codec_1_3.binary.Base64;
 import org.jasypt.digest.StandardByteDigester;
 import org.jasypt.normalization.Normalizer;
@@ -26,11 +27,11 @@ import java.nio.CharBuffer;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 
-public final class StrongCleanablePasswordEncryptor implements CleanablePasswordEncryptor {
+public final class JasyptPasswordEncryptorFromOACCv2_00_rc7 implements PasswordEncryptor {
    private final StandardByteDigester digester;
    private final Base64               base64;
 
-   public StrongCleanablePasswordEncryptor() {
+   public JasyptPasswordEncryptorFromOACCv2_00_rc7() {
       this.digester = new StandardByteDigester();
       this.digester.setAlgorithm("SHA-256");
       this.digester.setIterations(100000);
