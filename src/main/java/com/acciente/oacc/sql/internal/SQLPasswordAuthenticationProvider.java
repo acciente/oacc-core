@@ -24,7 +24,7 @@ import com.acciente.oacc.InvalidCredentialsException;
 import com.acciente.oacc.PasswordCredentials;
 import com.acciente.oacc.Resource;
 import com.acciente.oacc.UnsupportedCredentialsException;
-import com.acciente.oacc.sql.PasswordEncryptor;
+import com.acciente.oacc.encryptor.PasswordEncryptor;
 import com.acciente.oacc.sql.SQLDialect;
 import com.acciente.oacc.sql.internal.persister.ResourcePasswordPersister;
 import com.acciente.oacc.sql.internal.persister.SQLConnection;

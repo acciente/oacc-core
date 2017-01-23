@@ -20,7 +20,7 @@ package com.acciente.oacc;
 import com.acciente.oacc.helper.SQLAccessControlSystemResetUtil;
 import com.acciente.oacc.helper.TestConfigLoader;
 import com.acciente.oacc.sql.SQLAccessControlContextFactory;
-import com.acciente.oacc.sql.internal.encryptor.JasyptPasswordEncryptor;
+import com.acciente.oacc.encryptor.jasypt.JasyptPasswordEncryptor;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -70,7 +70,8 @@ public class TestAccessControl_JasyptEncryptorIncludingBackwardsCompatibility {
 
       // this uses the latest Jasypt password encryptor code
       {
-         final JasyptPasswordEncryptor jasyptPasswordEncryptor = JasyptPasswordEncryptor.getPasswordEncryptor();
+         // we use values different values from the default
+         final JasyptPasswordEncryptor jasyptPasswordEncryptor = JasyptPasswordEncryptor.getPasswordEncryptor("MD5", 2000, 32);
          systemAccessControlContextWithCurrentEncryptor
                = SQLAccessControlContextFactory.getAccessControlContext(TestConfigLoader.getDataSource(),
                                                                         TestConfigLoader.getDatabaseSchema(),

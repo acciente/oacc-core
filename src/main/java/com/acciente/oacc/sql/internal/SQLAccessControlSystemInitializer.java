@@ -21,7 +21,7 @@ import com.acciente.oacc.AccessControlContext;
 import com.acciente.oacc.DomainCreatePermissions;
 import com.acciente.oacc.DomainPermissions;
 import com.acciente.oacc.Resources;
-import com.acciente.oacc.sql.PasswordEncryptor;
+import com.acciente.oacc.encryptor.PasswordEncryptor;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;

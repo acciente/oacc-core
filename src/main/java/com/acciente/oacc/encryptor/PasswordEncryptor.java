@@ -15,9 +15,10 @@
  * See the License for the specific language governing
  * permissions and limitations under the License.
  */
-package com.acciente.oacc.sql;
+package com.acciente.oacc.encryptor;
 
-import com.acciente.oacc.sql.internal.encryptor.JasyptPasswordEncryptor;
+import com.acciente.oacc.sql.SQLAccessControlContextFactory;
+import com.acciente.oacc.encryptor.jasypt.JasyptPasswordEncryptor;
 
 /**
  * This interface is used to configure the password encryption scheme used by the built-in authentication provider

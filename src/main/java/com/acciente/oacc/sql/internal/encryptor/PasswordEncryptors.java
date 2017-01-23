@@ -17,7 +17,8 @@
  */
 package com.acciente.oacc.sql.internal.encryptor;
 
-import com.acciente.oacc.sql.PasswordEncryptor;
+import com.acciente.oacc.encryptor.PasswordEncryptor;
+import com.acciente.oacc.encryptor.jasypt.JasyptPasswordEncryptor;
 
 import java.util.Arrays;
 import java.util.List;

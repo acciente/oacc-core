@@ -31,7 +31,7 @@ import com.acciente.oacc.ResourcePermission;
 import com.acciente.oacc.ResourcePermissions;
 import com.acciente.oacc.Resources;
 import com.acciente.oacc.helper.SQLAccessControlSystemResetUtil;
-import com.acciente.oacc.sql.internal.encryptor.JasyptPasswordEncryptor;
+import com.acciente.oacc.encryptor.jasypt.JasyptPasswordEncryptor;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;

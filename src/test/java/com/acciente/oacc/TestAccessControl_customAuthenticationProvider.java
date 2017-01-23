@@ -22,7 +22,7 @@ import com.acciente.oacc.sql.SQLAccessControlContextFactory;
 import com.acciente.oacc.sql.SQLDialect;
 import com.acciente.oacc.sql.SQLProfile;
 import com.acciente.oacc.sql.internal.SQLPasswordAuthenticationProvider;
-import com.acciente.oacc.sql.internal.encryptor.JasyptPasswordEncryptor;
+import com.acciente.oacc.encryptor.jasypt.JasyptPasswordEncryptor;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
