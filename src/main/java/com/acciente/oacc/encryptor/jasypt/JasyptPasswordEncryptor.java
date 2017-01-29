@@ -29,22 +29,19 @@ import java.util.Arrays;
 public final class JasyptPasswordEncryptor implements PasswordEncryptor, Serializable {
    public static final String NAME = "jasypt";
 
-   private static final String DEFAULT_ENCRYPT_ALGORITHM       = "SHA-256";
-   private static final int    DEFAULT_ENCRYPT_ITERATIONS      = 100000;
-   private static final int    DEFAULT_ENCRYPT_SALT_SIZE_BYTES = 16;
+   private static final String DEFAULT_ALGORITHM       = "SHA-256";
+   private static final int    DEFAULT_ITERATIONS      = 100000;
+   private static final int    DEFAULT_SALT_SIZE_BYTES = 16;
 
-   private static final String MARKER          = NAME + ":";
-   private static final String PARAM_DELIMITER = "$";
+   private static final StandardByteDigesterPool digesterPool           = new StandardByteDigesterPool();
+   private static final PasswordEncoderDecoder   passwordEncoderDecoder = new PasswordEncoderDecoder();
 
-   private static final StandardByteDigesterPool digesterPool       = new StandardByteDigesterPool();
-   private static final HashEncoderDecoder       hashEncoderDecoder = new HashEncoderDecoder(MARKER, PARAM_DELIMITER);
-
-   private final String encryptAlgorithm;
-   private final int    encryptIterations;
-   private final int    encryptSaltSizeBytes;
+   private final String algorithm;
+   private final int    iterations;
+   private final int    saltSizeBytes;
 
    public static JasyptPasswordEncryptor getPasswordEncryptor() {
-      return getPasswordEncryptor(DEFAULT_ENCRYPT_ALGORITHM, DEFAULT_ENCRYPT_ITERATIONS, DEFAULT_ENCRYPT_SALT_SIZE_BYTES);
+      return getPasswordEncryptor(DEFAULT_ALGORITHM, DEFAULT_ITERATIONS, DEFAULT_SALT_SIZE_BYTES);
    }
 
    public static JasyptPasswordEncryptor getPasswordEncryptor(String encryptAlgorithm,
@@ -53,40 +50,39 @@ public final class JasyptPasswordEncryptor implements PasswordEncryptor, Seriali
       return new JasyptPasswordEncryptor(encryptAlgorithm, encryptIterations, encryptSaltSizeBytes);
    }
 
-   private JasyptPasswordEncryptor(String encryptAlgorithm, int encryptIterations, int encryptSaltSizeBytes) {
-      this.encryptAlgorithm = encryptAlgorithm;
-      this.encryptIterations = encryptIterations;
-      this.encryptSaltSizeBytes = encryptSaltSizeBytes;
+   private JasyptPasswordEncryptor(String algorithm, int iterations, int saltSizeBytes) {
+      this.algorithm = algorithm;
+      this.iterations = iterations;
+      this.saltSizeBytes = saltSizeBytes;
    }
 
    @Override
-   public String encryptPassword(final char[] password) {
-      if (password == null) {
+   public String encryptPassword(final char[] plainPassword) {
+      if (plainPassword == null) {
          return null;
       }
 
-      final byte[] encryptedPassword = digesterPool
-            .getStandardByteDigester(encryptAlgorithm, encryptIterations, encryptSaltSizeBytes)
-            .digest(getCleanedBytes(password));
+      final byte[] digest = digesterPool.getStandardByteDigester(algorithm, iterations, saltSizeBytes)
+            .digest(getCleanedBytes(plainPassword));
 
-      return hashEncoderDecoder.encodeHash(encryptAlgorithm, encryptIterations, encryptSaltSizeBytes, encryptedPassword);
+      return passwordEncoderDecoder.encodePassword(algorithm, iterations, saltSizeBytes, digest);
    }
 
    @Override
    public boolean checkPassword(final char[] plainPassword,
-                                final String encodedPasswordHash) {
+                                final String storedPassword) {
       if (plainPassword == null) {
-         return (encodedPasswordHash == null);
+         return (storedPassword == null);
       }
-      else if (encodedPasswordHash == null) {
+      else if (storedPassword == null) {
          return false;
       }
 
-      final DecodedHash decodedHash = hashEncoderDecoder.decodeHash(encodedPasswordHash);
-      return digesterPool.getStandardByteDigester(decodedHash.getEncryptAlgorithm(),
-                                                  decodedHash.getEncryptIterations(),
-                                                  decodedHash.getEncryptSaltSizeBytes())
-            .matches(getCleanedBytes(plainPassword), decodedHash.getEncryptedPassword());
+      final DecodedPassword decodedPassword = passwordEncoderDecoder.decodePassword(storedPassword);
+      return digesterPool.getStandardByteDigester(decodedPassword.getAlgorithm(),
+                                                  decodedPassword.getIterations(),
+                                                  decodedPassword.getSaltSizeBytes())
+            .matches(getCleanedBytes(plainPassword), decodedPassword.getDigest());
    }
 
    private static byte[] getCleanedBytes(char[] password) {
@@ -96,5 +92,4 @@ public final class JasyptPasswordEncryptor implements PasswordEncryptor, Seriali
       Arrays.fill(byteBuffer.array(), (byte) 0);
       return byteArray;
    }
-
 }
