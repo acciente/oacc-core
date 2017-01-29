@@ -20,6 +20,7 @@ package com.acciente.oacc.sql;
 import com.acciente.oacc.AccessControlContext;
 import com.acciente.oacc.AuthenticationProvider;
 import com.acciente.oacc.encryptor.PasswordEncryptor;
+import com.acciente.oacc.encryptor.jasypt.JasyptPasswordEncryptor;
 import com.acciente.oacc.sql.internal.SQLAccessControlContext;
 
 import javax.sql.DataSource;
@@ -29,6 +30,93 @@ import java.sql.Connection;
  * The factory that provides OACC's AccessControlContext implementation, which is backed by a database.
  */
 public class SQLAccessControlContextFactory {
+   /**
+    * Creates an {@link AccessControlContext} instance backed by the specified database connection. A set of valid
+    * OACC database tables are expected to reside in the specified schema. The dialect of SQL supported by the database
+    * server for which the connection is provided is specified using the SQLProfile parameter. The access control
+    * context returned by this method uses the built-in authentication provider that delegates all password encryption
+    * and decryption to a {@link PasswordEncryptor} instance provided by
+    * {@link JasyptPasswordEncryptor#getPasswordEncryptor()} -- therefore the instance returned by this method should
+    * only be used when all existing resource passwords were encrypted using Jasypt. This method is deprecated, please
+    * see the deprecation note below.
+    *
+    * @param connection a database connection with access to the required OACC tables
+    * @param schemaName the name of the schema in the database containing the OACC tables
+    * @param sqlProfile the database provider and dialect of SQL supported for the database server associated
+    *                   with the connection provided
+    * @return and {@link AccessControlContext} instance ready to receive API calls
+    * @deprecated as of OACC v2.0.0-rc8 this factory method exists simply to not break compilation of
+    * pre-existing code using this method. This method is being deprecated since it implicitly selects the Jasypt
+    * password encryptor with default parameters -- exactly as this method did prior to OACC v2.0.0-rc8. It is
+    * recommended that usages of this method be replaced with the following equivalent call that explicitly indicates
+    * the password encryption scheme in use:
+    * <p>
+    * {@link #getAccessControlContext(Connection, String, SQLProfile, PasswordEncryptor)}
+    * <p>
+    * where the password encryptor parameter is set to be {@link JasyptPasswordEncryptor#getPasswordEncryptor()}.
+    */
+   @Deprecated
+   public static AccessControlContext getAccessControlContext(Connection connection,
+                                                              String schemaName,
+                                                              SQLProfile sqlProfile) {
+      return SQLAccessControlContext.getAccessControlContext(connection,
+                                                             schemaName,
+                                                             sqlProfile,
+                                                             JasyptPasswordEncryptor.getPasswordEncryptor());
+   }
+
+   /**
+    * Creates an {@link AccessControlContext} instance backed by the specified database data source. A set of valid
+    * OACC database tables are expected to reside in the specified schema. The dialect of SQL supported by the database
+    * server for which the data source is provided is specified using the SQLProfile parameter. The access control
+    * context returned by this method uses the built-in authentication provider that delegates all password encryption
+    * and decryption to a {@link PasswordEncryptor} instance provided by
+    * {@link JasyptPasswordEncryptor#getPasswordEncryptor()} -- therefore the instance returned by this method should
+    * only be used when all existing resource passwords were encrypted using Jasypt. This method is deprecated, please
+    * see the deprecation note below.
+    *
+    * @param dataSource        a database data source with access to the required OACC tables
+    * @param schemaName the name of the schema in the database containing the OACC tables
+    * @param sqlProfile the database provider and dialect of SQL supported for the database server associated
+    *                   with the connection provided
+    * @return and {@link AccessControlContext} instance ready to receive API calls
+    * @deprecated as of OACC v2.0.0-rc8 this factory method exists simply to not break compilation of
+    * pre-existing code using this method. This method is being deprecated since it implicitly selects the Jasypt
+    * password encryptor with default parameters -- exactly as this method did prior to OACC v2.0.0-rc8. It is
+    * recommended that usages of this method be replaced with the following equivalent call that explicitly indicates
+    * the password encryption scheme in use:
+    * <p>
+    * {@link #getAccessControlContext(DataSource, String, SQLProfile, PasswordEncryptor)}
+    * <p>
+    * where the password encryptor parameter is set to be {@link JasyptPasswordEncryptor#getPasswordEncryptor()}.
+    */
+   @Deprecated
+   public static AccessControlContext getAccessControlContext(DataSource dataSource,
+                                                              String schemaName,
+                                                              SQLProfile sqlProfile) {
+      return SQLAccessControlContext.getAccessControlContext(dataSource,
+                                                             schemaName,
+                                                             sqlProfile,
+                                                             JasyptPasswordEncryptor.getPasswordEncryptor());
+   }
+
+   /**
+    * Creates an {@link AccessControlContext} instance backed by the specified database connection. A set of valid
+    * OACC database tables are expected to reside in the specified schema. The dialect of SQL supported by the database
+    * server for which the connection is provided is specified using the SQLProfile parameter. The access control
+    * context returned by this method uses the built-in authentication provider for resource authentication. The
+    * built-in authentication provider delegates all password encryption and decryption to the {@link PasswordEncryptor}
+    * instance provided -- therefore it is imperative that the {@link PasswordEncryptor} instance is able to decrypt
+    * existing resource passwords.
+    *
+    * @param connection        a database connection with access to the required OACC tables
+    * @param schemaName        the name of the schema in the database containing the OACC tables
+    * @param sqlProfile        the database provider and dialect of SQL supported for the database server associated
+    *                          with the connection provided
+    * @param passwordEncryptor a {@link PasswordEncryptor} instance to which the built-in authentication provider
+    *                          delegates all password encryption and decryption
+    * @return and {@link AccessControlContext} instance ready to receive API calls
+    */
    public static AccessControlContext getAccessControlContext(Connection connection,
                                                               String schemaName,
                                                               SQLProfile sqlProfile,
@@ -39,6 +127,23 @@ public class SQLAccessControlContextFactory {
                                                              passwordEncryptor);
    }
 
+   /**
+    * Creates an {@link AccessControlContext} instance backed by the specified database data source. A set of valid
+    * OACC database tables are expected to reside in the specified schema. The dialect of SQL supported by the database
+    * server for which the data source is provided is specified using the SQLProfile parameter. The access control
+    * context returned by this method uses the built-in authentication provider for resource authentication. The
+    * built-in authentication provider delegates all password encryption and decryption to the {@link PasswordEncryptor}
+    * instance provided -- therefore it is important that the {@link PasswordEncryptor} instance is able to decrypt
+    * existing resource passwords.
+    *
+    * @param dataSource        a database data source with access to the required OACC tables
+    * @param schemaName        the name of the schema in the database containing the OACC tables
+    * @param sqlProfile        the database provider and dialect of SQL supported for the database server associated
+    *                          with the data source provided
+    * @param passwordEncryptor a {@link PasswordEncryptor} instance to which the built-in authentication provider
+    *                          delegates all password encryption and decryption
+    * @return and {@link AccessControlContext} instance ready to receive API calls
+    */
    public static AccessControlContext getAccessControlContext(DataSource dataSource,
                                                               String schemaName,
                                                               SQLProfile sqlProfile,
@@ -49,6 +154,21 @@ public class SQLAccessControlContextFactory {
                                                              passwordEncryptor);
    }
 
+   /**
+    * Creates an {@link AccessControlContext} instance backed by the specified database connection. A set of valid
+    * OACC database tables are expected to reside in the specified schema. The dialect of SQL supported by the database
+    * server for which the connection is provided is specified using the SQLProfile parameter. The access control
+    * context returned by this method delegates all resource authentication to the specified custom authentication
+    * provider.
+    *
+    * @param connection             a database connection with access to the required OACC tables
+    * @param schemaName             the name of the schema in the database containing the OACC tables
+    * @param sqlProfile             the database provider and dialect of SQL supported for the database server associated
+    *                               with the connection provided
+    * @param authenticationProvider an {@link AuthenticationProvider} instance to which all resource authentication is
+    *                               delegated
+    * @return and {@link AccessControlContext} instance ready to receive API calls
+    */
    public static AccessControlContext getAccessControlContext(Connection connection,
                                                               String schemaName,
                                                               SQLProfile sqlProfile,
@@ -59,6 +179,21 @@ public class SQLAccessControlContextFactory {
                                                              authenticationProvider);
    }
 
+   /**
+    * Creates an {@link AccessControlContext} instance backed by the specified database data source. A set of valid
+    * OACC database tables are expected to reside in the specified schema. The dialect of SQL supported by the database
+    * server for which the data source is provided is specified using the SQLProfile parameter. The access control
+    * context returned by this method delegates all resource authentication to the specified custom authentication
+    * provider.
+    *
+    * @param dataSource             a database data source with access to the required OACC tables
+    * @param schemaName             the name of the schema in the database containing the OACC tables
+    * @param sqlProfile             the database provider and dialect of SQL supported for the database server associated
+    *                               with the connection provided
+    * @param authenticationProvider an {@link AuthenticationProvider} instance to which all resource authentication is
+    *                               delegated
+    * @return and {@link AccessControlContext} instance ready to receive API calls
+    */
    public static AccessControlContext getAccessControlContext(DataSource dataSource,
                                                               String schemaName,
                                                               SQLProfile sqlProfile,
@@ -70,7 +205,7 @@ public class SQLAccessControlContextFactory {
    }
 
    /**
-    * @deprecated  As of v2.0.0-rc.6; no replacement method necessary because unserializable fields are now marked as transient
+    * @deprecated As of v2.0.0-rc.6; no replacement method necessary because unserializable fields are now marked as transient
     */
    @Deprecated
    public static void preSerialize(AccessControlContext accessControlContext) {
@@ -85,7 +220,7 @@ public class SQLAccessControlContextFactory {
     * through an IllegalStateException from the accessControlContext.
     *
     * @param accessControlContext the accessControlContext on which to reset the database connection
-    * @param connection the database connection to be reset on the accessControlContext
+    * @param connection           the database connection to be reset on the accessControlContext
     */
    public static void postDeserialize(AccessControlContext accessControlContext, Connection connection) {
       SQLAccessControlContext.postDeserialize(accessControlContext, connection);
@@ -100,7 +235,7 @@ public class SQLAccessControlContextFactory {
     * through an IllegalStateException from the accessControlContext.
     *
     * @param accessControlContext the accessControlContext on which to reset the database connection
-    * @param dataSource the database dataSource to be reset on the accessControlContext
+    * @param dataSource           the database dataSource to be reset on the accessControlContext
     */
    public static void postDeserialize(AccessControlContext accessControlContext, DataSource dataSource) {
       SQLAccessControlContext.postDeserialize(accessControlContext, dataSource);

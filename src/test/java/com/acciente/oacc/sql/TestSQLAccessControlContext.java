@@ -85,10 +85,9 @@ public class TestSQLAccessControlContext extends TestSQLAccessControlContextBase
    private static AccessControlContext newSQLAccessControlContext()
          throws SQLException {
       Connection connection = DriverManager.getConnection(dbUrl, dbUser, dbPwd);
-      final JasyptPasswordEncryptor passwordEncryptor = JasyptPasswordEncryptor.getPasswordEncryptor();
-      SQLAccessControlSystemResetUtil.resetOACC(connection, dbSchema, oaccRootPwd, passwordEncryptor);
-      return SQLAccessControlContextFactory.getAccessControlContext(connection, dbSchema, SQLProfile.DB2_10_5_RECURSIVE,
-                                                                    passwordEncryptor);
+      SQLAccessControlSystemResetUtil.resetOACC(connection, dbSchema, oaccRootPwd,
+                                                JasyptPasswordEncryptor.getPasswordEncryptor());
+      return SQLAccessControlContextFactory.getAccessControlContext(connection, dbSchema, SQLProfile.DB2_10_5_RECURSIVE);
    }
 
    private static void authSysResource(final AccessControlContext accessControlContext) {
@@ -1028,7 +1027,7 @@ public class TestSQLAccessControlContext extends TestSQLAccessControlContextBase
          }
          else {
             testFail();
-            }
+         }
       }
       catch (OaccException e) {
          testFail(e);
@@ -1096,7 +1095,7 @@ public class TestSQLAccessControlContext extends TestSQLAccessControlContextBase
       testName("getDomainDescendants( CHILD-DOMAIN-4 ) = { CHILD-DOMAIN-4 } ");
       try {
          String domainName = "CHILD-DOMAIN-4";
-         List expected = Arrays.asList("CHILD-DOMAIN-4");
+         List   expected   = Arrays.asList("CHILD-DOMAIN-4");
 
          if (accessControlContext.getDomainDescendants(domainName).equals(new HashSet(expected))) {
             testOK();
@@ -1112,7 +1111,7 @@ public class TestSQLAccessControlContext extends TestSQLAccessControlContextBase
       testName("getDomainDescendants( CHILD-DOMAIN-3 ) = { CHILD-DOMAIN-3, CHILD-DOMAIN-4 } ");
       try {
          String domainName = "CHILD-DOMAIN-3";
-         List expected = Arrays.asList("CHILD-DOMAIN-3", "CHILD-DOMAIN-4");
+         List   expected   = Arrays.asList("CHILD-DOMAIN-3", "CHILD-DOMAIN-4");
 
          if (accessControlContext.getDomainDescendants(domainName).equals(new HashSet(expected))) {
             testOK();
@@ -1128,7 +1127,7 @@ public class TestSQLAccessControlContext extends TestSQLAccessControlContextBase
       testName("getDomainDescendants( CHILD-DOMAIN-2 ) = { CHILD-DOMAIN-2 } ");
       try {
          String domainName = "CHILD-DOMAIN-2";
-         List expected = Arrays.asList("CHILD-DOMAIN-2");
+         List   expected   = Arrays.asList("CHILD-DOMAIN-2");
 
          if (accessControlContext.getDomainDescendants(domainName).equals(new HashSet(expected))) {
             testOK();
@@ -1144,7 +1143,7 @@ public class TestSQLAccessControlContext extends TestSQLAccessControlContextBase
       testName("getDomainDescendants( CHILD-DOMAIN-1 ) = { CHILD-DOMAIN-1, CHILD-DOMAIN-3, CHILD-DOMAIN-4 } ");
       try {
          String domainName = "CHILD-DOMAIN-1";
-         List expected = Arrays.asList("CHILD-DOMAIN-1", "CHILD-DOMAIN-3", "CHILD-DOMAIN-4");
+         List   expected   = Arrays.asList("CHILD-DOMAIN-1", "CHILD-DOMAIN-3", "CHILD-DOMAIN-4");
 
          if (accessControlContext.getDomainDescendants(domainName).equals(new HashSet(expected))) {
             testOK();
@@ -1160,7 +1159,7 @@ public class TestSQLAccessControlContext extends TestSQLAccessControlContextBase
       testName("getDomainDescendants( ROOT-DOMAIN-1 ) = { ROOT-DOMAIN-1, CHILD-DOMAIN-1, CHILD-DOMAIN-2, CHILD-DOMAIN-3, CHILD-DOMAIN-4 } ");
       try {
          String domainName = "ROOT-DOMAIN-1";
-         List expected = Arrays.asList("ROOT-DOMAIN-1", "CHILD-DOMAIN-1", "CHILD-DOMAIN-2", "CHILD-DOMAIN-3", "CHILD-DOMAIN-4");
+         List   expected   = Arrays.asList("ROOT-DOMAIN-1", "CHILD-DOMAIN-1", "CHILD-DOMAIN-2", "CHILD-DOMAIN-3", "CHILD-DOMAIN-4");
 
          if (accessControlContext.getDomainDescendants(domainName).equals(new HashSet(expected))) {
             testOK();
