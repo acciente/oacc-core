@@ -44,6 +44,13 @@ public class PasswordEncoderDecoderTest {
          DECODED_PASSWORD_SALT_SIZE_BYTES + DELIMITER +
          new String(base64.encode(DECODED_PASSWORD_DIGEST), StandardCharsets.US_ASCII);
 
+   private static final String ENCODED_LEGACY_PASSWORD =
+         new String(base64.encode(DECODED_PASSWORD_DIGEST), StandardCharsets.US_ASCII);
+
+   private static final String DECODED_LEGACY_PASSWORD_ALGORITHM       = "SHA-256";
+   private static final int    DECODED_LEGACY_PASSWORD_ITERATIONS      = 100000;
+   private static final int    DECODED_LEGACY_PASSWORD_SALT_SIZE_BYTES = 16;
+
    @Test
    public void testEncodePassword() throws Exception {
       final String encodedPassword = encoderDecoder.encodePassword(DECODED_PASSWORD_ALGORITHM,
@@ -60,6 +67,16 @@ public class PasswordEncoderDecoderTest {
       assertThat(decodedPassword.getAlgorithm(), is(DECODED_PASSWORD_ALGORITHM));
       assertThat(decodedPassword.getIterations(), is(DECODED_PASSWORD_ITERATIONS));
       assertThat(decodedPassword.getSaltSizeBytes(), is(DECODED_PASSWORD_SALT_SIZE_BYTES));
+      assertThat(decodedPassword.getDigest(), is(DECODED_PASSWORD_DIGEST));
+   }
+
+   @Test
+   public void testDecodeLegacyPassword() throws Exception {
+      final DecodedPassword decodedPassword = encoderDecoder.decodePassword(ENCODED_LEGACY_PASSWORD);
+
+      assertThat(decodedPassword.getAlgorithm(), is(DECODED_LEGACY_PASSWORD_ALGORITHM));
+      assertThat(decodedPassword.getIterations(), is(DECODED_LEGACY_PASSWORD_ITERATIONS));
+      assertThat(decodedPassword.getSaltSizeBytes(), is(DECODED_LEGACY_PASSWORD_SALT_SIZE_BYTES));
       assertThat(decodedPassword.getDigest(), is(DECODED_PASSWORD_DIGEST));
    }
 }
