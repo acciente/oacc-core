@@ -49,6 +49,16 @@ class PasswordEncoderDecoder {
    private static final int    LEGACY_PASSWORD_ITERATIONS      = 100000;
    private static final int    LEGACY_PASSWORD_SALT_SIZE_BYTES = 16;
 
+   /**
+    * Encodes an identifying header, the parameters used to generate the Jasypt digest, and the Jasypt digest into a
+    * single "self-contained" password that contains enough information for future comparisons.
+    *
+    * @param algorithm     the algorithm used to generate the digest.
+    * @param iterations    the number of iterations used to generate the digest.
+    * @param saltSizeBytes the salt size bytes used to generate the digest.
+    * @param digest        the digest itself.
+    * @return a fully-encoded password ready for persistent storage.
+    */
    String encodePassword(String algorithm,
                          int iterations,
                          int saltSizeBytes,
@@ -71,6 +81,13 @@ class PasswordEncoderDecoder {
       return encodedPassword.toString();
    }
 
+   /**
+    * Decodes a previously encoded Jasypt password into its constituent parts (algorithm, iterations, salt size, digest).
+    *
+    * @param encodedPassword an encoded password that was previously returned by
+    *                        {{@link #encodePassword(String, int, int, byte[])}}.
+    * @return an object containing the decoded parts of the password (algorithm, iterations, salt size, digest).
+    */
    DecodedPassword decodePassword(String encodedPassword) {
       if (encodedPassword.startsWith(MARKER)) {
          final String[] decodedPasswordArray = encodedPassword.substring(MARKER.length()).split(QUOTED_PARAM_DELIMITER);
