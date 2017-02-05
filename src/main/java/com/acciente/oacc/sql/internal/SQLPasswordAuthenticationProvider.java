@@ -25,7 +25,6 @@ import com.acciente.oacc.PasswordCredentials;
 import com.acciente.oacc.Resource;
 import com.acciente.oacc.UnsupportedCredentialsException;
 import com.acciente.oacc.encryptor.PasswordEncryptor;
-import com.acciente.oacc.sql.SQLDialect;
 import com.acciente.oacc.sql.internal.persister.ResourcePasswordPersister;
 import com.acciente.oacc.sql.internal.persister.SQLConnection;
 import com.acciente.oacc.sql.internal.persister.SQLPasswordStrings;
@@ -51,22 +50,19 @@ public class SQLPasswordAuthenticationProvider implements AuthenticationProvider
    // protected constructors/methods
    protected SQLPasswordAuthenticationProvider(Connection connection,
                                                String schemaName,
-                                               SQLDialect sqlDialect,
                                                PasswordEncryptor passwordEncryptor) {
-      this(schemaName, sqlDialect, passwordEncryptor);
+      this(schemaName, passwordEncryptor);
       this.connection = connection;
    }
 
    protected SQLPasswordAuthenticationProvider(DataSource dataSource,
                                                String schemaName,
-                                               SQLDialect sqlDialect,
                                                PasswordEncryptor passwordEncryptor) {
-      this(schemaName, sqlDialect, passwordEncryptor);
+      this(schemaName, passwordEncryptor);
       this.dataSource = dataSource;
    }
 
    private SQLPasswordAuthenticationProvider(String schemaName,
-                                             SQLDialect sqlDialect,
                                              PasswordEncryptor passwordEncryptor) {
       this.passwordEncryptor = passwordEncryptor;
 

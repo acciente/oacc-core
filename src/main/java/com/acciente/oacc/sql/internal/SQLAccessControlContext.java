@@ -233,8 +233,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       this.connection = connection;
       // use the built-in authentication provider when no custom implementation is provided
       this.authenticationProvider
-            = new SQLPasswordAuthenticationProvider(connection, schemaName, sqlProfile.getSqlDialect(),
-                                                    passwordEncryptor);
+            = new SQLPasswordAuthenticationProvider(connection, schemaName, passwordEncryptor);
       this.hasDefaultAuthenticationProvider = true;
    }
 
@@ -256,8 +255,7 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       this.dataSource = dataSource;
       // use the built-in authentication provider when no custom implementation is provided
       this.authenticationProvider
-            = new SQLPasswordAuthenticationProvider(dataSource, schemaName, sqlProfile.getSqlDialect(),
-                                                    passwordEncryptor);
+            = new SQLPasswordAuthenticationProvider(dataSource, schemaName, passwordEncryptor);
       this.hasDefaultAuthenticationProvider = true;
    }
 
