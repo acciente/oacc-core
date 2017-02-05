@@ -30,6 +30,8 @@ import java.util.Arrays;
  * Password encryptor implementation that uses the Jasypt digester for creating password hashes.
  */
 public final class JasyptPasswordEncryptor implements PasswordEncryptor, Serializable {
+   private static final long serialVersionUID = 1L;
+
    public static final String NAME = "jasypt";
 
    private static final String DEFAULT_ALGORITHM       = "SHA-256";

@@ -29,6 +29,8 @@ import java.security.SecureRandom;
  * Password encryptor implementation that uses the OpenBSD BCrypt algorithm for creating password hashes.
  */
 public class BCryptPasswordEncryptor implements PasswordEncryptor, Serializable {
+   private static final long serialVersionUID = 1L;
+
    public static final String NAME = "bcrypt";
 
    private static final int BCRYPT_COST_FACTOR_MIN = 4;
