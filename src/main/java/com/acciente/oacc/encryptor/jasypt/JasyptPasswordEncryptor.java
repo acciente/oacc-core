@@ -26,6 +26,9 @@ import java.nio.CharBuffer;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 
+/**
+ * Password encryptor implementation that uses the Jasypt digester for creating password hashes.
+ */
 public final class JasyptPasswordEncryptor implements PasswordEncryptor, Serializable {
    public static final String NAME = "jasypt";
 
@@ -40,14 +43,27 @@ public final class JasyptPasswordEncryptor implements PasswordEncryptor, Seriali
    private final int    iterations;
    private final int    saltSizeBytes;
 
+   /**
+    * Creates a password encryptor that uses the Jasypt digester for password hashing with the following default
+    * parameters (algorithm: {@value DEFAULT_ALGORITHM}; iterations: {@value DEFAULT_ITERATIONS};
+    * saltSizeBytes: {@value DEFAULT_SALT_SIZE_BYTES})
+    *
+    * @return a {@link JasyptPasswordEncryptor} instance.
+    */
    public static JasyptPasswordEncryptor getPasswordEncryptor() {
       return getPasswordEncryptor(DEFAULT_ALGORITHM, DEFAULT_ITERATIONS, DEFAULT_SALT_SIZE_BYTES);
    }
 
-   public static JasyptPasswordEncryptor getPasswordEncryptor(String encryptAlgorithm,
-                                                              int encryptIterations,
-                                                              int encryptSaltSizeBytes) {
-      return new JasyptPasswordEncryptor(encryptAlgorithm, encryptIterations, encryptSaltSizeBytes);
+   /**
+    * Creates a password encryptor that uses the Jasypt digester for password hashing with the specified values for
+    * algorithm, iterations and saltSizeBytes.
+    *
+    * @return a {@link JasyptPasswordEncryptor} instance.
+    */
+   public static JasyptPasswordEncryptor getPasswordEncryptor(String algorithm,
+                                                              int iterations,
+                                                              int saltSizeBytes) {
+      return new JasyptPasswordEncryptor(algorithm, iterations, saltSizeBytes);
    }
 
    private JasyptPasswordEncryptor(String algorithm, int iterations, int saltSizeBytes) {
