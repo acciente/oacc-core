@@ -13,6 +13,7 @@
 
     <properties>
         <!-- Dependency versions -->
+        <bcprov-jdk15on.version>1.56</bcprov-jdk15on.version>
         <jasypt.version>1.9.2</jasypt.version>
         <junit.version>4.11</junit.version>
         <hamcrest-core.version>1.3</hamcrest-core.version>
@@ -40,6 +41,11 @@
     <!-- dependencies -->
     <dependencies>
         <!-- compile time -->
+        <dependency>
+            <groupId>org.bouncycastle</groupId>
+            <artifactId>bcprov-jdk15on</artifactId>
+            <version>${bcprov-jdk15on.version}</version>
+        </dependency>
         <dependency>
             <groupId>org.jasypt</groupId>
             <artifactId>jasypt</artifactId>

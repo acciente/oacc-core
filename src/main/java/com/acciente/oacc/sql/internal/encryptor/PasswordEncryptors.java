@@ -18,6 +18,7 @@
 package com.acciente.oacc.sql.internal.encryptor;
 
 import com.acciente.oacc.encryptor.PasswordEncryptor;
+import com.acciente.oacc.encryptor.bcrypt.BCryptPasswordEncryptor;
 import com.acciente.oacc.encryptor.jasypt.JasyptPasswordEncryptor;
 
 import java.util.Arrays;
@@ -34,6 +35,10 @@ public class PasswordEncryptors {
          throw new IllegalArgumentException("Encryptor name cannot be null");
       }
 
+      if (encryptorName.equalsIgnoreCase(BCryptPasswordEncryptor.NAME)) {
+         return BCryptPasswordEncryptor.getPasswordEncryptor();
+      }
+
       if (encryptorName.equalsIgnoreCase(JasyptPasswordEncryptor.NAME)) {
          return JasyptPasswordEncryptor.getPasswordEncryptor();
       }
@@ -42,6 +47,6 @@ public class PasswordEncryptors {
    }
 
    public static List<String> getSupportedEncryptorNames() {
-      return Arrays.asList(JasyptPasswordEncryptor.NAME);
+      return Arrays.asList(BCryptPasswordEncryptor.NAME, JasyptPasswordEncryptor.NAME);
    }
 }

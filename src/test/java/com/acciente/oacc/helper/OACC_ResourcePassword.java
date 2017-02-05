@@ -20,7 +20,6 @@ package com.acciente.oacc.helper;
 import com.acciente.oacc.Resources;
 import com.acciente.oacc.encryptor.PasswordEncryptor;
 import com.acciente.oacc.sql.internal.PasswordUtils;
-import com.acciente.oacc.encryptor.jasypt.JasyptPasswordEncryptor;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -33,7 +32,7 @@ public class OACC_ResourcePassword extends DbBase {
 
    private final char[] password_plaintext;
 
-   private static final PasswordEncryptor __passwordEncryptor = JasyptPasswordEncryptor.getPasswordEncryptor();
+   private static final PasswordEncryptor __passwordEncryptor = TestConfigLoader.getPasswordEncryptor();
 
    OACC_ResourcePassword(Builder builder) {
       resourceID = builder.resourceID;

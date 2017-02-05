@@ -22,7 +22,6 @@ import com.acciente.oacc.sql.SQLAccessControlContextFactory;
 import com.acciente.oacc.sql.SQLDialect;
 import com.acciente.oacc.sql.SQLProfile;
 import com.acciente.oacc.sql.internal.SQLPasswordAuthenticationProvider;
-import com.acciente.oacc.encryptor.jasypt.JasyptPasswordEncryptor;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -39,8 +38,8 @@ import static org.junit.Assert.fail;
 
 public class TestAccessControl_customAuthenticationProvider extends TestAccessControlBase {
 
-   public static final char[] GUEST_PASSWORD = "9UE5T".toCharArray();
-   public static final char[] ADMIN_PASSWORD = "... . -.-. .-. . -".toCharArray();
+   private static final char[] GUEST_PASSWORD = "9UE5T".toCharArray();
+   private static final char[] ADMIN_PASSWORD = "... . -.-. .-. . -".toCharArray();
    private static AccessControlContext customAccessControlContext;
    private static Resource             guestResource;
    private static Resource             adminResource;
@@ -180,13 +179,13 @@ public class TestAccessControl_customAuthenticationProvider extends TestAccessCo
       protected CustomAuthenticationProvider(Connection connection,
                                              String schemaName,
                                              SQLDialect sqlDialect) {
-         super(connection, schemaName, sqlDialect, JasyptPasswordEncryptor.getPasswordEncryptor());
+         super(connection, schemaName, sqlDialect, TestConfigLoader.getPasswordEncryptor());
       }
 
       protected CustomAuthenticationProvider(DataSource dataSource,
                                              String schemaName,
                                              SQLDialect sqlDialect) {
-         super(dataSource, schemaName, sqlDialect, JasyptPasswordEncryptor.getPasswordEncryptor());
+         super(dataSource, schemaName, sqlDialect, TestConfigLoader.getPasswordEncryptor());
       }
 
       @Override

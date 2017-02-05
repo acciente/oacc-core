@@ -17,26 +17,43 @@
  */
 package com.acciente.oacc.encryptor;
 
+import com.acciente.oacc.encryptor.bcrypt.BCryptPasswordEncryptor;
 import com.acciente.oacc.sql.SQLAccessControlContextFactory;
 import com.acciente.oacc.encryptor.jasypt.JasyptPasswordEncryptor;
+import com.acciente.oacc.sql.internal.SQLPasswordAuthenticationProvider;
 
 /**
  * This interface is used to configure the password encryption scheme used by the built-in authentication provider
- * ({@link com.acciente.oacc.sql.internal.SQLPasswordAuthenticationProvider}). In OACC v2.0.0-rc.7 and prior the
- * built-in authentication provider used Jasypt internally and did not allow other options. The factory methods in
- * {@link SQLAccessControlContextFactory} which use the built-in authentication provider now take an explicit parameter
- * that specifies an implementation of this interface.
+ * ({@link SQLPasswordAuthenticationProvider}). The goal is to enable using different password encryption algorthims
+ * with the built-in authentication provider.
+ * <p>
+ * In OACC v2.0.0-rc.7 and prior the built-in authentication provider used Jasypt internally and did not allow other
+ * options. The factory methods in {@link SQLAccessControlContextFactory} which use the built-in authentication
+ * provider now allow specifying an implementation of this interface.
  * <p><p>
  * The following password encryptor implementations are built-in:
  * <p>
- * {@link JasyptPasswordEncryptor} -- uses Jasypt use {@link JasyptPasswordEncryptor#getPasswordEncryptor()} to get
- * an instance.
- * <p><p>
+ * {@link JasyptPasswordEncryptor}: hashes passwords using a Jasypt digester.
+ * The following factory methods provide different configuration options (for details see method Javadocs):
+ * <ul>
+ * <li>{@link JasyptPasswordEncryptor#getPasswordEncryptor()}</li>
+ * <li>{@link JasyptPasswordEncryptor#getPasswordEncryptor(String encryptAlgorithm, int encryptIterations, int encryptSaltSizeBytes)}</li>
+ * </ul>
+ * <p>
  * Compatibility notes:
  * <p>
  * The {@link JasyptPasswordEncryptor} is designed to be fully compatible with existing OACC v2.0.0-rc.7 deployments.
  * This new Jasypt implementation writes a header prefix to new hashes that it creates, but supports checking passwords
  * on hashes that do not contain the header prefix.
+ * <p>
+ * <p>
+ * {@link BCryptPasswordEncryptor}: hashes passwords using an OpenBSD BCrypt implementation.
+ * The following factory methods provide different configuration options (for details see method Javadocs):
+ * <ul>
+ * <li>{@link BCryptPasswordEncryptor#getPasswordEncryptor()}</li>
+ * <li>{@link BCryptPasswordEncryptor#getPasswordEncryptorUsingCostFactor(int costFactor)}</li>
+ * <li>{@link BCryptPasswordEncryptor#getPasswordEncryptorUsingComputedCostFactor(int minComputeDurationInMillis)}</li>
+ * </ul>
  */
 public interface PasswordEncryptor {
    /**

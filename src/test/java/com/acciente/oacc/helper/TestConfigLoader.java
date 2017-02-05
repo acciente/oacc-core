@@ -18,8 +18,9 @@
 package com.acciente.oacc.helper;
 
 import com.acciente.oacc.encryptor.PasswordEncryptor;
+import com.acciente.oacc.encryptor.bcrypt.BCryptPasswordEncryptor;
+import com.acciente.oacc.encryptor.jasypt.JasyptPasswordEncryptor;
 import com.acciente.oacc.sql.SQLProfile;
-import com.acciente.oacc.sql.internal.encryptor.PasswordEncryptors;
 
 import javax.sql.DataSource;
 import java.io.InputStream;
@@ -90,11 +91,27 @@ public class TestConfigLoader {
             throw new RuntimeException("no " + PROP_PWD_ENCRYPTOR
                                              + " property specified in database configuration property file");
          }
-         passwordEncryptor = PasswordEncryptors.getPasswordEncryptor(pwdEncryptor);
+         passwordEncryptor = getPasswordEncryptor(pwdEncryptor);
       }
       catch (Exception e) {
          throw new RuntimeException(e);
       }
+   }
+
+   private static PasswordEncryptor getPasswordEncryptor(String encryptorName) {
+      if (encryptorName == null) {
+         throw new IllegalArgumentException("Encryptor name cannot be null");
+      }
+
+      if (encryptorName.equalsIgnoreCase(BCryptPasswordEncryptor.NAME)) {
+         return BCryptPasswordEncryptor.getPasswordEncryptorUsingCostFactor(4);
+      }
+
+      if (encryptorName.equalsIgnoreCase(JasyptPasswordEncryptor.NAME)) {
+         return JasyptPasswordEncryptor.getPasswordEncryptor();
+      }
+
+      throw new IllegalArgumentException("Encryptor name " + encryptorName + " not recognized");
    }
 
    private static void setDataSourceProperty(DataSource vendorSpecificDataSource,
