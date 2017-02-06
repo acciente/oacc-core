@@ -18,7 +18,7 @@
 
 package com.acciente.oacc.encryptor.bcrypt;
 
-import com.acciente.oacc.OaccException;
+import com.acciente.oacc.InvalidPasswordFormatException;
 import org.bouncycastle.crypto.generators.OpenBSDBCrypt;
 
 public class PasswordEncoderDecoder {
@@ -48,7 +48,7 @@ public class PasswordEncoderDecoder {
          return encodedPassword.substring(MARKER.length());
       }
       else {
-         throw new OaccException("Unexpected marker for BCrypt password: " + encodedPassword);
+         throw new InvalidPasswordFormatException("Unexpected marker for BCrypt password: " + encodedPassword);
       }
    }
 }

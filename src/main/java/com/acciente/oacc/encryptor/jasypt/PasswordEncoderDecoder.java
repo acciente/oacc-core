@@ -18,7 +18,7 @@
 
 package com.acciente.oacc.encryptor.jasypt;
 
-import com.acciente.oacc.OaccException;
+import com.acciente.oacc.InvalidPasswordFormatException;
 import org.jasypt.contrib.org.apache.commons.codec_1_3.binary.Base64;
 
 import java.nio.charset.StandardCharsets;
@@ -93,7 +93,7 @@ class PasswordEncoderDecoder {
          final String[] decodedPasswordArray = encodedPassword.substring(MARKER.length()).split(QUOTED_PARAM_DELIMITER);
 
          if (decodedPasswordArray.length != DECODED_PASSWORD_ARRAY_COUNT) {
-            throw new OaccException("Unexpected format for Jasypt password: " + encodedPassword);
+            throw new InvalidPasswordFormatException("Unexpected format for Jasypt password: " + encodedPassword);
          }
 
          final String algorithm;
@@ -107,7 +107,7 @@ class PasswordEncoderDecoder {
             saltSizeBytes = Integer.parseInt(decodedPasswordArray[DECODED_PASSWORD_ARRAY_SALT_SIZE_BYTES]);
          }
          catch (NumberFormatException e) {
-            throw new OaccException("Unexpected value in Jasypt password header for iterations and/or salt size: " + encodedPassword);
+            throw new InvalidPasswordFormatException("Unexpected value in Jasypt password header for iterations and/or salt size: " + encodedPassword);
          }
          digest = base64.decode(decodedPasswordArray[DECODED_PASSWORD_ARRAY_DIGEST].getBytes(StandardCharsets.US_ASCII));
 
