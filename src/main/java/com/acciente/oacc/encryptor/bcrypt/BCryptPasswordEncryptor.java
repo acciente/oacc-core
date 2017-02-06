@@ -43,6 +43,8 @@ public class BCryptPasswordEncryptor implements PasswordEncryptor, Serializable 
    private static final int DEFAULT_COMPUTED_COST_FACTOR_MIN                            = 10;
    private static final int DEFAULT_COMPUTED_COST_FACTOR_MIN_COMPUTE_DURATION_IN_MILLIS = 750;
 
+   private static final PasswordEncoderDecoder   passwordEncoderDecoder = new PasswordEncoderDecoder();
+
    private final int costFactor;
 
    /**
@@ -109,7 +111,9 @@ public class BCryptPasswordEncryptor implements PasswordEncryptor, Serializable 
          return null;
       }
 
-      return OpenBSDBCrypt.generate(plainPassword, gensalt(new SecureRandom()), costFactor /* log rounds */);
+      final String bcryptString = OpenBSDBCrypt.generate(plainPassword, gensalt(new SecureRandom()), costFactor /* log rounds */);
+
+      return passwordEncoderDecoder.encodePassword(bcryptString);
    }
 
    @Override
@@ -121,7 +125,9 @@ public class BCryptPasswordEncryptor implements PasswordEncryptor, Serializable 
          return false;
       }
 
-      return OpenBSDBCrypt.checkPassword(storedPassword, plainPassword);
+      final String bcryptString = passwordEncoderDecoder.decodePassword(storedPassword);
+
+      return OpenBSDBCrypt.checkPassword(bcryptString, plainPassword);
    }
 
    /**

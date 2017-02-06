@@ -25,6 +25,7 @@ import org.junit.Test;
 
 import java.security.SecureRandom;
 
+import static org.hamcrest.core.StringStartsWith.startsWith;
 import static org.junit.Assert.assertThat;
 
 public class BCryptPasswordEncryptorTest {
@@ -41,13 +42,22 @@ public class BCryptPasswordEncryptorTest {
    }
 
    @Test
-   public void encryptPassword() throws Exception {
+   public void encryptPasswordDifferentHashesForSamePassword() throws Exception {
       final char[] testPassword = "SomePasswordHere".toCharArray();
 
       final String encryptedPasswordPass1 = encryptor.encryptPassword(testPassword);
       final String encryptedPasswordPass2 = encryptor.encryptPassword(testPassword);
 
       assertThat(encryptedPasswordPass1, IsNot.not(IsEqual.equalTo(encryptedPasswordPass2)));
+   }
+
+   @Test
+   public void encryptPasswordHeaderMarkerPresent() throws Exception {
+      final char[] testPassword = "SomePasswordHere".toCharArray();
+
+      final String encryptedPasswordPass = encryptor.encryptPassword(testPassword);
+
+      assertThat(encryptedPasswordPass, startsWith(BCryptPasswordEncryptor.NAME + ":"));
    }
 
    @Test
