@@ -15,7 +15,7 @@ Thanks again - you rock!
 ### Contributing Code
 - For API changes, new features, elaborate enhancements or radical refactorings, please discuss on the [OACC mailing list](https://groups.google.com/forum/#!forum/oacc-users) first
 - When in doubt or for any questions, please ask on the [OACC mailing list](https://groups.google.com/forum/#!forum/oacc-users) before investing a lot of your time
-- You will need to fill out the Contributor's License Agreement (CLA) before we can accept and merge your code contribution(s)
+- You will need to fill out the [Acciente Contributor's License Agreement (CLA)](https://github.com/acciente/acciente-cla) before we can accept and merge your code contribution(s)
 - In general, please make sure to:
     + add a test for any new feature/enhancement
     + run the test suite for any changes
