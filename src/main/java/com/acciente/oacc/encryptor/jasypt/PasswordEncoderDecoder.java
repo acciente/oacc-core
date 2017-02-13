@@ -92,7 +92,8 @@ class PasswordEncoderDecoder {
          final String[] decodedPasswordArray = encodedPassword.substring(MARKER.length()).split(QUOTED_PARAM_DELIMITER);
 
          if (decodedPasswordArray.length != DECODED_PASSWORD_ARRAY_COUNT) {
-            throw new IllegalArgumentException("Unexpected format for Jasypt password: " + encodedPassword);
+            throw new IllegalArgumentException("Unexpected format for Jasypt password: " +
+                                                     encodedPassword.substring(0, MARKER.length()));
          }
 
          final String algorithm;

@@ -24,7 +24,9 @@ import org.junit.Test;
 import java.nio.charset.StandardCharsets;
 
 import static org.hamcrest.core.Is.is;
+import static org.hamcrest.core.StringEndsWith.endsWith;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.fail;
 
 public class PasswordEncoderDecoderTest {
    private final PasswordEncoderDecoder encoderDecoder = new PasswordEncoderDecoder();
@@ -46,6 +48,8 @@ public class PasswordEncoderDecoderTest {
 
    private static final String ENCODED_LEGACY_PASSWORD =
          new String(base64.encode(DECODED_PASSWORD_DIGEST), StandardCharsets.US_ASCII);
+
+   private static final String ENCODED_INVALID_PASSWORD = "jasypt:(the-content-in-parens-does-not-matter)";
 
    private static final String DECODED_LEGACY_PASSWORD_ALGORITHM       = "SHA-256";
    private static final int    DECODED_LEGACY_PASSWORD_ITERATIONS      = 100000;
@@ -78,5 +82,16 @@ public class PasswordEncoderDecoderTest {
       assertThat(decodedPassword.getIterations(), is(DECODED_LEGACY_PASSWORD_ITERATIONS));
       assertThat(decodedPassword.getSaltSizeBytes(), is(DECODED_LEGACY_PASSWORD_SALT_SIZE_BYTES));
       assertThat(decodedPassword.getDigest(), is(DECODED_PASSWORD_DIGEST));
+   }
+
+   @Test
+   public void decodePasswordCheckExceptionDoesNotContainFullEncodedPassword() throws Exception {
+      try {
+         encoderDecoder.decode(ENCODED_INVALID_PASSWORD);
+         fail("Expected IllegalArgumentException, but not thrown");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage(), endsWith(ENCODED_INVALID_PASSWORD.substring(0, MARKER.length())));
+      }
    }
 }

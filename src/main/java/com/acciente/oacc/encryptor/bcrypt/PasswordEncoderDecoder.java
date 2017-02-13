@@ -47,7 +47,8 @@ public class PasswordEncoderDecoder {
          return encodedPassword.substring(MARKER.length());
       }
       else {
-         throw new IllegalArgumentException("Unexpected marker for BCrypt password: " + encodedPassword);
+         throw new IllegalArgumentException("Unexpected marker for BCrypt password: " +
+                                                  encodedPassword.substring(0, MARKER.length()));
       }
    }
 }

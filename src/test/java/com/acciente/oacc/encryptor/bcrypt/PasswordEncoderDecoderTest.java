@@ -21,12 +21,15 @@ package com.acciente.oacc.encryptor.bcrypt;
 import org.junit.Test;
 
 import static org.hamcrest.core.Is.is;
+import static org.hamcrest.core.StringEndsWith.endsWith;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.fail;
 
 public class PasswordEncoderDecoderTest {
-   private static final String MARKER    = "bcrypt:";
-   private static final String BCRYPT_STRING = "$2a$12$HfshGe6U0YWGy0ylODEFx.aOIq44QupzArT1LYuAwffwLqHAhGZIW";
-   private static final String ENCODED_PASSWORD = MARKER + BCRYPT_STRING;
+   private static final String MARKER                   = "bcrypt:";
+   private static final String BCRYPT_STRING            = "$2a$12$HfshGe6U0YWGy0ylODEFx.aOIq44QupzArT1LYuAwffwLqHAhGZIW";
+   private static final String ENCODED_PASSWORD         = MARKER + BCRYPT_STRING;
+   private static final String ENCODED_INVALID_PASSWORD = "jasypt:(the-content-in-parens-does-not-matter)";
 
    private final PasswordEncoderDecoder encoderDecoder = new PasswordEncoderDecoder();
 
@@ -42,5 +45,16 @@ public class PasswordEncoderDecoderTest {
       final String bcryptString = encoderDecoder.decode(ENCODED_PASSWORD);
 
       assertThat(bcryptString, is(BCRYPT_STRING));
+   }
+
+   @Test
+   public void decodePasswordCheckExceptionDoesNotContainFullEncodedPassword() throws Exception {
+      try {
+         encoderDecoder.decode(ENCODED_INVALID_PASSWORD);
+         fail("Expected IllegalArgumentException, but not thrown");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage(), endsWith(ENCODED_INVALID_PASSWORD.substring(0, MARKER.length())));
+      }
    }
 }
