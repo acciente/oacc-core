@@ -18,7 +18,6 @@
 
 package com.acciente.oacc.encryptor.bcrypt;
 
-import com.acciente.oacc.InvalidPasswordFormatException;
 import org.bouncycastle.crypto.generators.OpenBSDBCrypt;
 
 public class PasswordEncoderDecoder {
@@ -32,7 +31,7 @@ public class PasswordEncoderDecoder {
     *                     {@link OpenBSDBCrypt#generate(char[], byte[], int)}.
     * @return a fully-encoded password ready for persistent storage.
     */
-   String encodePassword(String bcryptString) {
+   String encode(String bcryptString) {
       return MARKER + bcryptString;
 
    }
@@ -40,15 +39,15 @@ public class PasswordEncoderDecoder {
    /**
     * Decodes the encoded BCrypt string (OpenBSD standard BCrypt hash implementation) from an encoded password.
     *
-    * @param encodedPassword an encoded password that was previously returned by {{@link #encodePassword(String)}}.
+    * @param encodedPassword an encoded password that was previously returned by {{@link #encode(String)}}.
     * @return a BCrypt string (OpenBSD standard BCrypt hashing implementation).
     */
-   String decodePassword(String encodedPassword) {
+   String decode(String encodedPassword) {
       if (encodedPassword.startsWith(MARKER)) {
          return encodedPassword.substring(MARKER.length());
       }
       else {
-         throw new InvalidPasswordFormatException("Unexpected marker for BCrypt password: " + encodedPassword);
+         throw new IllegalArgumentException("Unexpected marker for BCrypt password: " + encodedPassword);
       }
    }
 }

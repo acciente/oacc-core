@@ -18,7 +18,6 @@
 
 package com.acciente.oacc.encryptor.bcrypt;
 
-import com.acciente.oacc.OaccException;
 import com.acciente.oacc.encryptor.PasswordEncryptor;
 import org.bouncycastle.crypto.generators.OpenBSDBCrypt;
 
@@ -43,7 +42,7 @@ public class BCryptPasswordEncryptor implements PasswordEncryptor, Serializable 
    private static final int DEFAULT_COMPUTED_COST_FACTOR_MIN                            = 10;
    private static final int DEFAULT_COMPUTED_COST_FACTOR_MIN_COMPUTE_DURATION_IN_MILLIS = 750;
 
-   private static final PasswordEncoderDecoder   passwordEncoderDecoder = new PasswordEncoderDecoder();
+   private static final PasswordEncoderDecoder passwordEncoderDecoder = new PasswordEncoderDecoder();
 
    private final int costFactor;
 
@@ -113,7 +112,7 @@ public class BCryptPasswordEncryptor implements PasswordEncryptor, Serializable 
 
       final String bcryptString = OpenBSDBCrypt.generate(plainPassword, gensalt(new SecureRandom()), costFactor /* log rounds */);
 
-      return passwordEncoderDecoder.encodePassword(bcryptString);
+      return passwordEncoderDecoder.encode(bcryptString);
    }
 
    @Override
@@ -125,7 +124,7 @@ public class BCryptPasswordEncryptor implements PasswordEncryptor, Serializable 
          return false;
       }
 
-      final String bcryptString = passwordEncoderDecoder.decodePassword(storedPassword);
+      final String bcryptString = passwordEncoderDecoder.decode(storedPassword);
 
       return OpenBSDBCrypt.checkPassword(bcryptString, plainPassword);
    }
@@ -162,8 +161,8 @@ public class BCryptPasswordEncryptor implements PasswordEncryptor, Serializable 
 
    private static void assertCostFactorValid(int computedCostFactorMin) {
       if (computedCostFactorMin < BCRYPT_COST_FACTOR_MIN || computedCostFactorMin > BCRYPT_COST_FACTOR_MAX) {
-         throw new OaccException("The cost factor must be between " + BCRYPT_COST_FACTOR_MIN + " and " +
-                                       BCRYPT_COST_FACTOR_MAX + " (inclusive)");
+         throw new IllegalArgumentException("The cost factor must be between " + BCRYPT_COST_FACTOR_MIN + " and " +
+                                                  BCRYPT_COST_FACTOR_MAX + " (inclusive)");
       }
    }
 }

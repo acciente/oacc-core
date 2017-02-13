@@ -83,7 +83,7 @@ public final class JasyptPasswordEncryptor implements PasswordEncryptor, Seriali
       final byte[] digest = digesterPool.getStandardByteDigester(algorithm, iterations, saltSizeBytes)
             .digest(getCleanedBytes(plainPassword));
 
-      return passwordEncoderDecoder.encodePassword(algorithm, iterations, saltSizeBytes, digest);
+      return passwordEncoderDecoder.encode(algorithm, iterations, saltSizeBytes, digest);
    }
 
    @Override
@@ -96,7 +96,7 @@ public final class JasyptPasswordEncryptor implements PasswordEncryptor, Seriali
          return false;
       }
 
-      final DecodedPassword decodedPassword = passwordEncoderDecoder.decodePassword(storedPassword);
+      final DecodedPassword decodedPassword = passwordEncoderDecoder.decode(storedPassword);
       return digesterPool.getStandardByteDigester(decodedPassword.getAlgorithm(),
                                                   decodedPassword.getIterations(),
                                                   decodedPassword.getSaltSizeBytes())

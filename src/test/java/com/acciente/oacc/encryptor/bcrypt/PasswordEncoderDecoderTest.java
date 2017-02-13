@@ -24,7 +24,7 @@ import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 
 public class PasswordEncoderDecoderTest {
-   private static final String MARKER    = "jasypt:";
+   private static final String MARKER    = "bcrypt:";
    private static final String BCRYPT_STRING = "$2a$12$HfshGe6U0YWGy0ylODEFx.aOIq44QupzArT1LYuAwffwLqHAhGZIW";
    private static final String ENCODED_PASSWORD = MARKER + BCRYPT_STRING;
 
@@ -32,14 +32,14 @@ public class PasswordEncoderDecoderTest {
 
    @Test
    public void encodePassword() throws Exception {
-      final String encodedPassword = encoderDecoder.encodePassword(BCRYPT_STRING);
+      final String encodedPassword = encoderDecoder.encode(BCRYPT_STRING);
 
       assertThat(encodedPassword, is(ENCODED_PASSWORD));
    }
 
    @Test
    public void decodePassword() throws Exception {
-      final String bcryptString = encoderDecoder.decodePassword(ENCODED_PASSWORD);
+      final String bcryptString = encoderDecoder.decode(ENCODED_PASSWORD);
 
       assertThat(bcryptString, is(BCRYPT_STRING));
    }

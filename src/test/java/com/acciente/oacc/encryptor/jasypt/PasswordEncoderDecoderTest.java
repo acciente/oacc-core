@@ -53,16 +53,16 @@ public class PasswordEncoderDecoderTest {
 
    @Test
    public void testEncodePassword() throws Exception {
-      final String encodedPassword = encoderDecoder.encodePassword(DECODED_PASSWORD_ALGORITHM,
-                                                                   DECODED_PASSWORD_ITERATIONS,
-                                                                   DECODED_PASSWORD_SALT_SIZE_BYTES,
-                                                                   DECODED_PASSWORD_DIGEST);
+      final String encodedPassword = encoderDecoder.encode(DECODED_PASSWORD_ALGORITHM,
+                                                           DECODED_PASSWORD_ITERATIONS,
+                                                           DECODED_PASSWORD_SALT_SIZE_BYTES,
+                                                           DECODED_PASSWORD_DIGEST);
       assertThat(encodedPassword, is(ENCODED_PASSWORD));
    }
 
    @Test
    public void testDecodePassword() throws Exception {
-      final DecodedPassword decodedPassword = encoderDecoder.decodePassword(ENCODED_PASSWORD);
+      final DecodedPassword decodedPassword = encoderDecoder.decode(ENCODED_PASSWORD);
 
       assertThat(decodedPassword.getAlgorithm(), is(DECODED_PASSWORD_ALGORITHM));
       assertThat(decodedPassword.getIterations(), is(DECODED_PASSWORD_ITERATIONS));
@@ -72,7 +72,7 @@ public class PasswordEncoderDecoderTest {
 
    @Test
    public void testDecodeLegacyPassword() throws Exception {
-      final DecodedPassword decodedPassword = encoderDecoder.decodePassword(ENCODED_LEGACY_PASSWORD);
+      final DecodedPassword decodedPassword = encoderDecoder.decode(ENCODED_LEGACY_PASSWORD);
 
       assertThat(decodedPassword.getAlgorithm(), is(DECODED_LEGACY_PASSWORD_ALGORITHM));
       assertThat(decodedPassword.getIterations(), is(DECODED_LEGACY_PASSWORD_ITERATIONS));

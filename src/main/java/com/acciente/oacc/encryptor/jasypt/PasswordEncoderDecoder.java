@@ -18,7 +18,6 @@
 
 package com.acciente.oacc.encryptor.jasypt;
 
-import com.acciente.oacc.InvalidPasswordFormatException;
 import org.jasypt.contrib.org.apache.commons.codec_1_3.binary.Base64;
 
 import java.nio.charset.StandardCharsets;
@@ -59,10 +58,10 @@ class PasswordEncoderDecoder {
     * @param digest        the digest itself.
     * @return a fully-encoded password ready for persistent storage.
     */
-   String encodePassword(String algorithm,
-                         int iterations,
-                         int saltSizeBytes,
-                         byte[] digest) {
+   String encode(String algorithm,
+                 int iterations,
+                 int saltSizeBytes,
+                 byte[] digest) {
       // setup array of values to encode -- to help ensure same param sequence in encode and decode logic
       final Object[] decodedPasswordArray = new Object[DECODED_PASSWORD_ARRAY_COUNT];
       decodedPasswordArray[DECODED_PASSWORD_ARRAY_ALGORITHM] = algorithm;
@@ -85,15 +84,15 @@ class PasswordEncoderDecoder {
     * Decodes a previously encoded Jasypt password into its constituent parts (algorithm, iterations, salt size, digest).
     *
     * @param encodedPassword an encoded password that was previously returned by
-    *                        {{@link #encodePassword(String, int, int, byte[])}}.
+    *                        {{@link #encode(String, int, int, byte[])}}.
     * @return an object containing the decoded parts of the password (algorithm, iterations, salt size, digest).
     */
-   DecodedPassword decodePassword(String encodedPassword) {
+   DecodedPassword decode(String encodedPassword) {
       if (encodedPassword.startsWith(MARKER)) {
          final String[] decodedPasswordArray = encodedPassword.substring(MARKER.length()).split(QUOTED_PARAM_DELIMITER);
 
          if (decodedPasswordArray.length != DECODED_PASSWORD_ARRAY_COUNT) {
-            throw new InvalidPasswordFormatException("Unexpected format for Jasypt password: " + encodedPassword);
+            throw new IllegalArgumentException("Unexpected format for Jasypt password: " + encodedPassword);
          }
 
          final String algorithm;
@@ -107,7 +106,7 @@ class PasswordEncoderDecoder {
             saltSizeBytes = Integer.parseInt(decodedPasswordArray[DECODED_PASSWORD_ARRAY_SALT_SIZE_BYTES]);
          }
          catch (NumberFormatException e) {
-            throw new InvalidPasswordFormatException("Unexpected value in Jasypt password header for iterations and/or salt size: " + encodedPassword);
+            throw new IllegalArgumentException("Unexpected value in Jasypt password header for iterations and/or salt size: " + encodedPassword);
          }
          digest = base64.decode(decodedPasswordArray[DECODED_PASSWORD_ARRAY_DIGEST].getBytes(StandardCharsets.US_ASCII));
 

@@ -24,7 +24,7 @@ import com.acciente.oacc.sql.internal.SQLPasswordAuthenticationProvider;
 
 /**
  * This interface is used to configure the password encryption scheme used by the built-in authentication provider
- * ({@link SQLPasswordAuthenticationProvider}). The goal is to enable using different password encryption algorthims
+ * ({@link SQLPasswordAuthenticationProvider}). The goal is to enable using different password encryption algorithms
  * with the built-in authentication provider.
  * <p>
  * In OACC v2.0.0-rc.7 and prior the built-in authentication provider used Jasypt internally and did not allow other
