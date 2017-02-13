@@ -18,13 +18,13 @@
 
 package com.acciente.oacc.encryptor.bcrypt;
 
-import org.hamcrest.core.Is;
-import org.hamcrest.core.IsEqual;
-import org.hamcrest.core.IsNot;
 import org.junit.Test;
 
 import java.security.SecureRandom;
 
+import static org.hamcrest.core.Is.is;
+import static org.hamcrest.core.IsEqual.equalTo;
+import static org.hamcrest.core.IsNot.not;
 import static org.hamcrest.core.StringStartsWith.startsWith;
 import static org.junit.Assert.assertThat;
 
@@ -38,7 +38,7 @@ public class BCryptPasswordEncryptorTest {
       final byte[] salt1 = encryptor.gensalt(secureRandom);
       final byte[] salt2 = encryptor.gensalt(secureRandom);
 
-      assertThat(salt1, IsNot.not(IsEqual.equalTo(salt2)));
+      assertThat(salt1, not(equalTo(salt2)));
    }
 
    @Test
@@ -48,7 +48,7 @@ public class BCryptPasswordEncryptorTest {
       final String encryptedPasswordPass1 = encryptor.encryptPassword(testPassword);
       final String encryptedPasswordPass2 = encryptor.encryptPassword(testPassword);
 
-      assertThat(encryptedPasswordPass1, IsNot.not(IsEqual.equalTo(encryptedPasswordPass2)));
+      assertThat(encryptedPasswordPass1, not(equalTo(encryptedPasswordPass2)));
    }
 
    @Test
@@ -66,6 +66,6 @@ public class BCryptPasswordEncryptorTest {
 
       final String encryptedPasswordPass1 = encryptor.encryptPassword(testPassword);
 
-      assertThat(encryptor.checkPassword(testPassword, encryptedPasswordPass1), Is.is(true));
+      assertThat(encryptor.checkPassword(testPassword, encryptedPasswordPass1), is(true));
    }
 }

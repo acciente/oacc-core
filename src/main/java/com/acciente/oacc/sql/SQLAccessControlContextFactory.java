@@ -44,16 +44,14 @@ public class SQLAccessControlContextFactory {
     * @param schemaName the name of the schema in the database containing the OACC tables
     * @param sqlProfile the database provider and dialect of SQL supported for the database server associated
     *                   with the connection provided
-    * @return and {@link AccessControlContext} instance ready to receive API calls
-    * @deprecated as of OACC v2.0.0-rc8 this factory method exists simply to not break compilation of
-    * pre-existing code using this method. This method is being deprecated since it implicitly selects the Jasypt
-    * password encryptor with default parameters -- exactly as this method did prior to OACC v2.0.0-rc8. It is
-    * recommended that usages of this method be replaced with the following equivalent call that explicitly indicates
-    * the password encryption scheme in use:
-    * <p>
-    * {@link #getAccessControlContext(Connection, String, SQLProfile, PasswordEncryptor)}
-    * <p>
-    * where the password encryptor parameter is set to be {@link JasyptPasswordEncryptor#getPasswordEncryptor()}.
+    * @return an {@link AccessControlContext} instance ready to receive API calls
+    * @deprecated as of OACC v2.0.0-rc8, replaced by
+    * {@link #getAccessControlContext(Connection, String, SQLProfile, PasswordEncryptor)} where the password encryptor
+    * parameter is set as {@link JasyptPasswordEncryptor#getPasswordEncryptor()}.
+    * This factory method exists to not break compilation of pre-existing code using this method. This method is
+    * being deprecated since it implicitly selects the Jasypt password encryptor with default parameters (exactly as
+    * this method did prior to OACC v2.0.0-rc8). It is recommended that usages of this method be replaced with
+    * above indicated equivalent call that explicitly indicates the password encryption scheme in use.
     */
    @Deprecated
    public static AccessControlContext getAccessControlContext(Connection connection,
@@ -75,20 +73,18 @@ public class SQLAccessControlContextFactory {
     * only be used when all existing resource passwords were encrypted using Jasypt. This method is deprecated, please
     * see the deprecation note below.
     *
-    * @param dataSource        a database data source with access to the required OACC tables
+    * @param dataSource a database data source with access to the required OACC tables
     * @param schemaName the name of the schema in the database containing the OACC tables
     * @param sqlProfile the database provider and dialect of SQL supported for the database server associated
     *                   with the connection provided
-    * @return and {@link AccessControlContext} instance ready to receive API calls
-    * @deprecated as of OACC v2.0.0-rc8 this factory method exists simply to not break compilation of
-    * pre-existing code using this method. This method is being deprecated since it implicitly selects the Jasypt
-    * password encryptor with default parameters -- exactly as this method did prior to OACC v2.0.0-rc8. It is
-    * recommended that usages of this method be replaced with the following equivalent call that explicitly indicates
-    * the password encryption scheme in use:
-    * <p>
-    * {@link #getAccessControlContext(DataSource, String, SQLProfile, PasswordEncryptor)}
-    * <p>
-    * where the password encryptor parameter is set to be {@link JasyptPasswordEncryptor#getPasswordEncryptor()}.
+    * @return an {@link AccessControlContext} instance ready to receive API calls
+    * @deprecated as of OACC v2.0.0-rc8, replaced by
+    * {@link #getAccessControlContext(DataSource, String, SQLProfile, PasswordEncryptor)} where the password encryptor
+    * parameter is set as {@link JasyptPasswordEncryptor#getPasswordEncryptor()}.
+    * This factory method exists to not break compilation of pre-existing code using this method. This method is
+    * being deprecated since it implicitly selects the Jasypt password encryptor with default parameters (exactly as
+    * this method did prior to OACC v2.0.0-rc8). It is recommended that usages of this method be replaced with
+    * above indicated equivalent call that explicitly indicates the password encryption scheme in use.
     */
    @Deprecated
    public static AccessControlContext getAccessControlContext(DataSource dataSource,
@@ -115,7 +111,7 @@ public class SQLAccessControlContextFactory {
     *                          with the connection provided
     * @param passwordEncryptor a {@link PasswordEncryptor} instance to which the built-in authentication provider
     *                          delegates all password encryption and decryption
-    * @return and {@link AccessControlContext} instance ready to receive API calls
+    * @return an {@link AccessControlContext} instance ready to receive API calls
     */
    public static AccessControlContext getAccessControlContext(Connection connection,
                                                               String schemaName,
@@ -142,7 +138,7 @@ public class SQLAccessControlContextFactory {
     *                          with the data source provided
     * @param passwordEncryptor a {@link PasswordEncryptor} instance to which the built-in authentication provider
     *                          delegates all password encryption and decryption
-    * @return and {@link AccessControlContext} instance ready to receive API calls
+    * @return an {@link AccessControlContext} instance ready to receive API calls
     */
    public static AccessControlContext getAccessControlContext(DataSource dataSource,
                                                               String schemaName,
@@ -167,7 +163,7 @@ public class SQLAccessControlContextFactory {
     *                               with the connection provided
     * @param authenticationProvider an {@link AuthenticationProvider} instance to which all resource authentication is
     *                               delegated
-    * @return and {@link AccessControlContext} instance ready to receive API calls
+    * @return an {@link AccessControlContext} instance ready to receive API calls
     */
    public static AccessControlContext getAccessControlContext(Connection connection,
                                                               String schemaName,
@@ -192,7 +188,7 @@ public class SQLAccessControlContextFactory {
     *                               with the connection provided
     * @param authenticationProvider an {@link AuthenticationProvider} instance to which all resource authentication is
     *                               delegated
-    * @return and {@link AccessControlContext} instance ready to receive API calls
+    * @return an {@link AccessControlContext} instance ready to receive API calls
     */
    public static AccessControlContext getAccessControlContext(DataSource dataSource,
                                                               String schemaName,
