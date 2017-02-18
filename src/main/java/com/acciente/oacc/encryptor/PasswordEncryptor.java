@@ -54,6 +54,15 @@ import com.acciente.oacc.sql.internal.SQLPasswordAuthenticationProvider;
  * <li>{@link BCryptPasswordEncryptor#getPasswordEncryptorUsingCostFactor(int costFactor)}</li>
  * <li>{@link BCryptPasswordEncryptor#getPasswordEncryptorUsingComputedCostFactor(int minComputeDurationInMillis)}</li>
  * </ul>
+ * <p>
+ * <p>
+ * {@link TransitioningPasswordEncryptor}: provides a means to transition from an existing (aka "old") password
+ * encryptor to a new password encryptor in an environment where OACC is already deployed -- where existing passwords
+ * in the tables are encrypted using the old password encryptor. The following factory methods provide different
+ * configuration options (for details see method Javadocs):
+ * <ul>
+ * <li>{@link TransitioningPasswordEncryptor#getPasswordEncryptor(PasswordEncryptor, PasswordEncryptor)}</li>
+ * </ul>
  */
 public interface PasswordEncryptor {
    /**
