@@ -21,6 +21,7 @@ import com.acciente.oacc.AccessControlContext;
 import com.acciente.oacc.AuthenticationProvider;
 import com.acciente.oacc.encryptor.PasswordEncryptor;
 import com.acciente.oacc.encryptor.jasypt.JasyptPasswordEncryptor;
+import com.acciente.oacc.encryptor.jasypt.LegacyJasyptPasswordEncryptor;
 import com.acciente.oacc.sql.internal.SQLAccessControlContext;
 
 import javax.sql.DataSource;
@@ -36,7 +37,7 @@ public class SQLAccessControlContextFactory {
     * server for which the connection is provided is specified using the SQLProfile parameter. The access control
     * context returned by this method uses the built-in authentication provider that delegates all password encryption
     * and decryption to a {@link PasswordEncryptor} instance provided by
-    * {@link JasyptPasswordEncryptor#getPasswordEncryptor()} -- therefore the instance returned by this method should
+    * {@link LegacyJasyptPasswordEncryptor#getPasswordEncryptor()} -- therefore the instance returned by this method may
     * only be used when all existing resource passwords were encrypted using Jasypt. This method is deprecated, please
     * see the deprecation note below.
     *
@@ -47,11 +48,8 @@ public class SQLAccessControlContextFactory {
     * @return an {@link AccessControlContext} instance ready to receive API calls
     * @deprecated as of OACC v2.0.0-rc8, replaced by
     * {@link #getAccessControlContext(Connection, String, SQLProfile, PasswordEncryptor)} where the password encryptor
-    * parameter is set as {@link JasyptPasswordEncryptor#getPasswordEncryptor()}.
-    * This factory method exists to not break compilation of pre-existing code using this method. This method is
-    * being deprecated since it implicitly selects the Jasypt password encryptor with default parameters (exactly as
-    * this method did prior to OACC v2.0.0-rc8). It is recommended that usages of this method be replaced with
-    * above indicated equivalent call that explicitly indicates the password encryption scheme in use.
+    * parameter is to the new Jasypt password encryptor implementation
+    * {@link JasyptPasswordEncryptor#getPasswordEncryptor()}.
     */
    @Deprecated
    public static AccessControlContext getAccessControlContext(Connection connection,
@@ -60,7 +58,7 @@ public class SQLAccessControlContextFactory {
       return SQLAccessControlContext.getAccessControlContext(connection,
                                                              schemaName,
                                                              sqlProfile,
-                                                             JasyptPasswordEncryptor.getPasswordEncryptor());
+                                                             LegacyJasyptPasswordEncryptor.getPasswordEncryptor());
    }
 
    /**
@@ -69,7 +67,7 @@ public class SQLAccessControlContextFactory {
     * server for which the data source is provided is specified using the SQLProfile parameter. The access control
     * context returned by this method uses the built-in authentication provider that delegates all password encryption
     * and decryption to a {@link PasswordEncryptor} instance provided by
-    * {@link JasyptPasswordEncryptor#getPasswordEncryptor()} -- therefore the instance returned by this method should
+    * {@link LegacyJasyptPasswordEncryptor#getPasswordEncryptor()} -- therefore the instance returned by this method may
     * only be used when all existing resource passwords were encrypted using Jasypt. This method is deprecated, please
     * see the deprecation note below.
     *
@@ -80,11 +78,8 @@ public class SQLAccessControlContextFactory {
     * @return an {@link AccessControlContext} instance ready to receive API calls
     * @deprecated as of OACC v2.0.0-rc8, replaced by
     * {@link #getAccessControlContext(DataSource, String, SQLProfile, PasswordEncryptor)} where the password encryptor
-    * parameter is set as {@link JasyptPasswordEncryptor#getPasswordEncryptor()}.
-    * This factory method exists to not break compilation of pre-existing code using this method. This method is
-    * being deprecated since it implicitly selects the Jasypt password encryptor with default parameters (exactly as
-    * this method did prior to OACC v2.0.0-rc8). It is recommended that usages of this method be replaced with
-    * above indicated equivalent call that explicitly indicates the password encryption scheme in use.
+    * parameter is to the new Jasypt password encryptor implementation
+    * {@link JasyptPasswordEncryptor#getPasswordEncryptor()}.
     */
    @Deprecated
    public static AccessControlContext getAccessControlContext(DataSource dataSource,
@@ -93,7 +88,7 @@ public class SQLAccessControlContextFactory {
       return SQLAccessControlContext.getAccessControlContext(dataSource,
                                                              schemaName,
                                                              sqlProfile,
-                                                             JasyptPasswordEncryptor.getPasswordEncryptor());
+                                                             LegacyJasyptPasswordEncryptor.getPasswordEncryptor());
    }
 
    /**
