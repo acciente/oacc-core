@@ -33,11 +33,21 @@ public class SQLAccessControlSystemInitializer {
                                      String dbSchema,
                                      char[] oaccRootPwd,
                                      PasswordEncryptor passwordEncryptor) throws SQLException {
+      initializeOACC(connection, dbSchema, oaccRootPwd, passwordEncryptor, false);
+   }
+
+   public static void initializeOACC(Connection connection,
+                                     String dbSchema,
+                                     char[] oaccRootPwd,
+                                     PasswordEncryptor passwordEncryptor,
+                                     boolean isSilent) throws SQLException {
       SchemaNameValidator.assertValid(dbSchema);
 
       final String schemaNameAndTablePrefix = dbSchema != null ? dbSchema + ".OAC_" : "OAC_";
 
-      System.out.println("Checking database...needs empty tables");
+      if (!isSilent) {
+         System.out.println("Checking database...needs empty tables");
+      }
 
       PreparedStatement statement = null;
       ResultSet resultSet;
@@ -47,13 +57,17 @@ public class SQLAccessControlSystemInitializer {
          resultSet = statement.executeQuery();
 
          if (resultSet.next()) {
-            System.out.println("Cannot initialize, likely that this OACC is already initialized! (check: found a system domain)");
+            if (!isSilent) {
+               System.out.println("Cannot initialize, likely that this OACC is already initialized! (check: found a system domain)");
+            }
             resultSet.close();
             return;
          }
          statement.close();
 
-         System.out.println("Initializing database...assuming empty tables (will fail safely if tables have data)");
+         if (!isSilent) {
+            System.out.println("Initializing database...assuming empty tables (will fail safely if tables have data)");
+         }
 
          // create an initial domain to hold the system user
          statement = connection.prepareStatement("INSERT INTO " + schemaNameAndTablePrefix + "Domain( DomainId, DomainName ) VALUES ( 0, ? )");

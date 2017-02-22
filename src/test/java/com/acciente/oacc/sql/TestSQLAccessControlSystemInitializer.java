@@ -91,7 +91,8 @@ public class TestSQLAccessControlSystemInitializer {
 
    @Test
    public void initializeOACC() throws SQLException, InterruptedException {
-      SQLAccessControlSystemInitializer.initializeOACC(con, TestConfigLoader.getDatabaseSchema(),
+      SQLAccessControlSystemInitializer.initializeOACC(con,
+                                                       TestConfigLoader.getDatabaseSchema(),
                                                        TestConfigLoader.getOaccRootPassword(),
                                                        TestConfigLoader.getPasswordEncryptor());
       assertThatOACCIsInInitializedState();

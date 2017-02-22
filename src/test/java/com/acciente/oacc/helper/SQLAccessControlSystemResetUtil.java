@@ -36,7 +36,7 @@ public class SQLAccessControlSystemResetUtil {
                                 PasswordEncryptor passwordEncryptor)
          throws SQLException {
       deleteAllOACCData(connection, dbSchema);
-      SQLAccessControlSystemInitializer.initializeOACC(connection, dbSchema, oaccRootPwd, passwordEncryptor);
+      SQLAccessControlSystemInitializer.initializeOACC(connection, dbSchema, oaccRootPwd, passwordEncryptor, true);
    }
 
    public static void resetOACC(DataSource dataSource, String dbSchema, char[] oaccRootPwd,
@@ -44,7 +44,7 @@ public class SQLAccessControlSystemResetUtil {
          throws SQLException {
       try (Connection connection = dataSource.getConnection()) {
          deleteAllOACCData(connection, dbSchema);
-         SQLAccessControlSystemInitializer.initializeOACC(connection, dbSchema, oaccRootPwd, passwordEncryptor);
+         SQLAccessControlSystemInitializer.initializeOACC(connection, dbSchema, oaccRootPwd, passwordEncryptor, true);
       }
    }
 
