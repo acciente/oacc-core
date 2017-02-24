@@ -17,10 +17,11 @@
  */
 package com.acciente.oacc;
 
+import com.acciente.oacc.encryptor.jasypt.JasyptPasswordEncryptor;
+import com.acciente.oacc.encryptor.jasypt.LegacyJasyptPasswordEncryptor;
 import com.acciente.oacc.helper.SQLAccessControlSystemResetUtil;
 import com.acciente.oacc.helper.TestConfigLoader;
 import com.acciente.oacc.sql.SQLAccessControlContextFactory;
-import com.acciente.oacc.encryptor.jasypt.JasyptPasswordEncryptor;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -36,28 +37,28 @@ public class TestAccessControl_JasyptEncryptorIncludingBackwardsCompatibility {
 
    private AccessControlContext accessControlContextWithLegacyEncryptor;
    private AccessControlContext accessControlContextWithCurrentEncryptor;
-   private String resourceExternalId;
-   private String resourceClassName;
-   private String resourceDomainName;
-   private PasswordCredentials resourceCredentials;
+   private String               resourceExternalId;
+   private String               resourceClassName;
+   private String               resourceDomainName;
+   private PasswordCredentials  resourceCredentials;
 
    @Before
    public void setUpTest() throws Exception {
-      // uses the original built-in password encryptor code in OACC v2.00 rc7 (and before)
+      // uses the legacy built-in password encryptor code (from OACC v2.00 rc7 and before)
       {
-         final JasyptPasswordEncryptorFromOACCv2_00_rc7 jasyptPasswordEncryptorFromOACCv2_00_rc7 =
-               new JasyptPasswordEncryptorFromOACCv2_00_rc7();
+         final LegacyJasyptPasswordEncryptor legacyJasyptPasswordEncryptor =
+               LegacyJasyptPasswordEncryptor.getPasswordEncryptor();
 
          SQLAccessControlSystemResetUtil.resetOACC(TestConfigLoader.getDataSource(),
                                                    TestConfigLoader.getDatabaseSchema(),
                                                    TestConfigLoader.getOaccRootPassword(),
-                                                   jasyptPasswordEncryptorFromOACCv2_00_rc7);
+                                                   legacyJasyptPasswordEncryptor);
 
          systemAccessControlContextWithLegacyEncryptor
                = SQLAccessControlContextFactory.getAccessControlContext(TestConfigLoader.getDataSource(),
                                                                         TestConfigLoader.getDatabaseSchema(),
                                                                         TestConfigLoader.getSQLProfile(),
-                                                                        jasyptPasswordEncryptorFromOACCv2_00_rc7);
+                                                                        legacyJasyptPasswordEncryptor);
          systemAccessControlContextWithLegacyEncryptor.authenticate(SYS_RESOURCE,
                                                                     PasswordCredentials.newInstance(TestConfigLoader.getOaccRootPassword()));
 
@@ -65,7 +66,7 @@ public class TestAccessControl_JasyptEncryptorIncludingBackwardsCompatibility {
                = SQLAccessControlContextFactory.getAccessControlContext(TestConfigLoader.getDataSource(),
                                                                         TestConfigLoader.getDatabaseSchema(),
                                                                         TestConfigLoader.getSQLProfile(),
-                                                                        jasyptPasswordEncryptorFromOACCv2_00_rc7);
+                                                                        legacyJasyptPasswordEncryptor);
       }
 
       // this uses the latest Jasypt password encryptor code
