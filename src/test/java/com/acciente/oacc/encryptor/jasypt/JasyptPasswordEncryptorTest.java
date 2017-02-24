@@ -18,11 +18,11 @@
 
 package com.acciente.oacc.encryptor.jasypt;
 
-import org.hamcrest.core.Is;
-import org.hamcrest.core.IsEqual;
-import org.hamcrest.core.IsNot;
 import org.junit.Test;
 
+import static org.hamcrest.core.Is.is;
+import static org.hamcrest.core.IsEqual.equalTo;
+import static org.hamcrest.core.IsNot.not;
 import static org.hamcrest.core.StringStartsWith.startsWith;
 import static org.junit.Assert.assertThat;
 
@@ -36,7 +36,7 @@ public class JasyptPasswordEncryptorTest {
       final String encryptedPasswordPass1 = encryptor.encryptPassword(testPassword);
       final String encryptedPasswordPass2 = encryptor.encryptPassword(testPassword);
 
-      assertThat(encryptedPasswordPass1, IsNot.not(IsEqual.equalTo(encryptedPasswordPass2)));
+      assertThat(encryptedPasswordPass1, not(equalTo(encryptedPasswordPass2)));
    }
 
    @Test
@@ -54,6 +54,6 @@ public class JasyptPasswordEncryptorTest {
 
       final String encryptedPasswordPass1 = encryptor.encryptPassword(testPassword);
 
-      assertThat(encryptor.checkPassword(testPassword, encryptedPasswordPass1), Is.is(true));
+      assertThat(encryptor.checkPassword(testPassword, encryptedPasswordPass1), is(true));
    }
 }
