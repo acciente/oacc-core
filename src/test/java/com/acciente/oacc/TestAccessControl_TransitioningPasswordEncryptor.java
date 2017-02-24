@@ -104,10 +104,8 @@ public class TestAccessControl_TransitioningPasswordEncryptor {
                                                                                              resourceDomainName,
                                                                                              resourceExternalId,
                                                                                              resourceCredentials);
-      System.out.printf("created resource %s (using legacy encryptor)\n", resource);
 
       accessControlContextWithLegacyEncryptor.authenticate(resource, resourceCredentials);
-      System.out.printf("authenticated resource %s (using legacy encryptor)\n", resource);
    }
 
    @Test
@@ -116,10 +114,8 @@ public class TestAccessControl_TransitioningPasswordEncryptor {
                                                                                              resourceDomainName,
                                                                                              resourceExternalId,
                                                                                              resourceCredentials);
-      System.out.printf("created resource %s (using legacy encryptor)\n", resource);
 
       accessControlContextWithTransitioningEncryptor.authenticate(resource, resourceCredentials);
-      System.out.printf("authenticated resource %s (using new encryptor)\n", resource);
    }
 
    @Test
@@ -128,10 +124,8 @@ public class TestAccessControl_TransitioningPasswordEncryptor {
                                                                                                     resourceDomainName,
                                                                                                     resourceExternalId,
                                                                                                     resourceCredentials);
-      System.out.printf("created resource %s (using new encryptor)\n", resource);
 
       accessControlContextWithTransitioningEncryptor.authenticate(resource, resourceCredentials);
-      System.out.printf("authenticated resource %s (using new encryptor)\n", resource);
    }
 
    private String generateResourceClass(boolean authenticatable,
