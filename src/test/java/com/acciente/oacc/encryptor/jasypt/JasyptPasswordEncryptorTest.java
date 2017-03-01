@@ -23,11 +23,21 @@ import org.junit.Test;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsEqual.equalTo;
 import static org.hamcrest.core.IsNot.not;
+import static org.hamcrest.core.IsNull.nullValue;
 import static org.hamcrest.core.StringStartsWith.startsWith;
 import static org.junit.Assert.assertThat;
 
 public class JasyptPasswordEncryptorTest {
    private final JasyptPasswordEncryptor encryptor = JasyptPasswordEncryptor.getPasswordEncryptor();
+
+   @Test
+   public void encryptNullPassword() throws Exception {
+      final char[] testPassword = null;
+
+      final String encryptedPassword = encryptor.encryptPassword(testPassword);
+
+      assertThat(encryptedPassword, is(nullValue()));
+   }
 
    @Test
    public void encryptPasswordDifferentHashesForSamePassword() throws Exception {
@@ -46,6 +56,31 @@ public class JasyptPasswordEncryptorTest {
       final String encryptedPasswordPass = encryptor.encryptPassword(testPassword);
 
       assertThat(encryptedPasswordPass, startsWith(JasyptPasswordEncryptor.NAME + ":"));
+   }
+
+   @Test
+   public void checkNullPasswords() throws Exception {
+      final char[] testPassword = null;
+
+      final String encryptedPassword = encryptor.encryptPassword(testPassword);
+
+      assertThat(encryptor.checkPassword(testPassword, encryptedPassword), is(true));
+   }
+
+   @Test
+   public void checkNullPassword() throws Exception {
+      final char[] testPassword = "SomePasswordHere".toCharArray();;
+
+      final String encryptedPassword = encryptor.encryptPassword(testPassword);
+
+      assertThat(encryptor.checkPassword(null, encryptedPassword), is(false));
+   }
+
+   @Test
+   public void checkNullStoredPassword() throws Exception {
+      final char[] testPassword = "SomePasswordHere".toCharArray();;
+
+      assertThat(encryptor.checkPassword(testPassword, null), is(false));
    }
 
    @Test
