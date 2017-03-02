@@ -23,6 +23,7 @@ import org.bouncycastle.crypto.generators.OpenBSDBCrypt;
 
 import java.io.Serializable;
 import java.security.SecureRandom;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Password encryptor implementation that uses the OpenBSD BCrypt algorithm for creating password hashes.
@@ -149,11 +150,11 @@ public class BCryptPasswordEncryptor implements PasswordEncryptor, Serializable 
    private static int computeCostFactor(int minComputeDurationInMillis, int computedCostFactorMin) {
       final byte[] salt = gensalt(new SecureRandom());
       for (int costFactor = computedCostFactorMin; costFactor <= COMPUTED_COST_FACTOR_MAX; costFactor++) {
-         final long startTime = System.currentTimeMillis();
+         final long startTime = System.nanoTime();
          OpenBSDBCrypt.generate(COMPUTED_COST_FACTOR_BENCHMARK_PASSWORD, salt, costFactor);
-         final long duration = System.currentTimeMillis() - startTime;
+         final long durationInMillis = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - startTime);
 
-         if (duration >= minComputeDurationInMillis) {
+         if (durationInMillis >= minComputeDurationInMillis) {
             return costFactor;
          }
       }
