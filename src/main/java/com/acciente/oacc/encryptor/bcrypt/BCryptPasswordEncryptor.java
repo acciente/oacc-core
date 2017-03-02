@@ -65,6 +65,7 @@ public class BCryptPasswordEncryptor implements PasswordEncryptor, Serializable 
     * This method enforces a floor value of {@value DEFAULT_COMPUTED_COST_FACTOR_MIN} for the cost factor, in other words the
     * minimum cost factor used is {@value DEFAULT_COMPUTED_COST_FACTOR_MIN}.
     *
+    * @param minComputeDurationInMillis specifies the minimal duration in ms to encrypt a password with BCrypt.
     * @return a {@link BCryptPasswordEncryptor} instance configured as described above.
     */
    public static BCryptPasswordEncryptor getPasswordEncryptorUsingComputedCostFactor(int minComputeDurationInMillis) {
@@ -79,7 +80,11 @@ public class BCryptPasswordEncryptor implements PasswordEncryptor, Serializable 
     * {@code minComputeDurationInMillis} parameter, in other words the minimum cost factor used is  the duration
     * specified in the {@code minComputeDurationInMillis} parameter.
     *
+    * @param minComputeDurationInMillis the minimal duration in ms to encrypt a password with BCrypt.
+    * @param computedCostFactorMin      the minimal BCrypt cost factor to encrypt a password.
     * @return a {@link BCryptPasswordEncryptor} instance configured as described above.
+    * @throws IllegalArgumentException if the specified minimal BCrypt cost factor is not between
+    *                                  {@value BCRYPT_COST_FACTOR_MIN} and {@value BCRYPT_COST_FACTOR_MAX} (inclusive).
     */
    public static BCryptPasswordEncryptor getPasswordEncryptorUsingComputedCostFactor(int minComputeDurationInMillis,
                                                                                      int computedCostFactorMin) {
@@ -94,6 +99,8 @@ public class BCryptPasswordEncryptor implements PasswordEncryptor, Serializable 
     * @param costFactor the BCrypt cost factor, must be between {@value BCRYPT_COST_FACTOR_MIN} and
     *                   {@value BCRYPT_COST_FACTOR_MAX} (inclusive).
     * @return a {@link BCryptPasswordEncryptor} instance configured as described above.
+    * @throws IllegalArgumentException if the specified BCrypt cost factor is not between {@value BCRYPT_COST_FACTOR_MIN}
+    *                                  and {@value BCRYPT_COST_FACTOR_MAX} (inclusive).
     */
    public static BCryptPasswordEncryptor getPasswordEncryptorUsingCostFactor(int costFactor) {
       assertCostFactorValid(costFactor);
@@ -130,16 +137,16 @@ public class BCryptPasswordEncryptor implements PasswordEncryptor, Serializable 
    }
 
    /**
-    * Returns the cost factor in use by this instance. This intended to provide access to the cost factor when it was
+    * Returns the cost factor in use by this instance. This allows determining the cost factor when it was
     * internally computed and would be otherwise indeterminable.
     *
-    * @return an integer cost factor.
+    * @return the integer cost factor used by this instance.
     */
    public int getCostFactor() {
       return costFactor;
    }
 
-   static int computeCostFactor(int minComputeDurationInMillis, int computedCostFactorMin) {
+   private static int computeCostFactor(int minComputeDurationInMillis, int computedCostFactorMin) {
       final byte[] salt = gensalt(new SecureRandom());
       for (int costFactor = computedCostFactorMin; costFactor <= COMPUTED_COST_FACTOR_MAX; costFactor++) {
          final long startTime = System.currentTimeMillis();
@@ -153,7 +160,7 @@ public class BCryptPasswordEncryptor implements PasswordEncryptor, Serializable 
       return COMPUTED_COST_FACTOR_MAX;
    }
 
-   static byte[] gensalt(SecureRandom secureRandom) {
+   private static byte[] gensalt(SecureRandom secureRandom) {
       final byte[] saltBytes = new byte[BCRYPT_SALT_SIZE];
       secureRandom.nextBytes(saltBytes);
       return saltBytes;

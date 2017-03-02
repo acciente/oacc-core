@@ -20,25 +20,109 @@ package com.acciente.oacc.encryptor.bcrypt;
 
 import org.junit.Test;
 
-import java.security.SecureRandom;
+import java.util.concurrent.TimeUnit;
 
+import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsEqual.equalTo;
 import static org.hamcrest.core.IsNot.not;
+import static org.hamcrest.core.IsNull.nullValue;
 import static org.hamcrest.core.StringStartsWith.startsWith;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 public class BCryptPasswordEncryptorTest {
    private final BCryptPasswordEncryptor encryptor = BCryptPasswordEncryptor.getPasswordEncryptorUsingCostFactor(4);
 
    @Test
-   public void testGensalt() throws Exception {
-      final SecureRandom secureRandom = new SecureRandom();
+   public void getEncryptorDoesNotAcceptCostFactorBelowMin() throws Exception {
+      try {
+         BCryptPasswordEncryptor.getPasswordEncryptorUsingCostFactor(3);
+         fail("getting BCrypt password encryptor with cost factor below the minimum should fail");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("cost factor must be"));
+      }
+   }
 
-      final byte[] salt1 = encryptor.gensalt(secureRandom);
-      final byte[] salt2 = encryptor.gensalt(secureRandom);
+   @Test
+   public void getEncryptorDoesNotAcceptCostFactorAboveMax() throws Exception {
+      try {
+         BCryptPasswordEncryptor.getPasswordEncryptorUsingCostFactor(32);
+         fail("getting BCrypt password encryptor with cost factor above the maximum should fail");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("cost factor must be"));
+      }
+   }
 
-      assertThat(salt1, not(equalTo(salt2)));
+   @Test
+   public void getEncryptorUsesSpecifiedCostFactor() throws Exception {
+      final int costFactor = 5;
+      final BCryptPasswordEncryptor passwordEncryptor
+            = BCryptPasswordEncryptor.getPasswordEncryptorUsingCostFactor(costFactor);
+
+      assertThat(passwordEncryptor.getCostFactor(), is(costFactor));
+   }
+
+   @Test
+   public void getComputedEncryptorDoesNotAcceptCostFactorBelowMin() throws Exception {
+      try {
+         final int minComputeDuration = 100;
+         BCryptPasswordEncryptor.getPasswordEncryptorUsingComputedCostFactor(minComputeDuration, 3);
+         fail("getting BCrypt password encryptor with minimum computed cost factor below the minimum should fail");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("cost factor must be"));
+      }
+   }
+
+   @Test
+   public void getComputedEncryptorDoesNotAcceptCostFactorAboveMax() throws Exception {
+      try {
+         final int minComputeDuration = 100;
+         BCryptPasswordEncryptor.getPasswordEncryptorUsingComputedCostFactor(minComputeDuration, 32);
+         fail("getting BCrypt password encryptor with minimum computed cost factor above the maximum should fail");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("cost factor must be"));
+      }
+   }
+
+   @Test
+   public void getComputedEncryptorComputesCostFactor() throws Exception {
+      final int minComputeDuration = 100;
+      final int minCostFactor = 4;
+      final BCryptPasswordEncryptor passwordEncryptor
+            = BCryptPasswordEncryptor.getPasswordEncryptorUsingComputedCostFactor(minComputeDuration, minCostFactor);
+
+      assertTrue(passwordEncryptor.getCostFactor() > minCostFactor);
+   }
+
+   @Test
+   public void getComputedEncryptorRunsAtLeastForMinComputeDuration() throws Exception {
+      final int minComputeDurationInMs = 250;
+      final int minCostFactor = 4;
+      final BCryptPasswordEncryptor passwordEncryptor
+            = BCryptPasswordEncryptor.getPasswordEncryptorUsingComputedCostFactor(minComputeDurationInMs, minCostFactor);
+      final char[] password = "opensesame".toCharArray();
+
+      final long startTime = System.nanoTime();
+      passwordEncryptor.encryptPassword(password);
+      final long endTime = System.nanoTime();
+      final long durationInMs = TimeUnit.NANOSECONDS.toMillis(endTime - startTime);
+
+      assertTrue(durationInMs > minComputeDurationInMs);
+   }
+
+   @Test
+   public void encryptNullPassword() throws Exception {
+      final char[] testPassword = null;
+
+      final String encryptedPassword = encryptor.encryptPassword(testPassword);
+
+      assertThat(encryptedPassword, is(nullValue()));
    }
 
    @Test
@@ -58,6 +142,31 @@ public class BCryptPasswordEncryptorTest {
       final String encryptedPasswordPass = encryptor.encryptPassword(testPassword);
 
       assertThat(encryptedPasswordPass, startsWith(BCryptPasswordEncryptor.NAME + ":"));
+   }
+
+   @Test
+   public void checkNullPasswords() throws Exception {
+      final char[] testPassword = null;
+
+      final String encryptedPassword = encryptor.encryptPassword(testPassword);
+
+      assertThat(encryptor.checkPassword(testPassword, encryptedPassword), is(true));
+   }
+
+   @Test
+   public void checkNullPassword() throws Exception {
+      final char[] testPassword = "SomePasswordHere".toCharArray();;
+
+      final String encryptedPassword = encryptor.encryptPassword(testPassword);
+
+      assertThat(encryptor.checkPassword(null, encryptedPassword), is(false));
+   }
+
+   @Test
+   public void checkNullStoredPassword() throws Exception {
+      final char[] testPassword = "SomePasswordHere".toCharArray();;
+
+      assertThat(encryptor.checkPassword(testPassword, null), is(false));
    }
 
    @Test
