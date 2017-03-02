@@ -18,6 +18,7 @@
 package com.acciente.oacc.encryptor.bcrypt;
 
 import com.acciente.oacc.encryptor.PasswordEncryptor;
+import com.acciente.oacc.encryptor.ReseedingSecureRandom;
 import com.acciente.oacc.normalizer.TextNormalizer;
 import org.bouncycastle.crypto.generators.OpenBSDBCrypt;
 
@@ -42,7 +43,8 @@ public class BCryptPasswordEncryptor implements PasswordEncryptor, Serializable 
 
    private static final PasswordEncoderDecoder passwordEncoderDecoder = new PasswordEncoderDecoder();
 
-   private final int costFactor;
+   private final int          costFactor;
+   private final SecureRandom secureRandom;
 
    /**
     * Returns a password encryptor that uses the BCrypt algorithm with a computed cost factor.
@@ -81,6 +83,7 @@ public class BCryptPasswordEncryptor implements PasswordEncryptor, Serializable 
 
    private BCryptPasswordEncryptor(int costFactor) {
       this.costFactor = costFactor;
+      secureRandom = new ReseedingSecureRandom();
    }
 
    @Override
@@ -90,7 +93,7 @@ public class BCryptPasswordEncryptor implements PasswordEncryptor, Serializable 
       }
       final char[] normalizedChars = TextNormalizer.getInstance().normalizeToNfc(plainPassword);
 
-      final String bcryptString = OpenBSDBCrypt.generate(normalizedChars, gensalt(new SecureRandom()), costFactor /* log rounds */);
+      final String bcryptString = OpenBSDBCrypt.generate(normalizedChars, gensalt(secureRandom), costFactor /* log rounds */);
 
       return passwordEncoderDecoder.encode(bcryptString);
    }
