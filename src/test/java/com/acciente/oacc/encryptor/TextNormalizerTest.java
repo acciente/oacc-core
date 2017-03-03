@@ -23,6 +23,7 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
 import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.not;
 import static org.junit.Assert.assertThat;
 import static org.junit.runners.Parameterized.Parameter;
 import static org.junit.runners.Parameterized.Parameters;
@@ -41,8 +42,8 @@ public class TextNormalizerTest {
    public TextNormalizer textNormalizer;
 
    @Test
-   public void testNormalizationA() throws Exception {
-      final char[] input    = "The big brown fox jumps over the picket fence".toCharArray();
+   public void normalizeToNfc_asciiUnchanged() throws Exception {
+      final char[] input    = "The big brown fox jumps over 2 picket fences ^^ !".toCharArray();
       final char[] expected = input;
 
       final char[] actual = textNormalizer.normalizeToNfc(input);
@@ -51,9 +52,9 @@ public class TextNormalizerTest {
    }
 
    @Test
-   public void testNormalizationOfSwedishLetter_Å() throws Exception {
-      final char[] input    = new char[]{0x212b}; // U+212B -- angstrom sign "Å")
-      final char[] expected = new char[]{0x00c5};
+   public void normalizeToNfc_latin1Unchanged() throws Exception {
+      final char[] input    = "¢£©®°ª¹²³ ¼½¾äöüÅé".toCharArray();
+      final char[] expected = input;
 
       final char[] actual = textNormalizer.normalizeToNfc(input);
 
@@ -61,42 +62,56 @@ public class TextNormalizerTest {
    }
 
    @Test
-   public void testNormalizationOfVietnameseLetter_ế() throws Exception {
-      final char[] input    = new char[]{0x1ebf}; // U+1EBF (ế) -- Vietnamese
-      final char[] expected = new char[]{0x1ebf};
+   public void normalizeToNfc_singletons() throws Exception {
+      final char[] singletons = new char[]{0x212b, 0x2126}; // angstrom-sign (Å), ohm-sign (Ω)
+      final char[] expected = new char[]{0x00c5, 0x03a9};   // latin-capital-a-with-ring-above (Å), omega (Ω)
 
-      final char[] actual = textNormalizer.normalizeToNfc(input);
-
-      assertThat(actual, equalTo(expected));
-   }
-
-   @Test
-   public void testNormalizationOfSequence1() throws Exception {
-      final char[] input    = new char[]{0x212b, 0x2126};
-      final char[] expected = new char[]{0x00c5, 0x03a9};
-
-      final char[] actual = textNormalizer.normalizeToNfc(input);
+      final char[] actual = textNormalizer.normalizeToNfc(singletons);
 
       assertThat(actual, equalTo(expected));
    }
 
    @Test
-   public void testNormalizationOfSequence2() throws Exception {
-      final char[] input    = new char[]{0x212b, 0x2126, 0x1e0b, 0x0323};
-      final char[] expected = new char[]{0x00c5, 0x03a9, 0x1e0d, 0x0307};
+   public void normalizeToNfc_combiningSequence() throws Exception {
+      final char[] combiningSequence = new char[]{'A', 0x30a}; // A, combining-ring-above
+      final char[] singleCharacter = new char[]{0x00c5};       // latin-capital-a-with-ring-above (Å)
 
-      final char[] actual = textNormalizer.normalizeToNfc(input);
+      final char[] normalizedSequence = textNormalizer.normalizeToNfc(combiningSequence);
+      final char[] normalizedCharacter = textNormalizer.normalizeToNfc(singleCharacter);
 
-      assertThat(actual, equalTo(expected));
+      assertThat(normalizedSequence, equalTo(normalizedCharacter));
    }
 
    @Test
-   public void testNormalizationOfSequence3() throws Exception {
-      final char[] input    = new char[]{0x03d3, 0x03d4, 0x1e9b};
-      final char[] expected = new char[]{0x03d3, 0x03d4, 0x1e9b};
+   public void normalizeToNfc_combiningMarkOrder() throws Exception {
+      final char[] sequence_ab = new char[]{'q', 0x307, 0x323}; // q, dot-above, dot-below
+      final char[] sequence_ba = new char[]{'q', 0x323, 0x307}; // q, dot-below, dot-above
 
-      final char[] actual = textNormalizer.normalizeToNfc(input);
+      final char[] normalized_ab = textNormalizer.normalizeToNfc(sequence_ab);
+      final char[] normalized_ba = textNormalizer.normalizeToNfc(sequence_ba);
 
-      assertThat(actual, equalTo(expected));
+      assertThat(normalized_ab, equalTo(normalized_ba));
+   }
+
+   @Test
+   public void normalizeToNfc_differentPrecomposedCharacterAndCombiningMark() throws Exception {
+      final char[] sequence_ab = new char[]{0x1e0b, 0x323}; // d-with-dot-above (ḋ), dot-below
+      final char[] sequence_cd = new char[]{0x1e0d, 0x307}; // d-with-dot-below (ḍ), dot-above
+
+      final char[] normalized_ab = textNormalizer.normalizeToNfc(sequence_ab);
+      final char[] normalized_cd = textNormalizer.normalizeToNfc(sequence_cd);
+
+      assertThat(normalized_ab, equalTo(normalized_cd));
+   }
+
+   @Test
+   public void normalizeToNfc_compatibilityEquivalentOnly() throws Exception {
+      final char[] sequence_ab = new char[]{'2', 0x2075}; // 2, superscript-5 (⁵)
+      final char[] sequence_ac = new char[]{'2', '5'};
+
+      final char[] normalized_ab = textNormalizer.normalizeToNfc(sequence_ab);
+      final char[] normalized_ac = textNormalizer.normalizeToNfc(sequence_ac);
+
+      assertThat(normalized_ab, not(equalTo(normalized_ac)));
    }
 }

@@ -19,20 +19,28 @@
 package com.acciente.oacc.encryptor;
 
 /**
- * This class normalizes Unicode plaintext that use characters that have more than one possible representation. This is
- * important because use may not always be aware of how their password text was encoded, since different possible
- * encodings visually look the same to the user. For example the sequence ffi may be represented as three separate
- * characters or as a single ligature.
+ * Normalizes Unicode text to handle characters that have more than one canonically equivalent representation.
  * <p>
- * This class first tries to use the ICU4J library for normalization since it allows normalization of text in character
- * arrays without converting to string. If ICU4J is not available, then it falls back to the text normalizer in the JDK
- * which *does* require the character array to be converted to String.
+ * This is important when comparing hashed passwords because plaintext that visually looks the same might actually
+ * be represented differently binarily, without the user being aware. For example, `é` (the letter `e` with accent acute)
+ * may be represented as a single Unicode character (U+00E9) or composed of two characters (U+0065 + U+0301), but both
+ * representations are canonically equivalent.
+ * <p>
+ * This class first tries to use the ICU4J library for normalization because it normalizes character arrays
+ * without converting to <code>String</code>. If ICU4J is not available, then it falls back to the text normalizer
+ * provided by the JDK, which produces an **intermediate <code>String</code> representation** of the text.
+ * <p>
+ * In other words, if you need to prevent a cleanable <code>char[]</code> password being turned into a temporary
+ * <code>String</code> during Unicode character normalization, you need to include a dependency to ICU4J.
  */
 public abstract class TextNormalizer {
    /**
-    * This method first tries to use the ICU4J library for normalization since it allows normalization of text in
-    * character arrays without converting to string. If ICU4J is not available, then it falls back to the text
-    * normalizer in the JDK which *does* require the character array to be converted to String.
+    * Get an instance of a text normalizer.
+    * <p>
+    * If the ICU4J library is available, the returned instance will use an ICU4J normalizer, which handles character
+    * arrays without converting to <code>String</code>. Otherwise (if ICU4J is not available), the fallback instance
+    * returned uses the normalizer provided by the JDK, which produces an **intermediate <code>String</code>
+    * representation** of the normalized text.
     *
     * @return a text normalizer instance
     */
@@ -46,10 +54,14 @@ public abstract class TextNormalizer {
    }
 
    /**
-    * Returns the normalized version of the password.
+    * Returns the canonically equivalent normalized (NFC) version of a Unicode character array.
+    * <p>
+    * Note:
+    * If the ICU4J library for normalization is not available, the fallback Normalizer provided by the JDK
+    * will produce an intermediate <code>String</code> representation of the normalized text!
     *
-    * @param source a plaintext password
-    * @return a normalized string
+    * @param source any Unicode text
+    * @return a character array containing the normalized representation of the source text
     */
    public abstract char[] normalizeToNfc(char[] source);
 }
