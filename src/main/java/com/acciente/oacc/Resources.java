@@ -85,22 +85,26 @@ public class Resources {
 
       @Override
       /**
-       * desired output:
-       *                    | externalId != null       | externalId == null
-       * -------------------|--------------------------|--------------------
-       * resourceId != null | R(_rId_, extId: _extId_) | R(_rId_)
-       * resourceId == null | R(extId: _extId_)        | R(_rId_, extId: _extId_)
+       * sample output:
+       *                    | externalId != null                      | externalId == null
+       * -------------------|-----------------------------------------|--------------------
+       * resourceId != null | { resourceId: 1234, externalId: "007" } | { resourceId: 1234 }
+       * resourceId == null | { externalId: "007" }                   | {}
        */
       public String toString() {
-         if (resourceId != null && externalId == null) {
-            return "R(" + String.valueOf(resourceId) + ")";
+         if (resourceId != null && externalId != null) {
+            return "{ resourceId: " + String.valueOf(resourceId) + ", externalId: \""  + externalId + "\" }";
          }
 
-         if (resourceId == null && externalId != null) {
-            return "R(extId: " + externalId + ")";
+         if (resourceId != null) {
+            return "{ resourceId: " + String.valueOf(resourceId) + "\" }";
          }
 
-         return "R(" + String.valueOf(resourceId) + ", extId: " + externalId + ")";
+         if (externalId != null) {
+            return "{ externalId: \""  + externalId + "\" }";
+         }
+
+         return "{}";
       }
    }
 }
