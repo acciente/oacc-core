@@ -275,15 +275,7 @@ public class DomainPermissions {
 
       @Override
       public String toString() {
-         if (isSystemPermission()) {
-            return "DOMAIN:SYS:" + permissionName
-                  + (withGrantOption ? " /G" : "");
-         }
-         else {
-            // USR: for user-defined
-            return "DOMAIN:" + permissionName
-                  + (withGrantOption ? " /G" : "");
-         }
+         return withGrantOption ? permissionName + " /G" : permissionName;
       }
 
       // private static helper method

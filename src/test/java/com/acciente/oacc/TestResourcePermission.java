@@ -20,9 +20,11 @@ package com.acciente.oacc;
 import org.junit.Test;
 
 import static org.hamcrest.CoreMatchers.containsString;
+import static org.hamcrest.CoreMatchers.endsWith;
 import static org.hamcrest.CoreMatchers.hasItem;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.sameInstance;
+import static org.hamcrest.CoreMatchers.startsWith;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 
@@ -248,5 +250,39 @@ public class TestResourcePermission {
       catch (Exception e) {
          assertThat(e.getMessage().toLowerCase(), containsString("invalid system permission name"));
       }
+   }
+
+   @Test
+   public void toString_systemPermission() {
+      for(String systemPermissionName : ResourcePermissions.getSysPermissionNames()) {
+         final ResourcePermission resourcePermission = ResourcePermissions.getInstance(systemPermissionName);
+         assertThat(resourcePermission.toString(), is(systemPermissionName));
+      }
+   }
+
+   @Test
+   public void toString_systemPermission_withGrant() {
+      for(String systemPermissionName : ResourcePermissions.getSysPermissionNames()) {
+         final ResourcePermission resourcePermission = ResourcePermissions.getInstanceWithGrantOption(systemPermissionName);
+         final String stringRepresentation = resourcePermission.toString();
+         assertThat(stringRepresentation, startsWith(systemPermissionName));
+         assertThat(stringRepresentation, endsWith("/G"));
+      }
+   }
+
+   @Test
+   public void toString_customPermission() {
+      String customPermissionName = "myPermission";
+      final ResourcePermission resourcePermission = ResourcePermissions.getInstance(customPermissionName);
+      assertThat(resourcePermission.toString(), is(customPermissionName));
+   }
+
+   @Test
+   public void toString_customPermission_withGrant() {
+      String customPermissionName = "myPermission";
+      final ResourcePermission resourcePermission = ResourcePermissions.getInstanceWithGrantOption(customPermissionName);
+      final String stringRepresentation = resourcePermission.toString();
+      assertThat(stringRepresentation, startsWith(customPermissionName));
+      assertThat(stringRepresentation, endsWith("/G"));
    }
 }

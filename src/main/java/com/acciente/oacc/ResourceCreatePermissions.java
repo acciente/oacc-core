@@ -425,12 +425,10 @@ public class ResourceCreatePermissions {
       @Override
       public String toString() {
          if (postCreateResourcePermission == null) {
-            return "*CREATE[]"
-                  + (withGrantOption ? " /G" : "");
+            return withGrantOption ? sysPermissionName + " /G" : sysPermissionName;
          }
          else {
-            return "*CREATE[" + postCreateResourcePermission.toString() + "]"
-                  + (withGrantOption ? " /G" : "");
+            return "[" + postCreateResourcePermission.toString() + "]" + (withGrantOption ? " /G" : "");
          }
       }
 

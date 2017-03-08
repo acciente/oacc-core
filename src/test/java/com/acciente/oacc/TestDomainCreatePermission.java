@@ -24,9 +24,11 @@ import java.io.IOException;
 import java.io.ObjectOutputStream;
 
 import static org.hamcrest.CoreMatchers.containsString;
+import static org.hamcrest.CoreMatchers.endsWith;
 import static org.hamcrest.CoreMatchers.hasItem;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.sameInstance;
+import static org.hamcrest.CoreMatchers.startsWith;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 
@@ -339,5 +341,47 @@ public class TestDomainCreatePermission {
             objectOutputStream.close();
          }
       }
+   }
+
+   @Test
+   public void toString_systemPermission() {
+      for(String systemPermissionName : DomainCreatePermissions.getSysPermissionNames()) {
+         final DomainCreatePermission domainCreatePermission
+               = DomainCreatePermissions.getInstance(systemPermissionName);
+         assertThat(domainCreatePermission.toString(), is(systemPermissionName));
+      }
+   }
+
+   @Test
+   public void toString_systemPermission_withGrant() {
+      for(String systemPermissionName : DomainCreatePermissions.getSysPermissionNames()) {
+         final DomainCreatePermission domainCreatePermission
+               = DomainCreatePermissions.getInstanceWithGrantOption(systemPermissionName);
+         final String stringRepresentation = domainCreatePermission.toString();
+         assertThat(stringRepresentation, startsWith(systemPermissionName));
+         assertThat(stringRepresentation, endsWith("/G"));
+      }
+   }
+
+   @Test
+   public void toString_customPermission() {
+      final DomainPermission domainPermission = DomainPermissions.getInstanceWithGrantOption(DomainPermissions.DELETE);
+      final DomainCreatePermission domainCreatePermission = DomainCreatePermissions.getInstance(domainPermission);
+      final String stringRepresentation = domainCreatePermission.toString();
+      assertThat(stringRepresentation, startsWith("["));
+      assertThat(stringRepresentation, containsString(domainPermission.toString()));
+      assertThat(stringRepresentation, endsWith("]"));
+   }
+
+   @Test
+   public void toString_customPermission_withGrant() {
+      final DomainPermission domainPermission = DomainPermissions.getInstanceWithGrantOption(DomainPermissions.DELETE);
+      final DomainCreatePermission domainCreatePermission
+            = DomainCreatePermissions.getInstanceWithGrantOption(domainPermission);
+      final String stringRepresentation = domainCreatePermission.toString();
+      assertThat(stringRepresentation, startsWith("["));
+      assertThat(stringRepresentation, containsString(domainPermission.toString()));
+      assertThat(stringRepresentation, containsString("]"));
+      assertThat(stringRepresentation, endsWith("/G"));
    }
 }

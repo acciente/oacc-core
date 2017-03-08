@@ -24,9 +24,11 @@ import java.io.IOException;
 import java.io.ObjectOutputStream;
 
 import static org.hamcrest.CoreMatchers.containsString;
+import static org.hamcrest.CoreMatchers.endsWith;
 import static org.hamcrest.CoreMatchers.hasItem;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.sameInstance;
+import static org.hamcrest.CoreMatchers.startsWith;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 
@@ -342,4 +344,42 @@ public class TestResourceCreatePermission {
       }
    }
 
+   @Test
+   public void toString_systemPermission() {
+      for(String systemPermissionName : ResourceCreatePermissions.getSysPermissionNames()) {
+         final ResourceCreatePermission resourceCreatePermission = ResourceCreatePermissions.getInstance(systemPermissionName);
+         assertThat(resourceCreatePermission.toString(), is(systemPermissionName));
+      }
+   }
+
+   @Test
+   public void toString_systemPermission_withGrant() {
+      for(String systemPermissionName : ResourceCreatePermissions.getSysPermissionNames()) {
+         final ResourceCreatePermission resourceCreatePermission = ResourceCreatePermissions.getInstanceWithGrantOption(systemPermissionName);
+         final String stringRepresentation = resourceCreatePermission.toString();
+         assertThat(stringRepresentation, startsWith(systemPermissionName));
+         assertThat(stringRepresentation, endsWith("/G"));
+      }
+   }
+
+   @Test
+   public void toString_customPermission() {
+      final ResourcePermission resourcePermission = ResourcePermissions.getInstance(ResourcePermissions.DELETE);
+      final ResourceCreatePermission resourceCreatePermission = ResourceCreatePermissions.getInstance(resourcePermission);
+      final String stringRepresentation = resourceCreatePermission.toString();
+      assertThat(stringRepresentation, startsWith("["));
+      assertThat(stringRepresentation, containsString(ResourcePermissions.DELETE.toString()));
+      assertThat(stringRepresentation, endsWith("]"));
+   }
+
+   @Test
+   public void toString_customPermission_withGrant() {
+      final ResourcePermission resourcePermission = ResourcePermissions.getInstance(ResourcePermissions.DELETE);
+      final ResourceCreatePermission resourceCreatePermission = ResourceCreatePermissions.getInstanceWithGrantOption(resourcePermission);
+      final String stringRepresentation = resourceCreatePermission.toString();
+      assertThat(stringRepresentation, startsWith("["));
+      assertThat(stringRepresentation, containsString(ResourcePermissions.DELETE.toString()));
+      assertThat(stringRepresentation, containsString("]"));
+      assertThat(stringRepresentation, endsWith("/G"));
+   }
 }

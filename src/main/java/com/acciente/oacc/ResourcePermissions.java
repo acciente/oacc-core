@@ -293,8 +293,7 @@ public class ResourcePermissions {
 
       @Override
       public String toString() {
-         return (isSystemPermission() ? "SYS:" + permissionName : permissionName)
-               + (withGrantOption ? " /G" : "");
+         return withGrantOption ? permissionName + " /G" : permissionName;
       }
 
       // private helper methods
