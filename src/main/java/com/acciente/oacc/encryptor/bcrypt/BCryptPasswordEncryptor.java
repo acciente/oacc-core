@@ -18,9 +18,8 @@
 package com.acciente.oacc.encryptor.bcrypt;
 
 import com.acciente.oacc.encryptor.PasswordEncryptor;
-import com.acciente.oacc.encryptor.SelfSeedingSecureRandom;
+import com.acciente.oacc.encryptor.ReseedingSecureRandom;
 import com.acciente.oacc.normalizer.TextNormalizer;
-
 import org.bouncycastle.crypto.generators.OpenBSDBCrypt;
 
 import java.io.Serializable;
@@ -43,8 +42,8 @@ public class BCryptPasswordEncryptor implements PasswordEncryptor, Serializable 
 
    private static final PasswordEncoderDecoder passwordEncoderDecoder = new PasswordEncoderDecoder();
 
-   private final int                     costFactor;
-   private final SelfSeedingSecureRandom secureRandom;
+   private final int                   costFactor;
+   private final ReseedingSecureRandom secureRandom;
 
    /**
     * Returns a password encryptor that uses the BCrypt algorithm with a computed cost factor.
@@ -83,7 +82,7 @@ public class BCryptPasswordEncryptor implements PasswordEncryptor, Serializable 
 
    private BCryptPasswordEncryptor(int costFactor) {
       this.costFactor = costFactor;
-      secureRandom = SelfSeedingSecureRandom.getInstance();
+      secureRandom = ReseedingSecureRandom.getInstance();
    }
 
    @Override
@@ -125,7 +124,7 @@ public class BCryptPasswordEncryptor implements PasswordEncryptor, Serializable 
 
    private static int computeCostFactor(int computedCostFactorMin, int minComputeDurationInMillis) {
       final byte[] salt = new byte[BCRYPT_SALT_SIZE];
-      SelfSeedingSecureRandom.getInstance().nextBytes(salt);
+      ReseedingSecureRandom.getInstance().nextBytes(salt);
 
       for (int costFactor = computedCostFactorMin; costFactor <= COMPUTED_COST_FACTOR_MAX; costFactor++) {
          final long startTime = System.nanoTime();
@@ -139,7 +138,7 @@ public class BCryptPasswordEncryptor implements PasswordEncryptor, Serializable 
       return COMPUTED_COST_FACTOR_MAX;
    }
 
-   private static byte[] gensalt(SelfSeedingSecureRandom secureRandom) {
+   private static byte[] gensalt(ReseedingSecureRandom secureRandom) {
       final byte[] saltBytes = new byte[BCRYPT_SALT_SIZE];
       secureRandom.nextBytes(saltBytes);
       return saltBytes;
