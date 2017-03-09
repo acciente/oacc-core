@@ -18,6 +18,7 @@
 package com.acciente.oacc.encryptor.bcrypt;
 
 import com.acciente.oacc.encryptor.PasswordEncryptor;
+import com.acciente.oacc.encryptor.RandomNumberGenerator;
 import com.acciente.oacc.encryptor.ReseedingSecureRandom;
 import com.acciente.oacc.normalizer.TextNormalizer;
 import org.bouncycastle.crypto.generators.OpenBSDBCrypt;
@@ -43,7 +44,7 @@ public class BCryptPasswordEncryptor implements PasswordEncryptor, Serializable 
    private static final PasswordEncoderDecoder passwordEncoderDecoder = new PasswordEncoderDecoder();
 
    private final int                   costFactor;
-   private final ReseedingSecureRandom secureRandom;
+   private final RandomNumberGenerator secureRandom;
 
    /**
     * Returns a password encryptor that uses the BCrypt algorithm with a computed cost factor.
@@ -123,9 +124,7 @@ public class BCryptPasswordEncryptor implements PasswordEncryptor, Serializable 
    }
 
    private static int computeCostFactor(int computedCostFactorMin, int minComputeDurationInMillis) {
-      final byte[] salt = new byte[BCRYPT_SALT_SIZE];
-      ReseedingSecureRandom.getInstance().nextBytes(salt);
-
+      final byte[] salt = gensalt(ReseedingSecureRandom.getInstance());
       for (int costFactor = computedCostFactorMin; costFactor <= COMPUTED_COST_FACTOR_MAX; costFactor++) {
          final long startTime = System.nanoTime();
          OpenBSDBCrypt.generate(COMPUTED_COST_FACTOR_BENCHMARK_PASSWORD, salt, costFactor);
@@ -138,7 +137,7 @@ public class BCryptPasswordEncryptor implements PasswordEncryptor, Serializable 
       return COMPUTED_COST_FACTOR_MAX;
    }
 
-   private static byte[] gensalt(ReseedingSecureRandom secureRandom) {
+   private static byte[] gensalt(RandomNumberGenerator secureRandom) {
       final byte[] saltBytes = new byte[BCRYPT_SALT_SIZE];
       secureRandom.nextBytes(saltBytes);
       return saltBytes;
