@@ -265,8 +265,7 @@ public class TestResourcePermission {
       for(String systemPermissionName : ResourcePermissions.getSysPermissionNames()) {
          final ResourcePermission resourcePermission = ResourcePermissions.getInstanceWithGrantOption(systemPermissionName);
          final String stringRepresentation = resourcePermission.toString();
-         assertThat(stringRepresentation, startsWith(systemPermissionName));
-         assertThat(stringRepresentation, endsWith("/G"));
+         assertThat(stringRepresentation, is(systemPermissionName + " /G"));
       }
    }
 
@@ -282,7 +281,6 @@ public class TestResourcePermission {
       String customPermissionName = "myPermission";
       final ResourcePermission resourcePermission = ResourcePermissions.getInstanceWithGrantOption(customPermissionName);
       final String stringRepresentation = resourcePermission.toString();
-      assertThat(stringRepresentation, startsWith(customPermissionName));
-      assertThat(stringRepresentation, endsWith("/G"));
+      assertThat(stringRepresentation, is(customPermissionName + " /G"));
    }
 }

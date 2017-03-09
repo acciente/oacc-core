@@ -86,22 +86,22 @@ public class Resources {
       @Override
       /**
        * sample output:
-       *                    | externalId != null                      | externalId == null
-       * -------------------|-----------------------------------------|--------------------
-       * resourceId != null | { resourceId: 1234, externalId: "007" } | { resourceId: 1234 }
-       * resourceId == null | { externalId: "007" }                   | {}
+       *                    | externalId != null                    | externalId == null
+       * -------------------|---------------------------------------|--------------------
+       * resourceId != null | {resourceId: 1234, externalId: "007"} | {resourceId: 1234}
+       * resourceId == null | {externalId: "007"}                   | {}
        */
       public String toString() {
          if (resourceId != null && externalId != null) {
-            return "{ resourceId: " + String.valueOf(resourceId) + ", externalId: \""  + externalId + "\" }";
+            return "{resourceId: " + String.valueOf(resourceId) + ", externalId: \""  + externalId + "\"}";
          }
 
          if (resourceId != null) {
-            return "{ resourceId: " + String.valueOf(resourceId) + "\" }";
+            return "{resourceId: " + String.valueOf(resourceId) + "}";
          }
 
          if (externalId != null) {
-            return "{ externalId: \""  + externalId + "\" }";
+            return "{externalId: \""  + externalId + "\"}";
          }
 
          return "{}";

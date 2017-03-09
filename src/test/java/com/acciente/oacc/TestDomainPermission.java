@@ -218,8 +218,7 @@ public class TestDomainPermission {
       for(String systemPermissionName : DomainPermissions.getSysPermissionNames()) {
          final DomainPermission domainPermission = DomainPermissions.getInstanceWithGrantOption(systemPermissionName);
          final String stringRepresentation = domainPermission.toString();
-         assertThat(stringRepresentation, startsWith(systemPermissionName));
-         assertThat(stringRepresentation, endsWith("/G"));
+         assertThat(stringRepresentation, is(systemPermissionName + " /G"));
       }
    }
 }

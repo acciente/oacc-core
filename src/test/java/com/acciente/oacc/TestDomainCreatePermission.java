@@ -358,8 +358,7 @@ public class TestDomainCreatePermission {
          final DomainCreatePermission domainCreatePermission
                = DomainCreatePermissions.getInstanceWithGrantOption(systemPermissionName);
          final String stringRepresentation = domainCreatePermission.toString();
-         assertThat(stringRepresentation, startsWith(systemPermissionName));
-         assertThat(stringRepresentation, endsWith("/G"));
+         assertThat(stringRepresentation, is(systemPermissionName + " /G"));
       }
    }
 
@@ -368,9 +367,7 @@ public class TestDomainCreatePermission {
       final DomainPermission domainPermission = DomainPermissions.getInstanceWithGrantOption(DomainPermissions.DELETE);
       final DomainCreatePermission domainCreatePermission = DomainCreatePermissions.getInstance(domainPermission);
       final String stringRepresentation = domainCreatePermission.toString();
-      assertThat(stringRepresentation, startsWith("["));
-      assertThat(stringRepresentation, containsString(domainPermission.toString()));
-      assertThat(stringRepresentation, endsWith("]"));
+      assertThat(stringRepresentation, is("[" + domainPermission.toString() + "]"));
    }
 
    @Test
@@ -379,9 +376,6 @@ public class TestDomainCreatePermission {
       final DomainCreatePermission domainCreatePermission
             = DomainCreatePermissions.getInstanceWithGrantOption(domainPermission);
       final String stringRepresentation = domainCreatePermission.toString();
-      assertThat(stringRepresentation, startsWith("["));
-      assertThat(stringRepresentation, containsString(domainPermission.toString()));
-      assertThat(stringRepresentation, containsString("]"));
-      assertThat(stringRepresentation, endsWith("/G"));
+      assertThat(stringRepresentation, is("[" + domainPermission.toString() + "] /G"));
    }
 }

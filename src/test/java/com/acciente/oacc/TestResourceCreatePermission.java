@@ -357,8 +357,7 @@ public class TestResourceCreatePermission {
       for(String systemPermissionName : ResourceCreatePermissions.getSysPermissionNames()) {
          final ResourceCreatePermission resourceCreatePermission = ResourceCreatePermissions.getInstanceWithGrantOption(systemPermissionName);
          final String stringRepresentation = resourceCreatePermission.toString();
-         assertThat(stringRepresentation, startsWith(systemPermissionName));
-         assertThat(stringRepresentation, endsWith("/G"));
+         assertThat(stringRepresentation, is(systemPermissionName + " /G"));
       }
    }
 
@@ -367,9 +366,7 @@ public class TestResourceCreatePermission {
       final ResourcePermission resourcePermission = ResourcePermissions.getInstance(ResourcePermissions.DELETE);
       final ResourceCreatePermission resourceCreatePermission = ResourceCreatePermissions.getInstance(resourcePermission);
       final String stringRepresentation = resourceCreatePermission.toString();
-      assertThat(stringRepresentation, startsWith("["));
-      assertThat(stringRepresentation, containsString(ResourcePermissions.DELETE.toString()));
-      assertThat(stringRepresentation, endsWith("]"));
+      assertThat(stringRepresentation, is("[" + ResourcePermissions.DELETE.toString() + "]"));
    }
 
    @Test
@@ -377,9 +374,6 @@ public class TestResourceCreatePermission {
       final ResourcePermission resourcePermission = ResourcePermissions.getInstance(ResourcePermissions.DELETE);
       final ResourceCreatePermission resourceCreatePermission = ResourceCreatePermissions.getInstanceWithGrantOption(resourcePermission);
       final String stringRepresentation = resourceCreatePermission.toString();
-      assertThat(stringRepresentation, startsWith("["));
-      assertThat(stringRepresentation, containsString(ResourcePermissions.DELETE.toString()));
-      assertThat(stringRepresentation, containsString("]"));
-      assertThat(stringRepresentation, endsWith("/G"));
+      assertThat(stringRepresentation, is("[" + ResourcePermissions.DELETE.toString() + "] /G"));
    }
 }
