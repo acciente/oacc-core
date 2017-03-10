@@ -72,7 +72,7 @@ public class TestAccessControl_JasyptEncryptorIncludingBackwardsCompatibility {
       // this uses the latest Jasypt password encryptor code
       {
          // we use values different values from the default
-         final JasyptPasswordEncryptor jasyptPasswordEncryptor = JasyptPasswordEncryptor.getPasswordEncryptor("MD5", 2000, 32);
+         final JasyptPasswordEncryptor jasyptPasswordEncryptor = JasyptPasswordEncryptor.newInstance("MD5", 2000, 32);
          systemAccessControlContextWithCurrentEncryptor
                = SQLAccessControlContextFactory.getAccessControlContext(TestConfigLoader.getDataSource(),
                                                                         TestConfigLoader.getDatabaseSchema(),

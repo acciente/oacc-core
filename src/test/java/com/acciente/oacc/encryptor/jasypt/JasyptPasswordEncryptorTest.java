@@ -28,7 +28,7 @@ import static org.hamcrest.core.StringStartsWith.startsWith;
 import static org.junit.Assert.assertThat;
 
 public class JasyptPasswordEncryptorTest {
-   private final JasyptPasswordEncryptor encryptor = JasyptPasswordEncryptor.getPasswordEncryptor();
+   private final JasyptPasswordEncryptor encryptor = JasyptPasswordEncryptor.newInstance("SHA-256", 100000, 16);
 
    @Test
    public void encryptNullPassword() throws Exception {

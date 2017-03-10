@@ -34,10 +34,9 @@ import com.acciente.oacc.sql.internal.SQLPasswordAuthenticationProvider;
  * The following password encryptor implementations are built-in:
  * <p>
  * {@link JasyptPasswordEncryptor}: hashes passwords using a Jasypt digester.
- * The following factory methods provide different configuration options (for details see method Javadocs):
+ * The following static factory method provides different configuration options (for details see method Javadocs):
  * <ul>
- * <li>{@link JasyptPasswordEncryptor#getPasswordEncryptor()}</li>
- * <li>{@link JasyptPasswordEncryptor#getPasswordEncryptor(String encryptAlgorithm, int encryptIterations, int encryptSaltSizeBytes)}</li>
+ * <li>{@link JasyptPasswordEncryptor#newInstance(String algorithm, int iterations, int saltSizeBytes)}</li>
  * </ul>
  * <p>
  * Compatibility notes:
@@ -48,7 +47,7 @@ import com.acciente.oacc.sql.internal.SQLPasswordAuthenticationProvider;
  * <p>
  * <p>
  * {@link BCryptPasswordEncryptor}: hashes passwords using an OpenBSD BCrypt implementation.
- * The following factory methods provide different configuration options (for details see method Javadocs):
+ * The following static factory methods provide different configuration options (for details see method Javadocs):
  * <ul>
  * <li>{@link BCryptPasswordEncryptor#newInstance(int costFactor)}</li>
  * <li>{@link BCryptPasswordEncryptor#newInstance(int minComputedCostFactor, int minComputeDurationInMillis)}</li>

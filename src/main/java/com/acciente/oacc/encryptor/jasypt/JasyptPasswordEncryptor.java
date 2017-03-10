@@ -34,10 +34,6 @@ public final class JasyptPasswordEncryptor implements PasswordEncryptor, Seriali
 
    public static final String NAME = "jasypt";
 
-   private static final String DEFAULT_ALGORITHM       = "SHA-256";
-   private static final int    DEFAULT_ITERATIONS      = 100000;
-   private static final int    DEFAULT_SALT_SIZE_BYTES = 16;
-
    private static final StandardByteDigesterPool digesterPool           = new StandardByteDigesterPool();
    private static final PasswordEncoderDecoder   passwordEncoderDecoder = new PasswordEncoderDecoder();
 
@@ -46,25 +42,14 @@ public final class JasyptPasswordEncryptor implements PasswordEncryptor, Seriali
    private final int    saltSizeBytes;
 
    /**
-    * Creates a password encryptor that uses the Jasypt digester for password hashing with the following default
-    * parameters (algorithm: {@value DEFAULT_ALGORITHM}; iterations: {@value DEFAULT_ITERATIONS};
-    * saltSizeBytes: {@value DEFAULT_SALT_SIZE_BYTES})
-    *
-    * @return a {@link JasyptPasswordEncryptor} instance.
-    */
-   public static JasyptPasswordEncryptor getPasswordEncryptor() {
-      return getPasswordEncryptor(DEFAULT_ALGORITHM, DEFAULT_ITERATIONS, DEFAULT_SALT_SIZE_BYTES);
-   }
-
-   /**
     * Creates a password encryptor that uses the Jasypt digester for password hashing with the specified values for
     * algorithm, iterations and saltSizeBytes.
     *
     * @return a {@link JasyptPasswordEncryptor} instance.
     */
-   public static JasyptPasswordEncryptor getPasswordEncryptor(String algorithm,
-                                                              int iterations,
-                                                              int saltSizeBytes) {
+   public static JasyptPasswordEncryptor newInstance(String algorithm,
+                                                     int iterations,
+                                                     int saltSizeBytes) {
       return new JasyptPasswordEncryptor(algorithm, iterations, saltSizeBytes);
    }
 

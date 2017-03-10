@@ -33,6 +33,10 @@ public class PasswordEncryptors {
    private static final int BCRYPT_MIN_COST_FACTOR                    = 10;
    private static final int BCRYPT_MIN_COMPUTATION_DURATION_IN_MILLIS = 750;
 
+   private static final String JASYPT_ALGORITHM       = "SHA-256";
+   private static final int    JASYPT_ITERATIONS      = 100000;
+   private static final int    JASYPT_SALT_SIZE_BYTES = 16;
+
    public static PasswordEncryptor getPasswordEncryptor(String encryptorName) {
       if (encryptorName == null) {
          throw new IllegalArgumentException("Encryptor name cannot be null");
@@ -43,7 +47,7 @@ public class PasswordEncryptors {
       }
 
       if (encryptorName.equalsIgnoreCase(JasyptPasswordEncryptor.NAME)) {
-         return JasyptPasswordEncryptor.getPasswordEncryptor();
+         return JasyptPasswordEncryptor.newInstance(JASYPT_ALGORITHM, JASYPT_ITERATIONS, JASYPT_SALT_SIZE_BYTES);
       }
 
       throw new IllegalArgumentException("Encryptor name " + encryptorName + " not recognized");

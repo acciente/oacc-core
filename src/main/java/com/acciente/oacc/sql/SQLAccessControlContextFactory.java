@@ -48,8 +48,8 @@ public class SQLAccessControlContextFactory {
     * @return an {@link AccessControlContext} instance ready to receive API calls
     * @deprecated as of OACC v2.0.0-rc8, replaced by
     * {@link #getAccessControlContext(Connection, String, SQLProfile, PasswordEncryptor)} where the password encryptor
-    * parameter is to the new Jasypt password encryptor implementation
-    * {@link JasyptPasswordEncryptor#getPasswordEncryptor()}.
+    * parameter is an instance of the new Jasypt password encryptor implementation
+    * {@link JasyptPasswordEncryptor}.
     */
    @Deprecated
    public static AccessControlContext getAccessControlContext(Connection connection,
@@ -78,8 +78,8 @@ public class SQLAccessControlContextFactory {
     * @return an {@link AccessControlContext} instance ready to receive API calls
     * @deprecated as of OACC v2.0.0-rc8, replaced by
     * {@link #getAccessControlContext(DataSource, String, SQLProfile, PasswordEncryptor)} where the password encryptor
-    * parameter is to the new Jasypt password encryptor implementation
-    * {@link JasyptPasswordEncryptor#getPasswordEncryptor()}.
+    * parameter is an instance of the new Jasypt password encryptor implementation
+    * {@link JasyptPasswordEncryptor}.
     */
    @Deprecated
    public static AccessControlContext getAccessControlContext(DataSource dataSource,

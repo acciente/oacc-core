@@ -108,7 +108,7 @@ public class TestConfigLoader {
       }
 
       if (encryptorName.equalsIgnoreCase(JasyptPasswordEncryptor.NAME)) {
-         return JasyptPasswordEncryptor.getPasswordEncryptor();
+         return JasyptPasswordEncryptor.newInstance("SHA-256", 100000, 16);
       }
 
       throw new IllegalArgumentException("Encryptor name " + encryptorName + " not recognized");
