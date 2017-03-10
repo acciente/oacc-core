@@ -30,36 +30,34 @@ import com.acciente.oacc.sql.internal.SQLPasswordAuthenticationProvider;
  * In OACC v2.0.0-rc.7 and prior the built-in authentication provider used Jasypt internally and did not allow other
  * options. The factory methods in {@link SQLAccessControlContextFactory} which use the built-in authentication
  * provider now allow specifying an implementation of this interface.
- * <p><p>
+ * <p>
  * The following password encryptor implementations are built-in:
- * <p>
- * {@link JasyptPasswordEncryptor}: hashes passwords using a Jasypt digester.
- * The following static factory method provides different configuration options (for details see method Javadocs):
  * <ul>
- * <li>{@link JasyptPasswordEncryptor#newInstance(String algorithm, int iterations, int saltSizeBytes)}</li>
- * </ul>
- * <p>
- * Compatibility notes:
- * <p>
- * The {@link JasyptPasswordEncryptor} is designed to be fully compatible with existing OACC v2.0.0-rc.7 deployments.
- * This new Jasypt implementation writes a header prefix to new hashes that it creates, but supports checking passwords
- * on hashes that do not contain the header prefix.
- * <p>
- * <p>
- * {@link BCryptPasswordEncryptor}: hashes passwords using an OpenBSD BCrypt implementation.
- * The following static factory methods provide different configuration options (for details see method Javadocs):
- * <ul>
- * <li>{@link BCryptPasswordEncryptor#newInstance(int costFactor)}</li>
- * <li>{@link BCryptPasswordEncryptor#newInstance(int minComputedCostFactor, int minComputeDurationInMillis)}</li>
- * </ul>
- * <p>
- * <p>
- * {@link TransitioningPasswordEncryptor}: provides a means to transition from an existing (aka "old") password
- * encryptor to a new password encryptor in an environment where OACC is already deployed -- where existing passwords
- * in the tables are encrypted using the old password encryptor. The following factory methods provide different
- * configuration options (for details see method Javadocs):
- * <ul>
- * <li>{@link TransitioningPasswordEncryptor#getPasswordEncryptor(PasswordEncryptor, PasswordEncryptor)}</li>
+ * <li>{@link JasyptPasswordEncryptor}: hashes passwords using a Jasypt digester.
+ *    The following static factory method provides different configuration options (for details see method Javadocs):
+ *    <ul>
+ *    <li>{@link JasyptPasswordEncryptor#newInstance(String algorithm, int iterations, int saltSizeBytes)}</li>
+ *    </ul>
+ *    Compatibility notes:<br>
+ *    The {@link JasyptPasswordEncryptor} is designed to be fully compatible with existing OACC v2.0.0-rc.7 deployments.
+ *    This new Jasypt implementation writes a header prefix to new hashes that it creates, but supports checking passwords
+ *    on hashes that do not contain the header prefix.
+ * </li>
+ * <li>{@link BCryptPasswordEncryptor}: hashes passwords using an OpenBSD BCrypt implementation.
+ *    The following static factory methods provide different configuration options (for details see method Javadocs):
+ *    <ul>
+ *    <li>{@link BCryptPasswordEncryptor#newInstance(int costFactor)}</li>
+ *    <li>{@link BCryptPasswordEncryptor#newInstance(int minComputedCostFactor, int minComputeDurationInMillis)}</li>
+ *    </ul>
+ * </li>
+ * <li>{@link TransitioningPasswordEncryptor}: provides a means to transition from an existing (aka "old") password
+ *    encryptor to a new password encryptor in an environment where OACC is already deployed -- where existing passwords
+ *    in the tables are encrypted using the old password encryptor. The following factory method provides different
+ *    configuration options (for details see method Javadocs):
+ *    <ul>
+ *    <li>{@link TransitioningPasswordEncryptor#getPasswordEncryptor(PasswordEncryptor, PasswordEncryptor)}</li>
+ *    </ul>
+ * </li>
  * </ul>
  */
 public interface PasswordEncryptor {
