@@ -15,7 +15,6 @@
  * See the License for the specific language governing
  * permissions and limitations under the License.
  */
-
 package com.acciente.oacc.encryptor;
 
 import java.io.Serializable;
@@ -23,28 +22,17 @@ import java.security.SecureRandom;
 import java.util.concurrent.TimeUnit;
 
 public class ReseedingSecureRandom implements RandomNumberGenerator, Serializable {
-   private static final long DEFAULT_MAX_TIME_BETWEEN_RESEED_IN_SECS           = TimeUnit.HOURS.toSeconds(1);
-   private static final int  DEFAULT_MAX_NUM_OF_GENERATED_VALUES_BEFORE_RESEED = 64;
-
    private final SecureRandom secureRandom;
-   private final Long         maxTimeBetweenReseedInSecs;
+   private final long         maxTimeBetweenReseedInSecs;
    private final int          maxNumOfGeneratedValuesBeforeReseed;
    private       long         lastSeedTime;
    private       long         generatedCount;
 
-   public static ReseedingSecureRandom getInstance() {
-      return new ReseedingSecureRandom(null, DEFAULT_MAX_NUM_OF_GENERATED_VALUES_BEFORE_RESEED, DEFAULT_MAX_TIME_BETWEEN_RESEED_IN_SECS);
-   }
-
-   public static ReseedingSecureRandom getInstance(int maxNumOfGeneratedValuesBeforeReseed, Long maxTimeBetweenReseedInSecs) {
+   public static ReseedingSecureRandom newInstance(int maxNumOfGeneratedValuesBeforeReseed, long maxTimeBetweenReseedInSecs) {
       return new ReseedingSecureRandom(null, maxNumOfGeneratedValuesBeforeReseed, maxTimeBetweenReseedInSecs);
    }
 
-   public static ReseedingSecureRandom getInstance(byte[] seed) {
-      return new ReseedingSecureRandom(seed, DEFAULT_MAX_NUM_OF_GENERATED_VALUES_BEFORE_RESEED, DEFAULT_MAX_TIME_BETWEEN_RESEED_IN_SECS);
-   }
-
-   public static ReseedingSecureRandom getInstance(byte[] seed, int maxNumOfGeneratedValuesBeforeReseed, Long maxTimeBetweenReseedInSecs) {
+   public static ReseedingSecureRandom newInstance(byte[] seed, int maxNumOfGeneratedValuesBeforeReseed, long maxTimeBetweenReseedInSecs) {
       return new ReseedingSecureRandom(seed, maxNumOfGeneratedValuesBeforeReseed, maxTimeBetweenReseedInSecs);
    }
 
@@ -82,7 +70,7 @@ public class ReseedingSecureRandom implements RandomNumberGenerator, Serializabl
 
    private void resetCountAndTime() {
       generatedCount = 0;
-      if (maxTimeBetweenReseedInSecs != null) {
+      if (maxTimeBetweenReseedInSecs > 0) {
          lastSeedTime = System.nanoTime();
       }
    }
@@ -98,7 +86,7 @@ public class ReseedingSecureRandom implements RandomNumberGenerator, Serializabl
          return true;
       }
 
-      if (maxTimeBetweenReseedInSecs == null) {
+      if (maxTimeBetweenReseedInSecs == 0) {
          return false;
       }
 
@@ -112,9 +100,9 @@ public class ReseedingSecureRandom implements RandomNumberGenerator, Serializabl
       }
    }
 
-   private static void assertValidMaxTimeBetweenReseed(Long maxTimeBetweenReseedInSecs) {
-      if (maxTimeBetweenReseedInSecs != null && maxTimeBetweenReseedInSecs < 1) {
-         throw new IllegalArgumentException("Max time (in seconds) between reseeding has to be greater than zero (or null, if not applicable");
+   private static void assertValidMaxTimeBetweenReseed(long maxTimeBetweenReseedInSecs) {
+      if (maxTimeBetweenReseedInSecs < 0) {
+         throw new IllegalArgumentException("Max time (in seconds) between reseeding has to be greater than one, or zero, if not applicable");
       }
    }
 }

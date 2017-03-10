@@ -41,6 +41,9 @@ public class BCryptPasswordEncryptor implements PasswordEncryptor, Serializable 
    private static final char[] COMPUTED_COST_FACTOR_BENCHMARK_PASSWORD = "honey badger don't care".toCharArray();
    private static final int    COMPUTED_COST_FACTOR_MAX                = BCRYPT_COST_FACTOR_MAX;
 
+   private static final long DEFAULT_MAX_TIME_BETWEEN_RESEEDING_RNG_IN_SECS           = TimeUnit.HOURS.toSeconds(1);
+   private static final int  DEFAULT_MAX_NUM_OF_GENERATED_VALUES_BEFORE_RESEEDING_RNG = 64;
+
    private static final PasswordEncoderDecoder passwordEncoderDecoder = new PasswordEncoderDecoder();
 
    private final int                   costFactor;
@@ -83,7 +86,8 @@ public class BCryptPasswordEncryptor implements PasswordEncryptor, Serializable 
 
    private BCryptPasswordEncryptor(int costFactor) {
       this.costFactor = costFactor;
-      secureRandom = ReseedingSecureRandom.getInstance();
+      secureRandom = ReseedingSecureRandom.newInstance(DEFAULT_MAX_NUM_OF_GENERATED_VALUES_BEFORE_RESEEDING_RNG,
+                                                       DEFAULT_MAX_TIME_BETWEEN_RESEEDING_RNG_IN_SECS);
    }
 
    @Override
@@ -124,7 +128,7 @@ public class BCryptPasswordEncryptor implements PasswordEncryptor, Serializable 
    }
 
    private static int computeCostFactor(int computedCostFactorMin, int minComputeDurationInMillis) {
-      final byte[] salt = gensalt(ReseedingSecureRandom.getInstance());
+      final byte[] salt = gensalt(ReseedingSecureRandom.newInstance(1, 0));
       for (int costFactor = computedCostFactorMin; costFactor <= COMPUTED_COST_FACTOR_MAX; costFactor++) {
          final long startTime = System.nanoTime();
          OpenBSDBCrypt.generate(COMPUTED_COST_FACTOR_BENCHMARK_PASSWORD, salt, costFactor);

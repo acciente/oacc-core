@@ -15,7 +15,6 @@
  * See the License for the specific language governing
  * permissions and limitations under the License.
  */
-
 package com.acciente.oacc.encryptor;
 
 import org.bouncycastle.util.Arrays;
@@ -32,17 +31,22 @@ import static org.junit.Assert.fail;
 
 public class ReseedingSecureRandomTest {
 
-   private static final int  SEED_LENGTH                      = 8;
-   private static final int  NUM_OF_RANDOM_BYTES              = 20; // should be >= 20 for testing, to avoid getting remainder of prev value
-   private static final long MAX_TIME_BETWEEN_RESEEDS_IN_SECS = 30;
+   private static final int  SEED_LENGTH                               = 8;
+   private static final int  NUM_OF_RANDOM_BYTES                       = 20; // should be >= 20 for testing, to avoid getting remainder of prev value
+   private static final long MAX_TIME_BETWEEN_RESEEDS_IN_SECS          = 30;
+   private static final int  MAX_NUM_OF_GENERATED_VALUES_BEFORE_RESEED = 64;
 
    @Test
    public void sameSeedGeneratesSameBytes() throws Exception {
       final byte[] seedBytes = ReseedingSecureRandom.getSeed(SEED_LENGTH);
       final byte[] randomBytes1 = new byte[NUM_OF_RANDOM_BYTES];
       final byte[] randomBytes2 = new byte[NUM_OF_RANDOM_BYTES];
-      final ReseedingSecureRandom prng1 = ReseedingSecureRandom.getInstance(seedBytes);
-      final ReseedingSecureRandom prng2 = ReseedingSecureRandom.getInstance(seedBytes);
+      final ReseedingSecureRandom prng1 = ReseedingSecureRandom.newInstance(seedBytes,
+                                                                            MAX_NUM_OF_GENERATED_VALUES_BEFORE_RESEED,
+                                                                            MAX_TIME_BETWEEN_RESEEDS_IN_SECS);
+      final ReseedingSecureRandom prng2 = ReseedingSecureRandom.newInstance(seedBytes,
+                                                                            MAX_NUM_OF_GENERATED_VALUES_BEFORE_RESEED,
+                                                                            MAX_TIME_BETWEEN_RESEEDS_IN_SECS);
 
       prng1.nextBytes(randomBytes1);
       prng2.nextBytes(randomBytes2);
@@ -55,7 +59,10 @@ public class ReseedingSecureRandomTest {
       final byte[] seedBytes = ReseedingSecureRandom.getSeed(SEED_LENGTH);
       final byte[] reseedingRandomBytes = new byte[NUM_OF_RANDOM_BYTES];
       final byte[] secureRandomBytes = new byte[NUM_OF_RANDOM_BYTES];
-      final ReseedingSecureRandom reseedingSecureRandom = ReseedingSecureRandom.getInstance(seedBytes);
+      final ReseedingSecureRandom reseedingSecureRandom
+            = ReseedingSecureRandom.newInstance(seedBytes,
+                                                MAX_NUM_OF_GENERATED_VALUES_BEFORE_RESEED,
+                                                MAX_TIME_BETWEEN_RESEEDS_IN_SECS);
       final SecureRandom secureRandom = new SecureRandom(seedBytes);
 
       reseedingSecureRandom.nextBytes(reseedingRandomBytes);
@@ -70,8 +77,12 @@ public class ReseedingSecureRandomTest {
       final byte[] seedBytes2 = Arrays.reverse(seedBytes1);
       final byte[] randomBytes1 = new byte[NUM_OF_RANDOM_BYTES];
       final byte[] randomBytes2 = new byte[NUM_OF_RANDOM_BYTES];
-      final ReseedingSecureRandom prng1 = ReseedingSecureRandom.getInstance(seedBytes1);
-      final ReseedingSecureRandom prng2 = ReseedingSecureRandom.getInstance(seedBytes2);
+      final ReseedingSecureRandom prng1 = ReseedingSecureRandom.newInstance(seedBytes1,
+                                                                            MAX_NUM_OF_GENERATED_VALUES_BEFORE_RESEED,
+                                                                            MAX_TIME_BETWEEN_RESEEDS_IN_SECS);
+      final ReseedingSecureRandom prng2 = ReseedingSecureRandom.newInstance(seedBytes2,
+                                                                            MAX_NUM_OF_GENERATED_VALUES_BEFORE_RESEED,
+                                                                            MAX_TIME_BETWEEN_RESEEDS_IN_SECS);
 
       prng1.nextBytes(randomBytes1);
       prng2.nextBytes(randomBytes2);
@@ -83,7 +94,7 @@ public class ReseedingSecureRandomTest {
    public void invalidMaxNumOfGeneratedValuesBeforeReseedThrowsException() throws Exception {
       final int invalidMaxNumOfGeneratedValuesBeforeReseed = 0;
       try {
-         ReseedingSecureRandom.getInstance(invalidMaxNumOfGeneratedValuesBeforeReseed, null);
+         ReseedingSecureRandom.newInstance(invalidMaxNumOfGeneratedValuesBeforeReseed, 0);
          fail("Invalid max number of values generated before reseeding should have failed;");
       }
       catch (IllegalArgumentException e) {
@@ -91,7 +102,7 @@ public class ReseedingSecureRandomTest {
       }
       try {
          final byte[] seedBytes = ReseedingSecureRandom.getSeed(SEED_LENGTH);
-         ReseedingSecureRandom.getInstance(seedBytes, invalidMaxNumOfGeneratedValuesBeforeReseed, null);
+         ReseedingSecureRandom.newInstance(seedBytes, invalidMaxNumOfGeneratedValuesBeforeReseed, 0);
          fail("Invalid max number of values generated before reseeding should have failed;");
       }
       catch (IllegalArgumentException e) {
@@ -101,9 +112,9 @@ public class ReseedingSecureRandomTest {
 
    @Test
    public void invalidMaxTimeBetweenReseedThrowsException() throws Exception {
-      final long invalidMaxTimeBetweenReseedInSecs = 0;
+      final long invalidMaxTimeBetweenReseedInSecs = -1;
       try {
-         ReseedingSecureRandom.getInstance(32, invalidMaxTimeBetweenReseedInSecs);
+         ReseedingSecureRandom.newInstance(32, invalidMaxTimeBetweenReseedInSecs);
          fail("Invalid max time between reseeding should have failed;");
       }
       catch (IllegalArgumentException e) {
@@ -111,7 +122,7 @@ public class ReseedingSecureRandomTest {
       }
       try {
          final byte[] seedBytes = ReseedingSecureRandom.getSeed(SEED_LENGTH);
-         ReseedingSecureRandom.getInstance(seedBytes, 32, invalidMaxTimeBetweenReseedInSecs);
+         ReseedingSecureRandom.newInstance(seedBytes, 32, invalidMaxTimeBetweenReseedInSecs);
          fail("Invalid max time between reseeding should have failed;");
       }
       catch (IllegalArgumentException e) {
@@ -125,7 +136,7 @@ public class ReseedingSecureRandomTest {
       final byte[] reseedingRandomBytes = new byte[NUM_OF_RANDOM_BYTES];
       final byte[] staticRandomBytes = new byte[NUM_OF_RANDOM_BYTES];
       final int maxValuesBeforeReseed = 3;
-      final ReseedingSecureRandom reseedingPrng = ReseedingSecureRandom.getInstance(seedBytes, maxValuesBeforeReseed, MAX_TIME_BETWEEN_RESEEDS_IN_SECS);
+      final ReseedingSecureRandom reseedingPrng = ReseedingSecureRandom.newInstance(seedBytes, maxValuesBeforeReseed, MAX_TIME_BETWEEN_RESEEDS_IN_SECS);
       final SecureRandom staticPrng = new SecureRandom(seedBytes);
 
       // first n passes
@@ -147,7 +158,7 @@ public class ReseedingSecureRandomTest {
       final byte[] reseedingRandomBytes = new byte[NUM_OF_RANDOM_BYTES];
       final byte[] staticRandomBytes = new byte[NUM_OF_RANDOM_BYTES];
       final int maxValuesBeforeReseed = 3;
-      final ReseedingSecureRandom reseedingPrng = ReseedingSecureRandom.getInstance(seedBytes, maxValuesBeforeReseed, null);
+      final ReseedingSecureRandom reseedingPrng = ReseedingSecureRandom.newInstance(seedBytes, maxValuesBeforeReseed, 0);
       final SecureRandom staticPrng = new SecureRandom(seedBytes);
 
       // first n passes
@@ -168,10 +179,9 @@ public class ReseedingSecureRandomTest {
       final byte[] seedBytes = ReseedingSecureRandom.getSeed(SEED_LENGTH);
       final byte[] reseedingRandomBytes = new byte[NUM_OF_RANDOM_BYTES];
       final byte[] staticRandomBytes = new byte[NUM_OF_RANDOM_BYTES];
-      final int maxValuesBeforeReseed = 64;
       final long maxTimeBeforeReseedInSecs = 1;
       final ReseedingSecureRandom reseedingPrng
-            = ReseedingSecureRandom.getInstance(seedBytes, maxValuesBeforeReseed, maxTimeBeforeReseedInSecs);
+            = ReseedingSecureRandom.newInstance(seedBytes, MAX_NUM_OF_GENERATED_VALUES_BEFORE_RESEED, maxTimeBeforeReseedInSecs);
       final SecureRandom staticPrng = new SecureRandom(seedBytes);
 
       // first pass
@@ -196,7 +206,7 @@ public class ReseedingSecureRandomTest {
       final byte[] staticRandomBytes = new byte[NUM_OF_RANDOM_BYTES];
       final int maxValuesBeforeReseed = 3;
       final ReseedingSecureRandom reseedingPrng
-            = ReseedingSecureRandom.getInstance(seedBytes, maxValuesBeforeReseed, MAX_TIME_BETWEEN_RESEEDS_IN_SECS);
+            = ReseedingSecureRandom.newInstance(seedBytes, maxValuesBeforeReseed, MAX_TIME_BETWEEN_RESEEDS_IN_SECS);
       final SecureRandom staticPrng = new SecureRandom(seedBytes);
 
       // first pass
@@ -225,10 +235,9 @@ public class ReseedingSecureRandomTest {
       final byte[] seedBytes = ReseedingSecureRandom.getSeed(SEED_LENGTH);
       final byte[] reseedingRandomBytes = new byte[NUM_OF_RANDOM_BYTES];
       final byte[] staticRandomBytes = new byte[NUM_OF_RANDOM_BYTES];
-      final int maxValuesBeforeReseed = 64;
       final long maxTimeBeforeReseedInSecs = 1;
       final ReseedingSecureRandom reseedingPrng
-            = ReseedingSecureRandom.getInstance(seedBytes, maxValuesBeforeReseed, maxTimeBeforeReseedInSecs);
+            = ReseedingSecureRandom.newInstance(seedBytes, MAX_NUM_OF_GENERATED_VALUES_BEFORE_RESEED, maxTimeBeforeReseedInSecs);
       final SecureRandom staticPrng = new SecureRandom(seedBytes);
 
       // first pass
