@@ -74,7 +74,7 @@ public class TestAccessControl_TransitioningPasswordEncryptor {
          // uses the transitioning password encryptor with BCrypt as the "new" password encryptor and
          // the legacy built-in password encryptor code (from OACC v2.00 rc7 and before) as the "old" encryptor
          final TransitioningPasswordEncryptor transitioningPasswordEncryptor = TransitioningPasswordEncryptor.getPasswordEncryptor(
-               BCryptPasswordEncryptor.getPasswordEncryptorUsingCostFactor(6),
+               BCryptPasswordEncryptor.newInstance(6),
                LegacyJasyptPasswordEncryptor.getPasswordEncryptor());
 
          systemAccessControlContextWithTransitioningEncryptor

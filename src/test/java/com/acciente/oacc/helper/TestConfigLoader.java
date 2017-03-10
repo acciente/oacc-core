@@ -104,7 +104,7 @@ public class TestConfigLoader {
       }
 
       if (encryptorName.equalsIgnoreCase(BCryptPasswordEncryptor.NAME)) {
-         return BCryptPasswordEncryptor.getPasswordEncryptorUsingCostFactor(4);
+         return BCryptPasswordEncryptor.newInstance(4);
       }
 
       if (encryptorName.equalsIgnoreCase(JasyptPasswordEncryptor.NAME)) {

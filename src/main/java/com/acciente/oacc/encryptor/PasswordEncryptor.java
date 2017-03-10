@@ -50,9 +50,8 @@ import com.acciente.oacc.sql.internal.SQLPasswordAuthenticationProvider;
  * {@link BCryptPasswordEncryptor}: hashes passwords using an OpenBSD BCrypt implementation.
  * The following factory methods provide different configuration options (for details see method Javadocs):
  * <ul>
- * <li>{@link BCryptPasswordEncryptor#getPasswordEncryptor()}</li>
- * <li>{@link BCryptPasswordEncryptor#getPasswordEncryptorUsingCostFactor(int costFactor)}</li>
- * <li>{@link BCryptPasswordEncryptor#getPasswordEncryptorUsingComputedCostFactor(int minComputeDurationInMillis)}</li>
+ * <li>{@link BCryptPasswordEncryptor#newInstance(int costFactor)}</li>
+ * <li>{@link BCryptPasswordEncryptor#newInstance(int minComputedCostFactor, int minComputeDurationInMillis)}</li>
  * </ul>
  * <p>
  * <p>

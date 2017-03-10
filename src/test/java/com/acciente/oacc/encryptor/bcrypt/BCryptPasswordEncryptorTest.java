@@ -15,7 +15,6 @@
  * See the License for the specific language governing
  * permissions and limitations under the License.
  */
-
 package com.acciente.oacc.encryptor.bcrypt;
 
 import org.junit.Test;
@@ -33,12 +32,12 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 public class BCryptPasswordEncryptorTest {
-   private final BCryptPasswordEncryptor encryptor = BCryptPasswordEncryptor.getPasswordEncryptorUsingCostFactor(4);
+   private final BCryptPasswordEncryptor encryptor = BCryptPasswordEncryptor.newInstance(4);
 
    @Test
    public void getEncryptorDoesNotAcceptCostFactorBelowMin() throws Exception {
       try {
-         BCryptPasswordEncryptor.getPasswordEncryptorUsingCostFactor(3);
+         BCryptPasswordEncryptor.newInstance(3);
          fail("getting BCrypt password encryptor with cost factor below the minimum should fail");
       }
       catch (IllegalArgumentException e) {
@@ -49,7 +48,7 @@ public class BCryptPasswordEncryptorTest {
    @Test
    public void getEncryptorDoesNotAcceptCostFactorAboveMax() throws Exception {
       try {
-         BCryptPasswordEncryptor.getPasswordEncryptorUsingCostFactor(32);
+         BCryptPasswordEncryptor.newInstance(32);
          fail("getting BCrypt password encryptor with cost factor above the maximum should fail");
       }
       catch (IllegalArgumentException e) {
@@ -61,7 +60,7 @@ public class BCryptPasswordEncryptorTest {
    public void getEncryptorUsesSpecifiedCostFactor() throws Exception {
       final int costFactor = 5;
       final BCryptPasswordEncryptor passwordEncryptor
-            = BCryptPasswordEncryptor.getPasswordEncryptorUsingCostFactor(costFactor);
+            = BCryptPasswordEncryptor.newInstance(costFactor);
 
       assertThat(passwordEncryptor.getCostFactor(), is(costFactor));
    }
@@ -70,7 +69,7 @@ public class BCryptPasswordEncryptorTest {
    public void getComputedEncryptorDoesNotAcceptCostFactorBelowMin() throws Exception {
       try {
          final int minComputeDuration = 100;
-         BCryptPasswordEncryptor.getPasswordEncryptorUsingComputedCostFactor(minComputeDuration, 3);
+         BCryptPasswordEncryptor.newInstance(3, minComputeDuration);
          fail("getting BCrypt password encryptor with minimum computed cost factor below the minimum should fail");
       }
       catch (IllegalArgumentException e) {
@@ -82,7 +81,7 @@ public class BCryptPasswordEncryptorTest {
    public void getComputedEncryptorDoesNotAcceptCostFactorAboveMax() throws Exception {
       try {
          final int minComputeDuration = 100;
-         BCryptPasswordEncryptor.getPasswordEncryptorUsingComputedCostFactor(minComputeDuration, 32);
+         BCryptPasswordEncryptor.newInstance(32, minComputeDuration);
          fail("getting BCrypt password encryptor with minimum computed cost factor above the maximum should fail");
       }
       catch (IllegalArgumentException e) {
@@ -95,7 +94,7 @@ public class BCryptPasswordEncryptorTest {
       final int minComputeDuration = 100;
       final int minCostFactor = 4;
       final BCryptPasswordEncryptor passwordEncryptor
-            = BCryptPasswordEncryptor.getPasswordEncryptorUsingComputedCostFactor(minComputeDuration, minCostFactor);
+            = BCryptPasswordEncryptor.newInstance(minCostFactor, minComputeDuration);
 
       assertTrue(passwordEncryptor.getCostFactor() > minCostFactor);
    }
@@ -105,7 +104,7 @@ public class BCryptPasswordEncryptorTest {
       final int minComputeDurationInMs = 250;
       final int minCostFactor = 4;
       final BCryptPasswordEncryptor passwordEncryptor
-            = BCryptPasswordEncryptor.getPasswordEncryptorUsingComputedCostFactor(minComputeDurationInMs, minCostFactor);
+            = BCryptPasswordEncryptor.newInstance(minCostFactor, minComputeDurationInMs);
       final char[] password = "opensesame".toCharArray();
 
       final long startTime = System.nanoTime();

@@ -15,7 +15,6 @@
  * See the License for the specific language governing
  * permissions and limitations under the License.
  */
-
 package com.acciente.oacc.encryptor.bcrypt;
 
 import com.acciente.oacc.encryptor.PasswordEncryptor;
@@ -40,58 +39,29 @@ public class BCryptPasswordEncryptor implements PasswordEncryptor, Serializable 
    private static final char[] COMPUTED_COST_FACTOR_BENCHMARK_PASSWORD = "honey badger don't care".toCharArray();
    private static final int    COMPUTED_COST_FACTOR_MAX                = BCRYPT_COST_FACTOR_MAX;
 
-   private static final int DEFAULT_COMPUTED_COST_FACTOR_MIN                            = 10;
-   private static final int DEFAULT_COMPUTED_COST_FACTOR_MIN_COMPUTE_DURATION_IN_MILLIS = 750;
-
    private static final PasswordEncoderDecoder passwordEncoderDecoder = new PasswordEncoderDecoder();
 
    private final int costFactor;
 
    /**
-    * Creates a password encryptor that uses the BCrypt algorithm with the smallest cost factor that causes the BCrypt
-    * computation to take at least {@value DEFAULT_COMPUTED_COST_FACTOR_MIN_COMPUTE_DURATION_IN_MILLIS}ms. This method
-    * enforces a floor value of {@value DEFAULT_COMPUTED_COST_FACTOR_MIN} for the cost factor, in other words the
-    * minimum cost factor used is {@value DEFAULT_COMPUTED_COST_FACTOR_MIN}.
-    *
-    * @return a {@link BCryptPasswordEncryptor} instance configured as described above.
-    */
-   public static BCryptPasswordEncryptor getPasswordEncryptor() {
-      return getPasswordEncryptorUsingComputedCostFactor(DEFAULT_COMPUTED_COST_FACTOR_MIN_COMPUTE_DURATION_IN_MILLIS,
-                                                         DEFAULT_COMPUTED_COST_FACTOR_MIN);
-   }
-
-   /**
-    * Returns a password encryptor that uses the BCrypt algorithm with the smallest cost factor that causes the BCrypt
+    * Returns a password encryptor that uses the BCrypt algorithm with a computed cost factor.
+    * The returned password encryptor uses the BCrypt algorithm with the smallest cost factor that causes the BCrypt
     * string computation to take at least the duration specified in the {@code minComputeDurationInMillis} parameter.
-    * This method enforces a floor value of {@value DEFAULT_COMPUTED_COST_FACTOR_MIN} for the cost factor, in other words the
-    * minimum cost factor used is {@value DEFAULT_COMPUTED_COST_FACTOR_MIN}.
-    *
-    * @param minComputeDurationInMillis specifies the minimal duration in ms to encrypt a password with BCrypt.
-    * @return a {@link BCryptPasswordEncryptor} instance configured as described above.
-    */
-   public static BCryptPasswordEncryptor getPasswordEncryptorUsingComputedCostFactor(int minComputeDurationInMillis) {
-      return getPasswordEncryptorUsingComputedCostFactor(minComputeDurationInMillis,
-                                                         DEFAULT_COMPUTED_COST_FACTOR_MIN);
-   }
-
-   /**
-    * Returns a password encryptor that uses the BCrypt algorithm with the smallest cost factor that causes the BCrypt
-    * string computation to take at least the duration specified in the {@code minComputeDurationInMillis} parameter.
-    * This method also enforces the floor value for the cost factor specifies in the
-    * {@code minComputeDurationInMillis} parameter, in other words the minimum cost factor used is  the duration
+    * This method also enforces the floor value for the cost factor specified in the
+    * {@code minComputedCostFactor} parameter. In other words, the minimum cost factor used is derived from the duration
     * specified in the {@code minComputeDurationInMillis} parameter.
     *
+    * @param minComputedCostFactor the minimum BCrypt cost factor for this encryptor, regardless of the cost factor that
+    *                              was computed to take at least the specified amount of time; must be between
+    *                              {@value BCRYPT_COST_FACTOR_MIN} and {@value BCRYPT_COST_FACTOR_MAX} (inclusive).
     * @param minComputeDurationInMillis the minimal duration in ms to encrypt a password with BCrypt.
-    * @param computedCostFactorMin      the minimal BCrypt cost factor to encrypt a password.
     * @return a {@link BCryptPasswordEncryptor} instance configured as described above.
     * @throws IllegalArgumentException if the specified minimal BCrypt cost factor is not between
     *                                  {@value BCRYPT_COST_FACTOR_MIN} and {@value BCRYPT_COST_FACTOR_MAX} (inclusive).
     */
-   public static BCryptPasswordEncryptor getPasswordEncryptorUsingComputedCostFactor(int minComputeDurationInMillis,
-                                                                                     int computedCostFactorMin) {
-      assertCostFactorValid(computedCostFactorMin);
-      return new BCryptPasswordEncryptor(computeCostFactor(minComputeDurationInMillis,
-                                                           computedCostFactorMin));
+   public static BCryptPasswordEncryptor newInstance(int minComputedCostFactor, int minComputeDurationInMillis) {
+      assertCostFactorValid(minComputedCostFactor);
+      return new BCryptPasswordEncryptor(computeCostFactor(minComputedCostFactor, minComputeDurationInMillis));
    }
 
    /**
@@ -103,7 +73,7 @@ public class BCryptPasswordEncryptor implements PasswordEncryptor, Serializable 
     * @throws IllegalArgumentException if the specified BCrypt cost factor is not between {@value BCRYPT_COST_FACTOR_MIN}
     *                                  and {@value BCRYPT_COST_FACTOR_MAX} (inclusive).
     */
-   public static BCryptPasswordEncryptor getPasswordEncryptorUsingCostFactor(int costFactor) {
+   public static BCryptPasswordEncryptor newInstance(int costFactor) {
       assertCostFactorValid(costFactor);
       return new BCryptPasswordEncryptor(costFactor);
    }
@@ -147,7 +117,7 @@ public class BCryptPasswordEncryptor implements PasswordEncryptor, Serializable 
       return costFactor;
    }
 
-   private static int computeCostFactor(int minComputeDurationInMillis, int computedCostFactorMin) {
+   private static int computeCostFactor(int computedCostFactorMin, int minComputeDurationInMillis) {
       final byte[] salt = gensalt(new SecureRandom());
       for (int costFactor = computedCostFactorMin; costFactor <= COMPUTED_COST_FACTOR_MAX; costFactor++) {
          final long startTime = System.nanoTime();

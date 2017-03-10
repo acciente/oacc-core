@@ -30,13 +30,16 @@ import java.util.List;
  * be defined in every {@link PasswordEncryptor} implementation is used.
  */
 public class PasswordEncryptors {
+   private static final int BCRYPT_MIN_COST_FACTOR                    = 10;
+   private static final int BCRYPT_MIN_COMPUTATION_DURATION_IN_MILLIS = 750;
+
    public static PasswordEncryptor getPasswordEncryptor(String encryptorName) {
       if (encryptorName == null) {
          throw new IllegalArgumentException("Encryptor name cannot be null");
       }
 
       if (encryptorName.equalsIgnoreCase(BCryptPasswordEncryptor.NAME)) {
-         return BCryptPasswordEncryptor.getPasswordEncryptor();
+         return BCryptPasswordEncryptor.newInstance(BCRYPT_MIN_COST_FACTOR, BCRYPT_MIN_COMPUTATION_DURATION_IN_MILLIS);
       }
 
       if (encryptorName.equalsIgnoreCase(JasyptPasswordEncryptor.NAME)) {
