@@ -37,7 +37,7 @@ public final class LegacyJasyptPasswordEncryptor implements PasswordEncryptor {
    /**
     * Returns an instance of the legacy password encryptor implementation used in OACC v2.0.0.rc7 (and prior).
     */
-   public static LegacyJasyptPasswordEncryptor getPasswordEncryptor() {
+   public static LegacyJasyptPasswordEncryptor newInstance() {
       return new LegacyJasyptPasswordEncryptor();
    }
 

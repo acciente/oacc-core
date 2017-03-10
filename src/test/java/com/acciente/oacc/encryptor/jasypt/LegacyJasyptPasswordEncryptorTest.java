@@ -28,7 +28,7 @@ import static org.hamcrest.core.StringStartsWith.startsWith;
 import static org.junit.Assert.assertThat;
 
 public class LegacyJasyptPasswordEncryptorTest {
-   private final LegacyJasyptPasswordEncryptor encryptor = LegacyJasyptPasswordEncryptor.getPasswordEncryptor();
+   private final LegacyJasyptPasswordEncryptor encryptor = LegacyJasyptPasswordEncryptor.newInstance();
 
    @Test
    public void encryptNullPassword() throws Exception {

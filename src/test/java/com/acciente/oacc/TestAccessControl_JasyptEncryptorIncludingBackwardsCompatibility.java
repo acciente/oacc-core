@@ -47,7 +47,7 @@ public class TestAccessControl_JasyptEncryptorIncludingBackwardsCompatibility {
       // uses the legacy built-in password encryptor code (from OACC v2.00 rc7 and before)
       {
          final LegacyJasyptPasswordEncryptor legacyJasyptPasswordEncryptor =
-               LegacyJasyptPasswordEncryptor.getPasswordEncryptor();
+               LegacyJasyptPasswordEncryptor.newInstance();
 
          SQLAccessControlSystemResetUtil.resetOACC(TestConfigLoader.getDataSource(),
                                                    TestConfigLoader.getDatabaseSchema(),

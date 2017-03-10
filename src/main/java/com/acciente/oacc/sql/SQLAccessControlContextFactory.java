@@ -37,7 +37,7 @@ public class SQLAccessControlContextFactory {
     * server for which the connection is provided is specified using the SQLProfile parameter. The access control
     * context returned by this method uses the built-in authentication provider that delegates all password encryption
     * and decryption to a {@link PasswordEncryptor} instance provided by
-    * {@link LegacyJasyptPasswordEncryptor#getPasswordEncryptor()} -- therefore the instance returned by this method may
+    * {@link LegacyJasyptPasswordEncryptor#newInstance()} -- therefore the instance returned by this method may
     * only be used when all existing resource passwords were encrypted using Jasypt. This method is deprecated, please
     * see the deprecation note below.
     *
@@ -58,7 +58,7 @@ public class SQLAccessControlContextFactory {
       return SQLAccessControlContext.getAccessControlContext(connection,
                                                              schemaName,
                                                              sqlProfile,
-                                                             LegacyJasyptPasswordEncryptor.getPasswordEncryptor());
+                                                             LegacyJasyptPasswordEncryptor.newInstance());
    }
 
    /**
@@ -67,7 +67,7 @@ public class SQLAccessControlContextFactory {
     * server for which the data source is provided is specified using the SQLProfile parameter. The access control
     * context returned by this method uses the built-in authentication provider that delegates all password encryption
     * and decryption to a {@link PasswordEncryptor} instance provided by
-    * {@link LegacyJasyptPasswordEncryptor#getPasswordEncryptor()} -- therefore the instance returned by this method may
+    * {@link LegacyJasyptPasswordEncryptor#newInstance()} -- therefore the instance returned by this method may
     * only be used when all existing resource passwords were encrypted using Jasypt. This method is deprecated, please
     * see the deprecation note below.
     *
@@ -88,7 +88,7 @@ public class SQLAccessControlContextFactory {
       return SQLAccessControlContext.getAccessControlContext(dataSource,
                                                              schemaName,
                                                              sqlProfile,
-                                                             LegacyJasyptPasswordEncryptor.getPasswordEncryptor());
+                                                             LegacyJasyptPasswordEncryptor.newInstance());
    }
 
    /**

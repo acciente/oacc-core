@@ -48,7 +48,7 @@ public class TestAccessControl_TransitioningPasswordEncryptor {
       {
          // use the legacy built-in password encryptor code (from OACC v2.00 rc7 and before) as the "old" encryptor
          final LegacyJasyptPasswordEncryptor legacyJasyptPasswordEncryptor =
-               LegacyJasyptPasswordEncryptor.getPasswordEncryptor();
+               LegacyJasyptPasswordEncryptor.newInstance();
 
          SQLAccessControlSystemResetUtil.resetOACC(TestConfigLoader.getDataSource(),
                                                    TestConfigLoader.getDatabaseSchema(),
@@ -75,7 +75,7 @@ public class TestAccessControl_TransitioningPasswordEncryptor {
          // the legacy built-in password encryptor code (from OACC v2.00 rc7 and before) as the "old" encryptor
          final TransitioningPasswordEncryptor transitioningPasswordEncryptor = TransitioningPasswordEncryptor.getPasswordEncryptor(
                BCryptPasswordEncryptor.newInstance(6),
-               LegacyJasyptPasswordEncryptor.getPasswordEncryptor());
+               LegacyJasyptPasswordEncryptor.newInstance());
 
          systemAccessControlContextWithTransitioningEncryptor
                = SQLAccessControlContextFactory.getAccessControlContext(TestConfigLoader.getDataSource(),
