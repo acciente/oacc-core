@@ -417,12 +417,10 @@ public class DomainCreatePermissions {
       @Override
       public String toString() {
          if (postCreateDomainPermission == null) {
-            return "*CREATE[]"
-                  + (withGrantOption ? " /G" : "");
+            return withGrantOption ? sysPermissionName + " /G" : sysPermissionName;
          }
          else {
-            return "*CREATE[" + postCreateDomainPermission.toString() + "]"
-                  + (withGrantOption ? " /G" : "");
+            return "[" + postCreateDomainPermission.toString() + "]" + (withGrantOption ? " /G" : "");
          }
       }
 
