@@ -24,11 +24,9 @@ import java.io.IOException;
 import java.io.ObjectOutputStream;
 
 import static org.hamcrest.CoreMatchers.containsString;
-import static org.hamcrest.CoreMatchers.endsWith;
 import static org.hamcrest.CoreMatchers.hasItem;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.sameInstance;
-import static org.hamcrest.CoreMatchers.startsWith;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 
@@ -366,7 +364,7 @@ public class TestResourceCreatePermission {
       final ResourcePermission resourcePermission = ResourcePermissions.getInstance(ResourcePermissions.DELETE);
       final ResourceCreatePermission resourceCreatePermission = ResourceCreatePermissions.getInstance(resourcePermission);
       final String stringRepresentation = resourceCreatePermission.toString();
-      assertThat(stringRepresentation, is("[" + ResourcePermissions.DELETE.toString() + "]"));
+      assertThat(stringRepresentation, is("[" + ResourcePermissions.DELETE + "]"));
    }
 
    @Test
@@ -374,6 +372,6 @@ public class TestResourceCreatePermission {
       final ResourcePermission resourcePermission = ResourcePermissions.getInstance(ResourcePermissions.DELETE);
       final ResourceCreatePermission resourceCreatePermission = ResourceCreatePermissions.getInstanceWithGrantOption(resourcePermission);
       final String stringRepresentation = resourceCreatePermission.toString();
-      assertThat(stringRepresentation, is("[" + ResourcePermissions.DELETE.toString() + "] /G"));
+      assertThat(stringRepresentation, is("[" + ResourcePermissions.DELETE + "] /G"));
    }
 }
