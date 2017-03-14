@@ -44,12 +44,12 @@ public abstract class TextNormalizer {
     *
     * @return a text normalizer instance
     */
-   public static TextNormalizer getTextNormalizer() {
+   public static TextNormalizer getInstance() {
       try {
-         return ICU4JTextNormalizer.getTextNormalizer();
+         return ICU4JTextNormalizer.getInstance();
       }
       catch (Exception e) {
-         return JDKTextNormalizer.getTextNormalizer();
+         return JDKTextNormalizer.getInstance();
       }
    }
 

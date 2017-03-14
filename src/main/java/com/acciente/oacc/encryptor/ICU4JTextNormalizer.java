@@ -36,7 +36,7 @@ public class ICU4JTextNormalizer extends TextNormalizer {
       nfcNormalizer = Normalizer2.getNFCInstance();
    }
 
-   public static ICU4JTextNormalizer getTextNormalizer() {
+   public static ICU4JTextNormalizer getInstance() {
       return singletonTextNormalizer;
    }
 

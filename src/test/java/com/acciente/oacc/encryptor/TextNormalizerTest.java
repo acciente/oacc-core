@@ -30,8 +30,8 @@ import static org.junit.runners.Parameterized.Parameters;
 
 @RunWith(Parameterized.class)
 public class TextNormalizerTest {
-   private static final ICU4JTextNormalizer icu4JTextNormalizer = ICU4JTextNormalizer.getTextNormalizer();
-   private static final JDKTextNormalizer   jdkTextNormalizer   = JDKTextNormalizer.getTextNormalizer();
+   private static final ICU4JTextNormalizer icu4JTextNormalizer = ICU4JTextNormalizer.getInstance();
+   private static final JDKTextNormalizer   jdkTextNormalizer   = JDKTextNormalizer.getInstance();
 
    @Parameters
    public static Object[] data() {

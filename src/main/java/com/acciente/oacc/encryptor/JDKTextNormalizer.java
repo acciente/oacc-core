@@ -27,7 +27,7 @@ public class JDKTextNormalizer extends TextNormalizer {
    private JDKTextNormalizer() {
    }
 
-   public static JDKTextNormalizer getTextNormalizer() {
+   public static JDKTextNormalizer getInstance() {
       return singletonTextNormalizer;
    }
 

@@ -26,7 +26,7 @@ import static org.junit.Assert.assertThat;
 public class TextNormalizerInstanceTest {
    @Test
    public void testReturnsICU4JTextNormalizer() throws Exception {
-      final TextNormalizer textNormalizer = TextNormalizer.getTextNormalizer();
+      final TextNormalizer textNormalizer = TextNormalizer.getInstance();
       assertThat(textNormalizer.getClass().getCanonicalName(), equalTo(ICU4JTextNormalizer.class.getCanonicalName()));
    }
 }
