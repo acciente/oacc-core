@@ -22,13 +22,15 @@ import java.nio.CharBuffer;
 import java.text.Normalizer;
 
 public class JDKTextNormalizer extends TextNormalizer {
-   private static final JDKTextNormalizer singletonTextNormalizer = new JDKTextNormalizer();
+   private static class SingletonHolder {
+      private static final JDKTextNormalizer instance = new JDKTextNormalizer();
+   }
 
    private JDKTextNormalizer() {
    }
 
    public static JDKTextNormalizer getInstance() {
-      return singletonTextNormalizer;
+      return SingletonHolder.instance;
    }
 
    @Override

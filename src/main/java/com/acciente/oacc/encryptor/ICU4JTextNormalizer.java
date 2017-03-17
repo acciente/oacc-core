@@ -30,14 +30,16 @@ public class ICU4JTextNormalizer extends TextNormalizer {
    private final Normalizer2 nfcNormalizer;
 
    // singleton instance
-   private static final ICU4JTextNormalizer singletonTextNormalizer = new ICU4JTextNormalizer();
+   private static class SingletonHolder {
+      private static final ICU4JTextNormalizer instance = new ICU4JTextNormalizer();
+   }
 
    private ICU4JTextNormalizer() {
       nfcNormalizer = Normalizer2.getNFCInstance();
    }
 
    public static ICU4JTextNormalizer getInstance() {
-      return singletonTextNormalizer;
+      return SingletonHolder.instance;
    }
 
    @Override
