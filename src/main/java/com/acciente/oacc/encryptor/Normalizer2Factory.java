@@ -15,21 +15,13 @@
  * See the License for the specific language governing
  * permissions and limitations under the License.
  */
+
 package com.acciente.oacc.encryptor;
 
-import org.junit.Test;
+import com.ibm.icu.text.Normalizer2;
 
-import static org.hamcrest.core.IsEqual.equalTo;
-import static org.junit.Assert.assertThat;
-
-public class TextNormalizerInstanceTest {
-   /**
-    * This test should pass if and only if ICU4J 4.6 or higher is in the classpath
-    */
-   @Test
-   public void testReturnsICU4JTextNormalizer() {
-      final TextNormalizer textNormalizer = TextNormalizer.getInstance();
-      assertThat(textNormalizer.getClass().getCanonicalName(),
-                 equalTo(ICU4JTextNormalizerForICU4JVersion4dot6AndHigher.class.getCanonicalName()));
+public class Normalizer2Factory {
+   public static Normalizer2 getNFCInstance() {
+      return Normalizer2.getInstance(null, "nfc", Normalizer2.Mode.COMPOSE);
    }
 }

@@ -32,7 +32,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 
 @RunWith(Parameterized.class)
-public class ICU4JDestBufferWorstCaseExpansionTest {
+public class ICU4JNormalizer2DestBufferWorstCaseExpansionTest {
    private Normalizer2 normalizer;
 
    @Parameters
@@ -57,7 +57,7 @@ public class ICU4JDestBufferWorstCaseExpansionTest {
 
    @Before
    public void setUp() throws Exception {
-      normalizer = Normalizer2.getNFCInstance();
+      normalizer = Normalizer2Factory.getNFCInstance();
    }
 
    @Test

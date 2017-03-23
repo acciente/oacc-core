@@ -30,12 +30,16 @@ import static org.junit.runners.Parameterized.Parameters;
 
 @RunWith(Parameterized.class)
 public class TextNormalizerTest {
-   private static final ICU4JTextNormalizer icu4JTextNormalizer = ICU4JTextNormalizer.getInstance();
-   private static final JDKTextNormalizer   jdkTextNormalizer   = JDKTextNormalizer.getInstance();
+   private static final TextNormalizer ICU_4_J_TEXT_NORMALIZER_FOR_ICU_4_J_VERSION_4_DOT_6_AND_HIGHER =
+         ICU4JTextNormalizerForICU4JVersion4dot6AndHigher.getInstance();
+   private static final TextNormalizer JDK_TEXT_NORMALIZER                                            =
+         JDKTextNormalizer.getInstance();
 
    @Parameters
    public static Object[] data() {
-      return new Object[]{icu4JTextNormalizer, jdkTextNormalizer};
+      return new Object[]{
+            ICU_4_J_TEXT_NORMALIZER_FOR_ICU_4_J_VERSION_4_DOT_6_AND_HIGHER,
+            JDK_TEXT_NORMALIZER};
    }
 
    @Parameter
@@ -64,7 +68,7 @@ public class TextNormalizerTest {
    @Test
    public void normalizeToNfc_singletons() throws Exception {
       final char[] singletons = new char[]{0x212b, 0x2126}; // angstrom-sign (Å), ohm-sign (Ω)
-      final char[] expected = new char[]{0x00c5, 0x03a9};   // latin-capital-a-with-ring-above (Å), omega (Ω)
+      final char[] expected   = new char[]{0x00c5, 0x03a9};   // latin-capital-a-with-ring-above (Å), omega (Ω)
 
       final char[] actual = textNormalizer.normalizeToNfc(singletons);
 
@@ -74,9 +78,9 @@ public class TextNormalizerTest {
    @Test
    public void normalizeToNfc_combiningSequence() throws Exception {
       final char[] combiningSequence = new char[]{'A', 0x30a}; // A, combining-ring-above
-      final char[] singleCharacter = new char[]{0x00c5};       // latin-capital-a-with-ring-above (Å)
+      final char[] singleCharacter   = new char[]{0x00c5};       // latin-capital-a-with-ring-above (Å)
 
-      final char[] normalizedSequence = textNormalizer.normalizeToNfc(combiningSequence);
+      final char[] normalizedSequence  = textNormalizer.normalizeToNfc(combiningSequence);
       final char[] normalizedCharacter = textNormalizer.normalizeToNfc(singleCharacter);
 
       assertThat(normalizedSequence, equalTo(normalizedCharacter));

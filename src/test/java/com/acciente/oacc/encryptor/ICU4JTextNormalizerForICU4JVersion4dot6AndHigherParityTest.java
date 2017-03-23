@@ -29,9 +29,9 @@ import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 
 @RunWith(Parameterized.class)
-public class ICU4JTextNormalizerParityTest {
-   private final ICU4JTextNormalizer textNormalizer = ICU4JTextNormalizer.getInstance();
-   private final Normalizer2         normalizer     = Normalizer2.getNFCInstance();
+public class ICU4JTextNormalizerForICU4JVersion4dot6AndHigherParityTest {
+   private final TextNormalizer textNormalizer = ICU4JTextNormalizerForICU4JVersion4dot6AndHigher.getInstance();
+   private final Normalizer2    normalizer     = Normalizer2Factory.getNFCInstance();
 
    @Parameterized.Parameters
    public static Object[] data() {

@@ -23,13 +23,13 @@ import java.text.Normalizer;
 
 public class JDKTextNormalizer extends TextNormalizer {
    private static class SingletonHolder {
-      private static final JDKTextNormalizer instance = new JDKTextNormalizer();
+      private static final TextNormalizer instance = new JDKTextNormalizer();
    }
 
    private JDKTextNormalizer() {
    }
 
-   public static JDKTextNormalizer getInstance() {
+   public static TextNormalizer getInstance() {
       return SingletonHolder.instance;
    }
 

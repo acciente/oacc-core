@@ -46,7 +46,7 @@ public abstract class TextNormalizer {
     */
    public static TextNormalizer getInstance() {
       try {
-         return ICU4JTextNormalizer.getInstance();
+         return ICU4JTextNormalizerForICU4JVersion4dot6AndHigher.getInstance();
       }
       catch (NoClassDefFoundError e) {
          return JDKTextNormalizer.getInstance();

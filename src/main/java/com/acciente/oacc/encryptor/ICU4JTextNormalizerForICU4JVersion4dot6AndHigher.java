@@ -22,7 +22,22 @@ import com.ibm.icu.text.Normalizer2;
 
 import java.nio.CharBuffer;
 
-public class ICU4JTextNormalizer extends TextNormalizer {
+/**
+ * Why is there this specific implementation of the TextNormalizer for ICU4J version 4.6 and higher?
+ * -------------------------------------------------------------------------------------------------
+ * In ICU4J versions prior to version 4.6 the methods to normalize text were in a class named Normalizer.
+ * Starting with ICU4J version 4.6 there is a new class named Normalizer2 with the normalization methods,
+ * and the methods in the old Normalizer class delegate to the methods in the new Normalizer2 class.
+ *
+ * The legacy Normalizer class delegates to a method of the new Normalizer2 class that allocates an internal
+ * working StringBuilder that is not externally accessible and therefore not cleanable.
+ *
+ * This class directly uses the new Normalizer2 via the method does *not* allocate an internal working
+ * StringBuilder, it also takes precautions to minimize the chance of the Normalizer2 leaking an
+ * inaccessible/non-cleanable buffer containing the source text (for details see note below about
+ * "Using ICU4J to ensure cleanable passwords").
+ */
+public class ICU4JTextNormalizerForICU4JVersion4dot6AndHigher extends TextNormalizer {
    // constants
    private static final char ZERO_CHAR = '\0';
 
@@ -31,14 +46,14 @@ public class ICU4JTextNormalizer extends TextNormalizer {
 
    // singleton instance
    private static class SingletonHolder {
-      private static final ICU4JTextNormalizer instance = new ICU4JTextNormalizer();
+      private static final TextNormalizer instance = new ICU4JTextNormalizerForICU4JVersion4dot6AndHigher();
    }
 
-   private ICU4JTextNormalizer() {
-      nfcNormalizer = Normalizer2.getNFCInstance();
+   private ICU4JTextNormalizerForICU4JVersion4dot6AndHigher() {
+      nfcNormalizer = Normalizer2Factory.getNFCInstance();
    }
 
-   public static ICU4JTextNormalizer getInstance() {
+   public static TextNormalizer getInstance() {
       return SingletonHolder.instance;
    }
 
