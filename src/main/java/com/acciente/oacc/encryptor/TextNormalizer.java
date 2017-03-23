@@ -46,10 +46,18 @@ public abstract class TextNormalizer {
     */
    public static TextNormalizer getInstance() {
       try {
+         // first see if a newer version of ICU4J is available
          return ICU4JTextNormalizerForICU4JVersion4dot6AndHigher.getInstance();
       }
-      catch (NoClassDefFoundError e) {
-         return JDKTextNormalizer.getInstance();
+      catch (NoClassDefFoundError e1) {
+         try {
+            // next see if an older version of ICU4J is available
+            return ICU4JTextNormalizerForICU4JBelowVersion4dot6.getInstance();
+         }
+         catch (NoClassDefFoundError e2) {
+            // otherwise fallback to the non-cleanable JDK based implementation
+            return JDKTextNormalizer.getInstance();
+         }
       }
    }
 
