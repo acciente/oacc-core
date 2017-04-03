@@ -45,9 +45,11 @@ public class ICU4JTextNormalizerForVer46On extends TextNormalizer {
    // state
    private final Normalizer2 nfcNormalizer;
 
-   // singleton instance
-   private static class SingletonHolder {
-      private static final TextNormalizer instance = new ICU4JTextNormalizerForVer46On();
+   // we use the singleton holder pattern to lazy initialize the singleton instance
+   // in a thread safe manner without the need for any explicit locking
+   // (see https://en.wikipedia.org/wiki/Initialization-on-demand_holder_idiom).
+   private static class LazyInitSingletonHolder {
+      private static final TextNormalizer INSTANCE = new ICU4JTextNormalizerForVer46On();
    }
 
    private ICU4JTextNormalizerForVer46On() {
@@ -55,7 +57,7 @@ public class ICU4JTextNormalizerForVer46On extends TextNormalizer {
    }
 
    public static TextNormalizer getInstance() {
-      return SingletonHolder.instance;
+      return LazyInitSingletonHolder.INSTANCE;
    }
 
    @Override

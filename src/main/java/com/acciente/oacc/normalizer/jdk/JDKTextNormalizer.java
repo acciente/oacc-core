@@ -24,15 +24,18 @@ import java.nio.CharBuffer;
 import java.text.Normalizer;
 
 public class JDKTextNormalizer extends TextNormalizer {
-   private static class SingletonHolder {
-      private static final TextNormalizer instance = new JDKTextNormalizer();
+   // we use the singleton holder pattern to lazy initialize the singleton instance
+   // in a thread safe manner without the need for any explicit locking
+   // (see https://en.wikipedia.org/wiki/Initialization-on-demand_holder_idiom).
+   private static class LazyInitSingletonHolder {
+      private static final TextNormalizer INSTANCE = new JDKTextNormalizer();
    }
 
    private JDKTextNormalizer() {
    }
 
    public static TextNormalizer getInstance() {
-      return SingletonHolder.instance;
+      return LazyInitSingletonHolder.INSTANCE;
    }
 
    @Override

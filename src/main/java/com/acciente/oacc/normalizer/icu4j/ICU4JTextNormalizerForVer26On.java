@@ -25,18 +25,25 @@ public class ICU4JTextNormalizerForVer26On extends TextNormalizer {
    // constants
    private static final char ZERO_CHAR = '\0';
 
-   // singleton instance
-   private static class SingletonHolder {
-      private static final TextNormalizer instance = new ICU4JTextNormalizerForVer26On();
+   // we use the singleton holder pattern to lazy initialize the singleton instance
+   // in a thread safe manner without the need for any explicit locking
+   // (see https://en.wikipedia.org/wiki/Initialization-on-demand_holder_idiom).
+   private static class LazyInitSingletonHolder {
+      private static final TextNormalizer INSTANCE = new ICU4JTextNormalizerForVer26On();
    }
 
    private ICU4JTextNormalizerForVer26On() {
-      // dummy call to trigger loading the Normalize class
+      // this "no-op" call to the Normalize class is *very* important, without it when the
+      // com.ibm.icu.text.Normalizer class is not present in the classpath a load of the
+      // class will not fail until it is attempted in the normalizeToNfc() method below -- which
+      // is too late. The class load needs to fail here to cause the getInstance() method below to
+      // propagate the class load exception and correctly trigger the fallback to the JDK based
+      // TextNormalizer implementation in the parent class's TextNormalizer#getInstance().
       Normalizer.normalize("", Normalizer.NFC, 0);
    }
 
    public static TextNormalizer getInstance() {
-      return SingletonHolder.instance;
+      return LazyInitSingletonHolder.INSTANCE;
    }
 
    @Override
