@@ -38,7 +38,7 @@ import java.nio.CharBuffer;
  * inaccessible/non-cleanable buffer containing the source text (for details see note below about
  * "Using ICU4J to ensure cleanable passwords").
  */
-public class ICU4JTextNormalizerForICU4JVersion4dot6AndHigher extends TextNormalizer {
+public class ICU4JTextNormalizerForVer46On extends TextNormalizer {
    // constants
    private static final char ZERO_CHAR = '\0';
 
@@ -47,10 +47,10 @@ public class ICU4JTextNormalizerForICU4JVersion4dot6AndHigher extends TextNormal
 
    // singleton instance
    private static class SingletonHolder {
-      private static final TextNormalizer instance = new ICU4JTextNormalizerForICU4JVersion4dot6AndHigher();
+      private static final TextNormalizer instance = new ICU4JTextNormalizerForVer46On();
    }
 
-   private ICU4JTextNormalizerForICU4JVersion4dot6AndHigher() {
+   private ICU4JTextNormalizerForVer46On() {
       nfcNormalizer = Normalizer2Factory.getNFCInstance();
    }
 
@@ -60,7 +60,7 @@ public class ICU4JTextNormalizerForICU4JVersion4dot6AndHigher extends TextNormal
 
    @Override
    public char[] normalizeToNfc(char[] charArraySource) {
-      /**
+      /*
        * Using ICU4J to ensure cleanable passwords
        * -----------------------------------------
        * Using ICU4J, without requisite precautions, does not ensure that the contents of the source
@@ -85,12 +85,10 @@ public class ICU4JTextNormalizerForICU4JVersion4dot6AndHigher extends TextNormal
        * the maximum expansion that can occur during NFC normalization. How much capacity do we need to
        * allocate?
        *
-       * According to this table (http://unicode.org/faq/normalization.html#12) the worst
-       * expansion for NFC is 3x. However, the 3x expansion refers to the worst case expansion
-       * of the final output string -- it does not account for the expansion during the intermediate
-       * processing. In tests using the Unicode characters that cause the worst case expansion it was
-       * observed that intermediate processing can cause up to 6x capacity expansion in the destination
-       * StringBuilder (see ICU4JDestBufferWorstCaseExpansionTest).
+       * According to (http://unicode.org/faq/normalization.html#12) the worst expansion for NFC is 3x. In
+       * tests of the ICU4J implementation, using the Unicode characters that cause the worst case expansion,
+       * it was verified that if the destination StringBuilder has a 3x initial capacity then the
+       * StringBuilder capacity does not increase (see ICU4JNormalizer2DestBufferWorstCaseExpansionTest).
        */
       final StringBuilder stringBuilderDest = new StringBuilder(6 * charArraySource.length);
       nfcNormalizer.normalize(CharBuffer.wrap(charArraySource), stringBuilderDest);

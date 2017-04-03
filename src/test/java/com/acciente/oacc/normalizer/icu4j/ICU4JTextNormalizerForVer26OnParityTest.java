@@ -28,8 +28,8 @@ import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 
 @RunWith(Parameterized.class)
-public class ICU4JTextNormalizerForICU4JBelowVersion4dot6ParityTest {
-   private final TextNormalizer textNormalizer = ICU4JTextNormalizerForICU4JBelowVersion4dot6.getInstance();
+public class ICU4JTextNormalizerForVer26OnParityTest {
+   private final TextNormalizer textNormalizer = ICU4JTextNormalizerForVer26On.getInstance();
 
    @Parameterized.Parameters
    public static Object[] data() {

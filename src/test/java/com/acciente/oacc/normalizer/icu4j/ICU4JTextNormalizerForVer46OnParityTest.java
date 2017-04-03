@@ -30,8 +30,8 @@ import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 
 @RunWith(Parameterized.class)
-public class ICU4JTextNormalizerForICU4JVersion4dot6AndHigherParityTest {
-   private final TextNormalizer textNormalizer = ICU4JTextNormalizerForICU4JVersion4dot6AndHigher.getInstance();
+public class ICU4JTextNormalizerForVer46OnParityTest {
+   private final TextNormalizer textNormalizer = ICU4JTextNormalizerForVer46On.getInstance();
    private final Normalizer2    normalizer     = Normalizer2Factory.getNFCInstance();
 
    @Parameterized.Parameters

@@ -29,8 +29,7 @@ import static org.hamcrest.Matchers.lessThanOrEqualTo;
 import static org.junit.Assert.assertThat;
 
 @RunWith(Parameterized.class)
-public class ICU4JLegacyNormalizerDestBufferWorstCaseExpansionTest {
-
+public class ICU4JTextNormalizerForVer26OnWorstCaseExpansionTest {
    @Parameters
    public static Object[] data() {
       return new Object[]{

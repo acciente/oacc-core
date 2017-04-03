@@ -17,7 +17,7 @@
  */
 package com.acciente.oacc.normalizer;
 
-import com.acciente.oacc.normalizer.icu4j.ICU4JTextNormalizerForICU4JVersion4dot6AndHigher;
+import com.acciente.oacc.normalizer.icu4j.ICU4JTextNormalizerForVer46On;
 import org.junit.Test;
 
 import static org.hamcrest.core.IsEqual.equalTo;
@@ -31,6 +31,6 @@ public class TextNormalizerInstanceTest {
    public void testReturnsICU4JTextNormalizer() {
       final TextNormalizer textNormalizer = TextNormalizer.getInstance();
       assertThat(textNormalizer.getClass().getCanonicalName(),
-                 equalTo(ICU4JTextNormalizerForICU4JVersion4dot6AndHigher.class.getCanonicalName()));
+                 equalTo(ICU4JTextNormalizerForVer46On.class.getCanonicalName()));
    }
 }

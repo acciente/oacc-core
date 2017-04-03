@@ -21,16 +21,16 @@ package com.acciente.oacc.normalizer.icu4j;
 import com.acciente.oacc.normalizer.TextNormalizer;
 import com.ibm.icu.text.Normalizer;
 
-public class ICU4JTextNormalizerForICU4JBelowVersion4dot6 extends TextNormalizer {
+public class ICU4JTextNormalizerForVer26On extends TextNormalizer {
    // constants
    private static final char ZERO_CHAR = '\0';
 
    // singleton instance
    private static class SingletonHolder {
-      private static final TextNormalizer instance = new ICU4JTextNormalizerForICU4JBelowVersion4dot6();
+      private static final TextNormalizer instance = new ICU4JTextNormalizerForVer26On();
    }
 
-   private ICU4JTextNormalizerForICU4JBelowVersion4dot6() {
+   private ICU4JTextNormalizerForVer26On() {
       // dummy call to trigger loading the Normalize class
       Normalizer.normalize("", Normalizer.NFC, 0);
    }

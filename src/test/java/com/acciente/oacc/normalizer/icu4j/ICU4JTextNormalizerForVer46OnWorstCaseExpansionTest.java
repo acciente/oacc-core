@@ -32,7 +32,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 
 @RunWith(Parameterized.class)
-public class ICU4JNormalizer2DestBufferWorstCaseExpansionTest {
+public class ICU4JTextNormalizerForVer46OnWorstCaseExpansionTest {
    private Normalizer2 normalizer;
 
    @Parameters
