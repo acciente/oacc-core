@@ -16,8 +16,9 @@
  * permissions and limitations under the License.
  */
 
-package com.acciente.oacc.encryptor;
+package com.acciente.oacc.normalizer.icu4j;
 
+import com.acciente.oacc.normalizer.TextNormalizer;
 import com.ibm.icu.text.Normalizer;
 
 public class ICU4JTextNormalizerForICU4JBelowVersion4dot6 extends TextNormalizer {

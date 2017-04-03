@@ -16,7 +16,7 @@
  * permissions and limitations under the License.
  */
 
-package com.acciente.oacc.encryptor;
+package com.acciente.oacc.normalizer.icu4j;
 
 import com.ibm.icu.text.Normalizer2;
 

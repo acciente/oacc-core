@@ -16,7 +16,9 @@
  * permissions and limitations under the License.
  */
 
-package com.acciente.oacc.encryptor;
+package com.acciente.oacc.normalizer.jdk;
+
+import com.acciente.oacc.normalizer.TextNormalizer;
 
 import java.nio.CharBuffer;
 import java.text.Normalizer;
