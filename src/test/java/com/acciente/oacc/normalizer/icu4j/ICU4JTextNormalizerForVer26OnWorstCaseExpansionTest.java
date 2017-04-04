@@ -32,6 +32,7 @@ import static org.junit.Assert.assertThat;
 public class ICU4JTextNormalizerForVer26OnWorstCaseExpansionTest {
    @Parameters
    public static Object[] data() {
+      // ref: http://unicode.org/faq/normalization.html
       return new Object[]{
             "foobar",
             "\ufb2c",
@@ -59,14 +60,6 @@ public class ICU4JTextNormalizerForVer26OnWorstCaseExpansionTest {
 
       // normalize the text
       final int actualDestLen = Normalizer.normalize(src.toCharArray(), dest, Normalizer.NFC, 0);
-      printStats(src, actualDestLen);
       assertThat(actualDestLen, lessThanOrEqualTo(expectedMaxExpansionSize));
-   }
-
-   private void printStats(String src, int destLen) {
-      System.out.printf("\nsrc=%s", src);
-      System.out.printf("\ndest=%s", destLen);
-      System.out.printf("\nsrc.length()=%s", src.length());
-      System.out.printf("\ndest.length()=%s", destLen);
    }
 }

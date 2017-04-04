@@ -37,6 +37,7 @@ public class ICU4JTextNormalizerForVer46OnWorstCaseExpansionTest {
 
    @Parameters
    public static Object[] data() {
+      // ref: http://unicode.org/faq/normalization.html
       return new Object[]{
             "foobar",
             "\ufb2c",
@@ -70,16 +71,7 @@ public class ICU4JTextNormalizerForVer46OnWorstCaseExpansionTest {
 
       // normalize the text
       normalizer.normalize(src, dest);
-      printStats(src, dest);
       assertThat(dest.length(), lessThanOrEqualTo(expectedMaxExpansionSize));
       assertThat(dest.capacity(), equalTo(expectedMaxExpansionSize));
-   }
-
-   private void printStats(String src, StringBuilder dest) {
-      System.out.printf("\nsrc=%s", src);
-      System.out.printf("\ndest=%s", dest);
-      System.out.printf("\nsrc.length()=%s", src.length());
-      System.out.printf("\ndest.length()=%s", dest.length());
-      System.out.printf("\ndest.capacity()=%s", dest.capacity());
    }
 }
