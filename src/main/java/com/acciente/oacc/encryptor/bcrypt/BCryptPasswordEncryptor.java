@@ -18,6 +18,7 @@
 package com.acciente.oacc.encryptor.bcrypt;
 
 import com.acciente.oacc.encryptor.PasswordEncryptor;
+import com.acciente.oacc.normalizer.TextNormalizer;
 import org.bouncycastle.crypto.generators.OpenBSDBCrypt;
 
 import java.io.Serializable;
@@ -87,8 +88,9 @@ public class BCryptPasswordEncryptor implements PasswordEncryptor, Serializable 
       if (plainPassword == null) {
          return null;
       }
+      final char[] normalizedChars = TextNormalizer.getInstance().normalizeToNfc(plainPassword);
 
-      final String bcryptString = OpenBSDBCrypt.generate(plainPassword, gensalt(new SecureRandom()), costFactor /* log rounds */);
+      final String bcryptString = OpenBSDBCrypt.generate(normalizedChars, gensalt(new SecureRandom()), costFactor /* log rounds */);
 
       return passwordEncoderDecoder.encode(bcryptString);
    }
@@ -103,8 +105,9 @@ public class BCryptPasswordEncryptor implements PasswordEncryptor, Serializable 
       }
 
       final String bcryptString = passwordEncoderDecoder.decode(storedPassword);
+      final char[] normalizedChars = TextNormalizer.getInstance().normalizeToNfc(plainPassword);
 
-      return OpenBSDBCrypt.checkPassword(bcryptString, plainPassword);
+      return OpenBSDBCrypt.checkPassword(bcryptString, normalizedChars);
    }
 
    /**

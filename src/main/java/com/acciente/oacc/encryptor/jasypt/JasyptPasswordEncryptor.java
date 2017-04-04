@@ -18,7 +18,7 @@
 package com.acciente.oacc.encryptor.jasypt;
 
 import com.acciente.oacc.encryptor.PasswordEncryptor;
-import org.jasypt.normalization.Normalizer;
+import com.acciente.oacc.normalizer.TextNormalizer;
 
 import java.io.Serializable;
 import java.nio.ByteBuffer;
@@ -89,7 +89,8 @@ public final class JasyptPasswordEncryptor implements PasswordEncryptor, Seriali
    }
 
    private static byte[] getCleanedBytes(char[] password) {
-      final ByteBuffer byteBuffer = StandardCharsets.UTF_8.encode(CharBuffer.wrap(Normalizer.normalizeToNfc(password)));
+      final char[] normalizedChars = TextNormalizer.getInstance().normalizeToNfc(password);
+      final ByteBuffer byteBuffer = StandardCharsets.UTF_8.encode(CharBuffer.wrap(normalizedChars));
       final byte[]     byteArray  = new byte[byteBuffer.remaining()];
       byteBuffer.get(byteArray);
       Arrays.fill(byteBuffer.array(), (byte) 0);

@@ -69,7 +69,7 @@ public class JasyptPasswordEncryptorTest {
 
    @Test
    public void checkNullPassword() throws Exception {
-      final char[] testPassword = "SomePasswordHere".toCharArray();;
+      final char[] testPassword = "SomePasswordHere".toCharArray();
 
       final String encryptedPassword = encryptor.encryptPassword(testPassword);
 
@@ -78,7 +78,7 @@ public class JasyptPasswordEncryptorTest {
 
    @Test
    public void checkNullStoredPassword() throws Exception {
-      final char[] testPassword = "SomePasswordHere".toCharArray();;
+      final char[] testPassword = "SomePasswordHere".toCharArray();
 
       assertThat(encryptor.checkPassword(testPassword, null), is(false));
    }
@@ -90,5 +90,15 @@ public class JasyptPasswordEncryptorTest {
       final String encryptedPasswordPass1 = encryptor.encryptPassword(testPassword);
 
       assertThat(encryptor.checkPassword(testPassword, encryptedPasswordPass1), is(true));
+   }
+
+   @Test
+   public void checkNormalizedPassword() throws Exception {
+      final char[] combiningSequencePwd = new char[]{'A', 0x30a}; // A, combining-ring-above
+      final char[] singleCharacterPwd = new char[]{0x00c5};       // latin-capital-a-with-ring-above (Å)
+
+      final String encryptedPasswordPass1 = encryptor.encryptPassword(combiningSequencePwd);
+
+      assertThat(encryptor.checkPassword(singleCharacterPwd, encryptedPasswordPass1), is(true));
    }
 }
