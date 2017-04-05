@@ -18,8 +18,8 @@
 
 package com.acciente.oacc.normalizer;
 
-import com.acciente.oacc.normalizer.icu4j.ICU4JTextNormalizerForVer26On;
-import com.acciente.oacc.normalizer.icu4j.ICU4JTextNormalizerForVer46On;
+import com.acciente.oacc.normalizer.icu4j.ICU4Jv26TextNormalizer;
+import com.acciente.oacc.normalizer.icu4j.ICU4Jv46TextNormalizer;
 import com.acciente.oacc.normalizer.jdk.JDKTextNormalizer;
 
 /**
@@ -51,12 +51,12 @@ public abstract class TextNormalizer {
    public static TextNormalizer getInstance() {
       try {
          // first see if a newer version of ICU4J is available
-         return ICU4JTextNormalizerForVer46On.getInstance();
+         return ICU4Jv46TextNormalizer.getInstance();
       }
       catch (NoClassDefFoundError e1) {
          try {
             // next see if an older version of ICU4J is available
-            return ICU4JTextNormalizerForVer26On.getInstance();
+            return ICU4Jv26TextNormalizer.getInstance();
          }
          catch (NoClassDefFoundError e2) {
             // otherwise fallback to the non-cleanable JDK based implementation

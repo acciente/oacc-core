@@ -19,20 +19,17 @@
 package com.acciente.oacc.normalizer.icu4j;
 
 import com.acciente.oacc.normalizer.TextNormalizer;
-import com.ibm.icu.text.Normalizer2;
+import com.ibm.icu.text.Normalizer;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
-
-import java.nio.CharBuffer;
 
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 
 @RunWith(Parameterized.class)
-public class ICU4JTextNormalizerForVer46OnParityTest {
-   private final TextNormalizer textNormalizer = ICU4JTextNormalizerForVer46On.getInstance();
-   private final Normalizer2    normalizer     = Normalizer2Factory.getNFCInstance();
+public class ICU4Jv26TextNormalizerParityTest {
+   private final TextNormalizer textNormalizer = ICU4Jv26TextNormalizer.getInstance();
 
    @Parameterized.Parameters
    public static Object[] data() {
@@ -62,8 +59,7 @@ public class ICU4JTextNormalizerForVer46OnParityTest {
 
    private char[] normalizeDirect() {
       // normalize using direct call to underlying normalizer
-      final StringBuilder destStringBuilder = new StringBuilder(2 * srcCharArray.length);
-      normalizer.normalize(CharBuffer.wrap(srcCharArray), destStringBuilder);
-      return destStringBuilder.toString().toCharArray();
+      final String dest = Normalizer.normalize(new String(srcCharArray), Normalizer.NFC);
+      return dest.toCharArray();
    }
 }

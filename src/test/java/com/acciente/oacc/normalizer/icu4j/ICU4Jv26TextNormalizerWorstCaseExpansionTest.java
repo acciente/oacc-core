@@ -18,23 +18,18 @@
 
 package com.acciente.oacc.normalizer.icu4j;
 
-import com.ibm.icu.text.Normalizer2;
-import org.junit.Before;
+import com.ibm.icu.text.Normalizer;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameter;
 import org.junit.runners.Parameterized.Parameters;
 
-import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.lessThanOrEqualTo;
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 
 @RunWith(Parameterized.class)
-public class ICU4JTextNormalizerForVer46OnWorstCaseExpansionTest {
-   private Normalizer2 normalizer;
-
+public class ICU4Jv26TextNormalizerWorstCaseExpansionTest {
    @Parameters
    public static Object[] data() {
       // ref: http://unicode.org/faq/normalization.html
@@ -56,22 +51,18 @@ public class ICU4JTextNormalizerForVer46OnWorstCaseExpansionTest {
    @Parameter
    public String src;
 
-   @Before
-   public void setUp() throws Exception {
-      normalizer = Normalizer2Factory.getNFCInstance();
-   }
-
    @Test
    public void testExpansion() throws Exception {
       final int expectedMaxExpansionSize = 3 * src.length();
 
       // allocate the destination to be 3x of the source length
-      StringBuilder dest = new StringBuilder(expectedMaxExpansionSize);
-      assertEquals(expectedMaxExpansionSize, dest.capacity());
+      char[] dest = new char[expectedMaxExpansionSize];
 
       // normalize the text
-      normalizer.normalize(src, dest);
-      assertThat(dest.length(), lessThanOrEqualTo(expectedMaxExpansionSize));
-      assertThat(dest.capacity(), equalTo(expectedMaxExpansionSize));
+      final int actualDestLen = Normalizer.normalize(src.toCharArray(), dest, Normalizer.NFC, 0);
+      assertThat("Note: " +
+                       "if this test fails, then the ICU4J library in use does not maintain our bounded expansion " +
+                       "and could leak passwords; use a different library or adjust the expansion factor",
+                 actualDestLen, lessThanOrEqualTo(expectedMaxExpansionSize));
    }
 }

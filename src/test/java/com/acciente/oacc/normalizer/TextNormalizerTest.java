@@ -18,8 +18,8 @@
 
 package com.acciente.oacc.normalizer;
 
-import com.acciente.oacc.normalizer.icu4j.ICU4JTextNormalizerForVer26On;
-import com.acciente.oacc.normalizer.icu4j.ICU4JTextNormalizerForVer46On;
+import com.acciente.oacc.normalizer.icu4j.ICU4Jv26TextNormalizer;
+import com.acciente.oacc.normalizer.icu4j.ICU4Jv46TextNormalizer;
 import com.acciente.oacc.normalizer.jdk.JDKTextNormalizer;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -33,18 +33,15 @@ import static org.junit.runners.Parameterized.Parameters;
 
 @RunWith(Parameterized.class)
 public class TextNormalizerTest {
-   private static final TextNormalizer ICU4J_TEXT_NORMALIZER_FOR_VER_46_ON =
-         ICU4JTextNormalizerForVer46On.getInstance();
-   private static final TextNormalizer ICU4J_TEXT_NORMALIZER_FOR_VER_26_ON =
-         ICU4JTextNormalizerForVer26On.getInstance();
-   private static final TextNormalizer JDK_TEXT_NORMALIZER                 =
-         JDKTextNormalizer.getInstance();
+   private static final TextNormalizer ICU4J_V46_TEXT_NORMALIZER = ICU4Jv46TextNormalizer.getInstance();
+   private static final TextNormalizer ICU4J_V26_TEXT_NORMALIZER = ICU4Jv26TextNormalizer.getInstance();
+   private static final TextNormalizer JDK_TEXT_NORMALIZER       = JDKTextNormalizer.getInstance();
 
    @Parameters
    public static Object[] data() {
       return new Object[]{
-            ICU4J_TEXT_NORMALIZER_FOR_VER_26_ON,
-            ICU4J_TEXT_NORMALIZER_FOR_VER_46_ON,
+            ICU4J_V26_TEXT_NORMALIZER,
+            ICU4J_V46_TEXT_NORMALIZER,
             JDK_TEXT_NORMALIZER};
    }
 

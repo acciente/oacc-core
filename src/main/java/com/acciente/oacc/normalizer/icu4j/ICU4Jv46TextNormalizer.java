@@ -38,7 +38,7 @@ import java.nio.CharBuffer;
  * inaccessible/non-cleanable buffer containing the source text (for details see note below about
  * "Using ICU4J to ensure cleanable passwords").
  */
-public class ICU4JTextNormalizerForVer46On extends TextNormalizer {
+public class ICU4Jv46TextNormalizer extends TextNormalizer {
    // constants
    private static final char ZERO_CHAR = '\0';
 
@@ -49,10 +49,10 @@ public class ICU4JTextNormalizerForVer46On extends TextNormalizer {
    // in a thread safe manner without the need for any explicit locking
    // (see https://en.wikipedia.org/wiki/Initialization-on-demand_holder_idiom).
    private static class LazyInitSingletonHolder {
-      private static final TextNormalizer INSTANCE = new ICU4JTextNormalizerForVer46On();
+      private static final TextNormalizer INSTANCE = new ICU4Jv46TextNormalizer();
    }
 
-   private ICU4JTextNormalizerForVer46On() {
+   private ICU4Jv46TextNormalizer() {
       nfcNormalizer = Normalizer2Factory.getNFCInstance();
    }
 

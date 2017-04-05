@@ -21,7 +21,7 @@ package com.acciente.oacc.normalizer.icu4j;
 import com.acciente.oacc.normalizer.TextNormalizer;
 import com.ibm.icu.text.Normalizer;
 
-public class ICU4JTextNormalizerForVer26On extends TextNormalizer {
+public class ICU4Jv26TextNormalizer extends TextNormalizer {
    // constants
    private static final char ZERO_CHAR = '\0';
 
@@ -29,10 +29,10 @@ public class ICU4JTextNormalizerForVer26On extends TextNormalizer {
    // in a thread safe manner without the need for any explicit locking
    // (see https://en.wikipedia.org/wiki/Initialization-on-demand_holder_idiom).
    private static class LazyInitSingletonHolder {
-      private static final TextNormalizer INSTANCE = new ICU4JTextNormalizerForVer26On();
+      private static final TextNormalizer INSTANCE = new ICU4Jv26TextNormalizer();
    }
 
-   private ICU4JTextNormalizerForVer26On() {
+   private ICU4Jv26TextNormalizer() {
       // this "no-op" call to the Normalize class is *very* important, without it when the
       // com.ibm.icu.text.Normalizer class is not present in the classpath a load of the
       // class will not fail until it is attempted in the normalizeToNfc() method below -- which
