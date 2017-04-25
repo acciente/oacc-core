@@ -67,7 +67,7 @@ public class SQLAccessControlSystemInitializer {
       dbUrl = initArgs.getProperty(PROP_DbUrl);
       dbUser = initArgs.getProperty(PROP_DbUser);
       dbPwd = initArgs.getProperty(PROP_DbPwd);
-      dbSchema = initArgs.getProperty(PROP_DbSchema, "TEST_OACC");
+      dbSchema = initArgs.getProperty(PROP_DbSchema);
       pwdEncryptor = initArgs.getProperty(PROP_PwdEncryptor);
       oaccRootPwd = initArgs.getProperty(PROP_OACCRootPwd);
 
