@@ -18,12 +18,14 @@
 
 package com.acciente.oacc.encryptor;
 
+import java.io.Serializable;
+
 /**
  * The purpose of this password encryptor is to provide a means to transition from an existing (aka "old") password
  * encryptor to a new password encryptor in an environment where OACC is already deployed -- where existing passwords
  * in the tables are encrypted using the old password encryptor.
  */
-public class TransitioningPasswordEncryptor implements PasswordEncryptor {
+public class TransitioningPasswordEncryptor implements PasswordEncryptor, Serializable {
    private final PasswordEncryptor newPasswordEncryptor;
    private final PasswordEncryptor oldPasswordEncryptor;
 
