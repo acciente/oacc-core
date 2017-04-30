@@ -55,7 +55,7 @@ import com.acciente.oacc.sql.internal.SQLPasswordAuthenticationProvider;
  *    in the tables are encrypted using the old password encryptor. The following factory method provides different
  *    configuration options (for details see method Javadocs):
  *    <ul>
- *    <li>{@link TransitioningPasswordEncryptor#getPasswordEncryptor(PasswordEncryptor, PasswordEncryptor)}</li>
+ *    <li>{@link TransitioningPasswordEncryptor#newInstance(PasswordEncryptor, PasswordEncryptor)}</li>
  *    </ul>
  * </li>
  * </ul>

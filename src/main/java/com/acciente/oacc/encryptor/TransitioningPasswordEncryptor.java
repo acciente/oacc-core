@@ -42,8 +42,8 @@ public class TransitioningPasswordEncryptor implements PasswordEncryptor, Serial
     *                             <code>newPasswordEncryptor</code> began.
     * @return a {@link TransitioningPasswordEncryptor} instance.
     */
-   public static TransitioningPasswordEncryptor getPasswordEncryptor(PasswordEncryptor newPasswordEncryptor,
-                                                                     PasswordEncryptor oldPasswordEncryptor) {
+   public static TransitioningPasswordEncryptor newInstance(PasswordEncryptor newPasswordEncryptor,
+                                                            PasswordEncryptor oldPasswordEncryptor) {
       return new TransitioningPasswordEncryptor(newPasswordEncryptor, oldPasswordEncryptor);
    }
 
