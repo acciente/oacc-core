@@ -25,6 +25,7 @@ import java.nio.charset.StandardCharsets;
 
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.StringEndsWith.endsWith;
+import static org.hamcrest.core.StringStartsWith.startsWith;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 
@@ -51,10 +52,6 @@ public class PasswordEncoderDecoderTest {
 
    private static final String ENCODED_INVALID_PASSWORD = "jasypt:(the-content-in-parens-does-not-matter)";
 
-   private static final String DECODED_LEGACY_PASSWORD_ALGORITHM       = "SHA-256";
-   private static final int    DECODED_LEGACY_PASSWORD_ITERATIONS      = 100000;
-   private static final int    DECODED_LEGACY_PASSWORD_SALT_SIZE_BYTES = 16;
-
    @Test
    public void testEncodePassword() throws Exception {
       final String encodedPassword = encoderDecoder.encode(DECODED_PASSWORD_ALGORITHM,
@@ -76,12 +73,13 @@ public class PasswordEncoderDecoderTest {
 
    @Test
    public void testDecodeLegacyPassword() throws Exception {
-      final DecodedPassword decodedPassword = encoderDecoder.decode(ENCODED_LEGACY_PASSWORD);
-
-      assertThat(decodedPassword.getAlgorithm(), is(DECODED_LEGACY_PASSWORD_ALGORITHM));
-      assertThat(decodedPassword.getIterations(), is(DECODED_LEGACY_PASSWORD_ITERATIONS));
-      assertThat(decodedPassword.getSaltSizeBytes(), is(DECODED_LEGACY_PASSWORD_SALT_SIZE_BYTES));
-      assertThat(decodedPassword.getDigest(), is(DECODED_PASSWORD_DIGEST));
+      try {
+         encoderDecoder.decode(ENCODED_LEGACY_PASSWORD);
+         fail("Expected an IllegalArgumentException");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage(), startsWith("Unexpected marker for Jasypt password:"));
+      }
    }
 
    @Test

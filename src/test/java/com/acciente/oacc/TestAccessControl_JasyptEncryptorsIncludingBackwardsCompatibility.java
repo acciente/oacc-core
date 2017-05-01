@@ -17,6 +17,7 @@
  */
 package com.acciente.oacc;
 
+import com.acciente.oacc.encryptor.TransitioningPasswordEncryptor;
 import com.acciente.oacc.encryptor.jasypt.JasyptPasswordEncryptor;
 import com.acciente.oacc.encryptor.jasypt.LegacyJasyptPasswordEncryptor;
 import com.acciente.oacc.helper.SQLAccessControlSystemResetUtil;
@@ -29,18 +30,20 @@ import static com.acciente.oacc.TestAccessControlBase.generateUniqueDomainName;
 import static com.acciente.oacc.TestAccessControlBase.generateUniqueExternalId;
 import static com.acciente.oacc.TestAccessControlBase.generateUniqueResourceClassName;
 
-public class TestAccessControl_JasyptEncryptorIncludingBackwardsCompatibility {
+public class TestAccessControl_JasyptEncryptorsIncludingBackwardsCompatibility {
    private static final Resource SYS_RESOURCE = Resources.getInstance(0);
 
-   private AccessControlContext systemAccessControlContextWithLegacyEncryptor;
-   private AccessControlContext systemAccessControlContextWithCurrentEncryptor;
+   private AccessControlContext systemContextUsingLegacyEncryptor;
+   private AccessControlContext userContextUsingLegacyEncryptor;
 
-   private AccessControlContext accessControlContextWithLegacyEncryptor;
-   private AccessControlContext accessControlContextWithCurrentEncryptor;
-   private String               resourceExternalId;
-   private String               resourceClassName;
-   private String               resourceDomainName;
-   private PasswordCredentials  resourceCredentials;
+   private AccessControlContext systemContextUsingCurrentWithLegacyFallbackEncryptor;
+   private AccessControlContext userContextUsingCurrentEncryptor;
+   private AccessControlContext userContextUsingCurrentWithLegacyFallbackEncryptor;
+
+   private String              resourceExternalId;
+   private String              resourceClassName;
+   private String              resourceDomainName;
+   private PasswordCredentials resourceCredentials;
 
    @Before
    public void setUpTest() throws Exception {
@@ -54,15 +57,15 @@ public class TestAccessControl_JasyptEncryptorIncludingBackwardsCompatibility {
                                                    TestConfigLoader.getOaccRootPassword(),
                                                    legacyJasyptPasswordEncryptor);
 
-         systemAccessControlContextWithLegacyEncryptor
+         systemContextUsingLegacyEncryptor
                = SQLAccessControlContextFactory.getAccessControlContext(TestConfigLoader.getDataSource(),
                                                                         TestConfigLoader.getDatabaseSchema(),
                                                                         TestConfigLoader.getSQLProfile(),
                                                                         legacyJasyptPasswordEncryptor);
-         systemAccessControlContextWithLegacyEncryptor.authenticate(SYS_RESOURCE,
-                                                                    PasswordCredentials.newInstance(TestConfigLoader.getOaccRootPassword()));
+         systemContextUsingLegacyEncryptor.authenticate(SYS_RESOURCE,
+                                                        PasswordCredentials.newInstance(TestConfigLoader.getOaccRootPassword()));
 
-         accessControlContextWithLegacyEncryptor
+         userContextUsingLegacyEncryptor
                = SQLAccessControlContextFactory.getAccessControlContext(TestConfigLoader.getDataSource(),
                                                                         TestConfigLoader.getDatabaseSchema(),
                                                                         TestConfigLoader.getSQLProfile(),
@@ -73,15 +76,29 @@ public class TestAccessControl_JasyptEncryptorIncludingBackwardsCompatibility {
       {
          // we use values different values from the default
          final JasyptPasswordEncryptor jasyptPasswordEncryptor = JasyptPasswordEncryptor.newInstance("MD5", 2000, 32);
-         systemAccessControlContextWithCurrentEncryptor
+
+         // we need to use a transitioning password encryptor that falls back to a LegacyJasyptPasswordEncryptor for
+         // the system context here since the OACC root password was written to using a LegacyJasyptPasswordEncryptor in
+         // the call to SQLAccessControlSystemResetUtil.resetOACC(...) above
+         final TransitioningPasswordEncryptor transitioningPasswordEncryptor =
+               TransitioningPasswordEncryptor.newInstance(
+                     jasyptPasswordEncryptor,
+                     LegacyJasyptPasswordEncryptor.newInstance());
+         systemContextUsingCurrentWithLegacyFallbackEncryptor
                = SQLAccessControlContextFactory.getAccessControlContext(TestConfigLoader.getDataSource(),
                                                                         TestConfigLoader.getDatabaseSchema(),
                                                                         TestConfigLoader.getSQLProfile(),
-                                                                        jasyptPasswordEncryptor);
-         systemAccessControlContextWithCurrentEncryptor.authenticate(SYS_RESOURCE,
-                                                                     PasswordCredentials.newInstance(TestConfigLoader.getOaccRootPassword()));
+                                                                        transitioningPasswordEncryptor);
+         systemContextUsingCurrentWithLegacyFallbackEncryptor.authenticate(SYS_RESOURCE,
+                                                                           PasswordCredentials.newInstance(TestConfigLoader.getOaccRootPassword()));
 
-         accessControlContextWithCurrentEncryptor
+         // the tests below use one of the user context encryptors below
+         userContextUsingCurrentWithLegacyFallbackEncryptor
+               = SQLAccessControlContextFactory.getAccessControlContext(TestConfigLoader.getDataSource(),
+                                                                        TestConfigLoader.getDatabaseSchema(),
+                                                                        TestConfigLoader.getSQLProfile(),
+                                                                        transitioningPasswordEncryptor);
+         userContextUsingCurrentEncryptor
                = SQLAccessControlContextFactory.getAccessControlContext(TestConfigLoader.getDataSource(),
                                                                         TestConfigLoader.getDatabaseSchema(),
                                                                         TestConfigLoader.getSQLProfile(),
@@ -89,53 +106,50 @@ public class TestAccessControl_JasyptEncryptorIncludingBackwardsCompatibility {
       }
 
       resourceExternalId = generateUniqueExternalId();
-      resourceClassName = generateResourceClass(true, false);
+      resourceClassName = generateAuthenticatableResourceClass();
       resourceDomainName = generateDomain();
       resourceCredentials = PasswordCredentials.newInstance(generateRandomPassword().toCharArray());
    }
 
    @Test
    public void testAuthenticateOfResourceWithLegacyPasswordUsingLegacyEncryptor() throws Exception {
-      final Resource resource = systemAccessControlContextWithLegacyEncryptor.createResource(resourceClassName,
-                                                                                             resourceDomainName,
-                                                                                             resourceExternalId,
-                                                                                             resourceCredentials);
+      final Resource resource = systemContextUsingLegacyEncryptor.createResource(resourceClassName,
+                                                                                 resourceDomainName,
+                                                                                 resourceExternalId,
+                                                                                 resourceCredentials);
 
-      accessControlContextWithLegacyEncryptor.authenticate(resource, resourceCredentials);
+      userContextUsingLegacyEncryptor.authenticate(resource, resourceCredentials);
    }
 
    @Test
-   public void testAuthenticateOfResourceWithLegacyPasswordUsingCurrentEncryptor() throws Exception {
-      final Resource resource = systemAccessControlContextWithLegacyEncryptor.createResource(resourceClassName,
-                                                                                             resourceDomainName,
-                                                                                             resourceExternalId,
-                                                                                             resourceCredentials);
+   public void testAuthenticateOfResourceWithLegacyPasswordUsingCurrentWithLegacyFallbackEncryptor() throws Exception {
+      final Resource resource = systemContextUsingLegacyEncryptor.createResource(resourceClassName,
+                                                                                 resourceDomainName,
+                                                                                 resourceExternalId,
+                                                                                 resourceCredentials);
 
-      accessControlContextWithCurrentEncryptor.authenticate(resource, resourceCredentials);
+      userContextUsingCurrentWithLegacyFallbackEncryptor.authenticate(resource, resourceCredentials);
    }
 
    @Test
    public void testAuthenticateOfResourceWithCurrentPasswordUsingCurrentEncryptor() throws Exception {
-      final Resource resource = systemAccessControlContextWithCurrentEncryptor.createResource(resourceClassName,
-                                                                                              resourceDomainName,
-                                                                                              resourceExternalId,
-                                                                                              resourceCredentials);
+      final Resource resource = systemContextUsingCurrentWithLegacyFallbackEncryptor.createResource(resourceClassName,
+                                                                                                    resourceDomainName,
+                                                                                                    resourceExternalId,
+                                                                                                    resourceCredentials);
 
-      accessControlContextWithCurrentEncryptor.authenticate(resource, resourceCredentials);
+      userContextUsingCurrentEncryptor.authenticate(resource, resourceCredentials);
    }
 
-   private String generateResourceClass(boolean authenticatable,
-                                        boolean nonAuthenticatedCreateAllowed) {
+   private String generateAuthenticatableResourceClass() {
       final String resourceClassName = generateUniqueResourceClassName();
-      systemAccessControlContextWithLegacyEncryptor.createResourceClass(resourceClassName,
-                                                                        authenticatable,
-                                                                        nonAuthenticatedCreateAllowed);
+      systemContextUsingLegacyEncryptor.createResourceClass(resourceClassName, true, false);
       return resourceClassName;
    }
 
    private String generateDomain() {
       final String domainName = generateUniqueDomainName();
-      systemAccessControlContextWithLegacyEncryptor.createDomain(domainName);
+      systemContextUsingLegacyEncryptor.createDomain(domainName);
       return domainName;
    }
 

@@ -36,18 +36,6 @@ class PasswordEncoderDecoder {
 
    private static final Base64 base64 = new Base64();
 
-   // The following Jasypt digest parameters are values that were used to encrypt password hashes prior to
-   // supporting configurable values, these values are important because they are used to decrypt password
-   // hashes that have no header (aka legacy password hashes).
-   //
-   // WARNING:
-   // These values are independent of the DEFAULT_ prefixed value defined in the JasyptPasswordEncryptor class,
-   // in particular the value in the JasyptPasswordEncryptor class may be changed without adverse affect, but
-   // these values should NOT be changed.
-   private static final String LEGACY_PASSWORD_ALGORITHM       = "SHA-256";
-   private static final int    LEGACY_PASSWORD_ITERATIONS      = 100000;
-   private static final int    LEGACY_PASSWORD_SALT_SIZE_BYTES = 16;
-
    /**
     * Encodes an identifying header, the parameters used to generate the Jasypt digest, and the Jasypt digest into a
     * single "self-contained" password that contains enough information for future comparisons.
@@ -119,15 +107,8 @@ class PasswordEncoderDecoder {
                .build();
       }
       else {
-         // if no marker is present we assume this is a legacy Jasypt hash (no marker is present in these hashes)
-         final byte[] digest = base64.decode(encodedPassword.getBytes(StandardCharsets.US_ASCII));
-
-         return new DecodedPassword.Builder()
-               .algorithm(LEGACY_PASSWORD_ALGORITHM)
-               .iterations(LEGACY_PASSWORD_ITERATIONS)
-               .saltSizeBytes(LEGACY_PASSWORD_SALT_SIZE_BYTES)
-               .digest(digest)
-               .build();
+         throw new IllegalArgumentException("Unexpected marker for Jasypt password: " +
+                                                  encodedPassword.substring(0, MARKER.length()));
       }
    }
 }
