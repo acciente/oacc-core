@@ -92,7 +92,7 @@ public class ICU4Jv46TextNormalizer extends TextNormalizer {
        * it was verified that if the destination StringBuilder has a 3x initial capacity then the
        * StringBuilder capacity does not increase (see ICU4JNormalizer2DestBufferWorstCaseExpansionTest).
        */
-      final StringBuilder stringBuilderDest = new StringBuilder(6 * charArraySource.length);
+      final StringBuilder stringBuilderDest = new StringBuilder(3 * charArraySource.length);
       nfcNormalizer.normalize(CharBuffer.wrap(charArraySource), stringBuilderDest);
 
       // copy the result out of the StringBuilder, before clearing the character array buffer backing the StringBuilder
