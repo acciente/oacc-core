@@ -15,16 +15,13 @@
  * See the License for the specific language governing
  * permissions and limitations under the License.
  */
-package com.acciente.oacc.sql;
 
-import junit.framework.JUnit4TestAdapter;
-import junit.framework.TestSuite;
+package com.acciente.oacc.normalizer.icu4j;
 
-public class TestSQLAccessControlSystemInitializerSuite {
-   public static TestSuite suite() {
-      TestSuite suite = new TestSuite();
-      suite.addTest(new JUnit4TestAdapter(TestSQLAccessControlSystemInitializer.class));
+import com.ibm.icu.text.Normalizer2;
 
-      return suite;
+public class Normalizer2Factory {
+   public static Normalizer2 getNFCInstance() {
+      return Normalizer2.getInstance(null, "nfc", Normalizer2.Mode.COMPOSE);
    }
 }

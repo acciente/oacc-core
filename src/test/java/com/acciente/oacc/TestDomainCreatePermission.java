@@ -340,4 +340,40 @@ public class TestDomainCreatePermission {
          }
       }
    }
+
+   @Test
+   public void toString_systemPermission() {
+      for(String systemPermissionName : DomainCreatePermissions.getSysPermissionNames()) {
+         final DomainCreatePermission domainCreatePermission
+               = DomainCreatePermissions.getInstance(systemPermissionName);
+         assertThat(domainCreatePermission.toString(), is(systemPermissionName));
+      }
+   }
+
+   @Test
+   public void toString_systemPermission_withGrant() {
+      for(String systemPermissionName : DomainCreatePermissions.getSysPermissionNames()) {
+         final DomainCreatePermission domainCreatePermission
+               = DomainCreatePermissions.getInstanceWithGrantOption(systemPermissionName);
+         final String stringRepresentation = domainCreatePermission.toString();
+         assertThat(stringRepresentation, is(systemPermissionName + " /G"));
+      }
+   }
+
+   @Test
+   public void toString_customPermission() {
+      final DomainPermission domainPermission = DomainPermissions.getInstanceWithGrantOption(DomainPermissions.DELETE);
+      final DomainCreatePermission domainCreatePermission = DomainCreatePermissions.getInstance(domainPermission);
+      final String stringRepresentation = domainCreatePermission.toString();
+      assertThat(stringRepresentation, is("[" + domainPermission.toString() + "]"));
+   }
+
+   @Test
+   public void toString_customPermission_withGrant() {
+      final DomainPermission domainPermission = DomainPermissions.getInstanceWithGrantOption(DomainPermissions.DELETE);
+      final DomainCreatePermission domainCreatePermission
+            = DomainCreatePermissions.getInstanceWithGrantOption(domainPermission);
+      final String stringRepresentation = domainCreatePermission.toString();
+      assertThat(stringRepresentation, is("[" + domainPermission.toString() + "] /G"));
+   }
 }

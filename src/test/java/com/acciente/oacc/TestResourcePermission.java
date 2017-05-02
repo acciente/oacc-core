@@ -249,4 +249,36 @@ public class TestResourcePermission {
          assertThat(e.getMessage().toLowerCase(), containsString("invalid system permission name"));
       }
    }
+
+   @Test
+   public void toString_systemPermission() {
+      for(String systemPermissionName : ResourcePermissions.getSysPermissionNames()) {
+         final ResourcePermission resourcePermission = ResourcePermissions.getInstance(systemPermissionName);
+         assertThat(resourcePermission.toString(), is(systemPermissionName));
+      }
+   }
+
+   @Test
+   public void toString_systemPermission_withGrant() {
+      for(String systemPermissionName : ResourcePermissions.getSysPermissionNames()) {
+         final ResourcePermission resourcePermission = ResourcePermissions.getInstanceWithGrantOption(systemPermissionName);
+         final String stringRepresentation = resourcePermission.toString();
+         assertThat(stringRepresentation, is(systemPermissionName + " /G"));
+      }
+   }
+
+   @Test
+   public void toString_customPermission() {
+      String customPermissionName = "myPermission";
+      final ResourcePermission resourcePermission = ResourcePermissions.getInstance(customPermissionName);
+      assertThat(resourcePermission.toString(), is(customPermissionName));
+   }
+
+   @Test
+   public void toString_customPermission_withGrant() {
+      String customPermissionName = "myPermission";
+      final ResourcePermission resourcePermission = ResourcePermissions.getInstanceWithGrantOption(customPermissionName);
+      final String stringRepresentation = resourcePermission.toString();
+      assertThat(stringRepresentation, is(customPermissionName + " /G"));
+   }
 }

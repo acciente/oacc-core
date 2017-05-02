@@ -15,22 +15,33 @@
  * See the License for the specific language governing
  * permissions and limitations under the License.
  */
-package com.acciente.oacc.sql.internal;
+package com.acciente.oacc.encryptor.jasypt;
 
+import com.acciente.oacc.encryptor.PasswordEncryptor;
+import com.acciente.oacc.normalizer.TextNormalizer;
 import org.jasypt.contrib.org.apache.commons.codec_1_3.binary.Base64;
 import org.jasypt.digest.StandardByteDigester;
-import org.jasypt.normalization.Normalizer;
 
 import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 
-public final class StrongCleanablePasswordEncryptor implements CleanablePasswordEncryptor {
+/**
+ * Password encryptor implementation that was the sole password encryptor in OACC v2.0.0.rc7 and prior.
+ */
+public final class LegacyJasyptPasswordEncryptor implements PasswordEncryptor {
    private final StandardByteDigester digester;
    private final Base64               base64;
 
-   public StrongCleanablePasswordEncryptor() {
+   /**
+    * Returns an instance of the legacy password encryptor implementation used in OACC v2.0.0.rc7 (and prior).
+    */
+   public static LegacyJasyptPasswordEncryptor newInstance() {
+      return new LegacyJasyptPasswordEncryptor();
+   }
+
+   private LegacyJasyptPasswordEncryptor() {
       this.digester = new StandardByteDigester();
       this.digester.setAlgorithm("SHA-256");
       this.digester.setIterations(100000);
@@ -65,7 +76,8 @@ public final class StrongCleanablePasswordEncryptor implements CleanablePassword
    }
 
    private byte[] getCleanedBytes(char[] password) {
-      final ByteBuffer byteBuffer = StandardCharsets.UTF_8.encode(CharBuffer.wrap(Normalizer.normalizeToNfc(password)));
+      final char[] normalizedChars = TextNormalizer.getInstance().normalizeToNfc(password);
+      final ByteBuffer byteBuffer = StandardCharsets.UTF_8.encode(CharBuffer.wrap(normalizedChars));
       final byte[] byteArray = new byte[byteBuffer.remaining()];
       byteBuffer.get(byteArray);
       Arrays.fill(byteBuffer.array(), (byte) 0);

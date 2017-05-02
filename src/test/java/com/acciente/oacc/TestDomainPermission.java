@@ -202,4 +202,21 @@ public class TestDomainPermission {
          assertThat(e.getMessage().toLowerCase(), containsString("invalid system permission name"));
       }
    }
+
+   @Test
+   public void toStringTest() {
+      for(String systemPermissionName : DomainPermissions.getSysPermissionNames()) {
+         final DomainPermission domainPermission = DomainPermissions.getInstance(systemPermissionName);
+         assertThat(domainPermission.toString(), is(systemPermissionName));
+      }
+   }
+
+   @Test
+   public void toStringTest_withGrant() {
+      for(String systemPermissionName : DomainPermissions.getSysPermissionNames()) {
+         final DomainPermission domainPermission = DomainPermissions.getInstanceWithGrantOption(systemPermissionName);
+         final String stringRepresentation = domainPermission.toString();
+         assertThat(stringRepresentation, is(systemPermissionName + " /G"));
+      }
+   }
 }

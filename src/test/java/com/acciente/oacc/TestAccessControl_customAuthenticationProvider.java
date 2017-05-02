@@ -19,7 +19,6 @@ package com.acciente.oacc;
 
 import com.acciente.oacc.helper.TestConfigLoader;
 import com.acciente.oacc.sql.SQLAccessControlContextFactory;
-import com.acciente.oacc.sql.SQLDialect;
 import com.acciente.oacc.sql.SQLProfile;
 import com.acciente.oacc.sql.internal.SQLPasswordAuthenticationProvider;
 import org.junit.After;
@@ -38,8 +37,8 @@ import static org.junit.Assert.fail;
 
 public class TestAccessControl_customAuthenticationProvider extends TestAccessControlBase {
 
-   public static final char[] GUEST_PASSWORD = "9UE5T".toCharArray();
-   public static final char[] ADMIN_PASSWORD = "... . -.-. .-. . -".toCharArray();
+   private static final char[] GUEST_PASSWORD = "9UE5T".toCharArray();
+   private static final char[] ADMIN_PASSWORD = "... . -.-. .-. . -".toCharArray();
    private static AccessControlContext customAccessControlContext;
    private static Resource             guestResource;
    private static Resource             adminResource;
@@ -71,8 +70,8 @@ public class TestAccessControl_customAuthenticationProvider extends TestAccessCo
                                                                      sqlProfile,
                                                                      new CustomAuthenticationProvider(dataSource,
                                                                                                       TestConfigLoader
-                                                                                                            .getDatabaseSchema(),
-                                                                                                      sqlProfile.getSqlDialect()));
+                                                                                                            .getDatabaseSchema()
+                                                                     ));
    }
 
    @After
@@ -176,16 +175,12 @@ public class TestAccessControl_customAuthenticationProvider extends TestAccessCo
    }
 
    private static class CustomAuthenticationProvider extends SQLPasswordAuthenticationProvider {
-      protected CustomAuthenticationProvider(Connection connection,
-                                             String schemaName,
-                                             SQLDialect sqlDialect) {
-         super(connection, schemaName, sqlDialect);
+      protected CustomAuthenticationProvider(Connection connection, String schemaName) {
+         super(connection, schemaName, TestConfigLoader.getPasswordEncryptor());
       }
 
-      protected CustomAuthenticationProvider(DataSource dataSource,
-                                             String schemaName,
-                                             SQLDialect sqlDialect) {
-         super(dataSource, schemaName, sqlDialect);
+      protected CustomAuthenticationProvider(DataSource dataSource, String schemaName) {
+         super(dataSource, schemaName, TestConfigLoader.getPasswordEncryptor());
       }
 
       @Override

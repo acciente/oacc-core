@@ -342,4 +342,36 @@ public class TestResourceCreatePermission {
       }
    }
 
+   @Test
+   public void toString_systemPermission() {
+      for(String systemPermissionName : ResourceCreatePermissions.getSysPermissionNames()) {
+         final ResourceCreatePermission resourceCreatePermission = ResourceCreatePermissions.getInstance(systemPermissionName);
+         assertThat(resourceCreatePermission.toString(), is(systemPermissionName));
+      }
+   }
+
+   @Test
+   public void toString_systemPermission_withGrant() {
+      for(String systemPermissionName : ResourceCreatePermissions.getSysPermissionNames()) {
+         final ResourceCreatePermission resourceCreatePermission = ResourceCreatePermissions.getInstanceWithGrantOption(systemPermissionName);
+         final String stringRepresentation = resourceCreatePermission.toString();
+         assertThat(stringRepresentation, is(systemPermissionName + " /G"));
+      }
+   }
+
+   @Test
+   public void toString_customPermission() {
+      final ResourcePermission resourcePermission = ResourcePermissions.getInstance(ResourcePermissions.DELETE);
+      final ResourceCreatePermission resourceCreatePermission = ResourceCreatePermissions.getInstance(resourcePermission);
+      final String stringRepresentation = resourceCreatePermission.toString();
+      assertThat(stringRepresentation, is("[" + ResourcePermissions.DELETE + "]"));
+   }
+
+   @Test
+   public void toString_customPermission_withGrant() {
+      final ResourcePermission resourcePermission = ResourcePermissions.getInstance(ResourcePermissions.DELETE);
+      final ResourceCreatePermission resourceCreatePermission = ResourceCreatePermissions.getInstanceWithGrantOption(resourcePermission);
+      final String stringRepresentation = resourceCreatePermission.toString();
+      assertThat(stringRepresentation, is("[" + ResourcePermissions.DELETE + "] /G"));
+   }
 }

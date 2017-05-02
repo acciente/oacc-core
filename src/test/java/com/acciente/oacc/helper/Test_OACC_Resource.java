@@ -18,9 +18,8 @@
 package com.acciente.oacc.helper;
 
 import com.acciente.oacc.Resources;
-import com.acciente.oacc.sql.internal.CleanablePasswordEncryptor;
+import com.acciente.oacc.encryptor.PasswordEncryptor;
 import com.acciente.oacc.sql.internal.PasswordUtils;
-import com.acciente.oacc.sql.internal.StrongCleanablePasswordEncryptor;
 import org.junit.Test;
 
 import static org.hamcrest.CoreMatchers.is;
@@ -31,7 +30,7 @@ public class Test_OACC_Resource {
 
    @Test
    public void meta_checkPasswords() {
-      CleanablePasswordEncryptor passwordEncryptor = new StrongCleanablePasswordEncryptor();
+      PasswordEncryptor passwordEncryptor = TestConfigLoader.getPasswordEncryptor();
       final char[] plaintext = "abc".toCharArray();
       final String digest_01 = passwordEncryptor.encryptPassword(plaintext);
       final String digest_02 = passwordEncryptor.encryptPassword(plaintext);
@@ -46,7 +45,7 @@ public class Test_OACC_Resource {
 
    @Test
    public void meta_equalityOfResourcesWithEncryptedPasswords() {
-      CleanablePasswordEncryptor passwordEncryptor = new StrongCleanablePasswordEncryptor();
+      PasswordEncryptor passwordEncryptor = TestConfigLoader.getPasswordEncryptor();
       final char[] plaintext = "abc".toCharArray();
       final String digest_01 = passwordEncryptor.encryptPassword(PasswordUtils.computeBoundPassword(
             Resources.getInstance(0), plaintext));

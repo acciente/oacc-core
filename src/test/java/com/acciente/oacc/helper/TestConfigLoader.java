@@ -17,6 +17,9 @@
  */
 package com.acciente.oacc.helper;
 
+import com.acciente.oacc.encryptor.PasswordEncryptor;
+import com.acciente.oacc.encryptor.bcrypt.BCryptPasswordEncryptor;
+import com.acciente.oacc.encryptor.jasypt.JasyptPasswordEncryptor;
 import com.acciente.oacc.sql.SQLProfile;
 
 import javax.sql.DataSource;
@@ -26,15 +29,17 @@ import java.lang.reflect.Method;
 import java.util.Properties;
 
 public class TestConfigLoader {
-   private static DataSource dataSource;
-   private static Boolean    isDatabaseCaseSensitive;
-   private static SQLProfile sqlProfile;
-   private static String     databaseSchema;
-   private static char[]     oaccRootPwd;
+   private static DataSource        dataSource;
+   private static Boolean           isDatabaseCaseSensitive;
+   private static SQLProfile        sqlProfile;
+   private static String            databaseSchema;
+   private static PasswordEncryptor passwordEncryptor;
+   private static char[]            oaccRootPwd;
 
    public static final String PROP_DATA_SOURCE_CLASS = "dataSourceClass";
    public static final String PROP_SQL_PROFILE       = "sqlProfile";
    public static final String PROP_DB_SCHEMA         = "dbSchema";
+   public static final String PROP_PWD_ENCRYPTOR     = "pwdEncryptor";
    public static final String PROP_OACC_ROOT_PWD     = "oaccRootPwd";
 
    static {
@@ -58,7 +63,8 @@ public class TestConfigLoader {
 
          final String sqlTypeName = properties.getProperty(PROP_SQL_PROFILE);
          if (sqlTypeName==null) {
-            throw new RuntimeException("no sqlType property specified in database configuration property file");
+            throw new RuntimeException("no " + PROP_SQL_PROFILE
+                                             + " property specified in database configuration property file");
          }
          sqlProfile = SQLProfile.valueOf(sqlTypeName);
 
@@ -66,6 +72,7 @@ public class TestConfigLoader {
             if (!(PROP_DATA_SOURCE_CLASS.equals(propertyName)
                   || PROP_SQL_PROFILE.equals(propertyName)
                   || PROP_DB_SCHEMA.equals(propertyName)
+                  || PROP_PWD_ENCRYPTOR.equals(propertyName)
                   || PROP_OACC_ROOT_PWD.equals(propertyName))) {
                setDataSourceProperty(vendorSpecificDataSource, propertyName, properties.getProperty(propertyName));
             }
@@ -77,10 +84,34 @@ public class TestConfigLoader {
             oaccRootPwd = properties.getProperty(PROP_OACC_ROOT_PWD).toCharArray();
          }
          isDatabaseCaseSensitive = CaseSensitiveChecker.isDatabaseCaseSensitive(dataSource);
+
+         // set password encryptor
+         final String pwdEncryptor = properties.getProperty(PROP_PWD_ENCRYPTOR);
+         if (pwdEncryptor == null) {
+            throw new RuntimeException("no " + PROP_PWD_ENCRYPTOR
+                                             + " property specified in database configuration property file");
+         }
+         passwordEncryptor = getPasswordEncryptor(pwdEncryptor);
       }
       catch (Exception e) {
          throw new RuntimeException(e);
       }
+   }
+
+   private static PasswordEncryptor getPasswordEncryptor(String encryptorName) {
+      if (encryptorName == null) {
+         throw new IllegalArgumentException("Encryptor name cannot be null");
+      }
+
+      if (encryptorName.equalsIgnoreCase(BCryptPasswordEncryptor.NAME)) {
+         return BCryptPasswordEncryptor.newInstance(4);
+      }
+
+      if (encryptorName.equalsIgnoreCase(JasyptPasswordEncryptor.NAME)) {
+         return JasyptPasswordEncryptor.newInstance("SHA-256", 100000, 16);
+      }
+
+      throw new IllegalArgumentException("Encryptor name " + encryptorName + " not recognized");
    }
 
    private static void setDataSourceProperty(DataSource vendorSpecificDataSource,
@@ -141,5 +172,9 @@ public class TestConfigLoader {
 
    public static boolean isDatabaseCaseSensitive() {
       return isDatabaseCaseSensitive;
+   }
+
+   public static PasswordEncryptor getPasswordEncryptor() {
+      return passwordEncryptor;
    }
 }

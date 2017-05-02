@@ -18,7 +18,9 @@
 package com.acciente.oacc;
 
 import com.acciente.oacc.helper.TestConfigLoader;
+import com.acciente.oacc.encryptor.PasswordEncryptor;
 import com.acciente.oacc.sql.SQLAccessControlContextFactory;
+import com.acciente.oacc.sql.internal.SQLPasswordAuthenticationProvider;
 import org.junit.Test;
 
 import javax.sql.DataSource;
@@ -40,7 +42,8 @@ public class TestSQLAccessControlContextFactory {
       try {
          SQLAccessControlContextFactory.getAccessControlContext(dataSource,
                                                                 invalidSchemaName,
-                                                                null);
+                                                                null,
+                                                                (PasswordEncryptor) null);
          fail("getting access control context with invalid schema name should have failed");
       }
       catch (IllegalArgumentException e) {
@@ -50,7 +53,7 @@ public class TestSQLAccessControlContextFactory {
          SQLAccessControlContextFactory.getAccessControlContext(dataSource,
                                                                 invalidSchemaName,
                                                                 null,
-                                                                null);
+                                                                (SQLPasswordAuthenticationProvider) null);
          fail("getting access control context with invalid schema name should have failed");
       }
       catch (IllegalArgumentException e) {
@@ -60,7 +63,8 @@ public class TestSQLAccessControlContextFactory {
       try {
          SQLAccessControlContextFactory.getAccessControlContext(connection,
                                                                 invalidSchemaName,
-                                                                null);
+                                                                null,
+                                                                (PasswordEncryptor) null);
          fail("getting access control context with invalid schema name should have failed");
       }
       catch (IllegalArgumentException e) {
@@ -70,7 +74,7 @@ public class TestSQLAccessControlContextFactory {
          SQLAccessControlContextFactory.getAccessControlContext(connection,
                                                                 invalidSchemaName,
                                                                 null,
-                                                                null);
+                                                                (SQLPasswordAuthenticationProvider) null);
          fail("getting access control context with invalid schema name should have failed");
       }
       catch (IllegalArgumentException e) {
