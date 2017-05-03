@@ -33,11 +33,13 @@ import static com.acciente.oacc.TestAccessControlBase.generateUniqueResourceClas
 public class TestAccessControl_TransitioningPasswordEncryptor {
    private static final Resource SYS_RESOURCE = Resources.getInstance(0);
 
-   private AccessControlContext systemAccessControlContextWithLegacyEncryptor;
-   private AccessControlContext systemAccessControlContextWithTransitioningEncryptor;
+   private AccessControlContext systemContextWithLegacyEncryptor;
+   private AccessControlContext systemContextWithTransitioningEncryptor;
 
-   private AccessControlContext accessControlContextWithLegacyEncryptor;
-   private AccessControlContext accessControlContextWithTransitioningEncryptor;
+   private AccessControlContext userContextWithLegacyEncryptor;
+   private AccessControlContext userContextWithTransitioningEncryptor;
+   private AccessControlContext userContextWithBcryptEncryptor;
+
    private String               resourceExternalId;
    private String               resourceClassName;
    private String               resourceDomainName;
@@ -45,102 +47,112 @@ public class TestAccessControl_TransitioningPasswordEncryptor {
 
    @Before
    public void setUpTest() throws Exception {
-      {
-         // use the legacy built-in password encryptor code (from OACC v2.00 rc7 and before) as the "old" encryptor
-         final LegacyJasyptPasswordEncryptor legacyJasyptPasswordEncryptor =
-               LegacyJasyptPasswordEncryptor.newInstance();
+      // use the legacy built-in password encryptor code (from OACC v2.00 rc7 and before) as the "old" encryptor
+      final LegacyJasyptPasswordEncryptor legacyJasyptPasswordEncryptor =
+            LegacyJasyptPasswordEncryptor.newInstance();
 
-         SQLAccessControlSystemResetUtil.resetOACC(TestConfigLoader.getDataSource(),
-                                                   TestConfigLoader.getDatabaseSchema(),
-                                                   TestConfigLoader.getOaccRootPassword(),
-                                                   legacyJasyptPasswordEncryptor);
+      SQLAccessControlSystemResetUtil.resetOACC(TestConfigLoader.getDataSource(),
+                                                TestConfigLoader.getDatabaseSchema(),
+                                                TestConfigLoader.getOaccRootPassword(),
+                                                legacyJasyptPasswordEncryptor);
 
-         systemAccessControlContextWithLegacyEncryptor
-               = SQLAccessControlContextFactory.getAccessControlContext(TestConfigLoader.getDataSource(),
-                                                                        TestConfigLoader.getDatabaseSchema(),
-                                                                        TestConfigLoader.getSQLProfile(),
-                                                                        legacyJasyptPasswordEncryptor);
-         systemAccessControlContextWithLegacyEncryptor.authenticate(SYS_RESOURCE,
-                                                                    PasswordCredentials.newInstance(TestConfigLoader.getOaccRootPassword()));
+      systemContextWithLegacyEncryptor
+            = SQLAccessControlContextFactory.getAccessControlContext(TestConfigLoader.getDataSource(),
+                                                                     TestConfigLoader.getDatabaseSchema(),
+                                                                     TestConfigLoader.getSQLProfile(),
+                                                                     legacyJasyptPasswordEncryptor);
+      systemContextWithLegacyEncryptor.authenticate(SYS_RESOURCE,
+                                                    PasswordCredentials.newInstance(TestConfigLoader.getOaccRootPassword()));
 
-         accessControlContextWithLegacyEncryptor
-               = SQLAccessControlContextFactory.getAccessControlContext(TestConfigLoader.getDataSource(),
-                                                                        TestConfigLoader.getDatabaseSchema(),
-                                                                        TestConfigLoader.getSQLProfile(),
-                                                                        legacyJasyptPasswordEncryptor);
-      }
+      userContextWithLegacyEncryptor
+            = SQLAccessControlContextFactory.getAccessControlContext(TestConfigLoader.getDataSource(),
+                                                                     TestConfigLoader.getDatabaseSchema(),
+                                                                     TestConfigLoader.getSQLProfile(),
+                                                                     legacyJasyptPasswordEncryptor);
 
-      {
-         // uses the transitioning password encryptor with BCrypt as the "new" password encryptor and
-         // the legacy built-in password encryptor code (from OACC v2.00 rc7 and before) as the "old" encryptor
-         final TransitioningPasswordEncryptor transitioningPasswordEncryptor =
-               TransitioningPasswordEncryptor.newInstance(
-                     BCryptPasswordEncryptor.newInstance(6),
-                     LegacyJasyptPasswordEncryptor.newInstance());
+      // uses the transitioning password encryptor with BCrypt as the "new" password encryptor and
+      // the legacy built-in password encryptor code (from OACC v2.00 rc7 and before) as the "old" encryptor
+      final BCryptPasswordEncryptor bCryptPasswordEncryptor = BCryptPasswordEncryptor.newInstance(6);
+      final TransitioningPasswordEncryptor transitioningPasswordEncryptor =
+            TransitioningPasswordEncryptor.newInstance(
+                  bCryptPasswordEncryptor,
+                  LegacyJasyptPasswordEncryptor.newInstance());
 
-         systemAccessControlContextWithTransitioningEncryptor
-               = SQLAccessControlContextFactory.getAccessControlContext(TestConfigLoader.getDataSource(),
-                                                                        TestConfigLoader.getDatabaseSchema(),
-                                                                        TestConfigLoader.getSQLProfile(),
-                                                                        transitioningPasswordEncryptor);
-         systemAccessControlContextWithTransitioningEncryptor.authenticate(SYS_RESOURCE,
-                                                                           PasswordCredentials.newInstance(TestConfigLoader.getOaccRootPassword()));
+      systemContextWithTransitioningEncryptor
+            = SQLAccessControlContextFactory.getAccessControlContext(TestConfigLoader.getDataSource(),
+                                                                     TestConfigLoader.getDatabaseSchema(),
+                                                                     TestConfigLoader.getSQLProfile(),
+                                                                     transitioningPasswordEncryptor);
+      systemContextWithTransitioningEncryptor.authenticate(SYS_RESOURCE,
+                                                           PasswordCredentials.newInstance(TestConfigLoader.getOaccRootPassword()));
 
-         accessControlContextWithTransitioningEncryptor
-               = SQLAccessControlContextFactory.getAccessControlContext(TestConfigLoader.getDataSource(),
-                                                                        TestConfigLoader.getDatabaseSchema(),
-                                                                        TestConfigLoader.getSQLProfile(),
-                                                                        transitioningPasswordEncryptor);
-      }
+      userContextWithTransitioningEncryptor
+            = SQLAccessControlContextFactory.getAccessControlContext(TestConfigLoader.getDataSource(),
+                                                                     TestConfigLoader.getDatabaseSchema(),
+                                                                     TestConfigLoader.getSQLProfile(),
+                                                                     transitioningPasswordEncryptor);
+
+      userContextWithBcryptEncryptor
+            = SQLAccessControlContextFactory.getAccessControlContext(TestConfigLoader.getDataSource(),
+                                                                     TestConfigLoader.getDatabaseSchema(),
+                                                                     TestConfigLoader.getSQLProfile(),
+                                                                     bCryptPasswordEncryptor);
 
       resourceExternalId = generateUniqueExternalId();
-      resourceClassName = generateResourceClass(true, false);
+      resourceClassName = generateAuthenticatableResourceClass();
       resourceDomainName = generateDomain();
       resourceCredentials = PasswordCredentials.newInstance(generateRandomPassword().toCharArray());
    }
 
    @Test
    public void testAuthenticateOfResourceWithLegacyPasswordUsingLegacyEncryptor() throws Exception {
-      final Resource resource = systemAccessControlContextWithLegacyEncryptor.createResource(resourceClassName,
-                                                                                             resourceDomainName,
-                                                                                             resourceExternalId,
-                                                                                             resourceCredentials);
+      final Resource resource = systemContextWithLegacyEncryptor.createResource(resourceClassName,
+                                                                                resourceDomainName,
+                                                                                resourceExternalId,
+                                                                                resourceCredentials);
 
-      accessControlContextWithLegacyEncryptor.authenticate(resource, resourceCredentials);
+      userContextWithLegacyEncryptor.authenticate(resource, resourceCredentials);
    }
 
    @Test
    public void testAuthenticateOfResourceWithLegacyPasswordUsingTransitioningEncryptor() throws Exception {
-      final Resource resource = systemAccessControlContextWithLegacyEncryptor.createResource(resourceClassName,
-                                                                                             resourceDomainName,
-                                                                                             resourceExternalId,
-                                                                                             resourceCredentials);
+      final Resource resource = systemContextWithLegacyEncryptor.createResource(resourceClassName,
+                                                                                resourceDomainName,
+                                                                                resourceExternalId,
+                                                                                resourceCredentials);
 
-      accessControlContextWithTransitioningEncryptor.authenticate(resource, resourceCredentials);
+      userContextWithTransitioningEncryptor.authenticate(resource, resourceCredentials);
    }
 
    @Test
    public void testAuthenticateOfResourceWithTransitioningPasswordUsingTransitioningEncryptor() throws Exception {
-      final Resource resource = systemAccessControlContextWithTransitioningEncryptor.createResource(resourceClassName,
-                                                                                                    resourceDomainName,
-                                                                                                    resourceExternalId,
-                                                                                                    resourceCredentials);
+      final Resource resource = systemContextWithTransitioningEncryptor.createResource(resourceClassName,
+                                                                                       resourceDomainName,
+                                                                                       resourceExternalId,
+                                                                                       resourceCredentials);
 
-      accessControlContextWithTransitioningEncryptor.authenticate(resource, resourceCredentials);
+      userContextWithTransitioningEncryptor.authenticate(resource, resourceCredentials);
    }
 
-   private String generateResourceClass(boolean authenticatable,
-                                        boolean nonAuthenticatedCreateAllowed) {
+   @Test
+   public void testAuthenticateOfResourceWithTransitioningPasswordUsingBcryptEncryptor() throws Exception {
+      final Resource resource = systemContextWithTransitioningEncryptor.createResource(resourceClassName,
+                                                                                       resourceDomainName,
+                                                                                       resourceExternalId,
+                                                                                       resourceCredentials);
+
+      userContextWithBcryptEncryptor.authenticate(resource, resourceCredentials);
+   }
+
+   private String generateAuthenticatableResourceClass() {
       final String resourceClassName = generateUniqueResourceClassName();
-      systemAccessControlContextWithLegacyEncryptor.createResourceClass(resourceClassName,
-                                                                        authenticatable,
-                                                                        nonAuthenticatedCreateAllowed);
+      systemContextWithLegacyEncryptor.createResourceClass(resourceClassName, true, false);
       return resourceClassName;
    }
 
    private String generateDomain() {
       final String domainName = generateUniqueDomainName();
-      systemAccessControlContextWithLegacyEncryptor.createDomain(domainName);
+      systemContextWithLegacyEncryptor.createDomain(domainName);
       return domainName;
    }
 
