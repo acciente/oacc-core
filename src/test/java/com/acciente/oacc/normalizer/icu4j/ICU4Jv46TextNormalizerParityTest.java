@@ -55,7 +55,6 @@ public class ICU4Jv46TextNormalizerParityTest {
       final char[] expectedResult = normalizeDirect();
       final char[] actualResult   = textNormalizer.normalizeToNfc(srcCharArray);
 
-      System.out.printf("\nsrcCharArray: %s", new String(srcCharArray));
       assertEquals(actualResult.length, expectedResult.length);
       assertArrayEquals(expectedResult, actualResult);
    }
