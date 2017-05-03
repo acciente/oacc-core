@@ -27,9 +27,12 @@
         <maven-surefire-plugin.version>2.17</maven-surefire-plugin.version>
         <maven-gpg-plugin.version>1.6</maven-gpg-plugin.version>
         <nexus-staging-maven-plugin.version>1.6.3</nexus-staging-maven-plugin.version>
+        <tools-maven-plugin.version>1.4</tools-maven-plugin.version>
 
         <!-- Don't compile tests automatically since they assume a test db is already setup -->
         <maven.test.skip>true</maven.test.skip>
+
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
     <!-- project information -->
@@ -235,6 +238,20 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>${maven-surefire-plugin.version}</version>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.geronimo.genesis.plugins</groupId>
+                <artifactId>tools-maven-plugin</artifactId>
+                <version>${tools-maven-plugin.version}</version>
+                <executions>
+                    <execution>
+                        <id>install-legal-files</id>
+                        <phase>generate-resources</phase>
+                        <goals>
+                            <goal>copy-legal-files</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
             <plugin>
                 <groupId>org.sonatype.plugins</groupId>
