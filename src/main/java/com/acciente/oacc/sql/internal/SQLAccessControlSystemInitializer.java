@@ -18,8 +18,10 @@
 package com.acciente.oacc.sql.internal;
 
 import com.acciente.oacc.AccessControlContext;
+import com.acciente.oacc.AuthenticationProvider;
 import com.acciente.oacc.DomainCreatePermissions;
 import com.acciente.oacc.DomainPermissions;
+import com.acciente.oacc.PasswordCredentials;
 import com.acciente.oacc.Resources;
 import com.acciente.oacc.encryptor.PasswordEncryptor;
 
@@ -40,6 +42,18 @@ public class SQLAccessControlSystemInitializer {
                                      String dbSchema,
                                      char[] oaccRootPwd,
                                      PasswordEncryptor passwordEncryptor,
+                                     boolean isSilent) throws SQLException {
+      final AuthenticationProvider authProvider
+            = new SQLPasswordAuthenticationProvider(connection,
+                                                    dbSchema,
+                                                    passwordEncryptor);
+      initializeOACC(connection, dbSchema, oaccRootPwd, authProvider, isSilent);
+   }
+
+   public static void initializeOACC(Connection connection,
+                                     String dbSchema,
+                                     char[] oaccRootPwd,
+                                     AuthenticationProvider authProvider,
                                      boolean isSilent) throws SQLException {
       SchemaNameValidator.assertValid(dbSchema);
 
@@ -87,17 +101,7 @@ public class SQLAccessControlSystemInitializer {
          statement.close();
 
          // set the system user's password
-         statement = connection.prepareStatement("INSERT INTO " + schemaNameAndTablePrefix + "ResourcePassword( ResourceId, Password ) VALUES ( 0, ? )");
-         char[] boundPassword = null;
-         try {
-            boundPassword = PasswordUtils.computeBoundPassword(Resources.getInstance(0), oaccRootPwd);
-            statement.setString(1, passwordEncryptor.encryptPassword(boundPassword));
-            statement.executeUpdate();
-         }
-         finally {
-            PasswordUtils.cleanPassword(boundPassword);
-         }
-         statement.close();
+         authProvider.setCredentials(Resources.getInstance(0), PasswordCredentials.newInstance(oaccRootPwd));
 
          // grant the system user [super user w/ grant] to the system domain
          statement = connection.prepareStatement("INSERT INTO " + schemaNameAndTablePrefix + "Grant_DomPerm_Sys( AccessorResourceId, GrantorResourceId, AccessedDomainId, SysPermissionId, IsWithGrant )"
