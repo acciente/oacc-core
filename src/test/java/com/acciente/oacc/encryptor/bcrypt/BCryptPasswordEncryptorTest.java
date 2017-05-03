@@ -135,6 +135,32 @@ public class BCryptPasswordEncryptorTest {
    }
 
    @Test
+   public void encryptPasswordDifferentHashesForLongPasswords() throws Exception {
+      // bcrypt only uses the **first 72 chars** of the plaintext to generate a hash, because
+      // it is meant to be used on low-entropy (e.g. human-memorable password) secrets, but
+      // with a deliberately slow hashing process as an added defense
+      // - source:(http://security.stackexchange.com/a/21537/23744)
+      //
+      // bcrypt authors Provos & Mazières mention passwords "up to 56 bytes" even though
+      // the algorithm itself makes use of a 72 byte initial value because they may have
+      // been motivated by the following statement from Bruce Schneier's original specification
+      // of Blowfish:
+      // **"The 448 [bit] limit on the key size ensures that the[sic] every bit of every subkey
+      // depends on every bit of the key."**
+      // - source:(https://en.wikipedia.org/wiki/Bcrypt)
+      //
+      // in practice, this should **not affect** us because the passwords are salted!
+      final String prefix72char = "123456789.123456789.123456789.123456789.123456789.123456789.123456789.12";
+      final char[] longPassword1 = (prefix72char + "-foo").toCharArray();
+      final char[] longPassword2 = (prefix72char + "-bar").toCharArray();
+
+      final String encryptedPasswordPass1 = encryptor.encryptPassword(longPassword1);
+      final String encryptedPasswordPass2 = encryptor.encryptPassword(longPassword2);
+      
+      assertThat(encryptedPasswordPass1, not(equalTo(encryptedPasswordPass2)));
+   }
+
+   @Test
    public void encryptPasswordHeaderMarkerPresent() throws Exception {
       final char[] testPassword = "SomePasswordHere".toCharArray();
 
