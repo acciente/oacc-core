@@ -95,6 +95,29 @@ public class TestAccessControl_authenticate extends TestAccessControlBase {
    }
 
    @Test
+   public void authenticateSystemUser_withoutCredentials_shouldFail() {
+      try {
+         accessControlContext.authenticate(SYS_RESOURCE);
+         fail("authentication of system resource without credentials should not have succeeded");
+      }
+      catch (UnsupportedOperationException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("does not support authentication without credentials"));
+      }
+   }
+
+   @Test
+   public void authenticateSystemUser_incompatibleCredentials_shouldFail() {
+      final Credentials incompatibleCredentials = new IncompatibleCredentials();
+      try {
+         accessControlContext.authenticate(SYS_RESOURCE, incompatibleCredentials);
+         fail("authentication of system resource without credentials should not have succeeded");
+      }
+      catch (InvalidCredentialsException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("unsupported credentials"));
+      }
+   }
+
+   @Test
    public void authenticate_withExtId_shouldSucceed() {
       final String domainName = generateDomain();
       final String resourceClassName = generateResourceClass(true, true);
@@ -233,5 +256,8 @@ public class TestAccessControl_authenticate extends TestAccessControlBase {
       catch (IllegalArgumentException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("is not of an authenticatable resource class"));
       }
+   }
+
+   private class IncompatibleCredentials implements Credentials {
    }
 }
