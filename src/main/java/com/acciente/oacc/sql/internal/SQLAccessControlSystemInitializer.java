@@ -19,6 +19,7 @@ package com.acciente.oacc.sql.internal;
 
 import com.acciente.oacc.AccessControlContext;
 import com.acciente.oacc.AuthenticationProvider;
+import com.acciente.oacc.Credentials;
 import com.acciente.oacc.DomainCreatePermissions;
 import com.acciente.oacc.DomainPermissions;
 import com.acciente.oacc.PasswordCredentials;
@@ -47,12 +48,14 @@ public class SQLAccessControlSystemInitializer {
             = new SQLPasswordAuthenticationProvider(connection,
                                                     dbSchema,
                                                     passwordEncryptor);
-      initializeOACC(connection, dbSchema, oaccRootPwd, authProvider, isSilent);
+      final Credentials oaccRootCredentials = PasswordCredentials.newInstance(oaccRootPwd);
+      
+      initializeOACC(connection, dbSchema, oaccRootCredentials, authProvider, isSilent);
    }
 
    public static void initializeOACC(Connection connection,
                                      String dbSchema,
-                                     char[] oaccRootPwd,
+                                     Credentials oaccRootCredentials,
                                      AuthenticationProvider authProvider,
                                      boolean isSilent) throws SQLException {
       SchemaNameValidator.assertValid(dbSchema);
@@ -101,7 +104,7 @@ public class SQLAccessControlSystemInitializer {
          statement.close();
 
          // set the system user's password
-         authProvider.setCredentials(Resources.getInstance(0), PasswordCredentials.newInstance(oaccRootPwd));
+         authProvider.setCredentials(Resources.getInstance(0), oaccRootCredentials);
 
          // grant the system user [super user w/ grant] to the system domain
          statement = connection.prepareStatement("INSERT INTO " + schemaNameAndTablePrefix + "Grant_DomPerm_Sys( AccessorResourceId, GrantorResourceId, AccessedDomainId, SysPermissionId, IsWithGrant )"
