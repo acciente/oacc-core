@@ -23,39 +23,43 @@ import com.acciente.oacc.encryptor.jasypt.JasyptPasswordEncryptor;
 import com.acciente.oacc.sql.internal.SQLPasswordAuthenticationProvider;
 
 /**
- * This interface is used to configure the password encryption scheme used by the built-in authentication provider
- * ({@link SQLPasswordAuthenticationProvider}). The goal is to enable using different password encryption algorithms
- * with the built-in authentication provider.
+ * This interface is used to configure the password encryption scheme employed
+ * by the built-in {@link SQLPasswordAuthenticationProvider}.
+ * The goal is to enable using different password encryption algorithms with
+ * the built-in authentication provider.
  * <p>
- * In OACC v2.0.0-rc.7 and prior the built-in authentication provider used Jasypt internally and did not allow other
- * options. The factory methods in {@link SQLAccessControlContextFactory} which use the built-in authentication
- * provider now allow specifying an implementation of this interface.
+ * In OACC v2.0.0-rc.7 and prior the built-in authentication provider always used
+ * Jasypt internally and did not allow other options. Now there are factory methods
+ * in {@link SQLAccessControlContextFactory} to specify the PasswordEncryptor to be
+ * used in the built-in authentication provider.
  * <p>
- * The following password encryptor implementations are built-in:
+ * The following password encryptor implementations are provided:
  * <ul>
- * <li>{@link JasyptPasswordEncryptor}: hashes passwords using a Jasypt digester.
- *    The following static factory method provides different configuration options (for details see method Javadocs):
+ * <li>{@link JasyptPasswordEncryptor} - hashes passwords using a Jasypt digester.
+ *    The following static factory method provides different configuration options:
  *    <ul>
  *    <li>{@link JasyptPasswordEncryptor#newInstance(String algorithm, int iterations, int saltSizeBytes)}</li>
  *    </ul>
  *    Compatibility notes:<br>
- *    The {@link JasyptPasswordEncryptor} is designed to be fully compatible with existing OACC v2.0.0-rc.7 deployments.
- *    This new Jasypt implementation writes a header prefix to new hashes that it creates, but supports checking passwords
- *    on hashes that do not contain the header prefix.
+ *    The new JasyptPasswordEncryptor implementation writes a header prefix to the
+ *    password hashes that it creates, and is not compatible with the
+ *    {@link com.acciente.oacc.encryptor.jasypt.LegacyJasyptPasswordEncryptor
+ *    LegacyJasyptPasswordEncryptor} used in OACC v2.0.0-rc.7 or before.
  * </li>
- * <li>{@link BCryptPasswordEncryptor}: hashes passwords using an OpenBSD BCrypt implementation.
- *    The following static factory methods provide different configuration options (for details see method Javadocs):
+ * <li>{@link BCryptPasswordEncryptor} - hashes passwords using an OpenBSD BCrypt implementation.
+ *    The following static factory methods provide different configuration options:
  *    <ul>
  *    <li>{@link BCryptPasswordEncryptor#newInstance(int costFactor)}</li>
  *    <li>{@link BCryptPasswordEncryptor#newInstance(int minComputedCostFactor, int minComputeDurationInMillis)}</li>
  *    </ul>
  * </li>
- * <li>{@link TransitioningPasswordEncryptor}: provides a means to transition from an existing (aka "old") password
- *    encryptor to a new password encryptor in an environment where OACC is already deployed -- where existing passwords
- *    in the tables are encrypted using the old password encryptor. The following factory method provides different
- *    configuration options (for details see method Javadocs):
+ * <li>{@link TransitioningPasswordEncryptor} - provides a means to transition from
+ *    an existing encryption scheme to a new one in an environment where OACC was
+ *    already deployed, i.e. where existing passwords in the tables were encrypted
+ *    with a different or older password encryptor. The following factory method
+ *    provides the configuration options:
  *    <ul>
- *    <li>{@link TransitioningPasswordEncryptor#newInstance(PasswordEncryptor, PasswordEncryptor)}</li>
+ *    <li>{@link TransitioningPasswordEncryptor#newInstance(PasswordEncryptor new, PasswordEncryptor old)}</li>
  *    </ul>
  * </li>
  * </ul>
