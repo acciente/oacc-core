@@ -45,6 +45,13 @@ public final class JasyptPasswordEncryptor implements PasswordEncryptor, Seriali
     * Creates a password encryptor that uses the Jasypt digester for password hashing with the specified values for
     * algorithm, iterations and saltSizeBytes.
     *
+    * @param algorithm     the name of the message digest algorithm to be used for password hashing.
+    *                      See the MessageDigest section in the <a href=
+    *                      "https://docs.oracle.com/javase/7/docs/technotes/guides/security/StandardNames.html#MessageDigest">
+    *                      Java Cryptography Architecture Standard Algorithm Name Documentation</a>
+    *                      for information about standard algorithm names.
+    * @param iterations    the number of times the password hash function will be applied recursively
+    * @param saltSizeBytes the size of the salt to be used, in bytes
     * @return a {@link JasyptPasswordEncryptor} instance.
     */
    public static JasyptPasswordEncryptor newInstance(String algorithm,
