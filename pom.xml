@@ -13,12 +13,12 @@
 
     <properties>
         <!-- Dependency versions -->
-        <bcprov-jdk15on.version>1.56</bcprov-jdk15on.version>
+        <bcprov-jdk15on.version>1.57</bcprov-jdk15on.version>
         <jasypt.version>1.9.2</jasypt.version>
         <junit.version>4.12</junit.version>
-        <hamcrest-core.version>1.3</hamcrest-core.version>
-        <icu4j.version>58.2</icu4j.version>
-        <postgresql.version>9.4.1212.jre7</postgresql.version>
+        <hamcrest-all.version>1.3</hamcrest-all.version>
+        <icu4j.version>59.1</icu4j.version>
+        <postgresql.version>42.1.1.jre7</postgresql.version>
 
         <!-- Maven plugin versions -->
         <maven-compiler-plugin.version>3.1</maven-compiler-plugin.version>
@@ -44,7 +44,7 @@
 
     <!-- dependencies -->
     <dependencies>
-        <!-- compile time -->
+        <!-- compile time scope: -->
         <dependency>
             <groupId>com.ibm.icu</groupId>
             <artifactId>icu4j</artifactId>
@@ -63,6 +63,7 @@
             <version>${jasypt.version}</version>
             <scope>compile</scope>
         </dependency>
+        <!-- test scope: -->
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
@@ -72,7 +73,7 @@
         <dependency>
             <groupId>org.hamcrest</groupId>
             <artifactId>hamcrest-all</artifactId>
-            <version>${hamcrest-core.version}</version>
+            <version>${hamcrest-all.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
