@@ -91,7 +91,7 @@
         <license>
             <name>Apache License 2.0</name>
             <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
-            <distribution>manual</distribution>
+            <distribution>repo</distribution>
             <comments>Commercial-friendly, open-source license</comments>
         </license>
     </licenses>
