@@ -41,6 +41,7 @@ public class BCryptPasswordEncryptor implements PasswordEncryptor, Serializable 
    private static final int    COMPUTED_COST_FACTOR_MAX                = BCRYPT_COST_FACTOR_MAX;
 
    private static final PasswordEncoderDecoder passwordEncoderDecoder = new PasswordEncoderDecoder();
+   private static final SecureRandom           secureRandom           = new SecureRandom();
 
    private final int costFactor;
 
@@ -90,7 +91,7 @@ public class BCryptPasswordEncryptor implements PasswordEncryptor, Serializable 
       }
       final char[] normalizedChars = TextNormalizer.getInstance().normalizeToNfc(plainPassword);
 
-      final String bcryptString = OpenBSDBCrypt.generate(normalizedChars, gensalt(new SecureRandom()), costFactor /* log rounds */);
+      final String bcryptString = OpenBSDBCrypt.generate(normalizedChars, gensalt(), costFactor /* log rounds */);
 
       return passwordEncoderDecoder.encode(bcryptString);
    }
@@ -121,7 +122,7 @@ public class BCryptPasswordEncryptor implements PasswordEncryptor, Serializable 
    }
 
    private static int computeCostFactor(int computedCostFactorMin, int minComputeDurationInMillis) {
-      final byte[] salt = gensalt(new SecureRandom());
+      final byte[] salt = gensalt();
       for (int costFactor = computedCostFactorMin; costFactor <= COMPUTED_COST_FACTOR_MAX; costFactor++) {
          final long startTime = System.nanoTime();
          OpenBSDBCrypt.generate(COMPUTED_COST_FACTOR_BENCHMARK_PASSWORD, salt, costFactor);
@@ -134,7 +135,7 @@ public class BCryptPasswordEncryptor implements PasswordEncryptor, Serializable 
       return COMPUTED_COST_FACTOR_MAX;
    }
 
-   private static byte[] gensalt(SecureRandom secureRandom) {
+   private static byte[] gensalt() {
       final byte[] saltBytes = new byte[BCRYPT_SALT_SIZE];
       secureRandom.nextBytes(saltBytes);
       return saltBytes;
