@@ -18,7 +18,6 @@
 package com.acciente.oacc.encryptor.bcrypt;
 
 import com.acciente.oacc.encryptor.PasswordEncryptor;
-import com.acciente.oacc.encryptor.RandomNumberGenerator;
 import com.acciente.oacc.encryptor.ReseedingSecureRandom;
 import com.acciente.oacc.normalizer.TextNormalizer;
 import org.bouncycastle.crypto.generators.OpenBSDBCrypt;
@@ -41,13 +40,14 @@ public class BCryptPasswordEncryptor implements PasswordEncryptor, Serializable 
    private static final char[] COMPUTED_COST_FACTOR_BENCHMARK_PASSWORD = "honey badger don't care".toCharArray();
    private static final int    COMPUTED_COST_FACTOR_MAX                = BCRYPT_COST_FACTOR_MAX;
 
-   private static final long DEFAULT_MAX_TIME_BETWEEN_RESEEDING_RNG_IN_SECS           = TimeUnit.HOURS.toSeconds(1);
-   private static final int  DEFAULT_MAX_NUM_OF_GENERATED_VALUES_BEFORE_RESEEDING_RNG = 64;
+   private static final long DEFAULT_MAX_TIME_BETWEEN_RESEEDING_RNG_IN_SECS           = TimeUnit.DAYS.toSeconds(7);
+   private static final int  DEFAULT_MAX_NUM_OF_GENERATED_VALUES_BEFORE_RESEEDING_RNG = 1024*1024;
 
+   private static final ReseedingSecureRandom  secureRandom = ReseedingSecureRandom.newInstance(DEFAULT_MAX_NUM_OF_GENERATED_VALUES_BEFORE_RESEEDING_RNG,
+                                                                                                DEFAULT_MAX_TIME_BETWEEN_RESEEDING_RNG_IN_SECS);
    private static final PasswordEncoderDecoder passwordEncoderDecoder = new PasswordEncoderDecoder();
 
-   private final int                   costFactor;
-   private final RandomNumberGenerator secureRandom;
+   private final int costFactor;
 
    /**
     * Returns a password encryptor that uses the BCrypt algorithm with a computed cost factor.
@@ -86,8 +86,6 @@ public class BCryptPasswordEncryptor implements PasswordEncryptor, Serializable 
 
    private BCryptPasswordEncryptor(int costFactor) {
       this.costFactor = costFactor;
-      secureRandom = ReseedingSecureRandom.newInstance(DEFAULT_MAX_NUM_OF_GENERATED_VALUES_BEFORE_RESEEDING_RNG,
-                                                       DEFAULT_MAX_TIME_BETWEEN_RESEEDING_RNG_IN_SECS);
    }
 
    @Override
@@ -97,7 +95,7 @@ public class BCryptPasswordEncryptor implements PasswordEncryptor, Serializable 
       }
       final char[] normalizedChars = TextNormalizer.getInstance().normalizeToNfc(plainPassword);
 
-      final String bcryptString = OpenBSDBCrypt.generate(normalizedChars, gensalt(secureRandom), costFactor /* log rounds */);
+      final String bcryptString = OpenBSDBCrypt.generate(normalizedChars, gensalt(), costFactor /* log rounds */);
 
       return passwordEncoderDecoder.encode(bcryptString);
    }
@@ -128,7 +126,7 @@ public class BCryptPasswordEncryptor implements PasswordEncryptor, Serializable 
    }
 
    private static int computeCostFactor(int computedCostFactorMin, int minComputeDurationInMillis) {
-      final byte[] salt = gensalt(ReseedingSecureRandom.newInstance(1, 0));
+      final byte[] salt = gensalt();
       for (int costFactor = computedCostFactorMin; costFactor <= COMPUTED_COST_FACTOR_MAX; costFactor++) {
          final long startTime = System.nanoTime();
          OpenBSDBCrypt.generate(COMPUTED_COST_FACTOR_BENCHMARK_PASSWORD, salt, costFactor);
@@ -141,7 +139,7 @@ public class BCryptPasswordEncryptor implements PasswordEncryptor, Serializable 
       return COMPUTED_COST_FACTOR_MAX;
    }
 
-   private static byte[] gensalt(RandomNumberGenerator secureRandom) {
+   private static byte[] gensalt() {
       final byte[] saltBytes = new byte[BCRYPT_SALT_SIZE];
       secureRandom.nextBytes(saltBytes);
       return saltBytes;
