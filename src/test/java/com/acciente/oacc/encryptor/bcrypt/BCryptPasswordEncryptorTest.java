@@ -35,7 +35,7 @@ public class BCryptPasswordEncryptorTest {
    private final BCryptPasswordEncryptor encryptor = BCryptPasswordEncryptor.newInstance(4);
 
    @Test
-   public void getEncryptorDoesNotAcceptCostFactorBelowMin() throws Exception {
+   public void newInstanceDoesNotAcceptCostFactorBelowMin() throws Exception {
       try {
          BCryptPasswordEncryptor.newInstance(3);
          fail("getting BCrypt password encryptor with cost factor below the minimum should fail");
@@ -46,7 +46,7 @@ public class BCryptPasswordEncryptorTest {
    }
 
    @Test
-   public void getEncryptorDoesNotAcceptCostFactorAboveMax() throws Exception {
+   public void newInstanceDoesNotAcceptCostFactorAboveMax() throws Exception {
       try {
          BCryptPasswordEncryptor.newInstance(32);
          fail("getting BCrypt password encryptor with cost factor above the maximum should fail");
@@ -57,7 +57,7 @@ public class BCryptPasswordEncryptorTest {
    }
 
    @Test
-   public void getEncryptorUsesSpecifiedCostFactor() throws Exception {
+   public void newInstanceUsesSpecifiedCostFactor() throws Exception {
       final int costFactor = 5;
       final BCryptPasswordEncryptor passwordEncryptor
             = BCryptPasswordEncryptor.newInstance(costFactor);
@@ -66,7 +66,7 @@ public class BCryptPasswordEncryptorTest {
    }
 
    @Test
-   public void getComputedEncryptorDoesNotAcceptCostFactorBelowMin() throws Exception {
+   public void newInstanceUsingComputedCostFactorDoesNotAcceptCostFactorBelowMin() throws Exception {
       try {
          final int minComputeDuration = 100;
          BCryptPasswordEncryptor.newInstance(3, minComputeDuration);
@@ -78,7 +78,7 @@ public class BCryptPasswordEncryptorTest {
    }
 
    @Test
-   public void getComputedEncryptorDoesNotAcceptCostFactorAboveMax() throws Exception {
+   public void newInstanceUsingComputedCostFactorDoesNotAcceptCostFactorAboveMax() throws Exception {
       try {
          final int minComputeDuration = 100;
          BCryptPasswordEncryptor.newInstance(32, minComputeDuration);
@@ -90,7 +90,7 @@ public class BCryptPasswordEncryptorTest {
    }
 
    @Test
-   public void getComputedEncryptorComputesCostFactor() throws Exception {
+   public void newInstanceUsingComputedCostFactorComputesCostFactor() throws Exception {
       final int minComputeDuration = 100;
       final int minCostFactor = 4;
       final BCryptPasswordEncryptor passwordEncryptor
@@ -100,7 +100,7 @@ public class BCryptPasswordEncryptorTest {
    }
 
    @Test
-   public void getComputedEncryptorRunsAtLeastForMinComputeDuration() throws Exception {
+   public void newInstanceUsingComputedCostFactorRunsAtLeastForMinComputeDuration() throws Exception {
       final int minComputeDurationInMs = 250;
       final int minCostFactor = 4;
       final BCryptPasswordEncryptor passwordEncryptor
@@ -112,7 +112,8 @@ public class BCryptPasswordEncryptorTest {
       final long endTime = System.nanoTime();
       final long durationInMs = TimeUnit.NANOSECONDS.toMillis(endTime - startTime);
 
-      assertTrue(durationInMs > minComputeDurationInMs);
+      assertTrue("durationInMs: " + durationInMs + ", minComputeDurationInMs: " + minComputeDurationInMs,
+                 durationInMs > minComputeDurationInMs);
    }
 
    @Test
