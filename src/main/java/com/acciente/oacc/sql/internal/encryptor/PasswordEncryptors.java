@@ -18,6 +18,7 @@
 package com.acciente.oacc.sql.internal.encryptor;
 
 import com.acciente.oacc.encryptor.PasswordEncryptor;
+import com.acciente.oacc.encryptor.bcrypt.BCryptCostFactorCalculator;
 import com.acciente.oacc.encryptor.bcrypt.BCryptPasswordEncryptor;
 import com.acciente.oacc.encryptor.jasypt.JasyptPasswordEncryptor;
 
@@ -43,7 +44,8 @@ public class PasswordEncryptors {
       }
 
       if (encryptorName.equalsIgnoreCase(BCryptPasswordEncryptor.NAME)) {
-         return BCryptPasswordEncryptor.newInstance(BCRYPT_MIN_COST_FACTOR, BCRYPT_MIN_COMPUTATION_DURATION_IN_MILLIS);
+         return BCryptPasswordEncryptor.newInstance(BCryptCostFactorCalculator.calculateCostFactor(
+               BCRYPT_MIN_COST_FACTOR, BCRYPT_MIN_COMPUTATION_DURATION_IN_MILLIS));
       }
 
       if (encryptorName.equalsIgnoreCase(JasyptPasswordEncryptor.NAME)) {
