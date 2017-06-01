@@ -35,61 +35,60 @@ public class SQLAccessControlSystemInitializer {
    private static final String PROP_DbSchema     = "-dbschema";
    private static final String PROP_PwdEncryptor = "-pwdencryptor";
    private static final String PROP_OACCRootPwd  = "-oaccsystempwd";
+   private static final String OPT_HELP_SHORT    = "-h";
+   private static final String OPT_HELP_LONG     = "--help";
+   private static final String OPT_HELP_QUESTION = "-?";
+   private static final String USAGE = "Usage:" +
+         "\n  java com.acciente.oacc.SQLAccessControlSystemInitializer " +
+         PROP_DbUrl + "=<db-url> " +
+         PROP_PwdEncryptor + "=(" +
+         join(" | ", PasswordEncryptors.getSupportedEncryptorNames()) + ") " +
+         PROP_OACCRootPwd + "=<OACC-system-password> " +
+         "[options]" +
+         "\n\nOptions:" +
+         "\n  " + PROP_DbUser + "=<db-user>      Database username." +
+         "\n  " + PROP_DbPwd + "=<db-password>   Database password." +
+         "\n  " + PROP_DbSchema + "=<db-schema>  Database schema." +
+         "\n\nOther:" +
+         "\n  -h, --help, -?         Shows usage info.";
 
    public static void main(String args[]) throws SQLException, IOException {
-      if (args.length == 0) {
-         System.out.println("Usage: java com.acciente.oacc.SQLAccessControlSystemInitializer "
-                                  + PROP_DbUrl + "=<db-url> "
-                                  + PROP_DbUser + "=<db-user> "
-                                  + PROP_DbPwd + "=<db-password> "
-                                  + PROP_PwdEncryptor
-                                  + "=" + join("|", PasswordEncryptors.getSupportedEncryptorNames()) + " "
-                                  + PROP_OACCRootPwd + "=<OACC-system-password> "
-                                  + "[ " + PROP_DbSchema + "=<db-schema> ]");
+      // first read the command line args into a properties object
+      Properties optionArgs = new Properties();
+
+      for (String arg : args) {
+         optionArgs.load(new StringReader(arg));
+      }
+
+      // print usage info, if necessary
+      if (args.length == 0
+            || optionArgs.containsKey(OPT_HELP_SHORT)
+            || optionArgs.containsKey(OPT_HELP_LONG)
+            || optionArgs.containsKey(OPT_HELP_QUESTION)) {
+         System.out.println(USAGE);
          return;
       }
 
-      // first read the command line args into a properties object
-      Properties initArgs = new Properties();
+      verifyOptionArgs(optionArgs);
 
-      for (String arg : args) {
-         initArgs.load(new StringReader(arg));
-      }
+      initializeOACC(optionArgs.getProperty(PROP_DbUrl),
+                     optionArgs.getProperty(PROP_DbUser),
+                     optionArgs.getProperty(PROP_DbPwd),
+                     optionArgs.getProperty(PROP_DbSchema),
+                     optionArgs.getProperty(PROP_OACCRootPwd).toCharArray(),
+                     PasswordEncryptors.getPasswordEncryptor(optionArgs.getProperty(PROP_PwdEncryptor)));
+   }
 
-      String dbUrl;
-      String dbUser;
-      String dbPwd;
-      String dbSchema;
-      String pwdEncryptor;
-      String oaccRootPwd;
-
-      // get the parameters into local vars and assign defaults as needed
-      dbUrl = initArgs.getProperty(PROP_DbUrl);
-      dbUser = initArgs.getProperty(PROP_DbUser);
-      dbPwd = initArgs.getProperty(PROP_DbPwd);
-      dbSchema = initArgs.getProperty(PROP_DbSchema);
-      pwdEncryptor = initArgs.getProperty(PROP_PwdEncryptor);
-      oaccRootPwd = initArgs.getProperty(PROP_OACCRootPwd);
-
-      // check if we have all the required parameters
-      if (dbUrl == null) {
-         throw new IllegalArgumentException(PROP_DbUrl + " is required!");
+   private static void verifyOptionArgs(Properties optionArgs) {
+      if (optionArgs.getProperty(PROP_DbUrl) == null) {
+         throw new IllegalArgumentException(PROP_DbUrl + " is required!\n" + USAGE);
       }
-      if (dbUser == null) {
-         throw new IllegalArgumentException(PROP_DbUser + " is required!");
+      if (optionArgs.getProperty(PROP_PwdEncryptor) == null) {
+         throw new IllegalArgumentException(PROP_PwdEncryptor + " is required!\n" + USAGE);
       }
-      if (dbPwd == null) {
-         throw new IllegalArgumentException(PROP_DbPwd + " is required!");
+      if (optionArgs.getProperty(PROP_OACCRootPwd) == null) {
+         throw new IllegalArgumentException(PROP_OACCRootPwd + " is required!\n" + USAGE);
       }
-      if (pwdEncryptor == null) {
-         throw new IllegalArgumentException(PROP_PwdEncryptor + " is required!");
-      }
-      if (oaccRootPwd == null) {
-         throw new IllegalArgumentException(PROP_OACCRootPwd + " is required!");
-      }
-
-      initializeOACC(dbUrl, dbUser, dbPwd, dbSchema, oaccRootPwd.toCharArray(),
-                     PasswordEncryptors.getPasswordEncryptor(pwdEncryptor));
    }
 
    public static void initializeOACC(String dbUrl,
@@ -99,9 +98,8 @@ public class SQLAccessControlSystemInitializer {
                                      char[] oaccRootPwd,
                                      PasswordEncryptor passwordEncryptor) throws SQLException {
       System.out.println("Connecting to OACC database @ " + dbUrl);
-      Connection connection = DriverManager.getConnection(dbUrl, dbUser, dbPwd);
 
-      try {
+      try (Connection connection = DriverManager.getConnection(dbUrl, dbUser, dbPwd)) {
          // delegate to internal handler
          com.acciente.oacc.sql.internal.SQLAccessControlSystemInitializer.initializeOACC(connection,
                                                                                          dbSchema,
@@ -110,7 +108,6 @@ public class SQLAccessControlSystemInitializer {
       }
       finally {
          System.out.println("Disconnecting from OACC database @ " + dbUrl);
-         connection.close();
       }
 
       System.out.println("Initialize..OK!");
@@ -127,13 +124,13 @@ public class SQLAccessControlSystemInitializer {
                                                                                       passwordEncryptor);
    }
 
-   //TODO remove this method and replace its usages with String.join() when OACC updates use Java 8
+   //TODO remove this method and replace its usages with String.join() when OACC updates to Java 8
    /**
     * Provides identical functionality of the Strings.join() method in Java 8
     *
     * @param delimiter the delimiter to insert between elements
     * @param elements the elements to concatenate
-    * @return
+    * @return a String of the specified elements joined by the specified delimiter
     */
    private static String join(final String delimiter, final List<String> elements) {
       if (elements == null || elements.size() == 0) {
