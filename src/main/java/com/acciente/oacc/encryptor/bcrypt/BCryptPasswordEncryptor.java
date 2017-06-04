@@ -18,11 +18,11 @@
 package com.acciente.oacc.encryptor.bcrypt;
 
 import com.acciente.oacc.encryptor.PasswordEncryptor;
+import com.acciente.oacc.encryptor.ReseedingSecureRandom;
 import com.acciente.oacc.normalizer.TextNormalizer;
 import org.bouncycastle.crypto.generators.OpenBSDBCrypt;
 
 import java.io.Serializable;
-import java.security.SecureRandom;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -40,6 +40,11 @@ public class BCryptPasswordEncryptor implements PasswordEncryptor, Serializable 
    private static final char[] COMPUTED_COST_FACTOR_BENCHMARK_PASSWORD = "honey badger don't care".toCharArray();
    private static final int    COMPUTED_COST_FACTOR_MAX                = BCRYPT_COST_FACTOR_MAX;
 
+   private static final long DEFAULT_MAX_TIME_BETWEEN_RESEEDING_RNG_IN_SECS           = TimeUnit.DAYS.toSeconds(7);
+   private static final int  DEFAULT_MAX_NUM_OF_GENERATED_VALUES_BEFORE_RESEEDING_RNG = 1024*1024;
+
+   private static final ReseedingSecureRandom  secureRandom = ReseedingSecureRandom.newInstance(DEFAULT_MAX_NUM_OF_GENERATED_VALUES_BEFORE_RESEEDING_RNG,
+                                                                                                DEFAULT_MAX_TIME_BETWEEN_RESEEDING_RNG_IN_SECS);
    private static final PasswordEncoderDecoder passwordEncoderDecoder = new PasswordEncoderDecoder();
    private static final SecureRandom           secureRandom           = new SecureRandom();
 
