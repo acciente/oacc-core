@@ -50,8 +50,6 @@ package com.acciente.oacc.encryptor;
  *    <ul>
  *    <li>{@link com.acciente.oacc.encryptor.bcrypt.BCryptPasswordEncryptor#newInstance(int)
  *      newInstance(int costFactor)}</li>
- *    <li>{@link com.acciente.oacc.encryptor.bcrypt.BCryptPasswordEncryptor#newInstance(int, int)
- *      newInstance(int minComputedCostFactor, int minComputeDurationInMillis)}</li>
  *    </ul>
  * </li>
  * <li>{@link TransitioningPasswordEncryptor} - provides a means to transition from

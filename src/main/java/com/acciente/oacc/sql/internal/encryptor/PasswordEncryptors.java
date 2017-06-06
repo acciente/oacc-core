@@ -30,8 +30,7 @@ import java.util.List;
  * be defined in every {@link PasswordEncryptor} implementation is used.
  */
 public class PasswordEncryptors {
-   private static final int BCRYPT_MIN_COST_FACTOR                    = 10;
-   private static final int BCRYPT_MIN_COMPUTATION_DURATION_IN_MILLIS = 750;
+   private static final int BCRYPT_MIN_COST_FACTOR = 10;
 
    private static final String JASYPT_ALGORITHM       = "SHA-256";
    private static final int    JASYPT_ITERATIONS      = 100000;
@@ -43,7 +42,7 @@ public class PasswordEncryptors {
       }
 
       if (encryptorName.equalsIgnoreCase(BCryptPasswordEncryptor.NAME)) {
-         return BCryptPasswordEncryptor.newInstance(BCRYPT_MIN_COST_FACTOR, BCRYPT_MIN_COMPUTATION_DURATION_IN_MILLIS);
+         return BCryptPasswordEncryptor.newInstance(BCRYPT_MIN_COST_FACTOR);
       }
 
       if (encryptorName.equalsIgnoreCase(JasyptPasswordEncryptor.NAME)) {
