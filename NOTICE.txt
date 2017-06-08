@@ -1,21 +1,5 @@
 Acciente OACC
 Copyright 2009-2017, Acciente LLC
 
-This product uses software developed by
-The ICU-TC of the Unicode® Consortium (http://site.icu-project.org/home).
-
-This product uses software developed by
-The JASYPT team (http://www.jasypt.org/team.html).
-
-This product uses software developed by
-The Legion of the Bouncy Castle Inc. (https://www.bouncycastle.org).
-
-This product uses software developed by
-The Apache Software Foundation (http://www.apache.org/).
-
-This product uses software developed by
-The JUnit team (http://junit.org/team-list.html).
-
-This product uses software developed by
-The Hamcrest team (https://github.com/hamcrest/JavaHamcrest).
-
+This product includes software developed at
+Acciente LLC (http://acciente.com/).
