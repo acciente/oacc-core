@@ -46,6 +46,19 @@ public interface AuthenticationProvider {
    void authenticate(Resource resource);
 
    /**
+    * Authenticates the specified resource using the supplied credentials.
+    * <p/>
+    * This authentication method requires a custom authentication provider and is not supported by the built-in
+    * authentication provider. It is intended for use where the resource identification is embedded in the credentials,
+    * such as in authentication protocols using encrypted authentication tokens. When using this method the custom
+    * authentication provider must return the resource to OACC from the custom authentication provider implementation.
+    *
+    * @param credentials the credentials to authenticate the resource
+    * @throws com.acciente.oacc.IncorrectCredentialsException if authentication failed due to incorrect credentials
+    */
+   Resource authenticate(Credentials credentials);
+
+   /**
     * Checks if the the authentication credentials are valid for the specified resource class and domain.
     * <p/>
     * This method may check if the credentials satisfy the minimum strength requirements, for example.

@@ -71,6 +71,22 @@ public interface AccessControlContext {
    void authenticate(Resource resource, Credentials credentials);
 
    /**
+    * Authenticates this security session using only security credentials.
+    * <p/>
+    * This authentication method requires a custom authentication provider and is not supported by the built-in
+    * authentication provider. It is intended for use where the resource identification is embedded in the credentials,
+    * such as in authentication protocols using encrypted authentication tokens. When using this method the custom
+    * authentication provider must return the resource to OACC from the custom authentication provider implementation.
+    * <p/>
+    * Note: Unless a session is authenticated, all attempts to call any other methods (except <code>authenticate</code>) will fail.
+    *
+    * @param credentials the credentials to authenticate the session
+    * @throws java.lang.IllegalArgumentException        if the resource does not exist or is not of an authenticatable resource class
+    * @throws com.acciente.oacc.AuthenticationException if authentication fails
+    */
+   void authenticate(Credentials credentials);
+
+   /**
     * Authenticates this security session against an {@link AuthenticationProvider} without
     * specifying authentication credentials, if that AuthenticationProvider supports such an operation.
     * <p/>

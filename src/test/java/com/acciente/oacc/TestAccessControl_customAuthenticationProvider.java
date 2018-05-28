@@ -26,7 +26,6 @@ import org.junit.Before;
 import org.junit.Test;
 
 import javax.sql.DataSource;
-import java.sql.Connection;
 
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.is;
@@ -105,7 +104,38 @@ public class TestAccessControl_customAuthenticationProvider extends TestAccessCo
    }
 
    @Test
-   public void createResource_withoutCredentials_shouldFail() {
+   public void authenticate_withOnlyCredentials_validCredentials_shouldSucceed() throws Exception {
+      customAccessControlContext.authenticate(TokenCredentials.newInstance(adminResource, ADMIN_PASSWORD));
+
+      // verify
+      assertThat(customAccessControlContext.getAuthenticatedResource(), is(adminResource));
+      assertThat(customAccessControlContext.getSessionResource(), is(adminResource));
+   }
+
+   @Test
+   public void authenticate_withOnlyCredentials_invalidCredentialsMissingResource_shouldFail() throws Exception {
+      try {
+         customAccessControlContext.authenticate(TokenCredentials.newInstance(null, ADMIN_PASSWORD));
+         fail("authenticating resource with invalid credentials should have failed");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("invalid token contents"));
+      }
+   }
+
+   @Test
+   public void authenticate_withOnlyCredentials_invalidCredentialsMissingPassword_shouldFail() throws Exception {
+      try {
+         customAccessControlContext.authenticate(TokenCredentials.newInstance(adminResource, null));
+         fail("authenticating resource with invalid credentials should have failed");
+      }
+      catch (IllegalArgumentException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("invalid token contents"));
+      }
+   }
+
+   @Test
+   public void createResource_withoutCredentials_shouldSuceed() {
       customAccessControlContext.authenticate(adminResource, PasswordCredentials.newInstance(ADMIN_PASSWORD));
 
       final Resource resource
@@ -137,6 +167,21 @@ public class TestAccessControl_customAuthenticationProvider extends TestAccessCo
       }
       catch (InvalidCredentialsException e) {
          assertThat(e.getMessage().toLowerCase(), containsString("does not meet minimum length"));
+      }
+   }
+
+   @Test
+   public void createResource_withTokenCredentials_shouldFail() {
+      customAccessControlContext.authenticate(adminResource, PasswordCredentials.newInstance(ADMIN_PASSWORD));
+
+      try {
+         customAccessControlContext.createResource(generateResourceClass(true, true),
+                                                   customAccessControlContext.getDomainNameByResource(adminResource),
+                                                   TokenCredentials.newInstance(guestResource, GUEST_PASSWORD));
+         fail("creating resource with invalid credentials should have failed");
+      }
+      catch (InvalidCredentialsException e) {
+         assertThat(e.getMessage().toLowerCase(), containsString("credentials type not supported in this context"));
       }
    }
 
@@ -175,11 +220,7 @@ public class TestAccessControl_customAuthenticationProvider extends TestAccessCo
    }
 
    private static class CustomAuthenticationProvider extends SQLPasswordAuthenticationProvider {
-      protected CustomAuthenticationProvider(Connection connection, String schemaName) {
-         super(connection, schemaName, TestConfigLoader.getPasswordEncryptor());
-      }
-
-      protected CustomAuthenticationProvider(DataSource dataSource, String schemaName) {
+      private CustomAuthenticationProvider(DataSource dataSource, String schemaName) {
          super(dataSource, schemaName, TestConfigLoader.getPasswordEncryptor());
       }
 
@@ -206,14 +247,37 @@ public class TestAccessControl_customAuthenticationProvider extends TestAccessCo
       }
 
       @Override
+      public Resource authenticate(Credentials credentials) {
+         if (credentials instanceof TokenCredentials) {
+            final TokenCredentials tokenCredentials = (TokenCredentials) credentials;
+
+            if (tokenCredentials.getResourceId() == null || tokenCredentials.getPassword() == null) {
+               throw new IllegalArgumentException("Invalid token contents");
+            }
+
+            super.authenticate(tokenCredentials.getResourceId(),
+                  PasswordCredentials.newInstance(tokenCredentials.getPassword()));
+
+            return tokenCredentials.getResourceId();
+         }
+         throw new InvalidCredentialsException(
+               "Authenticating with credentials only not supported for credentials class: " + credentials.getClass());
+      }
+
+      @Override
       public void validateCredentials(String resourceClassName, String domainName, Credentials credentials) {
          // unlike super.validateCredentials(), our custom validator passes if credentials are null
          if (credentials != null) {
-            if (credentials instanceof PasswordCredentials
-                  && strictResourceClass.equalsIgnoreCase(resourceClassName)
+            if (! (credentials instanceof PasswordCredentials)) {
+               throw new InvalidCredentialsException(
+                     "credentials type not supported in this context");
+            }
+
+            if (strictResourceClass.equalsIgnoreCase(resourceClassName)
                   && strictDomain.equalsIgnoreCase(domainName)
                   && ((PasswordCredentials) credentials).getPassword().length < strictMinPasswordLength) {
-               throw new InvalidCredentialsException("password does not meet minimum length criteria (" + strictMinPasswordLength + ")");
+               throw new InvalidCredentialsException(
+                     "password does not meet minimum length criteria (" + strictMinPasswordLength + ")");
             }
 
             super.validateCredentials(resourceClassName, domainName, credentials);
@@ -242,6 +306,36 @@ public class TestAccessControl_customAuthenticationProvider extends TestAccessCo
          }
 
          super.deleteCredentials(resource);
+      }
+   }
+
+   private static abstract class TokenCredentials implements Credentials {
+      private static TokenCredentials newInstance(Resource resourceId, char[] password) {
+         return new Impl(resourceId, password);
+      }
+
+      abstract Resource getResourceId();
+
+      abstract char[] getPassword();
+
+      private static class Impl extends TokenCredentials {
+         private Resource resourceId;
+         private char[]   password;
+
+         private Impl(Resource resourceId, char[] password) {
+            this.resourceId = resourceId;
+            this.password = password;
+         }
+
+         @Override
+         Resource getResourceId() {
+            return resourceId;
+         }
+
+         @Override
+         char[] getPassword() {
+            return password;
+         }
       }
    }
 }
