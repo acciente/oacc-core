@@ -140,7 +140,14 @@ public class SQLPasswordAuthenticationProvider implements AuthenticationProvider
 
    @Override
    public void authenticate(Resource resource) {
-      throw new UnsupportedOperationException("The built-in password authentication provider does not support authentication without credentials");
+      throw new UnsupportedOperationException(
+            "The built-in password authentication provider does not support authentication without credentials");
+   }
+
+   @Override
+   public Resource authenticate(Credentials credentials) {
+      throw new UnsupportedOperationException(
+            "The built-in password authentication provider does not support authentication using *only* credentials");
    }
 
    private void __authenticate(SQLConnection connection, Resource resource, char[] password) {

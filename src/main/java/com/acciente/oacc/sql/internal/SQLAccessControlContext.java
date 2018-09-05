@@ -370,6 +370,17 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
    }
 
    @Override
+   public void authenticate(Credentials credentials) {
+      __assertCredentialsSpecified(credentials);
+
+      // we deliberately don't resolve the resource before calling the common handler method, to avoid having
+      // to keep the connection open across a potentially long call to a third-party authenticationProvider or
+      // to avoid having to get a connection twice
+      __authenticate(null, credentials);
+
+   }
+
+   @Override
    public void authenticate(Resource resource) {
       __assertResourceSpecified(resource);
 
@@ -380,7 +391,20 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
    }
 
    private void __authenticate(Resource resource, Credentials credentials) {
-      // before delegating to the authentication provider we do some basic validation
+      final boolean resourceSpecified = resource != null;
+
+      // if the resource is not specified we need to first delegate to the authentication provider...
+      if (! resourceSpecified) {
+         resource = authenticationProvider.authenticate(credentials);
+
+         if (resource == null) {
+            throw new IllegalStateException(
+                  "No resource returned by the authentication provider when using only credentials to authenticate");
+
+         }
+      }
+
+      // do some basic validation on the resource being authenticated
       SQLConnection connection = null;
 
       final String resourceDomainForResource;
@@ -407,12 +431,15 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
          __closeConnection(connection);
       }
 
-      // now we delegate to the authentication provider
-      if (credentials != null) {
-         authenticationProvider.authenticate(resource, credentials);
-      }
-      else {
-         authenticationProvider.authenticate(resource);
+      // if the resource *was* provided by the caller then we delegate to the authentication provider after
+      // the validations above...otherwise the authentication provider has already been called
+      if (resourceSpecified) {
+         if (credentials != null) {
+            authenticationProvider.authenticate(resource, credentials);
+         }
+         else {
+            authenticationProvider.authenticate(resource);
+         }
       }
 
       authenticatedResource = resource;
