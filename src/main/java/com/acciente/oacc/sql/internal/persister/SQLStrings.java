@@ -953,7 +953,9 @@ public class SQLStrings implements Serializable {
             + "WHERE AccessorResourceId = ? AND AccessedDomainId = ? AND ResourceClassId = ? AND PostCreatePermissionId = ( "
             + "SELECT A.PermissionId FROM "
             + schemaNameAndTablePrefix
-            + "ResourceClassPermission A WHERE A.ResourceClassId = ResourceClassId AND A.PermissionName = ? )";
+            + "ResourceClassPermission A WHERE A.ResourceClassId = "
+            + schemaNameAndTablePrefix
+            + "Grant_ResCrPerm_PostCr.ResourceClassId AND A.PermissionName = ? )";
 
       SQL_removeInGrantResourceCreatePermissionPostCreate_BY_AccessorID
             = "DELETE FROM "
@@ -976,7 +978,9 @@ public class SQLStrings implements Serializable {
             + "Grant_ResCrPerm_PostCr WHERE AccessorResourceId = ? AND AccessedDomainId = ? AND ResourceClassId = ? AND PostCreatePermissionId = ( "
             + "SELECT A.PermissionId FROM "
             + schemaNameAndTablePrefix
-            + "ResourceClassPermission A WHERE A.ResourceClassId = ResourceClassId AND A.PermissionName = ? )";
+            + "ResourceClassPermission A WHERE A.ResourceClassId = "
+            + schemaNameAndTablePrefix
+            + "Grant_ResCrPerm_PostCr.ResourceClassId AND A.PermissionName = ? )";
 
       // GrantResourceCreatePermissionPostCreate - recursive
       SQL_findInGrantResourceCreatePermissionPostCreate_ResourceClassName_PostCreatePermissionName_PostCreateIsWithGrant_IsWithGrant_BY_AccessorID_AccessedDomainID_ResourceClassID
@@ -1160,7 +1164,9 @@ public class SQLStrings implements Serializable {
             + "WHERE AccessorResourceId = ? AND AccessedResourceId = ? AND ResourceClassId = ? AND PermissionId = ( "
             + "SELECT A.PermissionId FROM "
             + schemaNameAndTablePrefix
-            + "ResourceClassPermission A WHERE A.ResourceClassId = ResourceClassId AND A.PermissionName = ? )";
+            + "ResourceClassPermission A WHERE A.ResourceClassId = "
+            + schemaNameAndTablePrefix
+            + "Grant_ResPerm.ResourceClassId AND A.PermissionName = ? )";
 
       SQL_removeInGrantResourcePermission_BY_AccessorID_OR_AccessedID
             = "DELETE FROM "
@@ -1178,7 +1184,9 @@ public class SQLStrings implements Serializable {
             + "Grant_ResPerm WHERE AccessorResourceId = ? AND AccessedResourceId = ? AND ResourceClassId = ? AND PermissionId = ( "
             + "SELECT A.PermissionId FROM "
             + schemaNameAndTablePrefix
-            + "ResourceClassPermission A WHERE A.ResourceClassId = ResourceClassId AND A.PermissionName = ? )";
+            + "ResourceClassPermission A WHERE A.ResourceClassId = "
+            + schemaNameAndTablePrefix
+            + "Grant_ResPerm.ResourceClassId AND A.PermissionName = ? )";
 
       // GrantResourcePermission - recursive
       SQL_findInGrantResourcePermission_ResourceID_ExternalID_BY_AccessorID_ResourceClassID_PermissionID_IsWithGrant
@@ -1423,7 +1431,9 @@ public class SQLStrings implements Serializable {
             + "WHERE AccessorResourceId = ? AND AccessedDomainId = ? AND ResourceClassId = ? AND PermissionId = ( "
             + "SELECT A.PermissionId FROM "
             + schemaNameAndTablePrefix
-            + "ResourceClassPermission A WHERE A.ResourceClassId = ResourceClassId AND A.PermissionName = ? )";
+            + "ResourceClassPermission A WHERE A.ResourceClassId = "
+            + schemaNameAndTablePrefix
+            + "Grant_Global_ResPerm.ResourceClassId AND A.PermissionName = ? )";
 
       SQL_removeInGrantGlobalResourcePermission_BY_AccessorID
             = "DELETE FROM "
@@ -1446,7 +1456,9 @@ public class SQLStrings implements Serializable {
             + "Grant_Global_ResPerm WHERE AccessorResourceId = ? AND AccessedDomainId = ? AND ResourceClassId = ? AND PermissionId = ( "
             + "SELECT A.PermissionId FROM "
             + schemaNameAndTablePrefix
-            + "ResourceClassPermission A WHERE A.ResourceClassId = ResourceClassId AND A.PermissionName = ? )";
+            + "ResourceClassPermission A WHERE A.ResourceClassId = "
+            + schemaNameAndTablePrefix
+            + "Grant_Global_ResPerm.ResourceClassId AND A.PermissionName = ? )";
 
       // GrantGlobalResourcePermission - recursive
       SQL_findInGrantGlobalResourcePermission_ResourceID_ExternalID_BY_AccessorID_ResourceClassID_PermissionID_IsWithGrant_ResourceClassID
