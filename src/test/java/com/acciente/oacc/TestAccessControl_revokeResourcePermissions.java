@@ -149,6 +149,53 @@ public class TestAccessControl_revokeResourcePermissions extends TestAccessContr
    }
 
    @Test
+   public void revokeResourcePermissions_samePermissionNameAsOtherResourceClass_shouldSucceed() {
+      authenticateSystemResource();
+
+      // generate permissions with same name for two separate resource classes
+      final String resourceClassName = generateResourceClass(false, false);
+      final String otherResourceClassName = generateResourceClass(false, false);
+      final String customPermissionName = generateUniquePermissionName();
+      // note the order we create permissions in; prevent RDBMS silently picking first permission by name when there are multiple
+      final String[] orderedResourceClassNames = {otherResourceClassName, resourceClassName};
+      for (String rcName: orderedResourceClassNames) {
+         accessControlContext.createResourcePermission(rcName, customPermissionName);
+      }
+
+      final Resource accessorResource = generateUnauthenticatableResource();
+      final Resource accessedResource = accessControlContext.createResource(resourceClassName, generateDomain());
+      assertThat(accessControlContext.getEffectiveResourcePermissions(accessorResource, accessedResource).isEmpty(), is(
+            true));
+
+      Set<ResourcePermission> permissions_pre = setOf(ResourcePermissions.getInstance(customPermissionName));
+
+      accessControlContext.setResourcePermissions(accessorResource, accessedResource, permissions_pre);
+      assertThat(accessControlContext.getEffectiveResourcePermissions(accessorResource, accessedResource),
+                 is(permissions_pre));
+
+      // revoke permissions and verify
+      accessControlContext.revokeResourcePermissions(accessorResource,
+                                                     accessedResource,
+                                                     ResourcePermissions.getInstance(customPermissionName));
+
+      final Set<ResourcePermission> permissions_post = accessControlContext.getEffectiveResourcePermissions(accessorResource, accessedResource);
+      assertThat(permissions_post.isEmpty(), is(true));
+
+      // test set-based version
+      final Resource accessorResource2 = generateUnauthenticatableResource();
+      accessControlContext.setResourcePermissions(accessorResource2, accessedResource, permissions_pre);
+      assertThat(accessControlContext.getEffectiveResourcePermissions(accessorResource2, accessedResource),
+                 is(permissions_pre));
+
+      accessControlContext.revokeResourcePermissions(accessorResource2,
+                                                     accessedResource,
+                                                     setOf(ResourcePermissions.getInstance(customPermissionName)));
+
+      assertThat(accessControlContext.getEffectiveResourcePermissions(accessorResource2, accessedResource).isEmpty(),
+                 is(true));
+   }
+
+   @Test
    public void revokeResourcePermissions_ungrantedPermissions_shouldSucceed() {
       authenticateSystemResource();
       final String resourceClassName = generateResourceClass(false, false);

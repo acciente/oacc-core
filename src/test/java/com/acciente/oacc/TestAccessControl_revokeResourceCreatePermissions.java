@@ -299,6 +299,68 @@ public class TestAccessControl_revokeResourceCreatePermissions extends TestAcces
    }
 
    @Test
+   public void revokeResourceCreatePermissions_samePermissionNameAsOtherResourceClass_shouldSucceed() {
+      authenticateSystemResource();
+      final String domainName = generateDomain();
+      final Resource accessorResource = generateUnauthenticatableResource();
+
+      // create permissions with same name for different resource classes
+      final String resourceClassName = generateResourceClass(false, false);
+      final String otherResourceClassName = generateResourceClass(false, false);
+      final String customPermissionName = generateUniquePermissionName();
+      // note the order we create permissions in; prevent RDBMS silently picking first permission by name when there are multiple
+      final String[] orderedResourceClassNames = {otherResourceClassName, resourceClassName};
+      for (String rcName: orderedResourceClassNames) {
+         accessControlContext.createResourcePermission(rcName, customPermissionName);
+      }
+
+      final ResourceCreatePermission createPerm_create
+            = ResourceCreatePermissions.getInstance(ResourceCreatePermissions.CREATE);
+      final ResourceCreatePermission createPerm_sameName
+            = ResourceCreatePermissions.getInstance(ResourcePermissions.getInstance(customPermissionName));
+      assertThat(accessControlContext.getEffectiveResourceCreatePermissionsMap(accessorResource).isEmpty(), is(true));
+
+      // set up accessor
+      Set<ResourceCreatePermission> resourceCreatePermissions_pre
+            = setOf(createPerm_create,
+                    createPerm_sameName);
+
+      accessControlContext.setResourceCreatePermissions(accessorResource, resourceClassName, domainName, resourceCreatePermissions_pre);
+      assertThat(accessControlContext.getEffectiveResourceCreatePermissions(accessorResource,
+                                                                            resourceClassName,
+                                                                            domainName),
+                 is(resourceCreatePermissions_pre));
+
+      // revoke create permissions and verify
+      accessControlContext.revokeResourceCreatePermissions(accessorResource,
+                                                           resourceClassName,
+                                                           domainName,
+                                                           createPerm_create,
+                                                           createPerm_sameName);
+
+      final Set<ResourceCreatePermission> resourceCreatePermissions_post
+            = accessControlContext.getEffectiveResourceCreatePermissions(accessorResource,
+                                                                         resourceClassName,
+                                                                         domainName);
+      assertThat(resourceCreatePermissions_post.isEmpty(), is(true));
+
+      // test set-based version
+      final Resource accessorResource2 = generateUnauthenticatableResource();
+      accessControlContext.setResourceCreatePermissions(accessorResource2, resourceClassName, domainName, resourceCreatePermissions_pre);
+      assertThat(accessControlContext.getEffectiveResourceCreatePermissions(accessorResource2, resourceClassName, domainName),
+                 is(resourceCreatePermissions_pre));
+
+      accessControlContext.revokeResourceCreatePermissions(accessorResource2,
+                                                           resourceClassName,
+                                                           domainName,
+                                                           setOf(createPerm_create,
+                                                                 createPerm_sameName));
+
+      assertThat(accessControlContext.getEffectiveResourceCreatePermissions(accessorResource2, resourceClassName, domainName).isEmpty(),
+                 is(true));
+   }
+
+   @Test
    public void revokeResourceCreatePermissions_ungrantedPermissionsWithAndWithoutGrant_shouldFail() {
       final ResourcePermission resourcePermission_inherit_withGrant
             = ResourcePermissions.getInstanceWithGrantOption(ResourcePermissions.INHERIT);

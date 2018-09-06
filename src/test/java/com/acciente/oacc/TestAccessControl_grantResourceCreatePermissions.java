@@ -209,6 +209,140 @@ public class TestAccessControl_grantResourceCreatePermissions extends TestAccess
    }
 
    @Test
+   public void grantResourceCreatePermissions_samePermissionNameAsOtherResourceClass_shouldSucceed() {
+      authenticateSystemResource();
+      final Resource accessorResource = generateUnauthenticatableResource();
+      final String domainName = generateDomain();
+
+      // create permissions with same name for different resource classes
+      final String resourceClassName = generateResourceClass(false, false);
+      final String otherResourceClassName = generateResourceClass(false, false);
+      final String customPermissionName = generateUniquePermissionName();
+      // note the order we create permissions in; prevent RDBMS silently picking first permission by name when there are multiple
+      final String[] orderedResourceClassNames = {otherResourceClassName, resourceClassName};
+      for (String rcName: orderedResourceClassNames) {
+         accessControlContext.createResourcePermission(rcName, customPermissionName);
+      }
+
+      final ResourceCreatePermission createPerm_create
+            = ResourceCreatePermissions.getInstance(ResourceCreatePermissions.CREATE);
+      final ResourceCreatePermission createPerm_sameName
+            = ResourceCreatePermissions.getInstance(ResourcePermissions.getInstance(customPermissionName));
+      assertThat(accessControlContext.getEffectiveResourceCreatePermissionsMap(accessorResource).isEmpty(), is(true));
+
+      Set<ResourceCreatePermission> resourceCreatePermissions_expected
+            = setOf(createPerm_create,
+                    createPerm_sameName);
+
+      // grant create permissions and verify
+      accessControlContext.grantResourceCreatePermissions(accessorResource,
+                                                          resourceClassName,
+                                                          domainName,
+                                                          createPerm_create,
+                                                          createPerm_sameName);
+
+      final Set<ResourceCreatePermission> resourceCreatePermissions_post
+            = accessControlContext.getEffectiveResourceCreatePermissions(accessorResource,
+                                                                         resourceClassName,
+                                                                         domainName);
+      assertThat(resourceCreatePermissions_post, is(resourceCreatePermissions_expected));
+
+      // test set-based version
+      final Resource accessorResource2 = generateUnauthenticatableResource();
+      assertThat(accessControlContext.getEffectiveResourceCreatePermissionsMap(accessorResource2).isEmpty(), is(true));
+
+      accessControlContext.grantResourceCreatePermissions(accessorResource2,
+                                                          resourceClassName,
+                                                          domainName,
+                                                          setOf(createPerm_create,
+                                                                createPerm_sameName));
+
+      assertThat(accessControlContext.getEffectiveResourceCreatePermissions(accessorResource2, resourceClassName, domainName),
+                 is(resourceCreatePermissions_expected));
+   }
+
+   @Test
+   public void grantResourceCreatePermissions_upgradePostCreateGrantingRights_samePermissionNameAsOtherResourceClass_shouldSucceed() {
+      authenticateSystemResource();
+      final String domainName = generateDomain();
+
+      final String resourceClassName = generateResourceClass(false, false);
+      final String otherResourceClassName = generateResourceClass(false, false);
+      final String customPermissionName = generateUniquePermissionName();
+      // note the order we create permissions in; prevent RDBMS silently picking first permission by name when there are multiple
+      final String[] orderedResourceClassNames = {otherResourceClassName, resourceClassName};
+      for (String rcName: orderedResourceClassNames) {
+         accessControlContext.createResourcePermission(rcName, customPermissionName);
+      }
+
+      final ResourceCreatePermission createPerm_create
+            = ResourceCreatePermissions.getInstance(ResourceCreatePermissions.CREATE);
+      final ResourceCreatePermission createPerm_sameName
+            = ResourceCreatePermissions.getInstance(ResourcePermissions.getInstance(customPermissionName));
+
+      // grant initial create permissions
+      final Resource accessorResource = generateUnauthenticatableResource();
+      assertThat(accessControlContext.getEffectiveResourceCreatePermissionsMap(accessorResource).isEmpty(), is(true));
+
+      final Set<ResourceCreatePermission> resourceCreatePermissions_pre = setOf(createPerm_create,
+                                                                                createPerm_sameName);
+
+      accessControlContext.setResourceCreatePermissions(accessorResource,
+                                                        resourceClassName,
+                                                        domainName,
+                                                        resourceCreatePermissions_pre);
+
+      assertThat(accessControlContext.getEffectiveResourceCreatePermissions(accessorResource,
+                                                                            resourceClassName,
+                                                                            domainName),
+                 is(resourceCreatePermissions_pre));
+
+      final Resource accessorResource2 = generateUnauthenticatableResource();
+      assertThat(accessControlContext.getEffectiveResourceCreatePermissionsMap(accessorResource2).isEmpty(), is(true));
+
+      accessControlContext.setResourceCreatePermissions(accessorResource2,
+                                                        resourceClassName,
+                                                        domainName,
+                                                        resourceCreatePermissions_pre);
+
+      assertThat(accessControlContext.getEffectiveResourceCreatePermissions(accessorResource2,
+                                                                            resourceClassName,
+                                                                            domainName),
+                 is(resourceCreatePermissions_pre));
+
+      // create permissions with same name for different resource classes
+      final ResourceCreatePermission createPerm_sameName_withGrant
+            = ResourceCreatePermissions.getInstanceWithGrantOption(ResourcePermissions.getInstance(customPermissionName));
+
+      Set<ResourceCreatePermission> resourceCreatePermissions_expected
+            = setOf(createPerm_create,
+                    createPerm_sameName_withGrant);
+
+      // upgrade create permissions and verify
+      accessControlContext.grantResourceCreatePermissions(accessorResource,
+                                                          resourceClassName,
+                                                          domainName,
+                                                          createPerm_create,
+                                                          createPerm_sameName_withGrant);
+
+      final Set<ResourceCreatePermission> resourceCreatePermissions_post
+            = accessControlContext.getEffectiveResourceCreatePermissions(accessorResource,
+                                                                         resourceClassName,
+                                                                         domainName);
+      assertThat(resourceCreatePermissions_post, is(resourceCreatePermissions_expected));
+
+      // test set-based version
+      accessControlContext.grantResourceCreatePermissions(accessorResource2,
+                                                          resourceClassName,
+                                                          domainName,
+                                                          setOf(createPerm_create,
+                                                                createPerm_sameName_withGrant));
+
+      assertThat(accessControlContext.getEffectiveResourceCreatePermissions(accessorResource2, resourceClassName, domainName),
+                 is(resourceCreatePermissions_expected));
+   }
+
+   @Test
    public void grantResourceCreatePermissions_addPermission_shouldSucceedAsAuthorized() {
       authenticateSystemResource();
       final String resourceClassName = generateResourceClass(false, false);

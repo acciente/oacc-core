@@ -124,6 +124,45 @@ public class TestAccessControl_grantResourcePermissions extends TestAccessContro
    }
 
    @Test
+   public void grantResourcePermissions_samePermissionNameAsOtherResourceClass_shouldSucceed() {
+      authenticateSystemResource();
+
+      // generate permissions with same name for two separate resource classes
+      final String resourceClassName = generateResourceClass(false, false);
+      final String otherResourceClassName = generateResourceClass(false, false);
+      final String customPermissionName = generateUniquePermissionName();
+      // note the order we create permissions in; prevent RDBMS silently picking first permission by name when there are multiple
+      final String[] orderedResourceClassNames = {otherResourceClassName, resourceClassName};
+      for (String rcName: orderedResourceClassNames) {
+         accessControlContext.createResourcePermission(rcName, customPermissionName);
+      }
+
+      final Resource accessorResource = generateUnauthenticatableResource();
+      final Resource accessedResource = accessControlContext.createResource(resourceClassName, generateDomain());
+      assertThat(accessControlContext.getEffectiveResourcePermissions(accessorResource, accessedResource).isEmpty(), is(true));
+
+      Set<ResourcePermission> permissions_pre = setOf(ResourcePermissions.getInstance(customPermissionName));
+
+      // grant permissions and verify
+      accessControlContext.grantResourcePermissions(accessorResource,
+                                                    accessedResource,
+                                                    ResourcePermissions.getInstance(customPermissionName));
+
+      final Set<ResourcePermission> permissions_post = accessControlContext.getEffectiveResourcePermissions(accessorResource, accessedResource);
+      assertThat(permissions_post, is(permissions_pre));
+
+      // test set-based version
+      final Resource accessedResource2 = accessControlContext.createResource(resourceClassName, generateDomain());
+
+      accessControlContext.grantResourcePermissions(accessorResource,
+                                                    accessedResource2,
+                                                    setOf(ResourcePermissions.getInstance(customPermissionName)));
+
+      assertThat(accessControlContext.getEffectiveResourcePermissions(accessorResource, accessedResource2),
+                 is(permissions_pre));
+   }
+
+   @Test
    public void grantResourcePermissions_resetCredentialsPermissionOnUnauthenticatables_shouldFail() {
       authenticateSystemResource();
       final Resource accessorResource = generateAuthenticatableResource(generateUniquePassword());
@@ -928,6 +967,56 @@ public class TestAccessControl_grantResourcePermissions extends TestAccessContro
       accessControlContext.grantResourcePermissions(accessorResource2,
                                                     accessedResource,
                                                     setOf(ResourcePermissions.getInstanceWithGrantOption(grantedPermissionName)));
+
+      assertThat(accessControlContext.getEffectiveResourcePermissions(accessorResource2, accessedResource),
+                 is(permissions_expected));
+   }
+
+   @Test
+   public void grantResourcePermissions_upgradeGrantingRights_samePermissionNameAsOtherResourceClass_shouldSucceed() {
+      authenticateSystemResource();
+      // generate permissions with same name for two separate resource classes
+      final String resourceClassName = generateResourceClass(false, false);
+      final String otherResourceClassName = generateResourceClass(false, false);
+      final String customPermissionName = generateUniquePermissionName();
+      // note the order we create permissions in; prevent RDBMS silently picking first permission by name when there are multiple
+      final String[] orderedResourceClassNames = {otherResourceClassName, resourceClassName};
+      for (String rcName: orderedResourceClassNames) {
+         accessControlContext.createResourcePermission(rcName, customPermissionName);
+      }
+
+      final Resource accessorResource = generateUnauthenticatableResource();
+      final Resource accessorResource2 = generateUnauthenticatableResource();
+      final Resource accessedResource = accessControlContext.createResource(resourceClassName, generateDomain());
+      assertThat(accessControlContext.getEffectiveResourcePermissions(accessorResource, accessedResource).isEmpty(), is(true));
+
+      // setup accessor permissions
+      Set<ResourcePermission> accessorPermissions_pre = new HashSet<>();
+      accessorPermissions_pre.add(ResourcePermissions.getInstance(customPermissionName));
+
+      accessControlContext.setResourcePermissions(accessorResource, accessedResource, accessorPermissions_pre);
+      assertThat(accessControlContext.getEffectiveResourcePermissions(accessorResource, accessedResource), is(
+            accessorPermissions_pre));
+
+      accessControlContext.setResourcePermissions(accessorResource2, accessedResource, accessorPermissions_pre);
+
+      // upgrade permissions as grantor and verify
+      accessControlContext.grantResourcePermissions(accessorResource,
+                                                    accessedResource,
+                                                    ResourcePermissions.getInstanceWithGrantOption(customPermissionName));
+
+      Set<ResourcePermission> permissions_expected = setOf(ResourcePermissions.getInstanceWithGrantOption(customPermissionName));
+
+      final Set<ResourcePermission> permissions_post = accessControlContext.getEffectiveResourcePermissions(accessorResource, accessedResource);
+      assertThat(permissions_post, is(permissions_expected));
+
+      // test set-based version
+      assertThat(accessControlContext.getEffectiveResourcePermissions(accessorResource2, accessedResource), is(
+            accessorPermissions_pre));
+
+      accessControlContext.grantResourcePermissions(accessorResource2,
+                                                    accessedResource,
+                                                    setOf(ResourcePermissions.getInstanceWithGrantOption(customPermissionName)));
 
       assertThat(accessControlContext.getEffectiveResourcePermissions(accessorResource2, accessedResource),
                  is(permissions_expected));

@@ -161,6 +161,73 @@ public class TestAccessControl_revokeGlobalResourcePermissions extends TestAcces
    }
 
    @Test
+   public void revokeGlobalResourcePermissions_samePermissionNameAsOtherResourceClass_shouldSucceed() {
+      authenticateSystemResource();
+
+      // generate permissions with same name for two separate resource classes
+      final String resourceClassName = generateResourceClass(false, false);
+      final String otherResourceClassName = generateResourceClass(false, false);
+      final String customPermissionName = generateUniquePermissionName();
+      // note the order we create permissions in; prevent RDBMS silently picking first permission by name when there are multiple
+      final String[] orderedResourceClassNames = {otherResourceClassName, resourceClassName};
+      for (String rcName: orderedResourceClassNames) {
+         accessControlContext.createResourcePermission(rcName, customPermissionName);
+      }
+
+      final Resource accessorResource = generateUnauthenticatableResource();
+      final String domainName = accessControlContext.getDomainNameByResource(accessorResource);
+      assertThat(accessControlContext.getEffectiveGlobalResourcePermissionsMap(accessorResource).isEmpty(), is(true));
+
+      Set<ResourcePermission> permissions_pre = setOf(ResourcePermissions.getInstance(customPermissionName));
+
+      // setup permissions
+      accessControlContext.setGlobalResourcePermissions(accessorResource,
+                                                        resourceClassName,
+                                                        domainName,
+                                                        permissions_pre);
+
+      assertThat(accessControlContext.getEffectiveGlobalResourcePermissions(accessorResource,
+                                                                            resourceClassName,
+                                                                            domainName),
+                 is(permissions_pre));
+
+      // revoke permissions and verify
+      accessControlContext.revokeGlobalResourcePermissions(accessorResource,
+                                                           resourceClassName,
+                                                           domainName,
+                                                           ResourcePermissions
+                                                                 .getInstance(customPermissionName));
+
+      assertThat(accessControlContext.getEffectiveGlobalResourcePermissions(accessorResource,
+                                                                            resourceClassName,
+                                                                            domainName).isEmpty(),
+                 is(true));
+
+      // test set-based version
+      final Resource accessorResource2 = generateUnauthenticatableResource();
+      accessControlContext.setGlobalResourcePermissions(accessorResource2,
+                                                        resourceClassName,
+                                                        domainName,
+                                                        permissions_pre);
+
+      assertThat(accessControlContext.getEffectiveGlobalResourcePermissions(accessorResource2,
+                                                                            resourceClassName,
+                                                                            domainName),
+                 is(permissions_pre));
+
+      accessControlContext.revokeGlobalResourcePermissions(accessorResource2,
+                                                           resourceClassName,
+                                                           domainName,
+                                                           setOf(ResourcePermissions
+                                                                       .getInstance(customPermissionName)));
+
+      assertThat(accessControlContext.getEffectiveGlobalResourcePermissions(accessorResource2,
+                                                                            resourceClassName,
+                                                                            domainName).isEmpty(),
+                 is(true));
+   }
+
+   @Test
    public void revokeGlobalResourcePermissions_ungrantedPermissions_shouldSucceed() {
       authenticateSystemResource();
       final String authenticatableResourceClassName = generateResourceClass(true, false);
