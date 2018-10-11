@@ -13,7 +13,7 @@
 
     <properties>
         <!-- Dependency versions -->
-        <bcprov-jdk15on.version>1.57</bcprov-jdk15on.version>
+        <bcprov-jdk15on.version>1.58</bcprov-jdk15on.version>
         <jasypt.version>1.9.2</jasypt.version>
         <junit.version>4.12</junit.version>
         <hamcrest-all.version>1.3</hamcrest-all.version>
