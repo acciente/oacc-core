@@ -314,16 +314,11 @@ public class TestDomainCreatePermission {
          public boolean isWithGrantOption() { return false; }
 
          @Override
-         public boolean isWithGrant() { return false; }
-
-         @Override
          public boolean isGrantableFrom(DomainPermission other) { return false; }
 
          @Override
          public boolean equalsIgnoreGrantOption(Object other) { return false; }
 
-         @Override
-         public boolean equalsIgnoreGrant(Object other) { return false; }
       };
 
       final DomainCreatePermission DomainCreatePermission

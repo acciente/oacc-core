@@ -96,19 +96,6 @@ public class ResourceCreatePermissions {
       return resourceCreatePermission;
    }
 
-   /**
-    * Creates a new resource create permission with no post-create permissions (i.e. only resource creation)
-    *
-    * @param sysPermissionName
-    * @param withGrant         true if the permission should have the grant privilege, false otherwise
-    * @return a resource create permission
-    * @deprecated as of v2.0.0-rc.5; use {@link #getInstanceWithGrantOption(String)} or {@link #getInstance(String)} instead.
-    */
-   @Deprecated
-   public static ResourceCreatePermission getInstance(String sysPermissionName, boolean withGrant) {
-      return new ResourceCreatePermissionImpl(sysPermissionName, withGrant);
-   }
-
 
    /**
     * Creates a new resource create permission with no post-create permissions (i.e. only resource creation)
@@ -186,17 +173,6 @@ public class ResourceCreatePermissions {
       }
 
       return resourceCreatePermission;
-   }
-
-   /**
-    * @deprecated as of v2.0.0-rc.5; use {@link #getInstanceWithGrantOption(ResourcePermission)} or
-    * {@link #getInstance(ResourcePermission)} instead.
-    */
-   @Deprecated
-   public static ResourceCreatePermission getInstance(ResourcePermission postCreateResourcePermission,
-                                                      boolean withGrant) {
-      postCreateResourcePermission = ResourcePermissions.getInstance(postCreateResourcePermission);
-      return new ResourceCreatePermissionImpl((ResourcePermissionImpl) postCreateResourcePermission, withGrant);
    }
 
    public static ResourceCreatePermission getInstance(ResourceCreatePermission resourceCreatePermission) {
@@ -318,12 +294,6 @@ public class ResourceCreatePermissions {
       }
 
       @Override
-      @Deprecated
-      public boolean isWithGrant() {
-         return isWithGrantOption();
-      }
-
-      @Override
       public boolean isGrantableFrom(ResourceCreatePermission other) {
          if (other == null) {
             return false;
@@ -405,12 +375,6 @@ public class ResourceCreatePermissions {
          }
 
          return true;
-      }
-
-      @Override
-      @Deprecated
-      public boolean equalsIgnoreGrant(Object other) {
-         return equalsIgnoreGrantOption(other);
       }
 
       @Override

@@ -176,18 +176,10 @@ public class TestAccessControl_assertDomainCreatePermissions extends TestAccessC
          public boolean isWithGrantOption() { return true; }
 
          @Override
-         @Deprecated
-         public boolean isWithGrant() { return isWithGrantOption(); }
-
-         @Override
          public boolean isGrantableFrom(DomainCreatePermission other) { return true; }
 
          @Override
          public boolean equalsIgnoreGrantOption(Object other) { return true; }
-
-         @Override
-         @Deprecated
-         public boolean equalsIgnoreGrant(Object other) { return equalsIgnoreGrantOption(other); }
 
          // this implementation will always indicate two permissions are equal
          @Override
@@ -263,18 +255,10 @@ public class TestAccessControl_assertDomainCreatePermissions extends TestAccessC
          public boolean isWithGrantOption() { return true; }
 
          @Override
-         @Deprecated
-         public boolean isWithGrant() { return isWithGrantOption(); }
-
-         @Override
          public boolean isGrantableFrom(DomainCreatePermission other) { return true; }
 
          @Override
          public boolean equalsIgnoreGrantOption(Object other) { return true; }
-
-         @Override
-         @Deprecated
-         public boolean equalsIgnoreGrant(Object other) { return equalsIgnoreGrantOption(other); }
 
          @Override
          public boolean equals(Object other) { return true; }

@@ -124,14 +124,6 @@ public class ResourcePermissions {
       return resourcePermission;
    }
 
-   /**
-    * @deprecated as of v2.0.0-rc.5; use {@link #getInstanceWithGrantOption(String)} or {@link #getInstance(String)} instead.
-    */
-   @Deprecated
-   public static ResourcePermission getInstance(String permissionName, boolean withGrant) {
-      return new ResourcePermissionImpl(permissionName, withGrant);
-   }
-
    public static ResourcePermission getInstance(ResourcePermission resourcePermission) {
       if (resourcePermission instanceof ResourcePermissions.ResourcePermissionImpl) {
          return resourcePermission;
@@ -221,12 +213,6 @@ public class ResourcePermissions {
       }
 
       @Override
-      @Deprecated
-      public boolean isWithGrant() {
-         return isWithGrantOption();
-      }
-
-      @Override
       public boolean isGrantableFrom(ResourcePermission other) {
          if (other == null) {
             return false;
@@ -276,12 +262,6 @@ public class ResourcePermissions {
          }
 
          return true;
-      }
-
-      @Override
-      @Deprecated
-      public boolean equalsIgnoreGrant(Object other) {
-         return equalsIgnoreGrantOption(other);
       }
 
       @Override

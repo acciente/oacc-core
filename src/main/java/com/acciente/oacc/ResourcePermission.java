@@ -64,16 +64,6 @@ public interface ResourcePermission {
    boolean isWithGrantOption();
 
    /**
-    * Retrieves the "with grant" option.
-    *
-    * @return true if this permission includes the privilege to be granted to others, false otherwise.
-    *
-    * @deprecated as of v2.0.0-rc.5; use {@link #isWithGrantOption()} instead.
-    */
-   @Deprecated
-   boolean isWithGrant();
-
-   /**
     * Determines if this permission can be granted by a grantor holding the specified other permission.
     *
     * @param other another permission to compare with
@@ -91,15 +81,4 @@ public interface ResourcePermission {
     */
    boolean equalsIgnoreGrantOption(Object other);
 
-   /**
-    * Compare this permission with the specified other permission for equality, but ignoring the grant option.
-    *
-    * @param other another permission to compare with
-    * @return true if the specified other permission is equal to this permission ignoring the
-    *         value of the {@link #isWithGrant()} property.
-    *
-    * @deprecated as of v2.0.0-rc.5; use {@link #equalsIgnoreGrantOption(Object)} instead.
-    */
-   @Deprecated
-   boolean equalsIgnoreGrant(Object other);
 }

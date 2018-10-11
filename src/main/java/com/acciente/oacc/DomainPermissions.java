@@ -117,14 +117,6 @@ public class DomainPermissions {
       return domainPermission;
    }
 
-   /**
-    * @deprecated as of v2.0.0-rc.5; use {@link #getInstanceWithGrantOption(String)} or {@link #getInstance(String)} instead.
-    */
-   @Deprecated
-   public static DomainPermission getInstance(String sysPermissionName, boolean withGrant) {
-      return new DomainPermissionImpl(sysPermissionName, withGrant);
-   }
-
    public static DomainPermission getInstance(DomainPermission domainPermission) {
       if (domainPermission instanceof DomainPermissions.DomainPermissionImpl) {
          return domainPermission;
@@ -201,12 +193,6 @@ public class DomainPermissions {
       }
 
       @Override
-      @Deprecated
-      public boolean isWithGrant() {
-         return isWithGrantOption();
-      }
-
-      @Override
       public boolean isGrantableFrom(DomainPermission other) {
          if (other == null) {
             return false;
@@ -258,12 +244,6 @@ public class DomainPermissions {
          }
 
          return true;
-      }
-
-      @Override
-      @Deprecated
-      public boolean equalsIgnoreGrant(Object other) {
-         return equalsIgnoreGrantOption(other);
       }
 
       @Override

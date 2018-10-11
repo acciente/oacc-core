@@ -96,14 +96,6 @@ public class DomainCreatePermissions {
    }
 
    /**
-    * @deprecated as of v2.0.0-rc.5; use {@link #getInstanceWithGrantOption(String)} or {@link #getInstance(String)} instead.
-    */
-   @Deprecated
-   public static DomainCreatePermission getInstance(String sysPermissionName, boolean withGrant) {
-      return new DomainCreatePermissionImpl(sysPermissionName, withGrant);
-   }
-
-   /**
     * Creates a new domain create permission with no post-create permissions (i.e. only domain creation)
     * without the option to grant the create-permission to another resource
     *
@@ -179,15 +171,6 @@ public class DomainCreatePermissions {
       }
 
       return domainCreatePermission;
-   }
-
-   /**
-    * @deprecated as of v2.0.0-rc.5; use {@link #getInstanceWithGrantOption(DomainPermission)} or {@link #getInstance(DomainPermission)} instead.
-    */
-   @Deprecated
-   public static DomainCreatePermission getInstance(DomainPermission domainPostCreatePermission, boolean withGrant) {
-      domainPostCreatePermission = DomainPermissions.getInstance(domainPostCreatePermission);
-      return new DomainCreatePermissionImpl((DomainPermissionImpl) domainPostCreatePermission, withGrant);
    }
 
    public static DomainCreatePermission getInstance(DomainCreatePermission domainCreatePermission) {
@@ -308,12 +291,6 @@ public class DomainCreatePermissions {
       }
 
       @Override
-      @Deprecated
-      public boolean isWithGrant() {
-         return isWithGrantOption();
-      }
-
-      @Override
       public boolean isGrantableFrom(DomainCreatePermission other) {
          if (other == null) {
             return false;
@@ -397,12 +374,6 @@ public class DomainCreatePermissions {
          }
 
          return true;
-      }
-
-      @Override
-      @Deprecated
-      public boolean equalsIgnoreGrant(Object other) {
-         return equalsIgnoreGrantOption(other);
       }
 
       @Override

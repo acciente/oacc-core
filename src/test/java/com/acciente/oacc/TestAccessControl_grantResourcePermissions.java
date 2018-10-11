@@ -248,18 +248,10 @@ public class TestAccessControl_grantResourcePermissions extends TestAccessContro
          public boolean isWithGrantOption() { return true; }
 
          @Override
-         @Deprecated
-         public boolean isWithGrant() { return isWithGrantOption(); }
-
-         @Override
          public boolean isGrantableFrom(ResourcePermission other) { return true; }
 
          @Override
          public boolean equalsIgnoreGrantOption(Object other) { return false; }
-
-         @Override
-         @Deprecated
-         public boolean equalsIgnoreGrant(Object other) { return equalsIgnoreGrantOption(other); }
 
          @Override
          public boolean equals(Object other) { return false; }
@@ -744,21 +736,13 @@ public class TestAccessControl_grantResourcePermissions extends TestAccessContro
          public boolean isWithGrantOption() { return true; }
 
          @Override
-         @Deprecated
-         public boolean isWithGrant() { return isWithGrantOption(); }
-
-         @Override
          public boolean isGrantableFrom(ResourcePermission other) { return true; }
 
          @Override
          public boolean equalsIgnoreGrantOption(Object other) { return false; }
 
          @Override
-         @Deprecated
-         public boolean equalsIgnoreGrant(Object other) { return equalsIgnoreGrantOption(other); }
-
-         @Override
-         public String toString() { return (isSystemPermission() ? "SYS:" + getPermissionName() : getPermissionName()) + ( isWithGrant() ? " /G" : ""); }
+         public String toString() { return (isSystemPermission() ? "SYS:" + getPermissionName() : getPermissionName()) + ( isWithGrantOption() ? " /G" : ""); }
       };
 
       ResourcePermission ungrantedCustomSysPermission = new ResourcePermission() {
@@ -775,21 +759,13 @@ public class TestAccessControl_grantResourcePermissions extends TestAccessContro
          public boolean isWithGrantOption() { return true; }
 
          @Override
-         @Deprecated
-         public boolean isWithGrant() { return isWithGrantOption(); }
-
-         @Override
          public boolean isGrantableFrom(ResourcePermission other) { return true; }
 
          @Override
          public boolean equalsIgnoreGrantOption(Object other) { return false; }
 
          @Override
-         @Deprecated
-         public boolean equalsIgnoreGrant(Object other) { return equalsIgnoreGrantOption(other); }
-
-         @Override
-         public String toString() { return (isSystemPermission() ? "SYS:" + getPermissionName() : getPermissionName()) + ( isWithGrant() ? " /G" : ""); }
+         public String toString() { return (isSystemPermission() ? "SYS:" + getPermissionName() : getPermissionName()) + ( isWithGrantOption() ? " /G" : ""); }
       };
 
       try {
@@ -1383,18 +1359,10 @@ public class TestAccessControl_grantResourcePermissions extends TestAccessContro
          public boolean isWithGrantOption() { return true; }
 
          @Override
-         @Deprecated
-         public boolean isWithGrant() { return isWithGrantOption(); }
-
-         @Override
          public boolean isGrantableFrom(ResourcePermission other) { return true; }
 
          @Override
          public boolean equalsIgnoreGrantOption(Object other) { return false; }
-
-         @Override
-         @Deprecated
-         public boolean equalsIgnoreGrant(Object other) { return equalsIgnoreGrantOption(other); }
 
          @Override
          public boolean equals(Object other) { return false; }

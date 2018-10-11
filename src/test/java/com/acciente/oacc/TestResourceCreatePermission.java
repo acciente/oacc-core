@@ -315,16 +315,11 @@ public class TestResourceCreatePermission {
          public boolean isWithGrantOption() { return false; }
 
          @Override
-         public boolean isWithGrant() { return false; }
-
-         @Override
          public boolean isGrantableFrom(ResourcePermission other) { return false; }
 
          @Override
          public boolean equalsIgnoreGrantOption(Object other) { return false; }
 
-         @Override
-         public boolean equalsIgnoreGrant(Object other) { return false; }
       };
 
       final ResourceCreatePermission resourceCreatePermission

@@ -204,13 +204,6 @@ public class SQLAccessControlContext implements AccessControlContext, Serializab
       return new SQLAccessControlContext(dataSource, schemaName, sqlProfile, authenticationProvider);
    }
 
-   /**
-    * @deprecated  As of v2.0.0-rc.6; no replacement method necessary because unserializable fields are now marked as transient
-    */
-   @Deprecated
-   public static void preSerialize(AccessControlContext accessControlContext) {
-   }
-
    public static void postDeserialize(AccessControlContext accessControlContext, Connection connection) {
       if (accessControlContext instanceof SQLAccessControlContext) {
          SQLAccessControlContext sqlAccessControlContext = (SQLAccessControlContext) accessControlContext;

@@ -74,13 +74,6 @@ public class SQLPasswordAuthenticationProvider implements AuthenticationProvider
    }
 
    /**
-    * @deprecated  As of v2.0.0-rc.6; no replacement method necessary because unserializable fields are now marked as transient
-    */
-   @Deprecated
-   protected void preSerialize() {
-   }
-
-   /**
     * Re-initializes the transient data source after deserialization.
     * <p/>
     * This method is only intended to be called after successful deserialization, in order to reset
