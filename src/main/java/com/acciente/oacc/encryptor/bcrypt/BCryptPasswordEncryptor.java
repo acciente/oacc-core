@@ -44,11 +44,9 @@ public class BCryptPasswordEncryptor implements PasswordEncryptor, Serializable 
    /**
     * Returns a password encryptor that uses the BCrypt algorithm with the specified cost factor.
     *
-    * @param costFactor the BCrypt cost factor, must be between {@value BCRYPT_COST_FACTOR_MIN} and
-    *                   {@value BCRYPT_COST_FACTOR_MAX} (inclusive).
+    * @param costFactor the BCrypt cost factor, must be between 4 and 31 (inclusive).
     * @return a BCryptPasswordEncryptor instance configured as described above.
-    * @throws IllegalArgumentException if the specified BCrypt cost factor is not between {@value BCRYPT_COST_FACTOR_MIN}
-    *                                  and {@value BCRYPT_COST_FACTOR_MAX} (inclusive).
+    * @throws IllegalArgumentException if the specified BCrypt cost factor is not between 4 and 31 (inclusive).
     */
    public static BCryptPasswordEncryptor newInstance(int costFactor) {
       assertCostFactorValid(costFactor);
