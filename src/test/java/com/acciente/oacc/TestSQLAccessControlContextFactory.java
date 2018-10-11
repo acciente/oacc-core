@@ -1,5 +1,5 @@
 /*
- * Copyright 2009-2017, Acciente LLC
+ * Copyright 2009-2018, Acciente LLC
  *
  * Acciente LLC licenses this file to you under the
  * Apache License, Version 2.0 (the "License"); you
@@ -17,8 +17,8 @@
  */
 package com.acciente.oacc;
 
-import com.acciente.oacc.helper.TestConfigLoader;
 import com.acciente.oacc.encryptor.PasswordEncryptor;
+import com.acciente.oacc.helper.TestConfigLoader;
 import com.acciente.oacc.sql.SQLAccessControlContextFactory;
 import com.acciente.oacc.sql.internal.SQLPasswordAuthenticationProvider;
 import org.junit.Test;

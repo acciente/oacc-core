@@ -1,5 +1,5 @@
 Acciente OACC
-Copyright 2009-2017, Acciente LLC
+Copyright 2009-2018, Acciente LLC
 
 This product includes software developed at
 Acciente LLC (http://acciente.com/).
